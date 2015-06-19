@@ -126,18 +126,18 @@ public class TestDetectFiducialSquareImage {
 		alg.addImage(pattern,125,1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result));
-		assertEquals(0, result.which);
+		assertEquals(0,result.which);
 		assertEquals(0,result.rotation);
 		ImageFloat32 input2 = new ImageFloat32(input.width,input.height);
-		ImageMiscOps.rotateCW(input,input2);
+		ImageMiscOps.rotateCCW(input,input2);
 		assertTrue(alg.processSquare(input2, result));
 		assertEquals(0,result.which);
 		assertEquals(1,result.rotation);
-		ImageMiscOps.rotateCW(input2,input);
+		ImageMiscOps.rotateCCW(input2,input);
 		assertTrue(alg.processSquare(input, result));
 		assertEquals(0,result.which);
 		assertEquals(2,result.rotation);
-		ImageMiscOps.rotateCW(input,input2);
+		ImageMiscOps.rotateCCW(input,input2);
 		assertTrue(alg.processSquare(input2, result));
 		assertEquals(0,result.which);
 		assertEquals(3,result.rotation);
@@ -177,13 +177,13 @@ public class TestDetectFiducialSquareImage {
 		desc[0] = (short)0xFFFE;
 		compare(desc, def.desc[0]);
 		desc[0] = (short)0xFFFF;
-		desc[3] = (short)0x7FFF;
+		desc[252] = (short)0xFFFE;
 		compare(desc, def.desc[1]);
-		desc[3] = (short)0xFFFF;
+		desc[252] = (short)0xFFFF;
 		desc[255] = (short)0x7FFF;
 		compare(desc,def.desc[2]);
 		desc[255] = (short)0xFFFF;
-		desc[252] = (short)0xFFFE;
+		desc[3] = (short)0x7FFF;
 		compare(desc,def.desc[3]);
 	}
 

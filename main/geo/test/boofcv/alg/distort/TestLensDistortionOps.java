@@ -125,7 +125,7 @@ public class TestLensDistortionOps {
 	private void checkBorderOutside(int x, int y, PointTransform_F64 tran, PointTransform_F64 tranInv) {
 		tran.compute(x, y, pd);
 
-		double tol = 0.01;
+		double tol = 0.1;
 
 		String s = x+" "+y+" -> "+ pd.x+" "+ pd.y;
 		assertTrue(s,

@@ -28,59 +28,64 @@ import boofcv.struct.image.ImageUInt8;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for generating square fiducials EPS documents for printing.
  *
  * @author Peter Abeles
  */
-// TODO Specify units used
-// TODO specify page size and auto center
 public class BaseFiducialSquareEPS {
-	public double width = 10; // in centimeters of fiducial
 
 	public int threshold = 255/2; // threshold for converting to a binary image
-	public double CM_TO_POINTS = 72.0/2.54;
+	public double UNIT_TO_POINTS;
 	// should it add the file name and size to the document?
 	public boolean displayInfo = true;
 
 	public boolean showPreview = false;
 
+	// base unit of input lengths
+	Unit unit = Unit.CENTIMETER;
+
+	// grid pattern
 	public int numCols = 1;
 	public int numRows = 1;
 
 	PrintStream out;
 
-	// Total length of the target.  image + border
+	// Total length of the target.  image + black border
 	double targetLength;
+	// length of the white border surrounding the fiducial
 	double whiteBorder;
+	// length of the black border
 	double blackBorder;
+	// length of the inner pattern
 	double innerWidth ;
-	// length of both sides of the page
-	double pageLength;
+	// Length of the fiducial plus the white border
+	double totalWidth;
+	// width and height of the page
+	double pageWidth,pageHeight;
+	// offset to center everything
+	double centerOffsetX,centerOffsetY;
+
+	// image scale factor
 	double scale;
 
 	String outputName;
-	String inputPath;
 
-	ImageUInt8 image;
+	List<String> imagePaths = new ArrayList<String>();
 
-	public void setImage( String inputPath ) {
-		this.inputPath = inputPath;
-		image = UtilImageIO.loadImage(inputPath, ImageUInt8.class);
+	public Unit getUnit() {
+		return unit;
+	}
 
-		if( image == null ) {
-			System.err.println("Can't find image.  Path = "+inputPath);
-			System.exit(0);
-		}
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
 
-		// make sure the image is square and divisible by 8
-		int s = image.width - (image.width%8);
-		if( image.width != s || image.height != s ) {
-			ImageUInt8 tmp = new ImageUInt8(s, s);
-			new FDistort(image, tmp).scaleExt().apply();
-			image = tmp;
-		}
+	public void addImage( String inputPath ) {
+		this.imagePaths.add(inputPath);
 	}
 
 	public void setOutputName( String outputName )  {
@@ -92,18 +97,50 @@ public class BaseFiducialSquareEPS {
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;
-		generateSingle(fiducialWidth,whiteBorder);
+		generate(fiducialWidth, whiteBorder, -1, -1);
+	}
+
+	public void generateGrid( double fiducialWidth , double whiteBorder , PaperSize paper )
+			throws IOException
+	{
+		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
+		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
+
+		double totalWidth = fiducialWidth+2*whiteBorder;
+
+		this.numRows = (int)Math.floor(pageHeightUnit/totalWidth);
+		this.numCols = (int)Math.floor(pageWidthUnit/ totalWidth);
+		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
 	}
 
 	public void generateSingle( double fiducialWidth ) throws IOException {
-		double whiteBorder = Math.max(2 * CM_TO_POINTS, targetLength / 4.0);
+		double whiteBorder = Math.max(2, fiducialWidth / 4.0);
 		generateSingle(fiducialWidth, whiteBorder);
 	}
 
-	public void generateSingle( double fiducialWidth , double whiteBorder ) throws IOException {
+	public void generateSingle( double fiducialWidth , PaperSize paper ) throws IOException {
+		double whiteBorder = Math.max(2, fiducialWidth / 4.0);
+
+		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
+		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
+
+		numCols = numRows = 1;
+		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
+	}
+
+	public void generateSingle( double fiducialWidthCM , double whiteBorderCM ) throws IOException {
+		numCols = numRows = 1;
+		generate(fiducialWidthCM, whiteBorderCM,-1,-1);
+	}
+
+	private void generate( double fiducialWidthUnit , double whiteBorderUnit ,
+						   double pageWidthUnit , double pageHeightUnit   ) throws IOException {
+
+		UNIT_TO_POINTS = 72.0/(2.54*Unit.conversion(Unit.CENTIMETER,unit));
 
 		String outputName;
 		if( this.outputName == null ) {
+			String inputPath = imagePaths.get(0);
 			File dir = new File(inputPath).getParentFile();
 			outputName = new File(inputPath).getName();
 			outputName = outputName.substring(0,outputName.length()-3) + "eps";
@@ -112,35 +149,45 @@ public class BaseFiducialSquareEPS {
 			outputName = this.outputName;
 		}
 
-		this.width = fiducialWidth;
 
-		String inputName = new File(inputPath).getName();
+		String imageName;
+		if( imagePaths.size() == 1 ) {
+			imageName = new File(imagePaths.get(0)).getName();
+		} else {
+			imageName = "Multiple Patterns";
+		}
 
-		System.out.println("Target width "+width+" (cm)  image = "+inputName);
-		System.out.println("    input path = "+inputPath);
+		System.out.println("Fiducial width "+ fiducialWidthUnit +" ("+unit.abbreviation+")");
 
 		// print out the selected number in binary for debugging purposes
 		out = new PrintStream(outputName);
 
-		targetLength = width*CM_TO_POINTS;
-		this.whiteBorder = whiteBorder;
+		targetLength = fiducialWidthUnit* UNIT_TO_POINTS;
+		whiteBorder = whiteBorderUnit* UNIT_TO_POINTS;
 		blackBorder = targetLength/4.0;
 		innerWidth = targetLength/2.0;
-		pageLength = targetLength+whiteBorder*2;
-		scale = image.width/innerWidth;
+		totalWidth = targetLength+whiteBorder*2;
 
-		ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
-		if( showPreview )
-			ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
+		if( pageWidthUnit <= 0 ) {
+			pageWidth = numCols*totalWidth;
+		} else {
+			pageWidth = pageWidthUnit*UNIT_TO_POINTS;
+		}
 
-		printHeader(inputName);
+		if( pageHeightUnit <= 0 ) {
+			pageHeight = numRows*totalWidth;
+		} else {
+			pageHeight = pageHeightUnit*UNIT_TO_POINTS;
+		}
 
-		out.println();
-		out.print("  /drawImage {\n" +
-				"  "+binary.width+" " + binary.height + " 1 [" + scale + " 0 0 " + scale + " 0 0]\n" +
-				"  {<"+binaryToHex(binary)+">} image\n" +
-				"} def\n");
-		out.println();
+		// compute the offset to put it in the center of the page
+		centerOffsetX = (pageWidth-totalWidth*numCols)/2.0;
+		centerOffsetY = (pageHeight-totalWidth*numRows)/2.0;
+
+		printHeader(imageName,fiducialWidthUnit);
+
+		printImageDefinitions(fiducialWidthUnit);
+
 		// draws the black border around the fiducial
 		out.print(" /drawBorder\n"+
 				"{\n" +
@@ -152,7 +199,7 @@ public class BaseFiducialSquareEPS {
 
 		for (int row = 0; row < numRows; row++) {
 			for (int col = 0; col < numCols; col++) {
-				insertFiducial(row,col,inputName);
+				insertFiducial(row,col);
 			}
 		}
 
@@ -162,13 +209,62 @@ public class BaseFiducialSquareEPS {
 		System.out.println("Saved to "+new File(outputName).getAbsolutePath());
 	}
 
-	private void printHeader( String inputName ) {
+	private void printImageDefinitions( double fiducialWidthUnit ) {
+		for( int i = 0; i < imagePaths.size(); i++ ) {
+			String imageName = new File(imagePaths.get(i)).getName();
+			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
+
+			if( image == null ) {
+				System.err.println("Can't find image.  Path = "+ imagePaths.get(i));
+				System.exit(0);
+			} else {
+				System.out.println("  loaded "+imageName);
+			}
+
+			// make sure the image is square and divisible by 8
+			int s = image.width - (image.width%8);
+			if( image.width != s || image.height != s ) {
+				ImageUInt8 tmp = new ImageUInt8(s, s);
+				new FDistort(image, tmp).scaleExt().apply();
+				image = tmp;
+			}
+
+			scale = image.width/innerWidth;
+			ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
+			if( showPreview )
+				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
+
+			out.println();
+			out.print("  /"+getImageName(i)+" {\n" +
+					"  "+binary.width+" " + binary.height + " 1 [" + scale + " 0 0 " + scale + " 0 0]\n" +
+					"  {<"+binaryToHex(binary)+">} image\n" +
+					"} def\n");
+			out.println();
+			if( displayInfo ) {
+				out.print(" /"+getDisplayName(i)+"\n" +
+						"{\n" +
+						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (totalWidth - 10) +
+						" moveto (" + imageName + "   " + fiducialWidthUnit + " "+unit.abbreviation+") show\n"+
+						"} def\n" );
+			}
+		}
+	}
+
+	private String getImageName( int num ) {
+		return String.format("drawImage%03d",num);
+	}
+
+	private String getDisplayName( int num ) {
+		return String.format("displayInfo%03d",num);
+	}
+
+	private void printHeader( String inputName , double widthCM) {
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
-				"%%Title: "+inputName+" w="+width+"cm\n" +
+				"%%Title: "+inputName+" w="+ widthCM +"cm\n" +
 				"%%DocumentData: Clean7Bit\n" +
 				"%%Origin: 0 0\n" +
-				"%%BoundingBox: 0 0 "+(numCols*pageLength)+" "+(numRows*pageLength)+"\n" +
+				"%%BoundingBox: 0 0 "+pageWidth+" "+pageHeight+"\n" +
 				"%%LanguageLevel: 3\n" +
 				"%%Pages: 1\n" +
 				"%%Page: 1 1\n" +
@@ -182,23 +278,24 @@ public class BaseFiducialSquareEPS {
 				"  /b3 { b2 bb add} def\n");
 	}
 
-	private void insertFiducial(int row, int col, String inputName) {
+	private void insertFiducial(int row, int col ) {
 		out.print(
-				"  /originX " + (col * pageLength) + " def\n" +
-				"  /originY " + (row * pageLength) + " def\n" +
+				"  /originX " + (centerOffsetX + col * totalWidth) + " def\n" +
+				"  /originY " + (centerOffsetY + row * totalWidth) + " def\n" +
 				"  originX originY translate\n" );
 		out.println();
 		out.println("  drawBorder");
 
+		int imageNum = (row*numCols+col)%imagePaths.size();
+
 		// print out encoding information for convenience
 		if( displayInfo ) {
-			out.print("  /Times-Roman findfont\n" +
-					"7 scalefont setfont b1 " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
+			out.println("  "+getDisplayName(imageNum));
 		}
 
 		out.println("% Center then draw the image");
 		out.println("  b1 b1 translate");
-		out.println("  drawImage");
+		out.println("  "+getImageName(imageNum));
 		out.println("% Undo translations");
 		out.println("  -1 b1 mul -1 b1 mul translate");
 		out.println("  -1 originX mul -1 originY mul translate");

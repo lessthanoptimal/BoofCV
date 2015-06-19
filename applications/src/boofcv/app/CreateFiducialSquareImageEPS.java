@@ -21,6 +21,8 @@ package boofcv.app;
 import boofcv.io.UtilIO;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Outputs an EPS document describing a binary square fiducial that encodes the specified number
@@ -31,19 +33,33 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
 	public static void main(String[] args) throws IOException {
 
-		String inputPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png";
-		double width = 10;
+		List<String> inputPaths = new ArrayList<String>();
 
-		if( args.length == 2 ) {
-			width = Double.parseDouble(args[0]);
-			inputPath = args[1];
+
+		double fiducialWidth = 10;
+		if( args.length >= 2 ) {
+			fiducialWidth = Double.parseDouble(args[0]);
+			for (int i = 1; i < args.length; i++) {
+				inputPaths.add(args[i]);
+			}
+		} else {
+			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png");
+//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/text.png");
 		}
 
 		CreateFiducialSquareImageEPS app = new CreateFiducialSquareImageEPS();
 
-		app.setImage(inputPath);
-//		app.setOutputName("fiducial_image.eps");
+		for( String path : inputPaths ) {
+			app.addImage(path);
+		}
 
-		app.generateSingle(width);
+		app.setOutputName("fiducial_image.eps");
+
+
+//		app.setUnit(Unit.INCH);
+		app.generateSingle(fiducialWidth);
+//		app.generateGrid(2.5,1.0,2,3);
+//		app.generateSingle(2.5,PaperSize.LETTER);
+//		app.generateGrid(2.5,1.0,PaperSize.LETTER);
 	}
 }

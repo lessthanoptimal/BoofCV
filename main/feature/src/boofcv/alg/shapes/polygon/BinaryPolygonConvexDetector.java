@@ -22,7 +22,6 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.corner.SubpixelSparseCornerFit;
 import boofcv.alg.shapes.polyline.RefinePolyLine;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
@@ -56,7 +55,7 @@ import java.util.List;
  * </ol>
  *
  * <p>
- * Subpixel refinement is done using the provided {@link RefinePolygonLineToImage} and {@link SubpixelSparseCornerFit}.
+ * Subpixel refinement is done using the provided {@link RefinePolygonLineToImage} and {@link RefinePolygonCornersToImage}.
  * If straight lines are straight, as is the case with images with lens distortion removes, then the line based
  * refinement will tend to produce better results.  If lens distortion is present then the corner sub-pixel algorithm
  * is more likely to produce better results.

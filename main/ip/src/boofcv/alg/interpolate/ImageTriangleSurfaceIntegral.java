@@ -16,20 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.alg.interpolate;
 
 /**
- * Standard units of measure
+ * Computes the surface integral of a triangle over the image
  *
  * @author Peter Abeles
  */
-public enum Units {
-	MILLIMETERS,
-	CENTIMETERS,
-	METER,
-	KILOMETER,
-	INCH,
-	FOOT,
-	YARD,
-	MILE
+public class ImageTriangleSurfaceIntegral {
 }
