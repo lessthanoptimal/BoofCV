@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,12 @@
 package boofcv.gui.fiducial;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -58,10 +58,11 @@ public class VisualizeFiducial {
 
 		Point2D_I32 pixel[] = new Point2D_I32[8];
 		Point2D_F64 p = new Point2D_F64();
+		WorldToCameraToPixel transform = PerspectiveOps.createWorldToPixel(intrinsic,targetToCamera);
 		for (int i = 0; i < 8; i++) {
 			Point3D_F64 c = corners[i];
-			SePointOps_F64.transform(targetToCamera,c,c);
-			PerspectiveOps.convertNormToPixel(intrinsic,c.x/c.z,c.y/c.z,p);
+			if( !transform.transform(c,p) )
+				throw new RuntimeException("Crap");
 			pixel[i] = new Point2D_I32((int)(p.x+0.5),(int)(p.y+0.5));
 		}
 

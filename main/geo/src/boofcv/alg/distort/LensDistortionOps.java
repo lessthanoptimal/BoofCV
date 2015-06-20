@@ -287,10 +287,13 @@ public class LensDistortionOps {
 	/**
 	 * Creates the {@link LensDistortionPinhole lens distortion} for the specified camera parameters.
 	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
-	 * lens distortion.
+	 * lens distortion.  Automatically switches algorithm depending on the type of distortion or lack thereof.
 	 */
 	public static LensDistortionPinhole distortTransform(IntrinsicParameters param) {
-		return new LensDistortionRadialTangential(param);
+		if( param.isDistorted())
+			return new LensDistortionRadialTangential(param);
+		else
+			return new LensDistortionUndistorted(param);
 	}
 
 	/**

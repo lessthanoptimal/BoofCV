@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,6 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.optimization.UtilOptimize;
 
 import java.util.List;
 
@@ -65,6 +64,10 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		paramModel.encode(worldToCamera, param);
 
+		// TODO crap.... coding is messed up
+		Se3_F64 sanity = new Se3_F64();
+		paramModel.decode(param, sanity);
+
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
 
@@ -72,13 +75,29 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
+		double initialScore = minimizer.getFunctionValue();
+
+		worldToCamera.print();
+
+		boolean updated = false;
 		for( int i = 0; i < maxIterations; i++ ) {
-			if( UtilOptimize.step(minimizer) )
+			boolean converged = minimizer.iterate();
+			if( converged || minimizer.isUpdated() ) {
+				double score = minimizer.getFunctionValue();
+				// save the results
+				paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
+				updated = true;
+			}
+			if( converged ) {
+				if( i == 0 ) {
+					// if it converted on the first iteration then that means it already
+					// meet convergence.  use input to avoid introduction of small numerical errors
+					refinedWorldToCamera.set(worldToCamera);
+				}
 				break;
+			}
 		}
 
-		paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
-
-		return true;
+		return updated;
 	}
 }

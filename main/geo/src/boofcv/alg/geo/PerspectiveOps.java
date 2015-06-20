@@ -175,6 +175,9 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , double x , double y , Point2D_F64 pixel ) {
+		if( param.isDistorted() )
+			throw new IllegalArgumentException("Lens distortion not supported!");
+
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
@@ -202,6 +205,9 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F32 convertNormToPixel( IntrinsicParameters param , float x , float y , Point2D_F32 pixel ) {
+		if( param.isDistorted() )
+			throw new IllegalArgumentException("Lens distortion not supported!");
+
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
@@ -279,6 +285,9 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , Point2D_F64 pixel , Point2D_F64 norm ) {
+		if( param.isDistorted() )
+			throw new IllegalArgumentException("Lens distortion not supported!");
+
 		if( norm == null )
 			norm = new Point2D_F64();
 
@@ -307,6 +316,9 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F32 convertPixelToNorm( IntrinsicParameters param , Point2D_F32 pixel , Point2D_F32 norm ) {
+		if( param.isDistorted() )
+			throw new IllegalArgumentException("Lens distortion not supported!");
+
 		if( norm == null )
 			norm = new Point2D_F32();
 
@@ -379,6 +391,8 @@ public class PerspectiveOps {
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
 	public static Point2D_F64 renderPixel( IntrinsicParameters intrinsic , Point3D_F64 X ) {
+		if( intrinsic.isDistorted() )
+			throw new IllegalArgumentException("Don't support distorted lenses");
 		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
 		return PerspectiveOps.convertNormToPixel(intrinsic, norm, norm);
 	}
@@ -466,5 +480,15 @@ public class PerspectiveOps {
 		ret.set(temp);
 
 		return ret;
+	}
+
+	/**
+	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
+	 */
+	public static WorldToCameraToPixel createWorldToPixel( IntrinsicParameters intrinsic , Se3_F64 worldToCamera )
+	{
+		WorldToCameraToPixel alg = new WorldToCameraToPixel();
+		alg.configure(intrinsic,worldToCamera);
+		return alg;
 	}
 }

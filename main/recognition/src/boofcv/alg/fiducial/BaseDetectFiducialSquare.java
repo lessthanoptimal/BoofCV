@@ -20,8 +20,6 @@ package boofcv.alg.fiducial;
 
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.border.BorderType;
@@ -89,6 +87,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
+	// used to compute 3D pose of target
+	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
+
 	// transform from undistorted image to distorted
 	PointTransform_F64 pointUndistToDist;
 
@@ -99,11 +100,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private Class<T> inputType;
 
 	private boolean verbose = false;
-
-	// ----- Used to estimate 3D pose of calibration target
-
-	List<AssociatedPair> pairsPose = new ArrayList<AssociatedPair>();
-	Zhang99DecomposeHomography homographyToPose = new Zhang99DecomposeHomography();
 
 	/**
 	 * Configures the detector.
@@ -127,8 +123,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		for (int i = 0; i < 4; i++) {
 			pairsRemovePerspective.add(new AssociatedPair());
-			pairsPose.add( new AssociatedPair());
 		}
+
+		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
+		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
+		// will be provided later one
+		poseEstimator.setFiducial(-0.5,0.5,  0.5,0.5,  0.5,-0.5,  -0.5,-0.5);
 
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
@@ -178,18 +178,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			pointUndistToDist = new DoNothingTransform_F64();
 		}
 
-		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
-		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
-		// will be provided later one
-		pairsPose.get(0).p1.set(-0.5,  0.5);
-		pairsPose.get(1).p1.set( 0.5,  0.5);
-		pairsPose.get(2).p1.set( 0.5, -0.5);
-		pairsPose.get(3).p1.set(-0.5, -0.5);
-
-		// Setup homography to camera pose estimator
-		DenseMatrix64F K = new DenseMatrix64F(3,3);
-		PerspectiveOps.calibrationMatrix(intrinsic, K);
-		homographyToPose.setCalibrationMatrix(K);
+		poseEstimator.setIntrinsic(intrinsic);
 
 		// provide intrinsic camera parameters
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
@@ -308,23 +297,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	public void computeTargetToWorld( Quadrilateral_F64 quad , double lengthSide , Se3_F64 targetToWorld )
 	{
-		pairsPose.get(0).p2.set(quad.a);
-		pairsPose.get(1).p2.set(quad.b);
-		pairsPose.get(2).p2.set(quad.c);
-		pairsPose.get(3).p2.set(quad.d);
-
-		if( !computeHomography.process(pairsPose,H) )
-			throw new RuntimeException("Compute homography failed in targetToWorld!");
-
-		// refine homography estimate
-		if( !refineHomography.fitModel(pairsPose,H,H_refined) ) {
-			if( verbose ) System.out.println("rejected refine homography");
-			throw new RuntimeException("Refine homography failed in targetToWorld!");
+		if( !poseEstimator.process(quad) ) {
+			throw new RuntimeException("Failed on pose estimation!");
 		}
 
-		// TODO compute reprojection error
-
-		targetToWorld.set(homographyToPose.decompose(H_refined));
+		targetToWorld.set( poseEstimator.getWorldToCamera() );
 		GeometryMath_F64.scale(targetToWorld.getT(),lengthSide);
 	}
 

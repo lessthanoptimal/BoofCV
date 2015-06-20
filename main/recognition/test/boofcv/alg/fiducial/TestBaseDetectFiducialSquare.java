@@ -21,6 +21,7 @@ package boofcv.alg.fiducial;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
@@ -44,7 +45,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -73,6 +73,14 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(200+120,300+120));
 
 		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
+
+		// corners of the fiducial in world coordinates
+		double r = 2;
+		List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
+		worldPts.add(new Point3D_F64(-0.5*r, -0.5*r, 0));
+		worldPts.add(new Point3D_F64(-0.5*r,  0.5*r, 0));
+		worldPts.add(new Point3D_F64( 0.5*r,  0.5*r, 0));
+		worldPts.add(new Point3D_F64( 0.5*r, -0.5*r, 0));
 
 		// create a pattern with a corner for orientation and put it into the image
 		ImageUInt8 pattern = createPattern(6*20, true);
@@ -103,16 +111,16 @@ public class TestBaseDetectFiducialSquare {
 			}
 
 			// lower left hand corner in the fiducial.  side is of length 2
-			Point3D_F64 lowerLeft = new Point3D_F64(-1, -1, 0);
-			Point3D_F64 cameraPt = new Point3D_F64();
-			SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
-			Point2D_F64 pixelPt = new Point2D_F64();
-			PerspectiveOps.convertNormToPixel(intrinsic, cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, pixelPt);
+			WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic,ff.targetToSensor);
 
-//			System.out.println("pixel = " + pixelPt);
-			// see if that point projects into the correct location
-			assertEquals(expected.get(i).x, pixelPt.x, 1e-4);
-			assertEquals(expected.get(i).y, pixelPt.y, 1e-4);
+			for (int j = 0; j < 4; j++) {
+				System.out.println(" j = "+j);
+				Point2D_F64 pixelPt = worldToPixel.transform(worldPts.get(j));
+				Point2D_F64 expectedPt = expected.get((i+j)%4);
+
+				assertEquals(expectedPt.x, pixelPt.x, 1e-4);
+				assertEquals(expectedPt.y, pixelPt.y, 1e-4);
+			}
 
 			ImageMiscOps.rotateCW(pattern);
 		}
@@ -170,7 +178,7 @@ public class TestBaseDetectFiducialSquare {
 	@Test
 	public void computeTargetToWorld() {
 
-		double lengthSide = 0.5;
+		double lengthSide = 1.5;
 		IntrinsicParameters intrinsic = new IntrinsicParameters(400,400,0,320,240,640,380);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
@@ -183,6 +191,7 @@ public class TestBaseDetectFiducialSquare {
 
 		Quadrilateral_F64 quad = new Quadrilateral_F64();
 
+		// generate observations
 		double r = lengthSide/2.0;
 		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r, r)));
 		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r, r)));
@@ -190,7 +199,7 @@ public class TestBaseDetectFiducialSquare {
 		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r,-r)));
 
 		Se3_F64 found = new Se3_F64();
-		alg.computeTargetToWorld(quad, 0.5, found);
+		alg.computeTargetToWorld(quad, lengthSide, found);
 
 		assertTrue(MatrixFeatures.isIdentical(targetToWorld.getR(), found.getR(), 1e-6));
 		assertEquals(0,targetToWorld.getT().distance(found.getT()),1e-6);
