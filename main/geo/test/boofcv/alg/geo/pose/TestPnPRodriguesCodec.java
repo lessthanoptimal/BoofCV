@@ -86,7 +86,7 @@ public class TestPnPRodriguesCodec {
 		alg.encode(input,param);
 		alg.decode(param, output);
 
-		output.print();
+//		output.print();
 
 		assertTrue(input.T.isIdentical(output.T, 1e-8));
 		assertTrue(MatrixFeatures.isIdentical(input.R,output.R,1e-8));

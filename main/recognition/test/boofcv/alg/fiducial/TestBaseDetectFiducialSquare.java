@@ -114,7 +114,6 @@ public class TestBaseDetectFiducialSquare {
 			WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic,ff.targetToSensor);
 
 			for (int j = 0; j < 4; j++) {
-				System.out.println(" j = "+j);
 				Point2D_F64 pixelPt = worldToPixel.transform(worldPts.get(j));
 				Point2D_F64 expectedPt = expected.get((i+j)%4);
 

@@ -64,10 +64,6 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		paramModel.encode(worldToCamera, param);
 
-		// TODO crap.... coding is messed up
-		Se3_F64 sanity = new Se3_F64();
-		paramModel.decode(param, sanity);
-
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
 
@@ -75,15 +71,10 @@ public class PnPRefineRodrigues implements RefinePnP {
 
 		minimizer.initialize(param,0,convergenceTol*obs.size());
 
-		double initialScore = minimizer.getFunctionValue();
-
-		worldToCamera.print();
-
 		boolean updated = false;
 		for( int i = 0; i < maxIterations; i++ ) {
 			boolean converged = minimizer.iterate();
 			if( converged || minimizer.isUpdated() ) {
-				double score = minimizer.getFunctionValue();
 				// save the results
 				paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
 				updated = true;

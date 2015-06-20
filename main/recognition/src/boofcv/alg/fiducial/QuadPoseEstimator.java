@@ -206,12 +206,10 @@ public class QuadPoseEstimator {
 			return;
 		}
 
-		System.out.println("Solutions = "+solutions.size);
 
 		for (int i = 0; i < solutions.size; i++) {
 			double error = computeErrors(solutions.get(i));
 
-			System.out.println(i+" error = "+error);
 			// see if it's better and it should save the results
 			if( error < bestError ) {
 				bestError = error;
