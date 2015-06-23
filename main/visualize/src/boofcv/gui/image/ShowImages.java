@@ -69,6 +69,13 @@ public class ShowImages {
 	 * Creates a window showing the specified image.
 	 */
 	public static ImagePanel showWindow(BufferedImage img, String title) {
+		return showWindow(img,title,false);
+	}
+
+	/**
+	 * Creates a window showing the specified image.
+	 */
+	public static ImagePanel showWindow(BufferedImage img, String title, boolean closeOnExit ) {
 		JFrame frame = new JFrame(title);
 
 		ImagePanel panel = new ImagePanel(img);
@@ -78,6 +85,8 @@ public class ShowImages {
 		frame.pack();
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
+		if( closeOnExit )
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return panel;
 	}
@@ -88,6 +97,10 @@ public class ShowImages {
 	}
 
 	public static JFrame showWindow( final JComponent component , String title ) {
+		return showWindow(component,title,false);
+	}
+
+	public static JFrame showWindow( final JComponent component , String title, final boolean closeOnExit ) {
 		final JFrame frame = new JFrame(title);
 		frame.add(component, BorderLayout.CENTER);
 
@@ -95,6 +108,8 @@ public class ShowImages {
 			public void run() {
 				frame.pack();
 				frame.setVisible(true);
+				if( closeOnExit )
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 		});
 

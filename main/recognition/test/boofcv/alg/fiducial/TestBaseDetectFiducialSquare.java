@@ -260,6 +260,14 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	/**
+	 * Keep image size the same but change lens distortion parameters.  See everything still works.
+	 */
+	@Test
+	public void changeLensDistortion() {
+		fail("implement");
+	}
+
+	/**
 	 * Creates a square pattern image of the specified size
 	 *
 	 * @param squareLowLeft If true a square will be added to the image lower left

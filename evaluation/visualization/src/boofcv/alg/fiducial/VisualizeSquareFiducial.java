@@ -64,7 +64,7 @@ public class VisualizeSquareFiducial {
 
 		IntrinsicParameters paramUndist = new IntrinsicParameters();
 		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.removeDistortion(
-				AdjustmentType.SHRINK, BorderType.EXTENDED, intrinsic, paramUndist,
+				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
 				ImageType.single(ImageFloat32.class));
 
 		Detector detector = new Detector();

@@ -35,8 +35,8 @@ public enum AdjustmentType {
 	FULL_VIEW,
 	/**
 	 * The undistorted view will be entirely filled with pixels from the distorted view.  There will be no black
-	 * regions around the border.  This is accomplished by shrinking the image.  The advantage is that there are no
+	 * regions around the border.  This is accomplished by expanding the image.  The advantage is that there are no
 	 * edge conditions when image processing due to the black border, but you will discard information.
 	 */
-	SHRINK
+	EXPAND
 }

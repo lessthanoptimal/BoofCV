@@ -67,7 +67,7 @@ public class RemoveLensDistortionSequenceApp {
 			if( output == null ) {
 				output = new MultiSpectral<ImageUInt8>(ImageUInt8.class, input.width, input.height, input.getNumBands());
 				undistorter = new FDistort(input,output).cached(true).
-						transform(LensDistortionOps.transform_F32(AdjustmentType.SHRINK,param, null, true));
+						transform(LensDistortionOps.transform_F32(AdjustmentType.EXPAND,param, null, true));
 			}
 
 			undistorter.apply();

@@ -149,7 +149,7 @@ public class QuadPoseEstimator {
 		if( bestError == Double.MAX_VALUE )
 			return false;
 
-		System.out.println("bestError = "+bestError);
+//		System.out.println("bestError = "+bestError);
 
 		// refine the best estimate
 		inputP3P.clear();
@@ -165,7 +165,7 @@ public class QuadPoseEstimator {
 					double error = computeErrors(foundEPNP);
 					if (error < bestError) {
 						bestPose.set(foundEPNP);
-						System.out.println("    better epnp error = " + error);
+//						System.out.println("    better epnp error = " + error);
 					}
 				}
 			}
@@ -173,14 +173,13 @@ public class QuadPoseEstimator {
 
 //		refinedFiducialToCamera.set(bestPose);
 		if( !refine.fitModel(inputP3P,bestPose,refinedFiducialToCamera) ) {
-			System.out.println("    refined failed!");
 			// us the previous estimate instead
 			refinedFiducialToCamera.set(bestPose);
 			return true;
 		}
 
-		double refineError = computeErrors(refinedFiducialToCamera);
-		System.out.println("    refined error = "+refineError);
+//		double refineError = computeErrors(refinedFiducialToCamera);
+//		System.out.println("    refined error = "+refineError);
 
 		return true;
 	}

@@ -42,19 +42,20 @@ public class VisualizeFiducial {
 								 Graphics2D g2 )
 	{
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		double r = width/2.0;
-		double w = width;
+		double h = r;
 
 		Point3D_F64 corners[] = new Point3D_F64[8];
 		corners[0] = new Point3D_F64(-r,-r,0);
 		corners[1] = new Point3D_F64( r,-r,0);
 		corners[2] = new Point3D_F64( r, r,0);
 		corners[3] = new Point3D_F64(-r, r,0);
-		corners[4] = new Point3D_F64(-r,-r,w);
-		corners[5] = new Point3D_F64( r,-r,w);
-		corners[6] = new Point3D_F64( r, r,w);
-		corners[7] = new Point3D_F64(-r, r,w);
+		corners[4] = new Point3D_F64(-r,-r,h);
+		corners[5] = new Point3D_F64( r,-r,h);
+		corners[6] = new Point3D_F64( r, r,h);
+		corners[7] = new Point3D_F64(-r, r,h);
 
 		Point2D_I32 pixel[] = new Point2D_I32[8];
 		Point2D_F64 p = new Point2D_F64();

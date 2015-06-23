@@ -132,9 +132,13 @@ public class IntrinsicParameters implements Serializable {
 	 * If true then distortion parameters are specified.
 	 */
 	public boolean isDistorted() {
-		if( radial == null || radial.length == 1 )
-			return t1 != 0 || t2 != 0;
-		return true;
+		if( radial != null && radial.length > 0 ) {
+			for (int i = 0; i < radial.length; i++) {
+				if( radial[i] != 0 )
+					return false;
+			}
+		}
+		return t1 != 0 || t2 != 0;
 	}
 
 	public double getCx() {

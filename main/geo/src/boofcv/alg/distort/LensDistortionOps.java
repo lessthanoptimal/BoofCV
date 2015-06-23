@@ -82,7 +82,7 @@ public class LensDistortionOps {
 
 		PointTransform_F32 undistToDist = null;
 		switch( type ) {
-			case SHRINK:
+			case EXPAND:
 			case FULL_VIEW:
 				undistToDist = transform_F32(type, param, paramAdj, true);
 				break;
@@ -134,7 +134,7 @@ public class LensDistortionOps {
 		if( type == AdjustmentType.FULL_VIEW ) {
 			bound = DistortImageOps.boundBox_F32(param.width, param.height,
 					new PointToPixelTransform_F32(remove_p_to_p));
-		} else if( type == AdjustmentType.SHRINK) {
+		} else if( type == AdjustmentType.EXPAND) {
 			bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 					new PointToPixelTransform_F32(remove_p_to_p));
 
@@ -220,7 +220,7 @@ public class LensDistortionOps {
 		if( type == AdjustmentType.FULL_VIEW ) {
 			bound = DistortImageOps.boundBox_F64(param.width, param.height,
 					new PointToPixelTransform_F64(remove_p_to_p));
-		} else if( type == AdjustmentType.SHRINK) {
+		} else if( type == AdjustmentType.EXPAND) {
 			bound = LensDistortionOps.boundBoxInside(param.width, param.height,
 					new PointToPixelTransform_F64(remove_p_to_p));
 
@@ -285,9 +285,18 @@ public class LensDistortionOps {
 	}
 
 	/**
+	 * <p>
 	 * Creates the {@link LensDistortionPinhole lens distortion} for the specified camera parameters.
 	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
 	 * lens distortion.  Automatically switches algorithm depending on the type of distortion or lack thereof.
+	 * </p>
+	 *
+	 * <p>
+	 * Example:<br>
+	 * <pre>PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(param).distort_F64(false,true);</pre>
+	 * Creates a transform from normalized image coordinates into pixel coordinates.
+	 * </p>
+	 *
 	 */
 	public static LensDistortionPinhole distortTransform(IntrinsicParameters param) {
 		if( param.isDistorted())

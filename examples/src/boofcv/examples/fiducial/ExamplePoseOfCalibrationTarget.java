@@ -88,7 +88,7 @@ public class ExamplePoseOfCalibrationTarget {
 		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
 		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
-		ShowImages.showWindow(gui,"Calibration Target Pose");
+		ShowImages.showWindow(gui,"Calibration Target Pose",true);
 
 		// Allows the user to click on the image and pause
 		MousePauseHelper pauseHelper = new MousePauseHelper(gui);

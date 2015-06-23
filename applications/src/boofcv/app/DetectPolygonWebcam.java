@@ -31,7 +31,6 @@ import boofcv.struct.image.ImageFloat32;
 import com.github.sarxos.webcam.Webcam;
 import georegression.struct.shapes.Polygon2D_F64;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -73,7 +72,6 @@ public class DetectPolygonWebcam {
 		int imageWidth = d.width;
 		int imageHeight = d.height;
 
-
 		ConfigPolygonDetector config = new ConfigPolygonDetector(4);
 		config.configRefineLines.sampleRadius = 2;
 		config.configRefineLines.maxIterations = 30;
@@ -88,7 +86,7 @@ public class DetectPolygonWebcam {
 
 		ImageFloat32 gray = new ImageFloat32(imageWidth,imageHeight);
 		ImagePanel gui = new ImagePanel(imageWidth,imageHeight);
-		ShowImages.showWindow(gui,"Fiducials").setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		ShowImages.showWindow(gui,"Fiducials",true);
 
 		while( true ) {
 			BufferedImage frame = webcam.getImage();
@@ -105,6 +103,7 @@ public class DetectPolygonWebcam {
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.RED);
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			Line2D.Double l = new Line2D.Double();
 
 			for (int i = 0; i < shapes.size(); i++) {

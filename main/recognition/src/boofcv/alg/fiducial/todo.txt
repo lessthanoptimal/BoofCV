@@ -1,4 +1,3 @@
-- Check to see if a square in fiducial is concave and discard
-- Improve stability of fiducials, especially when they become smaller
-  * Optimize to minimize reprojection errors? Quad corners?  Edges?
-- Look at using poly fit in calibration detection routines
+- Improve recognition of small targets by using polygon image integrator
+- Compute how frequently a pixel is white or black.  use that to weigh results when computing scores
+   * If a target is mostly black then black is more important

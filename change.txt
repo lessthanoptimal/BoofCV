@@ -40,7 +40,8 @@ Version : Alpha 0.19
   * Lens distortion.  More abstracted
 - LensDistortionOps
   * refactored several functions to make it more consistent and easier to use
-  * Change fullView to shrink
+  * Change fullView to expand
+  * Many functions will now correct for lens distortion.
 - Square grid calibration target
   * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
     lack of regression tests
@@ -79,15 +80,25 @@ TODO
     - calibration regression
        * given points compute parameters.  radial and tangential
        * detect calibration points, chessboard and square grid.  many images
-  * Square Detector.  Create set of images in validation boof with hand selected corners
-                      Improve performance across a range of distances and orientations
-                      - Refine corner: weight fit to corner more
-  * Square Image Fiducial: Better example image than the dog, which can have ambiguous orientation
+    - square pattern needs to pass unit tests
+  * Fiducial
+     * Regression:
+        - Binary Motion Blur
+        - Binary Static
+     * Detector
+        - Polygon reject noisy edges
+        - Use border to reduce false positives
+        - Compute threshold for binarization in base by scanning around the fiducal border.
+        - Get corner fitting working again
+  * Fiducial Example Images
+     * redo image video with better fiducials
+     * remove original text example
+  * Polygon Detector Regression
+
   * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram comparison
-  * Add a jar which includes everything to Maven?
   * Documentation on how to build a single jar
   * ExamplePnP
   * Automatic generate F32 from F64 in some situations

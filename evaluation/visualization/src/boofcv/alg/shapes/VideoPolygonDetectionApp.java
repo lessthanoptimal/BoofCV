@@ -206,7 +206,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 		undistorted.reshape(intrinsic.width,intrinsic.height);
 		undistorter = LensDistortionOps.removeDistortion(
-				AdjustmentType.SHRINK, BorderType.EXTENDED, intrinsic, intrinsicUndist, undistorted.getImageType());
+				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, intrinsicUndist, undistorted.getImageType());
 
 		undistorted.reshape(intrinsic.width,intrinsic.height);
 		gray.reshape(intrinsic.width,intrinsic.height);

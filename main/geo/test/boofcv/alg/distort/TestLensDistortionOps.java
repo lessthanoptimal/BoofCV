@@ -208,15 +208,15 @@ public class TestLensDistortionOps {
 		IntrinsicParameters param =
 				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
-		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, true);
-		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, false);
+		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
+		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
 		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
 
-		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, true);
-		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, param, null, false);
+		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
+		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
 
 		checkInside(adjToDist, distToAdj);
 	}
@@ -226,15 +226,15 @@ public class TestLensDistortionOps {
 		IntrinsicParameters param =
 				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
-		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.SHRINK, param, null, true);
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.SHRINK, param, null, false);
+		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
+		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
 		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
 
-		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.SHRINK, param, null, true);
-		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.SHRINK, param, null, false);
+		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
+		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
 
 		checkInside(adjToDist, distToAdj);
 	}
@@ -376,7 +376,7 @@ public class TestLensDistortionOps {
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		IntrinsicParameters adjusted = new IntrinsicParameters();
-		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.SHRINK, orig, adjusted, false);
+		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
 		Point2D_F32 normFound = new Point2D_F32();
@@ -408,7 +408,7 @@ public class TestLensDistortionOps {
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		IntrinsicParameters adjusted = new IntrinsicParameters();
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.SHRINK, orig, adjusted, false);
+		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F64 adjPixel = new Point2D_F64();
 		Point2D_F64 normFound = new Point2D_F64();

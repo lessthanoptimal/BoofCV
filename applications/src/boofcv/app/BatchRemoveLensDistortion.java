@@ -51,7 +51,7 @@ public class BatchRemoveLensDistortion {
 		System.out.println();
 		System.out.println("Flags:");
 		System.out.println("-rename  Rename files on output to image%0d.png");
-		System.out.println("-SHRINK  Output image will be shrunk until there are no dark regions");
+		System.out.println("-EXPAND  Output image will be expanded until there are no dark regions");
 		System.out.println("-FULL_VIEW  Output image will contain the entire undistorted image");
 		System.out.println();
 		System.out.println("Default is FULL_VIEW and it doesn't rename the images");
@@ -67,8 +67,8 @@ public class BatchRemoveLensDistortion {
 			for (int i = 0; i < numFlags; i++) {
 				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
 					rename = true;
-				} else if( args[i].compareToIgnoreCase("-SHRINK") == 0 ) {
-					adjustmentType = AdjustmentType.SHRINK;
+				} else if( args[i].compareToIgnoreCase("-EXPAND") == 0 ) {
+					adjustmentType = AdjustmentType.EXPAND;
 				} else if( args[i].compareToIgnoreCase("-FULL_VIEW") == 0 ) {
 					adjustmentType = AdjustmentType.FULL_VIEW;
 				} else {
@@ -89,6 +89,15 @@ public class BatchRemoveLensDistortion {
 		System.out.println("rename         = "+rename);
 		System.out.println("output dir     = "+outputDir);
 
+
+		File fileOutputDir = new File(outputDir);
+		if( !fileOutputDir.exists() ) {
+			if( !fileOutputDir.mkdirs() ) {
+				throw new RuntimeException("Output directory did not exist and failed to create it");
+			} else {
+				System.out.println("  created output directory");
+			}
+		}
 
 		IntrinsicParameters param = UtilIO.loadXML(pathIntrinsic);
 		IntrinsicParameters paramAdj = new IntrinsicParameters();

@@ -83,7 +83,7 @@ public class ExampleFiducialImage {
 			VisualizeFiducial.drawCube(targetToSensor,param,detector.getWidth(i),g2);
 		}
 
-		ShowImages.showWindow(input,"Fiducials");
+		ShowImages.showWindow(input,"Fiducials",true);
 
 	}
 }

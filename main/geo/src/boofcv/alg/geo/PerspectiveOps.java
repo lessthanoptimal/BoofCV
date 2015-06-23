@@ -18,11 +18,10 @@
 
 package boofcv.alg.geo;
 
-import boofcv.alg.distort.NormalizedToPixel_F32;
-import boofcv.alg.distort.NormalizedToPixel_F64;
-import boofcv.alg.distort.PixelToNormalized_F32;
-import boofcv.alg.distort.PixelToNormalized_F64;
+import boofcv.alg.distort.*;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
@@ -164,9 +163,6 @@ public class PerspectiveOps {
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
 	 * </p>
-	 * <p>
-	 * NOTE: Lens distortion handled!
-	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param x X-coordinate of normalized.
@@ -175,16 +171,13 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , double x , double y , Point2D_F64 pixel ) {
-		if( param.isDistorted() )
-			throw new IllegalArgumentException("Lens distortion not supported!");
 
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
-		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(param).distort_F64(false,true);
 
-		alg.compute(x,y,pixel);
+		normToPixel.compute(x,y,pixel);
 
 		return pixel;
 	}
@@ -194,9 +187,6 @@ public class PerspectiveOps {
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F32} should be used instead.
 	 * </p>
-	 * <p>
-	 * NOTE: Lens distortion handled!
-	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
 	 * @param x X-coordinate of normalized.
@@ -205,16 +195,12 @@ public class PerspectiveOps {
 	 * @return pixel image coordinate
 	 */
 	public static Point2D_F32 convertNormToPixel( IntrinsicParameters param , float x , float y , Point2D_F32 pixel ) {
-		if( param.isDistorted() )
-			throw new IllegalArgumentException("Lens distortion not supported!");
-
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
-		NormalizedToPixel_F32 alg = new NormalizedToPixel_F32();
-		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		PointTransform_F32 normToPixel = LensDistortionOps.distortTransform(param).distort_F32(false, true);
 
-		alg.compute(x,y,pixel);
+		normToPixel.compute(x,y,pixel);
 
 		return pixel;
 	}
@@ -223,10 +209,6 @@ public class PerspectiveOps {
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
-	 * </p>
-	 *
-	 * <p>
-	 * NOTE: Lens distortion handled!
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -244,9 +226,6 @@ public class PerspectiveOps {
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
 	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
-	 * </p>
-	 * <p>
-	 * NOTE: Lens distortion handled!
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -273,9 +252,6 @@ public class PerspectiveOps {
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
 	 * If speed is a concern then {@link PixelToNormalized_F64} should be used instead.
 	 * </p>
-	 * <p>
-	 * NOTE: Lens distortion is not removed!
-	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
 	 *
@@ -285,16 +261,12 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , Point2D_F64 pixel , Point2D_F64 norm ) {
-		if( param.isDistorted() )
-			throw new IllegalArgumentException("Lens distortion not supported!");
-
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
-		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		PointTransform_F64 pixelToNorm = LensDistortionOps.distortTransform(param).distort_F64(true, false);
 
-		alg.compute(pixel.x,pixel.y,norm);
+		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
 		return norm;
 	}
@@ -303,9 +275,6 @@ public class PerspectiveOps {
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
 	 * If speed is a concern then {@link PixelToNormalized_F32} should be used instead.
-	 * </p>
-	 * <p>
-	 * NOTE: Lens distortion is not removed!
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -316,16 +285,12 @@ public class PerspectiveOps {
 	 * @return normalized image coordinate
 	 */
 	public static Point2D_F32 convertPixelToNorm( IntrinsicParameters param , Point2D_F32 pixel , Point2D_F32 norm ) {
-		if( param.isDistorted() )
-			throw new IllegalArgumentException("Lens distortion not supported!");
-
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		PixelToNormalized_F32 alg = new PixelToNormalized_F32();
-		alg.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		PointTransform_F32 pixelToNorm = LensDistortionOps.distortTransform(param).distort_F32(true, false);
 
-		alg.compute(pixel.x,pixel.y,norm);
+		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
 		return norm;
 	}
@@ -383,16 +348,13 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Renders a point in camera coordinates into the image plane in pixels.  Does not account
-	 * for lens distortion
+	 * Renders a point in camera coordinates into the image plane in pixels.
 	 *
 	 * @param intrinsic Intrinsic camera parameters.
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
 	public static Point2D_F64 renderPixel( IntrinsicParameters intrinsic , Point3D_F64 X ) {
-		if( intrinsic.isDistorted() )
-			throw new IllegalArgumentException("Don't support distorted lenses");
 		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
 		return PerspectiveOps.convertNormToPixel(intrinsic, norm, norm);
 	}
