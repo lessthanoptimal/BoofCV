@@ -26,20 +26,33 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for generating square fiducials EPS documents for printing.
+ * <p>
+ * Base class for generating square fiducials EPS documents for printing.  Fiducials are placed in a regular grid.
+ * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border.  The
+ * grid starts in the page's lower left and corner.
+ * </p>
+ *
+ * <pre>
+ * Border:  The border is a no-go zone where the fiducial can't be printed inside of.  This is only taken in account
+ *          when automatic centering or layout of the grid on the page is requested.
+ * Offset: Where the fiducial is offset inside the page.  Always used.  If centering is requested then the offset
+ *         is automatically computed and any user provided value ignored.
+ * PrintInfo: If true it will draw a string above the fiducial with the fiducial's  name and it's size
+ * </pre>
  *
  * @author Peter Abeles
  */
-// TODO When in grid mode.  just put labels above fiducials.  size printed once in the bottom
 public class BaseFiducialSquareEPS {
 
-	public int threshold = 255/2; // threshold for converting to a binary image
+	// threshold for converting to a binary image
+	public int threshold = 255/2;
 	public double UNIT_TO_POINTS;
 	public static final double CM_TO_POINTS = 72.0/2.54;
 	// should it add the file name and size to the document?
@@ -50,16 +63,21 @@ public class BaseFiducialSquareEPS {
 	// base unit of input lengths
 	Unit unit = Unit.CENTIMETER;
 
-	// grid pattern
+	// if true it will select the size of the grid
+	boolean autofillGrid = false;
+	// Request has been made to automatically center the fiducial in the page
+	boolean centerRequested = true;
+
+	// should it print the grid
+	boolean printGrid = false;
+
+	// Number of elements in the grid
 	public int numCols = 1;
 	public int numRows = 1;
 
-	boolean autofillGrid = false;
-
-	PrintStream out;
-
+	//============= These Parameters specify how it's printed
 	// Total length of the target.  image + black border
-	double targetLength;
+	double fiducialBoxWidth;
 	// length of the white border surrounding the fiducial
 	double whiteBorder;
 	// length of the black border
@@ -67,21 +85,24 @@ public class BaseFiducialSquareEPS {
 	// length of the inner pattern
 	double innerWidth ;
 	// Length of the fiducial plus the white border
-	double totalWidth;
+	double fiducialTotalWidth;
 	// width and height of the page
 	double pageWidth,pageHeight;
-	// border added around the page.
-	double pageBorder;
-	// the size of the requested border around the document.  the actual page border will be this minus the white border
-	double pageBorderRequest = 1*CM_TO_POINTS;
-	// offset to center everything
-	double centerOffsetX,centerOffsetY;
+	// offset of the page.  basically changes the origin
+	double offsetX, offsetY;
 
-	// image scale factor
-	double scale;
+	//============= These parameters are used to automatically generate some of the above parmeters
+	// No printing is allowed inside the border and this information is used to adjust offsets with the user request
+	double pageBorderX = 1*CM_TO_POINTS;
+	double pageBorderY = 1*CM_TO_POINTS;
 
-	String outputName;
+	// name of the output file
+	String outputFileName;
 
+	// stream in which the output file is written to
+	PrintStream out;
+
+	// Paths to image files containing fiducial patterns
 	List<String> imagePaths = new ArrayList<String>();
 
 	public Unit getUnit() {
@@ -90,6 +111,18 @@ public class BaseFiducialSquareEPS {
 
 	public void setUnit(Unit unit) {
 		this.unit = unit;
+	}
+
+	public void setCentering(boolean centerFiducial) {
+		this.centerRequested = centerFiducial;
+	}
+
+	public boolean isPrintGrid() {
+		return printGrid;
+	}
+
+	public void setPrintGrid(boolean printGrid) {
+		this.printGrid = printGrid;
 	}
 
 	public void addImage( String inputPath ) {
@@ -112,12 +145,28 @@ public class BaseFiducialSquareEPS {
 		this.showPreview = showPreview;
 	}
 
-	public void setPageBorder( double size , Unit units) {
-		pageBorderRequest = units.convert(size,Unit.CENTIMETER)*CM_TO_POINTS;
+	public void setPageBorder( double borderX , double borderY , Unit units) {
+		pageBorderX = units.convert(borderX,Unit.CENTIMETER)*CM_TO_POINTS;
+		pageBorderY = units.convert(borderY,Unit.CENTIMETER)*CM_TO_POINTS;
 	}
 
-	public void setOutputName( String outputName )  {
-		this.outputName = outputName;
+	public void setOffset( double offsetX , double offsetY , Unit units) {
+		this.offsetX = units.convert(offsetX,Unit.CENTIMETER)*CM_TO_POINTS;
+		this.offsetY = units.convert(offsetY,Unit.CENTIMETER)*CM_TO_POINTS;
+	}
+
+	public void setOutputFileName(String outputFileName)  {
+		this.outputFileName = outputFileName;
+	}
+
+	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows , PaperSize paper )
+			throws IOException
+	{
+		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
+		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
+		this.numRows = numRows;
+		this.numCols = numCols;
+		generate(fiducialWidth, whiteBorder, pageWidthUnit, pageHeightUnit);
 	}
 
 	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows )
@@ -150,7 +199,7 @@ public class BaseFiducialSquareEPS {
 		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
 
 		numCols = numRows = 1;
-		generate(fiducialWidth, whiteBorder, -1,pageHeightUnit);
+		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
 	}
 
 	public void generateSingle( double fiducialWidthCM , double whiteBorderCM ) throws IOException {
@@ -158,31 +207,27 @@ public class BaseFiducialSquareEPS {
 		generate(fiducialWidthCM, whiteBorderCM, -1,-1);
 	}
 
+	/**
+	 * Configures and saves a PDF of the fiducial.
+	 *
+	 * @param fiducialWidthUnit Width of the fiducial
+	 * @param whiteBorderUnit Thickness of the border around the fiducial
+	 * @param pageWidthUnit Width of the document. If <= 0 the width will be automatically selected
+	 * @param pageHeightUnit Height of the document. If <= 0 the height will be automatically selected
+	 * @throws IOException
+	 */
 	private void generate(double fiducialWidthUnit, double whiteBorderUnit,
 						  double pageWidthUnit, double pageHeightUnit) throws IOException {
 
-		UNIT_TO_POINTS = 72.0/(2.54*Unit.conversion(Unit.CENTIMETER,unit));
-
-		if( autofillGrid ) {
-			if( pageWidthUnit <= 0 || pageHeightUnit <=  0)
-				throw new IllegalArgumentException("If autofillGrid is turned on then the page size must be specified");
-
-			double pageBorderUnit = Math.max(0,pageBorderRequest/UNIT_TO_POINTS - whiteBorderUnit);
-
-			double totalWidthUnit = fiducialWidthUnit+2*whiteBorderUnit;
-			this.numRows = (int)Math.floor((pageHeightUnit-2*pageBorderUnit)/totalWidthUnit);
-			this.numCols = (int)Math.floor((pageWidthUnit-2*pageBorderUnit)/totalWidthUnit);
-		}
-
 		String outputName;
-		if( this.outputName == null ) {
+		if( this.outputFileName == null ) {
 			String inputPath = imagePaths.get(0);
 			File dir = new File(inputPath).getParentFile();
 			outputName = new File(inputPath).getName();
 			outputName = outputName.substring(0,outputName.length()-3) + "eps";
 			outputName = new File(dir,outputName).getCanonicalPath();
 		} else {
-			outputName = this.outputName;
+			outputName = this.outputFileName;
 		}
 
 
@@ -193,41 +238,126 @@ public class BaseFiducialSquareEPS {
 			imageName = "Multiple Patterns";
 		}
 
-		System.out.println("Fiducial width "+ fiducialWidthUnit +" ("+unit.abbreviation+")");
+		configureDocument(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
 
 		// print out the selected number in binary for debugging purposes
 		out = new PrintStream(outputName);
+		generateDocument(fiducialWidthUnit, imageName);
 
-		targetLength = fiducialWidthUnit* UNIT_TO_POINTS;
-		whiteBorder = whiteBorderUnit* UNIT_TO_POINTS;
-		blackBorder = targetLength/4.0;
-		innerWidth = targetLength/2.0;
-		totalWidth = targetLength+whiteBorder*2;
+		System.out.println("Saved to "+new File(outputName).getAbsolutePath());
+	}
 
-		if( pageBorderRequest > 0 ) {
-			pageBorder = Math.max(0,pageBorderRequest-whiteBorder);
-		} else {
-			pageBorder = 0;
+	/**
+	 * Compute how to build the documetn and setup all parameters
+	 */
+	private void configureDocument(double fiducialWidthUnit, double whiteBorderUnit,
+								   double pageWidthUnit, double pageHeightUnit ) throws FileNotFoundException
+	{
+		UNIT_TO_POINTS = 72.0/(2.54* Unit.conversion(Unit.CENTIMETER, unit));
+
+		if( autofillGrid ) {
+			if( pageWidthUnit <= 0 || pageHeightUnit <=  0)
+				throw new IllegalArgumentException("If autofillGrid is turned on then the page size must be specified");
+
+			autoSelectGridSize(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
 		}
 
+		System.out.println("Fiducial width "+ fiducialWidthUnit +" ("+unit.abbreviation+")");
+
+		fiducialBoxWidth = fiducialWidthUnit* UNIT_TO_POINTS;
+		whiteBorder = whiteBorderUnit* UNIT_TO_POINTS;
+		blackBorder = fiducialBoxWidth /4.0;
+		innerWidth = fiducialBoxWidth /2.0;
+		fiducialTotalWidth = fiducialBoxWidth +whiteBorder*2;
+
+		//  zone in which the target can't be placed unless it will print inside the border, which is not allowed
+		double deadZoneX = Math.max(0,pageBorderX-whiteBorder);
+		double deadZoneY = Math.max(0,pageBorderY-whiteBorder);
+
 		if( pageWidthUnit <= 0 ) {
-			pageWidth = numCols*totalWidth+2*pageBorder;
+			pageWidth = fiducialTotalWidth *numCols + deadZoneX;
 		} else {
 			pageWidth = pageWidthUnit*UNIT_TO_POINTS;
 		}
-
 		if( pageHeightUnit <= 0 ) {
-			pageHeight = numRows*totalWidth+2*pageBorder;
+			pageHeight = fiducialTotalWidth *numRows + deadZoneY;
 		} else {
 			pageHeight = pageHeightUnit*UNIT_TO_POINTS;
 		}
 
-		// compute the offset to put it in the center of the page
-		centerOffsetX = (pageWidth-totalWidth*numCols-2*pageBorder)/2.0;
-		centerOffsetY = (pageHeight-totalWidth*numRows-2*pageBorder)/2.0;
+		// Center the fiducial inside the page.  Reduce the size of the grid if required to fit it inside the
+		// page, including the border
+		if( centerRequested ) {
+			centerPage(deadZoneX, deadZoneY);
+		}
+	}
 
-		printHeader(imageName,fiducialWidthUnit);
+	/**
+	 * Centers the image while taking in account page border where it can't print.  Reduces the number of elements in
+	 * the grid if necessary.
+	 */
+	private void centerPage(double deadZoneX, double deadZoneY) {
+		double validX0 = pageBorderX;
+		double validX1 = pageWidth-pageBorderX;
+		double validY0 = pageBorderY;
+		double validY1 = pageHeight-pageBorderY;
 
+		boolean allGood = false;
+		while( numCols > 0 && numRows > 0 && !allGood) {
+			allGood = true;
+
+			// center the current target inside the page
+			offsetX = (pageWidth  - fiducialTotalWidth * numCols - 2 * deadZoneX) / 2.0;
+			offsetY = (pageHeight - fiducialTotalWidth * numRows - 2 * deadZoneY) / 2.0;
+
+			// Find the edges which bound the regions where printing is done
+			double edgeBlackLeft = offsetX+whiteBorder;
+			double edgeBlackRight = offsetX+ fiducialTotalWidth *numCols-whiteBorder;
+			double edgeBlackBottom = offsetY+whiteBorder;
+			double edgeBlackTop = offsetY+ fiducialTotalWidth *numRows-whiteBorder;
+
+			if( edgeBlackLeft < validX0 ||edgeBlackRight > validX1 ) {
+				allGood = false;
+				numCols--;
+			}
+
+			if( edgeBlackBottom < validY0 ||edgeBlackTop > validY1 ) {
+				allGood = false;
+				numRows--;
+			}
+		}
+
+		if( numCols == 0 || numRows == 0 )
+			throw new IllegalArgumentException("Can't place fiducial inside the page and not go outside the page border");
+	}
+
+	/**
+	 * Given the page size and other parameters figure out how many fiducials it can fit along the rows and columns
+	 */
+	private void autoSelectGridSize(double fiducialWidthUnit, double whiteBorderUnit, double pageWidthUnit, double pageHeightUnit) {
+
+		// find how far away from the page's edge does it need to stay
+		double pageBorderUnitX = Math.max(pageBorderX/UNIT_TO_POINTS , whiteBorderUnit);
+		double pageBorderUnitY = Math.max(pageBorderY/UNIT_TO_POINTS , whiteBorderUnit);
+
+		// area of fiducial and white border
+		double totalWidthUnit = fiducialWidthUnit+2*whiteBorderUnit;
+
+		// compute how much of the page it can use
+		double effectiveX = pageWidthUnit  - 2*pageBorderUnitX + 2*whiteBorderUnit;
+		double effectiveY = pageHeightUnit - 2*pageBorderUnitY + 2*whiteBorderUnit;
+
+		this.numCols = (int)Math.floor(effectiveX/totalWidthUnit);
+		this.numRows = (int)Math.floor(effectiveY/totalWidthUnit);
+	}
+
+	/**
+	 * Creates an EPS document from all the specifications in the class
+	 * @param fiducialWidthUnit Width of fiducial (including border) in user specified units.
+	 * @param documentTitle Title of the document
+	 */
+	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
+		printHeader(documentTitle,fiducialWidthUnit);
 		printImageDefinitions(fiducialWidthUnit);
 
 		// draws the black border around the fiducial
@@ -245,10 +375,11 @@ public class BaseFiducialSquareEPS {
 			}
 		}
 
+		if( printGrid )
+			printGrid();
+
 		out.print("  showpage\n" +
 				"%%EOF\n");
-
-		System.out.println("Saved to "+new File(outputName).getAbsolutePath());
 	}
 
 	private void printImageDefinitions( double fiducialWidthUnit ) {
@@ -271,7 +402,7 @@ public class BaseFiducialSquareEPS {
 				image = tmp;
 			}
 
-			scale = image.width/innerWidth;
+			double scale = image.width/innerWidth;
 			ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
 			if( showPreview )
 				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
@@ -285,7 +416,7 @@ public class BaseFiducialSquareEPS {
 			if(printInfo) {
 				out.print(" /"+getDisplayName(i)+"\n" +
 						"{\n" +
-						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (totalWidth - 10) +
+						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
 						" moveto (" + imageName + "   " + fiducialWidthUnit + " "+unit.abbreviation+") show\n"+
 						"} def\n" );
 			}
@@ -300,10 +431,10 @@ public class BaseFiducialSquareEPS {
 		return String.format("displayInfo%03d",num);
 	}
 
-	private void printHeader( String inputName , double widthCM) {
+	private void printHeader( String documentTitle , double widthCM) {
 		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
 				"%%Creator: BoofCV\n" +
-				"%%Title: "+inputName+" w="+ widthCM +" "+unit.abbreviation+"\n" +
+				"%%Title: "+documentTitle+" w="+ widthCM +" "+unit.abbreviation+"\n" +
 				"%%DocumentData: Clean7Bit\n" +
 				"%%Origin: 0 0\n" +
 				"%%BoundingBox: 0 0 "+pageWidth+" "+pageHeight+"\n" +
@@ -320,10 +451,29 @@ public class BaseFiducialSquareEPS {
 				"  /b3 { b2 bb add} def\n");
 	}
 
+	/**
+	 * Draws the grid in light grey on the document
+	 */
+	private void printGrid() {
+		out.println("% grid lines");
+
+		out.print(" /drawRow { moveto "+pageWidth+" 0 rlineto 1 setlinewidth stroke} def\n");
+		out.print(" /drawColumn { moveto 0 "+pageHeight+" rlineto 1 setlinewidth stroke} def\n");
+		out.print(" 0.75 setgray\n");
+		for (int i = 0; i <= numCols; i++) {
+			double x = offsetX + i*fiducialTotalWidth;
+			out.printf(" newpath %f 0 drawColumn\n",x);
+		}
+		for (int i = 0; i <= numRows; i++) {
+			double y = offsetY + i*fiducialTotalWidth;
+			out.printf(" newpath 0 %f drawRow\n",y);
+		}
+	}
+
 	private void insertFiducial(int row, int col ) {
 		out.print(
-				"  /originX " + (centerOffsetX + pageBorder + col * totalWidth) + " def\n" +
-				"  /originY " + (centerOffsetY + pageBorder + row * totalWidth) + " def\n" +
+				"  /originX " + (offsetX + col * fiducialTotalWidth) + " def\n" +
+				"  /originY " + (offsetY + row * fiducialTotalWidth) + " def\n" +
 				"  originX originY translate\n" );
 		out.println();
 		out.println("  drawBorder");
