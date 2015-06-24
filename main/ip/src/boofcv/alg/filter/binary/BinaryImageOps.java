@@ -465,8 +465,9 @@ public class BinaryImageOps {
 	 * Only converts the specified blobs over into the binary image
 	 *
 	 * @param labelImage Input image. Not modified.
-	 * @param binaryImage Output image. Modified.
-	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not.
+	 * @param binaryImage Output image. If null a new one will be declared. Modified.
+	 * @param selectedBlobs Each index corresponds to a blob and specifies if it is included or not.  Expected
+	 *                      size is the number of found clusters + 1.
 	 * @return The binary image.
 	 */
 	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ,
@@ -492,6 +493,28 @@ public class BinaryImageOps {
 		}
 
 		return binaryImage;
+	}
+
+
+	/**
+	 * Only converts the specified blobs over into the binary image.  Easier to use version of
+	 * {@link #labelToBinary(ImageSInt32, ImageUInt8, boolean[])}.
+	 *
+	 * @param labelImage Input image. Not modified.
+	 * @param binaryImage Output image. If null a new one will be declared. Modified.
+	 * @param numLabels Number of labels in the image.  This is the number of found clusters + 1.
+	 * @param selected The index of labels which will be marked as 1 in the output binary image.
+	 * @return The binary image.
+	 */
+	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ,
+											int numLabels, int ...selected )
+	{
+		boolean selectedBlobs[] = new boolean[numLabels];
+		for (int i = 0; i < selected.length; i++) {
+			selectedBlobs[selected[i]] = true;
+		}
+
+		return labelToBinary(labelImage,binaryImage,selectedBlobs);
 	}
 
 	/**

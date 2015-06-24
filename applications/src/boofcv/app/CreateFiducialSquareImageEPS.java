@@ -63,15 +63,14 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 			app.addImage(path);
 		}
 
-		app.setOutputName("fiducial_image.eps");
+		app.setOutputFileName("fiducial_image.eps");
 
-//		app.setPrintInfo(false);
-//		app.setPageBorder(4.0,Unit.CENTIMETER);
+		app.setPrintInfo(true);
+		app.setPrintGrid(false);
 //		app.setUnit(Unit.INCH);
 
 		app.generateSingle(fiducialWidth);
 //		app.generateGrid(2.5,1.0,2,3);
-//		app.generateSingle(2.5,PaperSize.LETTER);
-//		app.generateGrid(4,1.0,PaperSize.LETTER);
+//		app.generateGrid(6, 1, PaperSize.LETTER);
 	}
 }
