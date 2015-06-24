@@ -73,6 +73,8 @@ Version : Alpha 0.19
   * Will now display any BoofCV image directly.
 - Android
   * Can convert from 8888 to 3 channel multi-spectral images
+- BinaryImageOps
+  * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
 
 TODO
   * Distortion Model + Calibration
