@@ -209,7 +209,8 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	/**
-	 * Ensure that lens distortion is being removed from the fiducial square.
+	 * Ensure that lens distortion is being removed from the fiducial square.  All check to make sure the class
+	 * updates everything when init is called again with a different model.
 	 */
 	@Test
 	public void lensRemoval() {
@@ -219,8 +220,18 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(10+120,350));
 		expected.add( new Point2D_F64(10+120,350+120));
 
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(-0.15,-0.05);
+		DetectCorner detector = new DetectCorner();
 
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
+
+		detectWithLensDistortion(expected, detector, intrinsic);
+
+		intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.05);
+
+		detectWithLensDistortion(expected, detector, intrinsic);
+	}
+
+	private void detectWithLensDistortion(List<Point2D_F64> expected, DetectCorner detector, IntrinsicParameters intrinsic) {
 		// create a pattern with a corner for orientation and put it into the image
 		ImageUInt8 pattern = createPattern(6*20, true);
 		ImageUInt8 image = new ImageUInt8(640,480);
@@ -238,8 +249,6 @@ public class TestBaseDetectFiducialSquare {
 		ImageUInt8 distorted = new ImageUInt8(640,480);
 		distorter.apply(image,distorted);
 
-		DetectCorner detector = new DetectCorner();
-
 		detector.configure(intrinsic, false);
 		detector.process(distorted);
 
@@ -256,16 +265,9 @@ public class TestBaseDetectFiducialSquare {
 			assertTrue(f.distance(e) <= 0.4 );
 		}
 
-		// the check to see if square is correctly undistorted is inside the processing function itself
+		// The check to see if square is correctly undistorted is inside the processing function itself
 	}
 
-	/**
-	 * Keep image size the same but change lens distortion parameters.  See everything still works.
-	 */
-	@Test
-	public void changeLensDistortion() {
-		fail("implement");
-	}
 
 	/**
 	 * Creates a square pattern image of the specified size

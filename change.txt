@@ -87,6 +87,7 @@ TODO
      * Regression:
         - Binary Motion Blur
         - Binary Static
+        - Both: Looking at it directly static stability.
      * Detector
         - Polygon reject noisy edges
         - Use border to reduce false positives

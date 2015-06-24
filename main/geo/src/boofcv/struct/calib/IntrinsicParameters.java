@@ -135,7 +135,7 @@ public class IntrinsicParameters implements Serializable {
 		if( radial != null && radial.length > 0 ) {
 			for (int i = 0; i < radial.length; i++) {
 				if( radial[i] != 0 )
-					return false;
+					return true;
 			}
 		}
 		return t1 != 0 || t2 != 0;

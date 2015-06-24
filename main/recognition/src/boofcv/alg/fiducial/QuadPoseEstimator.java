@@ -45,33 +45,32 @@ import java.util.List;
 public class QuadPoseEstimator {
 
 	// provides set of hypotheses from 3 points
-	EstimateNofPnP p3p;
+	private EstimateNofPnP p3p;
 	// iterative refinement
-	RefinePnP refine;
+	private RefinePnP refine;
 
-	Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
+	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
-	PointTransform_F64 pixelToNorm;
-	PointTransform_F64 normToPixel;
+	private PointTransform_F64 pixelToNorm;
+	private PointTransform_F64 normToPixel;
 
 	// storage for inputs to estimation algorithms
-	Point2D3D[] points = new Point2D3D[4];
+	protected Point2D3D[] points = new Point2D3D[4];
 
-	List<Point2D_F64> listObs = new ArrayList<Point2D_F64>();
+	protected List<Point2D_F64> listObs = new ArrayList<Point2D_F64>();
 
-	List<Point2D3D> inputP3P = new ArrayList<Point2D3D>();
-	FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64.class,true);
-	Se3_F64 refinedFiducialToCamera = new Se3_F64();
-	Se3_F64 foundEPNP = new Se3_F64();
+	private List<Point2D3D> inputP3P = new ArrayList<Point2D3D>();
+	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64.class,true);
+	private Se3_F64 refinedFiducialToCamera = new Se3_F64();
+	private Se3_F64 foundEPNP = new Se3_F64();
 
-	Point3D_F64 cameraP3 = new Point3D_F64();
-	Point2D_F64 predicted = new Point2D_F64();
+	private Point3D_F64 cameraP3 = new Point3D_F64();
+	private Point2D_F64 predicted = new Point2D_F64();
 
 	// storage for when it searches for the best solution
-	double bestError;
-	Se3_F64 bestPose = new Se3_F64();
-	int bestIndex;
+	protected double bestError;
+	protected Se3_F64 bestPose = new Se3_F64();
 
 	/**
 	 * Constructor which picks reasonable and generally good algorithms for pose estimation.
@@ -141,15 +140,13 @@ public class QuadPoseEstimator {
 
 		// estimate pose using all permutations
 		bestError = Double.MAX_VALUE;
-		estimate(0);
-		estimate(1);
-		estimate(2);
-		estimate(3);
+		estimateP3P(0);
+		estimateP3P(1);
+		estimateP3P(2);
+		estimateP3P(3);
 
 		if( bestError == Double.MAX_VALUE )
 			return false;
-
-//		System.out.println("bestError = "+bestError);
 
 		// refine the best estimate
 		inputP3P.clear();
@@ -165,30 +162,26 @@ public class QuadPoseEstimator {
 					double error = computeErrors(foundEPNP);
 					if (error < bestError) {
 						bestPose.set(foundEPNP);
-//						System.out.println("    better epnp error = " + error);
 					}
 				}
 			}
 		}
 
-//		refinedFiducialToCamera.set(bestPose);
 		if( !refine.fitModel(inputP3P,bestPose,refinedFiducialToCamera) ) {
 			// us the previous estimate instead
 			refinedFiducialToCamera.set(bestPose);
 			return true;
 		}
 
-//		double refineError = computeErrors(refinedFiducialToCamera);
-//		System.out.println("    refined error = "+refineError);
-
 		return true;
 	}
 
 	/**
-	 * Estimates the pose from all put the excluded point
+	 * Estimates the pose using P3P from 3 out of 4 points.  Then use all 4 to pick the best solution
+	 *
 	 * @param excluded which corner to exclude and use to check the answers from the others
 	 */
-	private void estimate( int excluded ) {
+	protected void estimateP3P(int excluded) {
 
 		// the point used to check the solutions is the last one
 		inputP3P.clear();
@@ -213,18 +206,17 @@ public class QuadPoseEstimator {
 			if( error < bestError ) {
 				bestError = error;
 				bestPose.set(solutions.get(i));
-				bestIndex = excluded;
 			}
 		}
 
 	}
 
 	/**
-	 * Compute the sum of preprojection errors for all four points
+	 * Compute the sum of reprojection errors for all four points
 	 * @param fiducialToCamera Transform being evaluated
-	 * @return sum of error
+	 * @return sum of Euclidean-squared errors
 	 */
-	private double computeErrors(Se3_F64 fiducialToCamera ) {
+	protected double computeErrors(Se3_F64 fiducialToCamera ) {
 		if( fiducialToCamera.T.z < 0 ) {
 			// the low level algorithm should already filter this code, but just incase
 			return Double.MAX_VALUE;

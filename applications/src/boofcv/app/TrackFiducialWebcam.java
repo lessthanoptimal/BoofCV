@@ -101,7 +101,7 @@ public class TrackFiducialWebcam {
 
 		String patternPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
 		SquareImage_to_FiducialDetector<ImageFloat32> detector =
-				FactoryFiducial.squareImageRobust(new ConfigFiducialImage(),6, ImageFloat32.class);
+				FactoryFiducial.squareImageFast(new ConfigFiducialImage(),100, ImageFloat32.class);
 		detector.addTarget(loadImage(patternPath+"ke.png", ImageFloat32.class),100,2.5);
 		detector.addTarget(loadImage(patternPath+"dog.png", ImageFloat32.class),100,2.5);
 		detector.addTarget(loadImage(patternPath+"yu.png", ImageFloat32.class),100,2.5);
