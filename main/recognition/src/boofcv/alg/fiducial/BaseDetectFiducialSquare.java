@@ -169,8 +169,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 			pointSquareToInput = new SequencePointTransform_F32(transformHomography,pointUndistToDist);
 
-			this.pointUndistToDist = LensDistortionOps.
-					transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);;
+			this.pointUndistToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);
 
 			intrinsic = intrinsicUndist;
 		} else {
@@ -190,7 +189,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *
 	 * @param gray Undistorted input image
 	 */
-	public boolean process( T gray ) {
+	public void process( T gray ) {
 
 		squareDetector.process(gray);
 		FastQueue<Polygon2D_F64> candidates = squareDetector.getFound();
@@ -241,7 +240,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 				if( verbose ) System.out.println("rejected process square");
 			}
 		}
-		return true;
 	}
 
 	/**

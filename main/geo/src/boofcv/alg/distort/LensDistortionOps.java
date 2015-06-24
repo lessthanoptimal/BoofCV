@@ -63,9 +63,9 @@ public class LensDistortionOps {
 	 * @return ImageDistort which removes lens distortion
 	 */
 	public static <T extends ImageBase>
-	ImageDistort<T,T> removeDistortion( AdjustmentType type , BorderType borderType ,
-										IntrinsicParameters param, IntrinsicParameters paramAdj ,
-										ImageType<T> imageType )
+	ImageDistort<T,T> imageRemoveDistortion(AdjustmentType type, BorderType borderType,
+											IntrinsicParameters param, IntrinsicParameters paramAdj,
+											ImageType<T> imageType)
 	{
 		Class bandType = imageType.getImageClass();
 

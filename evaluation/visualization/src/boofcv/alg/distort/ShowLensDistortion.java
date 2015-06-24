@@ -196,7 +196,7 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 				fsetTangental(tangential1, tangential2);
 
 		AdjustmentType type = fullView ? AdjustmentType.FULL_VIEW : AdjustmentType.NONE;
-		ImageDistort distort = LensDistortionOps.removeDistortion(type, BorderType.VALUE,param,null,input.getImageType());
+		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(type, BorderType.VALUE, param, null, input.getImageType());
 
 		distort.apply(input,output);
 		thread.stopThread();

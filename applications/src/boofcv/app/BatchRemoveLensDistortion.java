@@ -110,8 +110,8 @@ public class BatchRemoveLensDistortion {
 		MultiSpectral<ImageFloat32> distoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 		MultiSpectral<ImageFloat32> undistoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 
-		ImageDistort distort = LensDistortionOps.removeDistortion(adjustmentType,null,param,paramAdj,
-				(ImageType)distoredImg.getImageType());
+		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, null, param, paramAdj,
+				(ImageType) distoredImg.getImageType());
 		UtilIO.saveXML(paramAdj,new File(outputDir,"intrinsicUndistorted.xml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);

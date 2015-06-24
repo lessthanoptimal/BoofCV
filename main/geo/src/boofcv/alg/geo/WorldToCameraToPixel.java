@@ -35,20 +35,32 @@ import georegression.transform.se.SePointOps_F64;
 public class WorldToCameraToPixel {
 
 	// transform from world to camera reference frames
-	Se3_F64 worldToCamera;
+	private Se3_F64 worldToCamera;
 
 	// storage for point in camera frame
-	Point3D_F64 cameraPt = new Point3D_F64();
+	private Point3D_F64 cameraPt = new Point3D_F64();
 
 	// transform from normalized image coordinates into pixels
-	PointTransform_F64 normToPixel;
+	private PointTransform_F64 normToPixel;
 
+	/**
+	 * Specifies intrinsic camera parameters and  the transform from world to camera.
+	 * @param intrinsic camera parameters
+	 * @param worldToCamera transform from world to camera
+	 */
 	public void configure( IntrinsicParameters intrinsic , Se3_F64 worldToCamera ) {
 		this.worldToCamera = worldToCamera;
 
 		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false,true);
 	}
 
+	/**
+	 * Computes the observed location of the specified point in world coordinates in the camera pixel.  If
+	 * the object can't be viewed because it is behind the camera then false is returned.
+	 * @param worldPt Location of point in world frame
+	 * @param pixelPt Pixel observation of point.
+	 * @return True if visible (+z) or false if not visible (-z)
+	 */
 	public boolean transform( Point3D_F64 worldPt , Point2D_F64 pixelPt ) {
 		SePointOps_F64.transform(worldToCamera,worldPt,cameraPt);
 
@@ -60,6 +72,13 @@ public class WorldToCameraToPixel {
 		return true;
 	}
 
+	/**
+	 * Computes location of 3D point in world as observed in the camera.  Point is returned if visible or null
+	 * if not visible.
+	 *
+	 * @param worldPt Location of point on world reference frame
+	 * @return Pixel coordinate of point or null if not visible
+	 */
 	public Point2D_F64 transform( Point3D_F64 worldPt ) {
 		Point2D_F64 out = new Point2D_F64();
 		if( transform(worldPt,out))

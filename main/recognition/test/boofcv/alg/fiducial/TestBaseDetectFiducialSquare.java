@@ -215,19 +215,17 @@ public class TestBaseDetectFiducialSquare {
 	@Test
 	public void lensRemoval() {
 		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
-		expected.add( new Point2D_F64(10,350+120));
-		expected.add( new Point2D_F64(10,350));
-		expected.add( new Point2D_F64(10+120,350));
-		expected.add( new Point2D_F64(10+120,350+120));
+		expected.add( new Point2D_F64(60,300+120));
+		expected.add( new Point2D_F64(60,300));
+		expected.add( new Point2D_F64(60+120,300));
+		expected.add( new Point2D_F64(60+120,300+120));
 
 		DetectCorner detector = new DetectCorner();
 
 		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
-
 		detectWithLensDistortion(expected, detector, intrinsic);
 
 		intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480).fsetRadial(0.1,0.05);
-
 		detectWithLensDistortion(expected, detector, intrinsic);
 	}
 
@@ -236,7 +234,7 @@ public class TestBaseDetectFiducialSquare {
 		ImageUInt8 pattern = createPattern(6*20, true);
 		ImageUInt8 image = new ImageUInt8(640,480);
 		ImageMiscOps.fill(image, 255);
-		image.subimage(10, 350, 10 + pattern.width, 350 + pattern.height, null).setTo(pattern);
+		image.subimage(60, 300, 60 + pattern.width, 300 + pattern.height, null).setTo(pattern);
 		// place the pattern right next to one of the corners to maximize distortion
 
 		// add lens distortion
@@ -252,7 +250,7 @@ public class TestBaseDetectFiducialSquare {
 		detector.configure(intrinsic, false);
 		detector.process(distorted);
 
-		assertEquals(1, detector.getFound().size());
+		assertEquals( 1, detector.getFound().size());
 		FoundFiducial ff = detector.getFound().get(0);
 
 		// see if the returned corners
@@ -260,9 +258,8 @@ public class TestBaseDetectFiducialSquare {
 		for (int j = 0; j < 4; j++) {
 			Point2D_F64 f = ff.location.get(j);
 			Point2D_F64 e = expected.get((j+1)%4);
-			undistTodist.compute(e.x,e.y,expectedImage);
-			e.set(expectedImage.x,expectedImage.y);
-			assertTrue(f.distance(e) <= 0.4 );
+			undistTodist.compute(e.x, e.y, expectedImage);
+			assertTrue(f.distance(expectedImage) <= 0.4 );
 		}
 
 		// The check to see if square is correctly undistorted is inside the processing function itself
@@ -413,8 +410,8 @@ public class TestBaseDetectFiducialSquare {
 
 			double minFrc = sum[indexMin] / sum[(indexMin+1)%4];
 
-			// if lens distortion is not corrected for its about 0.05
-			assertTrue(minFrc<0.02);
+			// if lens distortion is not corrected for its about 0.05 and 0.077 for the two different distortions
+			assertTrue(minFrc<0.035);
 
 			result.lengthSide = 2.0;
 			// number of image clockwise rotations to put min in lower-left corner

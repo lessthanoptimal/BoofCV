@@ -67,10 +67,10 @@ public class ExampleRemoveLensDistortion {
 		// shrink makes sure there are no dead zones inside the image
 		// fullView will include the entire original image
 		// The border is VALUE, which defaults to black, just so you can see it
-		ImageDistort allInside = LensDistortionOps.removeDistortion(AdjustmentType.EXPAND,BorderType.VALUE,param,null,
-				ImageType.ms(numBands,ImageFloat32.class));
-		ImageDistort fullView = LensDistortionOps.removeDistortion(AdjustmentType.FULL_VIEW,BorderType.VALUE,param,null,
-				ImageType.ms(numBands,ImageFloat32.class));
+		ImageDistort allInside = LensDistortionOps.imageRemoveDistortion(AdjustmentType.EXPAND, BorderType.VALUE, param, null,
+				ImageType.ms(numBands, ImageFloat32.class));
+		ImageDistort fullView = LensDistortionOps.imageRemoveDistortion(AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null,
+				ImageType.ms(numBands, ImageFloat32.class));
 
 		// NOTE: After lens distortion has been removed the intrinsic parameters is changed.  If you pass
 		//       in  a set of IntrinsicParameters to the 4th variable it will save it there.

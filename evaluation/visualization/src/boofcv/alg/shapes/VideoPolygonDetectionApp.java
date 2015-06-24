@@ -205,7 +205,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
 
 		undistorted.reshape(intrinsic.width,intrinsic.height);
-		undistorter = LensDistortionOps.removeDistortion(
+		undistorter = LensDistortionOps.imageRemoveDistortion(
 				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, intrinsicUndist, undistorted.getImageType());
 
 		undistorted.reshape(intrinsic.width,intrinsic.height);

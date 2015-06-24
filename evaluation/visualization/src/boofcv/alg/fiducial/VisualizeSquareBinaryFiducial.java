@@ -56,7 +56,7 @@ public class VisualizeSquareBinaryFiducial {
 		ImageFloat32 undistorted = new ImageFloat32(input.width,input.height);
 
 		IntrinsicParameters paramUndist = new IntrinsicParameters();
-		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.removeDistortion(
+		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.imageRemoveDistortion(
 				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
 				ImageType.single(ImageFloat32.class));
 
