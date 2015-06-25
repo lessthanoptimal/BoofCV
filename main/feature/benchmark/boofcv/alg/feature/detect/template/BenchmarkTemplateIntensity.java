@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.template;
+package boofcv.alg.feature.detect.template;
 
-import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.template.FactoryTemplateMatching;

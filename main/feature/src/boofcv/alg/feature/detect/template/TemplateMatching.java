@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,8 @@ public class TemplateMatching<T extends ImageBase> {
 
 	// Reference to the template being searched for
 	private T template;
+	// Mask for template to determine influence of each pixel
+	private T mask;
 	// Maximum number of matches that can be returned
 	private int maxMatches;
 
@@ -80,13 +82,14 @@ public class TemplateMatching<T extends ImageBase> {
 	 * Specifies the template to search for and the maximum number of matches to return.
 	 *
 	 * @param template   Template being searched for
+	 * @param mask       Optional mask.  Same size as template.  0 = pixel is transparent, values larger than zero
+	 *                   determine how influential the pixel is.  Can be null.
 	 * @param maxMatches The maximum number of matches it will return
 	 */
-	public void setTemplate(T template, int maxMatches) {
+	public void setTemplate(T template, T mask , int maxMatches) {
 		this.template = template;
+		this.mask = mask;
 		this.maxMatches = maxMatches;
-
-		int w = Math.min(template.width, template.height);
 	}
 
 	/**
@@ -97,7 +100,10 @@ public class TemplateMatching<T extends ImageBase> {
 	public void process(T image) {
 
 		// compute match intensities
-		match.process(image, template);
+		if( mask == null )
+			match.process(image, template);
+		else
+			match.process(image,template,mask);
 
 		ImageFloat32 intensity = match.getIntensity();
 		int offsetX = 0;
@@ -105,14 +111,14 @@ public class TemplateMatching<T extends ImageBase> {
 
 		// adjust intensity image size depending on if there is a border or not
 		if (!match.isBorderProcessed()) {
-			int x0 = match.getOffsetX();
-			int x1 = image.width - (template.width - offsetX);
-			int y0 = match.getOffsetY();
-			int y1 = image.height - (template.height - offsetY);
+			int x0 = match.getBorderX0();
+			int x1 = image.width - (template.width - x0);
+			int y0 = match.getBorderY0();
+			int y1 = image.height - (template.height - y0);
 			intensity = intensity.subimage(x0, y0, x1, y1, null);
 		} else {
-			offsetX = match.getOffsetX();
-			offsetY = match.getOffsetY();
+			offsetX = match.getBorderX0();
+			offsetY = match.getBorderY0();
 		}
 
 		// find local peaks in intensity image

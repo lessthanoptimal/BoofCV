@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,17 @@ public interface TemplateMatchingIntensity<T extends ImageBase> {
 	public void process(T image, T template);
 
 	/**
+	 * Matches the template with a mask to the image and computes an intensity image.
+	 *
+	 * @param image    Input image. Not modified.
+	 * @param mask     Mask that identifies how translucent pixels. 0 = 100% transparent and all values above
+	 *                 increase its importance.  Typical values are 0 to 255 for integer images and 0.0 to 1.0 for
+	 *                 floating point.
+	 * @param template Template image.  Must be equal to or smaller than the input image. Not modified.
+	 */
+	public void process(T image, T template, T mask );
+
+	/**
 	 * Contains results of template matching.  Higher intensity values correspond to a better match.
 	 * Local matches can be found using {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}.
 	 * See comment about processing the image border.
@@ -70,16 +81,30 @@ public interface TemplateMatchingIntensity<T extends ImageBase> {
 	public boolean isBorderProcessed();
 
 	/**
-	 * Offset from template's top left corner x-coordinate
+	 * Thickness of border along the image left side (lower extent)
 	 *
-	 * @return Offset in pixels
+	 * @return Border in pixels
 	 */
-	public int getOffsetX();
+	public int getBorderX0();
 
 	/**
-	 * Offset from template's top left corner y-coordinate
+	 * Thickness of border along the image right side (upper extent)
 	 *
-	 * @return Offset in pixels
+	 * @return Border in pixels
 	 */
-	public int getOffsetY();
+	public int getBorderX1();
+
+	/**
+	 * Thickness of border along the image top (lower extent)
+	 *
+	 * @return Border in pixels
+	 */
+	public int getBorderY0();
+
+	/**
+	 * Thickness of border along the image bottom (upper extent)
+	 *
+	 * @return Border in pixels
+	 */
+	public int getBorderY1();
 }

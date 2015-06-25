@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,24 @@ public abstract class TemplateDiffSquared<T extends ImageBase>
 
 			return -total;
 		}
+
+		@Override
+		protected float evaluateMask(int tl_x, int tl_y) {
+			float total = 0;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+				int templateIndex = template.startIndex + y * template.stride;
+				int maskIndex = mask.startIndex + y * mask.stride;
+
+				for (int x = 0; x < template.width; x++) {
+					float error = image.data[imageIndex++] - template.data[templateIndex++];
+					total += mask.data[maskIndex++] * error * error;
+				}
+			}
+
+			return -total;
+		}
 	}
 
 	public static class U8 extends TemplateDiffSquared<ImageUInt8> {
@@ -62,14 +80,46 @@ public abstract class TemplateDiffSquared<T extends ImageBase>
 
 			float total = 0;
 
+			// Reduce change of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
+
 			for (int y = 0; y < template.height; y++) {
 				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
 				int templateIndex = template.startIndex + y * template.stride;
 
+				int rowTotal = 0;
 				for (int x = 0; x < template.width; x++) {
 					int error = (image.data[imageIndex++] & 0xFF) - (template.data[templateIndex++] & 0xFF);
-					total += error * error;
+					rowTotal += error * error;
 				}
+
+				total += rowTotal / div;
+			}
+
+			return -total;
+		}
+
+		@Override
+		protected float evaluateMask(int tl_x, int tl_y) {
+
+			float total = 0;
+
+			// Reduce change of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f*255.0f;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+				int templateIndex = template.startIndex + y * template.stride;
+				int maskIndex = mask.startIndex + y * mask.stride;
+
+				int rowTotal = 0;
+				for (int x = 0; x < template.width; x++) {
+					int m = mask.data[maskIndex++] & 0xFF;
+					int error = (image.data[imageIndex++] & 0xFF) - (template.data[templateIndex++] & 0xFF);
+					rowTotal += m*error * error;
+				}
+
+				total += rowTotal / div;
 			}
 
 			return -total;

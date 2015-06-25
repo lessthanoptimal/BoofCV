@@ -76,6 +76,8 @@ Version : Alpha 0.19
   * Can convert from 8888 to 3 channel multi-spectral images
 - BinaryImageOps
   * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
+- Template Matching
+  * Can provide a mask for a template and effectively make pixels transparent or translucent
 
 TODO
   * Distortion Model + Calibration
@@ -98,7 +100,6 @@ TODO
      * remove original text example
   * Polygon Detector Regression
 
-  * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram comparison

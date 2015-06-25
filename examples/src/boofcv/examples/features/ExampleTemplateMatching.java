@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,17 +48,18 @@ public class ExampleTemplateMatching {
 	 *
 	 * @param image           Image being searched
 	 * @param template        Template being looked for
+	 * @param mask            Mask which determines influence of each pixel in template on score
 	 * @param expectedMatches Number of expected matches it hopes to find
 	 * @return List of match location and scores
 	 */
-	private static List<Match> findMatches(ImageFloat32 image, ImageFloat32 template,
+	private static List<Match> findMatches(ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask,
 										   int expectedMatches) {
 		// create template matcher.
 		TemplateMatching<ImageFloat32> matcher =
 				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
 
 		// Find the points which match the template the best
-		matcher.setTemplate(template, expectedMatches);
+		matcher.setTemplate(template, mask,expectedMatches);
 		matcher.process(image);
 
 		return matcher.getResults().toList();
@@ -95,6 +96,7 @@ public class ExampleTemplateMatching {
 		ShowImages.showWindow(output, "Match Intensity");
 	}
 
+	// TODO add masked example
 	public static void main(String args[]) {
 
 		// Load image and templates
@@ -113,17 +115,17 @@ public class ExampleTemplateMatching {
 		// Searches for a small 'x' that indicates where a window can be closed
 		// Only two such objects are in the image so at best there will be one false positive
 		g2.setColor(Color.RED);
-		drawRectangles(g2, image, templateX, 3);
+		drawRectangles(g2, image,null, templateX, 3);
 		// show match intensity image for this template
 		showMatchIntensity(image, templateX);
 
 		// Now it searches for a specific icon for which there is only one match
 		g2.setColor(Color.BLUE);
-		drawRectangles(g2, image, templatePaint, 1);
+		drawRectangles(g2, image,null, templatePaint, 1);
 
 		// Look for the Google Chrome browser icon. There is no match for this icon..
 		g2.setColor(Color.ORANGE);
-		drawRectangles(g2, image, templateBrowser, 1);
+		drawRectangles(g2, image,null, templateBrowser, 1);
 
 		// False positives can some times be pruned using the error score.  In photographs taken
 		// in the real world template matching tends to perform very poorly
@@ -135,9 +137,9 @@ public class ExampleTemplateMatching {
 	 * Helper function will is finds matches and displays the results as colored rectangles
 	 */
 	private static void drawRectangles(Graphics2D g2,
-									   ImageFloat32 image, ImageFloat32 template,
+									   ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask,
 									   int expectedMatches) {
-		List<Match> found = findMatches(image, template, expectedMatches);
+		List<Match> found = findMatches(image, template, mask, expectedMatches);
 
 		int r = 2;
 		int w = template.width + 2 * r;

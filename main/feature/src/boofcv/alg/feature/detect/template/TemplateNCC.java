@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,6 +84,43 @@ public abstract class TemplateNCC <T extends ImageBase>
 		}
 
 		@Override
+		protected float evaluateMask(int tl_x, int tl_y) {
+
+			float top = 0;
+			float imageMean = 0;
+			float imageSigma = 0;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+
+				for (int x = 0; x < template.width; x++) {
+					imageMean += image.data[imageIndex++];
+				}
+			}
+
+			imageMean /= area;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+				int templateIndex = template.startIndex + y * template.stride;
+				int maskIndex = mask.startIndex + y * mask.stride;
+
+				for (int x = 0; x < template.width; x++) {
+					float templateVal = template.data[templateIndex++];
+
+					float diff = image.data[imageIndex++] - imageMean;
+					imageSigma += diff*diff;
+
+					top += mask.data[maskIndex++]*diff*(templateVal-templateMean);
+				}
+			}
+			imageSigma = (float)Math.sqrt(imageSigma/area);
+
+			// technically top should be divided by area, but that won't change the solution
+			return top/(imageSigma*templateSigma);
+		}
+
+		@Override
 		public void setupTemplate(ImageFloat32 template) {
 			area = template.width*template.height;
 
@@ -124,6 +161,7 @@ public abstract class TemplateNCC <T extends ImageBase>
 		protected float evaluate(int tl_x, int tl_y) {
 
 			float top = 0;
+			int imageSum = 0;
 			float imageMean = 0;
 			float imageSigma = 0;
 
@@ -131,23 +169,62 @@ public abstract class TemplateNCC <T extends ImageBase>
 				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
 
 				for (int x = 0; x < template.width; x++) {
-					imageMean += image.data[imageIndex++] & 0xFF;
+					imageSum += image.data[imageIndex++] & 0xFF;
 				}
 			}
 
-			imageMean /= area;
+			imageMean = imageSum/area;
 
 			for (int y = 0; y < template.height; y++) {
 				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
 				int templateIndex = template.startIndex + y * template.stride;
 
 				for (int x = 0; x < template.width; x++) {
-					float templateVal = template.data[templateIndex++] & 0xFF;
+					int templateVal = template.data[templateIndex++] & 0xFF;
 
 					float diff = (image.data[imageIndex++] & 0xFF) - imageMean;
 					imageSigma += diff*diff;
 
 					top += diff*(templateVal-templateMean);
+				}
+			}
+			imageSigma = (float)Math.sqrt(imageSigma/area);
+
+			// technically top should be divided by area, but that won't change the solution
+			return top/(imageSigma*templateSigma);
+		}
+
+		@Override
+		protected float evaluateMask(int tl_x, int tl_y) {
+
+			float top = 0;
+			int imageSum = 0;
+			float imageMean = 0;
+			float imageSigma = 0;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+
+				for (int x = 0; x < template.width; x++) {
+					imageSum += image.data[imageIndex++] & 0xFF;
+				}
+			}
+
+			imageMean = imageSum/area;
+
+			for (int y = 0; y < template.height; y++) {
+				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
+				int templateIndex = template.startIndex + y * template.stride;
+				int maskIndex = mask.startIndex + y * mask.stride;
+
+				for (int x = 0; x < template.width; x++) {
+					int templateVal = template.data[templateIndex++] & 0xFF;
+					int m = mask.data[maskIndex++] & 0xFF;
+
+					float diff = (image.data[imageIndex++] & 0xFF) - imageMean;
+					imageSigma += diff*diff;
+
+					top += m*diff*(templateVal-templateMean);
 				}
 			}
 			imageSigma = (float)Math.sqrt(imageSigma/area);
