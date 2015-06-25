@@ -51,8 +51,8 @@ public abstract class GenericFiducialDetectorChecks {
 	public void checkNoDistortion() {
 		IntrinsicParameters param = loadIntrinsic();
 
-		if( param.radial == null )
-			fail("radial must not be null");
+		if( !param.isDistorted() )
+			fail("intrinsic must be distorted");
 
 		// normal case.  should work
 		for( ImageType type : types ) {
@@ -64,11 +64,80 @@ public abstract class GenericFiducialDetectorChecks {
 
 		// null.  might blow up
 		param.radial = null;
+		param.t1 = param.t2 = 0;
 		for( ImageType type : types ) {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 			detector.setIntrinsic(param);
 			detector.detect(image);
+		}
+	}
+
+	/**
+	 * Tests several items:
+	 *
+	 * 1) Does it properly handle setIntrinsic() being called multiple times
+	 * 2) Can it handle no distortion
+	 */
+	@Test
+	public void checkHandleNewIntrinsic() {
+		for( ImageType type : types ) {
+
+			ImageBase image = loadImage(type);
+			FiducialDetector detector = createDetector(type);
+
+			IntrinsicParameters intrinsic = loadIntrinsic();
+			assertTrue(intrinsic.isDistorted());
+
+			detector.setIntrinsic(intrinsic);
+
+			detector.detect(image);
+
+			assertTrue(detector.totalFound()>= 1);
+
+			int foundID[] = new int[ detector.totalFound() ];
+			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
+
+			for (int i = 0; i < detector.totalFound(); i++) {
+				foundID[i] = detector.getId(i);
+				Se3_F64 pose = new Se3_F64();
+				detector.getFiducialToCamera(i, pose);
+				foundPose.add(pose);
+			}
+
+			// run it again with a changed intrinsic that's incorrect
+			intrinsic.radial = null;
+			intrinsic.t1 = 0; intrinsic.t2 = 0;
+			detector.setIntrinsic(intrinsic);
+			detector.detect(image);
+
+			// results should have changed
+			if( foundID.length == detector.totalFound()) {
+				assertEquals(foundID.length, detector.totalFound());
+				for (int i = 0; i < detector.totalFound(); i++) {
+//				assertEquals(foundID[i],detector.getId(i));
+					Se3_F64 pose = new Se3_F64();
+					detector.getFiducialToCamera(i, pose);
+					assertTrue(pose.getT().distance(foundPose.get(i).T) > 1e-4);
+					assertFalse(MatrixFeatures.isIdentical(pose.getR(), foundPose.get(i).R, 1e-4));
+				}
+			} else {
+				// clearly changed
+			}
+
+			// then reproduce original
+			detector.setIntrinsic(loadIntrinsic());
+			detector.detect(image);
+
+			// see if it produced exactly the same results
+			assertEquals(foundID.length,detector.totalFound());
+			for (int i = 0; i < detector.totalFound(); i++) {
+				assertEquals(foundID[i],detector.getId(i));
+				Se3_F64 pose = new Se3_F64();
+				detector.getFiducialToCamera(i, pose);
+				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
+			}
 		}
 	}
 

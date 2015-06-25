@@ -18,16 +18,9 @@
 
 package boofcv.abst.fiducial;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
 public class TestBaseSquare_FiducialDetector {
-	@Test
-	public void checkUndistort() {
-		fail("Implement");
-	}
+	// intentionally left blank since it's functionality is tested elsewhere
 }

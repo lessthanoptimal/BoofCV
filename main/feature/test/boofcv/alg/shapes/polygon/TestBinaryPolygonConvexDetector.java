@@ -89,6 +89,7 @@ public class TestBinaryPolygonConvexDetector {
 		rectangles.add(new Rectangle2D_I32(90,90,120,120));
 
 		transform.set(0.8,0,0,0.8,1,2);
+		transform = transform.invert(null);
 
 		for( Class imageType : imageTypes ) {
 			checkDetected_LensDistortion(imageType, 0.5);
@@ -314,24 +315,23 @@ public class TestBinaryPolygonConvexDetector {
 	}
 
 	/**
-	 * Makes sure the transform doesn't extend points outside the original image
+	 * Should sanity check transforms to make sure they don't go outside the image
 	 */
 	@Test
 	public void setTransform_input() {
-		fail("Implement again");
-//		PointTransformHomography_F32 H = new PointTransformHomography_F32();
-//		PixelTransform_F32 transform = new PointToPixelTransform_F32(H);
-//
-//		RefinePolygonLineToImage alg = createAlg(4,true, ImageUInt8.class);
-//
-//		// correct example
-//		alg.getSnapToEdge().setTransform(20,30,transform);
-//
-//		// bad example
-//		try {
-//			H.getModel().a11 = 2;
-//			alg.getSnapToEdge().setTransform(20, 30, transform);
-//			fail("Should have thrown exception");
-//		} catch( RuntimeException ignore ) {}
+		Affine2D_F32 a = new Affine2D_F32();
+		transform.set(1.2,0,0,1.2,0,0);
+		UtilAffine.convert(transform,a);
+
+		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4);
+		alg.setLensDistortion(width, height, tranTo, tranFrom);
+		try {
+			// this should cause it to go outside the image
+			alg.setLensDistortion(width, height, tranFrom, tranTo);
+			fail("didn't blow up");
+		} catch( IllegalArgumentException ignore ){}
 	}
 }
