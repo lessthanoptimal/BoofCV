@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -444,6 +444,6 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Stereo Disparity");
+		ShowImages.showWindow(app, "Stereo Disparity", true);
 	}
 }

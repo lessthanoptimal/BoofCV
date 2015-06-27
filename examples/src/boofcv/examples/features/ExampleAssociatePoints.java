@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleD
 		panel.setAssociation(pointsA,pointsB,associate.getMatches());
 		panel.setImages(imageA,imageB);
 
-		ShowImages.showWindow(panel,"Associated Features");
+		ShowImages.showWindow(panel,"Associated Features",true);
 	}
 
 	/**

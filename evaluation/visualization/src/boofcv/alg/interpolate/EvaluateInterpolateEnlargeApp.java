@@ -150,6 +150,6 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Interpolation Enlarge");
+		ShowImages.showWindow(app,"Interpolation Enlarge",true);
 	}
 }

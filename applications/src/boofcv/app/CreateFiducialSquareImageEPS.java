@@ -43,10 +43,10 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 				inputPaths.add(args[i]);
 			}
 		} else {
-			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/ke.png");
+//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/ke.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yu.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yu_inverted.png");
+			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yu_inverted.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/pentarose.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/text_boofcv.png");
 //			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/leaf01.png");
@@ -69,8 +69,8 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 		app.setPrintGrid(false);
 //		app.setUnit(Unit.INCH);
 
-		app.generateSingle(fiducialWidth);
+		app.generateSingle(fiducialWidth,PaperSize.LETTER);
 //		app.generateGrid(2.5,1.0,2,3);
-//		app.generateGrid(6, 1, PaperSize.LETTER);
+//		app.generateGrid(4, 1, PaperSize.LETTER);
 	}
 }

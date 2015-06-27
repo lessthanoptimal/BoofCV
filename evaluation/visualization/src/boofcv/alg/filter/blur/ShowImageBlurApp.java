@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 import javax.swing.*;
@@ -226,10 +226,10 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 
 	public static void main(String args[]) {
 
-//		ShowImageBlurApp<ImageFloat32> app
-//				= new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
-		ShowImageBlurApp<ImageUInt8> app
-				= new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
+		ShowImageBlurApp<ImageFloat32> app
+				= new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
+//		ShowImageBlurApp<ImageUInt8> app
+//				= new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
@@ -243,6 +243,6 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Blur");
+		ShowImages.showWindow(app, "Image Blur",true);
 	}
 }

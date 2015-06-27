@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ExampleImageEnhancement {
 		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
 
 		panel.setPreferredSize(new Dimension(gray.width,gray.height));
-		ShowImages.showWindow(panel,"Histogram");
+		ShowImages.showWindow(panel,"Histogram",true);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class ExampleImageEnhancement {
 		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
 
 		panel.setPreferredSize(new Dimension(gray.width,gray.height));
-		ShowImages.showWindow(panel,"Sharpen");
+		ShowImages.showWindow(panel,"Sharpen",true);
 	}
 
 	public static void main( String args[] )

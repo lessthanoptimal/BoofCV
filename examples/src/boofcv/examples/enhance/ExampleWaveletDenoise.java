@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,6 @@ public class ExampleWaveletDenoise {
 		gui.addImage(ConvertBufferedImage.convertTo(noisy,null),"Noisy");
 		gui.addImage(ConvertBufferedImage.convertTo(denoised,null),"Denoised");
 
-		ShowImages.showWindow(gui,"Wavelet Noise Removal Example");
+		ShowImages.showWindow(gui,"Wavelet Noise Removal Example",true);
 	}
 }

@@ -365,6 +365,6 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Calibration Target Detection");
+		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}
 }

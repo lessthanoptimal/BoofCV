@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -210,6 +210,6 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Point Feature");
+		ShowImages.showWindow(app, "Point Feature",true);
 	}
 }

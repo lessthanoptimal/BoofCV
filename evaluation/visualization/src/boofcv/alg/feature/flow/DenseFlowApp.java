@@ -195,7 +195,7 @@ public class DenseFlowApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Dense Optical Flow");
+		ShowImages.showWindow(app,"Dense Optical Flow",true);
 	}
 
 }

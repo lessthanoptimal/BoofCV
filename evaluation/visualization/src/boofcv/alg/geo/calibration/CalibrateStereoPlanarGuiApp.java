@@ -26,6 +26,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
@@ -256,10 +257,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
 		app.configure(detector,2,false,true, leftImages,rightImages);
 
-		JFrame frame = new JFrame("Planar Stereo Calibration");
-		frame.add(app, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
+		ShowImages.showWindow(app,"Planar Stereo Calibration",true);
 
 		app.process("stereo.xml");
 	}

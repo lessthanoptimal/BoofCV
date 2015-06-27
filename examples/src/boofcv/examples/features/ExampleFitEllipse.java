@@ -75,6 +75,6 @@ public class ExampleFitEllipse {
 		}
 
 //		ShowImages.showWindow(VisualizeBinaryData.renderBinary(filtered,null),"Binary");
-		ShowImages.showWindow(image,"Ellipses");
+		ShowImages.showWindow(image,"Ellipses",true);
 	}
 }

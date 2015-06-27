@@ -384,6 +384,6 @@ public class DetectCalibrationSquaresApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Calibration Target Detection");
+		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}
 }
