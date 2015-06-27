@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
@@ -28,6 +29,7 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -64,11 +66,10 @@ public class TestDetectFiducialSquareImage {
 		ConvertImage.convert(rendered_F32, rendered);
 		ImageUInt8 input = new ImageUInt8(640,480);
 
-		ImageUInt8 pattern = new ImageUInt8(rendered.width-4*w,rendered.height-4*2);
-		pattern.setTo(rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null));
+		ImageUInt8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
 
 		DetectFiducialSquareImage<ImageUInt8> alg = new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
-		alg.addImage(pattern,125,2.0);
+		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
 
 		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
@@ -123,7 +124,7 @@ public class TestDetectFiducialSquareImage {
 		DetectFiducialSquareImage<ImageUInt8> alg =
 				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
 
-		alg.addImage(pattern,125,1.0);
+		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result));
 		assertEquals(0,result.which);
@@ -151,7 +152,7 @@ public class TestDetectFiducialSquareImage {
 	}
 
 	@Test
-	public void addImage() {
+	public void addPattern() {
 		ImageUInt8 image = new ImageUInt8(16*8,16*4);
 
 		// fill just one square
@@ -164,7 +165,7 @@ public class TestDetectFiducialSquareImage {
 		DetectFiducialSquareImage<ImageUInt8> alg =
 				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
 
-		alg.addImage(image,100,1.0);
+		alg.addPattern(threshold(image, 100), 1.0);
 
 		List<DetectFiducialSquareImage.FiducialDef> defs = alg.getTargets();
 		assertEquals(1,defs.size());
@@ -173,17 +174,17 @@ public class TestDetectFiducialSquareImage {
 
 		// manually construct the descriptor in each corner
 		short desc[] = new short[16*16];
-		Arrays.fill(desc,(short)0xFFFF);
-		desc[0] = (short)0xFFFE;
+		Arrays.fill(desc,(short)0x0000);
+		desc[0] = (short)0x0001;
 		compare(desc, def.desc[0]);
-		desc[0] = (short)0xFFFF;
-		desc[252] = (short)0xFFFE;
+		desc[0] = (short)0x0000;
+		desc[252] = (short)0x0001;
 		compare(desc, def.desc[1]);
-		desc[252] = (short)0xFFFF;
-		desc[255] = (short)0x7FFF;
+		desc[252] = (short)0x0000;
+		desc[255] = (short)0x8000;
 		compare(desc,def.desc[2]);
-		desc[255] = (short)0xFFFF;
-		desc[3] = (short)0x7FFF;
+		desc[255] = (short)0x0000;
+		desc[3] = (short)0x8000;
 		compare(desc,def.desc[3]);
 	}
 
@@ -234,5 +235,11 @@ public class TestDetectFiducialSquareImage {
 		int found = alg.hamming(a, b);
 
 		assertEquals(expected,found);
+	}
+
+	private ImageUInt8 threshold( ImageSingleBand image , double threshold ) {
+		ImageUInt8 out = new ImageUInt8(image.width,image.height);
+		GThresholdImageOps.threshold(image,out,threshold,false);
+		return out;
 	}
 }

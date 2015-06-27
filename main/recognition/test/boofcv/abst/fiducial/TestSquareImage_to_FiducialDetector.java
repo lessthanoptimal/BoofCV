@@ -61,7 +61,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImageRobust
 				(new ConfigFiducialImage(), 6, imageType.getImageClass());
 
-		ret.addTarget(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125,0.1);
+		ret.addPattern(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125, 0.1);
 
 		return ret;
 	}

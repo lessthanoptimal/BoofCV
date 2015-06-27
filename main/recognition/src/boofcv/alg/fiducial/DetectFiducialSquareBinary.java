@@ -29,16 +29,21 @@ import java.util.Arrays;
 
 /**
  * <p>
- * This fiducial encores a 12-bit number.  The inner region is broken up into 16-squares which are
- * either white or black.  One corner is always back and the others are always white.  This
- * allows orientation to be uniquely determined.
+ * Fiducial which encores a 12-bit number using a predetermined pattern.  The inner region is broken up into 4 by 4
+ * grid of 16-squares which are either white or black.  The lower left corner is always back and while all the other
+ * corners are always white.  This allows orientation to be uniquely determined.
  * </p>
+ * <center>
+ * <img src="doc-files/square_binary.png"/>
+ * </center>
  * <p>
- * Canonical orientation is with the black square in the lower-left hand corner.
+ * The above image visually shows the fiducials internal coordinate system.  The center of the fiducial is the origin
+ * of the coordinate system, e.g. all sides are width/2 distance away from the origin.  +x is to the right, +y is up
+ * , and +z out of the paper towards the viewer.  The black orientation corner is pointed out in the image.
+ * The fiducial's width refers to the width of each side along the black border NOT the internal encoded image.
  * </p>
  * @author Peter Abeles
  */
-// TODO classify the border.  If not all black discard the pattern
 public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 

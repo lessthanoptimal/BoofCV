@@ -43,6 +43,8 @@ public class FactoryFiducial {
 	 * Fast detector for square binary based fiducials.  The speed increase comes from using a simple
 	 * threshold and is not lighting invariant.
 	 *
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
+	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param binaryThreshold Threshold for binary image.
 	 * @param imageType Type of image it's processing
@@ -68,6 +70,8 @@ public class FactoryFiducial {
 	/**
 	 * Robust detector for square image based fiducials.  Lighting invariant detector
 	 *
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
+	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
 	 * @param imageType Type of image it's processing
@@ -91,8 +95,13 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Fast detector for square image based fiducials.  The speed increase comes from using a simple
-	 * threshold and is not lighting invariant.
+	 * <p>Fast detector for square image based fiducials.  The speed increase comes from using a simple
+	 * threshold and is not lighting invariant.</p>
+	 *
+	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * is returned instead of the more generic {@link FiducialDetector}.</p>
+	 *
+	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param binaryThreshold Threshold for binary image.
@@ -116,7 +125,12 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Robust detector for square image based fiducials.  Lighting invariant detector
+	 * <p>Robust detector for square image based fiducials.  Light invariant detector</p>
+	 *
+	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * is returned instead of the more generic {@link FiducialDetector}.</p>
+	 *
+	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
