@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
@@ -37,13 +36,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat32 input , ImageUInt8 output ,
@@ -73,7 +72,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -86,13 +85,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat64 input , ImageUInt8 output ,
@@ -122,7 +121,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -135,13 +134,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt8 input , ImageUInt8 output ,
@@ -171,7 +170,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFF) >= threshold )
+					if( (input.data[indexIn]& 0xFF) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -184,13 +183,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt16 input , ImageUInt8 output ,
@@ -220,7 +219,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -233,13 +232,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt16 input , ImageUInt8 output ,
@@ -269,7 +268,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]& 0xFFFF) >= threshold )
+					if( (input.data[indexIn]& 0xFFFF) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -282,13 +281,13 @@ public class ThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
-	 * @param output Binary output image. If null a new image will be declared. Modified.
+	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt32 input , ImageUInt8 output ,
@@ -318,7 +317,7 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++ ) {
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -333,7 +332,7 @@ public class ThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -384,7 +383,7 @@ public class ThresholdImageOps {
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
 					int threshold = (mean.data[indexMean]& 0xFF) + bias;
 
-					if( (input.data[indexIn]& 0xFF) >= threshold )
+					if( (input.data[indexIn]& 0xFF) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -399,7 +398,7 @@ public class ThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -450,7 +449,7 @@ public class ThresholdImageOps {
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
 					int threshold = (blur.data[indexMean]& 0xFF) + bias;
 
-					if( (input.data[indexIn]& 0xFF) >= threshold )
+					if( (input.data[indexIn]& 0xFF) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -465,7 +464,7 @@ public class ThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -516,7 +515,7 @@ public class ThresholdImageOps {
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
 					float threshold = (mean.data[indexMean]) + bias;
 
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -531,7 +530,7 @@ public class ThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -582,7 +581,7 @@ public class ThresholdImageOps {
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
 					float threshold = (blur.data[indexMean]) + bias;
 
-					if( (input.data[indexIn]) >= threshold )
+					if( (input.data[indexIn]) > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;

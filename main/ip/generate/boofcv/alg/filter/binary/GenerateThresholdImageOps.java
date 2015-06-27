@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,13 +81,13 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 	public void printThreshold( AutoTypeImage imageIn ) {
 		out.print("\t/**\n" +
 				"\t * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=\n" +
-				"\t * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=\n" +
+				"\t * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >\n" +
 				"\t * to 'threshold' are set to 1 and the others set to 0.\n" +
 				"\t *\n" +
 				"\t * @param input Input image. Not modified.\n" +
 				"\t * @param output (Optional) Binary output image. If null a new image will be declared. Modified.\n" +
 				"\t * @param threshold threshold value.\n" +
-				"\t * @param down If true then the inequality <= is used, otherwise if false then >= is used.\n" +
+				"\t * @param down If true then the inequality <= is used, otherwise if false then > is used.\n" +
 				"\t * @return Output image.\n" +
 				"\t */\n" +
 				"\tpublic static ImageUInt8 threshold( "+imageIn.getSingleBandName()+" input , ImageUInt8 output ,\n" +
@@ -117,7 +117,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++ ) {\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+imageIn.getBitWise()+") >= threshold )\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+imageIn.getBitWise()+") > threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
 				"\t\t\t\t\telse\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
@@ -139,7 +139,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * Thresholds the image using an adaptive threshold that is computed using a local square region centered\n" +
 				"\t * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.\n" +
 				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise\n" +
-				"\t * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1\n" +
+				"\t * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1\n" +
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
@@ -190,7 +190,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
 				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+") + bias;\n" +
 				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") >= threshold )\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") > threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
 				"\t\t\t\t\telse\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
@@ -212,7 +212,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * Thresholds the image using an adaptive threshold that is computed using a local square region centered\n" +
 				"\t * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.\n" +
 				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise\n" +
-				"\t * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1\n" +
+				"\t * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1\n" +
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
@@ -263,7 +263,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
 				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+") + bias;\n" +
 				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") >= threshold )\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") > threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
 				"\t\t\t\t\telse\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +

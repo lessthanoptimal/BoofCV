@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,11 +66,14 @@ public class GThresholdImageOps {
 	 */
 	// original code from http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
 	//                    Dr. Andrew Greensted
+	// modifications to reduce overflow
 	public static int computeOtsu( int histogram[] , int length , int totalPixels ) {
 
+		double dlength = length;
 		double sum = 0;
 		for (int i=0 ; i< length ; i++)
-			sum += i*histogram[i];
+			sum += (i/dlength)*histogram[i];
+
 
 		double sumB = 0;
 		int wB = 0;
@@ -85,7 +88,7 @@ public class GThresholdImageOps {
 			int wF = totalPixels - wB;         // Weight Foreground
 			if (wF == 0) break;
 
-			sumB += i*histogram[i];
+			sumB += (i/dlength)*histogram[i];
 
 			double mB = sumB / wB;            // Mean Background
 			double mF = (sum - sumB) / wF;    // Mean Foreground
@@ -197,13 +200,13 @@ public class GThresholdImageOps {
 
 	/**
 	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
-	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >=
+	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
 	 * @return binary image.
 	 */
 	public static <T extends ImageSingleBand>
@@ -232,7 +235,7 @@ public class GThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 * </p>
 	 *
 	 * <p>
@@ -269,7 +272,7 @@ public class GThresholdImageOps {
 	 * Thresholds the image using an adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels plus the bias.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) + bias ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) >= T(x,y) + bias ? 0 : 1
+	 * b(x,y) = I(x,y) > T(x,y) + bias ? 0 : 1
 	 * </p>
 	 *
 	 * <p>
