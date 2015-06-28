@@ -218,6 +218,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		frame.add(app, BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		app.process("intrinsic.xml");
 	}

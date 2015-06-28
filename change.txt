@@ -78,6 +78,12 @@ Version : Alpha 0.19
   * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
 - Template Matching
   * Can provide a mask for a template and effectively make pixels transparent or translucent
+- ConvertBufferedImage
+  * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
+  * Thanks thhart for pointing this out
+- ThresholdImageAOps
+  * Changed threshold up from >= to >.  Turns out the original choice was bad.  Images were not inverses of each other
+    and it was possible the threshold an image with two values up and end up with all 0.
 
 TODO
   * Distortion Model + Calibration
@@ -100,6 +106,7 @@ TODO
      * remove original text example
   * Polygon Detector Regression
 
+  * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram comparison

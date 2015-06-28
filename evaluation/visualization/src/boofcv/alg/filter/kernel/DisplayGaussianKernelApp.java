@@ -111,6 +111,6 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 
 		panel.setPreferredSize(new Dimension(640,480));
 
-		ShowImages.showWindow(panel,"Gaussian Kernels");
+		ShowImages.showWindow(panel,"Gaussian Kernels", true);
 	}
 }

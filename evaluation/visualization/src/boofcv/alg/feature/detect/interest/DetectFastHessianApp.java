@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class DetectFastHessianApp {
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(), BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
 
-		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName());
+		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName(),true);
 	}
 
 	public static void main( String args[] ) {

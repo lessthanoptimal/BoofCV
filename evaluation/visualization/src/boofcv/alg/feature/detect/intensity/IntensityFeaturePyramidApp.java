@@ -215,7 +215,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Feature Scale Space Pyramid Intensity");
+		ShowImages.showWindow(app,"Feature Scale Space Pyramid Intensity",true);
 
 	}
 }

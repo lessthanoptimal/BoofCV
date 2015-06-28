@@ -42,6 +42,19 @@ public enum PaperSize {
 	double width;
 	double height;
 
+	/**
+	 * Sees if the specified work matches any of the units full name or short name.
+	 */
+	public static PaperSize lookup( String word ) {
+		for( PaperSize paper : values() ) {
+			if( paper.toString().compareToIgnoreCase(word) == 0 ) {
+				return paper;
+			}
+		}
+
+		return null;
+	}
+
 	public Unit getUnit() {
 		return unit;
 	}

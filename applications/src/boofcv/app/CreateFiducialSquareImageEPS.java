@@ -18,8 +18,6 @@
 
 package boofcv.app;
 
-import boofcv.io.UtilIO;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,46 +29,195 @@ import java.util.List;
  */
 public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
+	public static String outputName = null;
+	public static int gridX = 1, gridY = 1;
+	public static double borderX = Double.NaN, borderY = Double.NaN;
+	public static double offsetX = 0, offsetY = 0;
+	public static boolean autoCenter = true;
+	public static double whiteBorder = -1;
+	public static Unit units = Unit.CENTIMETER;
+	public static PaperSize paper = null;
+	public static boolean printInfo = false;
+	public static boolean printGrid = false;
+	public static double fiducialWidth = -1;
+
+	public static List<String> images = new ArrayList<String>();
+
+	public static void printHelp() {
+		System.out.println("./application <optional flags> <fiducial width>  <image 0> ... <image N-1>");
+		System.out.println();
+		System.out.println("Optional Flags");
+		System.out.println("-OutputFile=<name>   Specify name of output file.  Default is input file + eps");
+		System.out.println("-Grid=fill           Automatically fill the paper with fiducials");
+		System.out.println("-Grid=<rows>,<cols>  Create a grid of fiducials with the specified number of rows and columns");
+		System.out.println("-WhiteBorder         Size of the white border around the fiducial.");
+		System.out.println("-PrintInfo           Will print the size and name of each fiducial.");
+		System.out.println("-PrintGrid           Will draw a light gray grid around the fiducials");
+		System.out.println("-Border=<x>,<y>      Specifies the border of the page in which it can't print. default = 1cm");
+		System.out.println("-Offsets=<x>,<y>     Shift the fiducial/grid");
+		System.out.println("                     Turns off auto centering");
+		System.out.println("-Units=<unit>        Specify units used: mm, cm, m, inch, foot, yard");
+		System.out.println("                     example: -Units=cm");
+		System.out.println("-PageSize=<type>     Specify the page: A0, A1, A2, A3, A4, legal, letter");
+		System.out.println("                     example: -PageSize=letter");
+		System.out.println();
+		System.out.println("Examples:");
+		System.out.println("./application -PrintInfo 10 fiducial_ke.eps ke.png");
+		System.out.println("         10cm fiducial using 'ke.png' as the pattern with it's size and info");
+		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 ke.png");
+		System.out.println("         2.5 inch fiducial, filling letter sized paper with grid, 'ke.png' as the pattern");
+		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 ke.png dog.png");
+		System.out.println("         same as the previous, but alternates between ke and dog patterns");
+	}
+
+	public static int parseFlags( String []args) {
+		int index = 0;
+
+		for( ; index < args.length; index++ ) {
+			String arg = args[index];
+			if( arg.charAt(0) == '-' ) {
+				String label = label(arg);
+
+				if( "OutputFile".compareToIgnoreCase(label) == 0 ) {
+					outputName = param(arg);
+				} else if( "Grid".compareToIgnoreCase(label) == 0 ) {
+					String right = param(arg);
+					if( "fill".compareToIgnoreCase(right) == 0 ) {
+						gridX = -1; gridY = -1;
+					} else {
+						String words[] = split(right);
+						gridX = Integer.parseInt(words[0]);
+						gridY = Integer.parseInt(words[1]);
+					}
+				} else if( "WhiteBorder".compareToIgnoreCase(label) == 0 ) {
+					whiteBorder = Double.parseDouble(param(arg));
+				} else if( "PrintInfo".compareToIgnoreCase(label) == 0 ) {
+					printInfo = true;
+				} else if( "PrintGrid".compareToIgnoreCase(label) == 0 ) {
+					printGrid = true;
+				} else if( "Border".compareToIgnoreCase(label) == 0 ) {
+					String words[] = split(param(arg));
+					borderX = Integer.parseInt(words[0]);
+					borderY = Integer.parseInt(words[1]);
+				} else if( "Offsets".compareToIgnoreCase(label) == 0 ) {
+					String words[] = split(param(arg));
+					offsetX = Integer.parseInt(words[0]);
+					offsetY = Integer.parseInt(words[1]);
+					autoCenter = false;
+				} else if( "Units".compareToIgnoreCase(label) == 0 ) {
+					units = Unit.lookup(param(arg));
+				} else if( "PageSize".compareToIgnoreCase(label) == 0 ) {
+					paper = PaperSize.lookup(param(arg));
+				} else {
+					throw new IllegalArgumentException("Unknown: "+label);
+				}
+			} else {
+				break;
+			}
+		}
+		return index;
+	}
+
+	public static void parseArguments( String []args) {
+		int where = parseFlags(args);
+		if( args.length-where < 2 )
+			throw new IllegalArgumentException("Expected size followed by image list");
+
+		fiducialWidth = Double.parseDouble(args[where++]);
+
+		while( where < args.length ) {
+			images.add( args[where++]);
+		}
+	}
+
+	public static String label( String arg ) {
+		int end = 1;
+		while( end < arg.length() ) {
+			if( arg.charAt(end) == '=' ) {
+				break;
+			}
+			end++;
+		}
+		return arg.substring(1,end);
+	}
+
+	public static String param( String arg ) {
+		int where = 0;
+		while( where < arg.length() ) {
+			if( arg.charAt(where++) == '=' ) {
+				return arg.substring(where,arg.length());
+			}
+		}
+		throw new IllegalArgumentException("Couldn't find '=' in "+arg);
+	}
+
+	public static String[] split( String arg ) {
+		int where = 0;
+		while( where < arg.length() ) {
+			if( arg.charAt(where++) == ',' ) {
+				String left = arg.substring(0, where-1);
+				String right = arg.substring(where,arg.length());
+				return new String[]{left,right};
+			}
+		}
+		throw new IllegalArgumentException("Couldn't find ',' in "+arg);
+	}
+
 	public static void main(String[] args) throws IOException {
 
-		List<String> inputPaths = new ArrayList<String>();
-
-
-		double fiducialWidth = 10;
-		if( args.length >= 2 ) {
-			fiducialWidth = Double.parseDouble(args[0]);
-			for (int i = 1; i < args.length; i++) {
-				inputPaths.add(args[i]);
-			}
-		} else {
-			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/ke.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yu.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yu_inverted.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/pentarose.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/text_boofcv.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/leaf01.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/leaf02.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/hand01.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/chicken.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/h2o.png");
-//			inputPaths.add(UtilIO.getPathToBase()+"data/applet/fiducial/image/yinyang.png");
+		try {
+			parseArguments(args);
+		} catch( IllegalArgumentException e ) {
+			printHelp();
+			System.out.println();
+			System.out.println(e.getMessage());
+			System.exit(-1);
 		}
 
+		System.out.println("################### Configuration");
+		System.out.println("Output          "+outputName);
+		System.out.println("Units           "+units);
+		System.out.println("Fiducial Width  "+fiducialWidth);
+		if( whiteBorder > -1 )
+			System.out.println("White Border    "+whiteBorder);
+		System.out.println("Print Info      "+printInfo);
+		System.out.println("Print Grid      "+printGrid);
+		if( paper != null )
+			System.out.println("Paper Size      "+paper);
+		if( gridX < 0)
+			System.out.println("Grid            automatic");
+		else if( gridX > 1 && gridY > 1)
+			System.out.printf("Grid            rows = %2d cols = %2d",gridY,gridX);
+		if( autoCenter)
+			System.out.println("Auto centering");
+		else
+			System.out.printf("Offset          x = %f y = %f",offsetX,offsetY);
+		if( !Double.isNaN(borderX))
+			System.out.printf("Page Border     x = %f y = %f",borderX,borderY);
+		System.out.println();
+		System.out.println("Images");
+		for( String p : images ) {
+			System.out.println("  "+p);
+		}
+
+		System.out.println("################### Generating");
 		CreateFiducialSquareImageEPS app = new CreateFiducialSquareImageEPS();
 
-		for( String path : inputPaths ) {
+		for( String path : images ) {
 			app.addImage(path);
 		}
 
-		app.setOutputFileName("fiducial_image.eps");
+		app.setOutputFileName(outputName);
 
-		app.setPrintInfo(true);
-		app.setPrintGrid(false);
-//		app.setUnit(Unit.INCH);
+		app.setPrintInfo(printInfo);
+		app.setPrintGrid(printGrid);
+		app.setUnit(units);
+		if( !autoCenter ) {
+			app.setCentering(false);
+			app.setOffset(offsetX, offsetY, units);
+		}
+		app.generateGrid(fiducialWidth,whiteBorder,gridX,gridY,paper);
 
-		app.generateSingle(fiducialWidth);
-//		app.generateGrid(2.5,1.0,2,3);
-//		app.generateGrid(6, 1, PaperSize.LETTER);
+		System.out.println("################### Finished");
 	}
 }

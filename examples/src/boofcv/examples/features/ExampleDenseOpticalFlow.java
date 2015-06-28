@@ -95,6 +95,6 @@ public class ExampleDenseOpticalFlow {
 		gui.add(visualized);
 		animate.start();
 
-		ShowImages.showWindow(gui,"Dense Optical Flow");
+		ShowImages.showWindow(gui,"Dense Optical Flow",true);
 	}
 }

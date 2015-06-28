@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -636,7 +636,14 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			if( ImageInt16.class.isInstance(src))
+			if( ImageInt8.class.isInstance(src))
+				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+			else if( ImageFloat.class.isInstance(src) )
+				// no good equivalent.  Just assume the image is a regular gray scale image
+				// with pixel values from 0 to 255
+				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+			else if( ImageInteger.class.isInstance(src))
+				// no good equivalent.  I'm giving it the biggest pixel for the range
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);
 			else
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);

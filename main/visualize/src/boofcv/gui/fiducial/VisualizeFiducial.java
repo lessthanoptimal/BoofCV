@@ -28,11 +28,36 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * @author Peter Abeles
  */
 public class VisualizeFiducial {
+
+	private static final Font font = new Font("Serif", Font.BOLD, 24);
+
+
+	/**
+	 * Draws a flat cube to show where the square fiducial is on the image
+	 *
+	 */
+	public static void drawNumbers( Se3_F64 targetToCamera , IntrinsicParameters intrinsic , int id , Graphics2D g2 )
+	{
+		// Computer the center of the fiducial in pixel coordinates
+		Point2D_F64 p = new Point2D_F64();
+		Point3D_F64 c = new Point3D_F64();
+		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, targetToCamera);
+		worldToPixel.transform(c,p);
+
+		// Draw the ID number approximately in the center
+		FontMetrics metrics = g2.getFontMetrics(font);
+		String text = Integer.toString(id);
+		Rectangle2D r = metrics.getStringBounds(text,null);
+		g2.setColor(Color.ORANGE);
+		g2.setFont(font);
+		g2.drawString(text,(float)(p.x-r.getWidth()/2),(float)(p.y+r.getHeight()/2));
+	}
 
 	/**
 	 * Draws a flat cube to show where the square fiducial is on the image

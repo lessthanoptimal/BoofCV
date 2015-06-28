@@ -19,7 +19,6 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -32,14 +31,10 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import com.github.sarxos.webcam.Webcam;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.transform.se.SePointOps_F64;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import static boofcv.io.image.UtilImageIO.loadImage;
@@ -102,18 +97,18 @@ public class TrackFiducialWebcam {
 		String patternPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
 		SquareImage_to_FiducialDetector<ImageFloat32> detector =
 				FactoryFiducial.squareImageFast(new ConfigFiducialImage(),100, ImageFloat32.class);
-		detector.addTarget(loadImage(patternPath+"ke.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"dog.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"yu.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"yu_inverted.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"pentarose.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"text_boofcv.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"leaf01.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"leaf02.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"hand01.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"chicken.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"h2o.png", ImageFloat32.class),100,2.5);
-		detector.addTarget(loadImage(patternPath+"yinyang.png", ImageFloat32.class),100,2.5);
+		detector.addPattern(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, 2.5);
+		detector.addPattern(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, 2.5);
 
 		detector.setIntrinsic(param);
 
@@ -139,19 +134,8 @@ public class TrackFiducialWebcam {
 				double width = detector.getWidth(i);
 				int id = detector.getId(i);
 
-				// Computer the center of the fiducial in pixel coordinates
-				Point2D_F64 p = new Point2D_F64();
-				Point3D_F64 c = new Point3D_F64();
-				SePointOps_F64.transform(targetToSensor, c, c);
-				PerspectiveOps.convertNormToPixel(param, c.x / c.z, c.y / c.z, p);
-
 				// Draw the ID number approximately in the center
-				FontMetrics metrics = g2.getFontMetrics(font);
-				String text = Integer.toString(id);
-				Rectangle2D r = metrics.getStringBounds(text,null);
-				g2.setColor(Color.ORANGE);
-				g2.setFont(font);
-				g2.drawString(text,(float)(p.x-r.getWidth()/2),(float)(p.y+r.getHeight()/2));
+				VisualizeFiducial.drawNumbers(targetToSensor, param, id, g2);
 
 				// draw a cube to show orientation and location
 				VisualizeFiducial.drawCube(targetToSensor, param, width, g2);

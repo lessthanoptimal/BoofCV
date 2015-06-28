@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class TestThresholdImageOps {
 						output.set(x,y,0);
 					}
 				} else {
-					if( v >= threshold ) {
+					if( v > threshold ) {
 						output.set(x,y,1);
 					} else {
 						output.set(x,y,0);
@@ -203,7 +203,7 @@ public class TestThresholdImageOps {
 						output.set(x,y,0);
 					}
 				} else {
-					if( v >= threshold ) {
+					if( v > threshold ) {
 						output.set(x,y,1);
 					} else {
 						output.set(x,y,0);
@@ -246,10 +246,15 @@ public class TestThresholdImageOps {
 	public void performThreshold( Method m , ImageSingleBand input , ImageUInt8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
+		int areaBelow = 8*input.height;
+		int areaAbove = input.width*input.height - areaBelow;
+
+
 		m.invoke(null,input,output,7,true);
-		assertEquals(240, GImageStatistics.sum(output),1e-4);
+		assertEquals(areaBelow, GImageStatistics.sum(output),1e-4);
 
 		m.invoke(null,input,output,7,false);
-		assertEquals(390, GImageStatistics.sum(output),1e-4);
+		assertEquals(areaAbove, GImageStatistics.sum(output),1e-4);
 	}
+
 }
