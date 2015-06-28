@@ -18,19 +18,12 @@
 
 package boofcv.app;
 
-import boofcv.abst.distort.FDistort;
-import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.image.ShowImages;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>
@@ -49,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BaseFiducialSquareEPS {
+public abstract class BaseFiducialSquareEPS {
 
 	// threshold for converting to a binary image
 	public int threshold = 255/2;
@@ -102,9 +95,6 @@ public class BaseFiducialSquareEPS {
 	// stream in which the output file is written to
 	PrintStream out;
 
-	// Paths to image files containing fiducial patterns
-	List<String> imagePaths = new ArrayList<String>();
-
 	public Unit getUnit() {
 		return unit;
 	}
@@ -123,10 +113,6 @@ public class BaseFiducialSquareEPS {
 
 	public void setPrintGrid(boolean printGrid) {
 		this.printGrid = printGrid;
-	}
-
-	public void addImage( String inputPath ) {
-		this.imagePaths.add(inputPath);
 	}
 
 	public boolean isPrintInfo() {
@@ -197,22 +183,12 @@ public class BaseFiducialSquareEPS {
 
 		String outputName;
 		if( this.outputFileName == null ) {
-			String inputPath = imagePaths.get(0);
-			File dir = new File(inputPath).getParentFile();
-			outputName = new File(inputPath).getName();
-			outputName = outputName.substring(0,outputName.length()-3) + "eps";
-			outputName = new File(dir,outputName).getCanonicalPath();
+			outputName = defaultOutputFileName();
 		} else {
 			outputName = this.outputFileName;
 		}
 
-
-		String imageName;
-		if( imagePaths.size() == 1 ) {
-			imageName = new File(imagePaths.get(0)).getName();
-		} else {
-			imageName = "Multiple Patterns";
-		}
+		String imageName = selectEpsName();
 
 		configureDocument(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
 
@@ -334,7 +310,7 @@ public class BaseFiducialSquareEPS {
 	 */
 	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
 		printHeader(documentTitle,fiducialWidthUnit);
-		printImageDefinitions(fiducialWidthUnit);
+		printPatternDefinitions(fiducialWidthUnit);
 
 		// draws the black border around the fiducial
 		out.print(" /drawBorder\n"+
@@ -358,52 +334,28 @@ public class BaseFiducialSquareEPS {
 				"%%EOF\n");
 	}
 
-	private void printImageDefinitions( double fiducialWidthUnit ) {
-		for( int i = 0; i < imagePaths.size(); i++ ) {
-			String imageName = new File(imagePaths.get(i)).getName();
-			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
+	/**
+	 * Define EPS functions for each pattern:
+	 *   {@link #getImageName}  -> renders the pattern
+	 *   {@link #getDisplayName} -> displays information above fiducial
+	 *
+	 *
+	 * @param fiducialWidthUnit Size of the fiducial
+	 */
+	protected abstract void printPatternDefinitions(double fiducialWidthUnit);
 
-			if( image == null ) {
-				System.err.println("Can't find image.  Path = "+ imagePaths.get(i));
-				System.exit(0);
-			} else {
-				System.out.println("  loaded "+imageName);
-			}
+	/**
+	 * Returns the total number of unqiue patterns
+	 */
+	protected abstract int totalPatterns();
 
-			// make sure the image is square and divisible by 8
-			int s = image.width - (image.width%8);
-			if( image.width != s || image.height != s ) {
-				ImageUInt8 tmp = new ImageUInt8(s, s);
-				new FDistort(image, tmp).scaleExt().apply();
-				image = tmp;
-			}
+	protected abstract void addPattern( String name );
 
-			double scale = image.width/innerWidth;
-			ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
-			if( showPreview )
-				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
-
-			out.println();
-			out.print("  /"+getImageName(i)+" {\n" +
-					"  "+binary.width+" " + binary.height + " 1 [" + scale + " 0 0 " + scale + " 0 0]\n" +
-					"  {<"+binaryToHex(binary)+">} image\n" +
-					"} def\n");
-			out.println();
-			if(printInfo) {
-				out.print(" /"+getDisplayName(i)+"\n" +
-						"{\n" +
-						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-						" moveto (" + imageName + "   " + fiducialWidthUnit + " "+unit.abbreviation+") show\n"+
-						"} def\n" );
-			}
-		}
-	}
-
-	private String getImageName( int num ) {
+	protected String getImageName( int num ) {
 		return String.format("drawImage%03d",num);
 	}
 
-	private String getDisplayName( int num ) {
+	protected String getDisplayName( int num ) {
 		return String.format("displayInfo%03d",num);
 	}
 
@@ -454,7 +406,7 @@ public class BaseFiducialSquareEPS {
 		out.println();
 		out.println("  drawBorder");
 
-		int imageNum = (row*numCols+col)%imagePaths.size();
+		int imageNum = (row*numCols+col)%totalPatterns();
 
 		// print out encoding information for convenience
 		if(printInfo) {
@@ -498,4 +450,14 @@ public class BaseFiducialSquareEPS {
 		this.numRows = numRows;
 		this.numCols = numCols;
 	}
+
+	/**
+	 * Returns an automatically selected name/path for the output file
+	 */
+	public abstract String defaultOutputFileName();
+
+	/**
+	 * Name of the image which will go into the EPS document
+	 */
+	public abstract String selectEpsName();
 }
