@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,7 +166,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// rectangle that contains the area of interest
 		targetRect = findBound.getBoundRect();
 
-		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1, null);
+		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
 		derivX.reshape(subGray.width, subGray.height);
 		derivY.reshape(subGray.width, subGray.height);
 
@@ -351,7 +351,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			ImageMiscOps.fill(wholeImage,0);
 		} else {
 			ImageFloat32 found = intensityAlg.getIntensity();
-			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1, null);
+			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
 			out.setTo(found);
 		}
 	}

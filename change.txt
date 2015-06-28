@@ -78,7 +78,7 @@ Version : Alpha 0.19
   * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
 - Template Matching
   * Can provide a mask for a template and effectively make pixels transparent or translucent
-  * Requested by Rafael Maus and otherse
+  * Requested by Rafael Maus and others
 - ConvertBufferedImage
   * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
   * Thanks thhart for pointing this out

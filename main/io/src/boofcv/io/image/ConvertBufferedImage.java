@@ -435,10 +435,15 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts an image into a BufferedImage.
+	 * <p>
+	 * Converts an image into a BufferedImage. The best way to think of this function is that it's a mindless
+	 * typecast.  If you don't provide an output image then it will create one.  However there isn't always a direct
+	 * equivalent between a BoofCV image and BufferedImage internal type.  A "reasonable" choice will be made, but
+	 * for your application it might not be a good choice.
+	 * </p>
 	 *
 	 * @param src Input image.  Pixels must have a value from 0 to 255.
-	 * @param dst Where the converted image is written to.  If null a new image is created.
+	 * @param dst Where the converted image is written to.  If null a new image is created.  See comment above about type.
 	 * @param orderRgb If applicable, should it change the order of the color bands (assumed RGB or ARGB) into the
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
@@ -642,6 +647,7 @@ public class ConvertBufferedImage {
 				// no good equivalent.  Just assume the image is a regular gray scale image
 				// with pixel values from 0 to 255
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+//			throw new RuntimeException("Fail!");
 			else if( ImageInteger.class.isInstance(src))
 				// no good equivalent.  I'm giving it the biggest pixel for the range
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);

@@ -110,7 +110,15 @@ public class TestTemplateMatching {
 
 	@Test
 	public void withMask() {
-		fail("implement");
+		expected = new ArrayList<Match>();
+		DummyIntensity intensity = new DummyIntensity(false, 4, 5);
+
+		TemplateMatching alg = new TemplateMatching(intensity);
+
+		alg.setTemplate(template, new ImageFloat32(5,5), 10);
+		alg.process(input);
+
+		assertTrue(intensity.maskedCalled);
 	}
 
 	private void checkResults(List<Match> found, List<Match> expected,
@@ -135,6 +143,7 @@ public class TestTemplateMatching {
 		ImageFloat32 intensity = new ImageFloat32(width, height);
 		boolean border;
 		int offsetX, offsetY;
+		boolean maskedCalled = false;
 
 		private DummyIntensity(boolean border, int offsetX, int offsetY) {
 			this.border = border;
@@ -144,6 +153,8 @@ public class TestTemplateMatching {
 
 		@Override
 		public void process(ImageBase image, ImageBase template) {
+			assertTrue(image!=null);
+			assertTrue(template!=null);
 			GImageMiscOps.fill(intensity, 0);
 
 			for (Match m : expected) {
@@ -153,11 +164,9 @@ public class TestTemplateMatching {
 
 		@Override
 		public void process(ImageBase image, ImageBase template, ImageBase mask) {
-			GImageMiscOps.fill(intensity, 0);
-
-			for (Match m : expected) {
-				intensity.set(m.x, m.y, (float) m.score);
-			}
+			assertTrue(mask!=null);
+			maskedCalled = true;
+			process(image,template);
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class WrapRefineCornerCanny
 						cp.x + searchRadius +1,cp.y+ searchRadius +1);
 				BoofMiscOps.boundRectangleInside(image, r);
 
-				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1, null);
+				ImageFloat32 sub = image.subimage(r.x0,r.y0,r.x1,r.y1);
 
 				alg.process(sub);
 				rp.x = r.x0 + (float)alg.getCorner().x;
