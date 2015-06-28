@@ -68,6 +68,11 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 
 	@Override
 	public void process(T image, T template, T mask ) {
+		if( mask == null ) {
+			process(image,template);
+			return;
+		}
+
 		this.image = image;
 		this.template = template;
 		this.mask = mask;

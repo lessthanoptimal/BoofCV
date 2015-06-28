@@ -70,14 +70,14 @@ public class ExampleTemplateMatching {
 	 * Computes the template match intensity image and displays the results. Brighter intensity indicates
 	 * a better match to the template.
 	 */
-	public static void showMatchIntensity(ImageFloat32 image, ImageFloat32 template) {
+	public static void showMatchIntensity(ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask) {
 
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<ImageFloat32> matchIntensity =
 				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
 
 		// apply the template to the image
-		matchIntensity.process(image, template);
+		matchIntensity.process(image, template, mask);
 
 		// get the results
 		ImageFloat32 intensity = matchIntensity.getIntensity();
@@ -96,41 +96,36 @@ public class ExampleTemplateMatching {
 		ShowImages.showWindow(output, "Match Intensity");
 	}
 
-	// TODO add masked example
 	public static void main(String args[]) {
 
 		// Load image and templates
 		String directory = "../data/applet/template/";
 
 		ImageFloat32 image = UtilImageIO.loadImage(directory + "desktop.png", ImageFloat32.class);
-		ImageFloat32 templateX = UtilImageIO.loadImage(directory + "x.png", ImageFloat32.class);
+		ImageFloat32 templateCursor = UtilImageIO.loadImage(directory + "cursor.png", ImageFloat32.class);
+		ImageFloat32 maskCursor = UtilImageIO.loadImage(directory + "cursor_mask.png", ImageFloat32.class);
 		ImageFloat32 templatePaint = UtilImageIO.loadImage(directory + "paint.png", ImageFloat32.class);
-		ImageFloat32 templateBrowser = UtilImageIO.loadImage(directory + "browser.png", ImageFloat32.class);
 
 		// create output image to show results
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		ConvertBufferedImage.convertTo(image, output);
 		Graphics2D g2 = output.createGraphics();
 
-		// Searches for a small 'x' that indicates where a window can be closed
-		// Only two such objects are in the image so at best there will be one false positive
-		g2.setColor(Color.RED);
-		drawRectangles(g2, image,null, templateX, 3);
+		// Search for the cursor in the image.  For demonstration purposes it has been pasted 3 times
+		g2.setColor(Color.RED); g2.setStroke(new BasicStroke(5));
+		drawRectangles(g2, image, templateCursor, maskCursor, 3);
 		// show match intensity image for this template
-		showMatchIntensity(image, templateX);
+		showMatchIntensity(image, templateCursor, maskCursor);
+
+		// Now it's try finding the cursor without a mask.  it will get confused when the background is black
+		g2.setColor(Color.BLUE); g2.setStroke(new BasicStroke(2));
+		drawRectangles(g2, image, templateCursor, null, 3);
 
 		// Now it searches for a specific icon for which there is only one match
-		g2.setColor(Color.BLUE);
-		drawRectangles(g2, image,null, templatePaint, 1);
+		g2.setColor(Color.ORANGE); g2.setStroke(new BasicStroke(3));
+		drawRectangles(g2, image, templatePaint, null, 1);
 
-		// Look for the Google Chrome browser icon. There is no match for this icon..
-		g2.setColor(Color.ORANGE);
-		drawRectangles(g2, image,null, templateBrowser, 1);
-
-		// False positives can some times be pruned using the error score.  In photographs taken
-		// in the real world template matching tends to perform very poorly
-
-		ShowImages.showWindow(output, "Found Matches");
+		ShowImages.showWindow(output, "Found Matches",true);
 	}
 
 	/**
@@ -145,7 +140,6 @@ public class ExampleTemplateMatching {
 		int w = template.width + 2 * r;
 		int h = template.height + 2 * r;
 
-		g2.setStroke(new BasicStroke(3));
 		for (Match m : found) {
 			// the return point is the template's top left corner
 			int x0 = m.x - r;
