@@ -64,3 +64,19 @@ task trackFiducial(dependsOn: classes ) << {
         classpath = sourceSets.main.runtimeClasspath
     }
 }
+
+// Create a jar which contains all the applications
+task applicationsJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'BoofCV Applications Jar',
+                'Implementation-Version': version,
+                'Main-Class': 'boofcv.app.Help'
+    }
+    archiveName = 'applications.jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+
+    doLast {
+        archivePath.renameTo(file(archiveName))
+    }
+}

@@ -25,7 +25,6 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -33,6 +32,8 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import static boofcv.io.image.UtilImageIO.loadImage;
 
 /**
  * Detects square binary fiducials inside an image, writes out there pose, and visualizes a virtual flat cube
@@ -43,15 +44,16 @@ import java.awt.image.BufferedImage;
 public class ExampleFiducialImage {
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/fiducial/image/";
+		String imagePath   = "../data/applet/fiducial/image/examples/";
+		String patternPath = "../data/applet/fiducial/image/patterns/";
 
-		String imageName = "image0000.jpg";
-//		String imageName = "image0001.jpg";
-//		String imageName = "image0002.jpg";
+		String imageName = "image00.jpg";
+//		String imageName = "image01.jpg";
+//		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		BufferedImage input = UtilImageIO.loadImage(directory + imageName);
+		IntrinsicParameters param = UtilIO.loadXML(imagePath + "intrinsic.xml");
+		BufferedImage input = loadImage(imagePath + imageName);
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial
@@ -60,12 +62,19 @@ public class ExampleFiducialImage {
 //				squareImageFast(new ConfigFiducialImage(0.1), 100, ImageFloat32.class);
 
 		// give it a description of all the targets
-		double width = 0.1;
-		ImageFloat32 dog = UtilImageIO.loadImage(directory + "dog.png",ImageFloat32.class);
-		detector.addTarget(dog, 125, width);
-		// uncomment to detect the text target
-		ImageFloat32 text = UtilImageIO.loadImage(directory + "text.png",ImageFloat32.class);
-		detector.addTarget(text, 125, width);
+		double width = 4; // 4 cm
+		detector.addPattern(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, width);
+		detector.addPattern(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, width);
 
 		detector.setIntrinsic(param);
 
@@ -80,6 +89,7 @@ public class ExampleFiducialImage {
 			System.out.println("Location:");
 			System.out.println(targetToSensor);
 
+			VisualizeFiducial.drawNumbers(targetToSensor,param,detector.getId(i), g2);
 			VisualizeFiducial.drawCube(targetToSensor,param,detector.getWidth(i),g2);
 		}
 

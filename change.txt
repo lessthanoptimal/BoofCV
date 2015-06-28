@@ -79,6 +79,9 @@ Version : Alpha 0.19
 - ConvertBufferedImage
   * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
   * Thanks thhart for pointing this out
+- ThresholdImageAOps
+  * Changed threshold up from >= to >.  Turns out the original choice was bad.  Images were not inverses of each other
+    and it was possible the threshold an image with two values up and end up with all 0.
 
 TODO
   * Distortion Model + Calibration
@@ -96,9 +99,6 @@ TODO
         - Use border to reduce false positives
         - Compute threshold for binarization in base by scanning around the fiducal border.
         - Get corner fitting working again
-  * Fiducial Example Images
-     * redo image video with better fiducials
-     * remove original text example
   * Polygon Detector Regression
 
   * Template with transparent pixels

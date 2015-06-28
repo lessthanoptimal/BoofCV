@@ -41,6 +41,21 @@ public enum Unit {
 		this.abbreviation = abbreviation;
 	}
 
+	/**
+	 * Sees if the specified work matches any of the units full name or short name.
+	 */
+	public static Unit lookup( String word ) {
+		for( Unit unit : values() ) {
+			if( unit.toString().compareToIgnoreCase(word) == 0 ) {
+				return unit;
+			} else if( unit.getAbbreviation().compareToIgnoreCase(word) == 0 ) {
+				return unit;
+			}
+		}
+
+		return null;
+	}
+
 	public double convert( double value , Unit to ) {
 		return value*Unit.conversion(this,to);
 	}

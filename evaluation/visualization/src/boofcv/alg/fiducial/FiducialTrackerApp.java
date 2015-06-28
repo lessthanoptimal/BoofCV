@@ -45,6 +45,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Let's the user select a region in the image and tracks it using different algorithms.
@@ -156,6 +159,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getFiducialToCamera(i, targetToSensor);
 			double width = detector.getWidth(i);
+			int id = detector.getId(i);
+
+			VisualizeFiducial.drawNumbers(targetToSensor, intrinsic, id, g2);
 			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, g2);
 		}
 		panel.setBufferedImageSafe(imageGUI);
@@ -178,10 +184,28 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			detector = FactoryFiducial.squareImageFast(new ConfigFiducialImage(), 100, imageClass);
 
 			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
-			BufferedImage dog = media.openImage(path + "/dog.png");
-			BufferedImage text = media.openImage(path+"/text.png");
-			d.addTarget(ConvertBufferedImage.convertFromSingle(dog,null,imageClass),125,length);
-			d.addTarget(ConvertBufferedImage.convertFromSingle(text,null,imageClass),125,length);
+
+			String pathImg = new File(path,"../patterns").getPath();
+			List<String> names = new ArrayList<String>();
+			names.add("ke.png");
+			names.add("dog.png");
+			names.add("yu.png");
+			names.add("yu_inverted.png");
+			names.add("pentarose.png");
+			names.add("text_boofcv.png");
+			names.add("leaf01.png");
+			names.add("leaf02.png");
+			names.add("hand01.png");
+			names.add("chicken.png");
+			names.add("h2o.png");
+			names.add("yinyang.png");
+
+			for( String foo : names ) {
+				BufferedImage img = media.openImage(new File(pathImg,foo).getPath());
+				if( img == null )
+					throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
+				d.addPattern(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
+			}
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
@@ -223,9 +247,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 //		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 //		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/movie.mjpeg"));
-//		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/movie.mjpeg"));
+//		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/video/movie.mjpeg"));
 //		inputs.add(new PathLabel(CALIB_CHESS, "../data/applet/fiducial/calibration/movie.mjpeg"));
-//
+
 //		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up

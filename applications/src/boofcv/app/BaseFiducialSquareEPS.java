@@ -162,49 +162,25 @@ public class BaseFiducialSquareEPS {
 	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows , PaperSize paper )
 			throws IOException
 	{
-		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
-		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
+		double pageWidthUnit, pageHeightUnit;
+		if( paper != null ) {
+			pageWidthUnit = paper.getUnit().convert(paper.getWidth(), unit);
+			pageHeightUnit = paper.getUnit().convert(paper.getHeight(), unit);
+		} else {
+			pageWidthUnit = -1;
+			pageHeightUnit = -1;
+		}
 		this.numRows = numRows;
 		this.numCols = numCols;
+
+		if( numRows < 1 || numCols < 1 )
+			this.autofillGrid = true;
+
+		if( whiteBorder < 0 ) {
+			double cm2 = Unit.CENTIMETER.convert(2.0,unit);
+			whiteBorder = Math.max(cm2, fiducialWidth / 4.0);
+		}
 		generate(fiducialWidth, whiteBorder, pageWidthUnit, pageHeightUnit);
-	}
-
-	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows )
-			throws IOException
-	{
-		this.numRows = numRows;
-		this.numCols = numCols;
-		generate(fiducialWidth, whiteBorder, -1, -1);
-	}
-
-	public void generateGrid( double fiducialWidth , double whiteBorder , PaperSize paper )
-			throws IOException
-	{
-		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
-		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
-
-		this.autofillGrid = true;
-		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
-	}
-
-	public void generateSingle( double fiducialWidth ) throws IOException {
-		double whiteBorder = Math.max(2, fiducialWidth / 4.0);
-		generateSingle(fiducialWidth, whiteBorder);
-	}
-
-	public void generateSingle( double fiducialWidth , PaperSize paper ) throws IOException {
-		double whiteBorder = Math.max(2, fiducialWidth / 4.0);
-
-		double pageWidthUnit = paper.getUnit().convert(paper.getWidth(),unit);
-		double pageHeightUnit = paper.getUnit().convert(paper.getHeight(),unit);
-
-		numCols = numRows = 1;
-		generate(fiducialWidth, whiteBorder, pageWidthUnit,pageHeightUnit);
-	}
-
-	public void generateSingle( double fiducialWidthCM , double whiteBorderCM ) throws IOException {
-		numCols = numRows = 1;
-		generate(fiducialWidthCM, whiteBorderCM, -1,-1);
 	}
 
 	/**
