@@ -101,6 +101,19 @@ public class ConfigPolygonDetector implements Configuration {
 			throw new IllegalArgumentException("The detector only support black objects so refine lines fitBlack must be true");
 		if( refineWithCorners && !configRefineCorners.insideBlack )
 			throw new IllegalArgumentException("The detector only support black objects so refine corners fitBlack must be true");
+	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{ numberOfSides="+numberOfSides+
+				" , contour2Poly_mergeTolerance="+contour2Poly_mergeTolerance+
+				" , contour2Poly_iterations="+contour2Poly_iterations+
+				" , contour2Poly_splitDistanceFraction="+contour2Poly_splitDistanceFraction+
+				" , refineWithLines="+refineWithLines+
+				" , refineWithCorners="+refineWithCorners+
+				" , minContourImageWidthFraction="+minContourImageWidthFraction+
+				" , clockwise="+clockwise+
+				" , configRefineLines="+configRefineLines+
+				" , configRefineCorners="+configRefineCorners+" }";
 	}
 }

@@ -65,4 +65,15 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 	public void checkValidity() {
 
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{ endPointDistance="+endPointDistance
+				+" , cornerOffset="+cornerOffset
+				+" , lineSamples="+lineSamples
+				+" , sampleRadius="+sampleRadius
+				+" , maxIterations="+maxIterations
+				+" , convergeTolPixels="+convergeTolPixels
+				+" , insideBlack="+insideBlack+" }";
+	}
 }

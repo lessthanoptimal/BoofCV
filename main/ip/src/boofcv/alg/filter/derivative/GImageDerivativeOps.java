@@ -53,7 +53,7 @@ public class GImageDerivativeOps {
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 		Class<D> getDerivativeType( Class<I> imageType ) {
 		if( imageType == ImageFloat32.class ) {
-			return (Class<D>)ImageFloat32.class;
+			return (Class<D>) ImageFloat32.class;
 		} else if( imageType == ImageUInt8.class ) {
 			return (Class<D>) ImageSInt16.class;
 		} else if( imageType == ImageUInt16.class ) {

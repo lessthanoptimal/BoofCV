@@ -29,10 +29,6 @@ import boofcv.struct.Configuration;
 public class ConfigRefinePolygonLineToImage implements Configuration{
 
 	/**
-	 *  How many indexes away in the contour list should end points be.
-	 */
-	public int endPointDistance;
-	/**
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
 	 * with ambiguous borders.
 	 */
@@ -62,5 +58,15 @@ public class ConfigRefinePolygonLineToImage implements Configuration{
 	@Override
 	public void checkValidity() {
 
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{ cornerOffset="+cornerOffset+
+				" , lineSamples="+lineSamples+
+				" , sampleRadius="+sampleRadius+
+				" , maxIterations="+maxIterations+
+				" , convergeTolPixels="+convergeTolPixels+
+				" , insideBlack="+insideBlack+" }";
 	}
 }

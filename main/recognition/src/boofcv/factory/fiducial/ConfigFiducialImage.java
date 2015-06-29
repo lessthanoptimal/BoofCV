@@ -31,7 +31,7 @@ import boofcv.struct.Configuration;
 public class ConfigFiducialImage implements Configuration {
 
 	/**
-	 * If the difference between an candidate and a target is less than this amount it is considered
+	 * If the difference between an candidate and a target is less than this amount it is considered\
 	 * a match.
 	 */
 	public double maxErrorFraction = 0.15;
@@ -63,5 +63,11 @@ public class ConfigFiducialImage implements Configuration {
 
 	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
 		this.squareDetector = squareDetector;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{ maxErrorFraction="+maxErrorFraction+
+				" squareDetector="+squareDetector+" }";
 	}
 }
