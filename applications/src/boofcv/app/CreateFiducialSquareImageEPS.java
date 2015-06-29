@@ -41,7 +41,7 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 	List<String> imagePaths = new ArrayList<String>();
 
 	@Override
-	protected void printPatternDefinitions(double fiducialWidthUnit) {
+	protected void printPatternDefinitions() {
 		for( int i = 0; i < imagePaths.size(); i++ ) {
 			String imageName = new File(imagePaths.get(i)).getName();
 			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
@@ -67,18 +67,11 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
 
 			out.println();
-			out.print("  /"+getImageName(i)+" {\n" +
+			out.print("  /"+getPatternPrintDef(i)+" {\n" +
 					"  "+binary.width+" " + binary.height + " 1 [" + scale + " 0 0 " + scale + " 0 0]\n" +
 					"  {<"+binaryToHex(binary)+">} image\n" +
 					"} def\n");
 			out.println();
-			if(printInfo) {
-				out.print(" /"+getDisplayName(i)+"\n" +
-						"{\n" +
-						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-						" moveto (" + imageName + "   " + fiducialWidthUnit + " "+unit.abbreviation+") show\n"+
-						"} def\n" );
-			}
 		}
 	}
 
@@ -90,6 +83,12 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 	@Override
 	protected void addPattern(String name) {
 		this.imagePaths.add(name);
+	}
+
+	@Override
+	protected String getPatternName(int num) {
+		String n = new File(imagePaths.get(num)).getName();
+		return n.substring(0,n.length()-4);
 	}
 
 	@Override
@@ -119,6 +118,7 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
 		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("image path");
 
+		parser.setExampleNames("ke.png","dog.png");
 		parser.execute(args,new CreateFiducialSquareImageEPS());
 	}
 }

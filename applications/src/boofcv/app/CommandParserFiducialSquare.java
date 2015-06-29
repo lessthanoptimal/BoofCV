@@ -46,11 +46,17 @@ public class CommandParserFiducialSquare {
 
 	public List<String> patternNames = new ArrayList<String>();
 
+	public List<String> exampleNames = new ArrayList<String>();
+
 	public CommandParserFiducialSquare(String nameOfPatterns) {
 		this.nameOfPatterns = nameOfPatterns;
 	}
 
 	public void printHelp() {
+
+		String n0 = exampleNames.get(0);
+		String n1 = exampleNames.get(1);
+
 		System.out.println("./application <optional flags> <fiducial width>  <"+nameOfPatterns+" 0> ... <"+nameOfPatterns+" N-1>");
 		System.out.println();
 		System.out.println("Optional Flags");
@@ -69,12 +75,12 @@ public class CommandParserFiducialSquare {
 		System.out.println("                     example: -PageSize=letter");
 		System.out.println();
 		System.out.println("Examples:");
-		System.out.println("./application -PrintInfo -OutputFile=fiducial_ke.eps 10 ke.png");
-		System.out.println("         10cm fiducial using 'ke.png' as the pattern with it's size and info");
-		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 ke.png");
-		System.out.println("         2.5 inch fiducial, filling letter sized paper with grid, 'ke.png' as the pattern");
-		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 ke.png dog.png");
-		System.out.println("         same as the previous, but alternates between ke and dog patterns");
+		System.out.println("./application -PrintInfo -OutputFile=fiducial.eps 10 "+n0);
+		System.out.println("         10cm fiducial using '"+n0+"' as the pattern with it's size and info");
+		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 "+n0);
+		System.out.println("         2.5 inch fiducial, filling letter sized paper with grid, '"+n0+"' as the pattern");
+		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 "+n0+" "+n1);
+		System.out.println("         same as the previous, but alternates between "+n0+" and "+n1+" patterns");
 	}
 
 	public int parseFlags( String []args) {
@@ -224,5 +230,10 @@ public class CommandParserFiducialSquare {
 			}
 		}
 		throw new IllegalArgumentException("Couldn't find ',' in "+arg);
+	}
+
+	public void setExampleNames( String name0 , String name1 ) {
+		exampleNames.add(name0);
+		exampleNames.add(name1);
 	}
 }

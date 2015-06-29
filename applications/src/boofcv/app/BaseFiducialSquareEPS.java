@@ -309,8 +309,19 @@ public abstract class BaseFiducialSquareEPS {
 	 * @param documentTitle Title of the document
 	 */
 	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
-		printHeader(documentTitle,fiducialWidthUnit);
-		printPatternDefinitions(fiducialWidthUnit);
+		printHeader(documentTitle, fiducialWidthUnit);
+		printPatternDefinitions();
+
+		if (printInfo) {
+			for (int i = 0; i < totalPatterns(); i++) {
+				String patternName = getPatternName(i);
+				out.print(" /" + getDisplayDef(i) + "\n" +
+						"{\n" +
+						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
+						" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
+						"} def\n");
+			}
+		}
 
 		// draws the black border around the fiducial
 		out.print(" /drawBorder\n"+
@@ -335,14 +346,10 @@ public abstract class BaseFiducialSquareEPS {
 	}
 
 	/**
-	 * Define EPS functions for each pattern:
-	 *   {@link #getImageName}  -> renders the pattern
-	 *   {@link #getDisplayName} -> displays information above fiducial
-	 *
-	 *
-	 * @param fiducialWidthUnit Size of the fiducial
+	 * Creates definitions which will render the pattern.  Each pattern's difintion will have the name returned
+	 * by {@link #getPatternPrintDef(int)}
 	 */
-	protected abstract void printPatternDefinitions(double fiducialWidthUnit);
+	protected abstract void printPatternDefinitions();
 
 	/**
 	 * Returns the total number of unqiue patterns
@@ -351,11 +358,16 @@ public abstract class BaseFiducialSquareEPS {
 
 	protected abstract void addPattern( String name );
 
-	protected String getImageName( int num ) {
+	/**
+	 * Human readable pattern name.  Will be printed on document
+	 */
+	protected abstract String getPatternName( int num );
+
+	protected String getPatternPrintDef(int num) {
 		return String.format("drawImage%03d",num);
 	}
 
-	protected String getDisplayName( int num ) {
+	protected String getDisplayDef(int num) {
 		return String.format("displayInfo%03d",num);
 	}
 
@@ -410,12 +422,12 @@ public abstract class BaseFiducialSquareEPS {
 
 		// print out encoding information for convenience
 		if(printInfo) {
-			out.println("  " + getDisplayName(imageNum));
+			out.println("  " + getDisplayDef(imageNum));
 		}
 
 		out.println("% Center then draw the image");
 		out.println("  b1 b1 translate");
-		out.println("  "+getImageName(imageNum));
+		out.println("  "+getPatternPrintDef(imageNum));
 		out.println("% Undo translations");
 		out.println("  -1 b1 mul -1 b1 mul translate");
 		out.println("  -1 originX mul -1 originY mul translate");
