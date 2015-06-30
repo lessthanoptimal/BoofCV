@@ -85,6 +85,9 @@ Version : Alpha 0.19
 - ThresholdImageOps
   * Changed threshold up from >= to >.  Turns out the original choice was bad.  Images were not inverses of each other
     and it was possible the threshold an image with two values up and end up with all 0.
+- PyBoof has been added to integration
+  * Python wrapper for BoofCV
+  * Thanks Romotive for allowing me to donate this code!
 
 TODO
   * Distortion Model + Calibration
