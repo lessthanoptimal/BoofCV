@@ -1,0 +1,25 @@
+dependencies {
+    compile project(':main:all')
+
+    compile 'net.sf.py4j:py4j:0.8.2.1'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'java/src'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'java/test'
+        }
+    }
+}
+
+idea {
+    module {
+        name = "PyBoof"
+    }
+}
