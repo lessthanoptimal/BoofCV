@@ -25,7 +25,9 @@ package boofcv.app;
  */
 public class Help {
 	public static void main(String[] args) {
-		Class []options = new Class[]{CreateFiducialSquareImageEPS.class};
+		Class []options = new Class[]{
+				CreateFiducialSquareImageEPS.class,
+				CreateFiducialSquareBinaryEPS.class};
 
 		System.out.println("Trying to run a command-line application?  Here are your options!");
 		System.out.println();

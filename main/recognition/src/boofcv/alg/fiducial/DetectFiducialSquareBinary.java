@@ -29,9 +29,9 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Fiducial which encores a 12-bit number using a predetermined pattern.  The inner region is broken up into 4 by 4
- * grid of 16-squares which are either white or black.  The lower left corner is always back and while all the other
- * corners are always white.  This allows orientation to be uniquely determined.
+ * Fiducial which encores a 12-bit number (0 to 4095) using a predetermined pattern.  The inner region is broken up
+ * into 4 by 4 grid of 16-squares which are either white or black.  The lower left corner is always back and
+ * while all the other corners are always white.  This allows orientation to be uniquely determined.
  * </p>
  * <center>
  * <img src="doc-files/square_binary.png"/>

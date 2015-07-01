@@ -70,9 +70,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// Storage for the found fiducials
 	private FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
 
-	// precomputed lookup table for distorted to undistorted pixel locations
-//	private Point2D_I32 tableDistPixel[];
-
+	// Detects the squares
 	private BinaryPolygonConvexDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it

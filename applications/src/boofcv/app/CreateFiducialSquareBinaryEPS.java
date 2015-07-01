@@ -66,6 +66,9 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 
 	@Override
 	protected void addPattern(String name) {
+		int value = Integer.parseInt(name);
+		if( value < 0 || value > 4095 )
+			throw new IllegalArgumentException("Values must be tween 0 and 4095, inclusive");
 		numbers.add( Integer.parseInt(name));
 	}
 
