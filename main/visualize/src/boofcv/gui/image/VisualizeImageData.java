@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -392,6 +392,24 @@ public class VisualizeImageData {
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
+	public static BufferedImage colorizeGradient( ImageSingleBand derivX , ImageSingleBand derivY , double maxAbsValue ){
+		if( derivX instanceof  ImageSInt16 ) {
+			return colorizeGradient((ImageSInt16)derivX,(ImageSInt16)derivY,(int)maxAbsValue);
+		} else if( derivX instanceof  ImageFloat32 ) {
+			return colorizeGradient((ImageFloat32)derivX,(ImageFloat32)derivY,(int)maxAbsValue);
+		} else {
+			throw new IllegalArgumentException("Image type not supported");
+		}
+	}
+
+	/**
+	 * Renders two gradients on the same image using two sets of colors, on for each input image.
+	 *
+	 * @param derivX (Input) Image with positive and negative values.
+	 * @param derivY (Input) Image with positive and negative values.
+	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @return visualized gradient
+	 */
 	public static BufferedImage colorizeGradient( ImageSInt16 derivX , ImageSInt16 derivY , int maxAbsValue ) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
@@ -401,7 +419,6 @@ public class VisualizeImageData {
 		int[] outData = outputRaster.getDataStorage();
 		int outStride = outputRaster.getScanlineStride();
 		int outOffset = outputRaster.getDataOffset(0)-outputRaster.getPixelStride()+1;
-
 
 		if( maxAbsValue < 0 ) {
 			maxAbsValue = ImageStatistics.maxAbs(derivX);

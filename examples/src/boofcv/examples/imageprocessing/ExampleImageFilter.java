@@ -65,7 +65,7 @@ public class ExampleImageFilter {
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
 		ShowImages.showWindow(outputImage,"Procedural Fixed Type");
 	}
 
@@ -86,7 +86,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
@@ -109,7 +109,7 @@ public class ExampleImageFilter {
 		gradient.process(blurred,derivX,derivY);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
 		ShowImages.showWindow(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
@@ -129,7 +129,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
