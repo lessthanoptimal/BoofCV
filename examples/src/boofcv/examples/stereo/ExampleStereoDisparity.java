@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,8 +153,8 @@ public class ExampleStereoDisparity {
 		ImageUInt8 distRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);
 
 		// rectify images
-		ImageUInt8 rectLeft = new ImageUInt8(distLeft.width,distLeft.height);
-		ImageUInt8 rectRight = new ImageUInt8(distRight.width,distRight.height);
+		ImageUInt8 rectLeft = distLeft.createSameShape();
+		ImageUInt8 rectRight = distRight.createSameShape();
 
 		rectify(distLeft,distRight,param,rectLeft,rectRight);
 

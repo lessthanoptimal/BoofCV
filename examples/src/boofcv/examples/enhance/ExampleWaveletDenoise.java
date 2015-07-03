@@ -44,7 +44,7 @@ public class ExampleWaveletDenoise {
 
 		ImageFloat32 noisy = input.clone();
 		GImageMiscOps.addGaussian(noisy, rand, 20, 0, 255);
-		ImageFloat32 denoised = new ImageFloat32(input.width,input.height);
+		ImageFloat32 denoised = noisy.createSameShape();
 
 		// How many levels in wavelet transform
 		int numLevels = 4;

@@ -88,6 +88,7 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("AdjustmentType = "+adjustmentType);
 		System.out.println("rename         = "+rename);
+		System.out.println("input regex      = "+regex);
 		System.out.println("output dir     = "+outputDir);
 
 

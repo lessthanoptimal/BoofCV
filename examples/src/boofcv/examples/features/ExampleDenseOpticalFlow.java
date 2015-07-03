@@ -68,7 +68,7 @@ public class ExampleDenseOpticalFlow {
 
 		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
 		ImageFloat32 previous = new ImageFloat32(full.width/2,full.height/2);
-		ImageFloat32 current = new ImageFloat32(previous.width,previous.height);
+		ImageFloat32 current = previous.createSameShape();
 		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);

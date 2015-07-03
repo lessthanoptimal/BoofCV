@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.factory.fiducial.ConfigFiducialImage;
+import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
@@ -36,8 +36,6 @@ import georegression.struct.se.Se3_F64;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import static boofcv.io.image.UtilImageIO.loadImage;
 
 /**
  * Actively tracks and displays found fiducials live in a video stream from a webcam.
@@ -90,25 +88,25 @@ public class TrackFiducialWebcam {
 
 
 		// Uncomment to select different detectors
-//		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1), 6, ImageFloat32.class);
+		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1), 6, ImageFloat32.class);
 //		FiducialDetector<ImageFloat32> detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5, 7), 0.03, ImageFloat32.class);
 //		FiducialDetector<ImageFloat32> detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(5, 7), 0.03, ImageFloat32.class);
 
-		String patternPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
-		SquareImage_to_FiducialDetector<ImageFloat32> detector =
-				FactoryFiducial.squareImageFast(new ConfigFiducialImage(),100, ImageFloat32.class);
-		detector.addPattern(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, 2.5);
-		detector.addPattern(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, 2.5);
+//		String patternPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
+//		SquareImage_to_FiducialDetector<ImageFloat32> detector =
+//				FactoryFiducial.squareImageFast(new ConfigFiducialImage(),100, ImageFloat32.class);
+//		detector.addPattern(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, 2.5);
+//		detector.addPattern(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, 2.5);
 
 		detector.setIntrinsic(param);
 

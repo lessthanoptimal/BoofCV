@@ -45,7 +45,7 @@ public class ExampleImageEnhancement {
 //		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
 		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
-		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
+		ImageUInt8 adjusted = gray.createSameShape();
 
 		int histogram[] = new int[256];
 		int transform[] = new int[256];
@@ -73,7 +73,7 @@ public class ExampleImageEnhancement {
 //		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
 		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
-		ImageUInt8 adjusted = new ImageUInt8(gray.width, gray.height);
+		ImageUInt8 adjusted = gray.createSameShape();
 
 
 		ListDisplayPanel panel = new ListDisplayPanel();

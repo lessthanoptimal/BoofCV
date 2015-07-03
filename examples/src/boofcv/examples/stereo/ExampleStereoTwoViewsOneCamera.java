@@ -99,8 +99,8 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// Rectify and remove lens distortion for stereo processing
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
-		ImageUInt8 rectifiedLeft = new ImageUInt8(distortedLeft.width, distortedLeft.height);
-		ImageUInt8 rectifiedRight = new ImageUInt8(distortedLeft.width, distortedLeft.height);
+		ImageUInt8 rectifiedLeft = distortedLeft.createSameShape();
+		ImageUInt8 rectifiedRight = distortedRight.createSameShape();
 
 		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
 

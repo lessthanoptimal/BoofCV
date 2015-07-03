@@ -46,7 +46,7 @@ public class ExampleCannyEdge {
 		BufferedImage image = UtilImageIO.loadImage("../data/applet/simple_objects.jpg");
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
-		ImageUInt8 edgeImage = new ImageUInt8(gray.width,gray.height);
+		ImageUInt8 edgeImage = gray.createSameShape();
 
 		// Create a canny edge detector which will dynamically compute the threshold based on maximum edge intensity
 		// It has also been configured to save the trace as a graph.  This is the graph created while performing

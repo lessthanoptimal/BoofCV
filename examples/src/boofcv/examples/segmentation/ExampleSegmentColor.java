@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ExampleSegmentColor {
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,input.width,input.height,3);
+		MultiSpectral<ImageFloat32> hsv = input.createSameShape();
 
 		// Convert into HSV
 		ColorHsv.rgbToHsv_F32(input,hsv);

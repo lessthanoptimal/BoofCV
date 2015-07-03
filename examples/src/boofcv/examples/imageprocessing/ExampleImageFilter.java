@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		T blurred = (T)input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -96,7 +96,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		T blurred = (T)input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -118,7 +118,7 @@ public class ExampleImageFilter {
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageSingleBand blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		ImageSingleBand blurred = (ImageSingleBand)input.createSameShape();
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 

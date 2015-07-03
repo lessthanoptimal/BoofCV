@@ -167,8 +167,6 @@ public class ExampleImageStitching {
 	{
 		// specify size of output image
 		double scale = 0.5;
-		int outputWidth = imageA.getWidth();
-		int outputHeight = imageA.getHeight();
 
 		// Convert into a BoofCV color format
 		MultiSpectral<ImageFloat32> colorA =
@@ -177,7 +175,7 @@ public class ExampleImageStitching {
 				ConvertBufferedImage.convertFromMulti(imageB, null,true, ImageFloat32.class);
 
 		// Where the output images are rendered into
-		MultiSpectral<ImageFloat32> work = new MultiSpectral<ImageFloat32>(ImageFloat32.class,outputWidth,outputHeight,3);
+		MultiSpectral<ImageFloat32> work = colorA.createSameShape();
 
 		// Adjust the transform so that the whole image can appear inside of it
 		Homography2D_F64 fromAToWork = new Homography2D_F64(scale,0,colorA.width/4,0,scale,colorA.height/4,0,0,1);
