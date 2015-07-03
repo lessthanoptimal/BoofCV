@@ -117,15 +117,15 @@ def adjustment_to_java( value ):
         raise RuntimeError("Unknown type")
 
 def remove_distortion( input, output, intrinsic, adjustment=AdjustmentType.FULL_VIEW, border=Border.VALUE):
-    java_sb_type = image_type(input)
-    distorter, java_intrinsic_out = create_remove_lens_distortion(intrinsic,java_sb_type,adjustment,border)
+    image_type = ImageType(input.getImageType())
+    distorter, java_intrinsic_out = create_remove_lens_distortion(intrinsic,image_type,adjustment,border)
     distorter.apply(input,output)
     intrinsic_out = Intrinsic()
     intrinsic_out.set_boof(java_intrinsic_out)
     return intrinsic_out
 
-def create_remove_lens_distortion( intrinsic, dtype, adjustment=AdjustmentType.FULL_VIEW, border=Border.VALUE ):
-    java_image_type = dtype_to_image_type(dtype)
+def create_remove_lens_distortion( intrinsic, image_type, adjustment=AdjustmentType.FULL_VIEW, border=Border.VALUE ):
+    java_image_type = image_type.get_java_object()
     java_adjustment = adjustment_to_java(adjustment)
     java_border = border_to_java(border)
     java_intrinsic = intrinsic.convert_boof()

@@ -32,7 +32,7 @@ class ConfigFiducialImage(Config):
 
 class FiducialFactory:
     def __init__(self, dtype ):
-        self.boof_image_type =  dtype_to_single_band_class(dtype)
+        self.boof_image_type =  dtype_to_Class_SingleBand(dtype)
 
     def squareRobust(self, config, binary_radius ):
         if isinstance(config,ConfigFiducialImage):
@@ -79,8 +79,8 @@ class FiducialDetector(JavaWrapper):
     def getWidth(self, which ):
         self.java_obj.getWidth(which)
 
-    # TODO later
-    # def getInputType(self):
+    def getInputType(self):
+        return ImageType(self.java_obj.getInputType())
 
 class FiducialImageDetector(FiducialDetector):
 

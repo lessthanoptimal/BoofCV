@@ -15,11 +15,11 @@ config = recognition.ConfigFiducialImage()
 print "Configuring detector"
 detector = recognition.FiducialFactory( np.uint8 ).squareRobust(config,6)
 detector.setIntrinsic(intrinsic)
-detector.addPattern(image.load_image(data_path+"../patterns/chicken.png",np.uint8),4.0)
-detector.addPattern(image.load_image(data_path+"../patterns/yu.png",np.uint8),4.0)
+detector.addPattern(image.load_single_band(data_path+"../patterns/chicken.png",np.uint8),4.0)
+detector.addPattern(image.load_single_band(data_path+"../patterns/yu.png",np.uint8),4.0)
 
 print "Detecting image"
-detector.detect(image.load_image(data_path+"image01.jpg",np.uint8))
+detector.detect(image.load_single_band(data_path+"image01.jpg",np.uint8))
 
 print "Number Found = "+str(detector.totalFound())
 

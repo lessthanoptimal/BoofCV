@@ -3,9 +3,9 @@ import pyboof.image as image
 
 import numpy as np
 
-original = image.load_image('../../../data/applet/outdoors01.jpg',np.uint8)
-gaussian = image.create_boof_image( original.getWidth() , original.getHeight() , np.uint8 )
-mean = image.create_boof_image( original.getWidth() , original.getHeight() , np.uint8 )
+original = image.load_single_band('../../../data/applet/outdoors01.jpg',np.uint8)
+gaussian = image.create_single_band( original.getWidth() , original.getHeight() , np.uint8 )
+mean = image.create_single_band( original.getWidth() , original.getHeight() , np.uint8 )
 
 ip.blur_gaussian(original,gaussian,radius=3)
 ip.blur_mean(original,mean,radius=3)

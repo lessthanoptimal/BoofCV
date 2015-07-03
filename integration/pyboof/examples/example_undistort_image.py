@@ -10,8 +10,8 @@ intrinsic = calib.Intrinsic()
 intrinsic.load_xml(data_path+"intrinsic.xml")
 
 # Load original image and the undistorted image
-original = image.load_image(data_path+"frame08.jpg",np.uint8)
-undistorted = image.create_boof_image( original.getWidth() , original.getHeight() , image.image_type(original) )
+original = image.load_single_band(data_path+"frame08.jpg",np.uint8)
+undistorted = image.create_single_band( original.getWidth() , original.getHeight() , image.get_dtype(original) )
 
 # Remove distortion and show the reuslts
 calib.remove_distortion(original,undistorted,intrinsic)

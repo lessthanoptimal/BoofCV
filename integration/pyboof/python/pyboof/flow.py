@@ -46,7 +46,7 @@ class BoofFlow:
 
     def gradient(self,type="sobel"):
         type_grad = gradient_type(self.image)
-        derivX = create_boof_image(self.get_width(),self.get_height(),type_grad)
-        derivY = create_boof_image(self.get_width(),self.get_height(),type_grad)
+        derivX = create_single_band(self.get_width(),self.get_height(),type_grad)
+        derivY = create_single_band(self.get_width(),self.get_height(),type_grad)
         ip.gradient(self.image,derivX,derivY,type)
         return GradientFlow(derivX,derivY)
