@@ -194,6 +194,16 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * Creates a new image of the same type which also has the same shape.  This is the same as calling
+	 * {@link #_createNew(int, int)} with this image's width and height.
+	 *
+	 * @return new image with the same shape as this.
+	 */
+	public T createShapeShape() {
+		return _createNew(getWidth(),getHeight());
+	}
+
+	/**
 	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
 	 * of the sub-image are not copied.
 	 *

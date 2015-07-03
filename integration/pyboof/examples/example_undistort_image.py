@@ -11,9 +11,10 @@ intrinsic.load_xml(data_path+"intrinsic.xml")
 
 # Load original image and the undistorted image
 original = image.load_single_band(data_path+"frame08.jpg",np.uint8)
-undistorted = image.create_single_band( original.getWidth() , original.getHeight() , image.get_dtype(original) )
+undistorted = original.createSameShape()
 
 # Remove distortion and show the reuslts
 calib.remove_distortion(original,undistorted,intrinsic)
 image.show_in_java(original,"Original")
 image.show_in_java(undistorted,"Undistorted")
+
