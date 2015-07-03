@@ -1,4 +1,3 @@
-import os
 from pyboof.ip import *
 from pyboof.image import *
 

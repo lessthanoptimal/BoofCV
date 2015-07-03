@@ -114,12 +114,19 @@ def boof_to_ndarray( boof ):
 
     return np.ndarray(shape=(height,width), dtype=nptype, buffer=data)
 
-def gradient_type( boof ):
-    dtype = JImageDataType_to_dtype(boof)
-
+def gradient_dtype( dtype ):
+    """
+    Returns the appropriate image dtype of the provided image dtype
+    :param dtype: Type of input image data
+    :return: Appropriate image type to store gradient data
+    """
     if dtype == np.uint8:
         return np.int16
+    elif dtype == np.int8:
+        return np.int16
     elif dtype == np.uint16:
+        return np.int32
+    elif dtype == np.int16:
         return np.int32
     elif dtype == np.float32:
         return np.float32
@@ -177,7 +184,7 @@ def get_dtype( boof_image ):
     :param boof_image: A BoofCV Java image
     :return: The NumPy dtype
     """
-    return JImageDataType_to_dtype(boof_image.getImageType().getDataType())
+    return ImageDataType_to_dtype(boof_image.getImageType().getDataType())
 
 def JImageDataType_to_dtype( ImageDataType ):
     """
@@ -298,5 +305,3 @@ def dtype_to_ImageType( dtype ):
     java_class = dtype_to_Class_SingleBand(dtype)
     return gateway.jvm.boofcv.struct.image.ImageType.single(java_class)
 
-def show_in_java( boof_image , title="Image"):
-    gateway.jvm.boofcv.gui.image.ShowImages.showWindow(boof_image,title)

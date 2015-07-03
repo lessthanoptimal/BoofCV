@@ -33,18 +33,25 @@ def blur_mean(input,output,radius=1):
 def blur_median(input,output,radius=1):
     gateway.jvm.boofcv.alg.filter.blur.BlurImageOps.median(input,output,radius,None)
 
-def gradient(input, derivX , derivY, type="sobel", border=Border.EXTENDED):
+class GradientType:
+    SOBEL="sobel"
+    PREWITT="prewitt"
+    THREE="three"
+    TWO0="two0"
+    TWO1="two1"
+
+def gradient(input, derivX , derivY, type=GradientType.SOBEL, border=Border.EXTENDED):
     java_border = border_to_java(border)
     java_DerivativeOps = gateway.jvm.boofcv.alg.filter.derivative.GImageDerivativeOps
-    if type is "sobel":
+    if type is GradientType.SOBEL:
         java_DerivativeOps.sobel(input,derivX,derivY,java_border)
-    elif type is "prewitt":
+    elif type is GradientType.PREWITT:
         java_DerivativeOps.prewitt(input,derivX,derivY,java_border)
-    elif type is "three":
-        java_DerivativeOps.boofcv(input,derivX,derivY,java_border)
-    elif type is "two0":
+    elif type is GradientType.THREE:
+        java_DerivativeOps.three(input,derivX,derivY,java_border)
+    elif type is GradientType.TWO0:
         java_DerivativeOps.two0(input,derivX,derivY,java_border)
-    elif type is "two1":
+    elif type is GradientType.TWO1:
         java_DerivativeOps.two1(input,derivX,derivY,java_border)
     else:
         raise RuntimeError("Unknown gradient type "+type)
