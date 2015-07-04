@@ -126,6 +126,11 @@ public class BatchRemoveLensDistortion {
 				throw new RuntimeException("Can't load file");
 			}
 
+			if( orig.getWidth() != param.width || orig.getHeight() != param.height ) {
+				System.err.println("intrinsic parameters and image size do not match!");
+				System.exit(-1);
+			}
+
 			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, ImageFloat32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);

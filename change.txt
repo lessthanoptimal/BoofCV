@@ -92,31 +92,28 @@ Version : Alpha 0.19
 TODO
   * Distortion Model + Calibration
     - calibration regression
-       * given points compute parameters.  radial and tangential
-       * detect calibration points, chessboard and square grid.  many images
+       * Same data set include different terms in estimation
     - square pattern needs to pass unit tests
   * Fiducial
-     * Regression:
-        - Binary Motion Blur
-        - Binary Static
-        - Both: Looking at it directly static stability.
      * Detector
-        - Polygon reject noisy edges
-        - Use border to reduce false positives
         - Compute threshold for binarization in base by scanning around the fiducal border.
         - Get corner fitting working again
-  * Fiducial Example Images
-     * redo image video with better fiducials
-     * remove original text example
-  * Polygon Detector Regression
+  * Polygon Detector
+    - Polygon reject noisy edges
+    - See if removing the requirement that dark/light be known degrades results
+    - Regression with hand slected points
 
-  * Template with transparent pixels
+  * BOW Scene classification
+    - regression test
+    - examples
+
+  * Histogram Comparison
+
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram comparison
   * Documentation on how to build a single jar
   * ExamplePnP
-  * Automatic generate F32 from F64 in some situations
 
 ---------------------------------------------
 Date    : 2014/9/22
