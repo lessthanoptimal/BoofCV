@@ -89,7 +89,7 @@ public class VisualizeSquareFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 
-		PointTransform_F64 add_p_to_p = LensDistortionOps.distortTransform(intrinsic).distort_F64(true, true);
+		PointTransform_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 
 		Se3_F64 targetToWorld = new Se3_F64();
 

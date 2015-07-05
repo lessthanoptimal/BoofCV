@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -406,6 +406,6 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Monocular Plane Visual Odometry");
+		ShowImages.showWindow(app, "Monocular Plane Visual Odometry",true);
 	}
 }

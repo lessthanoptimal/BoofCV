@@ -151,7 +151,7 @@ public class TestLensDistortionOps {
 		IntrinsicParameters orig = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 distToNorm = LensDistortionOps.distortTransform(orig).undistort_F32(true, false);
+		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
@@ -180,7 +180,7 @@ public class TestLensDistortionOps {
 		IntrinsicParameters orig = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F64 distToNorm = LensDistortionOps.distortTransform(orig).undistort_F64(true, false);
+		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
 
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);
@@ -370,7 +370,7 @@ public class TestLensDistortionOps {
 		IntrinsicParameters orig = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 distToNorm = LensDistortionOps.distortTransform(orig).undistort_F32(true, false);
+		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
@@ -402,7 +402,7 @@ public class TestLensDistortionOps {
 		IntrinsicParameters orig = new IntrinsicParameters().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F64 distToNorm = LensDistortionOps.distortTransform(orig).undistort_F64(true, false);
+		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
 
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);

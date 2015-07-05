@@ -39,18 +39,18 @@ public class LensDistortionRadialTangential implements LensDistortionPinhole{
 	@Override
 	public PointTransform_F64 distort_F64(boolean pixelIn, boolean pixelOut) {
 		if( pixelIn ) {
+			PointTransform_F64 p_to_n = new AddRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				PointTransform_F64 p_to_n = new AddRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F64(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new AddRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial,p.t1,p.t2);
+				return p_to_n;
 			}
 		} else {
+			AddRadialNtoN_F64 n_to_n = new AddRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				AddRadialNtoN_F64 n_to_n = new AddRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F64(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new AddRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
+				return n_to_n;
 			}
 		}
 	}
@@ -58,18 +58,18 @@ public class LensDistortionRadialTangential implements LensDistortionPinhole{
 	@Override
 	public PointTransform_F64 undistort_F64(boolean pixelIn, boolean pixelOut) {
 		if( pixelIn ) {
+			PointTransform_F64 p_to_n = new RemoveRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				PointTransform_F64 p_to_n = new RemoveRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F64(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new RemoveRadialPtoN_F64().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial,p.t1,p.t2);
+				return p_to_n;
 			}
 		} else {
+			RemoveRadialNtoN_F64 n_to_n = new RemoveRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				RemoveRadialNtoN_F64 n_to_n = new RemoveRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F64(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new RemoveRadialNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
+				return n_to_n;
 			}
 		}
 	}
@@ -77,18 +77,18 @@ public class LensDistortionRadialTangential implements LensDistortionPinhole{
 	@Override
 	public PointTransform_F32 distort_F32(boolean pixelIn, boolean pixelOut) {
 		if( pixelIn ) {
+			PointTransform_F32 p_to_n = new AddRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				PointTransform_F32 p_to_n = new AddRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F32(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new AddRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial,p.t1,p.t2);
+				return p_to_n;
 			}
 		} else {
+			AddRadialNtoN_F32 n_to_n = new AddRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				AddRadialNtoN_F32 n_to_n = new AddRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F32(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new AddRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
+				return n_to_n;
 			}
 		}
 	}
@@ -96,18 +96,18 @@ public class LensDistortionRadialTangential implements LensDistortionPinhole{
 	@Override
 	public PointTransform_F32 undistort_F32(boolean pixelIn, boolean pixelOut) {
 		if( pixelIn ) {
+			PointTransform_F32 p_to_n = new RemoveRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				PointTransform_F32 p_to_n = new RemoveRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F32(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new RemoveRadialPtoN_F32().setK(p.fx,p.fy,p.skew,p.cx,p.cy).setDistortion(p.radial,p.t1,p.t2);
+				return p_to_n;
 			}
 		} else {
+			RemoveRadialNtoN_F32 n_to_n = new RemoveRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
 			if( pixelOut ) {
-				RemoveRadialNtoN_F32 n_to_n = new RemoveRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
 				return new TransformThenPixel_F32(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
-				return new RemoveRadialNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
+				return n_to_n;
 			}
 		}
 	}

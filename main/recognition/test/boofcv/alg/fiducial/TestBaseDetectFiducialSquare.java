@@ -238,8 +238,8 @@ public class TestBaseDetectFiducialSquare {
 		// place the pattern right next to one of the corners to maximize distortion
 
 		// add lens distortion
-		PointTransform_F32 distToUndistort = LensDistortionOps.distortTransform(intrinsic).undistort_F32(true, true);
-		PointTransform_F64 undistTodist = LensDistortionOps.distortTransform(intrinsic).distort_F64(true, true);
+		PointTransform_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
+		PointTransform_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageUInt8.class);
 		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distort(false, interp,
 				FactoryImageBorder.value(ImageUInt8.class, 0), ImageUInt8.class);

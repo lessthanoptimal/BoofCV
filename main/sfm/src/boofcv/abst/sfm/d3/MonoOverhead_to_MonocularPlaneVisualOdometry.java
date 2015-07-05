@@ -68,7 +68,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	public void setCalibration( MonoPlaneParameters param ) {
 		this.planeToCamera = param.planeToCamera;
 		alg.configureCamera(param.intrinsic, param.planeToCamera);
-		normToPixel = LensDistortionOps.distortTransform(param.intrinsic).distort_F64(false,true);
+		normToPixel = LensDistortionOps.transformPoint(param.intrinsic).distort_F64(false,true);
 	}
 
 	@Override

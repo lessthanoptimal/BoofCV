@@ -86,7 +86,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 		this.overheadWidth = overheadWidth;
 		this.overheadHeight = overheadHeight;
 
-		PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
+		PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;

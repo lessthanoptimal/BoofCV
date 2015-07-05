@@ -100,8 +100,8 @@ public class QuadPoseEstimator {
 	 * @param intrinsic Intrinsic camera parameters
 	 */
 	public void setIntrinsic( IntrinsicParameters intrinsic ) {
-		pixelToNorm = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true,false);
-		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,15 +19,11 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.Point2D3D;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -39,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckEstimate1ofPnP extends EpipolarTestSimulation {
+public abstract class CheckEstimate1ofPnP extends BaseChecksPnP {
 
 	// algorithm being tested
 	Estimate1ofPnP alg;
@@ -66,16 +62,13 @@ public abstract class CheckEstimate1ofPnP extends EpipolarTestSimulation {
 	}
 
 	private void perfectObservations( int numSample ) {
-		init(numSample,false);
+		perfectObservations(worldToCamera0,numSample);
+		perfectObservations(worldToCamera1,numSample);
+	}
 
-		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
+	private void perfectObservations( Se3_F64 worldToCamera , int numSample ) {
+		List<Point2D3D> inputs = createObservations(worldToCamera,numSample);
 
-		for( int i = 0; i < currentObs.size(); i++ ) {
-			Point2D_F64 o = currentObs.get(i);
-			Point3D_F64 X = worldPts.get(i);
-
-			inputs.add( new Point2D3D(o,X));
-		}
 
 		Se3_F64 found = new Se3_F64();
 		assertTrue(alg.process(inputs,found));
