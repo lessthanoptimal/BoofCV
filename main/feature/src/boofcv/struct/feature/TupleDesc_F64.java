@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.struct.feature;
 
+
+import java.util.Arrays;
 
 /**
  * Basic description of an image feature's attributes using an array.
@@ -54,6 +56,10 @@ public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 
 	public void setValue(double[] value) {
 		this.value = value;
+	}
+
+	public void fill( double value ) {
+		Arrays.fill(this.value,value);
 	}
 
 	@Override

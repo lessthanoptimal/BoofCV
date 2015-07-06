@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -221,29 +221,5 @@ public class TestSurfDescribeOps {
 		assertEquals(w,SurfDescribeOps.rotatedWidth(10,Math.cos(theta),Math.sin(theta)),1e-8);
 		theta -= Math.PI*2;
 		assertEquals(w,SurfDescribeOps.rotatedWidth(10,Math.cos(theta),Math.sin(theta)),1e-8);
-	}
-	
-	/**
-	 * Compare against some hand computed examples
-	 */
-	@Test
-	public void normalizeFeatures_known() {
-		double features[] = new double[64];
-		features[5] = 2;
-		features[10] = 4;
-		SurfDescribeOps.normalizeFeatures(features);
-		assertEquals(0.44721,features[5],1e-3);
-		assertEquals(0.89443,features[10],1e-3);
-	}
-
-	/**
-	 * The descriptor is all zeros.  See if it handles this special case.
-	 */
-	@Test
-	public void normalizeFeatures_zeros() {
-		double features[] = new double[64];
-		SurfDescribeOps.normalizeFeatures(features);
-		for( int i = 0; i < features.length; i++ )
-			assertEquals(0,features[i],1e-4);
 	}
 }

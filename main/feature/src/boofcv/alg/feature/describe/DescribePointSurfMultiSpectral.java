@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.feature.UtilFeature;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
@@ -92,7 +93,7 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 			featureIndex += bandDesc.size();
 		}
 
-		SurfDescribeOps.normalizeFeatures(desc.value);
+		UtilFeature.normalizeL2(desc);
 
 		describe.setImage(grayII);
 		desc.laplacianPositive = describe.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);

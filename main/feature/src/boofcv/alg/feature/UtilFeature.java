@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -74,5 +75,32 @@ public class UtilFeature {
 				return detDesc.createDescription();
 			}
 		};
+	}
+
+	/**
+	 * <p>
+	 * Normalized the tuple such that the L2-norm is equal to 1.  This is also often referred to as
+	 * the Euclidean or frobenius (all though that's a matrix norm).
+	 * </p>
+	 *
+	 * <p>
+	 * value[i] = value[i]/sqrt(sum(value[j]*value[j], for all j))
+	 * </p>
+	 *
+	 * @param desc tuple
+	 */
+	public static void normalizeL2( TupleDesc_F64 desc ) {
+		double norm = 0;
+		for (int i = 0; i < desc.size(); i++) {
+			double v = desc.value[i];
+			norm += v*v;
+		}
+		if( norm == 0 )
+			return;
+
+		norm = Math.sqrt(norm);
+		for (int i = 0; i < desc.size(); i++) {
+			desc.value[i] /= norm;
+		}
 	}
 }
