@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -201,21 +201,21 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageSingleBand>
 		int h = input.height;
 
 		if( dx >= 0 ){
-			output.subimage(dx,0,w,h,null).setTo(input.subimage(0,0,w-dx,h,null));
-			output.subimage(0,0,dx,h,null).setTo(input.subimage(w-dx,0,w,h,null));
+			output.subimage(dx,0,w,h).setTo(input.subimage(0,0,w-dx,h));
+			output.subimage(0,0,dx,h).setTo(input.subimage(w-dx,0,w,h));
 		} else {
-			output.subimage(0,0,w+dx,h,null).setTo(input.subimage(-dx,0,w,h,null));
-			output.subimage(w+dx,0,w,h,null).setTo(input.subimage(0,0,-dx,h,null));
+			output.subimage(0,0,w+dx,h).setTo(input.subimage(-dx,0,w,h));
+			output.subimage(w+dx,0,w,h).setTo(input.subimage(0,0,-dx,h));
 		}
 
 		T tmp = (T)output.clone();
 
 		if( dy >= 0 ){
-			output.subimage(0,dy,w,h,null).setTo(tmp.subimage(0,0,w,h-dy,null));
-			output.subimage(0,0,w,dy,null).setTo(tmp.subimage(0,h-dy,w,h,null));
+			output.subimage(0,dy,w,h).setTo(tmp.subimage(0,0,w,h-dy));
+			output.subimage(0,0,w,dy).setTo(tmp.subimage(0,h-dy,w,h));
 		} else {
-			output.subimage(0,0,w,h+dy,null).setTo(tmp.subimage(0,-dy,w,h,null));
-			output.subimage(0,h+dy,w,h,null).setTo(tmp.subimage(0,0,w,-dy,null));
+			output.subimage(0,0,w,h+dy).setTo(tmp.subimage(0,-dy,w,h));
+			output.subimage(0,h+dy,w,h).setTo(tmp.subimage(0,0,w,-dy));
 		}
 	}
 }

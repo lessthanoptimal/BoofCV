@@ -37,3 +37,16 @@ idea {
         name = "BoofCV Evaluation"
     }
 }
+
+// Runs an application from the examples directory
+// gradle evaluationRun -Pwhich=boofcv.alg.fiducial.FiducialTrackerApp
+task evaluationRun(dependsOn: 'classes' )<< {
+    if (project.hasProperty('which')) {
+        javaexec {
+            main = "$which"
+            classpath = sourceSets.main.runtimeClasspath
+        }
+    } else {
+        print 'Which not specified!!!!!'
+    }
+}

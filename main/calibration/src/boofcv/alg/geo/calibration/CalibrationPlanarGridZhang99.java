@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,8 @@ import java.util.List;
  * <p>
  * Full implementation of the Zhang99 camera calibration algorithm using planar calibration targets.  First
  * linear approximations of camera parameters are computed, which are then refined using non-linear estimation.
+ * One difference from the original paper is that tangential distortion can be included. No linear estimate
+ * if found for tangential, they are estimated by initializing the non-linear estimate with all zero.
  * </p>
  *
  * <p>
@@ -61,13 +63,7 @@ public class CalibrationPlanarGridZhang99 {
 	private Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
-	private Zhang99Parameters optimized;
-
-	// description of the calibration target with point locations
-	private PlanarCalibrationTarget target;
-
-	// if true the intrinsic calibration matrix will have the skew parameter set to zero
-	private boolean assumeZeroSkew;
+	private Zhang99ParamAll optimized;
 
 	// optimization algorithm
 	private UnconstrainedLeastSquares optimizer;
@@ -75,23 +71,27 @@ public class CalibrationPlanarGridZhang99 {
 	// provides information on calibration status
 	private Listener listener;
 
+	// where calibration points are layout on the target.
+	private List<Point2D_F64> layout;
+
 	/**
 	 * Configures calibration process.
 	 *
-	 * @param target Description of the known calibration target
+	 * @param layout Layout of calibration points on the target
 	 * @param assumeZeroSkew Should it assumed the camera has zero skew. Typically true.
 	 * @param numRadialParam Number of radial distortion parameters to consider.  Typically 0,1,2.
+	 * @param includeTangential Should it include tangential distortion?
 	 */
-	public CalibrationPlanarGridZhang99(PlanarCalibrationTarget target,
+	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout,
 										boolean assumeZeroSkew,
-										int numRadialParam)
+										int numRadialParam,
+										boolean includeTangential )
 	{
-		computeHomography = new Zhang99ComputeTargetHomography(target.points);
+		this.layout = layout;
+		computeHomography = new Zhang99ComputeTargetHomography(layout);
 		computeK = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
-		computeRadial = new RadialDistortionEstimateLinear(target,numRadialParam);
-		this.target = target;
-		this.assumeZeroSkew = assumeZeroSkew;
-		optimized = new Zhang99Parameters(assumeZeroSkew,numRadialParam);
+		computeRadial = new RadialDistortionEstimateLinear(layout,numRadialParam);
+		optimized = new Zhang99ParamAll(assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -115,13 +115,13 @@ public class CalibrationPlanarGridZhang99 {
 		optimized.setNumberOfViews(observations.size());
 
 		// compute initial parameter estimates using linear algebra
-		Zhang99Parameters initial =  initialParam(observations);
+		Zhang99ParamAll initial =  initialParam(observations);
 		if( initial == null )
 			return false;
 
 		status("Non-linear refinement");
 		// perform non-linear optimization to improve results
-		if( !optimizedParam(observations,target.points,initial,optimized,optimizer))
+		if( !optimizedParam(observations,layout,initial,optimized,optimizer))
 			return false;
 
 		return true;
@@ -130,7 +130,7 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected Zhang99Parameters initialParam( List<List<Point2D_F64>> observations )
+	protected Zhang99ParamAll initialParam( List<List<Point2D_F64>> observations )
 	{
 		status("Estimating Homographies");
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
@@ -156,11 +156,12 @@ public class CalibrationPlanarGridZhang99 {
 		}
 
 		status("Estimating Radial Distortion");
-		computeRadial.process(K,homographies,observations);
+		computeRadial.process(K, homographies, observations);
 
 		double distort[] = computeRadial.getParameters();
 
-		return convertIntoZhangParam(motions, K,assumeZeroSkew, distort);
+		return convertIntoZhangParam(motions, K,optimized.assumeZeroSkew, distort,
+				optimized.includeTangential);
 	}
 
 	private void status( String message ) {
@@ -181,8 +182,8 @@ public class CalibrationPlanarGridZhang99 {
 	 */
 	public boolean optimizedParam( List<List<Point2D_F64>> observations ,
 								   List<Point2D_F64> grid ,
-								   Zhang99Parameters initial ,
-								   Zhang99Parameters found ,
+								   Zhang99ParamAll initial ,
+								   Zhang99ParamAll found ,
 								   UnconstrainedLeastSquares optimizer )
 	{
 		if( optimizer == null ) {
@@ -192,18 +193,17 @@ public class CalibrationPlanarGridZhang99 {
 //			optimizer = FactoryOptimization.leastSquareLevenberg(1e-3);
 		}
 
-		double model[] = new double[ initial.size() ];
+		double model[] = new double[ initial.numParameters() ];
 		initial.convertToParam(model);
 
 		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
 				initial.createNew(), grid,observations);
 
-// Both the numerical and analytical Jacobian appear to provide the same results, but the
-// unit test tolerance is so crude that I trust the numerical Jacobian more
-//		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
-//				initial.assumeZeroSkew,initial.distortion.length,observations.size(),grid);
+		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
+				initial.assumeZeroSkew,initial.radial.length,initial.includeTangential,
+				observations.size(),grid);
 
-		optimizer.setFunction(func,null);
+		optimizer.setFunction(func,jacobian);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
 
 		for( int i = 0; i < 500; i++ ) {
@@ -222,13 +222,14 @@ public class CalibrationPlanarGridZhang99 {
 	}
 
 	/**
-	 * Converts results fond in the linear algorithms into {@link Zhang99Parameters}
+	 * Converts results fond in the linear algorithms into {@link Zhang99ParamAll}
 	 */
-	public static Zhang99Parameters convertIntoZhangParam(List<Se3_F64> motions,
+	public static Zhang99ParamAll convertIntoZhangParam(List<Se3_F64> motions,
 														  DenseMatrix64F K,
 														  boolean assumeZeroSkew,
-														  double[] distort) {
-		Zhang99Parameters ret = new Zhang99Parameters();
+														  double[] distort,
+														  boolean includeTangential ) {
+		Zhang99ParamAll ret = new Zhang99ParamAll();
 
 		ret.assumeZeroSkew = assumeZeroSkew;
 
@@ -238,13 +239,15 @@ public class CalibrationPlanarGridZhang99 {
 		ret.x0 = K.get(0,2);
 		ret.y0 = K.get(1,2);
 
-		ret.distortion = distort;
+		ret.radial = distort;
 
-		ret.views = new Zhang99Parameters.View[motions.size()];
+		ret.includeTangential = includeTangential;
+
+		ret.views = new Zhang99ParamAll.View[motions.size()];
 		for( int i = 0; i < ret.views.length; i++ ) {
 			Se3_F64 m = motions.get(i);
 
-			Zhang99Parameters.View v = new Zhang99Parameters.View();
+			Zhang99ParamAll.View v = new Zhang99ParamAll.View();
 			v.T = m.getT();
 			RotationMatrixGenerator.matrixToRodrigues(m.getR(), v.rotation);
 
@@ -255,23 +258,28 @@ public class CalibrationPlanarGridZhang99 {
 	}
 
 	/**
-	 * Applies radial distortion to the point.
+	 * Applies radial and tangential distortion to the normalized image coordinate.
 	 *
-	 * @param pt point in calibrated pixel coordinates
+	 * @param normPt point in normalized image coordinates
 	 * @param radial radial distortion parameters
+	 * @param t1 tangential parameter
+	 * @param t2 tangential parameter
 	 */
-	public static void applyDistortion(Point2D_F64 pt, double[] radial)
+	public static void applyDistortion(Point2D_F64 normPt, double[] radial, double t1 , double t2 )
 	{
+		final double x = normPt.x;
+		final double y = normPt.y;
+
 		double a = 0;
-		double r2 = pt.x*pt.x + pt.y*pt.y;
-		double r = r2;
+		double r2 = x*x + y*y;
+		double r2i = r2;
 		for( int i = 0; i < radial.length; i++ ) {
-			a += radial[i]*r;
-			r *= r2;
+			a += radial[i]*r2i;
+			r2i *= r2;
 		}
 
-		pt.x += pt.x*a;
-		pt.y += pt.y*a;
+		normPt.x = x + x*a + 2*t1*x*y + t2*(r2 + 2*x*x);
+		normPt.y = y + y*a + t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 
 	/**
@@ -281,7 +289,7 @@ public class CalibrationPlanarGridZhang99 {
 		this.optimizer = optimizer;
 	}
 
-	public Zhang99Parameters getOptimized() {
+	public Zhang99ParamAll getOptimized() {
 		return optimized;
 	}
 

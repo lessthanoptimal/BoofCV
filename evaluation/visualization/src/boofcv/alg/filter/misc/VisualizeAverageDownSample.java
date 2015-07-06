@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.alg.filter.misc;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -46,7 +45,7 @@ public class VisualizeAverageDownSample {
 				original.getWidth()/3,original.getHeight()/3,3);
 
 		AverageDownSampleOps.down(input,output);
-		DistortImageOps.scale(input,output2, TypeInterpolate.BILINEAR);
+		new FDistort(input,output2).scaleExt().apply();
 
 		BufferedImage outputFull = ConvertBufferedImage.convertTo_F32(output, null, true);
 		BufferedImage outputFull2 = ConvertBufferedImage.convertTo_F32(output2, null, true);

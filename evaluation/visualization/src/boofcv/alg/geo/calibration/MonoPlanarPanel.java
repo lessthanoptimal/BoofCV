@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,8 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -82,7 +81,6 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	int errorScale = 20;
 
-	
 	public MonoPlanarPanel() {
 		super(new BorderLayout());
 
@@ -154,7 +152,8 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		return comp;
 	}
 	
-	public void addImage( String name , BufferedImage image ) {
+	public void addImage( String name , BufferedImage image )
+	{
 		names.add(name);
 		images.add(image);
 
@@ -182,7 +181,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		updateResultsGUI();
 	}
 
-	public void setCalibration(Zhang99Parameters found) {
+	public void setCalibration(Zhang99ParamAll found) {
 		String textX = String.format("%5.1f",found.x0);
 		String textY = String.format("%5.1f", found.y0);
 		paramCenterX.setText(textX);
@@ -196,10 +195,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramC.setText(textC);
 	}
 
-	public void setCorrection( ImageDistort<ImageFloat32,ImageFloat32> undoRadial )
+	public void setCorrection( IntrinsicParameters param )
 	{
 		checkUndistorted.setEnabled(true);
-		mainView.setDistorted(undoRadial);
+		mainView.setDistorted(param,null);
 	}
 
 	@Override

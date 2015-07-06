@@ -1,0 +1,1 @@
+Functions to make working with OpenCV and BoofCV together in the same project easier.

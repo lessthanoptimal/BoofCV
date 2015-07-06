@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 
-	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/image/";
+	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/image/examples/";
 
 	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
@@ -47,13 +47,13 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 	@Override
 	public ImageBase loadImage(ImageType imageType)
 	{
-		BufferedImage out = UtilImageIO.loadImage(directory+"image0000.jpg");
+		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("image00.jpg"));
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 
 	@Override
 	public IntrinsicParameters loadIntrinsic() {
-		return UtilIO.loadXML(directory+"intrinsic.xml");
+		return UtilIO.loadXML(getClass().getResource("intrinsic.xml"));
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImageRobust
 				(new ConfigFiducialImage(), 6, imageType.getImageClass());
 
-		ret.addTarget(UtilImageIO.loadImage(directory + "dog.png", imageType.getImageClass()), 125,0.1);
+		ret.addPattern(UtilImageIO.loadImage(directory + "../patterns/chicken.png", imageType.getImageClass()), 125, 0.1);
 
 		return ret;
 	}

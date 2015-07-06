@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -84,13 +86,13 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 		compare(interp,img, 0, height/2);
 		compare(interp,img, width/2, height-1);
 		compare(interp,img, width/2, 0);
-		compare(interp,img, 0, 0);
-		compare(interp,img, width-1, height-1);
+		compare(interp, img, 0, 0);
+		compare(interp, img, width - 1, height - 1);
 	}
 
 	protected void compare( InterpolatePixelS<T> interp , T img , float x , float y )
 	{
-		assertEquals(compute(img, x,y), interp.get(x, y), 1e-5f);
+		assertEquals(compute(img, x, y), interp.get(x, y), 1e-5f);
 	}
 
 
@@ -104,7 +106,7 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 	 * Sees if get throws an exception if it is out of bounds
 	 */
 	@Test
-	public void get_outside() {
+	public void get_outside_noborder() {
 		T img = createImage(width, height);
 
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
@@ -120,7 +122,7 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 			interp.get(x, y);
 			if( exceptionOutside )
 				fail("Didn't throw an exception when accessing an outside pixel");
-		} catch( IllegalArgumentException e ) {}
+		} catch( RuntimeException e ) {}
 	}
 
 
@@ -142,6 +144,29 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 		assertEquals(interp.get(10.1f, 10), interp.get_fast(10.1f, 10), 1e-6);
 		assertEquals(interp.get(10, 10.6f), interp.get_fast(10, 10.6f), 1e-6);
 		assertEquals(interp.get(10.8f, 10.6f), interp.get_fast(10.8f, 10.6f), 1e-6);
+	}
+
+
+	/**
+	 * If a border is specified it should handle everything just fine
+	 */
+	@Test
+	public void get_outside_border() {
+		T img = createImage(width, height);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
+
+		BoofTesting.checkSubImage(this, "get_outside_border", false, img);
+	}
+	public void get_outside_border(T img) {
+		InterpolatePixelS<T> interp = wrap(img, 0, 100);
+
+		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.value(img.getClass(),5);
+		interp.setBorder(border);
+		interp.setImage(img);
+
+		// outside the image it should work just fine
+		assertEquals(5,interp.get(-10, 23),1e-6);
+		assertEquals(5,interp.get(0,2330),1e-6);
 	}
 
 	@Test

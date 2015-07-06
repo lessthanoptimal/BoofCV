@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class TestStereoProcessingBase {
 		// point being viewed
 		Point3D_F64 X = new Point3D_F64(-0.01,0.1,3);
 
-		StereoParameters param = createStereoParam(width,height,false);
+		StereoParameters param = createStereoParam(width,height);
 
 		// create input images by rendering the point in both
 		ImageUInt8 left = new ImageUInt8(width,height);
@@ -90,7 +90,7 @@ public class TestStereoProcessingBase {
 		// point being viewed
 		Point3D_F64 X = new Point3D_F64(-0.01,0.1,3);
 
-		StereoParameters param = createStereoParam(width,height,false);
+		StereoParameters param = createStereoParam(width,height);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param.left,null);
 
@@ -150,15 +150,15 @@ public class TestStereoProcessingBase {
 		return new Point2D_F64(meanX,meanY);
 	}
 
-	public static StereoParameters createStereoParam( int width , int height , boolean flipY ) {
+	public static StereoParameters createStereoParam( int width , int height ) {
 		StereoParameters ret = new StereoParameters();
 
 		ret.setRightToLeft(new Se3_F64());
-		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
+		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
 		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new IntrinsicParameters(300,320,0,width/2,height/2,width,height, flipY, new double[]{0.1,1e-4});
-		ret.right = new IntrinsicParameters(290,310,0,width/2+2,height/2-6,width,height, flipY, new double[]{0.05,-2e-4});
+		ret.left = new IntrinsicParameters().fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
+		ret.right = new IntrinsicParameters().fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);
 
 		return ret;
 	}

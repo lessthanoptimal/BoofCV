@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -37,6 +39,8 @@ import boofcv.struct.image.ImageType;
  */
 public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<ImageSInt16>  {
 
+	// used to read outside the image border
+	private ImageBorder_I32 border;
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
@@ -51,7 +55,14 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 	}
 
 	@Override
+	public void setBorder(ImageBorder<ImageSInt16> border) {
+		this.border = (ImageBorder_I32)border;
+	}
+
+	@Override
 	public void setImage(ImageSInt16 image ) {
+		if( border != null )
+			border.setImage(image);
 		this.image = image;
 	}
 
@@ -64,7 +75,7 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 	public float get(float x, float y) {
 
 		if( x < 0 || y < 0 || x > image.width-1 || y > image.height-1 )
-			throw new IllegalArgumentException("Pixel out of bounds. "+x+" "+y);
+			return get_border(x,y);
 
 		int xx = (int)x;
 		int yy = (int)y;
@@ -102,6 +113,38 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 
 		value /= totalWeightY;
 		
+		if( value > max )
+			return max;
+		else if( value < min )
+			return min;
+		else
+			return value;
+	}
+
+	public float get_border(float x, float y) {
+		int xx = (int)Math.floor(x);
+		int yy = (int)Math.floor(y);
+
+		final int radius = kernel.getRadius();
+		final int width = kernel.getWidth();
+
+		int x0 = xx - radius;
+		int x1 = x0 + width;
+
+		int y0 = yy - radius;
+		int y1 = y0 + width;
+
+		float value = 0;
+		for( int i = y0; i < y1; i++ ) {
+			float valueX = 0;
+			for( int j = x0; j < x1; j++ ) {
+				float w = kernel.compute(j-x);
+				valueX += w * border.get(j,i);
+			}
+			float w = kernel.compute(i-y);
+			value += w*valueX;
+		}
+
 		if( value > max )
 			return max;
 		else if( value < min )

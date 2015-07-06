@@ -30,6 +30,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -39,9 +40,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -108,15 +111,16 @@ public class DetectCalibrationSquaresApp
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() != 7)
+		if( reader.remainingTokens() != 8)
 			throw new RuntimeException("Unexpected number of tokens in config file: "+reader.remainingTokens());
 
 		if( !(reader.nextString().compareToIgnoreCase("square") == 0)) {
 			throw new RuntimeException("Not a square grid config file");
 		}
 
+		int numRadial = (int)reader.nextDouble();
+		boolean includeTangential = reader.nextString().compareTo("true") == 0;
 		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
-		boolean flipY = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
@@ -337,7 +341,7 @@ public class DetectCalibrationSquaresApp
 	 */
 	private void detectTarget() {
 
-		ConfigChessboard config = new ConfigChessboard(1,1);
+		ConfigChessboard config = new ConfigChessboard(1,1,30);
 
 		if( calibGUI.isManual() ) {
 			GThresholdImageOps.threshold(gray,binary,calibGUI.getThresholdLevel(),true);
@@ -353,22 +357,25 @@ public class DetectCalibrationSquaresApp
 		DetectCalibrationSquaresApp app = new DetectCalibrationSquaresApp();
 
 //		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Square/";
-//		String prefix = "../data/evaluation/calibration/stereo/Bumblebee2_Square/";
-		String prefix = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang/";
+		String prefix = "../data/applet/calibration/stereo/Bumblebee2_Square/";
+//		String prefix = "../data/applet/calibration/mono/PULNiX_CCD_6mm_Zhang/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
 
+//		List<String> imageNames = BoofMiscOps.directoryList(prefix, "frame");
+		List<String> imageNames = BoofMiscOps.directoryList(prefix, "left");
+//		List<String> imageNames = BoofMiscOps.directoryList(prefix, "CalibIm");
+
+		Collections.sort(imageNames);
+
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		for( int i = 1; i < 6; i++ ) {
-			String name = String.format("View %02d",i);
-//			String fileName = String.format("frame%02d.jpg",i);
-//			String fileName = String.format("left%02d.jpg",i);
-//			String fileName = String.format("right%02d.jpg",i);
-			String fileName = String.format("CalibIm%d.gif",i);
-			inputs.add(new PathLabel(name, prefix + fileName));
+		for (int i = 0; i < imageNames.size(); i++) {
+			String name = imageNames.get(i);
+			String firstName = new File(name).getName();
+
+			inputs.add(new PathLabel(firstName,name));
 		}
-//		inputs.add(new PathLabel("View 01",prefix+"right02.jpg"));
 
 		app.setInputList(inputs);
 
@@ -377,6 +384,6 @@ public class DetectCalibrationSquaresApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Calibration Target Detection");
+		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}
 }

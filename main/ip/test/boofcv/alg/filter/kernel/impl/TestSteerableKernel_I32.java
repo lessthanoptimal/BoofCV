@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,9 @@ public class TestSteerableKernel_I32 {
 		double c[] = new double[]{0.1,0.2,0.8};
 		DummySteerableCoefficients coef = new DummySteerableCoefficients(c);
 		Kernel2D basis[] = new Kernel2D[3];
-		basis[0] = FactoryKernel.random2D_I32(width/2,0,30,rand);
-		basis[1] = FactoryKernel.random2D_I32(width/2,0,30,rand);
-		basis[2] = FactoryKernel.random2D_I32(width/2,0,30,rand);
+		basis[0] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
+		basis[1] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
+		basis[2] = FactoryKernel.random2D_I32(width,width/2,0,30,rand);
 
 		Kernel2D_I32 expected = new Kernel2D_I32(width);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class VideoShowImageDerivative extends ProcessImageSequence<ImageUInt8> {
 		}
 		SimpleImageSequence<ImageUInt8> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(ImageUInt8.class));
 
-		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_I8();
+		ImageGradient<ImageUInt8, ImageSInt16> gradient = FactoryDerivative.sobel_U8();
 
 		VideoShowImageDerivative display = new VideoShowImageDerivative(sequence, gradient);
 

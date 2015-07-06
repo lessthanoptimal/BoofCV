@@ -16,6 +16,7 @@ Version : Alpha 0.19
   * Added utilities to convert Picture into BoofCV formatted images
 - Images can be serialized again
   * Made ImageType serializable now
+  * Fixed bug where subimages were not assigned an image type.
 - Scene classification
   * Bag-of-Words based techniques
   * K-Nearest-Neighbor classification.  Learning and Classifier
@@ -25,22 +26,97 @@ Version : Alpha 0.19
 - Added in-place CW and CCW image rotation
 - Fiducials
   * Image square fiducials can now have their width individually set
+  * Square based fiducials now use the new polygon detector and benefit from its improved subpixel
+  * Fixed bug where the returned orientation was inconsistent with the JavaDoc
+  * Fixed another bug that caused the sides to "flip" depending on view angle
 - PerspectiveOps
   * Can render pixel in camera frame using InrinsicParameters
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of
   solutions to PnP, essential, homography
+- Camera Model
+  * Support for tangential distortion has been added
+  * Intrinsic parameters can now use a flow style assignment of parameters
+  * Removed support for flipY to simplify the code.  Just flip the image if this is an issue.
+  * Lens distortion.  More abstracted
+- LensDistortionOps
+  * refactored several functions to make it more consistent and easier to use
+  * Change fullView to expand
+  * Many functions will now correct for lens distortion.
+- Square grid calibration target
+  * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
+    lack of regression tests
+- Calibration
+  * A single class fully specifies the calibration target now
+  * Intrinsic paramters can now use a flow style assignment of parameters
+- Interpolation actually can interpolate along the image border now
+  * Can specify a border and is automatically used if a pixel outside the image is requested
+- PixelMath
+  * Added minus(image,scalar)
+  * Added minus(scalar,image)
+- Distortion
+  * Scale once again goes from in.width/out.width instead of (in.width-1)/(out.width-1)
+    - The former is correct, but you have to deal with interpolating values like 9.5 when there are 10 pixels (9 is largest index)
+  * Added FDistort
+    - Much easier to use and more flexible than the procedural fuctions in DistortImageOps
+- FactoryDerivativeSparse
+  * Added sobel, prewitt, three, two0, two1
+- Gradient Two0 and Two1
+  * There are two different ways to define the gradient from two samples, depending on the zero index.
+  * Two0 is [1] - [0] and Two1 is [0] - [-1].
+  * Before only one of these variants was available
+- UtilImageIO
+  * Can save an image directly that is in BoofCV format
+- Shape Features
+  * Corner fitting algorithm that uses the tangent of the gradient
+  * Black convex polygon detector
+  * Polygon fitting
+- ShowImages
+  * Will now display any BoofCV image directly.
+- Android
+  * Can convert from 8888 to 3 channel multi-spectral images
+- BinaryImageOps
+  * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
+- Template Matching
+  * Can provide a mask for a template and effectively make pixels transparent or translucent
+  * Requested by Rafael Maus and others
+- ConvertBufferedImage
+  * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
+  * Thanks thhart for pointing this out
+- ThresholdImageOps
+  * Changed threshold up from >= to >.  Turns out the original choice was bad.  Images were not inverses of each other
+    and it was possible the threshold an image with two values up and end up with all 0.
+- PyBoof has been added to integration
+  * Python wrapper for BoofCV
+  * Thanks Romotive for allowing me to donate this code!
 
 TODO
-  * Square Detector.  Create set of images in validation boof with hand selected corners
-                      Improve performance across a range of distances and orientations
-  * Square Image: Better example image than the dog, which can have ambiguous orientation
+  * Distortion Model + Calibration
+    - calibration regression
+       * given points compute parameters.  radial and tangential
+       * detect calibration points, chessboard and square grid.  many images
+    - square pattern needs to pass unit tests
+  * Fiducial
+     * Regression:
+        - Binary Motion Blur
+        - Binary Static
+        - Both: Looking at it directly static stability.
+     * Detector
+        - Polygon reject noisy edges
+        - Use border to reduce false positives
+        - Compute threshold for binarization in base by scanning around the fiducal border.
+        - Get corner fitting working again
+  * Fiducial Example Images
+     * redo image video with better fiducials
+     * remove original text example
+  * Polygon Detector Regression
+
   * Template with transparent pixels
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
   * Histogram comparison
-  * Add a jar which includes everything to Maven?
   * Documentation on how to build a single jar
   * ExamplePnP
+  * Automatic generate F32 from F64 in some situations
 
 ---------------------------------------------
 Date    : 2014/9/22

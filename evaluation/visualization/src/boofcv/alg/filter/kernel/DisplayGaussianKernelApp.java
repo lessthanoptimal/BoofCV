@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.alg.filter.kernel;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -87,7 +86,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 			Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
-			DistortImageOps.scale(smallImg,largeImg, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(smallImg,largeImg).interpNN().scaleExt().apply();
 
 			double maxValue = GImageStatistics.maxAbs(largeImg);
 			BufferedImage out = VisualizeImageData.colorizeSign(largeImg,null,maxValue);
@@ -112,6 +111,6 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 
 		panel.setPreferredSize(new Dimension(640,480));
 
-		ShowImages.showWindow(panel,"Gaussian Kernels");
+		ShowImages.showWindow(panel,"Gaussian Kernels", true);
 	}
 }

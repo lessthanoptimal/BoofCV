@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,14 +123,14 @@ public class SiftDetector {
 	 */
 	private void createDerivatives() {
 		// TODO optimize usign a sparse kernel?
-		Kernel2D_F32 kerX = new Kernel2D_F32(3,
+		Kernel2D_F32 kerX = new Kernel2D_F32(3,new float[]{
 				 0,0,0,
 				-1,0,1,
-				 0,0,0);
-		Kernel2D_F32 kerY = new Kernel2D_F32(3,
+				 0,0,0});
+		Kernel2D_F32 kerY = new Kernel2D_F32(3,new float[]{
 				0,-1,0,
 				0, 0,0,
-				0, 1,0);
+				0, 1,0});
 		Kernel2D_F32 kerXX = KernelMath.convolve2D(kerX, kerX);
 		Kernel2D_F32 kerXY = KernelMath.convolve2D(kerX,kerY);
 		Kernel2D_F32 kerYY = KernelMath.convolve2D(kerY,kerY);

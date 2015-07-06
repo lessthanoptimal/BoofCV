@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,8 @@ public class SfmTestHelper {
 		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion
-		PointTransform_F32 distLeft = LensDistortionOps.transformPixelToRadial_F32(param.left);
-		PointTransform_F32 distRight = LensDistortionOps.transformPixelToRadial_F32(param.right);
+		PointTransform_F32 distLeft = LensDistortionOps.distortTransform(param.left).distort_F32(true,true);
+		PointTransform_F32 distRight = LensDistortionOps.distortTransform(param.right).distort_F32(true,true);
 
 		Point2D_F32 lensLeft = new Point2D_F32();
 		Point2D_F32 lensRight = new Point2D_F32();

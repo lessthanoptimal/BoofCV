@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate.kernel;
 
+import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 
 /**
@@ -39,20 +40,25 @@ import boofcv.struct.convolve.KernelContinuous1D_F32;
 public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 
 	// parameter in its convolution function
-    float a;
+	float a;
 
-    /**
-     * Values of a =-0.5 and -0.75 are typical
-     * @param a A parameter
-     */
-    public BicubicKernel_F32( float a ) {
+	/**
+	 * Values of a =-0.5 and -0.75 are typical
+	 * @param a A parameter
+	 */
+	public BicubicKernel_F32( float a ) {
 		super(5);
-        this.a = a;
-    }
+		this.a = a;
+	}
 
 	@Override
 	public boolean isInteger() {
 		return false;
+	}
+
+	@Override
+	public <T extends KernelBase> T copy() {
+		return (T)new BicubicKernel_F32(a);
 	}
 
 	@Override

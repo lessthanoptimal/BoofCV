@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,11 +85,20 @@ public class FactoryDerivative {
 	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImageGradient<I,D> two( Class<I> inputType , Class<D> derivType)
+	ImageGradient<I,D> two0(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findDerivative(GradientTwo.class,inputType,derivType);
+		Method m = findDerivative(GradientTwo0.class,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m);
+	}
+
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImageGradient<I,D> two1(Class<I> inputType, Class<D> derivType)
+	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+		Method m = findDerivative(GradientTwo1.class,inputType,derivType);
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
@@ -144,23 +153,23 @@ public class FactoryDerivative {
 		return hessianDirectSobel(ImageFloat32.class,ImageFloat32.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_I8( double sigma , int radius ) {
+	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_U8(double sigma, int radius) {
 		return gaussian(sigma,radius,ImageUInt8.class,ImageSInt16.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_I8() {
+	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_U8() {
 		return sobel(ImageUInt8.class,ImageSInt16.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> three_I8() {
+	public static ImageGradient<ImageUInt8, ImageSInt16> three_U8() {
 		return three(ImageUInt8.class,ImageSInt16.class);
 	}
 
-	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectThree_I8() {
+	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectThree_U8() {
 		return hessianDirectThree(ImageUInt8.class,ImageSInt16.class);
 	}
 
-	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectSobel_I8() {
+	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectSobel_U8() {
 		return hessianDirectSobel(ImageUInt8.class,ImageSInt16.class);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class TestHornSchunckPyramid {
 		ImageMiscOps.fillRectangle(image1,40,4,0,3,height);
 		ImageMiscOps.fillRectangle(image2,40,5,0,3,height);
 
-		GImageDerivativeOps.two(image2, deriv2X, deriv2Y, BorderType.EXTENDED);
+		GImageDerivativeOps.two0(image2, deriv2X, deriv2Y, BorderType.EXTENDED);
 
 		// have the smoothness constraint be weak
 		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);

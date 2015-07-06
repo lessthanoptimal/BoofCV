@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,16 @@
 
 package boofcv.abst.calib;
 
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
-import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -42,101 +40,96 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestCalibrateMonoPlanar {
 
-	List<Se3_F64> pose = new ArrayList<Se3_F64>();
-	PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(3, 4, 30);
-	DenseMatrix64F K = new DenseMatrix64F(3,3,true,300,0,250,0,350,400,0,0,1);
-	int width = 500;
-	int height = 600;
+	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).
+	fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
+	PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
+
+	ImageFloat32 blank = new ImageFloat32(intrinsic.width,intrinsic.height);
+
+	List<Se3_F64> targetToCamera = new ArrayList<Se3_F64>();
 
 	public TestCalibrateMonoPlanar() {
-		double z = -250;
+		double z = 250;
 		double w = 40;
 
-		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0,0,0,null),new Vector3D_F64(0,0,z)));
-		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.1,0,0,null),new Vector3D_F64(w,0,z)));
-		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0,0.1,0,null),new Vector3D_F64(w,w,z)));
-		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0,0,0.1,null),new Vector3D_F64(0,-w,z)));
-		pose.add( new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.05,0,0.1,null),new Vector3D_F64(0,-w,z)));
-
+		targetToCamera.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0, 0, null), new Vector3D_F64(0, 0, z)));
+		targetToCamera.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.1, 0, 0, null), new Vector3D_F64(w, 0, z)));
+		targetToCamera.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0.1, 0, null), new Vector3D_F64(w, w, z)));
+		targetToCamera.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
+		targetToCamera.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.05, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
 	}
 
 	/**
-	 * Calibrates the images once by manually flipping the images and another time by setting flipY
-	 * to true.  Results should be identical
+	 * Give it a fake feature detector and a fairly benign scenario and see if it can correctly
+	 * estimate the camera parameters.
 	 */
 	@Test
-	public void testFlipY() {
-		IntrinsicParameters foundManual = computeIntrinsic(true);
-		IntrinsicParameters foundOther = computeIntrinsic(false);
+	public void fullBasic() {
 
-		assertEquals(foundManual.cx,foundOther.cx,1e-8);
-		assertEquals(foundManual.cy,foundOther.cy,1e-8);
-		assertEquals(foundManual.fx,foundOther.fx,1e-8);
-		assertEquals(foundManual.fy,foundOther.fy,1e-8);
-	}
+		FakeDetector detector = new FakeDetector();
+		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector);
+		alg.configure(true,2,true);
 
-	private IntrinsicParameters computeIntrinsic(boolean manualFlip) {
-		PlanarCalibrationDetector detector = new FakeDetector(manualFlip);
+		for (int i = 0; i < targetToCamera.size(); i++) {
+			alg.addImage(blank);
+		}
 
-		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(detector,!manualFlip);
+		IntrinsicParameters found = alg.process();
 
-		alg.configure(target,false,2);
+		assertEquals(intrinsic.fx,found.fx,1e-3);
+		assertEquals(intrinsic.fy,found.fy,1e-3);
+		assertEquals(intrinsic.cx,found.cx,1e-3);
+		assertEquals(intrinsic.cy,found.cy,1e-3);
+		assertEquals(intrinsic.skew,found.skew,1e-3);
 
-		for( int i = 0; i < pose.size(); i++ )
-			alg.addImage(new ImageFloat32(width,height));
+		assertEquals(intrinsic.radial[0],found.radial[0],1e-5);
+		assertEquals(intrinsic.radial[1],found.radial[1],1e-5);
 
-		return alg.process();
+		assertEquals(intrinsic.t1,found.t1,1e-5);
+		assertEquals(intrinsic.t2,found.t2,1e-5);
 	}
 
 	private class FakeDetector implements PlanarCalibrationDetector {
 
-		boolean manualFlip;
 		int count = 0;
 
 		List<Point2D_F64> obs;
 
-		private FakeDetector(boolean manualFlip) {
-			this.manualFlip = manualFlip;
-		}
+		List<Point2D_F64> layout = PlanarDetectorSquareGrid.createLayout(3, 4, 30, 30);
 
 		@Override
 		public boolean process(ImageFloat32 input) {
 
-			Se3_F64 se = pose.get(count++);
+			Se3_F64 t2c = targetToCamera.get(count++);
 
 			obs = new ArrayList<Point2D_F64>();
 
-			for( Point2D_F64 p2 : target.points ) {
+			for( Point2D_F64 p2 : layout ) {
+				// location of calibration point on the target
 				Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
 
-				Point3D_F64 a = SePointOps_F64.transform(se,p3,null);
+				Point3D_F64 a = SePointOps_F64.transform(t2c,p3,null);
 
 				Point2D_F64 pixel = new Point2D_F64();
+				normToPixel.compute(a.x/a.z,a.y/a.z,pixel);
 
-				// to normalized image coordinates
-				pixel.x = a.x/a.z;
-				pixel.y = a.y/a.z;
-
-				// to pixels
-				GeometryMath_F64.mult(K,pixel,pixel);
-
-				if( pixel.x < 0 || pixel.x >= width || pixel.y < 0 || pixel.y >= height )
+				if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= input.height-1 )
 					throw new RuntimeException("Adjust test setup, bad observation");
-
-				if( manualFlip ) {
-					pixel.y = height - pixel.y - 1;
-				}
 
 				obs.add(pixel);
 			}
-
 
 			return true;
 		}
 
 		@Override
-		public List<Point2D_F64> getPoints() {
+		public List<Point2D_F64> getDetectedPoints() {
 			return obs;
+		}
+
+		@Override
+		public List<Point2D_F64> getLayout() {
+			return layout;
 		}
 	}
 }

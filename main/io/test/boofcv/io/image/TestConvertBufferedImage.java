@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,30 @@ public class TestConvertBufferedImage {
 
 	int imgWidth = 10;
 	int imgHeight = 20;
+
+	@Test
+	public void checkInputs() {
+		BufferedImage found;
+
+		found = ConvertBufferedImage.checkInputs(new ImageUInt8(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		found = ConvertBufferedImage.checkInputs(new ImageSInt8(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		found = ConvertBufferedImage.checkInputs(new ImageUInt16(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
+		found = ConvertBufferedImage.checkInputs(new ImageSInt16(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
+
+		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
+		// gray input image with pixel values from 0 to 255
+		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		found = ConvertBufferedImage.checkInputs(new ImageFloat64(10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+
+		found = ConvertBufferedImage.checkInputs(new MultiSpectral(ImageUInt8.class,3,10,10),null);
+		assertTrue(found.getType() == BufferedImage.TYPE_INT_RGB);
+	}
 
 	@Test
 	public void extractInterleavedU8() {

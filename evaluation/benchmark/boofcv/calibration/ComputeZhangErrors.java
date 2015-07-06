@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,7 @@ package boofcv.calibration;
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
@@ -74,7 +73,7 @@ public class ComputeZhangErrors {
 	 * Compute error metrics using parameters on Zhang's website
 	 */
 	public static void zhangResults( List<List<Point2D_F64>> observations , List<Point2D_F64> target ) {
-		Zhang99Parameters param = getZhangParam();
+		Zhang99ParamAll param = getZhangParam();
 
 		param.convertToIntrinsic().print();
 		List<ImageResults> errors =
@@ -85,16 +84,17 @@ public class ComputeZhangErrors {
 	/**
 	 * Returns a set of parameters using the found results on Zhang's website
 	 */
-	private static Zhang99Parameters getZhangParam() {
-		Zhang99Parameters param = new Zhang99Parameters(false,2,5);
+	private static Zhang99ParamAll getZhangParam() {
+		Zhang99ParamAll param = new Zhang99ParamAll(false,2,false,5);
 
 		param.a = 832.5;
 		param.c = 0.204494;
 		param.b = 832.53;
 		param.x0 = 303.959;
 		param.y0 = 206.585;
-		param.distortion[0] = -0.228601;
-		param.distortion[1] = 0.190353;
+		param.radial[0] = -0.228601;
+		param.radial[1] = 0.190353;
+		param.t1 = param.t2 = 0;
 
 		List<DenseMatrix64F> mat = getPose();
 
@@ -117,18 +117,18 @@ public class ComputeZhangErrors {
 	 * as the initial value when optimizing to see if the focal length stays the same.
 	 */
 	public static void nonlinearUsingZhang(List<List<Point2D_F64>> observations ,
-										   PlanarCalibrationTarget target) {
-		Zhang99Parameters param = getZhangParam();
-		Zhang99Parameters found = new Zhang99Parameters(false,2,5);
+										   List<Point2D_F64> layout) {
+		Zhang99ParamAll param = getZhangParam();
+		Zhang99ParamAll found = new Zhang99ParamAll(false,2,false,5);
 
 		// perform non-linear optimization to improve results
 		// NOTE: constructor doesn't matter
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(target,false,1);
-		alg.optimizedParam(observations,target.points,param,found,null);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(layout,false,1,false);
+		alg.optimizedParam(observations,layout,param,found,null);
 
 		found.convertToIntrinsic().print();
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, found, target.points);
+				CalibrateMonoPlanar.computeErrors(observations, found, layout);
 		CalibrateMonoPlanar.printErrors(errors);
 	}
 }

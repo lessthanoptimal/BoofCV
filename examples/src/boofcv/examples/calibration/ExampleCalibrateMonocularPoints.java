@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -50,21 +49,21 @@ public class ExampleCalibrateMonocularPoints {
 	/**
 	 * Given a description of the calibration target and the observed location of the calibration
 	 *
-	 * @param targetDesc Describes the target's known physical structure
+	 * @param layout How calibration points are laid out on the board
 	 * @param observations Observations of the target in different images
 	 */
-	public static void calibrate( PlanarCalibrationTarget targetDesc ,
+	public static void calibrate( List<Point2D_F64> layout,
 								  List<List<Point2D_F64>> observations ) {
 
 		// Assume zero skew and model lens distortion with two radial parameters
 		CalibrationPlanarGridZhang99 zhang99 =
-				new CalibrationPlanarGridZhang99(targetDesc,true,2);
+				new CalibrationPlanarGridZhang99(layout,true,2,false);
 
 		if( !zhang99.process(observations) )
 			throw new RuntimeException("Calibration failed!");
 
 		// Get camera parameters and extrinsic target location in each image
-		Zhang99Parameters found = zhang99.getOptimized();
+		Zhang99ParamAll found = zhang99.getOptimized();
 
 		// Convenient function for converting from specialized Zhang99 format to generalized
 		IntrinsicParameters param = found.convertToIntrinsic();
@@ -78,13 +77,10 @@ public class ExampleCalibrateMonocularPoints {
 	/**
 	 * Detects calibration points found in several images and returned as a list. Not the focus of this example.
 	 */
-	public static List<List<Point2D_F64>> loadObservations() {
+	public static List<List<Point2D_F64>> loadObservations( PlanarCalibrationDetector detector ) {
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-		List<String> imageNames = BoofMiscOps.directoryList(directory,"left");
-
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(5, 7));
+		List<String> imageNames = BoofMiscOps.directoryList(directory, "left");
 
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
 
@@ -95,18 +91,18 @@ public class ExampleCalibrateMonocularPoints {
 			if( !detector.process(input) )
 				throw new RuntimeException("Detection failed!");
 
-			ret.add(detector.getPoints());
+			ret.add(detector.getDetectedPoints());
 		}
 
 		return ret;
 	}
 
 	public static void main( String args[] ) {
-		// target description and list of observations
-		PlanarCalibrationTarget desc = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
-		List<List<Point2D_F64>> calibPts = loadObservations();
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
+				detectorChessboard(new ConfigChessboard(5, 7, 30));
 
-		// Calibrate the camera
-		calibrate(desc,calibPts);
+		List<List<Point2D_F64>> calibPts = loadObservations(detector);
+
+		calibrate(detector.getLayout(),calibPts);
 	}
 }

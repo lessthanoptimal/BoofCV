@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ import java.util.List;
  *
  * <p>
  * Radial distortion is modeled using the following equations:<br>
- * u' = u + (u - u<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + x<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + x<sup>2</sup>)<sup>2</sup>]<br>
- * v' = v + (v - v<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + x<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + x<sup>2</sup>)<sup>2</sup>]<br>
+ * u' = u + (u - u<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + y<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + y<sup>2</sup>)<sup>2</sup>]<br>
+ * v' = v + (v - v<sub>0</sub>)*[ k<sub>1</sub>(x<sup>2</sup> + y<sup>2</sup>) +k<sub>2</sub>(x<sup>2</sup> + y<sup>2</sup>)<sup>2</sup>]<br>
  * where (u',v') is the observed distortion in pixel coordinates, (u<sub>0</sub>,v<sub>0</sub>) is the image center in
  * pixel coordinates, (x,y) is the predicted distortion free calibrated coordinates.
  * </p>
@@ -76,11 +76,11 @@ public class RadialDistortionEstimateLinear {
 	/**
 	 * Creates a estimator for the specified number of distortion parameters.
 	 *
-	 * @param gridDesc Description of calibration grid
+	 * @param layout Description of calibration grid
 	 * @param numParam Number of radial distortion parameters. Two is a good number.
 	 */
-	public RadialDistortionEstimateLinear(PlanarCalibrationTarget gridDesc, int numParam) {
-		worldPoints = gridDesc.points;
+	public RadialDistortionEstimateLinear(List<Point2D_F64> layout, int numParam) {
+		worldPoints = layout;
 		X = new DenseMatrix64F(numParam,1);
 	}
 

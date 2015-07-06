@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			alg.segment(input,expected);
 
 			// provide an output which is a sub-image
-			ImageSInt32 found = new ImageSInt32(width+3,height+2).subimage(2,1,width+2,height+1,null);
+			ImageSInt32 found = new ImageSInt32(width+3,height+2).subimage(2,1,width+2,height+1);
 			alg.segment(input,found);
 			BoofTesting.assertEquals(expected,found,0);
 

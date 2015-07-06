@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.app;
 
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -30,6 +32,9 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,33 +43,100 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class BatchRemoveLensDistortion {
+
+	public static void printHelpAndExit(String[] args) {
+		System.out.println("Expected 1 flag and 3 arguments, had "+args.length+" instead");
+		System.out.println();
+		System.out.println("<file path regex> <path to intrinsic.xml> <output directory>");
+		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.xml");
+		System.out.println();
+		System.out.println("Flags:");
+		System.out.println("-rename  Rename files on output to image%0d.png");
+		System.out.println("-EXPAND  Output image will be expanded until there are no dark regions");
+		System.out.println("-FULL_VIEW  Output image will contain the entire undistorted image");
+		System.out.println();
+		System.out.println("Default is FULL_VIEW and it doesn't rename the images");
+	}
+
 	public static void main(String[] args) {
+		String regex,pathIntrinsic,outputDir;
+		AdjustmentType adjustmentType = AdjustmentType.FULL_VIEW;
+		boolean rename = false;
 
-		String directory = "/home/pja/projects/boofcv/evaluation/fiducial/";
+		if( args.length >= 3 ) {
+			int numFlags = args.length-3;
+			for (int i = 0; i < numFlags; i++) {
+				if( args[i].compareToIgnoreCase("-rename") == 0 ) {
+					rename = true;
+				} else if( args[i].compareToIgnoreCase("-EXPAND") == 0 ) {
+					adjustmentType = AdjustmentType.EXPAND;
+				} else if( args[i].compareToIgnoreCase("-FULL_VIEW") == 0 ) {
+					adjustmentType = AdjustmentType.FULL_VIEW;
+				} else {
+					System.err.println("Unknown flag "+args[i]);
+				}
+			}
 
-		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
+			regex = args[numFlags];
+			pathIntrinsic = args[numFlags+1];
+			outputDir = args[numFlags+2];
+		}else {
+			printHelpAndExit(args);
+			System.exit(0);
+			return;
+		}
+
+		System.out.println("AdjustmentType = "+adjustmentType);
+		System.out.println("rename         = "+rename);
+		System.out.println("output dir     = "+outputDir);
+
+
+		File fileOutputDir = new File(outputDir);
+		if( !fileOutputDir.exists() ) {
+			if( !fileOutputDir.mkdirs() ) {
+				throw new RuntimeException("Output directory did not exist and failed to create it");
+			} else {
+				System.out.println("  created output directory");
+			}
+		}
+
+		IntrinsicParameters param = UtilIO.loadXML(pathIntrinsic);
 		IntrinsicParameters paramAdj = new IntrinsicParameters();
-		List<String> fileNames = BoofMiscOps.directoryList(directory, "image");
+
+		List<File> files = Arrays.asList(BoofMiscOps.findMatches(regex));
+		Collections.sort(files);
+
+		System.out.println("Found a total of "+files.size()+" matching files");
 
 		MultiSpectral<ImageFloat32> distoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 		MultiSpectral<ImageFloat32> undistoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
 
-		ImageDistort distort = LensDistortionOps.removeDistortion(true,null,param,paramAdj,
-				(ImageType)distoredImg.getImageType());
-		UtilIO.saveXML(paramAdj,directory+"intrinsicUndistorted.xml");
+		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, BorderType.VALUE, param, paramAdj,
+				(ImageType) distoredImg.getImageType());
+		UtilIO.saveXML(paramAdj,new File(outputDir,"intrinsicUndistorted.xml").getAbsolutePath());
 
 		BufferedImage out = new BufferedImage(param.width,param.height,BufferedImage.TYPE_INT_RGB);
 
-		for( String name : fileNames ) {
-			System.out.println("processing " + name);
-			BufferedImage orig = UtilImageIO.loadImage(name);
+		for( int i = 0; i < files.size(); i++ ) {
+			File file = files.get(i);
+			System.out.println("processing " + file.getName());
+			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
+			if( orig == null ) {
+				throw new RuntimeException("Can't load file");
+			}
 
 			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, ImageFloat32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);
 
-			String nameOut = name.split("\\.")[0]+"_undistorted.png";
-			UtilImageIO.saveImage(out,nameOut);
+			String nameOut;
+			if( rename ) {
+				nameOut = String.format("image%05d.png",i);
+			} else {
+				nameOut = file.getName().split("\\.")[0]+"_undistorted.png";
+			}
+
+			UtilImageIO.saveImage(out,new File(outputDir,nameOut).getAbsolutePath());
 		}
 	}
 }

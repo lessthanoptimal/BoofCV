@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,15 @@ public class FactoryInterpolation {
 		return createPixelS(min,max,type,t);
 	}
 
+	/**
+	 * Creates an interpolation class of the specified type for the specified image type.
+	 *
+	 * @param min Minimum possible pixel value.  Inclusive.
+	 * @param max Maximum possible pixel value.  Inclusive.
+	 * @param type Interpolation type
+	 * @param imageType Type of input image
+	 * @return Interpolation
+	 */
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, Class<T> imageType)
 	{
@@ -134,7 +143,11 @@ public class FactoryInterpolation {
 		else if( type == ImageSInt32.class )
 			return (InterpolatePixelS<T>)new ImplBilinearPixel_S32();
 		else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+ typeName(type));
+	}
+
+	private static String typeName(Class type) {
+		return type == null ? "null" : type.getName();
 	}
 
 	public static <T extends ImageSingleBand> InterpolateRectangle<T> bilinearRectangle( T image ) {
@@ -153,7 +166,7 @@ public class FactoryInterpolation {
 		else if( type == ImageSInt16.class )
 			return (InterpolateRectangle<T>)new BilinearRectangle_S16();
 		else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> nearestNeighborPixelS(Class<T> type) {
@@ -168,7 +181,7 @@ public class FactoryInterpolation {
 		else if( type == ImageSInt32.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_S32();
 		else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
 	public static <T extends ImageSingleBand> InterpolateRectangle<T> nearestNeighborRectangle( Class<?> type ) {
@@ -179,7 +192,7 @@ public class FactoryInterpolation {
 //		else if( type == ImageSInt16.class )
 //			return (InterpolateRectangle<T>)new NearestNeighborRectangle_S16();
 		else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> bicubicS(float param, float min, float max, Class<T> type) {
@@ -191,7 +204,7 @@ public class FactoryInterpolation {
 		else if( type == ImageSInt16.class )
 			return (InterpolatePixelS<T>)new ImplInterpolatePixelConvolution_S16(kernel,min,max);
 		else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> polynomialS(int maxDegree, double min, double max, Class<T> type) {
@@ -200,6 +213,6 @@ public class FactoryInterpolation {
 		else if( ImageInteger.class.isAssignableFrom(type) ) {
 			return (InterpolatePixelS<T>)new ImplPolynomialPixel_I(maxDegree,(float)min,(float)max);
 		} else
-			throw new RuntimeException("Unknown image type: "+type.getName());
+			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 }

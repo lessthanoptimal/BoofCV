@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks3D;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
@@ -38,6 +37,8 @@ import georegression.struct.se.Se3_F64;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.alg.distort.LensDistortionOps.distortTransform;
 
 /**
  * Wrapper around {@link VisOdomPixelDepthPnP} for {@link DepthVisualOdometry}.
@@ -106,8 +107,8 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	public void setCalibration(IntrinsicParameters paramVisual, PixelTransform_F32 visToDepth) {
 		sparse3D.configure(paramVisual,visToDepth);
 
-		PointTransform_F64 leftPixelToNorm = LensDistortionOps.transformRadialToNorm_F64(paramVisual);
-		PointTransform_F64 leftNormToPixel = LensDistortionOps.transformNormToRadial_F64(paramVisual);
+		PointTransform_F64 leftPixelToNorm = distortTransform(paramVisual).undistort_F64(true,false);
+		PointTransform_F64 leftNormToPixel = distortTransform(paramVisual).distort_F64(false,true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

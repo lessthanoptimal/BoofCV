@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
+import boofcv.core.image.border.ImageBorder_I32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
@@ -39,6 +40,7 @@ public class ImplBilinearPixel_S32 extends BilinearPixel<ImageSInt32> {
 	}
 
 	public ImplBilinearPixel_S32(ImageSInt32 orig) {
+
 		setImage(orig);
 	}
 	@Override
@@ -60,10 +62,28 @@ public class ImplBilinearPixel_S32 extends BilinearPixel<ImageSInt32> {
 		return val;
 	}
 
+	public float get_border(float x, float y) {
+		float xf = (float)Math.floor(x);
+		float yf = (float)Math.floor(y);
+		int xt = (int) xf;
+		int yt = (int) yf;
+		float ax = x - xf;
+		float ay = y - yf;
+
+		ImageBorder_I32 border = (ImageBorder_I32)this.border;
+
+		float val = (1.0f - ax) * (1.0f - ay) * border.get(xt,yt); // (x,y)
+		val += ax * (1.0f - ay) *  border.get(xt + 1, yt);; // (x+1,y)
+		val += ax * ay *  border.get(xt + 1, yt + 1);; // (x+1,y+1)
+		val += (1.0f - ax) * ay *  border.get(xt,yt+1);; // (x,y+1)
+
+		return val;
+	}
+
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1)
-			throw new IllegalArgumentException("Point is outside of the image "+x+" "+y);
+			return get_border(x,y);
 
 		int xt = (int) x;
 		int yt = (int) y;

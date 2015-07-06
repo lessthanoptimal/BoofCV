@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
@@ -54,7 +56,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.scale(input,output, TypeInterpolate.BILINEAR);
+		DistortImageOps.scale(input,output, null, TypeInterpolate.BILINEAR);
 
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input);
 		interp.setImage(input);
@@ -89,7 +91,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.rotate(input, output, TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
+		DistortImageOps.rotate(input, output,null , TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
 
 		double error = 0;
 		// the outside pixels are ignored because numerical round off can cause those to be skipped
@@ -163,5 +165,18 @@ public class TestDistortImageOps {
 		assertEquals(3,found.y0,1e-4);
 		assertEquals(10,found.width,1e-4);
 		assertEquals(20,found.height,1e-4);
+	}
+
+	@Test
+	public void boundBox_F64() {
+		// basic sanity check
+		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,2,3);
+		PixelTransformAffine_F64 transform = new PixelTransformAffine_F64(affine);
+		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20, transform);
+
+		assertEquals(2,found.x0,1e-8);
+		assertEquals(3,found.y0,1e-8);
+		assertEquals(10,found.width,1e-8);
+		assertEquals(20,found.height,1e-8);
 	}
 }

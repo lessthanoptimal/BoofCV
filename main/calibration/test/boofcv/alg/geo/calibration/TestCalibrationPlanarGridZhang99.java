@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,19 +41,19 @@ public class TestCalibrationPlanarGridZhang99 {
 	 */
 	@Test
 	public void fullTest() {
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.points;
-		Zhang99Parameters expected = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
+		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
+		Zhang99ParamAll expected = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(expected,grid);
 
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(config,expected.assumeZeroSkew,2);
+		CalibrationPlanarGridZhang99 alg =
+				new CalibrationPlanarGridZhang99(grid,expected.assumeZeroSkew,2,expected.includeTangential);
 
 		assertTrue(alg.process(observations));
 
-		Zhang99Parameters found = alg.getOptimized();
+		Zhang99ParamAll found = alg.getOptimized();
 
-		checkIntrinsicOnly(expected, found,0.01,0.1);
+		checkIntrinsicOnly(expected, found,0.01,0.1,0.1);
 	}
 
 	/**
@@ -61,17 +61,17 @@ public class TestCalibrationPlanarGridZhang99 {
 	 */
 	@Test
 	public void initialParam() {
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.points;
-		Zhang99Parameters initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
+		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
+		Zhang99ParamAll initial = GenericCalibrationGrid.createEasierParam(true, 2, false, 3, rand);
+		// tangential can't be linearly estimated
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
-		Helper alg = new Helper(config,true,2);
+		Helper alg = new Helper(grid,true,2,false);
 
-		Zhang99Parameters found = alg.initialParam(observations);
+		Zhang99ParamAll found = alg.initialParam(observations);
 
-		checkIntrinsicOnly(initial, found,0.01,0.1);
+		checkIntrinsicOnly(initial, found, 0.01, 0.1, 0.1);
 	}
 
 	/**
@@ -80,17 +80,16 @@ public class TestCalibrationPlanarGridZhang99 {
 	@Test
 	public void optimizedParam_perfect() {
 
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.points;
-		Zhang99Parameters initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
-		Zhang99Parameters found = new Zhang99Parameters(true,2,3);
+		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
+		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
+		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(config,true,2);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
 		assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
 
-		checkEquals(initial, found,initial);
+		checkEquals(initial, found, initial);
 	}
 
 	/**
@@ -99,11 +98,10 @@ public class TestCalibrationPlanarGridZhang99 {
 	@Test
 	public void optimizedParam_noisy() {
 
-		PlanarCalibrationTarget config = GenericCalibrationGrid.createStandardConfig();
-		List<Point2D_F64> grid = config.points;
-		Zhang99Parameters initial = GenericCalibrationGrid.createStandardParam(true,2,3,rand);
-		Zhang99Parameters expected = initial.copy();
-		Zhang99Parameters found = new Zhang99Parameters(true,2,3);
+		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
+		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
+		Zhang99ParamAll expected = initial.copy();
+		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
 
 		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
@@ -114,32 +112,52 @@ public class TestCalibrationPlanarGridZhang99 {
 		initial.x0 += rand.nextDouble()*0.01*Math.abs(initial.x0);
 		initial.y0 += rand.nextDouble()*0.01*Math.abs(initial.y0);
 
-		for( int i = 0; i < expected.distortion.length; i++ ) {
-			initial.distortion[i] = rand.nextGaussian()*expected.distortion[i]*0.1;
+		for( int i = 0; i < expected.radial.length; i++ ) {
+			initial.radial[i] = rand.nextGaussian()*expected.radial[i]*0.1;
 		}
 
-		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(config,true,2);
+		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
 		assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
 
 		checkEquals(expected, found, initial);
 	}
 
-	private void checkIntrinsicOnly(Zhang99Parameters initial,
-									Zhang99Parameters found , double tolK , double tolD ) {
+	@Test
+	public void applyDistortion() {
+		Point2D_F64 n = new Point2D_F64(0.05,-0.1);
+		double radial[] = new double[]{0.1};
+		double t1 = 0.034,t2 = 0.34;
+
+		Point2D_F64 distorted = new Point2D_F64();
+
+		double r2 = n.x*n.x + n.y*n.y;
+		distorted.x = n.x + radial[0]*r2*n.x + 2*t1*n.x*n.y + t2*(r2 + 2*n.x*n.x);
+		distorted.y = n.y + radial[0]*r2*n.y + t1*(r2 + 2*n.y*n.y) + 2*t2*n.x*n.y;
+
+		CalibrationPlanarGridZhang99.applyDistortion(n,radial,t1,t2);
+
+		assertEquals(distorted.x, n.x, 1e-8);
+		assertEquals(distorted.y, n.y, 1e-8);
+	}
+
+	private void checkIntrinsicOnly(Zhang99ParamAll initial,
+									Zhang99ParamAll found , double tolK , double tolD , double tolT ) {
 		assertEquals(initial.a,found.a,Math.abs(initial.a)*tolK);
 		assertEquals(initial.b,found.b,Math.abs(initial.b)*tolK);
 		assertEquals(initial.c,found.c,Math.abs(initial.c)*tolK);
 		assertEquals(initial.x0,found.x0,Math.abs(initial.x0)*tolK);
 		assertEquals(initial.y0, found.y0, Math.abs(initial.y0) * tolK);
 
-		for( int i = 0; i < initial.distortion.length; i++ ) {
-			assertEquals(initial.distortion[i],found.distortion[i],tolD);
+		for( int i = 0; i < initial.radial.length; i++ ) {
+			assertEquals(initial.radial[i],found.radial[i],tolD);
 		}
+		assertEquals(initial.t1,found.t1,tolT);
+		assertEquals(initial.t2,found.t2,tolT);
 	}
 
-	public static void checkEquals( Zhang99Parameters expected ,
-									Zhang99Parameters found ,
-									Zhang99Parameters initial )
+	public static void checkEquals( Zhang99ParamAll expected ,
+									Zhang99ParamAll found ,
+									Zhang99ParamAll initial )
 	{
 		double pixelTol=0.5;
 		double paramTol=0.3;
@@ -151,16 +169,19 @@ public class TestCalibrationPlanarGridZhang99 {
 		assertTrue(Math.abs(expected.x0-initial.x0)*paramTol >= Math.abs(expected.x0-found.x0));
 		assertTrue(Math.abs(expected.y0-initial.y0)*paramTol >= Math.abs(expected.y0-found.y0));
 
-		for( int i = 0; i < expected.distortion.length; i++ ) {
-			double e = expected.distortion[i];
-			double f = found.distortion[i];
-			double init = initial.distortion[i];
+		for( int i = 0; i < expected.radial.length; i++ ) {
+			double e = expected.radial[i];
+			double f = found.radial[i];
+			double init = initial.radial[i];
 			assertTrue(Math.abs(init - f) * 0.5 >= Math.abs(f - e));
 		}
 
+		assertTrue(Math.abs(expected.t1 - found.t1) <= Math.abs(initial.t1 - found.t1));
+		assertTrue(Math.abs(expected.t2 - found.t2) <= Math.abs(initial.t2 - found.t2));
+
 		for( int i = 0; i < 2; i++ ) {
-			Zhang99Parameters.View pp = expected.views[i];
-			Zhang99Parameters.View ff = found.views[i];
+			Zhang99ParamAll.View pp = expected.views[i];
+			Zhang99ParamAll.View ff = found.views[i];
 
 			GeometryUnitTest.assertEquals(pp.T, ff.T, pixelTol);
 			GeometryUnitTest.assertEquals(pp.rotation.unitAxisRotation,ff.rotation.unitAxisRotation,pixelTol);
@@ -171,11 +192,12 @@ public class TestCalibrationPlanarGridZhang99 {
 	private static class Helper extends CalibrationPlanarGridZhang99
 	{
 
-		public Helper(PlanarCalibrationTarget config, boolean assumeZeroSkew, int numSkewParam) {
-			super(config, assumeZeroSkew, numSkewParam);
+		public Helper(List<Point2D_F64> layout, boolean assumeZeroSkew,
+					  int numRadial, boolean includeTangential) {
+			super(layout, assumeZeroSkew, numRadial,includeTangential);
 		}
 
-		public Zhang99Parameters initialParam( List<List<Point2D_F64>> observations ) {
+		public Zhang99ParamAll initialParam( List<List<Point2D_F64>> observations ) {
 			return super.initialParam(observations);
 		}
 	}

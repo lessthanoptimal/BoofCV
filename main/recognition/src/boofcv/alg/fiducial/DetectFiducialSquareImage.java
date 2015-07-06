@@ -18,15 +18,16 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.feature.associate.HammingTable16;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -36,7 +37,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment
+ * <p>
+ * Fiducial which uses images to describe arbitrary binary patterns.  When useing this fiducial it's up to the user to
+ * select good images which will provide unique orientation and are easily distinguished against other patterns and
+ * noise insensitive.
+ * </p>
+ * <center>
+ * <img src="doc-files/square_image.png"/>
+ * </center>
+ * <p>
+ * The above image visually shows the fiducials internal coordinate system.  The center of the fiducial is the origin
+ * of the coordinate system, e.g. all sides are width/2 distance away from the origin.  +x is to the right, +y is up
+ * , and +z out of the paper towards the viewer.
+ * </p>
+ * <p>
+ * A good pattern will have thick lines or thick shapes.  When detecting the image it's not uncommon for the distortion
+ * removal to be off by one or two pixels.  So think lines are be completely out of synch.  The image should also
+ * be chosen so that there is to rotational ambiguity.  A perfect circle in the center is an example of a bad fiducial
+ * in which orientation can't be uniquely determined.
+ * </p>
  * @author Peter Abeles
  */
 public class DetectFiducialSquareImage<T extends ImageSingleBand>
@@ -49,7 +68,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	private final static int DESC_LENGTH = squareLength*squareLength/16;
 
 	// converts the input image into a binary one
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
+	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,false,ImageFloat32.class);
 	private ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
 
 	// list of all known targets
@@ -72,10 +91,8 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 *
 	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
-	public DetectFiducialSquareImage(InputToBinary<T> thresholder,
-									 SplitMergeLineFitLoop fitPolygon,
-									 double minContourFraction, double matchThreshold, Class<T> inputType) {
-		super(thresholder,fitPolygon, squareLength+squareLength, minContourFraction, inputType);
+	public DetectFiducialSquareImage(BinaryPolygonConvexDetector<T> quadDetector, double matchThreshold, Class<T> inputType) {
+		super(quadDetector, squareLength+squareLength, inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 
@@ -90,36 +107,50 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 * square and of the appropriate size.  Thus the original shape of the image doesn't
 	 * matter.  Square shapes are highly recommended since that's what the target looks like.
 	 *
-	 * @param grayScale Grayscale input image
-	 * @param threshold Threshold which will be used to convert it into a binary image
+	 * @param inputBinary Binary input image pattern.  0 = black, 1 = white.
 	 * @param lengthSide How long one of the sides of the target is in world units.
 	 * @return The ID of the provided image
 	 */
-	public int addImage( T grayScale , double threshold , double lengthSide ) {
-		// scale the image to the desired size
-		T scaled = GeneralizedImageOps.createSingleBand(getInputType(),squareLength,squareLength);
+	public int addPattern(ImageUInt8 inputBinary, double lengthSide) {
+		if( inputBinary == null ) {
+			throw new IllegalArgumentException("Input image is null.");
+		} else if( lengthSide <= 0 ) {
+			throw new IllegalArgumentException("Parameter lengthSide must be more than zero");
+		} else if(ImageStatistics.max(inputBinary) > 1 )
+			throw new IllegalArgumentException("A binary image is composed on 0 and 1 pixels.  This isn't binary!");
 
-		// See if it can use the better algorithm for scaling down the image
-		if( grayScale.width > squareLength && grayScale.height > squareLength ) {
-			AverageDownSampleOps.down(grayScale,scaled);
+		// see if it needs to be resized
+		if ( inputBinary.width != squareLength || inputBinary.height != squareLength ) {
+			// need to create a new image and rescale it to better handle the resizing
+			ImageFloat32 inputGray = new ImageFloat32(inputBinary.width,inputBinary.height);
+			ConvertImage.convert(inputBinary,inputGray);
+			PixelMath.multiply(inputGray,255,inputGray);
+
+			ImageFloat32 scaled = new ImageFloat32(squareLength,squareLength);
+
+			// See if it can use the better algorithm for scaling down the image
+			if( inputBinary.width > squareLength && inputBinary.height > squareLength ) {
+				AverageDownSampleOps.down(inputGray,scaled);
+			} else {
+				new FDistort(inputGray,scaled).scaleExt().apply();
+			}
+			GThresholdImageOps.threshold(scaled,binary,255/2.0,false);
 		} else {
-			DistortImageOps.scale(grayScale, scaled, TypeInterpolate.BILINEAR);
+			binary.setTo(inputBinary);
 		}
-
-		// threshold it
-		GThresholdImageOps.threshold(scaled,binary,threshold,true);
 
 		// describe it in 4 different orientations
 		FiducialDef def = new FiducialDef();
 		def.lengthSide = lengthSide;
 
+		// CCW rotation so that the index refers to how many CW rotation it takes to put it into the nominal pose
 		binaryToDef(binary, def.desc[0]);
-		ImageMiscOps.rotateCW(binary);
+		ImageMiscOps.rotateCCW(binary);
 		binaryToDef(binary, def.desc[1]);
-		ImageMiscOps.rotateCW(binary);
-		binaryToDef(binary,def.desc[2]);
-		ImageMiscOps.rotateCW(binary);
-		binaryToDef(binary,def.desc[3]);
+		ImageMiscOps.rotateCCW(binary);
+		binaryToDef(binary, def.desc[2]);
+		ImageMiscOps.rotateCCW(binary);
+		binaryToDef(binary, def.desc[3]);
 
 		int index = targets.size();
 		targets.add( def );
@@ -142,36 +173,34 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	@Override
 	protected boolean processSquare(ImageFloat32 gray, Result result) {
 
-		int off = (gray.width-binary.width)/2;
+		int off = squareLength/2;
 		gray.subimage(off,off,gray.width-off,gray.width-off,grayNoBorder);
+
+//		grayNoBorder.printInt();
 
 		threshold.process(grayNoBorder,binary);
 
-		binaryToDef(binary,squareDef);
+//		binary.printBinary();
+		binaryToDef(binary, squareDef);
 
+		boolean matched = false;
+		int bestScore = hammingThreshold+1;
 		for (int i = 0; i < targets.size(); i++) {
 			FiducialDef def = targets.get(i);
 
-			int bestOrientation = 0;
-			int bestScore = Integer.MAX_VALUE;
 			for (int j = 0; j < 4; j++) {
 				int score = hamming(def.desc[j], squareDef);
 				if( score < bestScore ) {
 					bestScore = score;
-					bestOrientation = j;
+					result.rotation = j;
+					result.which = i;
+					result.lengthSide = def.lengthSide;
+					matched = true;
 				}
-			}
-
-			// see if it meets the match threshold
-			if( bestScore <= hammingThreshold ) {
-				result.rotation = bestOrientation;
-				result.which = i;
-				result.lengthSide = def.lengthSide;
-				return true;
 			}
 		}
 
-		return false;
+		return matched;
 	}
 
 	/**

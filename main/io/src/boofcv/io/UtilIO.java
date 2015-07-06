@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.URL;
 
 
 /**
@@ -61,7 +62,10 @@ public class UtilIO {
 			if( foundMain && foundLib )
 				return path;
 
-			path = "../"+path;
+			if( i > 0 )
+				path = "../"+path;
+			else
+				path = "../";
 		}
 		throw new RuntimeException("Base not found");
 	}
@@ -136,6 +140,10 @@ public class UtilIO {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static <T> T loadXML( URL url ) {
+		return loadXML(url.getPath());
 	}
 
 	public static <T> T loadXML( String fileName ) {

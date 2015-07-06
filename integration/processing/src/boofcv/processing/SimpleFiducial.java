@@ -63,7 +63,6 @@ public class SimpleFiducial {
 		param.cy = height/2;
 		param.fx = param.cx/Math.tan(UtilAngle.degreeToRadian(30)); // assume 60 degree FOV
 		param.fy = param.cx/Math.tan(UtilAngle.degreeToRadian(30));
-		param.flipY = false;
 
 		setIntrinsic(param);
 	}

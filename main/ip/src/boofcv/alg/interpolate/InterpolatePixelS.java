@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,12 @@ import boofcv.struct.image.ImageSingleBand;
 public interface InterpolatePixelS<T extends ImageSingleBand> extends InterpolatePixel<T> {
 
 	/**
-	 * Returns the interpolated pixel value at the specified location while taking in account
-	 * the image border. Bounds checking is done to ensure that the coordinate is inside the image
-	 * and to see if the interpolation technique needs to be adjusted for the image border.
+	 * Returns the interpolated pixel value at the specified location while checking to see if
+	 * border conditions apply.  If the requested pixel is outside the image border it will attempt
+	 * to process it using or throw a null pointer exception of a border handler has not been specified.
 	 *
-	 * @param x Point's x-coordinate. x >= 0 && x < image.width
-	 * @param y Point's y-coordinate. y >= 0 && y < image.height
+	 * @param x Point's x-coordinate. x >= 0 && x < image.width or all values if border specified
+	 * @param y Point's y-coordinate. y >= 0 && y < image.height or all values if border specified
 	 * @return Interpolated intensity value or NaN if it can't be interpolated.
 	 */
 	public float get(float x, float y);

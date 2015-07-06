@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,8 +144,8 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	public void setCalibration(StereoParameters param) {
 
 		param.rightToLeft.invert(leftToRight);
-		leftImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.left);
-		rightImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.right);
+		leftImageToNorm = LensDistortionOps.distortTransform(param.left).undistort_F64(true,false);
+		rightImageToNorm = LensDistortionOps.distortTransform(param.right).undistort_F64(true,false);
 	}
 
 	/**

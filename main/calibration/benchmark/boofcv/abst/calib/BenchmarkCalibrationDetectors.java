@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Chessboard extends PerformerBase {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(5,7));
+				detectorChessboard(new ConfigChessboard(5,7,30));
 
 		@Override
 		public void process() {
@@ -52,7 +52,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Square extends PerformerBase {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorSquareGrid(new ConfigSquareGrid(5, 7));
+				detectorSquareGrid(new ConfigSquareGrid(5, 7,30,30));
 
 		@Override
 		public void process() {

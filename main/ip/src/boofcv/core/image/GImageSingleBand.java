@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,8 @@ import boofcv.struct.image.ImageSingleBand;
  */
 public interface GImageSingleBand {
 
+	void wrap( ImageSingleBand image );
+
 	int getWidth();
 
 	int getHeight();
@@ -44,6 +46,12 @@ public interface GImageSingleBand {
 	 * @param num Value of the pixel
 	 */
 	void set( int x , int y , Number num );
+
+	/**
+	 * get which returns a double, has no bounds checking. Still slow, but faster than the super generic get.  Also
+	 * doesn't create memory on each get
+	 */
+	double unsafe_getD(int x, int y);
 
 	/**
 	 * Sets pixel based on pixel value in data array

@@ -437,6 +437,120 @@ public class PixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageUInt8 input , int value , ImageUInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (byte)((input.data[indexSrc] & 0xFF) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageUInt8 input , int value , int lower , int upper , ImageUInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = (input.data[indexSrc] & 0xFF) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (byte)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageUInt8 input , ImageUInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (byte)( value - (input.data[indexSrc] & 0xFF));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageUInt8 input , int lower , int upper , ImageUInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = value - (input.data[indexSrc] & 0xFF);
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (byte)val;
+			}
+		}
+	}
+
+	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -661,6 +775,120 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
 				int val = (input.data[indexSrc] ) + value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (byte)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt8 input , int value , ImageSInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (byte)((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt8 input , int value , int lower , int upper , ImageSInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (byte)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt8 input , ImageSInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (byte)( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt8 input , int lower , int upper , ImageSInt8 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = value - (input.data[indexSrc] );
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output.data[indexDst] = (byte)val;
@@ -901,6 +1129,120 @@ public class PixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageUInt16 input , int value , ImageUInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (short)((input.data[indexSrc] & 0xFFFF) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageUInt16 input , int value , int lower , int upper , ImageUInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = (input.data[indexSrc] & 0xFFFF) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (short)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageUInt16 input , ImageUInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (short)( value - (input.data[indexSrc] & 0xFFFF));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageUInt16 input , int lower , int upper , ImageUInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = value - (input.data[indexSrc] & 0xFFFF);
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (short)val;
+			}
+		}
+	}
+
+	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -1125,6 +1467,120 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
 				int val = (input.data[indexSrc] ) + value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (short)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt16 input , int value , ImageSInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (short)((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt16 input , int value , int lower , int upper , ImageSInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = (short)val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt16 input , ImageSInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = (short)( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt16 input , int lower , int upper , ImageSInt16 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = value - (input.data[indexSrc] );
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output.data[indexDst] = (short)val;
@@ -1365,6 +1821,120 @@ public class PixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt32 input , int value , ImageSInt32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt32 input , int value , int lower , int upper , ImageSInt32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt32 input , ImageSInt32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( int value , ImageSInt32 input , int lower , int upper , ImageSInt32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				int val = value - (input.data[indexSrc] );
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -1589,6 +2159,120 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
 				long val = (input.data[indexSrc] ) + value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt64 input , long value , ImageSInt64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageSInt64 input , long value , long lower , long upper , ImageSInt64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				long val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( long value , ImageSInt64 input , ImageSInt64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( long value , ImageSInt64 input , long lower , long upper , ImageSInt64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				long val = value - (input.data[indexSrc] );
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output.data[indexDst] = val;
@@ -1829,6 +2513,120 @@ public class PixelMath {
 	}
 
 	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageFloat32 input , float value , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				float val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , ImageFloat32 input , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , ImageFloat32 input , float lower , float upper , ImageFloat32 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				float val = value - (input.data[indexSrc] );
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -2053,6 +2851,120 @@ public class PixelMath {
 
 			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
 				double val = (input.data[indexSrc] ) + value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageFloat64 input , double value , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ((input.data[indexSrc] ) - value);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				double val = (input.data[indexSrc] ) - value;
+				if( val < lower ) val = lower;
+				if( val > upper ) val = upper;
+				output.data[indexDst] = val;
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( double value , ImageFloat64 input , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				output.data[indexDst] = ( value - (input.data[indexSrc] ));
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( double value , ImageFloat64 input , double lower , double upper , ImageFloat64 output ) {
+
+		InputSanityCheck.checkSameShape(input,output);
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++, indexDst++ ) {
+				double val = value - (input.data[indexSrc] );
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output.data[indexDst] = val;

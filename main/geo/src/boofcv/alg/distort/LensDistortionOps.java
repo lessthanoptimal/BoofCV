@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,9 @@ import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
+import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 /**
  * Operations related to manipulating lens distortion in images
@@ -53,8 +55,7 @@ public class LensDistortionOps {
 	 * when detecting features, which EXTENDED minimizes.
 	 * </p>
 	 *
-	 * @param allInside If true then the undistorted image will be filled with valid pixels.
-	 *                  If false then the undistorted image will contain the entire original image.
+	 * @param type The type of adjustment it will do
 	 * @param borderType Specifies how the image border is handled. Null means borders are ignored.
 	 * @param param Original intrinsic parameters.
 	 * @param paramAdj (output) Intrinsic parameters which reflect the undistorted image.  Can be null.
@@ -62,9 +63,9 @@ public class LensDistortionOps {
 	 * @return ImageDistort which removes lens distortion
 	 */
 	public static <T extends ImageBase>
-	ImageDistort<T,T> removeDistortion( boolean allInside , BorderType borderType ,
-										IntrinsicParameters param, IntrinsicParameters paramAdj ,
-										ImageType<T> imageType )
+	ImageDistort<T,T> imageRemoveDistortion(AdjustmentType type, BorderType borderType,
+											IntrinsicParameters param, IntrinsicParameters paramAdj,
+											ImageType<T> imageType)
 	{
 		Class bandType = imageType.getImageClass();
 
@@ -79,11 +80,17 @@ public class LensDistortionOps {
 		else
 			border = FactoryImageBorder.general(bandType,borderType);
 
-		PointTransform_F32 transform;
-		if( allInside)
-			transform = LensDistortionOps.allInside(param, paramAdj);
-		else
-			transform = LensDistortionOps.fullView(param,paramAdj);
+		PointTransform_F32 undistToDist = null;
+		switch( type ) {
+			case EXPAND:
+			case FULL_VIEW:
+				undistToDist = transform_F32(type, param, paramAdj, true);
+				break;
+
+			case NONE:
+				undistToDist = distortTransform(param).distort_F32(true, true);
+				break;
+		}
 
 		ImageDistort<T,T> distort;
 
@@ -100,187 +107,202 @@ public class LensDistortionOps {
 				throw new RuntimeException("Unsupported image family: "+imageType.getFamily());
 		}
 
-		distort.setModel(new PointToPixelTransform_F32(transform));
+		distort.setModel(new PointToPixelTransform_F32(undistToDist));
 
 		return distort;
 	}
 
 	/**
-	 * <p>
-	 * Transforms the view such that the entire original image is visible after lens distortion has been removed.
-	 * The appropriate {@link PointTransform_F32} is returned and a new set of intrinsic camera parameters for
-	 * the "virtual" camera that is associated with the returned transformed.
-	 * </p>
+	 * Creates a {@link PointTransform_F32} for adding and removing lens distortion.
 	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
+	 * @param type The type of adjustment it will apply to the transform
 	 * @param param Intrinsic camera parameters.
-	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @return New transform that adjusts the view and removes lens distortion..
+	 * @param paramAdj If not null, the new camera parameters for the undistorted view are stored here.
+	 * @param undistortedToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
+	 *                       image and the output will be in distorted image, if false then the reverse transform
+	 *                       is returned.
+	 * @return The requested transform
 	 */
-	public static PointTransform_F32 fullView( IntrinsicParameters param,
-											   IntrinsicParameters paramAdj ) {
+	public static PointTransform_F32 transform_F32(AdjustmentType type,
+												   IntrinsicParameters param,
+												   IntrinsicParameters paramAdj,
+												   boolean undistortedToDistorted)
+	{
+		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
 
-		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
-		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		RectangleLength2D_F32 bound;
+		if( type == AdjustmentType.FULL_VIEW ) {
+			bound = DistortImageOps.boundBox_F32(param.width, param.height,
+					new PointToPixelTransform_F32(remove_p_to_p));
+		} else if( type == AdjustmentType.EXPAND) {
+			bound = LensDistortionOps.boundBoxInside(param.width, param.height,
+					new PointToPixelTransform_F32(remove_p_to_p));
 
-		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(param.width, param.height,
-				new PointToPixelTransform_F32(removeDistort));
+			// ensure there are no strips of black
+			LensDistortionOps.roundInside(bound);
+		} else {
+			throw new IllegalArgumentException("Unsupported type "+type);
+		}
 
 		double scaleX = bound.width/param.width;
 		double scaleY = bound.height/param.height;
 
-		double scale = Math.max(scaleX, scaleY);
+		double scale;
 
-		// translation
-		double deltaX = bound.x0;
-		double deltaY = bound.y0;
+		if( type == AdjustmentType.FULL_VIEW ) {
+			scale = Math.max(scaleX, scaleY);
+		} else {
+			scale = Math.min(scaleX, scaleY);
+		}
 
-		// adjustment matrix
-		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
-
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,tranAdj,flip);
-		} else
-			return tranAdj;
-	}
-
-	/**
-	 * <p>
-	 * Adjusts the view such that each pixel has a correspondence to the original image while maximizing the
-	 * view area. In other words no black regions which can cause problems for some image processing algorithms.
-	 * </p>
-	 *
-	 * <p>
-	 * The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
-	 * </p>
-	 *
-	 * @param param Intrinsic camera parameters.
-	 * @param paramAdj If not null, the new camera parameters are stored here.
-	 * @return New transform that adjusts the view and removes lens distortion..
-	 */
-	public static PointTransform_F32 allInside( IntrinsicParameters param,
-												IntrinsicParameters paramAdj ) {
-		RemoveRadialPtoP_F32 removeDistort = new RemoveRadialPtoP_F32();
-		AddRadialPtoP_F32 addDistort = new AddRadialPtoP_F32();
-		removeDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-		addDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-
-		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(param.width, param.height,
-				new PointToPixelTransform_F32(removeDistort));
-
-		// ensure there are no strips of black
-		LensDistortionOps.roundInside(bound);
-
-		double scaleX = bound.width/param.width;
-		double scaleY = bound.height/param.height;
-
-		double scale = Math.min(scaleX, scaleY);
-
-		// translation and shift over so that the small axis is in the middle
 		double deltaX = bound.x0 + (scaleX-scale)*param.width/2.0;
 		double deltaY = bound.y0 + (scaleY-scale)*param.height/2.0;
 
 		// adjustment matrix
 		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
 
-		PointTransform_F32 tranAdj = PerspectiveOps.adjustIntrinsic_F32(addDistort, false, param, A, paramAdj);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,tranAdj,flip);
-		} else
-			return tranAdj;
+		return adjustmentTransform_F32(param, paramAdj, undistortedToDistorted, remove_p_to_p, A);
 	}
 
 	/**
-	 * Removes radial distortion from the image in pixel coordinates and converts it into normalized image coordinates
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Distorted pixel to normalized image coordinates
+	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
+	 * and {@link PointTransform_F32}
 	 */
-	public static PointTransform_F64 transformRadialToNorm_F64(IntrinsicParameters param)
-	{
-		RemoveRadialPtoN_F64 radialDistort = new RemoveRadialPtoN_F64();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+	private static PointTransform_F32 adjustmentTransform_F32(IntrinsicParameters param,
+															  IntrinsicParameters paramAdj,
+															  boolean undistToDist,
+															  PointTransform_F32 remove_p_to_p,
+															  DenseMatrix64F A) {
+		DenseMatrix64F A_inv = null;
 
-		if( param.flipY) {
-			return new FlipVerticalNorm_F64(radialDistort,param.height);
+		if( !undistToDist || paramAdj != null ) {
+			A_inv = new DenseMatrix64F(3, 3);
+			if (!CommonOps.invert(A, A_inv)) {
+				throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
+			}
+		}
+
+		if( paramAdj != null ) {
+			PerspectiveOps.adjustIntrinsic(param, A_inv, paramAdj);
+		}
+
+		if( undistToDist ) {
+			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A);
+
+			return new SequencePointTransform_F32(adjust,add_p_to_p);
 		} else {
-			return radialDistort;
+			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A_inv);
+
+			return new SequencePointTransform_F32(remove_p_to_p,adjust);
 		}
 	}
 
 	/**
-	 * Removes radial distortion from the pixel coordinate.
+	 * Creates a {@link PointTransform_F64} for adding and removing lens distortion.
 	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transformation into undistorted pixel coordinates
+	 * @param type The type of adjustment it will apply to the transform
+	 * @param param Intrinsic camera parameters.
+	 * @param paramAdj If not null, the new camera parameters for the undistorted view are stored here.
+	 * @param undistortedToDistorted If true then the transform's input is assumed to be pixels in the adjusted undistorted
+	 *                       image and the output will be in distorted image, if false then the reverse transform
+	 *                       is returned.
+	 * @return The requested transform
 	 */
-	public static PointTransform_F64 transformRadialToPixel_F64( IntrinsicParameters param )
+	public static PointTransform_F64 transform_F64(AdjustmentType type,
+												   IntrinsicParameters param,
+												   IntrinsicParameters paramAdj,
+												   boolean undistortedToDistorted)
 	{
-		RemoveRadialPtoP_F64 removeRadial = new RemoveRadialPtoP_F64();
-		removeRadial.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
+		PointTransform_F64 remove_p_to_p = distortTransform(param).undistort_F64(true, true);
 
-		if( param.flipY) {
-			PointTransform_F64 flip = new FlipVertical_F64(param.height);
-			return new SequencePointTransform_F64(flip,removeRadial,flip);
+		RectangleLength2D_F64 bound;
+		if( type == AdjustmentType.FULL_VIEW ) {
+			bound = DistortImageOps.boundBox_F64(param.width, param.height,
+					new PointToPixelTransform_F64(remove_p_to_p));
+		} else if( type == AdjustmentType.EXPAND) {
+			bound = LensDistortionOps.boundBoxInside(param.width, param.height,
+					new PointToPixelTransform_F64(remove_p_to_p));
+
+			// ensure there are no strips of black
+			LensDistortionOps.roundInside(bound);
 		} else {
-			return removeRadial;
+			throw new IllegalArgumentException("Unsupported type "+type);
 		}
+
+		double scaleX = bound.width/param.width;
+		double scaleY = bound.height/param.height;
+
+		double scale;
+
+		if( type == AdjustmentType.FULL_VIEW ) {
+			scale = Math.max(scaleX, scaleY);
+		} else {
+			scale = Math.min(scaleX, scaleY);
+		}
+
+		double deltaX = bound.x0 + (scaleX-scale)*param.width/2.0;
+		double deltaY = bound.y0 + (scaleY-scale)*param.height/2.0;
+
+		// adjustment matrix
+		DenseMatrix64F A = new DenseMatrix64F(3,3,true,scale,0,deltaX,0,scale,deltaY,0,0,1);
+
+		return adjustmentTransform_F64(param, paramAdj, undistortedToDistorted, remove_p_to_p, A);
 	}
 
 	/**
-	 * Converts normalized image coordinates into distorted pixel coordinates.
-	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transform from normalized image coordinates into distorted pixel coordinates
+	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
+	 * and {@link PointTransform_F32}
 	 */
-	public static PointTransform_F64 transformNormToRadial_F64(IntrinsicParameters param)
-	{
-		AddRadialNtoN_F64 addRadial = new AddRadialNtoN_F64();
-		addRadial.set(param.radial);
+	private static PointTransform_F64 adjustmentTransform_F64(IntrinsicParameters param,
+															  IntrinsicParameters paramAdj,
+															  boolean adjToDistorted,
+															  PointTransform_F64 remove_p_to_p,
+															  DenseMatrix64F A) {
+		DenseMatrix64F A_inv = null;
 
-		NormalizedToPixel_F64 toPixel = new NormalizedToPixel_F64();
-		toPixel.set(param.fx,param.fy,param.skew,param.cx,param.cy);
+		if( !adjToDistorted || paramAdj != null ) {
+			A_inv = new DenseMatrix64F(3, 3);
+			if (!CommonOps.invert(A, A_inv)) {
+				throw new RuntimeException("Failed to invert adjustment matrix.  Probably bad.");
+			}
+		}
 
-		if( param.flipY ) {
-			return new SequencePointTransform_F64(addRadial,toPixel,new FlipVertical_F64(param.height));
+		if( paramAdj != null ) {
+			PerspectiveOps.adjustIntrinsic(param, A_inv, paramAdj);
+		}
+
+		if( adjToDistorted ) {
+			PointTransform_F64 add_p_to_p = distortTransform(param).distort_F64(true, true);
+			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A);
+
+			return new SequencePointTransform_F64(adjust,add_p_to_p);
 		} else {
-			return new SequencePointTransform_F64(addRadial,toPixel);
+			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A_inv);
+
+			return new SequencePointTransform_F64(remove_p_to_p,adjust);
 		}
 	}
 
 	/**
 	 * <p>
-	 * Transform from undistorted pixel coordinates to distorted with radial pixel coordinates
+	 * Creates the {@link LensDistortionPinhole lens distortion} for the specified camera parameters.
+	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
+	 * lens distortion.  Automatically switches algorithm depending on the type of distortion or lack thereof.
 	 * </p>
 	 *
 	 * <p>
-	 * NOTE: The original image coordinate system is maintained even if the intrinsic parameter flipY is true.
+	 * Example:<br>
+	 * <pre>PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(param).distort_F64(false,true);</pre>
+	 * Creates a transform from normalized image coordinates into pixel coordinates.
 	 * </p>
 	 *
-	 * @param param Intrinsic camera parameters
-	 * @return Transform from undistorted to distorted image.
 	 */
-	public static PointTransform_F32 transformPixelToRadial_F32(IntrinsicParameters param)
-	{
-		AddRadialPtoP_F32 radialDistort = new AddRadialPtoP_F32();
-		radialDistort.set(param.fx, param.fy, param.skew, param.cx, param.cy, param.radial);
-
-		if( param.flipY) {
-			PointTransform_F32 flip = new FlipVertical_F32(param.height);
-			return new SequencePointTransform_F32(flip,radialDistort,flip);
-		} else {
-			return radialDistort;
-		}
+	public static LensDistortionPinhole distortTransform(IntrinsicParameters param) {
+		if( param.isDistorted())
+			return new LensDistortionRadialTangential(param);
+		else
+			return new LensDistortionUndistorted(param);
 	}
 
 	/**
@@ -329,6 +351,51 @@ public class LensDistortionOps {
 	}
 
 	/**
+	 * Finds the maximum area axis-aligned rectangle contained inside the transformed image which
+	 * does not include any pixels outside the sources border.  Assumes that the coordinates are not
+	 * flipped and some other stuff too.
+	 *
+	 * @param srcWidth Width of the source image
+	 * @param srcHeight Height of the source image
+	 * @param transform Transform being applied to the image
+	 * @return Bounding box
+	 */
+	public static RectangleLength2D_F64 boundBoxInside(int srcWidth, int srcHeight,
+													   PixelTransform_F64 transform) {
+
+		double x0,y0,x1,y1;
+
+		transform.compute(0,0);
+		x0 = transform.distX;
+		y0 = transform.distY;
+
+		transform.compute(srcWidth,0);
+		x1=transform.distX;
+		transform.compute(0, srcHeight);
+		y1=transform.distY;
+
+		for( int x = 0; x < srcWidth; x++ ) {
+			transform.compute(x, 0);
+			if( transform.distY > y0 )
+				y0 = transform.distY;
+			transform.compute(x,srcHeight);
+			if( transform.distY < y1 )
+				y1 = transform.distY;
+		}
+
+		for( int y = 0; y < srcHeight; y++ ) {
+			transform.compute(0,y);
+			if( transform.distX > x0 )
+				x0 = transform.distX;
+			transform.compute(srcWidth,y);
+			if( transform.distX < x1 )
+				x1 = transform.distX;
+		}
+
+		return new RectangleLength2D_F64(x0,y0,x1-x0,y1-y0);
+	}
+
+	/**
 	 * Adjust bound to ensure the entire image is contained inside, otherwise there might be
 	 * single pixel wide black regions
 	 */
@@ -337,6 +404,22 @@ public class LensDistortionOps {
 		float y0 = (float)Math.ceil(bound.y0);
 		float x1 = (float)Math.floor(bound.x0+bound.width);
 		float y1 = (float)Math.floor(bound.y0+bound.height);
+
+		bound.x0 = x0;
+		bound.y0 = y0;
+		bound.width = x1-x0;
+		bound.height = y1-y0;
+	}
+
+	/**
+	 * Adjust bound to ensure the entire image is contained inside, otherwise there might be
+	 * single pixel wide black regions
+	 */
+	public static void roundInside( RectangleLength2D_F64 bound ) {
+		double x0 = Math.ceil(bound.x0);
+		double y0 = Math.ceil(bound.y0);
+		double x1 = Math.floor(bound.x0+bound.width);
+		double y1 = Math.floor(bound.y0+bound.height);
 
 		bound.x0 = x0;
 		bound.y0 = y0;

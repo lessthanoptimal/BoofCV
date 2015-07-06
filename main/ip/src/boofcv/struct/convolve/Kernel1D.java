@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ public abstract class Kernel1D extends KernelBase {
 		super(width);
 	}
 
-	public Kernel1D(int offset , int width) {
-		super(offset,width);
+	public Kernel1D(int width, int offset) {
+		super(width, offset);
 	}
 
 	public Kernel1D() {

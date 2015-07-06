@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ExampleRemovePerspectiveDistortion {
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortMS(input,output,pixelTransform,true, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortMS(input,output,pixelTransform, null, TypeInterpolate.BILINEAR);
 
 		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
 		ShowImages.showWindow(buffered,"Original Image");

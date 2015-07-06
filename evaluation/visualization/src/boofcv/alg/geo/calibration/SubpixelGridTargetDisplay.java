@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
@@ -106,7 +105,7 @@ public class SubpixelGridTargetDisplay<T extends ImageSingleBand>
 		double x = -visibleRect.x;
 		double y = -visibleRect.y;
 
-		DistortImageOps.affine(input,transformed,TypeInterpolate.NEAREST_NEIGHBOR,scale,0,0,scale,x,y);
+		new FDistort(input,transformed).interpNN().affine(scale,0,0,scale,x,y).apply();
 		ConvertBufferedImage.convertTo(transformed,workImage,true);
 	}
 

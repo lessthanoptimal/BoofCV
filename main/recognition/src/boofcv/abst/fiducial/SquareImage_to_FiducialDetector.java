@@ -19,10 +19,9 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import georegression.struct.se.Se3_F64;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialDetector}
@@ -30,61 +29,38 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
-	implements FiducialDetector<T>
+	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareImage<T>>
 {
-	DetectFiducialSquareImage<T> alg;
-
-	ImageType<T> type;
-
 	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
-		this.alg = alg;
-		this.type = ImageType.single(alg.getInputType());
+		super(alg);
 	}
 
 	/**
-	 * Add a new target to the list.
+	 * Add a new pattern to be detected.  This function takes in a raw gray scale image and thresholds it.
 	 *
-	 * @param target Gray scale image of the target
+	 * @param pattern Gray scale image of the pattern
 	 * @param threshold Threshold used to convert it into a binary image
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addTarget( T target , double threshold , double lengthSide ) {
-		alg.addImage(target, threshold, lengthSide);
+	public void addPattern(T pattern, double threshold, double lengthSide) {
+		ImageUInt8 binary = new ImageUInt8(pattern.width,pattern.height);
+		GThresholdImageOps.threshold(pattern,binary,threshold,false);
+		alg.addPattern(binary, lengthSide);
 	}
 
-	@Override
-	public void detect(T input) {
-		alg.process(input);
-	}
-
-	@Override
-	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		alg.configure(intrinsic);
-	}
-
-	@Override
-	public int totalFound() {
-		return alg.getFound().size;
-	}
-
-	@Override
-	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		fiducialToCamera.set(alg.getFound().get(which).targetToSensor);
-	}
-
-	@Override
-	public int getId( int which ) {
-		return alg.getFound().get(which).index;
+	/**
+	 * Add a new pattern to be detected.
+	 *
+	 * @param binary Binary image of the pattern.  0 = black, 1 = white.
+	 * @param lengthSide Length of a side on the square in world units.
+	 */
+	public void addPattern(ImageUInt8 binary, double lengthSide) {
+		alg.addPattern(binary, lengthSide);
 	}
 
 	@Override
 	public double getWidth(int which) {
 		int index = alg.getFound().get(which).index;
 		return alg.getTargets().get(index).lengthSide;
-	}
-
-	@Override
-	public ImageType<T> getInputType() {
-		return type;
 	}
 }

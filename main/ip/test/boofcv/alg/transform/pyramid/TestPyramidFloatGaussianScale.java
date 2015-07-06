@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,9 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
@@ -67,9 +66,9 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 		// test the first layer
 		BlurFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
 		ImageFloat32 blurrImg = new ImageFloat32(width, height);
-		blur.process(img,blurrImg);
+		blur.process(img, blurrImg);
 		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
-		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
+		new FDistort(blurrImg,expected).scaleExt().apply();
 		ImageFloat32 found = alg.getLayer(0);
 
 		BoofTesting.assertEquals(expected,found,1e-4);
@@ -79,7 +78,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 		blurrImg = new ImageFloat32(expected.width,expected.height);
 		blur.process(expected,blurrImg);
 		expected = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
-		DistortImageOps.scale(blurrImg, expected, TypeInterpolate.BILINEAR);
+		new FDistort(blurrImg,expected).scaleExt().apply();
 		found = alg.getLayer(1);
 
 		BoofTesting.assertEquals(expected,found, 1e-4);

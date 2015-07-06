@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,120 +18,107 @@
 
 package boofcv.app;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.io.UtilIO;
+import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Outputs an EPS document describing a binary square fiducial that encodes the specified number
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImageEPS {
+public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
-	public static String outputName = "fiducial_image.eps";
-	public static String inputPath = UtilIO.getPathToBase()+"data/applet/fiducial/image/dog.png";
-	public static double width = 10; // in centimeters
+	// Paths to image files containing fiducial patterns
+	List<String> imagePaths = new ArrayList<String>();
 
-	public static double CM_TO_POINTS = 72.0/2.54;
+	@Override
+	protected void printPatternDefinitions() {
+		for( int i = 0; i < imagePaths.size(); i++ ) {
+			String imageName = new File(imagePaths.get(i)).getName();
+			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
 
-	public static String binaryToHex( ImageUInt8 binary ) {
-
-		if( binary.width%8 != 0 )
-			throw new RuntimeException("Width must be divisible by 8");
-
-		StringBuilder s = new StringBuilder(binary.width*binary.height/4);
-
-		for (int y = binary.height-1; y >= 0 ; y--) {
-			int i = y*binary.width;
-			for (int x = 0; x < binary.width; x += 8, i+= 8) {
-				int value = 0;
-				for (int j = 0; j < 8; j++) {
-					value |= binary.data[i+j] << (7-j);
-				}
-
-				String hex = Integer.toHexString(value);
-				if( hex.length() == 1 )
-					hex = "0"+hex;
-				s.append(hex);
+			if( image == null ) {
+				System.err.println("Can't find image.  Path = "+ imagePaths.get(i));
+				System.exit(0);
+			} else {
+				System.out.println("  loaded "+imageName);
 			}
-		}
 
-		return s.toString();
+			// make sure the image is square and divisible by 8
+			int s = image.width - (image.width%8);
+			if( image.width != s || image.height != s ) {
+				ImageUInt8 tmp = new ImageUInt8(s, s);
+				new FDistort(image, tmp).scaleExt().apply();
+				image = tmp;
+			}
+
+			double scale = image.width/innerWidth;
+			ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
+			if( showPreview )
+				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
+
+			out.println();
+			out.print("  /"+getPatternPrintDef(i)+" {\n" +
+					"  "+binary.width+" " + binary.height + " 1 [" + scale + " 0 0 " + scale + " 0 0]\n" +
+					"  {<"+binaryToHex(binary)+">} image\n" +
+					"} def\n");
+			out.println();
+		}
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
+	@Override
+	protected int totalPatterns() {
+		return imagePaths.size();
+	}
 
-		if( args.length == 2 ) {
-			width = Double.parseDouble(args[0]);
-			inputPath = args[1];
+	@Override
+	protected void addPattern(String name) {
+		this.imagePaths.add(name);
+	}
+
+	@Override
+	protected String getPatternName(int num) {
+		String n = new File(imagePaths.get(num)).getName();
+		return n.substring(0,n.length()-4);
+	}
+
+	@Override
+	public String defaultOutputFileName() {
+		String inputPath = imagePaths.get(0);
+		File dir = new File(inputPath).getParentFile();
+		String outputName = new File(inputPath).getName();
+		outputName = outputName.substring(0,outputName.length()-3) + "eps";
+		try {
+			outputName = new File(dir,outputName).getCanonicalPath();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
+		return outputName;
+	}
 
-		String inputName = new File(inputPath).getName();
-
-		System.out.println("Target width "+width+" (cm)  image = "+inputName);
-
-		ImageUInt8 image = UtilImageIO.loadImage(inputPath,ImageUInt8.class);
-
-		if( image.width != 304 || image.height != 304 ) {
-			ImageUInt8 out = new ImageUInt8(304,304);
-			DistortImageOps.scale(image,out, TypeInterpolate.BILINEAR);
-			image = out;
+	@Override
+	public String selectEpsName() {
+		if( imagePaths.size() == 1 ) {
+			return new File(imagePaths.get(0)).getName();
+		} else {
+			return "Multiple Patterns";
 		}
+	}
 
-		ImageUInt8 binary = ThresholdImageOps.threshold(image,null,256/2,false);
+	public static void main(String[] args) throws IOException {
 
-//		BinaryImageOps.invert(binary,binary);
-//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary,null),"Binary Image");
+		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("image path");
 
-		// print out the selected number in binary for debugging purposes
-		PrintStream out = new PrintStream(outputName);
-
-		double targetLength = width*CM_TO_POINTS;
-		double whiteBorder = targetLength/4.0;
-		double blackBorder = targetLength/4.0;
-		double innerWidth = targetLength/2.0;
-		double pageLength = targetLength+whiteBorder*2;
-		double scale = binary.width/innerWidth;
-
-		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
-				"%%Creator: BoofCV\n" +
-				"%%Title: "+inputName+" w="+width+"cm\n" +
-				"%%DocumentData: Clean7Bit\n" +
-				"%%Origin: 0 0\n" +
-				"%%BoundingBox: 0 0 "+pageLength+" "+pageLength+"\n" +
-				"%%LanguageLevel: 3\n" +
-				"%%Pages: 1\n" +
-				"%%Page: 1 1\n" +
-				"  /wb "+whiteBorder+" def\n" +
-				"  /bb "+blackBorder+" def\n" +
-				"  /b0 "+whiteBorder+" def\n" +
-				"  /b1 { wb bb add} def\n" +
-				"  /b2 { b1 "+innerWidth+" add} def\n" +
-				"  /b3 { b2 bb add} def\n" +
-				"% bottom top left right borders..\n" +
-				"  newpath b0 b0 moveto b0 b3 lineto b1 b3 lineto b1 b0 lineto closepath fill\n" +
-				"  newpath b1 b2 moveto b1 b3 lineto b3 b3 lineto b3 b2 lineto closepath fill\n" +
-				"  newpath b1 b0 moveto b1 b1 lineto b3 b1 lineto b2 b0 lineto closepath fill\n" +
-				"  newpath b2 b0 moveto b2 b3 lineto b3 b3 lineto b3 b0 lineto closepath fill\n");
-
-		// print out encoding information for convenience
-		out.print("  /Times-Roman findfont\n" +
-				"7 scalefont setfont b1 " + (pageLength - 10) + " moveto (" + inputName + "   " + width + " cm) show\n");
-
-		out.println("% Drawing the image");
-		out.println("b1 b1 translate");
-		out.println(binary.width+" "+binary.height+" 1 ["+scale+" 0 0 "+scale+" 0 0]");
-		out.println("{<" + binaryToHex(binary) + ">} image");
-		out.print("  showpage\n" +
-				"%%EOF\n");
-
+		parser.setExampleNames("ke.png","dog.png");
+		parser.execute(args,new CreateFiducialSquareImageEPS());
 	}
 }

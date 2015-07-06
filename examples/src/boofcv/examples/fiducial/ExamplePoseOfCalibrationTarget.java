@@ -72,9 +72,8 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
-		double sizeOfSquareInMeters = 0.03;
 		CalibrationFiducialDetector<ImageFloat32> detector =
-				FactoryFiducial.calibChessboard(new ConfigChessboard(5, 4),sizeOfSquareInMeters,ImageFloat32.class);
+				FactoryFiducial.calibChessboard(new ConfigChessboard(5, 4, 0.03),ImageFloat32.class);
 
 		detector.setIntrinsic(intrinsic);
 
@@ -89,7 +88,7 @@ public class ExamplePoseOfCalibrationTarget {
 		viewer.setWorldToCamera(new Se3_F64(rotY,new Vector3D_F64(0.75,0,1.25)));
 		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
 		gui.add(BorderLayout.WEST, imagePanel); gui.add(BorderLayout.CENTER, viewer);
-		ShowImages.showWindow(gui,"Calibration Target Pose");
+		ShowImages.showWindow(gui,"Calibration Target Pose",true);
 
 		// Allows the user to click on the image and pause
 		MousePauseHelper pauseHelper = new MousePauseHelper(gui);

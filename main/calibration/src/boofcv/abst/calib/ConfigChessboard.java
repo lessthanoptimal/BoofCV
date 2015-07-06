@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,16 +60,24 @@ public class ConfigChessboard implements Configuration {
 	 */
 	public double binaryAdaptiveBias = -10;
 
-	public ConfigChessboard(int numCols, int numRows) {
+	/**
+	 * Physical width of each square on the calibration target
+	 */
+	public  double squareWidth;
+
+	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {
 		this.numCols = numCols;
 		this.numRows = numRows;
+		this.squareWidth = squareWidth;
 	}
 
-	public ConfigChessboard(int numCols, int numRows, int nonmaxRadius,
+	public ConfigChessboard(int numCols, int numRows, double squareWidth,
+							int nonmaxRadius,
 							double relativeSizeThreshold ) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.nonmaxRadius = nonmaxRadius;
+		this.squareWidth = squareWidth;
 		this.relativeSizeThreshold = relativeSizeThreshold;
 	}
 

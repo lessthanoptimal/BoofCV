@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,27 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class FactoryGImageSingleBand {
+
+	public static GImageSingleBand create( Class imageType ) {
+		if( imageType == ImageUInt8.class )
+			return new GSingle_U8(null);
+		else if( imageType == ImageSInt8.class )
+			return new GSingle_S8( null );
+		else if( imageType == ImageUInt16.class )
+			return new GSingle_U16( null );
+		else if( imageType == ImageSInt16.class )
+			return new GSingle_S16( null );
+		else if( imageType == ImageSInt32.class )
+			return new GSingle_S32( null );
+		else if( imageType == ImageSInt64.class )
+			return new GSingle_I64( null );
+		else if( imageType == ImageFloat32.class )
+			return new GSingle_F32( null );
+		else if( imageType == ImageFloat64.class )
+			return new GSingle_F64( null );
+		else
+			throw new IllegalArgumentException("Unknown image type: "+imageType);
+	}
 
 	public static GImageSingleBand wrap( ImageSingleBand image ) {
 		if( image.getClass() == ImageUInt8.class )
@@ -111,6 +132,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
 		public void set(int index, float value) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
@@ -134,6 +160,11 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Number get(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public double unsafe_getD(int x, int y) {
 			return image.get(x,y);
 		}
 
@@ -170,6 +201,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
@@ -202,6 +238,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int index, float value) {
 			image.data[index] = (byte)value;
 		}
@@ -221,6 +262,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public Number get(int x, int y) {
 			return image.get(x,y);
+		}
+
+		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
 		}
 
 		@Override
@@ -251,6 +297,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
 		}
@@ -275,6 +326,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public Number get(int x, int y) {
 			return image.get(x,y);
+		}
+
+		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
 		}
 
 		@Override
@@ -305,6 +361,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
 		}
@@ -329,6 +390,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public Number get(int x, int y) {
 			return image.get(x,y);
+		}
+
+		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
 		}
 
 		@Override
@@ -364,6 +430,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
@@ -393,6 +464,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public Number get(int x, int y) {
 			return image.get(x,y);
+		}
+
+		@Override
+		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
 		}
 
 		@Override
@@ -432,6 +508,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public void wrap(ImageSingleBand image) {
+			this.image = (T)image;
+		}
+
+		@Override
 		public int getWidth() {
 			return image.getWidth();
 		}
@@ -456,6 +537,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public void wrap(ImageSingleBand image) {
+			throw new RuntimeException("Not supported for GSingleBorder.  Needs a bit of a resdesign");
+		}
+
+		@Override
 		public int getWidth() {
 			return image.getImage().getWidth();
 		}
@@ -467,7 +553,7 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public ImageSingleBand getImage() {
-			return image.getImage();
+			return (ImageSingleBand)image.getImage();
 		}
 	}
 }

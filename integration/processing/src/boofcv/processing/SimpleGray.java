@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -201,7 +201,7 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortSingle(image, output, pixelTransform, true, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortSingle(image, output, pixelTransform, null, TypeInterpolate.BILINEAR);
 
 		return new SimpleGray(output);
 	}
@@ -272,8 +272,12 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 		return gradient(FactoryDerivative.three(image.getClass(), null));
 	}
 
-	public SimpleGradient gradientTwo() {
-		return gradient(FactoryDerivative.two(image.getClass(), null));
+	public SimpleGradient gradientTwo0() {
+		return gradient(FactoryDerivative.two0(image.getClass(), null));
+	}
+
+	public SimpleGradient gradientTwo1() {
+		return gradient(FactoryDerivative.two1(image.getClass(), null));
 	}
 
 	/**

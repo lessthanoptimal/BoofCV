@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.feature.flow;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.flow.DenseOpticalFlow;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.gui.PanelGridPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -102,10 +101,10 @@ public class DenseFlowApp
 		input1.reshape(unscaled.width/2,unscaled.height/2);
 		flow.reshape(unscaled.width/2,unscaled.height/2);
 
-		ConvertBufferedImage.convertFrom(image0,unscaled,false);
-		DistortImageOps.scale(unscaled,input0, TypeInterpolate.BILINEAR);
-		ConvertBufferedImage.convertFrom(image1,unscaled,false);
-		DistortImageOps.scale(unscaled,input1, TypeInterpolate.BILINEAR);
+		ConvertBufferedImage.convertFrom(image0, unscaled, false);
+		new FDistort(unscaled,input0).scaleExt().apply();
+		ConvertBufferedImage.convertFrom(image1, unscaled, false);
+		new FDistort(unscaled,input1).scaleExt().apply();
 
 		converted0 = new BufferedImage(input0.width,input0.height,BufferedImage.TYPE_INT_RGB);
 		converted1 = new BufferedImage(input0.width,input0.height,BufferedImage.TYPE_INT_RGB);
@@ -196,7 +195,7 @@ public class DenseFlowApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Dense Optical Flow");
+		ShowImages.showWindow(app,"Dense Optical Flow",true);
 	}
 
 }

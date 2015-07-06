@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,37 +15,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixel;
+import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 
 
 /**
+ * <p>
  * Performs nearest neighbor interpolation to extract values between pixels in an image.
+ * </p>
+ *
+ * <p>
+ * NOTE: This code was automatically generated using {@link GenerateNearestNeighborPixel}.
+ * </p>
  *
  * @author Peter Abeles
  */
 public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32> {
 
 	private float data[];
-
 	public NearestNeighborPixel_F32() {
 	}
 
 	public NearestNeighborPixel_F32(ImageFloat32 orig) {
+
 		setImage(orig);
 	}
-
 	@Override
 	public void setImage(ImageFloat32 image) {
-		this.orig = image;
+		super.setImage(image);
 		this.data = orig.data;
-		this.stride = orig.getStride();
-		this.width = orig.getWidth();
-		this.height = orig.getHeight();
 	}
 
 	@Override
@@ -53,10 +55,14 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32>
 		return data[ orig.startIndex + ((int)y)*stride + (int)x];
 	}
 
+	public float get_border(float x, float y) {
+		return ((ImageBorder_F32)border).get((int)Math.floor(x),(int)Math.floor(y));
+	}
+
 	@Override
 	public float get(float x, float y) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1 )
-			throw new IllegalArgumentException("Point is outside of the image");
+			return get_border(x,y);
 		int xx = (int)x;
 		int yy = (int)y;
 
@@ -67,4 +73,5 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32>
 	public ImageType<ImageFloat32> getImageType() {
 		return ImageType.single(ImageFloat32.class);
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,9 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -76,8 +75,8 @@ public class ExampleStereoDisparity3D {
 		ImageUInt8 scaledLeft = new ImageUInt8((int)(distLeft.width*scale),(int)(distLeft.height*scale));
 		ImageUInt8 scaledRight = new ImageUInt8((int)(distRight.width*scale),(int)(distRight.height*scale));
 
-		DistortImageOps.scale(distLeft,scaledLeft, TypeInterpolate.BILINEAR);
-		DistortImageOps.scale(distRight,scaledRight, TypeInterpolate.BILINEAR);
+		new FDistort(distLeft,scaledLeft).scaleExt().apply();
+		new FDistort(distRight,scaledRight).scaleExt().apply();
 
 		// Don't forget to adjust camera parameters for the change in scale!
 		PerspectiveOps.scaleIntrinsic(param.left, scale);

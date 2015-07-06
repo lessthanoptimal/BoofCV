@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
@@ -64,7 +63,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 	@Override
 	public boolean process(T leftImage) {
 
-		DistortImageOps.scale(leftImage, scaled, TypeInterpolate.BILINEAR);
+		new FDistort(leftImage,scaled).scaleExt().apply();
 
 		return alg.process(scaled);
 	}

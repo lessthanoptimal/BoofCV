@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,8 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -62,23 +61,15 @@ public class CalibrateMonoPlanar {
 	// detects calibration points inside of images
 	protected PlanarCalibrationDetector detector;
 
-	// Is the image's y-axis inverted?
-	protected boolean flipY;
-
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
-	// calibration configuration
-	protected PlanarCalibrationTarget target;
-	protected boolean assumeZeroSkew;
 
 	// computed parameters
-	protected Zhang99Parameters foundZhang;
+	protected Zhang99ParamAll foundZhang;
 	protected IntrinsicParameters foundIntrinsic;
 
 	// Information on calibration targets and results
 	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	// observations with the y-axis inverted, if flipY is true
-	protected List<List<Point2D_F64>> observationsAdj = new ArrayList<List<Point2D_F64>>();
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
@@ -91,28 +82,25 @@ public class CalibrateMonoPlanar {
 	 * High level configuration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
-	 *                Normally this should be false.
 	 */
-	public CalibrateMonoPlanar(PlanarCalibrationDetector detector , boolean flipY) {
+	public CalibrateMonoPlanar(PlanarCalibrationDetector detector ) {
 		this.detector = detector;
-		this.flipY = flipY;
 	}
 
 	/**
 	 * Specify calibration assumptions.
-	 * 
-	 * @param target Description of the calibration target's physical layout.
+	 *
 	 * @param assumeZeroSkew If true then zero skew is assumed.  Typically this will be true.
 	 * @param numRadialParam Number of radial parameters. Typically set to 2.
+	 * @param includeTangential If true it will estimate tangential distortion parameters.
+	 *                          Try false then true
 	 */
-	public void configure( PlanarCalibrationTarget target ,
-						   boolean assumeZeroSkew ,
-						   int numRadialParam )
+	public void configure( boolean assumeZeroSkew ,
+						   int numRadialParam ,
+						   boolean includeTangential )
 	{
-		this.assumeZeroSkew = assumeZeroSkew;
-		this.target = target;
-		zhang99 = new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(
+				detector.getLayout(),assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -143,22 +131,7 @@ public class CalibrateMonoPlanar {
 		if( !detector.process(image) )
 			return false;
 		else {
-			int h = image.getHeight();
-			List<Point2D_F64> points = detector.getPoints();
-			List<Point2D_F64> adjusted = new ArrayList<Point2D_F64>();
-
-			// make it so +y is pointed up not down, and becomes a right handed coordinate system
-			if(flipY) {
-				for( Point2D_F64 p : points ) {
-					Point2D_F64 a = new Point2D_F64(p.x,h-p.y-1);
-					adjusted.add(a);
-				}
-			} else {
-				adjusted.addAll(points);
-			}
-
-			observations.add(points);
-			observationsAdj.add(adjusted);
+			observations.add(detector.getDetectedPoints());
 			return true;
 		}
 	}
@@ -168,7 +141,6 @@ public class CalibrateMonoPlanar {
 	 */
 	public void removeLatestImage() {
 		observations.remove( observations.size() - 1 );
-		observationsAdj.remove( observationsAdj.size() - 1 );
 	}
 
 	/**
@@ -176,16 +148,17 @@ public class CalibrateMonoPlanar {
 	 * estimate calibration parameters.  Error statistics are also computed.
 	 */
 	public IntrinsicParameters process() {
-		if( !zhang99.process(observationsAdj) ) {
+		if( zhang99 == null )
+			throw new IllegalArgumentException("Please call configure first.");
+		if( !zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
 		foundZhang = zhang99.getOptimized();
 
-		errors = computeErrors(observationsAdj, foundZhang,target.points);
+		errors = computeErrors(observations, foundZhang,detector.getLayout());
 
 		foundIntrinsic = foundZhang.convertToIntrinsic();
-		foundIntrinsic.flipY = flipY;
 		foundIntrinsic.width = widthImg;
 		foundIntrinsic.height = heightImg;
 
@@ -205,7 +178,7 @@ public class CalibrateMonoPlanar {
 	 * @return List of error statistics
 	 */
 	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
-													Zhang99Parameters param ,
+													Zhang99ParamAll param ,
 													List<Point2D_F64> grid )
 	{
 		Zhang99OptimizationFunction function =
@@ -274,19 +247,11 @@ public class CalibrateMonoPlanar {
 		return errors;
 	}
 
-	public Zhang99Parameters getZhangParam() {
+	public Zhang99ParamAll getZhangParam() {
 		return foundZhang;
 	}
 
 	public IntrinsicParameters getIntrinsic() {
 		return foundIntrinsic;
-	}
-
-	public PlanarCalibrationTarget getTarget() {
-		return target;
-	}
-
-	public boolean isFlipY() {
-		return flipY;
 	}
 }

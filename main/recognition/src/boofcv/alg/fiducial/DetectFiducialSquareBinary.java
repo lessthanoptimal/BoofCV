@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -29,16 +29,21 @@ import java.util.Arrays;
 
 /**
  * <p>
- * This fiducial encores a 12-bit number.  The inner region is broken up into 16-squares which are
- * either white or black.  One corner is always back and the others are always white.  This
- * allows orientation to be uniquely determined.
+ * Fiducial which encores a 12-bit number (0 to 4095) using a predetermined pattern.  The inner region is broken up
+ * into 4 by 4 grid of 16-squares which are either white or black.  The lower left corner is always back and
+ * while all the other corners are always white.  This allows orientation to be uniquely determined.
  * </p>
+ * <center>
+ * <img src="doc-files/square_binary.png"/>
+ * </center>
  * <p>
- * Canonical orientation is with the black square in the lower-left hand corner.
+ * The above image visually shows the fiducials internal coordinate system.  The center of the fiducial is the origin
+ * of the coordinate system, e.g. all sides are width/2 distance away from the origin.  +x is to the right, +y is up
+ * , and +z out of the paper towards the viewer.  The black orientation corner is pointed out in the image.
+ * The fiducial's width refers to the width of each side along the black border NOT the internal encoded image.
  * </p>
  * @author Peter Abeles
  */
-// TODO classify the border.  If not all black discard the pattern
 public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
@@ -63,20 +68,31 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// length of a side on the fiducials in world units
 	private double lengthSide = 1;
 
+	// ambiguity threshold. 0 to 1.  0 = very strict and 1 = anything goes
+	// Sets how strict a square must be black or white for it to be accepted.
+	protected double ambiguityThreshold = 0.4;
+
 	/**
 	 * Configures the fiducial detector
 	 *
-	 * @param fitPolygon used to fit a polygon to binary blobs
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareBinary(InputToBinary<T> thresholder,
-									  SplitMergeLineFitLoop fitPolygon,
-									  double minContourFraction, Class<T> inputType) {
-		super(thresholder,fitPolygon, w*8, minContourFraction, inputType);
+	public DetectFiducialSquareBinary(BinaryPolygonConvexDetector<T> quadDetector,  Class<T> inputType) {
+		super(quadDetector, w*8, inputType);
 
 		int widthNoBorder = w*4;
 
 		binary.reshape(widthNoBorder,widthNoBorder);
+	}
+
+	/**
+	 * parameters which specifies how tolerant it is of a square being ambiguous black or white.
+	 * @param ambiguityThreshold 0 to 1, insclusive
+	 */
+	public void setAmbiguityThreshold(double ambiguityThreshold) {
+		if( ambiguityThreshold < 0 || ambiguityThreshold > 1 )
+			throw new IllegalArgumentException("Must be from 0 to 1, inclusive");
+		this.ambiguityThreshold = ambiguityThreshold;
 	}
 
 	public void setLengthSide(double lengthSide) {
@@ -175,12 +191,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 */
 	private boolean thresholdBinaryNumber() {
 
-		int lower = (int)(N*0.15);
-		int upper = (int)(N*0.85);
+		int lower = (int)(N*(ambiguityThreshold/2.0));
+		int upper = (int)(N*(1-ambiguityThreshold/2.0));
 
 		for (int i = 0; i < 16; i++) {
-
-
 			if( counts[i] < lower ) {
 				classified[i] = 0;
 			} else if( counts[i] > upper ) {

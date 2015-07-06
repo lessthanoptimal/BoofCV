@@ -18,6 +18,7 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
@@ -30,24 +31,15 @@ import boofcv.struct.Configuration;
 public class ConfigFiducialImage implements Configuration {
 
 	/**
-	 * Minimum number of pixels in a shape's contour specified as a fraction of the input
-	 * image's width.  Used to prune shapes which are too small.
-	 */
-	public double minContourFraction = 0.23;
-	/**
-	 * Tolerance in pixels before a line is split when fitting a contour
-	 */
-	public int borderTolerance = 4;
-	/**
-	 * The maximum number of iterations the polygon fitting algorithm can run for
-	 */
-	public int borderMaxIterations = 20;
-
-	/**
-	 * If the difference between an candidate and a target is less than this amount it is considered
+	 * If the difference between an candidate and a target is less than this amount it is considered\
 	 * a match.
 	 */
-	public double maxErrorFraction = 0.1;
+	public double maxErrorFraction = 0.15;
+
+	/**
+	 * Configuration for square detector
+	 */
+	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
 
 	public ConfigFiducialImage() {
 	}
@@ -57,27 +49,25 @@ public class ConfigFiducialImage implements Configuration {
 
 	}
 
-	public int getBorderTolerance() {
-		return borderTolerance;
+	public double getMaxErrorFraction() {
+		return maxErrorFraction;
 	}
 
-	public void setBorderTolerance(int borderTolerance) {
-		this.borderTolerance = borderTolerance;
+	public void setMaxErrorFraction(double maxErrorFraction) {
+		this.maxErrorFraction = maxErrorFraction;
 	}
 
-	public int getBorderMaxIterations() {
-		return borderMaxIterations;
+	public ConfigPolygonDetector getSquareDetector() {
+		return squareDetector;
 	}
 
-	public void setBorderMaxIterations(int borderMaxIterations) {
-		this.borderMaxIterations = borderMaxIterations;
+	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
+		this.squareDetector = squareDetector;
 	}
 
-	public double getMinContourFraction() {
-		return minContourFraction;
-	}
-
-	public void setMinContourFraction(double minContourFraction) {
-		this.minContourFraction = minContourFraction;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{ maxErrorFraction="+maxErrorFraction+
+				" squareDetector="+squareDetector+" }";
 	}
 }

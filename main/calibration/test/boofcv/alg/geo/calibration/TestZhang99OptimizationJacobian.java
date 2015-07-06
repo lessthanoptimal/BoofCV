@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -39,18 +39,16 @@ public class TestZhang99OptimizationJacobian {
 
 	@Test
 	public void compareToNumeric() {
-		compareToNumerical(false);
-		compareToNumerical(true);
+		compareToNumerical(false,false);
+		compareToNumerical(true,false);
+		compareToNumerical(false,true);
+		compareToNumerical(true, true);
 	}
 
-	private void compareToNumerical(boolean assumeZeroSkew) {
-		PlanarCalibrationTarget config = FactoryPlanarCalibrationTarget.gridSquare(1, 1, 30, 30);
-		Zhang99Parameters param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2, 3, rand);
-		param.distortion[0] = 0.1;
-		param.distortion[1] = -0.2;
-		param.distortion = new double[]{0.1};
+	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
+		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
-		List<Point2D_F64> gridPts = config.points;
+		List<Point2D_F64> gridPts = PlanarDetectorSquareGrid.createLayout(1, 1, 30, 30);
 
 		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
 
@@ -58,17 +56,20 @@ public class TestZhang99OptimizationJacobian {
 			observations.add( estimate(param,param.views[i],gridPts));
 		}
 
-		double dataParam[] = new double[ param.size() ];
+		double dataParam[] = new double[ param.numParameters() ];
 		param.convertToParam(dataParam);
 
 		Zhang99OptimizationFunction func =
 				new Zhang99OptimizationFunction( param.copy(),gridPts,observations );
 
 		Zhang99OptimizationJacobian alg = new Zhang99OptimizationJacobian(
-				assumeZeroSkew,param.distortion.length,observations.size(),gridPts);
+				assumeZeroSkew,param.radial.length,param.includeTangential,observations.size(),gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
-//		JacobianChecker.jacobianPrint(func, alg, dataParam, 1e-3);
-		assertTrue(JacobianChecker.jacobian(func, alg, dataParam, 1e-3));
+		double tol = includeTangential ? 0.05 : 0.01;
+//		DerivativeChecker.jacobianPrintR(func, alg, dataParam, tol);
+		assertTrue(DerivativeChecker.jacobianR(func, alg, dataParam, tol));
 	}
+
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	public void setCalibration( MonoPlaneParameters param ) {
 		this.planeToCamera = param.planeToCamera;
 		alg.configureCamera(param.intrinsic, param.planeToCamera);
-		normToPixel = LensDistortionOps.transformNormToRadial_F64(param.intrinsic);
+		normToPixel = LensDistortionOps.distortTransform(param.intrinsic).distort_F64(false,true);
 	}
 
 	@Override

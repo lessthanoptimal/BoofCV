@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,8 @@ import static org.junit.Assert.assertEquals;
 public class TestFilterSequence {
 
 	Random rand = new Random(234);
-	int radius = 2;
+	int kernelWidth = 5;
+	int radius = kernelWidth/2;
 	int width = 30;
 	int height = 40;
 
@@ -49,9 +50,9 @@ public class TestFilterSequence {
 	 */
 	@Test
 	public void compareToManualSequence() {
-		Kernel1D_F32 ker1 = FactoryKernel.random1D_F32(radius,0,5,rand);
-		Kernel1D_F32 ker2 = FactoryKernel.random1D_F32(radius+1,0,5,rand);
-		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(radius+2,0,5,rand);
+		Kernel1D_F32 ker1 = FactoryKernel.random1D_F32(kernelWidth,radius,0,5,rand);
+		Kernel1D_F32 ker2 = FactoryKernel.random1D_F32(kernelWidth+2,radius+1,0,5,rand);
+		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(kernelWidth+4,radius+2,0,5,rand);
 
 		ImageFloat32 input = new ImageFloat32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,10);

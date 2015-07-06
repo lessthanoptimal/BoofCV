@@ -166,7 +166,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 		ret.subImage = true;
 
 		for( int i = 0; i < bands.length; i++ ) {
-			ret.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1, null);
+			ret.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1);
 		}
 		
 		return ret;

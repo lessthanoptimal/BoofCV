@@ -30,7 +30,7 @@ task fiducialBinary(dependsOn: classes ) << {
     }
 }
 
-// gradle fiducialBinary -Pwidth=10.0 -Pnumber="../data/applet/fiducial/image/dog.png"
+// gradle fiducialBinary -Pwidth=10.0 -Pimage="../data/applet/fiducial/image/dog.png"
 task fiducialImage(dependsOn: classes ) << {
 
     if (project.hasProperty('width') && project.hasProperty('image')) {
@@ -62,5 +62,21 @@ task trackFiducial(dependsOn: classes ) << {
         main = "boofcv.app.TrackFiducialWebcam"
         args = ext.param
         classpath = sourceSets.main.runtimeClasspath
+    }
+}
+
+// Create a jar which contains all the applications
+task applicationsJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'BoofCV Applications Jar',
+                'Implementation-Version': version,
+                'Main-Class': 'boofcv.app.Help'
+    }
+    archiveName = 'applications.jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+
+    doLast {
+        archivePath.renameTo(file(archiveName))
     }
 }

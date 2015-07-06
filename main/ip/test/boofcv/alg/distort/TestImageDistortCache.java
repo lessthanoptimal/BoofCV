@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -33,8 +32,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestImageDistortCache {
 
-	InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-	DummyBorder border = new DummyBorder();
+	TestImageDistortBasic.DummyInterpolate interp = new TestImageDistortBasic.DummyInterpolate();
 
 	float offX=0,offY=0;
 
@@ -48,31 +46,31 @@ public class TestImageDistortCache {
 
 	@Test
 	public void applyBorder() {
-		Helper alg = new Helper(interp,border);
+		Helper alg = new Helper(interp,new TestImageDistortBasic.DummyBorder());
 
 		offX=offY=0;
 		alg.reset();
-		border.reset();
+		interp.reset();
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
 		assertEquals(150,alg.getTotal());
-		assertEquals(0,border.getTotal());
+		assertEquals(0,interp.getTotalBorder());
 
 		offX=offY=0.1f;
 		alg.reset();
-		border.reset();
+		interp.reset();
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
 		assertEquals(150,alg.getTotal());
-		assertEquals(10+14,border.getTotal());
+		assertEquals(10+14,interp.getTotalBorder());
 
 		offX=offY=-0.1f;
 		alg.reset();
-		border.reset();
+		interp.reset();
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
 		assertEquals(150,alg.getTotal());
-		assertEquals(10+14,border.getTotal());
+		assertEquals(10+14,interp.getTotalBorder());
 	}
 
 	@Test
@@ -122,24 +120,4 @@ public class TestImageDistortCache {
 			assertTrue(dstImg.isInBounds(x,y));
 		}
 	}
-
-	private static class DummyBorder extends ImageBorder {
-
-		int total = 0;
-
-		public void reset() {
-			total = 0;
-		}
-
-		public int getTotal() {
-			return total;
-		}
-
-		@Override
-		public double getGeneral(int x, int y) {
-			total++;
-			return 0;
-		}
-	}
-
 }

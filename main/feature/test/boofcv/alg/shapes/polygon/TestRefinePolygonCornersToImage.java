@@ -1,0 +1,243 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.shapes.polygon;
+
+import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.shapes.ShapeFittingOps;
+import boofcv.struct.ConnectRule;
+import boofcv.struct.PointIndex_I32;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_I32;
+import georegression.struct.se.Se2_F64;
+import georegression.struct.shapes.Polygon2D_F64;
+import georegression.transform.ConvertTransform_F64;
+import org.ddogleg.struct.GrowQueue_I32;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
+
+	List<Point2D_I32> contour;
+	GrowQueue_I32 split;
+
+	@Test
+	public void perfectRectangle() {
+
+		Polygon2D_F64 expected = new Polygon2D_F64(x0,y0 , x1,y0, x1,y1, x0,y1);
+		Polygon2D_F64 found = new Polygon2D_F64(4);
+
+		for (Class imageType : imageTypes) {
+			for (int i = 0; i < 2; i++) {
+				boolean black = i == 0;
+
+				setup(new Affine2D_F64(), black, imageType);
+				findContour(black);
+
+				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black,imageType);
+
+				alg.setImage(image);
+				assertEquals(4, alg.refine(contour, split, found));
+
+				assertTrue(expected.isEquivalent(found, 0.01));
+
+				// give it the wrong information and it should fail
+				alg.setInsideBlack(!black);
+				assertEquals(0, alg.refine(contour, split, found));
+			}
+		}
+	}
+
+	@Test
+	public void perfectRectangle_subimage() {
+		Polygon2D_F64 expected = new Polygon2D_F64(x0,y0 , x1,y0, x1,y1, x0,y1);
+		Polygon2D_F64 found = new Polygon2D_F64(4);
+
+		for (Class imageType : imageTypes) {
+			for (int i = 0; i < 2; i++) {
+				boolean black = i == 0;
+
+				setup(new Affine2D_F64(), black, imageType);
+				findContour(black);
+
+				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black,imageType);
+
+				alg.setImage(BoofTesting.createSubImageOf_S(image));
+				assertEquals(4, alg.refine(contour, split, found));
+
+				assertTrue(expected.isEquivalent(found, 0.01));
+
+				// give it the wrong information and it should fail
+				alg.setInsideBlack(!black);
+				assertEquals(0, alg.refine(contour, split, found));
+			}
+		}
+	}
+
+	@Test
+	public void distortedRectangle() {
+		double tol = 0.4;
+		Polygon2D_F64 original = new Polygon2D_F64(x0,y0 , x1,y0, x1,y1, x0,y1);
+		Polygon2D_F64 found = new Polygon2D_F64(4);
+
+		Affine2D_F64 affines[] = new Affine2D_F64[2];
+		affines[0] = new Affine2D_F64();
+		affines[1] = new Affine2D_F64(1.3,0.05,-0.15,0.87,0.1,0.6);
+		ConvertTransform_F64.convert(new Se2_F64(0, 0, 0.2), affines[0]);
+
+		for (Class imageType : imageTypes) {
+			for (int i = 0; i < 2; i++) {
+				for(Affine2D_F64 affine : affines ) {
+					boolean black = i == 0;
+
+					setup(affine, black, imageType);
+					findContour(black);
+
+					RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black, imageType);
+
+					alg.setImage(BoofTesting.createSubImageOf_S(image));
+					assertEquals(4, alg.refine(contour, split, found));
+
+					Polygon2D_F64 expected = apply(affine,original);
+					assertTrue(expected.isEquivalent(found, tol));
+
+					// give it the wrong information and it should fail
+					alg.setInsideBlack(!black);
+					assertEquals(0, alg.refine(contour, split, found));
+				}
+			}
+		}
+	}
+
+	@Test
+	public void determineDirection() {
+		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(true, ImageUInt8.class);
+
+		List<Point2D_I32> contour = createContour(10);
+		GrowQueue_I32 split = new GrowQueue_I32(4);
+		split.add(0);  split.add(10);  split.add(20); split.add(30);
+
+		alg.setInsideBlack(true);
+		assertEquals( 1,alg.determineDirection(contour,split));
+		assertEquals(-1,alg.determineDirection(flip(contour),split));
+		assertEquals( 1,alg.determineDirection(flip(contour),flip(split)));
+		assertEquals(-1,alg.determineDirection(contour,flip(split)));
+
+		alg.setInsideBlack(false);
+		assertEquals(-1,alg.determineDirection(contour,split));
+		assertEquals( 1,alg.determineDirection(flip(contour),split));
+		assertEquals(-1,alg.determineDirection(flip(contour),flip(split)));
+		assertEquals( 1,alg.determineDirection(contour,flip(split)));
+	}
+
+	private List<Point2D_I32> createContour(int w ) {
+		ArrayList<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+
+		for (int i = 0; i < w; i++) {
+			contour.add( new Point2D_I32(i,w));
+		}
+		for (int i = 0; i < w; i++) {
+			contour.add( new Point2D_I32(w,w-i));
+		}
+		for (int i = 0; i < w; i++) {
+			contour.add( new Point2D_I32(w-i,0));
+		}
+		for (int i = 0; i < w; i++) {
+			contour.add( new Point2D_I32(0,i));
+		}
+
+		return contour;
+	}
+
+	private List<Point2D_I32> flip( List<Point2D_I32> input ) {
+		List<Point2D_I32> flipped = new ArrayList<Point2D_I32>();
+
+		for (int i = 0; i < input.size(); i++) {
+			int index = UtilShapePolygon.addOffset(0,-i,input.size());
+			flipped.add(input.get(index));
+		}
+
+		return flipped;
+	}
+
+	private GrowQueue_I32 flip( GrowQueue_I32 input ) {
+		GrowQueue_I32 flipped = new GrowQueue_I32();
+
+		for (int i = 0; i < input.size(); i++) {
+			int index = UtilShapePolygon.addOffset(0,-i,input.size());
+			flipped.add(input.get(index));
+		}
+
+		return flipped;
+	}
+
+
+	@Test
+	public void pickEndIndex() {
+		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(true, ImageUInt8.class);
+
+		alg.setPixelsAway(6);
+		alg.contour = new ArrayList();
+		alg.splits = new GrowQueue_I32();
+
+		int away = alg.getPixelsAway();
+		int N = 20;
+		for (int i = 0; i < N; i++) {
+			alg.contour.add( new Point2D_I32());
+		}
+
+		alg.splits.add(0);
+		alg.splits.add(7);
+		alg.splits.add(9);
+		alg.splits.add(14);
+
+		assertEquals(away, alg.pickEndIndex(0,1));
+		assertEquals(14  , alg.pickEndIndex(0,-1));
+		assertEquals(9  , alg.pickEndIndex(1, 1));
+		assertEquals(1  , alg.pickEndIndex(1,-1));
+		assertEquals(14 , alg.pickEndIndex(2, 1));
+		assertEquals(7  , alg.pickEndIndex(2,-1));
+		assertEquals(0  , alg.pickEndIndex(3, 1));
+		assertEquals(9  , alg.pickEndIndex(3,-1));
+	}
+
+	private void findContour( boolean black ) {
+		ImageUInt8 binary = new ImageUInt8(image.width,image.height);
+		GThresholdImageOps.threshold(image,binary,40,black);
+
+		contour = BinaryImageOps.contour(binary, ConnectRule.FOUR,null).get(0).external;
+
+		List<PointIndex_I32> corners = ShapeFittingOps.fitPolygon(contour,true,3,0.4,10);
+
+		split = new GrowQueue_I32(corners.size());
+		for (int i = 0; i < corners.size(); i++) {
+			split.add(corners.get(i).index);
+		}
+	}
+}

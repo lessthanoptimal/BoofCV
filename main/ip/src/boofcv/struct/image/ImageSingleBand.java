@@ -84,14 +84,17 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	}
 
 	/**
+	 * <p>
 	 * Creates a rectangular sub-image from 'this' image.  The subimage will share the same internal array
 	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
 	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
 	 * than the original.
+	  *</p>
 	 *
+	 * <p>
 	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
-	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height).
-	 *
+	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height,null).
+	 * </p>
 	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image, inclusive.
 	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
@@ -119,6 +122,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		subimage.height = y1 - y0;
 		subimage.startIndex = startIndex + y0 * stride + x0;
 		subimage.subImage = true;
+		subimage.imageType = imageType;
 
 		return subimage;
 	}

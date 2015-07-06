@@ -25,10 +25,11 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.feature.shapes.SplitMergeLineFitLoop;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -42,6 +43,8 @@ public class FactoryFiducial {
 	 * Fast detector for square binary based fiducials.  The speed increase comes from using a simple
 	 * threshold and is not lighting invariant.
 	 *
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
+	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param binaryThreshold Threshold for binary image.
 	 * @param imageType Type of image it's processing
@@ -52,17 +55,22 @@ public class FactoryFiducial {
 										  int binaryThreshold ,
 										  Class<T> imageType ) {
 
-		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
+		config.squareDetector.clockwise = false;
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				binary,poly,config.minContourFraction,imageType);
+				squareDetector,imageType);
+		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
 	/**
 	 * Robust detector for square image based fiducials.  Lighting invariant detector
+	 *
+	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
@@ -73,18 +81,27 @@ public class FactoryFiducial {
 	FiducialDetector<T> squareBinaryRobust( ConfigFiducialBinary config,
 											int thresholdRadius,
 											Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				binary,poly,config.minContourFraction,imageType);
+				squareDetector,imageType);
+		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
 	}
 
 	/**
-	 * Fast detector for square image based fiducials.  The speed increase comes from using a simple
-	 * threshold and is not lighting invariant.
+	 * <p>Fast detector for square image based fiducials.  The speed increase comes from using a simple
+	 * threshold and is not lighting invariant.</p>
+	 *
+	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * is returned instead of the more generic {@link FiducialDetector}.</p>
+	 *
+	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param binaryThreshold Threshold for binary image.
@@ -95,17 +112,25 @@ public class FactoryFiducial {
 	SquareImage_to_FiducialDetector<T> squareImageFast( ConfigFiducialImage config,
 														int binaryThreshold,
 														Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = 
+				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
-				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
+				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
 
 	/**
-	 * Robust detector for square image based fiducials.  Lighting invariant detector
+	 * <p>Robust detector for square image based fiducials.  Light invariant detector</p>
+	 *
+	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * is returned instead of the more generic {@link FiducialDetector}.</p>
+	 *
+	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
 	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
@@ -116,11 +141,15 @@ public class FactoryFiducial {
 	SquareImage_to_FiducialDetector<T> squareImageRobust( ConfigFiducialImage config,
 														  int thresholdRadius,
 														  Class<T> imageType ) {
-		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 
-		SplitMergeLineFitLoop poly = new SplitMergeLineFitLoop(config.borderTolerance,0.05,config.borderMaxIterations );
+		config.squareDetector.clockwise = false;
+
+		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
+		BinaryPolygonConvexDetector<T> squareDetector =
+				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+		
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
-				binary,poly,config.minContourFraction,config.maxErrorFraction,imageType);
+				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
@@ -129,25 +158,23 @@ public class FactoryFiducial {
 	 * Wrapper around chessboard calibration detector.
 	 *
 	 * @param config Description of the chessboard.
-	 * @param sizeOfSquares Physical size of each square.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, double sizeOfSquares,Class<T> imageType) {
-		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
+	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 
 	/**
 	 * Wrapper around square-grid calibration detector.
 	 *
 	 * @param config Description of the chessboard.
-	 * @param sizeOfSquares Physical size of each square.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, double sizeOfSquares,Class<T> imageType) {
-		return new CalibrationFiducialDetector<T>(config,sizeOfSquares,imageType);
+	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 }

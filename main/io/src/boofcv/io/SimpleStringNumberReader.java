@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class SimpleStringNumberReader {
 		if( !next() )
 			throw new RuntimeException("There is no next token!");
 		if( !isString())
-			throw new RuntimeException("The token is a double not a string");
+			throw new RuntimeException("The token is a double not a string. "+current);
 		return (String)current;
 	}
 
@@ -105,7 +105,7 @@ public class SimpleStringNumberReader {
 		if( !next() )
 			throw new RuntimeException("There is no next token!");
 		if( isString())
-			throw new RuntimeException("The token is a string not a double");
+			throw new RuntimeException("The token is a string not a double. "+current);
 		return (Double)current;
 	}
 	

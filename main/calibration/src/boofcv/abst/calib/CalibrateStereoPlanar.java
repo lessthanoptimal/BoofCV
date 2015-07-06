@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.abst.calib;
 
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
@@ -63,17 +62,18 @@ public class CalibrateStereoPlanar {
 	CalibrateMonoPlanar calibLeft;
 	CalibrateMonoPlanar calibRight;
 
+	List<Point2D_F64> layout;
+
 	/**
 	 * Configures stereo calibration
 	 *
 	 * @param detector Target detection algorithm.
-	 * @param flipY If true the y-axis will be inverted to ensure the assumed coordinate system is being used.
-	 *                Most of the time this will be false.
 	 */
-	public CalibrateStereoPlanar(PlanarCalibrationDetector detector, boolean flipY)
+	public CalibrateStereoPlanar(PlanarCalibrationDetector detector)
 	{
-		calibLeft = new CalibrateMonoPlanar(detector,flipY);
-		calibRight = new CalibrateMonoPlanar(detector,flipY);
+		calibLeft = new CalibrateMonoPlanar(detector);
+		calibRight = new CalibrateMonoPlanar(detector);
+		layout = detector.getLayout();
 	}
 
 	/**
@@ -89,16 +89,16 @@ public class CalibrateStereoPlanar {
 	/**
 	 * Specify calibration assumptions.
 	 *
-	 * @param target Describes the calibration target.
 	 * @param assumeZeroSkew If true zero skew is assumed.
 	 * @param numRadialParam Number of radial parameters
+	 * @param includeTangential If true it will estimate tangential distortion parameters.
 	 */
-	public void configure( PlanarCalibrationTarget target ,
-						   boolean assumeZeroSkew ,
-						   int numRadialParam )
+	public void configure( boolean assumeZeroSkew ,
+						   int numRadialParam ,
+						   boolean includeTangential )
 	{
-		calibLeft.configure(target,assumeZeroSkew,numRadialParam);
-		calibRight.configure(target,assumeZeroSkew,numRadialParam);
+		calibLeft.configure(assumeZeroSkew,numRadialParam,includeTangential);
+		calibRight.configure(assumeZeroSkew,numRadialParam,includeTangential);
 	}
 
 	/**
@@ -108,7 +108,6 @@ public class CalibrateStereoPlanar {
 	 * @param right Image of right target.
 	 */
 	public boolean addPair( ImageFloat32 left , ImageFloat32 right ) {
-
 		if( !calibLeft.addImage(left) )
 			return false;
 
@@ -143,9 +142,9 @@ public class CalibrateStereoPlanar {
 	{
 		IntrinsicParameters intrinsic = calib.process();
 
-		Zhang99Parameters zhangParam = calib.getZhangParam();
+		Zhang99ParamAll zhangParam = calib.getZhangParam();
 
-		for( Zhang99Parameters.View v : zhangParam.views ) {
+		for( Zhang99ParamAll.View v : zhangParam.views ) {
 			Se3_F64 pose = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,pose.getR());
 			pose.getT().set(v.T);
@@ -163,7 +162,7 @@ public class CalibrateStereoPlanar {
 	 */
 	private Se3_F64 computeRightToLeft() {
 		// location of points in the world coordinate system
-		List<Point2D_F64> points2D = calibLeft.getTarget().points;
+		List<Point2D_F64> points2D = layout;
 		List<Point3D_F64> points3D = new ArrayList<Point3D_F64>();
 
 		for( Point2D_F64 p : points2D ) {
@@ -198,10 +197,6 @@ public class CalibrateStereoPlanar {
 
 	public CalibrateMonoPlanar getCalibRight() {
 		return calibRight;
-	}
-
-	public boolean isConvertToRightHanded() {
-		return calibLeft.isFlipY();
 	}
 
 	public void printStatistics() {

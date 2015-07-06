@@ -18,9 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F32;
@@ -57,7 +55,7 @@ public class TestPerspectiveOps {
 	public void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
 
 		// find the pixel location in the unscaled image
@@ -74,59 +72,22 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void adjustDistortion_F32() {
+	public void adjustIntrinsic() {
 
-		DenseMatrix64F A = new DenseMatrix64F(3,3,true,1,2,3,10,4,8,2,4,9);
 		DenseMatrix64F B = new DenseMatrix64F(3,3,true,2,0,1,0,3,2,0,0,1);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300, true, null);
-		IntrinsicParameters paramAdj = new IntrinsicParameters();
+		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
+		IntrinsicParameters found = PerspectiveOps.adjustIntrinsic(param, B, null);
 
-		PointTransformHomography_F32 firstTran = new PointTransformHomography_F32(A);
+		DenseMatrix64F A = PerspectiveOps.calibrationMatrix(param, null);
 
-		// test forward case
-		PointTransform_F32 foundTran = PerspectiveOps.adjustIntrinsic_F32(firstTran, true, param, B, paramAdj);
+		DenseMatrix64F expected = new DenseMatrix64F(3,3);
+		CommonOps.mult(B, A, expected);
 
-		Point2D_F32 X = new Point2D_F32(1,3);
+		assertTrue(found.radial == null);
+		DenseMatrix64F foundM = PerspectiveOps.calibrationMatrix(found,null);
 
-		Point2D_F32 foundPt = new Point2D_F32();
-		Point2D_F32 expectedPt = new Point2D_F32();
-
-		foundTran.compute(1,3,foundPt);
-
-		Point2D_F32 temp = new Point2D_F32();
-		GeometryMath_F32.mult(A, X, temp);
-		GeometryMath_F32.mult(B, temp, expectedPt);
-
-		assertEquals(expectedPt.x,foundPt.x,1e-4);
-		assertEquals(expectedPt.y,foundPt.y,1e-4);
-
-		// check the new intrinsic parameters
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, null);
-		DenseMatrix64F Kfound = PerspectiveOps.calibrationMatrix(paramAdj, null);
-		DenseMatrix64F Kexpected = new DenseMatrix64F(3,3);
-
-		CommonOps.mult(B,K,Kexpected);
-		assertTrue(MatrixFeatures.isIdentical(Kexpected,Kfound,1e-8));
-
-		// test reverse case
-		foundTran = PerspectiveOps.adjustIntrinsic_F32(firstTran, false, param, B, paramAdj);
-
-		foundTran.compute(1,3,foundPt);
-
-		GeometryMath_F32.mult(B, X, temp);
-		GeometryMath_F32.mult(A, temp, expectedPt);
-
-		assertEquals(expectedPt.x,foundPt.x,1e-4);
-		assertEquals(expectedPt.y,foundPt.y,1e-4);
-
-		// check the new intrinsic parameters
-		Kfound = PerspectiveOps.calibrationMatrix(paramAdj, null);
-		CommonOps.invert(B);
-
-		CommonOps.mult(B,K,Kexpected);
-		assertTrue(MatrixFeatures.isIdentical(Kexpected,Kfound,1e-8));
-
+		assertTrue(MatrixFeatures.isIdentical(expected,foundM,1e-8));
 	}
 
 	@Test
@@ -150,7 +111,7 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		IntrinsicParameters ret = PerspectiveOps.matrixToParam(K, 100, 200, true, null);
+		IntrinsicParameters ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);
@@ -159,12 +120,11 @@ public class TestPerspectiveOps {
 		assertTrue(ret.cy == cy);
 		assertTrue(ret.width == 100);
 		assertTrue(ret.height == 200);
-		assertTrue(ret.flipY);
 	}
 
 	@Test
-	public void convertNormToPixel_intrinsic() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+	public void convertNormToPixel_intrinsic_F64() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
@@ -177,6 +137,23 @@ public class TestPerspectiveOps {
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
+	}
+
+	@Test
+	public void convertNormToPixel_intrinsic_F32() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+
+		Point2D_F32 norm = new Point2D_F32(-0.1f,0.25f);
+		Point2D_F32 expected = new Point2D_F32();
+
+		GeometryMath_F32.mult(K, norm, expected);
+
+		Point2D_F32 found = PerspectiveOps.convertNormToPixel(intrinsic,norm.x,norm.y,(Point2D_F32)null);
+
+		assertEquals(expected.x, found.x, 1e-4);
+		assertEquals(expected.y, found.y, 1e-4);
 	}
 
 	@Test
@@ -195,8 +172,8 @@ public class TestPerspectiveOps {
 	}
 
 	@Test
-	public void convertPixelToNorm_intrinsic() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+	public void convertPixelToNorm_intrinsic_F64() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -211,6 +188,25 @@ public class TestPerspectiveOps {
 
 		assertEquals(expected.x, found.x, 1e-8);
 		assertEquals(expected.y, found.y, 1e-8);
+	}
+
+	@Test
+	public void convertPixelToNorm_intrinsic_F32() {
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+
+		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
+		CommonOps.invert(K,K_inv);
+
+		Point2D_F32 pixel = new Point2D_F32(100,120);
+		Point2D_F32 expected = new Point2D_F32();
+
+		GeometryMath_F32.mult(K_inv,pixel,expected);
+
+		Point2D_F32 found = PerspectiveOps.convertPixelToNorm(intrinsic, pixel, null);
+
+		assertEquals(expected.x, found.x, 1e-4);
+		assertEquals(expected.y, found.y, 1e-4);
 	}
 
 	@Test
@@ -263,7 +259,7 @@ public class TestPerspectiveOps {
 	public void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600,false,null);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
 
 		double normX = X.x/X.z;
 		double normY = X.y/X.z;

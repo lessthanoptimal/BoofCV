@@ -244,7 +244,7 @@ public class TestBinaryImageOps {
 	}
 
 	@Test
-	public void labelToBinary_selective() {
+	public void labelToBinary_array_boolean() {
 		ImageUInt8 expected = new ImageUInt8(13,8);
 		expected.data = TEST;
 		ImageUInt8 found = new ImageUInt8(13,8);
@@ -254,6 +254,27 @@ public class TestBinaryImageOps {
 		boolean selected[] = new boolean[]{false,false,true};
 
 		BinaryImageOps.labelToBinary(input,found,selected);
+
+		for( int i = 0; i < 8; i++ ) {
+			for( int j = 0; j < 13; j++ ) {
+				if( input.get(j,i) == 2 ) {
+					assertEquals(1,found.get(j,i));
+				} else {
+					assertEquals(0,found.get(j,i));
+				}
+			}
+		}
+	}
+
+	@Test
+	public void labelToBinary_individual_indexes() {
+		ImageUInt8 expected = new ImageUInt8(13,8);
+		expected.data = TEST;
+		ImageUInt8 found = new ImageUInt8(13,8);
+		ImageSInt32 input = new ImageSInt32(13,8);
+		input.data = EXPECTED8;
+
+		BinaryImageOps.labelToBinary(input, found, 3,2);
 
 		for( int i = 0; i < 8; i++ ) {
 			for( int j = 0; j < 13; j++ ) {

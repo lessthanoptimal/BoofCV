@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
-		alg.setTemplate(template, 10);
+		alg.setTemplate(template,null, 10);
 		alg.process(input);
 
 		expected.remove(2);
@@ -77,7 +77,7 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
-		alg.setTemplate(template, 10);
+		alg.setTemplate(template,null, 10);
 		alg.process(input);
 
 		checkResults(alg.getResults().toList(), expected, 4, 5);
@@ -98,7 +98,7 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
-		alg.setTemplate(template, 2);
+		alg.setTemplate(template,null, 2);
 		alg.process(input);
 
 		// remove the lowest scores
@@ -106,6 +106,19 @@ public class TestTemplateMatching {
 		expected.remove(0);
 
 		checkResults(alg.getResults().toList(), expected, 4, 5);
+	}
+
+	@Test
+	public void withMask() {
+		expected = new ArrayList<Match>();
+		DummyIntensity intensity = new DummyIntensity(false, 4, 5);
+
+		TemplateMatching alg = new TemplateMatching(intensity);
+
+		alg.setTemplate(template, new ImageFloat32(5,5), 10);
+		alg.process(input);
+
+		assertTrue(intensity.maskedCalled);
 	}
 
 	private void checkResults(List<Match> found, List<Match> expected,
@@ -125,11 +138,12 @@ public class TestTemplateMatching {
 		}
 	}
 
-	private class DummyIntensity implements TemplateMatchingIntensity {
+	private class  DummyIntensity implements TemplateMatchingIntensity {
 
 		ImageFloat32 intensity = new ImageFloat32(width, height);
 		boolean border;
 		int offsetX, offsetY;
+		boolean maskedCalled = false;
 
 		private DummyIntensity(boolean border, int offsetX, int offsetY) {
 			this.border = border;
@@ -139,11 +153,20 @@ public class TestTemplateMatching {
 
 		@Override
 		public void process(ImageBase image, ImageBase template) {
+			assertTrue(image!=null);
+			assertTrue(template!=null);
 			GImageMiscOps.fill(intensity, 0);
 
 			for (Match m : expected) {
 				intensity.set(m.x, m.y, (float) m.score);
 			}
+		}
+
+		@Override
+		public void process(ImageBase image, ImageBase template, ImageBase mask) {
+			assertTrue(mask!=null);
+			maskedCalled = true;
+			process(image,template);
 		}
 
 		@Override
@@ -157,12 +180,22 @@ public class TestTemplateMatching {
 		}
 
 		@Override
-		public int getOffsetX() {
+		public int getBorderX0() {
 			return offsetX;
 		}
 
 		@Override
-		public int getOffsetY() {
+		public int getBorderX1() {
+			return offsetX;
+		}
+
+		@Override
+		public int getBorderY0() {
+			return offsetY;
+		}
+
+		@Override
+		public int getBorderY1() {
 			return offsetY;
 		}
 	}

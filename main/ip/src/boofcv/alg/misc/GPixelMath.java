@@ -88,17 +88,17 @@ public class GPixelMath {
 	public static <T extends ImageSingleBand> void divide(T input, double denominator, T output) {
 
 		if( ImageUInt8.class == input.getClass() ) {
-			PixelMath.divide((ImageUInt8)input,denominator,(ImageUInt8)output);
+			PixelMath.divide((ImageUInt8) input, denominator, (ImageUInt8) output);
 		} else if( ImageSInt8.class == input.getClass() ) {
-			PixelMath.divide((ImageSInt8)input,denominator,(ImageSInt8)output);
+			PixelMath.divide((ImageSInt8) input, denominator, (ImageSInt8) output);
 		} else if( ImageUInt16.class == input.getClass() ) {
-			PixelMath.divide((ImageUInt16)input,denominator,(ImageUInt16)output);
+			PixelMath.divide((ImageUInt16) input, denominator, (ImageUInt16) output);
 		} else if( ImageSInt16.class == input.getClass() ) {
-			PixelMath.divide((ImageSInt16)input,denominator,(ImageSInt16)output);
+			PixelMath.divide((ImageSInt16) input, denominator, (ImageSInt16) output);
 		} else if( ImageSInt32.class == input.getClass() ) {
-			PixelMath.divide((ImageSInt32)input,denominator,(ImageSInt32)output);
+			PixelMath.divide((ImageSInt32) input, denominator, (ImageSInt32) output);
 		} else if( ImageSInt64.class == input.getClass() ) {
-			PixelMath.divide((ImageSInt64)input,denominator,(ImageSInt64)output);
+			PixelMath.divide((ImageSInt64) input, denominator, (ImageSInt64) output);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			PixelMath.divide((ImageFloat32)input,(float)denominator,(ImageFloat32)output);
 		} else if( ImageFloat64.class == input.getClass() ) {
@@ -311,9 +311,9 @@ public class GPixelMath {
 	 */
 	public static <T extends ImageSingleBand> void plus(T input, double value, T output) {
 		if( ImageUInt8.class == input.getClass() ) {
-			PixelMath.plus((ImageUInt8) input, (int)value, (ImageUInt8) output);
+			PixelMath.plus((ImageUInt8) input, (int) value, (ImageUInt8) output);
 		} else if( ImageSInt8.class == input.getClass() ) {
-			PixelMath.plus((ImageSInt8) input, (int)value, (ImageSInt8) output);
+			PixelMath.plus((ImageSInt8) input, (int) value, (ImageSInt8) output);
 		} else if( ImageUInt16.class == input.getClass() ) {
 			PixelMath.plus((ImageUInt16) input, (int)value, (ImageUInt16) output);
 		} else if( ImageSInt16.class == input.getClass() ) {
@@ -321,7 +321,7 @@ public class GPixelMath {
 		} else if( ImageSInt32.class == input.getClass() ) {
 			PixelMath.plus((ImageSInt32) input, (int)value, (ImageSInt32) output);
 		} else if( ImageSInt64.class == input.getClass() ) {
-			PixelMath.plus((ImageSInt64) input, (int)value, (ImageSInt64) output);
+			PixelMath.plus((ImageSInt64) input, (long)value, (ImageSInt64) output);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			PixelMath.plus((ImageFloat32) input, (float) value, (ImageFloat32) output);
 		} else if( ImageFloat64.class == input.getClass() ) {
@@ -354,11 +354,151 @@ public class GPixelMath {
 		} else if( ImageSInt32.class == input.getClass() ) {
 			PixelMath.plus((ImageSInt32)input,(int)value,(int)lower,(int)upper,(ImageSInt32)output);
 		} else if( ImageSInt64.class == input.getClass() ) {
-			PixelMath.plus((ImageSInt64)input,(int)value,(long)lower,(long)upper,(ImageSInt64)output);
+			PixelMath.plus((ImageSInt64)input,(long)value,(long)lower,(long)upper,(ImageSInt64)output);
 		} else if( ImageFloat32.class == input.getClass() ) {
 			PixelMath.plus((ImageFloat32)input,(float)value,(float)lower,(float)upper,(ImageFloat32)output);
 		} else if( ImageFloat64.class == input.getClass() ) {
 			PixelMath.plus((ImageFloat64)input,value,lower,upper,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element in input.
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void minus(T input, double value, T output) {
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.minus((ImageUInt8) input, (int) value, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt8) input, (int) value, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.minus((ImageUInt16) input, (int) value, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt16) input, (int) value, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt32) input, (int) value, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt64) input, (long) value, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.minus((ImageFloat32) input, (float) value, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.minus((ImageFloat64) input, value, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Value on left side of equation.
+	 * @param input The input image, elements subtracted from value. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void minus( double value, T input, T output) {
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageUInt8) input, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt8) input, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageUInt16) input, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt16) input, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt32) input, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.minus((long) value, (ImageSInt64) input, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.minus((float) value, (ImageFloat32) input, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.minus(value, (ImageFloat64) input, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = input - value
+	 * </p>
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void minus(T input, double value,
+														 double lower , double upper , T output)
+	{
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.minus((ImageUInt8) input, (int) value, (int) lower, (int) upper, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt8) input, (int) value, (int) lower, (int) upper, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.minus((ImageUInt16) input, (int) value, (int) lower, (int) upper, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt16) input, (int) value, (int) lower, (int) upper, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt32) input, (int) value, (int) lower, (int) upper, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.minus((ImageSInt64) input, (long) value, (long) lower, (long) upper, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.minus((ImageFloat32) input, (float) value, (float) lower, (float) upper, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.minus((ImageFloat64) input, value, lower, upper, (ImageFloat64) output);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Subtracts the value of each element from a scalar value. Both input and output images can be the same instance.
+	 * </p>
+	 * <p>
+	 * output = value - input
+	 * </p>
+	 * @param value Left side of equation.
+	 * @param input The input image. Not modified.
+	 * @param lower Lower bound on output. Inclusive.
+	 * @param upper Upper bound on output. Inclusive.
+	 * @param output The output image. Modified.
+	 */
+	public static <T extends ImageSingleBand> void minus(double value, T input,
+														 double lower , double upper , T output)
+	{
+		if( ImageUInt8.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageUInt8) input, (int) lower, (int) upper, (ImageUInt8) output);
+		} else if( ImageSInt8.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt8) input, (int) lower, (int) upper, (ImageSInt8) output);
+		} else if( ImageUInt16.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageUInt16) input, (int) lower, (int) upper, (ImageUInt16) output);
+		} else if( ImageSInt16.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt16) input, (int) lower, (int) upper, (ImageSInt16) output);
+		} else if( ImageSInt32.class == input.getClass() ) {
+			PixelMath.minus((int) value, (ImageSInt32) input, (int) lower, (int) upper, (ImageSInt32) output);
+		} else if( ImageSInt64.class == input.getClass() ) {
+			PixelMath.minus((long) value, (ImageSInt64) input, (long) lower, (long) upper, (ImageSInt64) output);
+		} else if( ImageFloat32.class == input.getClass() ) {
+			PixelMath.minus((float) value, (ImageFloat32) input, (float) lower, (float) upper, (ImageFloat32) output);
+		} else if( ImageFloat64.class == input.getClass() ) {
+			PixelMath.minus(value, (ImageFloat64) input, lower, upper, (ImageFloat64) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,8 @@ public class TestStereoSparse3D {
 		param.rightToLeft.getT().set(0.2, 0, 0.1);
 //		RotationMatrixGenerator.eulerXYZ(0.02,0.01,-0.03,param.rightToLeft.getR());
 
-		param.left = PerspectiveOps.matrixToParam(K1,640,480,false,null);
-		param.right = PerspectiveOps.matrixToParam(K2,640,480,false,null);
+		param.left = PerspectiveOps.matrixToParam(K1,640,480,null);
+		param.right = PerspectiveOps.matrixToParam(K2,640,480,null);
 		param.left.radial = new double[2];
 		param.right.radial = new double[2];
 	}

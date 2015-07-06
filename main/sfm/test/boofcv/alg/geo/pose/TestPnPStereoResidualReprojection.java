@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,8 +90,8 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 		StereoParameters param = new StereoParameters();
 		param.rightToLeft = this.param.rightToLeft;
 		// intrinsic parameters are configured to be identical to normalized image coordinates
-		param.left = new IntrinsicParameters(1,1,0,0,0,0,0,false,new double[]{0,0});
-		param.right = new IntrinsicParameters(1,1,0,0,0,0,0,false,new double[]{0,0});
+		param.left = new IntrinsicParameters(1,1,0,0,0,0,0).fsetRadial(0,0);
+		param.right = new IntrinsicParameters(1,1,0,0,0,0,0).fsetRadial(0,0);
 		validation.setStereoParameters(param);
 		validation.setModel(worldToLeft);
 		double expected = validation.computeDistance(pointPose.get(0));

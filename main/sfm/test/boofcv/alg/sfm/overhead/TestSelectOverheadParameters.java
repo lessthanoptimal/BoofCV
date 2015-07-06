@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 public class TestSelectOverheadParameters {
 
 	protected int width=320,height=240;
-	IntrinsicParameters param = new IntrinsicParameters(150,150,0,width/2,height/2,width,height, false, new double[]{0,0});
+	IntrinsicParameters param = new IntrinsicParameters(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
 	Se3_F64 cameraToPlane = new Se3_F64();
 	Se3_F64 planeToCamera;
 

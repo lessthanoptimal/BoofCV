@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,9 @@ public class BaseCalibrationConfig {
 	MediaManager media = DefaultMediaManager.INSTANCE;
 
 	public boolean assumeZeroSkew;
-	public boolean flipY;
+	public int numRadial;
+	public boolean includeTangential;
 	public PlanarCalibrationDetector detector;
-	public PlanarCalibrationTarget target;
 
 	public BaseCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -58,12 +58,13 @@ public class BaseCalibrationConfig {
 		if( !reader.read(input) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() < 6 )
+		if( reader.remainingTokens() < 7 )
 			throw new RuntimeException("Not enough tokens in config file");
 
 		String type = reader.nextString();
+		numRadial = (int)reader.nextDouble();
+		includeTangential = Boolean.parseBoolean(reader.nextString());
 		assumeZeroSkew = Boolean.parseBoolean(reader.nextString());
-		flipY = Boolean.parseBoolean(reader.nextString());
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 
@@ -71,11 +72,9 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numCols, numRows));
-			target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, width, space);
+			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numCols, numRows,width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(numCols, numRows));
-			target = FactoryPlanarCalibrationTarget.gridChess(numCols,numRows,width);
+			detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(numCols, numRows,width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);
 		}
@@ -87,9 +86,5 @@ public class BaseCalibrationConfig {
 
 	public PlanarCalibrationDetector getDetector() {
 		return detector;
-	}
-
-	public PlanarCalibrationTarget getTarget() {
-		return target;
 	}
 }

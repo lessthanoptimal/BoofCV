@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
@@ -34,18 +35,15 @@ public class ConfigFiducialBinary implements Configuration {
 	public double targetWidth;
 
 	/**
-	 * Minimum number of pixels in a shape's contour specified as a fraction of the input
-	 * image's width.  Used to prune shapes which are too small.
+	 * Value from 0 to 1.  0 is very strict and 1 is very relaxed.  Used when classifying a require block
+	 * as black or white.  If it can't be classified then the shape is discarded
 	 */
-	public double minContourFraction = 0.23;
+	public double ambiguousThreshold = 0.4;
+
 	/**
-	 * Tolerance in pixels before a line is split when fitting a contour
+	 * Configuration for square detector
 	 */
-	public int borderTolerance = 4;
-	/**
-	 * The maximum number of iterations the polygon fitting algorithm can run for
-	 */
-	public int borderMaxIterations = 20;
+	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
 
 	public ConfigFiducialBinary() {
 	}
@@ -56,7 +54,8 @@ public class ConfigFiducialBinary implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
+			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
 	}
 
 	public double getTargetWidth() {
@@ -67,27 +66,11 @@ public class ConfigFiducialBinary implements Configuration {
 		this.targetWidth = targetWidth;
 	}
 
-	public int getBorderTolerance() {
-		return borderTolerance;
+	public ConfigPolygonDetector getSquareDetector() {
+		return squareDetector;
 	}
 
-	public void setBorderTolerance(int borderTolerance) {
-		this.borderTolerance = borderTolerance;
-	}
-
-	public int getBorderMaxIterations() {
-		return borderMaxIterations;
-	}
-
-	public void setBorderMaxIterations(int borderMaxIterations) {
-		this.borderMaxIterations = borderMaxIterations;
-	}
-
-	public double getMinContourFraction() {
-		return minContourFraction;
-	}
-
-	public void setMinContourFraction(double minContourFraction) {
-		this.minContourFraction = minContourFraction;
+	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
+		this.squareDetector = squareDetector;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.distort.PixelTransformAffine_F32;
-import boofcv.alg.distort.impl.DistortSupport;
+import boofcv.abst.distort.FDistort;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
@@ -96,13 +95,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		InterpolatePixelS<T> interp = (InterpolatePixelS<T>)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
-		PixelTransformAffine_F32 model = DistortSupport.transformScale(scaledImage,color);
-		for( int i = 0; i < color.getNumBands(); i++ )
-			DistortImageOps.distortSingle(color.getBand(i),scaledImage.getBand(i),model,null,interp);
-
-		// numerical round off error can cause the interpolation to go outside
-		// of pixel value bounds
-//		GeneralizedImageOps.boundImage(scaledImage,0,255);
+		new FDistort(color,scaledImage).interp(interp).border(BorderType.EXTENDED).scale().apply();
 
 		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null,true);
 		panel.setBufferedImage(out);
@@ -157,6 +150,6 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Interpolation Enlarge");
+		ShowImages.showWindow(app,"Interpolation Enlarge",true);
 	}
 }

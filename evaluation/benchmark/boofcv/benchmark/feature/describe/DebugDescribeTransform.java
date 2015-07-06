@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.benchmark.feature.describe;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -54,7 +53,7 @@ public class DebugDescribeTransform {
 
 		T distorted = (T)orig._createNew((int)(w*scale) , (int)(w*scale) );
 
-		DistortImageOps.rotate(orig,distorted, TypeInterpolate.BILINEAR,(float)theta);
+		new FDistort(orig,distorted).rotate(theta).apply();
 //		DistortImageOps.scale(orig,distorted, TypeInterpolate.BILINEAR);
 
 		alg.setImage(orig);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,14 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.core.image.border.BorderType;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -35,6 +34,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -47,15 +48,23 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ShowLensDistortion<T extends ImageSingleBand>
-		extends SelectInputPanel implements ChangeListener
+		extends SelectInputPanel implements ChangeListener, ItemListener
 {
-	double radial1 = -0.65;
-	double radial2 = -0.1;
+	double radial1 = 0;
+	double radial2 = 0;
+	double tangential1 = 0;
+	double tangential2 = 0;
+	boolean fullView = false;
 
 	Class<T> imageType;
 
 	JSpinner radialOrder1;
 	JSpinner radialOrder2;
+	JSpinner tangentialOrder1;
+	JSpinner tangentialOrder2;
+
+	JCheckBox showFullImage;
+
 	ImagePanel gui = new ImagePanel();
 	boolean processedImage = false;
 
@@ -86,20 +95,43 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		radialOrder1 = new JSpinner(new SpinnerNumberModel(radial1,-1.0,2.0,0.05));
 		radialOrder1.addChangeListener(this);
 		int h = radialOrder1.getPreferredSize().height;
-		radialOrder1.setPreferredSize(new Dimension(50,h));
+		radialOrder1.setPreferredSize(new Dimension(50, h));
 		radialOrder1.setMaximumSize(radialOrder1.getPreferredSize());
 
 		radialOrder2 = new JSpinner(new SpinnerNumberModel(radial2,-1.0,2.0,0.05));
 		radialOrder2.addChangeListener(this);
-		radialOrder2.setPreferredSize(new Dimension(50,h));
+		radialOrder2.setPreferredSize(new Dimension(50, h));
 		radialOrder2.setMaximumSize(radialOrder1.getPreferredSize());
 
-		ret.add(Box.createRigidArea(new Dimension(10,1)));
+		tangentialOrder1 = new JSpinner(new SpinnerNumberModel(tangential1,-1.0,1.0,0.01));
+		tangentialOrder1.addChangeListener(this);
+		tangentialOrder1.setPreferredSize(new Dimension(50, h));
+		tangentialOrder1.setMaximumSize(tangentialOrder1.getPreferredSize());
+
+		tangentialOrder2 = new JSpinner(new SpinnerNumberModel(tangential2,-1.0,1.0,0.01));
+		tangentialOrder2.addChangeListener(this);
+		tangentialOrder2.setPreferredSize(new Dimension(50, h));
+		tangentialOrder2.setMaximumSize(tangentialOrder2.getPreferredSize());
+
+		showFullImage = new JCheckBox();
+		showFullImage.setSelected(fullView);
+		showFullImage.addItemListener(this);
+
+		ret.add(Box.createRigidArea(new Dimension(10, 1)));
 		ret.add(new JLabel("Radial 1:"));
 		ret.add(radialOrder1);
 		ret.add(Box.createRigidArea(new Dimension(10,1)));
 		ret.add(new JLabel("Radial 2:"));
 		ret.add(radialOrder2);
+		ret.add(Box.createRigidArea(new Dimension(10,1)));
+		ret.add(new JLabel("T1:"));
+		ret.add(tangentialOrder1);
+		ret.add(Box.createRigidArea(new Dimension(10,1)));
+		ret.add(new JLabel("T2:"));
+		ret.add(tangentialOrder2);
+		ret.add(Box.createRigidArea(new Dimension(10,1)));
+		ret.add(new JLabel("Full:"));
+		ret.add(showFullImage);
 
 		// change the enabled status of the spinner
 		ret.addPropertyChangeListener(new PropertyChangeListener() {
@@ -159,17 +191,14 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		ProgressMonitorThread thread = new MyMonitorThread(this);
 		thread.start();
 
-		PointTransform_F32 ptran =
-				new AddRadialPtoP_F32(input.width*0.8,input.width*0.8,0,
-						input.width/2,input.height/2,radial1,radial2);
-		PixelTransform_F32 tran=new PointToPixelTransform_F32(ptran);
+		IntrinsicParameters param = new IntrinsicParameters().fsetK(input.width * 0.8, input.width * 0.8, 0,
+				input.width / 2, input.height / 2, input.width, input.height).fsetRadial(radial1, radial2).
+				fsetTangental(tangential1, tangential2);
 
-		for( int i = 0; i < input.getNumBands(); i++ , progress++ ) {
-			T bandIn = input.getBand(i);
-			T bandOut = output.getBand(i);
+		AdjustmentType type = fullView ? AdjustmentType.FULL_VIEW : AdjustmentType.NONE;
+		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(type, BorderType.VALUE, param, null, input.getImageType());
 
-			DistortImageOps.distortSingle(bandIn,bandOut,tran,false, TypeInterpolate.BILINEAR);
-		}
+		distort.apply(input,output);
 		thread.stopThread();
 		ConvertBufferedImage.convertTo(output, renderedImage, true);
 
@@ -194,12 +223,22 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	public synchronized void stateChanged(ChangeEvent e) {
 		if( e.getSource() == radialOrder1 )
 			radial1 = ((Number) radialOrder1.getValue()).doubleValue();
-		if( e.getSource() == radialOrder2 )
+		else if( e.getSource() == radialOrder2 )
 			radial2 = ((Number) radialOrder2.getValue()).doubleValue();
+		else if( e.getSource() == tangentialOrder1 )
+			tangential1 = ((Number) tangentialOrder1.getValue()).doubleValue();
+		else if( e.getSource() == tangentialOrder2 )
+			tangential2 = ((Number) tangentialOrder2.getValue()).doubleValue();
 
 		performUpdate();
 	}
-	
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		fullView = showFullImage.isSelected();
+		performUpdate();
+	}
+
 	private class MyMonitorThread extends ProgressMonitorThread {
 
 		protected MyMonitorThread(Component comp) {

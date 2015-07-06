@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,9 +166,9 @@ public class DetectLineHoughFootSubimage<I extends ImageSingleBand, D extends Im
 
 	private void processSubimage( int x0 , int y0 , int x1 , int y1 ,
 								  List<LineParametric2D_F32> found ) {
-		D derivX = (D)this.derivX.subimage(x0,y0,x1,y1, null);
-		D derivY = (D)this.derivY.subimage(x0,y0,x1,y1, null);
-		ImageUInt8 binary = this.binary.subimage(x0,y0,x1,y1, null);
+		D derivX = (D)this.derivX.subimage(x0,y0,x1,y1);
+		D derivY = (D)this.derivY.subimage(x0,y0,x1,y1);
+		ImageUInt8 binary = this.binary.subimage(x0,y0,x1,y1);
 
 		alg.transform(derivX, derivY, binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();

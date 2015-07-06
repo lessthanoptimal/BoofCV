@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,8 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
@@ -83,11 +84,11 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		});
 
 		// add different types of adjustments
-		PointTransform_F32 tran = LensDistortionOps.transformPixelToRadial_F32(param);
-		addUndistorted("No Adjustment", tran);
-		PointTransform_F32 allInside = LensDistortionOps.allInside(param, null);
-		addUndistorted("All Inside", allInside);
-		PointTransform_F32 fullView = LensDistortionOps.fullView(param, null);
+		PointTransform_F32 add_p_to_p = LensDistortionOps.distortTransform(param).distort_F32(true,true);
+		addUndistorted("No Adjustment", add_p_to_p);
+		PointTransform_F32 shrink = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
+		addUndistorted("Shrink", shrink);
+		PointTransform_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,param, null,true);
 		addUndistorted("Full View", fullView);
 
 		hasProcessed = true;
@@ -96,12 +97,11 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	private void addUndistorted(final String name, final PointTransform_F32 model) {
 		// Set up image distort
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class,0);
 		ImageDistort<ImageFloat32,ImageFloat32> undistorter =
-				FactoryDistort.distort(false,interp, null, ImageFloat32.class);
+				FactoryDistort.distort(false,interp, border, ImageFloat32.class);
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
-		// Fill the image with all black then render it
-		GImageMiscOps.fill(undist, 0);
 		DistortImageOps.distortMS(dist, undist, undistorter);
 
 		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null,true);
@@ -155,7 +155,8 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		while( !app.getHasProcessedImage() ) {
 			Thread.yield();
 		}
-		ShowImages.showWindow(app, "Remove Lens Distortion");
+		ShowImages.showWindow(app, "Remove Lens Distortion").
+				setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		System.out.println("Done");
 	}

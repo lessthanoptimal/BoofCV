@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.examples.features;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.flow.DenseOpticalFlow;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.gui.PanelGridPanel;
 import boofcv.gui.feature.VisualizeOpticalFlow;
@@ -73,9 +72,9 @@ public class ExampleDenseOpticalFlow {
 		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);
-		DistortImageOps.scale(full, previous, TypeInterpolate.BILINEAR);
+		new FDistort(full, previous).scaleExt().apply();
 		ConvertBufferedImage.convertFrom(buff1, full);
-		DistortImageOps.scale(full,current, TypeInterpolate.BILINEAR);
+		new FDistort(full, current).scaleExt().apply();
 
 		// compute dense motion
 		denseFlow.process(previous, current, flow);
@@ -96,6 +95,6 @@ public class ExampleDenseOpticalFlow {
 		gui.add(visualized);
 		animate.start();
 
-		ShowImages.showWindow(gui,"Dense Optical Flow");
+		ShowImages.showWindow(gui,"Dense Optical Flow",true);
 	}
 }

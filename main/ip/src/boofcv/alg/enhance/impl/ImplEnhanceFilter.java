@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ import boofcv.struct.image.ImageUInt8;
 public class ImplEnhanceFilter {
 
 	public static Kernel2D_I32 kernelEnhance4_I32 = new Kernel2D_I32(3, new int[]{0,-1,0,-1,5,-1,0,-1,0});
-	public static Kernel2D_F32 kernelEnhance4_F32 = new Kernel2D_F32(3, 0,-1,0,-1,5,-1,0,-1,0);
+	public static Kernel2D_F32 kernelEnhance4_F32 = new Kernel2D_F32(3, new float[]{0,-1,0,-1,5,-1,0,-1,0});
 	public static Kernel2D_I32 kernelEnhance8_I32 = new Kernel2D_I32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
-	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, -1,-1,-1,-1,9,-1,-1,-1,-1);
+	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 
 	public static void sharpenInner4( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {

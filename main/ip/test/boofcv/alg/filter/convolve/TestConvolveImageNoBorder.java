@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ public class TestConvolveImageNoBorder {
 	@Test
 	public void compareToStandard_symmetric() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
-		a.setKernelRadius(2);
+		a.setKernelWidth(5);
 		a.setOffset(2);
 		a.performTests(22);
 	}
@@ -36,8 +36,16 @@ public class TestConvolveImageNoBorder {
 	@Test
 	public void compareToStandard_UNsymmetric() {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
-		a.setKernelRadius(2);
+		a.setKernelWidth(5);
 		a.setOffset(1);
+		a.performTests(22);
+	}
+
+	@Test
+	public void compareToStandard_even() {
+		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
+		a.setKernelWidth(4);
+		a.setOffset(3);
 		a.performTests(22);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,13 @@ public class NormalizedToPixel_F64 implements PointTransform_F64 {
 	// camera calibration matrix
 	double fx, fy, skew, cx, cy;
 
-	public void set(double fx, double fy, double skew, double cx, double cy) {
+	public NormalizedToPixel_F64 set(double fx, double fy, double skew, double cx, double cy) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
 		this.cx = cx;
 		this.cy = cy;
+		return this;
 	}
 
 

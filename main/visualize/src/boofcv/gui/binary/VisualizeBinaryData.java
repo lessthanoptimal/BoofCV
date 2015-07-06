@@ -145,17 +145,9 @@ public class VisualizeBinaryData {
 	 *
 	 * @param contours List of contours
 	 * @param colors List of RGB colors for each element in contours.  If null then random colors will be used.
-	 * @param width Width of input image.
-	 * @param height Height of input image.
 	 * @param out (Optional) Storage for output
-	 * @return Rendered image for display.
 	 */
-	public static BufferedImage renderExternal( List<Contour> contours , int colors[] ,
-												int width , int height , BufferedImage out) {
-
-		if( out == null ) {
-			out = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-		}
+	public static void renderExternal( List<Contour> contours , int colors[] , BufferedImage out) {
 
 		colors = checkColors(colors,contours.size());
 
@@ -166,8 +158,6 @@ public class VisualizeBinaryData {
 				out.setRGB(p.x,p.y,color);
 			}
 		}
-
-		return out;
 	}
 
 	public static int[] checkColors(  int[] colors , int size ) {
@@ -179,6 +169,16 @@ public class VisualizeBinaryData {
 			}
 		}
 		return colors;
+	}
+
+	public static BufferedImage renderExternal( List<Contour> contours , Color color , BufferedImage out) {
+		for( Contour c : contours ) {
+			for(Point2D_I32 p : c.external ) {
+				out.setRGB(p.x,p.y,color.getRGB());
+			}
+		}
+
+		return out;
 	}
 
 	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int colors[], BufferedImage out) {
@@ -330,7 +330,7 @@ public class VisualizeBinaryData {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
 				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = (byte)(1-binaryImage.data[indexSrc++] * 255);
+					data[rasterIndex++] = (byte)((1-binaryImage.data[indexSrc++]) * 255);
 				}
 			}
 		} else {

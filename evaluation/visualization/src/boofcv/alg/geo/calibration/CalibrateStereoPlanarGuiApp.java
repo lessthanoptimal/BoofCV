@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,12 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.calib.CalibrateStereoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
@@ -99,6 +99,10 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 					System.out.println("Feature detection failed in:");
 					System.out.println(leftImages.get(i)+" and/or "+rightImages.get(i));
 				}
+			} else {
+				System.out.println("Failed to load left  = "+leftImages.get(i));
+				System.out.println("Failed to load right = "+rightImages.get(i));
+
 			}
 		}
 
@@ -137,7 +141,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	/**
 	 * Computes stereo rectification and then passes the distortion along to the gui.
 	 */
-	private void setRectification(StereoParameters param) {
+	private void setRectification(final StereoParameters param) {
 
 		// calibration matrix for left and right camera
 		DenseMatrix64F K1 = PerspectiveOps.calibrationMatrix(param.getLeft(), null);
@@ -146,20 +150,12 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		RectifyCalibrated rectify = RectifyImageOps.createCalibrated();
 		rectify.process(K1,new Se3_F64(),K2,param.getRightToLeft().invert(null));
 
-		DenseMatrix64F rect1 = rectify.getRect1();
-		DenseMatrix64F rect2 = rectify.getRect2();
-
-//		RectifyImageOps.fullViewLeft(param.getLeft(),toRight,rect1,rect2,rectify.getCalibrationMatrix());
-
-		// Rectification distortion for each image
-		final ImageDistort<ImageFloat32,ImageFloat32> distort1 = RectifyImageOps.rectifyImage(param.getLeft(),
-				rect1,ImageFloat32.class);
-		final ImageDistort<ImageFloat32,ImageFloat32> distort2 = RectifyImageOps.rectifyImage(param.getRight(),
-				rect2,ImageFloat32.class);
+		final DenseMatrix64F rect1 = rectify.getRect1();
+		final DenseMatrix64F rect2 = rectify.getRect2();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				gui.setRectification(distort1, distort2);
+				gui.setRectification(param.getLeft(),rect1,param.getRight(),rect2);
 			}
 		});
 		gui.repaint();
@@ -175,23 +171,21 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * correspond to images taken at the same time.
 	 *
 	 * @param detector Calibration target detector.
-	 * @param target Description of the target being detected.
 	 * @param assumeZeroSkew If true the skew parameter is assumed to be zero
-	 * @param flipY If true the y-axis will be inverted.
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
 	public void configure( PlanarCalibrationDetector detector ,
-						   PlanarCalibrationTarget target,
+						   int numRadial,
+						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
-						   boolean flipY ,
 						   List<String> leftImages , List<String> rightImages  ) {
 
 		if( leftImages.size() != rightImages.size() )
 			throw new IllegalArgumentException("Number of left and right images must be the same");
 
-		calibrator = new CalibrateStereoPlanar(detector,flipY);
-		calibrator.configure(target,assumeZeroSkew,2);
+		calibrator = new CalibrateStereoPlanar(detector);
+		calibrator.configure(assumeZeroSkew,numRadial,includeTangential);
 		this.leftImages = leftImages;
 		this.rightImages = rightImages;
 	}
@@ -201,7 +195,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		ParseStereoCalibrationConfig parser = new ParseStereoCalibrationConfig(media);
 
 		if( parser.parse(fileName) ) {
-			configure(parser.detector,parser.target,parser.assumeZeroSkew,parser.flipY,
+			configure(parser.detector,parser.numRadial,
+					parser.includeTangential,parser.assumeZeroSkew,
 					parser.getLeftImages(),parser.getRightImages());
 		} else {
 			System.err.println("Configuration failed");
@@ -245,11 +240,10 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-//		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7));
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7));
-
-//		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridSquare(5,7,30,30);
-		PlanarCalibrationTarget target = FactoryPlanarCalibrationTarget.gridChess(5, 7, 30);
+//		PlanarCalibrationDetector detector =
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
+		PlanarCalibrationDetector detector =
+				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7,30));
 
 		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
@@ -261,12 +255,9 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 		Collections.sort(rightImages);
 
 		CalibrateStereoPlanarGuiApp app = new CalibrateStereoPlanarGuiApp();
-		app.configure(detector,target,true,false, leftImages,rightImages);
+		app.configure(detector,2,false,true, leftImages,rightImages);
 
-		JFrame frame = new JFrame("Planar Stereo Calibration");
-		frame.add(app, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
+		ShowImages.showWindow(app,"Planar Stereo Calibration",true);
 
 		app.process("stereo.xml");
 	}

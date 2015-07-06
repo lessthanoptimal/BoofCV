@@ -57,17 +57,40 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	public ImageType<T> imageType;
 
 	/**
-	 * Returns a rectangular subimage of this image.  The subimage reference the same image data, but has a different
-	 * startIndex, stride, width, and height.  Thus no memory is copied and is an inexpensive operation.
+	 * <p>
+	 * Creates a rectangular sub-image from 'this' image.  The subimage will share the same internal array
+	 * that stores each pixel's value.  Any changes to pixel values in the original image or the sub-image will
+	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
+	 * than the original.
+	 *</p>
 	 *
-	 * @param x0 Lower extent of subimage. x-axis
-	 * @param y0 Lower extent of subimage. y-axis
-	 * @param x1 Upper extent of subimage. x-axis
-	 * @param y1 Upper extent of subimage. y-axis
-	 * @param subimage (Optional) Storage for where the subimage is written to.  If null a new instance is created.
-	 * @return The subimage
+	 * <p>
+	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive.  Thus,
+	 * a sub-image will contain all the original pixels if the following is used: subimage(0,0,width,height,null).
+	 * </p>
+	 *
+	 * @param x0 x-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @param subimage Optional output for sub-image.  If not null the subimage will be written into this image.
+	 * @return A sub-image of 'this' image.
 	 */
 	public abstract T subimage(int x0, int y0, int x1, int y1, T subimage);
+
+	/**
+	 * Same as {@link #subimage(int, int, int, int, ImageBase)}, but sets the storage for the input subimage
+	 * to null.
+	 *
+	 * @param x0 x-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param y0 y-coordinate of top-left corner of the sub-image, inclusive.
+	 * @param x1 x-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
+	 * @return A sub-image of 'this' image.
+	 */
+	public T subimage(int x0, int y0, int x1, int y1 ) {
+		return subimage(x0,y0,x1,y1,null);
+	}
 
 	/**
 	 * Changes the width and height of the image.  If the image data array isn't large enough to hold an
@@ -168,6 +191,16 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 */
 	public ImageType<T> getImageType() {
 		return imageType;
+	}
+
+	/**
+	 * Creates a new image of the same type which also has the same shape.  This is the same as calling
+	 * {@link #_createNew(int, int)} with this image's width and height.
+	 *
+	 * @return new image with the same shape as this.
+	 */
+	public T createShapeShape() {
+		return _createNew(getWidth(),getHeight());
 	}
 
 	/**

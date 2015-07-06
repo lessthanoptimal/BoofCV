@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.so.Rodrigues_F64;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
@@ -49,7 +49,7 @@ public class TestRodriguesRotationGradient {
 			param[1] = (rand.nextDouble()-0.5);
 			param[2] = (rand.nextDouble()-0.5);
 
-			assertTrue(JacobianChecker.jacobian(f, g, param, 1e-6));
+			assertTrue(DerivativeChecker.jacobian(f, g, param, 1e-6));
 		}
 	}
 
@@ -61,8 +61,8 @@ public class TestRodriguesRotationGradient {
 //		RodToMatrix f = new RodToMatrix();
 //		RodToGradient g = new RodToGradient();
 //
-//		JacobianChecker.jacobianPrint(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6);
-//		assertTrue(JacobianChecker.jacobian(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6));
+//		DerivativeChecker.jacobianPrintR(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6);
+//		assertTrue(DerivativeChecker.jacobianR(f, g, new double[]{1e-6,1e-6,1e-6}, 1e-6));
 //	}
 	
 	public static class RodToMatrix implements FunctionNtoM

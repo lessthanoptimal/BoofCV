@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class TestNormalizedToPixel_F64 {
 
 	@Test
 	public void basicTest() {
-		IntrinsicParameters p = new IntrinsicParameters(1, 2, 3, 4, 5, 200, 300, false, null);
+		IntrinsicParameters p = new IntrinsicParameters().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
 

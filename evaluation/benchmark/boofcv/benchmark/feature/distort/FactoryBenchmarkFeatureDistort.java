@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.benchmark.feature.distort;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.filter.basic.GGrayImageOps;
@@ -116,7 +116,7 @@ public class FactoryBenchmarkFeatureDistort {
 		protected void distortImage(T image, T distortedImage ,double theta) {
 			distortedImage.reshape(image.width,image.height);
 
-			DistortImageOps.rotate(image,distortedImage,TypeInterpolate.BILINEAR,(float)theta);
+			new FDistort(image, distortedImage).rotate(theta).apply();
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,8 +173,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 	 */
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
 		planeProjection.setIntrinsic(intrinsic);
-		normToPixel = LensDistortionOps.transformNormToRadial_F64(intrinsic);
-		pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
+		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false,true);
+		pixelToNorm = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true,false);
 
 		// Find the change in angle caused by a pixel error in the image center.  The same angle error will induce a
 		// larger change in pixel values towards the outside of the image edge.  For fish-eyes lenses this could

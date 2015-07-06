@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,8 @@ public class TestConvolveImageNoBorderSparse {
 
 	int width = 10;
 	int height = 15;
-	int kernelRadius = 1;
+	int kernelWidth = 3;
+	int kernelRadius = kernelWidth/2;
 
 	int testX = 5;
 	int testY = 6;
@@ -72,10 +73,10 @@ public class TestConvolveImageNoBorderSparse {
 			Object storage;
 			Object kernel;
 			if (Kernel1D_F32.class == paramTypes[0]) {
-				kernel = FactoryKernel.random1D_F32(kernelRadius, -1, 1, rand);
+				kernel = FactoryKernel.random1D_F32(kernelWidth,kernelRadius, -1, 1, rand);
 				storage = new float[ kernelRadius*2+1];
 			} else if (Kernel1D_I32.class == paramTypes[0]) {
-				kernel = FactoryKernel.random1D_I32(kernelRadius, 0, 5, rand);
+				kernel = FactoryKernel.random1D_I32(kernelWidth,kernelRadius, 0, 5, rand);
 				storage = new int[ kernelRadius*2+1];
 			} else {
 				throw new RuntimeException("Unknown kernel type");

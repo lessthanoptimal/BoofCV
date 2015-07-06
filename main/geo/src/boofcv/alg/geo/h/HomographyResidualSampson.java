@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,8 @@ public class HomographyResidualSampson
 	LinearSolver<DenseMatrix64F> solver = LinearSolverFactory.linear(2);
 
 	@Override
-	public void setModel(DenseMatrix64F F) {
-		this.H = F;
+	public void setModel(DenseMatrix64F H) {
+		this.H = H;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class HomographyResidualSampson
 		GeometryMath_F64.mult(H, p.p1, temp);
 
 		double top1 = error1(p.p1.x,p.p1.y,p.p2.x,p.p2.y);
-		double top2 = error2(p.p1.x, p.p1.y, p.p2.x, p.p2.y);
+		double top2 = error2(p.p1.x,p.p1.y,p.p2.x,p.p2.y);
 
 		computeJacobian(p.p1,p.p2);
 		// JJ = J*J'

@@ -34,8 +34,10 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_I32;
@@ -96,7 +98,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public void configure( int numCols , int numRows ) {
-		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+		ConfigChessboard config = new ConfigChessboard(numCols,numRows,30);
 
 		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,2,imageType);
 
@@ -113,7 +115,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		if( !reader.read(r) )
 			throw new RuntimeException("Parsing configuration failed");
 
-		if( reader.remainingTokens() != 6) {
+		if( reader.remainingTokens() != 7) {
 			while( reader.remainingTokens() != 0 ) {
 				System.out.println("token: "+reader.nextString());
 			}
@@ -124,8 +126,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			throw new RuntimeException("Not a chessboard config file");
 		}
 
+		int numRadial = (int)reader.nextDouble();
+		boolean includeTangential = reader.nextString().compareTo("true") == 0;
 		boolean zeroSkew = reader.nextString().compareTo("true") == 0;
-		boolean flipY = reader.nextString().compareTo("true") == 0;
 
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
@@ -192,7 +195,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 
 			if( calibGUI.isShowNumbers() ) {
-				drawNumbers(g2, alg.getPoints(),1);
+				drawNumbers(g2, alg.getPoints(),null,1);
 			}
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
@@ -261,18 +264,29 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		}
 	}
 
-	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget , double scale ) {
+	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
+									PointTransform_F32 transform ,
+									double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
 
+		Point2D_F32 adj = new Point2D_F32();
+
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < foundTarget.size(); i++ ) {
 			Point2D_F64 p = foundTarget.get(i);
+
+			if( transform != null ) {
+				transform.compute((float)p.x,(float)p.y,adj);
+			} else {
+				adj.set((float)p.x,(float)p.y);
+			}
+
 			String text = String.format("%2d",i);
 
-			int x = (int)(p.x*scale);
-			int y = (int)(p.y*scale);
+			int x = (int)(adj.x*scale);
+			int y = (int)(adj.y*scale);
 
 			g2.setColor(Color.BLACK);
 			g2.drawString(text,x-1,y);
@@ -351,6 +365,6 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Calibration Target Detection");
+		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}
 }

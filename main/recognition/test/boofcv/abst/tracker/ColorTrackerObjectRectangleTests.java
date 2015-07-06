@@ -1,7 +1,24 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.abst.tracker;
 
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
@@ -78,7 +95,7 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 			TextureGrayTrackerObjectRectangleTests.convexFill(region[i],original.getBand(2),band2[colorIndex]);
 		}
 
-		DistortImageOps.affine(original,input, TypeInterpolate.BILINEAR,scale,0,0,scale,tranX,tranY);
+		new FDistort(original,input).affine(scale,0,0,scale,tranX,tranY).apply();
 	}
 
 	private Point2D_F64 average( Point2D_F64 a , Point2D_F64 b ) {

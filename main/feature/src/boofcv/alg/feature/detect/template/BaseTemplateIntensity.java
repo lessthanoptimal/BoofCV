@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,10 +34,11 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 	// references to the input
 	protected T image;
 	protected T template;
+	protected T mask;
 
-	// offset from pixel intensity coordinate to top left corner of template
-	private int offsetX;
-	private int offsetY;
+	// thickness of the border along the lower extents of the image
+	private int borderX0,borderY0;
+	private int borderX1,borderY1;
 
 	@Override
 	public void process(T image, T template) {
@@ -48,15 +49,52 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 		int w = image.width - template.width;
 		int h = image.height - template.height;
 
-		offsetX = template.width / 2;
-		offsetY = template.height / 2;
+		borderX0 = template.width / 2;
+		borderY0 = template.height / 2;
+		borderX1 = template.width-borderX0;
+		borderY1 = template.height-borderY0;
 
 		for (int y = 0; y < h; y++) {
-			int index = intensity.startIndex + (y + offsetY) * intensity.stride + offsetX;
+			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
 			for (int x = 0; x < w; x++) {
 				intensity.data[index++] = evaluate(x, y);
 			}
 		}
+
+		// deference to avoid causing a memory leak
+		this.image = null;
+		this.template = null;
+	}
+
+	@Override
+	public void process(T image, T template, T mask ) {
+		if( mask == null ) {
+			process(image,template);
+			return;
+		}
+
+		this.image = image;
+		this.template = template;
+		this.mask = mask;
+		intensity.reshape(image.width, image.height);
+
+		int w = image.width - template.width;
+		int h = image.height - template.height;
+
+		borderX0 = template.width / 2;
+		borderY0 = template.height / 2;
+
+		for (int y = 0; y < h; y++) {
+			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+			for (int x = 0; x < w; x++) {
+				intensity.data[index++] = evaluateMask(x, y);
+			}
+		}
+
+		// deference to avoid causing a memory leak
+		this.image = null;
+		this.template = null;
+		this.mask = null;
 	}
 
 	/**
@@ -68,18 +106,37 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 	 */
 	protected abstract float evaluate(int tl_x, int tl_y);
 
+	/**
+	 * Evaluate the masked template at the specified location.
+	 *
+	 * @param tl_x Template's top left corner x-coordinate
+	 * @param tl_y Template's top left corner y-coordinate
+	 * @return match value with better matches having a more positive value
+	 */
+	protected abstract float evaluateMask(int tl_x, int tl_y);
+
 	@Override
 	public ImageFloat32 getIntensity() {
 		return intensity;
 	}
 
 	@Override
-	public int getOffsetX() {
-		return offsetX;
+	public int getBorderX0() {
+		return borderX0;
 	}
 
 	@Override
-	public int getOffsetY() {
-		return offsetY;
+	public int getBorderY0() {
+		return borderY0;
+	}
+
+	@Override
+	public int getBorderX1() {
+		return borderX1;
+	}
+
+	@Override
+	public int getBorderY1() {
+		return borderY1;
 	}
 }

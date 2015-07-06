@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,12 @@ import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Miscellaneous functions which have no better place to go.
@@ -342,5 +344,37 @@ public class BoofMiscOps {
 		}
 
 		return ret;
+	}
+
+	public static File[] findMatches( File directory , String regex ) {
+		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
+		return directory.listFiles(new FileFilter(){
+			@Override
+			public boolean accept(File file) {
+				return p.matcher(file.getName()).matches();
+			}
+		});
+	}
+
+	/**
+	 * Looks up all files which are in the specified directory and match the regex.<b>
+	 * Example: path/to/input/image\d*.jpg
+	 *
+	 * @param pathRegex regex
+	 * @return list of matching files
+	 */
+	public static File[] findMatches( String pathRegex ) {
+
+		File f = new File(pathRegex);
+		File directory = f.getParentFile();
+		String regex = f.getName();
+
+		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
+		return directory.listFiles(new FileFilter(){
+			@Override
+			public boolean accept(File file) {
+				return p.matcher(file.getName()).matches();
+			}
+		});
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 	extends VideoSequenceSimulator<I>
 {
-	IntrinsicParameters param = new IntrinsicParameters(150,155,0,width/2,height/2,width,height, false, new double[]{0,0});
+	IntrinsicParameters param = new IntrinsicParameters(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
 	MonocularPlaneVisualOdometry<I> algorithm;
 
 	I left;

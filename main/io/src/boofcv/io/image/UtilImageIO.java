@@ -18,6 +18,7 @@
 
 package boofcv.io.image;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
@@ -27,6 +28,7 @@ import sun.awt.image.IntegerInterleavedRaster;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.*;
 import java.net.URL;
 import java.security.AccessControlException;
@@ -119,6 +121,14 @@ public class UtilImageIO {
 		return ConvertBufferedImage.convertFromSingle(img, (T) null, imageType);
 	}
 
+	/**
+	 * Saves the {@link BufferedImage} to the specified file.  The image type of the output is determined by
+	 * the name's extension.  By default the file is saved using {@link ImageIO#write(RenderedImage, String, File)}}
+	 * but if that fails then it will see if it can save it using BoofCV native code for PPM and PGM.
+	 *
+	 * @param img Image which is to be saved.
+	 * @param fileName Name of the output file.  The type is determined by the extension.
+	 */
 	public static void saveImage(BufferedImage img, String fileName) {
 		try {
 			String type;
@@ -142,6 +152,23 @@ public class UtilImageIO {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 *
+	 * <p>Saves the BoofCV formatted image.  This is identical to the following code:</p>
+	 *
+	 * <pre>
+	 * BufferedImage out = ConvertBufferedImage.convertTo(image,null,true);
+	 * saveImage(out,fileName);
+	 * </pre>
+	 *
+	 * @param image Image which is to be saved.
+	 * @param fileName Name of the output file.  The type is determined by the extension.
+	 */
+	public static void saveImage( ImageBase image , String fileName ) {
+		BufferedImage out = ConvertBufferedImage.convertTo(image,null,true);
+		saveImage(out,fileName);
 	}
 
 	/**

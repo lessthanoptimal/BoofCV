@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,10 @@
 
 package boofcv.gui.image;
 
-import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSingleBand;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,6 +69,13 @@ public class ShowImages {
 	 * Creates a window showing the specified image.
 	 */
 	public static ImagePanel showWindow(BufferedImage img, String title) {
+		return showWindow(img,title,false);
+	}
+
+	/**
+	 * Creates a window showing the specified image.
+	 */
+	public static ImagePanel showWindow(BufferedImage img, String title, boolean closeOnExit ) {
 		JFrame frame = new JFrame(title);
 
 		ImagePanel panel = new ImagePanel(img);
@@ -79,39 +85,22 @@ public class ShowImages {
 		frame.pack();
 		frame.setLocationByPlatform(true);
 		frame.setVisible(true);
+		if( closeOnExit )
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		return panel;
 	}
 
-	public static ImagePanel showWindow( ImageUInt8 img , String title ) {
-		BufferedImage buff = ConvertBufferedImage.convertTo(img,null);
-
-		return showWindow(buff,title);
-	}
-
-	public static ImagePanel showWindow( ImageSInt16 img , String title ) {
-		int max = ImageStatistics.maxAbs(img);
-		BufferedImage buff;
-		if( img.getDataType().isSigned() )
-			buff = VisualizeImageData.colorizeSign(img,null,max);
-		else
-			buff = VisualizeImageData.grayUnsigned(img,null,max);
-
-		return showWindow(buff,title);
-	}
-
-	public static ImagePanel showWindow( ImageFloat32 img , String title , boolean showMagnitude) {
-		float max = ImageStatistics.maxAbs(img);
-		BufferedImage buff;
-		if( showMagnitude )
-			buff = VisualizeImageData.grayMagnitude(img,null,max);
-		else
-			buff = VisualizeImageData.colorizeSign(img,null,max);
-
+	public static ImagePanel showWindow( ImageBase img, String title ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
 		return showWindow(buff,title);
 	}
 
 	public static JFrame showWindow( final JComponent component , String title ) {
+		return showWindow(component,title,false);
+	}
+
+	public static JFrame showWindow( final JComponent component , String title, final boolean closeOnExit ) {
 		final JFrame frame = new JFrame(title);
 		frame.add(component, BorderLayout.CENTER);
 
@@ -119,9 +108,22 @@ public class ShowImages {
 			public void run() {
 				frame.pack();
 				frame.setVisible(true);
+				if( closeOnExit )
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 		});
 
 		return frame;
+	}
+
+	public static ImagePanel showWindow( ImageSingleBand img , String title , boolean showMagnitude) {
+		double max = GImageStatistics.maxAbs(img);
+		BufferedImage buff;
+		if( showMagnitude )
+			buff = VisualizeImageData.grayMagnitude(img,null,max);
+		else
+			buff = VisualizeImageData.colorizeSign(img,null,max);
+
+		return showWindow(buff,title);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.pose;
 
 import georegression.struct.se.Se3_F64;
 import org.ejml.UtilEjml;
+import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
@@ -68,5 +69,26 @@ public class TestPnPRodriguesCodec {
 
 		assertTrue(a.T.isIdentical(found.T,1e-8));
 		assertTrue(MatrixFeatures.isIdentical(a.R,found.R,1e-8));
+	}
+
+	/**
+	 * Pathological place which caused an issue in the past
+	 */
+	@Test
+	public void testCase1() {
+		Se3_F64 input = new Se3_F64();
+		CommonOps.diag(input.getR(),3,1,-1,-1);
+
+		Se3_F64 output = new Se3_F64();
+		PnPRodriguesCodec alg = new PnPRodriguesCodec();
+
+		double param[] = new double[6];
+		alg.encode(input,param);
+		alg.decode(param, output);
+
+//		output.print();
+
+		assertTrue(input.T.isIdentical(output.T, 1e-8));
+		assertTrue(MatrixFeatures.isIdentical(input.R,output.R,1e-8));
 	}
 }

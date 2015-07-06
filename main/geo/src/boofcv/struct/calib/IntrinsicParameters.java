@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,14 @@ import java.io.Serializable;
  * </p>
  *
  * <p>
- * Radial Distortion:<br>
- * x' = x + x[k<sub>1</sub> r<sup>2</sup> + ... + k<sub>n</sub> r<sup>2n</sup>]<br>
+ * Radial and Tangental Distortion:<br>
+ * x<sub>d</sub> = x<sub>n</sub> + x<sub>n</sub>[k<sub>1</sub> r<sup>2</sup> + ... + k<sub>n</sub> r<sup>2n</sup>] + dx<br>
+ * dx<sub>u</sub> = [ 2t<sub>1</sub> u v + t<sub>2</sub>(r<sup>2</sup> + 2u<sup>2</sup>)] <br>
+ * dx<sub>v</sub> = [ t<sub>1</sub>(r<sup>2</sup> + 2v<sup>2</sup>) + 2 t<sub>2</sub> u v]<br>
+ * <br>
  * r<sup>2</sup> = u<sup>2</sup> + v<sup>2</sup><br>
- * where x' is the distorted pixel, x=(x,y) are pixel coordinates and (u,v)=K<sup>-1</sup>x are normalized image coordinates.
- * </p>
- *
- * <p>
- * If flipY axis is true then the y-coordinate was transformed by, y = height - y - 1, (flipped along
- * the vertical axis) during calibration.  This is done to ensure that the image coordinate system has
- * the following characteristics, +Z axis points out of the camera optical axis and is right handed.
+ * where x<sub>d</sub> is the distorted coordinates, x<sub>n</sub>=(u,v) is undistorted normalized image coordinates.
+ * Pixel coordinates are found x = K*[u;v]
  * </p>
  *
  * @author Peter Abeles
@@ -58,9 +56,6 @@ public class IntrinsicParameters implements Serializable {
 	/** image shape (units: pixels) */
 	public int width,height;
 
-	/** When calibrated was the y-axis flipped: y = (height - y - 1) */
-	public boolean flipY;
-
 	/** focal length along x and y axis (units: pixels) */
 	public double fx,fy;
 	/** skew parameter, typically 0 (units: pixels)*/
@@ -70,15 +65,30 @@ public class IntrinsicParameters implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
+	/** tangential distortion parameters */
+	public double t1, t2;
 
+	/**
+	 * Default constructor.  flipY is false and everything else is zero or null.
+	 */
 	public IntrinsicParameters() {
 	}
 
-	public IntrinsicParameters(double fx, double fy,
-							   double skew,
-							   double cx, double cy,
-							   int width, int height,
-							   boolean flipY, double[] radial) {
+	public IntrinsicParameters( IntrinsicParameters param ) {
+		set(param);
+	}
+
+	public IntrinsicParameters( double fx, double fy,
+								double skew,
+								double cx, double cy,
+								int width, int height ) {
+		fsetK(fx, fy, skew, cx, cy, width, height);
+	}
+
+	public IntrinsicParameters fsetK(double fx, double fy,
+									 double skew,
+									 double cx, double cy,
+									 int width, int height) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -86,12 +96,19 @@ public class IntrinsicParameters implements Serializable {
 		this.cy = cy;
 		this.width = width;
 		this.height = height;
-		this.flipY = flipY;
-		this.radial = radial;
+
+		return this;
 	}
 
-	public IntrinsicParameters( IntrinsicParameters param ) {
-		set(param);
+	public IntrinsicParameters fsetRadial( double ...radial ) {
+		this.radial = radial.clone();
+		return this;
+	}
+
+	public IntrinsicParameters fsetTangental( double t1 , double t2) {
+		this.t1 = t1;
+		this.t2 = t2;
+		return this;
 	}
 
 	public void set( IntrinsicParameters param ) {
@@ -102,11 +119,26 @@ public class IntrinsicParameters implements Serializable {
 		this.cy = param.cy;
 		this.width = param.width;
 		this.height = param.height;
-		this.flipY = param.flipY;
 		this.radial = param.radial;
 
 		if( param.radial != null )
 			radial = param.radial.clone();
+
+		this.t1 = param.t1;
+		this.t2 = param.t2;
+	}
+
+	/**
+	 * If true then distortion parameters are specified.
+	 */
+	public boolean isDistorted() {
+		if( radial != null && radial.length > 0 ) {
+			for (int i = 0; i < radial.length; i++) {
+				if( radial[i] != 0 )
+					return true;
+			}
+		}
+		return t1 != 0 || t2 != 0;
 	}
 
 	public double getCx() {
@@ -173,16 +205,24 @@ public class IntrinsicParameters implements Serializable {
 		this.height = height;
 	}
 
-	public boolean isFlipY() {
-		return flipY;
+	public double getT1() {
+		return t1;
 	}
 
-	public void setFlipY(boolean flipY) {
-		this.flipY = flipY;
+	public void setT1(double t1) {
+		this.t1 = t1;
+	}
+
+	public double getT2() {
+		return t2;
+	}
+
+	public void setT2(double t2) {
+		this.t2 = t2;
 	}
 
 	public void print() {
-		System.out.println("Shape "+width+" "+height+" flipY = "+ flipY);
+		System.out.println("Shape "+width+" "+height);
 		System.out.printf("center %7.2f %7.2f\n", cx, cy);
 		System.out.println("fx = " + fx);
 		System.out.println("fy = "+fy);
@@ -193,6 +233,11 @@ public class IntrinsicParameters implements Serializable {
 			}
 		} else {
 			System.out.println("No radial");
+		}
+		if( t1 != 0 && t2 != 0)
+			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
+		else {
+			System.out.println("No tangential");
 		}
 	}
 }

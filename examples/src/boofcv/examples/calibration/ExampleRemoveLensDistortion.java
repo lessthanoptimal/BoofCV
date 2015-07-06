@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.examples.calibration;
 
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.core.image.border.BorderType;
@@ -63,13 +64,13 @@ public class ExampleRemoveLensDistortion {
 		int numBands = distortedImg.getNumBands();
 
 		// create new transforms which optimize view area in different ways.
-		// allInside makes sure there are no dead zones inside the image
+		// shrink makes sure there are no dead zones inside the image
 		// fullView will include the entire original image
 		// The border is VALUE, which defaults to black, just so you can see it
-		ImageDistort allInside = LensDistortionOps.removeDistortion(true,BorderType.VALUE,param,null,
-				ImageType.ms(numBands,ImageFloat32.class));
-		ImageDistort fullView = LensDistortionOps.removeDistortion(false,BorderType.VALUE,param,null,
-				ImageType.ms(numBands,ImageFloat32.class));
+		ImageDistort allInside = LensDistortionOps.imageRemoveDistortion(AdjustmentType.EXPAND, BorderType.VALUE, param, null,
+				ImageType.ms(numBands, ImageFloat32.class));
+		ImageDistort fullView = LensDistortionOps.imageRemoveDistortion(AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null,
+				ImageType.ms(numBands, ImageFloat32.class));
 
 		// NOTE: After lens distortion has been removed the intrinsic parameters is changed.  If you pass
 		//       in  a set of IntrinsicParameters to the 4th variable it will save it there.

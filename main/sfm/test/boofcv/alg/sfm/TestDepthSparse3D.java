@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestDepthSparse3D {
 		ImageUInt16 depth = new ImageUInt16(w,h);
 		depth.set(5,6,1000);
 
-		IntrinsicParameters param = new IntrinsicParameters(1,1,0,5,10,w,h,false,new double[]{0,0});
+		IntrinsicParameters param = new IntrinsicParameters(1,1,0,5,10,w,h).fsetRadial(0,0);
 
 		PixelTransform_F32 v2d = new PixelTransform_F32() {
 

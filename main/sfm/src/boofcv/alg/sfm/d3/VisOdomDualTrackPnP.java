@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,8 +154,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	public void setCalibration(StereoParameters param) {
 
 		param.rightToLeft.invert(leftToRight);
-		leftImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.left );
-		rightImageToNorm = LensDistortionOps.transformRadialToNorm_F64(param.right);
+		leftImageToNorm = LensDistortionOps.distortTransform(param.left).undistort_F64(true,false);
+		rightImageToNorm = LensDistortionOps.distortTransform(param.right).undistort_F64(true,false);
 		stereoCheck.setCalibration(param);
 	}
 

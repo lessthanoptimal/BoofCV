@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,9 @@ package boofcv.struct.feature;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.UtilIO;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.*;
+import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.After;
@@ -38,6 +40,8 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public class TestObjectSerialization {
+
+	Random rand = new Random(234);
 
 	@After
 	public void cleanup() {
@@ -114,7 +118,7 @@ public class TestObjectSerialization {
 		FastQueue<ImageUInt8> found = UtilIO.loadXML("temp.txt");
 
 		assertEquals(list.size(),found.size());
-		assertTrue(list.type==found.type);
+		assertTrue(list.type == found.type);
 		assertFalse(found.isDeclareInstances());
 
 		for( int i = 0; i < list.size; i++ ) {
@@ -134,8 +138,8 @@ public class TestObjectSerialization {
 
 		DenseMatrix64F found = UtilIO.loadXML("temp.txt");
 
-		assertEquals(orig.numRows,found.numRows);
-		assertEquals(orig.numCols,found.numCols);
+		assertEquals(orig.numRows, found.numRows);
+		assertEquals(orig.numCols, found.numCols);
 
 		for( int i = 0; i < orig.data.length; i++ ) {
 			assertEquals(orig.data[i],found.data[i],1e-8);
@@ -149,8 +153,6 @@ public class TestObjectSerialization {
 					ImageUInt16.class,ImageSInt16.class,
 					ImageSInt32.class,ImageSInt64.class,
 					ImageFloat32.class,ImageFloat64.class};
-
-		Random rand = new Random(234);
 
 		for( Class imageType : types ) {
 			ImageSingleBand original = GeneralizedImageOps.createSingleBand(imageType,3,5);
@@ -173,5 +175,45 @@ public class TestObjectSerialization {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void testMultiSpectral() {
+		MultiSpectral original = new MultiSpectral(ImageUInt8.class,40,50,3);
+		GImageMiscOps.addUniform(original, rand, 0, 100);
+		UtilIO.saveXML(original, "temp.txt");
+
+		MultiSpectral found = UtilIO.loadXML("temp.txt");
+		assertEquals(original.width,found.width);
+		assertEquals(original.height,found.height);
+		assertEquals(original.stride,found.stride);
+		assertEquals(original.startIndex, found.startIndex);
+		assertEquals(original.getNumBands(),found.getNumBands());
+
+		BoofTesting.assertEquals(original,found,1e-8);
+	}
+
+	@Test
+	public void testIntrinsicParamters() {
+		IntrinsicParameters original = new IntrinsicParameters().
+				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
+
+		UtilIO.saveXML(original, "temp.txt");
+
+		IntrinsicParameters found = UtilIO.loadXML("temp.txt");
+
+		assertEquals(original.fx,found.fx,1e-8);
+		assertEquals(original.fy, found.fy, 1e-8);
+		assertEquals(original.skew,found.skew,1e-8);
+		assertEquals(original.cx,found.cx,1e-8);
+		assertEquals(original.cy,found.cy,1e-8);
+		assertEquals(original.width,found.width);
+		assertEquals(original.height,found.height);
+		assertEquals(original.radial[0],found.radial[0],1e-8);
+		assertEquals(original.radial[1],found.radial[1],1e-8);
+		assertEquals(original.t1,found.t1,1e-8);
+		assertEquals(original.t2,found.t2,1e-8);
+
+
 	}
 }

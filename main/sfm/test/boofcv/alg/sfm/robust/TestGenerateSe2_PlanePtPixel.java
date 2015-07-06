@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class TestGenerateSe2_PlanePtPixel {
 
 	Random rand = new Random(93948);
 
-	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480,false,new double[]{0,0});
+	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).fsetRadial(0,0);
 
 	GenerateSe2_PlanePtPixel alg = new GenerateSe2_PlanePtPixel();
 	Se3_F64 planeToCamera;

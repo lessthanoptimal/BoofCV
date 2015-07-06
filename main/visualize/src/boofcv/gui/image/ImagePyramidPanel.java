@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.gui.image;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.io.image.ConvertBufferedImage;
@@ -107,7 +106,7 @@ public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPan
 		int N = pyramid.getNumLayers();
 
 		for( int i = 0; i < N; i++ ) {
-			DistortImageOps.scale(pyramid.getLayer(i),upscale, TypeInterpolate.NEAREST_NEIGHBOR);
+			new FDistort(pyramid.getLayer(i),upscale).interpNN().scaleExt().apply();
 			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null,true);
 			if( showScales )
 				addImage(b,String.format("%5.2f",pyramid.getScale(i)));

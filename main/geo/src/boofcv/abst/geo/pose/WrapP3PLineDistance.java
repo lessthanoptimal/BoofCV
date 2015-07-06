@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -116,8 +116,12 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			if( !motionFit.process(cloudWorld,cloudCamera) )
 				continue;
 
-			Se3_F64 found = solutions.grow();
-			found.set( motionFit.getTransformSrcToDst() );
+			Se3_F64 found = motionFit.getTransformSrcToDst();
+			// ignore solutions which are behind the camera
+			if( found.T.z <= 0 )
+				continue;
+
+			solutions.grow().set(found);
 		}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,7 @@ package boofcv.calibration;
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 
@@ -40,15 +39,15 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrateUsingZhangData {
-	PlanarCalibrationTarget target;
+	List<Point2D_F64> layout;
 	List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
-	Zhang99Parameters found;
+	Zhang99ParamAll found;
 
 	UnconstrainedLeastSquares optimizer;
 	
 	public void loadModel( String fileName) throws IOException {
 		System.out.println("loading model "+fileName);
-		target = new PlanarCalibrationTarget(loadPoints(fileName));
+		layout = loadPoints(fileName);
 	}
 	
 	public void loadObservations( String fileName ) throws IOException {
@@ -80,7 +79,7 @@ public class CalibrateUsingZhangData {
 	public void process(  boolean assumeZeroSkew ,
 						  int numRadialParam) {
 		CalibrationPlanarGridZhang99 Zhang99
-				= new CalibrationPlanarGridZhang99(target,assumeZeroSkew,numRadialParam);
+				= new CalibrationPlanarGridZhang99(layout,assumeZeroSkew,numRadialParam,false);
 		Zhang99.setOptimizer(optimizer);
 
 		if( !Zhang99.process(observations) ) {
@@ -90,7 +89,7 @@ public class CalibrateUsingZhangData {
 		found = Zhang99.getOptimized();
 
 		List<ImageResults> errors =
-				CalibrateMonoPlanar.computeErrors(observations, found, target.points);
+				CalibrateMonoPlanar.computeErrors(observations, found, layout);
 		CalibrateMonoPlanar.printErrors(errors);
 
 		System.out.println("center x = "+found.x0);
@@ -98,17 +97,17 @@ public class CalibrateUsingZhangData {
 		System.out.println("a = "+found.a);
 		System.out.println("b = "+found.b);
 		System.out.println("c = "+found.c);
-		for( int i = 0; i < found.distortion.length; i++ ) {
-			System.out.printf("radial[%d] = %6.2e\n",i,found.distortion[i]);
+		for( int i = 0; i < found.radial.length; i++ ) {
+			System.out.printf("radial[%d] = %6.2e\n",i,found.radial[i]);
 		}
 	}
 
 	public void printZhangError() {
-		ComputeZhangErrors.zhangResults(observations,target.points);
+		ComputeZhangErrors.zhangResults(observations,layout);
 	}
 
 	public void optimizeUsingZhang() {
-		ComputeZhangErrors.nonlinearUsingZhang(observations,target);
+		ComputeZhangErrors.nonlinearUsingZhang(observations,layout);
 	}
 
 	public void setOptimizer(UnconstrainedLeastSquares optimizer) {

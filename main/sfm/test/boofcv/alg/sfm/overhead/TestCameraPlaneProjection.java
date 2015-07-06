@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,8 @@ public class TestCameraPlaneProjection {
 
 	int width = 800;
 	int height = 850;
-	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height, false, new double[]{0.002,0});
-	PointTransform_F64 pixelToNorm = LensDistortionOps.transformRadialToNorm_F64(param);
-	PointTransform_F64 normToPixel = LensDistortionOps.transformNormToRadial_F64(param);
+	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0.002, 0);
+	PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(param).distort_F64(false,true);
 
 	Se3_F64 planeToCamera;
 

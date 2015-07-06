@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ import java.awt.image.BufferedImage;
  */
 public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChecks {
 
-
-	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/calibration/";
+	// selected because it has significant lens distortion
+	String directory = UtilIO.getPathToBase()+"data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 
 	public TestCalibrationFiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
@@ -47,7 +47,7 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
 
-		BufferedImage out = UtilImageIO.loadImage(directory + "image00.jpg");
+		BufferedImage out = UtilImageIO.loadImage(directory + "frame09.jpg");
 		return ConvertBufferedImage.convertFrom(out, true, imageType);
 	}
 
@@ -58,6 +58,6 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7), 0.03, imageType.getImageClass());
+		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageType.getImageClass());
 	}
 }

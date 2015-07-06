@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,35 +89,20 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 	private void init(Input srcImg, Output dstImg) {
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
+		interp.setBorder(border);
 		interp.setImage(srcImg);
 	}
 
 	public void applyBorder() {
 
-		border.setImage(srcImg);
-
-		final float minInterpX = interp.getFastBorderX();
-		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
-
-		final float widthF = srcImg.getWidth()-1;
-		final float heightF = srcImg.getHeight()-1;
-
+		// todo TO make this faster first apply inside the region which can process the fast border
+		// then do the slower border thingy
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y);
 
-				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
-						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
-					if( dstToSrc.distX < 0f || dstToSrc.distX > widthF || dstToSrc.distY < 0f || dstToSrc.distY > heightF )
-						assign(indexDst,(float)border.getGeneral((int)dstToSrc.distX,(int)dstToSrc.distY));
-					else
-						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-				} else {
-					assign(indexDst,interp.get_fast(dstToSrc.distX, dstToSrc.distY));
-				}
+				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
 			}
 		}
 	}
