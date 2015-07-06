@@ -113,7 +113,6 @@ TODO
   * Look at Sandreas's NewWarp
   * Histogram comparison
   * Documentation on how to build a single jar
-  * ExamplePnP
 
 ---------------------------------------------
 Date    : 2014/9/22
