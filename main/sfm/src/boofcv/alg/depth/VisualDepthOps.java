@@ -45,7 +45,7 @@ public class VisualDepthOps {
 	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		PointTransform_F64 p2n = LensDistortionOps.distortTransform(param).undistort_F64(true,false);
+		PointTransform_F64 p2n = LensDistortionOps.transformPoint(param).undistort_F64(true,false);
 
 		Point2D_F64 n = new Point2D_F64();
 

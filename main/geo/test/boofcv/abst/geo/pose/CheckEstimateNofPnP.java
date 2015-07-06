@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,7 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.abst.geo.EstimateNofPnP;
-import boofcv.alg.geo.f.EpipolarTestSimulation;
 import boofcv.struct.geo.Point2D3D;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.ops.MatrixFeatures;
@@ -40,7 +37,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
+public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 
 	// algorithm being tested
 	EstimateNofPnP alg;
@@ -48,6 +45,9 @@ public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
 	boolean onlyMinimum;
 
 	FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(1,Se3_F64.class,true);
+
+	Se3_F64 worldToCamera0 = new Se3_F64();
+	Se3_F64 worldToCamera1 = new Se3_F64();
 
 	protected CheckEstimateNofPnP(boolean onlyMinimum) {
 		this.onlyMinimum = onlyMinimum;
@@ -71,16 +71,12 @@ public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
 	}
 
 	private void perfectObservations( int numSample ) {
-		init(numSample,false);
+		perfectObservations(worldToCamera0,numSample);
+		perfectObservations(worldToCamera1, numSample);
+	}
 
-		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
-
-		for( int i = 0; i < currentObs.size(); i++ ) {
-			Point2D_F64 o = currentObs.get(i);
-			Point3D_F64 X = worldPts.get(i);
-
-			inputs.add( new Point2D3D(o,X));
-		}
+	private void perfectObservations( Se3_F64 worldToCamera , int numSample ) {
+		List<Point2D3D> inputs = createObservations(worldToCamera,numSample);
 
 		assertTrue(alg.process(inputs,solutions));
 
@@ -99,20 +95,20 @@ public abstract class CheckEstimateNofPnP extends EpipolarTestSimulation {
 	}
 
 	/**
+	 * All observations are behind the camera.  It should reject these
+	 */
+	@Test
+	public void checkAllObservationsBehindCamera() {
+		// This test is intentionally left blank.  If the point is behind the camera it shouldn't be observable so
+		// it is reasonable for the PnP solution to come up with something crazy
+	}
+
+	/**
 	 * Call it multiple times and make sure the same solutions are returned.
 	 */
 	@Test
 	public void checkMultipleCalls() {
-		init(alg.getMinimumPoints(),false);
-
-		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
-
-		for( int i = 0; i < currentObs.size(); i++ ) {
-			Point2D_F64 o = currentObs.get(i);
-			Point3D_F64 X = worldPts.get(i);
-
-			inputs.add( new Point2D3D(o,X));
-		}
+		List<Point2D3D> inputs = createObservations(worldToCamera0,alg.getMinimumPoints());
 
 		assertTrue(alg.process(inputs,solutions));
 		assertTrue(solutions.size() > 0 );

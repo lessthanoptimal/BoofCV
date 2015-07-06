@@ -1,5 +1,6 @@
 import cv2
 import pyboof.image as image
+import pyboof.swing as swing
 import numpy as np
 
 image_path = '../../../data/applet/outdoors01.jpg'
@@ -14,6 +15,6 @@ boof_gray = image.load_single_band(image_path,np.uint8)
 boof_color = image.load_multi_spectral(image_path,np.uint8)
 
 # Let's display all 3 of them in Java
-image.show_in_java(boof_cv,"OpenCV")
-image.show_in_java(boof_gray,"Gray Scale")
-image.show_in_java(boof_color,"Color")
+swing.show(boof_cv,"OpenCV")
+swing.show(boof_gray,"Gray Scale")
+swing.show(boof_color,"Color")

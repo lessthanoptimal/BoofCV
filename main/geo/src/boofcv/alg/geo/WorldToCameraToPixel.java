@@ -51,7 +51,7 @@ public class WorldToCameraToPixel {
 	public void configure( IntrinsicParameters intrinsic , Se3_F64 worldToCamera ) {
 		this.worldToCamera = worldToCamera;
 
-		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false,true);
+		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 	}
 
 	/**

@@ -55,7 +55,8 @@ public class ShowImages {
 	public static ImageGridPanel showGrid( int numColumns , String title , BufferedImage ...images ) {
 		JFrame frame = new JFrame(title);
 
-		ImageGridPanel panel = new ImageGridPanel(images.length/numColumns,numColumns,images);
+		int numRows = images.length/numColumns + images.length%numColumns;
+		ImageGridPanel panel = new ImageGridPanel(numRows,numColumns,images);
 
 		frame.add(panel, BorderLayout.CENTER);
 

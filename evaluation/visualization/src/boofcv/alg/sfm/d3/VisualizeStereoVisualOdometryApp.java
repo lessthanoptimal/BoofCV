@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -436,6 +436,6 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Stereo Visual Odometry");
+		ShowImages.showWindow(app, "Stereo Visual Odometry",true);
 	}
 }

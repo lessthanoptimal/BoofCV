@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,10 +73,8 @@ public class ExampleRectifyCalibratedStereo {
 				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
 
 		// storage for undistorted + rectified images
-		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
-		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
+		MultiSpectral<ImageFloat32> rectLeft = distLeft.createSameShape();
+		MultiSpectral<ImageFloat32> rectRight = distRight.createSameShape();
 
 		// Compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -117,6 +115,6 @@ public class ExampleRectifyCalibratedStereo {
 		panel.addItem(new RectifiedPairPanel(true, origLeft, origRight), "Original");
 		panel.addItem(new RectifiedPairPanel(true, outLeft, outRight), "Rectified");
 
-		ShowImages.showWindow(panel,"Stereo Rectification Calibrated");
+		ShowImages.showWindow(panel,"Stereo Rectification Calibrated",true);
 	}
 }

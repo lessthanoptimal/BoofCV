@@ -88,7 +88,7 @@ public class LensDistortionOps {
 				break;
 
 			case NONE:
-				undistToDist = distortTransform(param).distort_F32(true, true);
+				undistToDist = transformPoint(param).distort_F32(true, true);
 				break;
 		}
 
@@ -128,7 +128,7 @@ public class LensDistortionOps {
 												   IntrinsicParameters paramAdj,
 												   boolean undistortedToDistorted)
 	{
-		PointTransform_F32 remove_p_to_p = distortTransform(param).undistort_F32(true, true);
+		PointTransform_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound;
 		if( type == AdjustmentType.FULL_VIEW ) {
@@ -187,7 +187,7 @@ public class LensDistortionOps {
 		}
 
 		if( undistToDist ) {
-			PointTransform_F32 add_p_to_p = distortTransform(param).distort_F32(true, true);
+			PointTransform_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
 			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A);
 
 			return new SequencePointTransform_F32(adjust,add_p_to_p);
@@ -214,7 +214,7 @@ public class LensDistortionOps {
 												   IntrinsicParameters paramAdj,
 												   boolean undistortedToDistorted)
 	{
-		PointTransform_F64 remove_p_to_p = distortTransform(param).undistort_F64(true, true);
+		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
 
 		RectangleLength2D_F64 bound;
 		if( type == AdjustmentType.FULL_VIEW ) {
@@ -273,7 +273,7 @@ public class LensDistortionOps {
 		}
 
 		if( adjToDistorted ) {
-			PointTransform_F64 add_p_to_p = distortTransform(param).distort_F64(true, true);
+			PointTransform_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
 			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A);
 
 			return new SequencePointTransform_F64(adjust,add_p_to_p);
@@ -298,7 +298,7 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 */
-	public static LensDistortionPinhole distortTransform(IntrinsicParameters param) {
+	public static LensDistortionPinhole transformPoint(IntrinsicParameters param) {
 		if( param.isDistorted())
 			return new LensDistortionRadialTangential(param);
 		else

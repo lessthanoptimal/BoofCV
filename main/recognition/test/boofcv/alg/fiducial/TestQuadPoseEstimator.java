@@ -92,7 +92,7 @@ public class TestQuadPoseEstimator {
 		alg.listObs.add(worldToPixel.transform(alg.points[2].location));
 		alg.listObs.add(worldToPixel.transform(alg.points[3].location));
 
-		PointTransform_F64 pixelToNorm = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true, false);
+		PointTransform_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
 		for (int i = 0; i < 4; i++) {
 			Point2D_F64 pixel = alg.listObs.get(i);

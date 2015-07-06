@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class ExampleImageFilter {
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
 		ShowImages.showWindow(outputImage,"Procedural Fixed Type");
 	}
 
@@ -75,7 +75,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		T blurred = (T)input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -86,7 +86,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
@@ -96,7 +96,7 @@ public class ExampleImageFilter {
 		Class<T> inputType = (Class<T>)input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		T blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		T blurred = (T)input.createSameShape();
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -109,7 +109,7 @@ public class ExampleImageFilter {
 		gradient.process(blurred,derivX,derivY);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
 		ShowImages.showWindow(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
@@ -118,7 +118,7 @@ public class ExampleImageFilter {
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageSingleBand blurred = GeneralizedImageOps.createSingleBand(inputType, input.width, input.height);
+		ImageSingleBand blurred = (ImageSingleBand)input.createSameShape();
 		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
@@ -129,7 +129,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX,null,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 

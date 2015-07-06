@@ -109,6 +109,7 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 		for( int i = 0; i < distances.size; i++ ) {
 			PointDistance3 pd = distances.get(i);
 
+			// find points in camera frame
 			X1.set( u1.x*pd.dist1 , u1.y*pd.dist1 , u1.z*pd.dist1 );
 			X2.set( u2.x*pd.dist2 , u2.y*pd.dist2 , u2.z*pd.dist2 );
 			X3.set( u3.x*pd.dist3 , u3.y*pd.dist3 , u3.z*pd.dist3 );
@@ -116,12 +117,10 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 			if( !motionFit.process(cloudWorld,cloudCamera) )
 				continue;
 
-			Se3_F64 found = motionFit.getTransformSrcToDst();
-			// ignore solutions which are behind the camera
-			if( found.T.z <= 0 )
-				continue;
-
-			solutions.grow().set(found);
+			// NOTE: This transform is world to camera and it's perfectly valid for to have a negative Z value
+			//       and be behind the camera.
+			Se3_F64 found = solutions.grow();
+			found.set( motionFit.getTransformSrcToDst() );
 		}
 
 

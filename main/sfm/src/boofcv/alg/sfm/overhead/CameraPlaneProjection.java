@@ -65,8 +65,8 @@ public class CameraPlaneProjection {
 								  IntrinsicParameters intrinsic )
 	{
 		this.planeToCamera = planeToCamera;
-		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
-		pixelToNorm = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true, false);
+		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
 		planeToCamera.invert(cameraToPlane);
 	}
@@ -77,8 +77,8 @@ public class CameraPlaneProjection {
 	 */
 	public void setIntrinsic(IntrinsicParameters intrinsic )
 	{
-		normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
-		pixelToNorm = LensDistortionOps.distortTransform(intrinsic).undistort_F64(true, false);
+		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
+		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 	}
 
 	/**

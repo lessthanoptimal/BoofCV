@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,10 +42,10 @@ public class ExampleColorSpace {
 		MultiSpectral<ImageFloat32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, ImageFloat32.class);
 
 		//---- convert RGB image into different color formats
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,rgb.width,rgb.height,3);
+		MultiSpectral<ImageFloat32> hsv = rgb.createSameShape();
 		ColorHsv.rgbToHsv_F32(rgb, hsv);
 
-		MultiSpectral<ImageFloat32> yuv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,rgb.width,rgb.height,3);
+		MultiSpectral<ImageFloat32> yuv = rgb.createSameShape();
 		ColorYuv.yuvToRgb_F32(rgb, yuv);
 
 		//---- Convert individual pixels into different formats

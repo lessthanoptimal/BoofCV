@@ -199,8 +199,8 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 *
 	 * @return new image with the same shape as this.
 	 */
-	public T createShapeShape() {
-		return _createNew(getWidth(),getHeight());
+	public T createSameShape() {
+		return _createNew(width,height);
 	}
 
 	/**
@@ -212,7 +212,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	@SuppressWarnings({"unchecked", "CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
 	@Override
 	public T clone() {
-		T ret = _createNew(width,height);
+		T ret = createSameShape();
 
 		ret.setTo(this);
 

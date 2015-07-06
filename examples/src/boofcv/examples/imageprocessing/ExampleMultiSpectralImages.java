@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,7 @@ public class ExampleMultiSpectralImages {
 		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
 
 		// declare the output blurred image
-		MultiSpectral<ImageUInt8> blurred =
-				new MultiSpectral<ImageUInt8>(ImageUInt8.class,image.width,image.height,image.getNumBands());
+		MultiSpectral<ImageUInt8> blurred = image.createSameShape();
 		
 		// Apply Gaussian blur to each band in the image
 		for( int i = 0; i < image.getNumBands(); i++ ) {

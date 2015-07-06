@@ -88,6 +88,7 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("AdjustmentType = "+adjustmentType);
 		System.out.println("rename         = "+rename);
+		System.out.println("input regex      = "+regex);
 		System.out.println("output dir     = "+outputDir);
 
 
@@ -123,6 +124,11 @@ public class BatchRemoveLensDistortion {
 			BufferedImage orig = UtilImageIO.loadImage(file.getAbsolutePath());
 			if( orig == null ) {
 				throw new RuntimeException("Can't load file");
+			}
+
+			if( orig.getWidth() != param.width || orig.getHeight() != param.height ) {
+				System.err.println("intrinsic parameters and image size do not match!");
+				System.exit(-1);
 			}
 
 			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, ImageFloat32.class);

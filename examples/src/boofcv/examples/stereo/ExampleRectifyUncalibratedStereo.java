@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,10 +71,8 @@ public class ExampleRectifyUncalibratedStereo {
 				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
 
 		// storage for rectified images
-		MultiSpectral<ImageFloat32> rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				unrectLeft.getWidth(),unrectLeft.getHeight(),unrectLeft.getNumBands());
-		MultiSpectral<ImageFloat32> rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
-				unrectRight.getWidth(),unrectRight.getHeight(),unrectRight.getNumBands());
+		MultiSpectral<ImageFloat32> rectLeft = unrectLeft.createSameShape();
+		MultiSpectral<ImageFloat32> rectRight = unrectRight.createSameShape();
 
 		// Compute rectification
 		RectifyFundamental rectifyAlg = RectifyImageOps.createUncalibrated();

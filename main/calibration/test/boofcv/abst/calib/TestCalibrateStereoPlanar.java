@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 public class TestCalibrateStereoPlanar {
 	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
-	PointTransform_F64 normToPixel = LensDistortionOps.distortTransform(intrinsic).distort_F64(false, true);
+	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
 	ImageFloat32 blank = new ImageFloat32(intrinsic.width,intrinsic.height);
 
