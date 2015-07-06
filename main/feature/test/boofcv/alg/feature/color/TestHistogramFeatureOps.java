@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,32 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.alg.feature.color;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestHammingTable16 {
-
+public class TestHistogramFeatureOps {
 	@Test
-	public void exhaustive() {
-		HammingTable16 alg = new HammingTable16();
-
-		for( int i = 0; i < 256; i++ ) {
-			for( int j = 0; j < 256; j++ ) {
-				int expected = TestDescriptorDistance.hamming(i,j);
-				int found = alg.lookup((short)i,(short)j);
-
-				assertEquals(expected,found);
-			}
-		}
-
-		int expected = TestDescriptorDistance.hamming(65533,62003);
-		int found = alg.lookup((short)65533,(short)62003);
-		assertEquals(expected,found);
+	public void stuff() {
+		fail("Implement");
 	}
 }

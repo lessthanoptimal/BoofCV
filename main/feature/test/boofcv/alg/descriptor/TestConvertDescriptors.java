@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.alg.descriptor;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
@@ -24,11 +24,12 @@ import boofcv.struct.feature.TupleDesc_U8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestConvertTupleDescOps {
+public class TestConvertDescriptors {
 
 	/**
 	 * General test with a known output
@@ -40,7 +41,7 @@ public class TestConvertTupleDescOps {
 
 		TupleDesc_U8 output = new TupleDesc_U8(4);
 
-		ConvertTupleDescOps.positive(input,output);
+		ConvertDescriptors.positive(input, output);
 
 		assertEquals((int)(1*255.0/4.0),output.value[0] & 0xFF);
 		assertEquals((int)(2*255.0/4.0),output.value[1] & 0xFF);
@@ -57,7 +58,7 @@ public class TestConvertTupleDescOps {
 
 		TupleDesc_U8 output = new TupleDesc_U8(4);
 
-		ConvertTupleDescOps.positive(input,output);
+		ConvertDescriptors.positive(input, output);
 
 		for( int i = 0; i < 4; i++ )
 			assertEquals(0,output.value[0]);
@@ -73,7 +74,7 @@ public class TestConvertTupleDescOps {
 
 		TupleDesc_S8 output = new TupleDesc_S8(4);
 
-		ConvertTupleDescOps.real(input, output);
+		ConvertDescriptors.real(input, output);
 
 		assertEquals((int)( 1*127.0/4.0),output.value[0]);
 		assertEquals((int)(-2*127.0/4.0),output.value[1]);
@@ -90,9 +91,14 @@ public class TestConvertTupleDescOps {
 
 		TupleDesc_S8 output = new TupleDesc_S8(4);
 
-		ConvertTupleDescOps.real(input, output);
+		ConvertDescriptors.real(input, output);
 
 		for( int i = 0; i < 4; i++ )
 			assertEquals(0,output.value[0]);
+	}
+
+	@Test
+	public void convertNcc_F64() {
+		fail("Implement");
 	}
 }

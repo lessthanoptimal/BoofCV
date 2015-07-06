@@ -16,18 +16,33 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.color;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package boofcv.alg.descriptor;
 
 /**
+ * Lookup table for hamming distance from 16-bit variables
+ *
  * @author Peter Abeles
  */
-public class TestHistogramOps {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class HammingTable16 {
+
+	// about 10% faster if int[] is used instead of byte[]
+	public int score[] = new int[65536];
+
+	public HammingTable16() {
+		int index = 0;
+		for( int i = 0; i < 65536; i++ ) {
+			score[index++] = DescriptorDistance.hamming(i);
+		}
+	}
+
+	/**
+	 * Looks up the hamming distance from a table
+	 *
+	 * @param a First feature vector
+	 * @param b Second feature vector
+	 * @return Hamming score
+	 */
+	public int lookup( short a , short b ) {
+		return score[ (a ^ b) & 0xFFFF ];
 	}
 }

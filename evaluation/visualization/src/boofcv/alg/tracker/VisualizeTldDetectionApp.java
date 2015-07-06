@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.tld.TldParameters;

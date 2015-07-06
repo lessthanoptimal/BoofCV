@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.factory.feature.describe;
 import boofcv.abst.feature.describe.ConvertPositive_F64_U8;
 import boofcv.abst.feature.describe.ConvertReal_F64_S8;
 import boofcv.abst.feature.describe.ConvertTupleDesc;
+import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.feature.TupleDesc_U8;
@@ -35,7 +36,7 @@ public class FactoryConvertTupleDesc {
 
 	/**
 	 * Converts two {@link boofcv.struct.feature.TupleDesc} as describe by
-	 * {@link boofcv.alg.feature.describe.ConvertTupleDescOps#positive(TupleDesc_F64, TupleDesc_U8)}.
+	 * {@link ConvertDescriptors#positive(TupleDesc_F64, TupleDesc_U8)}.
 	 *
 	 * @param numElements Number of elements in the descriptor
 	 * @return The converter.
@@ -46,7 +47,7 @@ public class FactoryConvertTupleDesc {
 
 	/**
 	 * Converts two {@link boofcv.struct.feature.TupleDesc} as describe by
-	 * {@link boofcv.alg.feature.describe.ConvertTupleDescOps#real(TupleDesc_F64, TupleDesc_S8)}.
+	 * {@link ConvertDescriptors#real(TupleDesc_F64, TupleDesc_S8)}.
 	 *
 	 * @param numElements Number of elements in the descriptor
 	 * @return The converter.

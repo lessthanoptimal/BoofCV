@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.alg.feature.describe.ConvertTupleDescOps;
+import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_U8;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class TestConvertPositive_F64_U8 {
 		alg.convert(input,found);
 
 		TupleDesc_U8 expected = alg.createOutput();
-		ConvertTupleDescOps.positive(input, expected);
+		ConvertDescriptors.positive(input, expected);
 
 		for( int i = 0; i < 5; i++ ) {
 			assertEquals(expected.value[i],found.value[i]);

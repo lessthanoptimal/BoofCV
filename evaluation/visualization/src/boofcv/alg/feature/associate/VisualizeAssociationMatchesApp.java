@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;

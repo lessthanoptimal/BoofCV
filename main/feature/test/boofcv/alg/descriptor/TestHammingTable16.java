@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,33 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.associate;
+package boofcv.alg.descriptor;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Lookup table for hamming distance from 16-bit variables
- *
  * @author Peter Abeles
  */
-public class HammingTable16 {
+public class TestHammingTable16 {
 
-	// about 10% faster if int[] is used instead of byte[]
-	public int score[] = new int[65536];
+	@Test
+	public void exhaustive() {
+		HammingTable16 alg = new HammingTable16();
 
-	public HammingTable16() {
-		int index = 0;
-		for( int i = 0; i < 65536; i++ ) {
-			score[index++] = DescriptorDistance.hamming(i);
+		for( int i = 0; i < 256; i++ ) {
+			for( int j = 0; j < 256; j++ ) {
+				int expected = TestDescriptorDistance.hamming(i,j);
+				int found = alg.lookup((short)i,(short)j);
+
+				assertEquals(expected,found);
+			}
 		}
-	}
 
-	/**
-	 * Looks up the hamming distance from a table
-	 *
-	 * @param a First feature vector
-	 * @param b Second feature vector
-	 * @return Hamming score
-	 */
-	public int lookup( short a , short b ) {
-		return score[ (a ^ b) & 0xFFFF ];
+		int expected = TestDescriptorDistance.hamming(65533,62003);
+		int found = alg.lookup((short)65533,(short)62003);
+		assertEquals(expected,found);
 	}
 }

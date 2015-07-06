@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.FoundPointSO;
 import boofcv.abst.feature.orientation.OrientationImage;
-import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;

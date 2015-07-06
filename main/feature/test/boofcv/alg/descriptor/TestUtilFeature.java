@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature;
+package boofcv.alg.descriptor;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import org.junit.Test;
@@ -44,6 +44,31 @@ public class TestUtilFeature {
 	public void normalizeL2_zeros_F64() {
 		TupleDesc_F64 feature = new TupleDesc_F64(64);
 		UtilFeature.normalizeL2(feature);
+		for( int i = 0; i < feature.value.length; i++ )
+			assertEquals(0,feature.value[i],1e-4);
+	}
+
+	@Test
+	public void normalizeSumOne_F64() {
+		TupleDesc_F64 feature = new TupleDesc_F64(64);
+		feature.value[5] = 2;
+		feature.value[10] = 4;
+		UtilFeature.normalizeSumOne(feature);
+
+		double total = 0;
+		for (int i = 0; i < feature.size(); i++) {
+			total += feature.getDouble(i);
+		}
+		assertEquals(1,total,1e-8);
+	}
+
+	/**
+	 * The descriptor is all zeros.  See if it handles this special case.
+	 */
+	@Test
+	public void normalizeSumOne_zeros_F64() {
+		TupleDesc_F64 feature = new TupleDesc_F64(64);
+		UtilFeature.normalizeSumOne(feature);
 		for( int i = 0; i < feature.value.length; i++ )
 			assertEquals(0,feature.value[i],1e-4);
 	}

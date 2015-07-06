@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.ImageSingleBand;
@@ -27,7 +28,7 @@ import boofcv.struct.image.ImageSingleBand;
  * allows the descriptor to be light invariant.  The entire region must be inside the image for a descriptor to be computed
  * because any outside values will change its intensity normalization.
  *
- * @see boofcv.alg.feature.associate.DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
+ * @see DescriptorDistance#ncc(boofcv.struct.feature.NccFeature, boofcv.struct.feature.NccFeature)
  *
  * @author Peter Abeles
  */

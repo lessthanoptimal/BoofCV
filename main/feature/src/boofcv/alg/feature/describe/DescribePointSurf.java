@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;

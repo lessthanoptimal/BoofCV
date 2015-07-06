@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;

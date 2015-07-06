@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature;
+package boofcv.alg.descriptor;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribeMulti;
@@ -101,6 +101,31 @@ public class UtilFeature {
 		norm = Math.sqrt(norm);
 		for (int i = 0; i < desc.size(); i++) {
 			desc.value[i] /= norm;
+		}
+	}
+
+	/**
+	 * <p>
+	 * Normalized the tuple such that it's sum is equal to 1.
+	 * </p>
+	 *
+	 * <p>
+	 * value[i] = value[i]/sqrt(sum(value[j], for all j))
+	 * </p>
+	 *
+	 * @param desc tuple
+	 */
+	public static void normalizeSumOne( TupleDesc_F64 desc ) {
+		double sum = 0;
+		for (int i = 0; i < desc.size(); i++) {
+			double v = desc.value[i];
+			sum += v;
+		}
+		if( sum == 0 )
+			return;
+
+		for (int i = 0; i < desc.size(); i++) {
+			desc.value[i] /= sum;
 		}
 	}
 }
