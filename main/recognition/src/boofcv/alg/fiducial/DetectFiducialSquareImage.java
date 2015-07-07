@@ -20,7 +20,7 @@ package boofcv.alg.fiducial;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.feature.associate.HammingTable16;
+import boofcv.alg.descriptor.HammingTable16;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageMiscOps;

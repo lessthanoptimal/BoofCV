@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.DescriptorDistance;
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_S8;
 

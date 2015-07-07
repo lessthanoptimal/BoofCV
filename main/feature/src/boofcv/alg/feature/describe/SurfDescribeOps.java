@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -219,21 +219,5 @@ public class SurfDescribeOps {
 	public static double rotatedWidth( double width , double c , double s )
 	{
 		return Math.abs(c)*width + Math.abs(s)*width;
-	}
-
-	public static void normalizeFeatures( double []features ) {
-		double norm = 0;
-		for( int i = 0; i < features.length; i++ ) {
-			double a = features[i];
-			norm += a*a;
-		}
-		// if the norm is zero, don't normalize
-		if( norm == 0 )
-			return;
-		
-		norm = Math.sqrt(norm);
-		for( int i = 0; i < features.length; i++ ) {
-			features[i] /= norm;
-		}
 	}
 }

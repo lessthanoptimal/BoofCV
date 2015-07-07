@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.TupleDesc;

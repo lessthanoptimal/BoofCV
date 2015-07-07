@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.alg.feature.describe.ConvertTupleDescOps;
+import boofcv.alg.descriptor.ConvertDescriptors;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 
 /**
  * Converts two types of region descriptors.
  *
- * @see boofcv.alg.feature.describe.ConvertTupleDescOps#real(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_S8)
+ * @see ConvertDescriptors#real(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_S8)
  *
  * @author Peter Abeles
  */
@@ -44,7 +44,7 @@ public class ConvertReal_F64_S8 implements ConvertTupleDesc<TupleDesc_F64, Tuple
 
 	@Override
 	public void convert(TupleDesc_F64 input, TupleDesc_S8 output) {
-		ConvertTupleDescOps.real(input, output);
+		ConvertDescriptors.real(input, output);
 	}
 
 	@Override

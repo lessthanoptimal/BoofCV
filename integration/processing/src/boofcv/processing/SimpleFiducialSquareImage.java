@@ -46,6 +46,6 @@ public class SimpleFiducialSquareImage extends SimpleFiducial {
 	public void addTarget( PImage image , double targetLength ) {
 		ImageUInt8 gray = new ImageUInt8(image.width,image.height);
 		ConvertProcessing.convertFromRGB(image,gray);
-		detector.addTarget(gray,targetLength,125);
+		detector.addPattern(gray,targetLength,125);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
@@ -164,7 +165,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 
 		// normalize feature vector to have an Euclidean length of 1
 		// adds light invariance
-		SurfDescribeOps.normalizeFeatures(ret.value);
+		UtilFeature.normalizeL2(ret);
 
 		// Laplacian's sign
 		ret.laplacianPositive = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
