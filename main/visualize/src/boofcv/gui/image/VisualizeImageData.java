@@ -162,8 +162,12 @@ public class VisualizeImageData {
 
 		if (src.getDataType().isInteger()) {
 			return grayMagnitude((ImageInteger) src, dst, (int) normalize);
-		} else {
+		} else if( src instanceof ImageFloat32 ){
 			return grayMagnitude((ImageFloat32) src, dst, (float) normalize);
+		} else if( src instanceof ImageFloat64 ){
+			return grayMagnitude((ImageFloat64) src, dst, (float) normalize);
+		} else {
+			throw new RuntimeException("Unsupported type");
 		}
 	}
 
@@ -358,6 +362,20 @@ public class VisualizeImageData {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = Math.abs(src.get(x, y));
+
+				int rgb = (int) (255 * v / maxAbsValue);
+
+				dst.setRGB(x, y, rgb << 16 | rgb << 8 | rgb);
+			}
+		}
+
+		return dst;
+	}
+
+	private static BufferedImage grayMagnitude(ImageFloat64 src, BufferedImage dst, double maxAbsValue) {
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				double v = Math.abs(src.get(x, y));
 
 				int rgb = (int) (255 * v / maxAbsValue);
 

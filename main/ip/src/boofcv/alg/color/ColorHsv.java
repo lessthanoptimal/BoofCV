@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,13 +30,12 @@ import boofcv.struct.image.MultiSpectral;
  * </p>
  *
  * <p>
- * NOTE: The hue is represented in radians instead of degrees, as is often done.
+ * NOTE: The hue is represented in radians instead of degrees, as is often done.<br>
  * NOTE: Hue will be set to NaN if it is undefined.  It is undefined when chroma is zero, which happens when the input
  * color is a pure gray (e.g. same value across all color bands).
  * </p>
  *
- * <p>
- * RGB to HSV:<br>
+ * <p> RGB to HSV:</pr>
  * <pre>
  * min = min(r,g,b)
  * max = max(r,g,b)
@@ -61,7 +60,6 @@ import boofcv.struct.image.MultiSpectral;
  *   hue += 2.0*PI
  *
  * </pre>
- * </p>
  *
  * <p>
  * [1] http://www.cs.rit.edu/~ncs/color/t_convert.html
