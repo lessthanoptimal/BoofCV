@@ -63,18 +63,18 @@ public class ExampleFiducialImage {
 
 		// give it a description of all the targets
 		double width = 4; // 4 cm
-		detector.addPattern(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, width);
-		detector.addPattern(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, width);
 
 		detector.setIntrinsic(param);
 

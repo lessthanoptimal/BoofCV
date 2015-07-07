@@ -204,7 +204,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 				BufferedImage img = media.openImage(new File(pathImg,foo).getPath());
 				if( img == null )
 					throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
-				d.addPattern(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
+				d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
 			}
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {

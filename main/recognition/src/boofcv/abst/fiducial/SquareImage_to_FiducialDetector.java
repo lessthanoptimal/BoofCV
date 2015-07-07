@@ -42,7 +42,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	 * @param threshold Threshold used to convert it into a binary image
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addPattern(T pattern, double threshold, double lengthSide) {
+	public void addPatternImage(T pattern, double threshold, double lengthSide) {
 		ImageUInt8 binary = new ImageUInt8(pattern.width,pattern.height);
 		GThresholdImageOps.threshold(pattern,binary,threshold,false);
 		alg.addPattern(binary, lengthSide);
@@ -54,7 +54,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	 * @param binary Binary image of the pattern.  0 = black, 1 = white.
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addPattern(ImageUInt8 binary, double lengthSide) {
+	public void addPatternBinary(ImageUInt8 binary, double lengthSide) {
 		alg.addPattern(binary, lengthSide);
 	}
 
