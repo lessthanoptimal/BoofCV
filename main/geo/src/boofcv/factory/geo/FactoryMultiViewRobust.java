@@ -123,7 +123,7 @@ public class FactoryMultiViewRobust {
 
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
 				computeFundamental_1(essential.which, essential.numResolve);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
@@ -158,7 +158,7 @@ public class FactoryMultiViewRobust {
 
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.
 				computeFundamental_1(essential.which, essential.numResolve);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);

@@ -24,6 +24,7 @@ import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.h.WrapHomographyLinear;
 import boofcv.abst.geo.pose.*;
+import boofcv.abst.geo.triangulate.*;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
@@ -351,7 +352,78 @@ public class FactoryMultiView {
 	 *
 	 * @return PoseFromPairLinear6
 	 */
-	public static PoseFromPairLinear6 computePoseFromPair() {
+	public static PoseFromPairLinear6 triangulatePoseFromPair() {
 		return new PoseFromPairLinear6();
+	}
+
+	/**
+	 * Triangulate two view by finding the intersection of two rays.
+	 *
+	 * @see boofcv.alg.geo.triangulate.TriangulateGeometric
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateTwoViewsCalibrated triangulateTwoGeometric() {
+		return new WrapGeometricTriangulation();
+	}
+
+	/**
+	 * Triangulate two view using the Discrete Linear Transform (DLT)
+	 *
+	 * @see boofcv.alg.geo.triangulate.TriangulateLinearDLT
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateTwoViewsCalibrated triangulateTwoDLT() {
+		return new WrapTwoViewsTriangulateDLT();
+	}
+
+	/**
+	 * Triangulate N views using the Discrete Linear Transform (DLT)
+	 *
+	 * @see boofcv.alg.geo.triangulate.TriangulateLinearDLT
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateNViewsCalibrated triangulateNDLT() {
+		return new WrapNViewsTriangulateDLT();
+	}
+
+	/**
+	 * Triangulate two view by finding the depth of the pixel using a linear algorithm.
+	 *
+	 * @see boofcv.alg.geo.triangulate.PixelDepthLinear
+	 *
+	 * @return Two view triangulation algorithm
+	 */
+	public static TriangulateTwoViewsCalibrated triangulateTwoLinearDepth() {
+		return new WrapPixelDepthLinear();
+	}
+
+	/**
+	 * Refine the triangulation using Sampson error.  Approximately takes in account epipolar constraints.
+	 *
+	 * @see boofcv.alg.geo.triangulate.ResidualsTriangulateSampson
+	 *
+	 * @param convergenceTol Tolerance for finishing optimization
+	 * @param maxIterations Maximum number of allowed iterations
+	 * @return Triangulation refinement algorithm.
+	 */
+	public static RefineTriangulationEpipolar triangulateRefineEpipolar( double convergenceTol, int maxIterations ) {
+		return new LeastSquaresTriangulateEpipolar(convergenceTol,maxIterations);
+	}
+
+	/**
+	 * Refine the triangulation by computing the difference between predicted and actual pixel location.
+	 * Does not take in account epipolar constraints.
+	 *
+	 * @see boofcv.alg.geo.triangulate.ResidualsTriangulateSimple
+	 *
+	 * @param convergenceTol Tolerance for finishing optimization
+	 * @param maxIterations Maximum number of allowed iterations
+	 * @return Triangulation refinement algorithm.
+	 */
+	public static RefineTriangulationCalibrated triangulateRefine( double convergenceTol, int maxIterations ) {
+		return new LeastSquaresTriangulateCalibrated(convergenceTol,maxIterations);
 	}
 }

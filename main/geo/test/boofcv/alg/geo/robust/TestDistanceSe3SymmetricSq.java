@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
-import boofcv.factory.geo.FactoryTriangulate;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDistanceSe3SymmetricSq {
 
-	TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 	DistanceSe3SymmetricSq alg;
 	
 	public TestDistanceSe3SymmetricSq() {

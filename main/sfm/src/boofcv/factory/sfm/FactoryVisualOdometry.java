@@ -48,7 +48,6 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.EstimatorToGenerator;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
@@ -326,7 +325,7 @@ public class FactoryVisualOdometry {
 			refinePnP = new PnPStereoRefineRodrigues(1e-12,refineIterations);
 		}
 
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
 				trackerLeft,trackerRight,descriptor,associateUnique,triangulate,motion,refinePnP);
@@ -380,7 +379,7 @@ public class FactoryVisualOdometry {
 			assocSame = new AssociateDescTo2D<Desc>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 		associateStereo.setThreshold(maxAssociationError);
 

@@ -83,7 +83,7 @@ public class ExampleMultiviewSceneReconstruction {
 	AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
 
 	// Triangulates the 3D coordinate of a point from two observations
-	TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 	// List of visual features (e.g. SURF) descriptions in each image
 	List<FastQueue<SurfFeature>> imageVisualFeatures = new ArrayList<FastQueue<SurfFeature>>();
