@@ -180,6 +180,10 @@ public class CalibratedImageGridPanel extends JPanel {
 	}
 
 	private void drawFeatures(Graphics2D g2 , double scale) {
+
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
 		List<Point2D_F64> points = features.get(selectedImage);
 
 		Point2D_F32 adj = new Point2D_F32();
@@ -194,7 +198,7 @@ public class CalibratedImageGridPanel extends JPanel {
 				} else {
 					adj.set((float)p.x,(float)p.y);
 				}
-				VisualizeFeatures.drawCross(g2, (int) (adj.x*scale), (int) (adj.y*scale), 4);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
@@ -204,7 +208,7 @@ public class CalibratedImageGridPanel extends JPanel {
 				} else {
 					adj.set((float)p.x,(float)p.y);
 				}
-				VisualizeFeatures.drawCross(g2, (int) (adj.x*scale), (int) (adj.y*scale), 4);
+				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
 		}
 
@@ -216,7 +220,7 @@ public class CalibratedImageGridPanel extends JPanel {
 					} else {
 						adj.set((float)p.x,(float)p.y);
 					}
-					VisualizeFeatures.drawPoint(g2,(int)(adj.x*scale),(int)(adj.y*scale),2,Color.BLUE);
+					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,2,Color.BLUE,false);
 				}
 			}
 		}
@@ -243,15 +247,11 @@ public class CalibratedImageGridPanel extends JPanel {
 					adj.set((float)p.x,(float)p.y);
 				}
 
-				int r = (int)(errorScale*result.pointError[i]);
+				double r = errorScale*result.pointError[i];
 				if( r < 1 )
 					continue;
 
-				int x = (int)(adj.x*scale) - r;
-				int y = (int)(adj.y*scale) - r;
-				int w = r*2+1;
-
-				g2.drawOval(x, y, w, w);
+				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
 			}
 
 			g2.setStroke(before);
@@ -265,15 +265,12 @@ public class CalibratedImageGridPanel extends JPanel {
 					adj.set((float)p.x,(float)p.y);
 				}
 
-				int r = (int)(errorScale*result.pointError[i]);
+				double r = errorScale*result.pointError[i];
 				if( r < 1 )
 					continue;
 
-				int x = (int)(adj.x*scale) - r;
-				int y = (int)(adj.y*scale) - r;
-				int w = r*2+1;
 
-				g2.drawOval(x, y, w, w);
+				VisualizeFeatures.drawCircle(g2, adj.x * scale, adj.y * scale, r);
 			}
 		}
 	}
