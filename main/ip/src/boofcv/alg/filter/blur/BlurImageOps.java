@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -192,7 +192,7 @@ public class BlurImageOps {
 	MultiSpectral<T> mean(MultiSpectral<T> input, MultiSpectral<T> output, int radius , T storage ) {
 
 		if( storage == null )
-			storage = GeneralizedImageOps.createSingleBand(input.getType(),input.width,input.height);
+			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
 		if( output == null )
 			output = input._createNew(input.width,input.height);
 
@@ -238,7 +238,7 @@ public class BlurImageOps {
 	MultiSpectral<T> gaussian(MultiSpectral<T> input, MultiSpectral<T> output, double sigma , int radius, T storage ) {
 
 		if( storage == null )
-			storage = GeneralizedImageOps.createSingleBand(input.getType(), input.width, input.height);
+			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if( output == null )
 			output = input._createNew(input.width,input.height);
 

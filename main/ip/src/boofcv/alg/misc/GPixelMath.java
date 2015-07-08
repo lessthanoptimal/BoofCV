@@ -642,24 +642,24 @@ public class GPixelMath {
 	 */
 	public static <T extends ImageSingleBand> void averageBand(MultiSpectral<T> input, T output) {
 
-		if( ImageUInt8.class == input.getType() ) {
+		if( ImageUInt8.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageUInt8>) input, (ImageUInt8) output);
-		} else if( ImageSInt8.class == input.getType() ) {
+		} else if( ImageSInt8.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageSInt8>) input, (ImageSInt8) output);
-		} else if( ImageUInt16.class == input.getType() ) {
+		} else if( ImageUInt16.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageUInt16>) input, (ImageUInt16) output);
-		} else if( ImageSInt16.class == input.getType() ) {
+		} else if( ImageSInt16.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageSInt16>) input, (ImageSInt16) output);
-		} else if( ImageSInt32.class == input.getType() ) {
+		} else if( ImageSInt32.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageSInt32>) input, (ImageSInt32) output);
-		} else if( ImageSInt64.class == input.getType() ) {
+		} else if( ImageSInt64.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageSInt64>) input, (ImageSInt64) output);
-		} else if( ImageFloat32.class == input.getType() ) {
+		} else if( ImageFloat32.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageFloat32>) input, (ImageFloat32) output);
-		} else if( ImageFloat64.class == input.getType() ) {
+		} else if( ImageFloat64.class == input.getBandType() ) {
 			PixelMath.averageBand((MultiSpectral<ImageFloat64>) input, (ImageFloat64) output);
 		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+input.getType().getSimpleName());
+			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
 	}
 }

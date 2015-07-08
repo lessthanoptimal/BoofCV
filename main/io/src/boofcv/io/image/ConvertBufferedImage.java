@@ -197,7 +197,7 @@ public class ConvertBufferedImage {
 			convertFromSingle(src, sb, (Class<ImageSingleBand>) sb.getClass());
 		} else if( dst instanceof MultiSpectral ) {
 			MultiSpectral ms = (MultiSpectral)dst;
-			convertFromMulti(src,ms,orderRgb,ms.getType());
+			convertFromMulti(src,ms,orderRgb,ms.getBandType());
 		} else {
 			throw new IllegalArgumentException("Unknown type " + dst.getClass().getSimpleName());
 		}
@@ -462,12 +462,12 @@ public class ConvertBufferedImage {
 		} else if( src instanceof MultiSpectral ) {
 			MultiSpectral ms = (MultiSpectral)src;
 
-			if( ImageUInt8.class == ms.getType() ) {
+			if( ImageUInt8.class == ms.getBandType() ) {
 				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst, orderRgb);
-			} else if( ImageFloat32.class == ms.getType() ) {
+			} else if( ImageFloat32.class == ms.getBandType() ) {
 				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst, orderRgb);
 			} else {
-				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getType().getSimpleName());
+				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getBandType().getSimpleName());
 			}
 		}
 
@@ -732,7 +732,7 @@ public class ConvertBufferedImage {
 
 		if( swap ) {
 			if( image.getNumBands() == 3 ) {
-				T[] temp = (T[])Array.newInstance(image.getType(),3);
+				T[] temp = (T[])Array.newInstance(image.getBandType(),3);
 
 				temp[0] = image.getBand(2);
 				temp[1] = image.getBand(1);
@@ -742,7 +742,7 @@ public class ConvertBufferedImage {
 				image.bands[1] = temp[1];
 				image.bands[2] = temp[2];
 			} else if( image.getNumBands() == 4 ) {
-				T[] temp = (T[])Array.newInstance(image.getType(),4);
+				T[] temp = (T[])Array.newInstance(image.getBandType(),4);
 
 				if( bufferedImageType == BufferedImage.TYPE_INT_ARGB ) {
 					temp[0] = image.getBand(1);

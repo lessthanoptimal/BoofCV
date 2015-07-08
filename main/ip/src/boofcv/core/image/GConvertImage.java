@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class GConvertImage {
 	 * @return Converted image.
 	 */
 	public static <T extends ImageSingleBand>T average( MultiSpectral<T> input , T output ) {
-		Class type = input.getType();
+		Class type = input.getBandType();
 		if( type == ImageUInt8.class ) {
 			return (T)ConvertImage.average((MultiSpectral<ImageUInt8>)input,(ImageUInt8)output);
 		} else if( type == ImageSInt8.class ) {

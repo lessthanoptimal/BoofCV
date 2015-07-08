@@ -146,8 +146,8 @@ public class DistortImageOps {
 				   PixelTransform_F32 transform,
 				   ImageBorder<M> border, TypeInterpolate interpType)
 	{
-		Class<Input> inputBandType = input.getType();
-		Class<Output> outputBandType = output.getType();
+		Class<Input> inputBandType = input.getBandType();
+		Class<Output> outputBandType = output.getBandType();
 		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, inputBandType);
 
 		ImageDistort<Input,Output> distorter = FactoryDistort.distort(false,interp, border, outputBandType);

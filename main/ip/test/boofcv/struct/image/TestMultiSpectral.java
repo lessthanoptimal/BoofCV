@@ -44,7 +44,7 @@ public class TestMultiSpectral {
 	public void constructor() {
 		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth, imgHeight, 3);
 
-		assertTrue(ImageUInt8.class == img.getType());
+		assertTrue(ImageUInt8.class == img.getBandType());
 		assertTrue(3 == img.bands.length);
 		assertTrue(3 == img.getNumBands());
 		assertTrue(imgWidth == img.width);

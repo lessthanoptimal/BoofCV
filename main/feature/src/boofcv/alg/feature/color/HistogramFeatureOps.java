@@ -18,15 +18,16 @@
 
 package boofcv.alg.feature.color;
 
-import boofcv.alg.descriptor.ConvertDescriptors;
-import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.struct.feature.NccFeature;
+import boofcv.alg.InputSanityCheck;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.*;
-
-import java.util.List;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 /**
+ * TODO update
+ *
  * <p>
  * Operations related to using image histograms as a way to compare images.  The histogram
  * is a feature descriptor and all the feature descriptor operations can be used on these
@@ -42,7 +43,6 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-// TODO also support computing likelihood of a color belonging to a histogram distribution
 public class HistogramFeatureOps {
 
 	/**
@@ -123,125 +123,74 @@ public class HistogramFeatureOps {
 		}
 	}
 
-	/**
-	 * Computes a single-band normalized histogram for any single band image.
-	 *
-	 * @param image Input image. Not modified.
-	 * @param minPixelValue Minimum possible value for a pixel.
-	 * @param maxPixelValue Maximum possible value for a pixel.
-	 * @param histogram The output histogram.
-	 */
-	public static <T extends ImageSingleBand>
-	void histogram( T image ,  double minPixelValue , double maxPixelValue , TupleDesc_F64 histogram ) {
-		if( image.getClass() == ImageUInt8.class ) {
-			histogram((ImageUInt8)image,(int)maxPixelValue,histogram );
-		} else if( image.getClass() == ImageUInt16.class ) {
-			histogram((ImageUInt16)image,(int)maxPixelValue,histogram);
-		} else if( image.getClass() == ImageFloat32.class ) {
-			histogram((ImageFloat32)image,(float)minPixelValue,(float)maxPixelValue,histogram);
-		} else {
-			throw new IllegalArgumentException("Unsupported band type");
+	public static void histogram( ImageFloat32 image0 , ImageFloat32 image1 , Histogram_F64 histogram )
+	{
+		InputSanityCheck.checkSameShape(image0, image1);
+
+		float min0 = (float)histogram.getMinimum(0);
+		float min1 = (float)histogram.getMinimum(1);
+		float divisor0 = (float)histogram.getMaximum(0)-min0;
+		float divisor1 = (float)histogram.getMaximum(1)-min1;
+
+		int bins0 = histogram.getLength(0);
+		int bins1 = histogram.getLength(1);
+
+		histogram.fill(0);
+
+		for( int y = 0; y < image0.height; y++ ) {
+
+			int index0 = image0.startIndex + y*image0.stride;
+			int index1 = image1.startIndex + y*image1.stride;
+
+			for( int x = 0; x < image0.width; x++ , index0++ , index1++) {
+				int which0 = (int)(bins0*(image0.data[index0]-min0)/divisor0);
+				int which1 = (int)(bins1*(image1.data[index1]-min1)/divisor1);
+
+				histogram.value[which1*bins0 + which0]++;
+			}
 		}
 	}
 
-	/**
-	 * Computes a histogram for each band in the image.
-	 *
-	 * @param image Input image. Not modified.
-	 * @param minPixelValue Minimum possible value for a pixel for all bands.
-	 * @param maxPixelValue Maximum possible value for a pixel for all bands.
-	 * @param output Output histograms.  Must have same number of bands as input image. Modified.
-	 */
-	public static<T extends ImageSingleBand>
-	void histogram( MultiSpectral<T> image ,
-					double minPixelValue , double maxPixelValue , List<TupleDesc_F64> output ) {
-		if (image.getNumBands() != output.size())
+	public static void histogram_F32( MultiSpectral<ImageFloat32> image , Histogram_F64 histogram )
+	{
+		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
 
-		for (int i = 0; i < image.getNumBands(); i++) {
-			histogram(image.getBand(i),minPixelValue,maxPixelValue,output.get(i));
+		final int D = histogram.getDimensions();
+		int coordinate[] = new int[ D ];
+
+		histogram.fill(0);
+
+		for (int y = 0; y < image.getHeight(); y++) {
+			int imageIndex = image.getStartIndex() + y*image.getStride();
+			for (int x = 0; x < image.getWidth(); x++, imageIndex++ ) {
+				for (int i = 0; i < D; i++) {
+					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]);
+				}
+				int index = histogram.getIndex(coordinate);
+				histogram.value[index] += 1;
+			}
 		}
 	}
+	public static void histogram_U8( MultiSpectral<ImageUInt8> image , Histogram_F64 histogram )
+	{
+		if (image.getNumBands() != histogram.getDimensions())
+			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
 
-	public double distanceSAD( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
+		final int D = histogram.getDimensions();
+		int coordinate[] = new int[ D ];
 
-		double total = 0;
+		histogram.fill(0);
 
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.sad(descA,descB);
+		for (int y = 0; y < image.getHeight(); y++) {
+			int imageIndex = image.getStartIndex() + y*image.getStride();
+			for (int x = 0; x < image.getWidth(); x++) {
+				for (int i = 0; i < D; i++) {
+					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]&0xFF);
+				}
+				int index = histogram.getIndex(coordinate);
+				histogram.value[index] += 1;
+			}
 		}
-
-		return total;
-	}
-
-	public double distanceEuclidean( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.euclidean(descA, descB);
-		}
-
-		return total;
-	}
-
-	public double distanceEuclideanSq( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.euclideanSq(descA,descB);
-		}
-
-		return total;
-	}
-
-	public double distanceNCC( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			NccFeature nccA = new NccFeature(descA.size());
-			NccFeature nccB = new NccFeature(descB.size());
-
-			ConvertDescriptors.convertNcc(descA,nccA);
-			ConvertDescriptors.convertNcc(descB,nccB);
-
-			total += DescriptorDistance.ncc(nccA,nccB);
-		}
-
-		return total;
 	}
 }

@@ -109,7 +109,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * 
 	 * @return The type of ImageSingleBand which each band is stored as.
 	 */
-	public Class<T> getType() {
+	public Class<T> getBandType() {
 		return type;
 	}
 
@@ -184,7 +184,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 			reshape(orig.width,orig.height);
 		if( orig.getNumBands() != getNumBands() )
 			throw new IllegalArgumentException("The number of bands must be the same");
-		if( orig.getType() != getType() )
+		if( orig.getBandType() != getBandType() )
 			throw new IllegalArgumentException("The band type must be the same");
 
 		int N = orig.getNumBands();
