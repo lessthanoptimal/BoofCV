@@ -1,25 +1,23 @@
-import pyboof.image as image
-import pyboof.calib as calib
-import pyboof.recognition as recognition
+import pyboof as pb
 
 import numpy as np
 
 data_path = "../../../data/applet/fiducial/image/examples/"
 
 # Load the camera parameters
-intrinsic = calib.Intrinsic()
+intrinsic = pb.Intrinsic()
 intrinsic.load_xml(data_path+"intrinsic.xml")
 
-config = recognition.ConfigFiducialImage()
+config = pb.ConfigFiducialImage()
 
 print "Configuring detector"
-detector = recognition.FiducialFactory( np.uint8 ).squareRobust(config,6)
+detector = pb.FiducialFactory( np.uint8 ).squareRobust(config,6)
 detector.setIntrinsic(intrinsic)
-detector.addPattern(image.load_single_band(data_path+"../patterns/chicken.png",np.uint8),4.0)
-detector.addPattern(image.load_single_band(data_path+"../patterns/yu.png",np.uint8),4.0)
+detector.addPattern(pb.load_single_band(data_path+"../patterns/chicken.png",np.uint8),4.0)
+detector.addPattern(pb.load_single_band(data_path+"../patterns/yu.png",np.uint8),4.0)
 
 print "Detecting image"
-detector.detect(image.load_single_band(data_path+"image01.jpg",np.uint8))
+detector.detect(pb.load_single_band(data_path+"image01.jpg",np.uint8))
 
 print "Number Found = "+str(detector.totalFound())
 

@@ -47,7 +47,7 @@ Version : Alpha 0.19
     lack of regression tests
 - Calibration
   * A single class fully specifies the calibration target now
-  * Intrinsic paramters can now use a flow style assignment of parameters
+  * Intrinsic parameters can now use a flow style assignment of parameters
 - Interpolation actually can interpolate along the image border now
   * Can specify a border and is automatically used if a pixel outside the image is requested
 - PixelMath
