@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.gui.image;
 
+import georegression.struct.point.Point2D_F64;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -32,9 +34,9 @@ import java.awt.image.BufferedImage;
 public class ImageZoomPanel extends JScrollPane {
 	// the image being displayed
 	protected BufferedImage img;
-	ImagePanel panel = new ImagePanel();
-	
-	double scale=1;
+	protected ImagePanel panel = new ImagePanel();
+
+	protected double scale=1;
 
 	public ImageZoomPanel(final BufferedImage img ) {
 		this.img = img;
@@ -46,11 +48,11 @@ public class ImageZoomPanel extends JScrollPane {
 	}
 
 	public void setScale( double scale ) {
-		
+
 		Rectangle r = panel.getVisibleRect();
 		double centerX = (r.x + r.width/2.0)/this.scale;
 		double centerY = (r.y + r.height/2.0)/this.scale;
-		
+
 		this.scale = scale;
 		int w=0,h=0;
 		if( img != null ) {
@@ -59,10 +61,10 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 		panel.setPreferredSize(new Dimension(w, h));
 		getViewport().setView(panel);
-		
-		centerView(centerX,centerY);
+
+		centerView(centerX, centerY);
 	}
-	
+
 	public void centerView( double cx , double cy ) {
 		Rectangle r = panel.getVisibleRect();
 		int x = (int)(cx*scale-r.width/2);
@@ -80,15 +82,15 @@ public class ImageZoomPanel extends JScrollPane {
 	 */
 	public void setBufferedImage(BufferedImage image) {
 		this.img = image;
-		
+
 		Dimension prev = getPreferredSize();
-		
+
 		int w=0,h=0;
 		if( img != null ) {
 			w = (int)Math.ceil(img.getWidth()*scale);
 			h = (int)Math.ceil(img.getHeight()*scale);
 		}
-		
+
 		if( prev.getWidth() != w || prev.getHeight() != h ) {
 			panel.setPreferredSize(new Dimension(w,h));
 			getViewport().setView(panel);
@@ -98,8 +100,23 @@ public class ImageZoomPanel extends JScrollPane {
 	public BufferedImage getImage() {
 		return img;
 	}
-	
-	private class ImagePanel extends JPanel
+
+	public Point2D_F64 pixelToPoint(int x, int y) {
+		Point2D_F64 ret = new Point2D_F64();
+		ret.x = x/scale;
+		ret.y = y/scale;
+
+		return ret;
+	}
+
+	/**
+	 * Paint inside the image panel. Useful for overlays
+	 */
+	protected void paintInPanel(AffineTransform tran,Graphics2D g2 ) {
+		// intentionally empty
+	}
+
+	protected class ImagePanel extends JPanel
 	{
 		@Override
 		public void paintComponent(Graphics g) {
@@ -111,6 +128,8 @@ public class ImageZoomPanel extends JScrollPane {
 
 			AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
 			g2.drawImage(img,tran,null);
+
+			paintInPanel(tran, g2);
 		}
 	}
 }
