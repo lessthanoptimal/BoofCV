@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,11 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	int factor;
 	// reference to the output BufferedImage
 	BufferedImage imageGUI;
+
+	// does it have a new image available
+	boolean hasNext;
+
+	boolean hasNextBeenCalled;
 
 	int frameID=-1;
 
@@ -137,6 +142,8 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		bufferedImage = new BufferedImage(videoCoder.getWidth(), videoCoder.getHeight(),
 				BufferedImage.TYPE_3BYTE_BGR);
 
+		hasNext = readNextFrame();
+		hasNextBeenCalled = false;
 	}
 
 	public void setReduce(int factor) {
@@ -144,10 +151,19 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		reducedImage = new BufferedImage(videoCoder.getWidth() / factor, videoCoder.getHeight() / factor,
 				BufferedImage.TYPE_3BYTE_BGR);
 
+		handleReduce();
 	}
 
 	@Override
 	public boolean hasNext() {
+		if( hasNextBeenCalled ) {
+			hasNext = readNextFrame();
+			hasNextBeenCalled = false;
+		}
+		return hasNext;
+	}
+
+	private boolean readNextFrame() {
 		while (container.readNextPacket(packet) >= 0) {
 			frameID++;
 
@@ -200,6 +216,8 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 						}
 
 						bufferedImage = converter.toImage(newPic);
+
+						handleReduce();
 						return true;
 					}
 				}
@@ -214,8 +232,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		return false;
 	}
 
-	@Override
-	public T next() {
+	private void handleReduce() {
 		if (reducedImage != null) {
 			Graphics2D g2 = reducedImage.createGraphics();
 
@@ -228,7 +245,12 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		}
 
 		image.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI, image,true);
+		ConvertBufferedImage.convertFrom(imageGUI, image, true);
+	}
+
+	@Override
+	public T next() {
+		hasNextBeenCalled = true;
 		return image;
 	}
 
@@ -238,6 +260,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	@Override
 	public BufferedImage getGuiImage() {
+		hasNextBeenCalled = true;
 		return imageGUI;
 	}
 
