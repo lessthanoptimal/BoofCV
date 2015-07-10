@@ -23,10 +23,12 @@ import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.util.List;
 
 /**
@@ -43,14 +45,14 @@ public class VisualizeShapes {
 	}
 
 	public static void draw( Point2D_F64 p0 , Point2D_F64 p1 , Graphics2D g2 ) {
-		g2.drawLine((int)(p0.x+0.5),(int)(p0.y+0.5),(int)(p1.x+0.5),(int)(p1.y+0.5));
+		g2.drawLine((int) (p0.x + 0.5), (int) (p0.y + 0.5), (int) (p1.x + 0.5), (int) (p1.y + 0.5));
 	}
 
 	public static void drawArrow( Quadrilateral_F64 quad , Graphics2D g2 ) {
 		drawArrow(quad.a, quad.b, g2);
 		drawArrow(quad.b, quad.c,g2);
 		drawArrow(quad.c, quad.d,g2);
-		drawArrow(quad.d, quad.a,g2);
+		drawArrow(quad.d, quad.a, g2);
 	}
 
 	public static void drawArrow( Point2D_F64 p0 , Point2D_F64 p1 , Graphics2D g2 ) {
@@ -67,8 +69,8 @@ public class VisualizeShapes {
 		int tanX = (y1-y2);
 		int tanY = (x2-x1);
 
-		g2.drawLine(x2+tanX,y2+tanY,x1,y1);
-		g2.drawLine(x2-tanX,y2-tanY,x1,y1);
+		g2.drawLine(x2 + tanX, y2 + tanY, x1, y1);
+		g2.drawLine(x2 - tanX, y2 - tanY, x1, y1);
 	}
 
 	/**
@@ -129,5 +131,33 @@ public class VisualizeShapes {
 		shape = AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y).createTransformedShape(shape);
 
 		g2.draw(shape);
+	}
+
+	/**
+	 * Draws an axis aligned rectangle
+	 * @param rect Rectangle
+	 * @param g2 Graphics object
+	 */
+	public static void drawRectangle( Rectangle2D_I32 rect , Graphics2D g2 ) {
+		g2.drawLine(rect.x0, rect.y0, rect.x1, rect.y0);
+		g2.drawLine(rect.x1, rect.y0, rect.x1, rect.y1);
+		g2.drawLine(rect.x0, rect.y1, rect.x1, rect.y1);
+		g2.drawLine(rect.x0, rect.y1, rect.x0, rect.y0);
+	}
+
+	public static void drawQuad( Quadrilateral_F64 quad , Graphics2D g2 , boolean subpixel  ) {
+		if( subpixel ) {
+			Line2D.Double line = new Line2D.Double();
+
+			line.setLine(quad.a.x,quad.a.y,quad.b.x,quad.b.y);  g2.draw(line);
+			line.setLine(quad.b.x,quad.b.y,quad.c.x,quad.c.y);  g2.draw(line);
+			line.setLine(quad.c.x,quad.c.y,quad.d.x,quad.d.y);  g2.draw(line);
+			line.setLine(quad.d.x,quad.d.y,quad.a.x,quad.a.y);  g2.draw(line);
+		} else {
+			g2.drawLine((int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5), (int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5));
+			g2.drawLine((int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5), (int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5));
+			g2.drawLine((int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5), (int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5));
+			g2.drawLine((int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5), (int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5));
+		}
 	}
 }

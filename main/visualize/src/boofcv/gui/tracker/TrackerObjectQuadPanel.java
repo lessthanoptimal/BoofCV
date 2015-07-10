@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.gui.tracker;
 
+import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.feature.VisualizeShapes;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -109,20 +111,14 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 				drawCorner(g2,quad.b,Color.ORANGE);
 				drawCorner(g2,quad.c,Color.CYAN);
 			} else if( numSelected == 4 ) {
-				drawLine(g2,quad.a,quad.b);
-				drawLine(g2,quad.b,quad.c);
-				drawLine(g2,quad.c,quad.d);
-				drawLine(g2,quad.d,quad.a);
+				VisualizeShapes.drawQuad(quad, g2, false);
 				drawCorner(g2,quad.a,Color.RED);
 				drawCorner(g2,quad.b,Color.ORANGE);
 				drawCorner(g2,quad.c,Color.CYAN);
 				drawCorner(g2,quad.d,Color.BLUE);
 			}
 		} else if( targetVisible ) {
-			drawLine(g2,quad.a,quad.b);
-			drawLine(g2,quad.b,quad.c);
-			drawLine(g2,quad.c,quad.d);
-			drawLine(g2,quad.d,quad.a);
+			VisualizeShapes.drawQuad(quad, g2, false);
 			drawCorner(g2,quad.a,Color.RED);
 			drawCorner(g2,quad.b,Color.ORANGE);
 			drawCorner(g2,quad.c,Color.CYAN);
@@ -135,14 +131,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	}
 
 	private void drawCorner( Graphics2D g2 , Point2D_F64 a , Color color ) {
-
-		int r = 6;
-		int w = r*2+1;
-		int x = (int)a.x - r;
-		int y = (int)a.y - r;
-
-		g2.setColor(color);
-		g2.fillOval(x, y, w, w);
+		VisualizeFeatures.drawPoint(g2,(int)(a.x+0.5),(int)(a.y+0.5),6,color,false);
 	}
 
 	@Override

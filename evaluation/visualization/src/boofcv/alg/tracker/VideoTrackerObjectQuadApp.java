@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -317,6 +317,6 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Tracking Rectangle");
+		ShowImages.showWindow(app, "Tracking Rectangle",true);
 	}
 }
