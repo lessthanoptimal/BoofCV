@@ -3,7 +3,7 @@ PyBoof is a wrapper around BoofCV for Python.  It uses Py4j to call BoofCV Java 
 # Installation
 
 1) sudo ./setup.py install
-2) Run PyBoofEntryPoint
+2) Run the java class PyBoofEntryPoint
 
 You must have PyBoofEntryPoint running.  Then run an example:
 

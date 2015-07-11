@@ -236,4 +236,8 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	public void setBands(T[] bands) {
 		this.bands = bands;
 	}
+
+	public void setBand( int which , T image ) {
+		this.bands[which] = image;
+	}
 }

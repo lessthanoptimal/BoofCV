@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pyboof.common as common
 from pyboof import gateway
+import py4j.java_gateway as jg
 
 class Family:
     """
@@ -22,19 +23,8 @@ class ImageType(common.JavaWrapper):
     def __init__(self, jImageType):
         self.set_java_object(jImageType)
 
-    def convert_java(self):
-        jImageClass = dtype_to_Class_SingleBand(self.dtype)
-        if self.family == Family.SINGLE_BAND:
-            return gateway.jvm.boofcv.struct.image.ImageType.single(jImageClass)
-        elif self.family == Family.MULTI_SPECTRAL:
-            return gateway.jvm.boofcv.struct.image.ImageType.ms(self.num_bands,jImageClass)
-        elif self.family == Family.INTERLEAVED:
-            return gateway.jvm.boofcv.struct.image.ImageType.interleaved(self.num_bands,jImageClass)
-        else:
-            raise Exception("Unknown family")
-
     def create_boof_image(self, width, height ):
-        return self.convert_java().createImage(width,height)
+        return self.java_obj.createImage(width,height)
 
     def get_family(self):
         return self.java_obj.getFamily().ordinal()
@@ -88,31 +78,71 @@ def load_multi_spectral( path , dtype ):
 
     return multi_spectral
 
+def convert_boof_image( input , output ):
+    """
+    Converts between two different boofcv images.  Essentially performs a typecast and doesn't change
+    pixel values.  Except if the input has more than one band and the output is gray scale.  It then
+    averages the bands.
+
+    :param input: BoofCV image
+    :param output:  BoofCV image
+    :return:
+    """
+    gateway.jvm.boofcv.core.image.GConvertImage.convert(input,output)
+
 def ndarray_to_boof( npimg ):
     if npimg is None:
         raise Exception("Input image is None")
 
-    if npimg.dtype == np.uint8:
-        b = gateway.jvm.boofcv.struct.image.ImageUInt8()
-        b.setData( bytearray(npimg.data) )
-    elif npimg.dtype == np.float32:
-        b = gateway.jvm.boofcv.struct.image.ImageFloat32()
-        b.setData( npimg.data )
+    if len(npimg.shape) == 2:
+        if npimg.dtype == np.uint8:
+            b = gateway.jvm.boofcv.struct.image.ImageUInt8()
+            b.setData( bytearray(npimg.data) )
+        elif npimg.dtype == np.float32:
+            b = gateway.jvm.boofcv.struct.image.ImageFloat32()
+            b.setData( npimg.data )
+        else:
+            raise Exception("Image type not supported yet")
     else:
-        raise Exception("Image type not supported yet")
+        num_bands = npimg.shape[2]
+
+        bands = []
+        for i in range(num_bands):
+            bands.append(npimg[:,:,i])
+
+        class_type = dtype_to_Class_SingleBand(npimg.dtype)
+
+        b = gateway.jvm.boofcv.struct.image.MultiSpectral(class_type,num_bands)
+
+        for i in range(num_bands):
+            if npimg.dtype == np.uint8:
+                band = gateway.jvm.boofcv.struct.image.ImageUInt8()
+                band.setData( bytearray(bands[i]) )
+            elif npimg.dtype == np.float32:
+                band = gateway.jvm.boofcv.struct.image.ImageFloat32()
+                band.setData( bands[i] )
+            band.setWidth(npimg.shape[1])
+            band.setHeight(npimg.shape[0])
+            band.setStride(npimg.shape[1])
+            b.setBand(i,band)
 
     b.setWidth(npimg.shape[1])
     b.setHeight(npimg.shape[0])
     b.setStride(npimg.shape[1])
+
     return b
 
 def boof_to_ndarray( boof ):
     width = boof.getWidth()
     height = boof.getHeight()
-    data = boof.getData()
-    nptype = JImageDataType_to_dtype(boof)
+    if jg.is_instance_of(gateway, boof, gateway.jvm.boofcv.struct.image.ImageSingleBand ):
+        data = boof.getData()
+        nptype = JImageDataType_to_dtype(boof)
 
-    return np.ndarray(shape=(height,width), dtype=nptype, buffer=data)
+        return np.ndarray(shape=(height,width), dtype=nptype, buffer=data)
+    else:
+        raise Exception("Only single band supported so far")
+
 
 def gradient_dtype( dtype ):
     """

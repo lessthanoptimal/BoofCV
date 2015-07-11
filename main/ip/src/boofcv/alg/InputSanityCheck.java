@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,9 +77,9 @@ public class InputSanityCheck {
 
 	public static void checkSameShape(ImageBase<?> imgA, ImageBase<?> imgB) {
 		if (imgA.width != imgB.width)
-			throw new IllegalArgumentException("Image widths do not match.");
+			throw new IllegalArgumentException("Image widths do not match. "+imgA.width+" "+imgB.width);
 		if (imgA.height != imgB.height)
-			throw new IllegalArgumentException("Image heights do not match.");
+			throw new IllegalArgumentException("Image heights do not match. "+imgA.height+" "+imgB.height);
 	}
 
 	public static void checkSameShape(ImagePyramid<?> imgA, ImagePyramid<?> imgB) {

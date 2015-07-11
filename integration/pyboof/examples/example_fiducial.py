@@ -11,7 +11,7 @@ intrinsic.load_xml(data_path+"intrinsic.xml")
 config = pb.ConfigFiducialImage()
 
 print "Configuring detector"
-detector = pb.FiducialFactory( np.uint8 ).squareRobust(config,6)
+detector = pb.FactoryFiducial( np.uint8 ).squareRobust(config,6)
 detector.setIntrinsic(intrinsic)
 detector.addPattern(pb.load_single_band(data_path+"../patterns/chicken.png",np.uint8),4.0)
 detector.addPattern(pb.load_single_band(data_path+"../patterns/yu.png",np.uint8),4.0)
