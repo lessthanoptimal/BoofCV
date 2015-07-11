@@ -21,10 +21,22 @@ package boofcv.alg.feature.color;
 import boofcv.struct.feature.TupleDesc_F64;
 
 /**
+ * <p>
  * A multi dimensional histogram.  This is an extension of {@link TupleDesc_F64} to faciliate comparision of different
  * histograms.  Each dimension in the histogram coverages a range from the minimum to maximum value.  This range is
  * divided by the number of bins in a dimension.  Data is stored in a row major format from lower dimension to upper
  * dimension.  For a 3D histogram a coordinate (a,b,c) would have index = c + b*length[0] + a*length[0]*length[1].
+ * </p>
+ *
+ * <p>Usage example for RGB image:</p>
+ * <pre>
+ * Histogram_F64 hist = new Histogram_F64(20,20,20);
+ * hist.setRange(0,0,255);
+ * hist.setRange(1,0,255);
+ * hist.setRange(2,0,255);
+ * GHistogramFeatureOps.histogram(image,hist);</pre>
+ *
+ *
  *
  * @author Peter Abeles
  */
@@ -142,7 +154,8 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	}
 
 	/**
-	 * Given a value it returns the corresponding bin index in this histogram for the specified dimension.
+	 * Given a value it returns the corresponding bin index in this histogram for the specified dimension. This
+	 * is for floating point values.
 	 *
 	 * @param dimension  Which dimension the value belongs to
 	 * @param value Floating point value between min and max, inclusive.
@@ -158,6 +171,22 @@ public class Histogram_F64 extends TupleDesc_F64 {
 		else {
 			return (int)(fraction*length[dimension]);
 		}
+	}
+
+	/**
+	 * Given a value it returns the corresponding bin index in this histogram for integer values.  The discretion
+	 * is taken in account and 1 is added to the range.
+	 *
+	 * @param dimension  Which dimension the value belongs to
+	 * @param value Floating point value between min and max, inclusive.
+	 * @return The index/bin
+	 */
+	public int getDimensionIndex( int dimension , int value ) {
+		double min = valueMin[dimension];
+		double max = valueMax[dimension];
+
+		double fraction = ((value-min)/(max-min+1.0));
+		return (int)(fraction*length[dimension]);
 	}
 
 	/**

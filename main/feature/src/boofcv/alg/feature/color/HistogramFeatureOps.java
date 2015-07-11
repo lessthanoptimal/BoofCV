@@ -25,10 +25,8 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 /**
- * TODO update
- *
  * <p>
- * Operations related to using image histograms as a way to compare images.  The histogram
+ * Type specific operations for creating histgrams of image pixel values.  The histogram
  * is a feature descriptor and all the feature descriptor operations can be used on these
  * histograms.
  * <p>
@@ -100,14 +98,14 @@ public class HistogramFeatureOps {
 	 * Computes a single-band normalized histogram from a floating point image..
 	 *
 	 * @param image Input image. Not modified.
-	 * @param minPixelValue Minimum possible for for a pixel
-	 * @param maxPixelValue Maximum possible value for a pixel.
+	 * @param minPixelValue Minimum possible for for a pixel. Inclusive
+	 * @param maxPixelValue Maximum possible value for a pixel. Inclusive
 	 * @param histogram The output histogram.
 	 */
 	public static void histogram( ImageFloat32 image , float minPixelValue , float maxPixelValue , TupleDesc_F64 histogram )
 	{
 		int numBins = histogram.size();
-		float divisor = (maxPixelValue-minPixelValue)*1.0001f;
+		float divisor = maxPixelValue-minPixelValue;
 
 		histogram.fill(0);
 
@@ -116,8 +114,10 @@ public class HistogramFeatureOps {
 			int index = image.startIndex + y*image.stride;
 			for( int x = 0; x < image.width; x++ , index++ ) {
 				int bin = (int)(numBins*(image.data[index]-minPixelValue)/divisor);
-
-				histogram.value[bin]++;
+				if( bin == numBins )
+					histogram.value[bin-1]++;
+				else
+					histogram.value[bin]++;
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public class HistogramFeatureOps {
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
 
-		if( histogram.isRangeSet() )
+		if( !histogram.isRangeSet() )
 			throw new IllegalArgumentException("Must specify range along each dimension in histogram");
 
 		final int D = histogram.getDimensions();
@@ -143,7 +143,7 @@ public class HistogramFeatureOps {
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			int imageIndex = image.getStartIndex() + y*image.getStride();
-			for (int x = 0; x < image.getWidth(); x++, imageIndex++ ) {
+			for (int x = 0; x < image.getWidth(); x++ , imageIndex++) {
 				for (int i = 0; i < D; i++) {
 					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]);
 				}
@@ -164,7 +164,7 @@ public class HistogramFeatureOps {
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
 
-		if( histogram.isRangeSet() )
+		if( !histogram.isRangeSet() )
 			throw new IllegalArgumentException("Must specify range along each dimension in histogram");
 
 		final int D = histogram.getDimensions();
@@ -174,7 +174,7 @@ public class HistogramFeatureOps {
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			int imageIndex = image.getStartIndex() + y*image.getStride();
-			for (int x = 0; x < image.getWidth(); x++) {
+			for (int x = 0; x < image.getWidth(); x++, imageIndex++) {
 				for (int i = 0; i < D; i++) {
 					coordinate[i] = histogram.getDimensionIndex(i,image.getBand(i).data[imageIndex]&0xFF);
 				}

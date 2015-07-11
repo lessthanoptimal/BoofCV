@@ -25,6 +25,8 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.List;
+
 /**
  * Various utilities related to image features
  *
@@ -75,6 +77,36 @@ public class UtilFeature {
 				return detDesc.createDescription();
 			}
 		};
+	}
+
+	/**
+	 * Concats the list of tuples together into one big feature.  The combined feature must be large
+	 * enough to store all the inputs.
+	 *
+	 * @param inputs List of tuples.
+	 * @param combined Storage for combined output.  If null a new instance will be declared.
+	 * @return Resulting combined.
+	 */
+	public static TupleDesc_F64 combine( List<TupleDesc_F64> inputs , TupleDesc_F64 combined ) {
+		int N = 0;
+		for (int i = 0; i < inputs.size(); i++) {
+			N += inputs.get(i).size();
+		}
+		if( combined == null ) {
+			combined = new TupleDesc_F64(N);
+		} else {
+			if (N != combined.size())
+				throw new RuntimeException("The combined feature needs to be " + N + "  not " + combined.size());
+		}
+
+		int start = 0;
+		for (int i = 0; i < inputs.size(); i++) {
+			double v[] = inputs.get(i).value;
+			System.arraycopy(v,0,combined.value,start,v.length);
+			start += v.length;
+		}
+
+		return combined;
 	}
 
 	/**

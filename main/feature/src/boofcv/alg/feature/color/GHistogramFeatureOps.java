@@ -18,33 +18,16 @@
 
 package boofcv.alg.feature.color;
 
-import boofcv.alg.descriptor.ConvertDescriptors;
-import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.alg.descriptor.UtilFeature;
-import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.*;
 
-import java.util.List;
-
 /**
  * <p>
- * Operations related to using image histograms as a way to compare images.  The histogram
- * is a feature descriptor and all the feature descriptor operations can be used on these
- * histograms.
- * <p>
- *
- * <p>
- * Unlike histogram operations in {@link boofcv.alg.misc.ImageStatistics} the initial scale of
- * the image doesn't matter.  More specifically, {@link boofcv.alg.misc.ImageStatistics} simply
- * rounds the value to the nearest one and adds it to the element in a histogram.  While these
- * operations use the image's max values and the number of elements in the histogram to compute
- * the bin period.
+ * Generic version of {@link HistogramFeatureOps} which determines image type at runtime.
+ * See {@link }
  * </p>
  * @author Peter Abeles
  */
-// TODO also support computing likelihood of a color belonging to a histogram distribution
-	// TODO move distance functions into descriptor distance?
 public class GHistogramFeatureOps {
 
 	/**
@@ -91,7 +74,8 @@ public class GHistogramFeatureOps {
 	}
 
 	/**
-	 * Computes a coupled histogram from a list of colors.
+	 * Computes a coupled histogram from a list of colors.  If the input is for integer values then add one
+	 * to the maximum value.  For example if the range of values is 0 to 255, then make it 0 to 256.
 	 *
 	 * @param colors List of colors stored in an interleaved format
 	 * @param length Length of usable portion of colors
@@ -114,89 +98,5 @@ public class GHistogramFeatureOps {
 			int index = histogram.getIndex(coordinate);
 			histogram.value[index] += 1.0;
 		}
-
-		UtilFeature.normalizeSumOne(histogram);
-	}
-
-	public double distanceSAD( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.sad(descA,descB);
-		}
-
-		return total;
-	}
-
-	public double distanceEuclidean( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.euclidean(descA, descB);
-		}
-
-		return total;
-	}
-
-	public double distanceEuclideanSq( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			total += DescriptorDistance.euclideanSq(descA,descB);
-		}
-
-		return total;
-	}
-
-	public double distanceNCC( List<TupleDesc_F64> histogramA , List<TupleDesc_F64> histogramB ) {
-		if( histogramA.size() != histogramB.size() )
-			throw new IllegalArgumentException("Number of bands in histograms doesn't match");
-
-		double total = 0;
-
-		for (int i = 0; i < histogramA.size(); i++) {
-			TupleDesc_F64 descA = histogramA.get(i);
-			TupleDesc_F64 descB = histogramB.get(i);
-
-			if( descA.size() != descB.size() )
-				throw new IllegalArgumentException("Length of band "+i+" doesn't match");
-
-			NccFeature nccA = new NccFeature(descA.size());
-			NccFeature nccB = new NccFeature(descB.size());
-
-			ConvertDescriptors.convertNcc(descA,nccA);
-			ConvertDescriptors.convertNcc(descB,nccB);
-
-			total += DescriptorDistance.ncc(nccA,nccB);
-		}
-
-		return total;
 	}
 }

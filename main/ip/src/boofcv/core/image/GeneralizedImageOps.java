@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class GeneralizedImageOps {
 		} else if (img instanceof ImageInterleaved) {
 			return get((ImageInterleaved) img, x, y, band);
 		} else if (img instanceof MultiSpectral) {
-			return get(((MultiSpectral)img).getBand(band),x,y);
+			return get(((MultiSpectral) img).getBand(band), x, y);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
@@ -216,6 +216,18 @@ public class GeneralizedImageOps {
 			((ImageSInt64) img).set(x, y, (long)value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+		}
+	}
+
+	public static void set( ImageMultiBand img , int x , int y , double ...value ) {
+		if( img instanceof MultiSpectral ) {
+			MultiSpectral ms = (MultiSpectral)img;
+
+			for (int i = 0; i < value.length; i++) {
+				set(ms.getBand(i),x,y,value[i]);
+			}
+		} else {
+			throw new IllegalArgumentException("Add support for this image type!");
 		}
 	}
 

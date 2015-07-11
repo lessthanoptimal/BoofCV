@@ -43,9 +43,9 @@ public class TestHistogram_F64 {
 		assertFalse(hist.isRangeSet());
 		hist.setRange(1,-1,1);
 		assertFalse(hist.isRangeSet());
-		hist.setRange(0,-1,1);
+		hist.setRange(0, -1, 1);
 		assertFalse(hist.isRangeSet());
-		hist.setRange(2,-1,1);
+		hist.setRange(2, -1, 1);
 		assertTrue(hist.isRangeSet());
 	}
 
@@ -53,7 +53,7 @@ public class TestHistogram_F64 {
 	public void getDimensions() {
 		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
-		assertEquals(3,hist.getDimensions());
+		assertEquals(3, hist.getDimensions());
 	}
 
 	@Test
@@ -70,18 +70,38 @@ public class TestHistogram_F64 {
 	}
 
 	@Test
-	public void getDimensionIndex() {
+	public void getDimensionIndex_double() {
 		Histogram_F64 hist = new Histogram_F64(2,6,4);
 
 		hist.setRange(1,-1,1);
 
 		double period = 2.0/6.0;
 
-		assertEquals(0, hist.getDimensionIndex(1, -1));
-		assertEquals(5, hist.getDimensionIndex(1, 1));
-		assertEquals(0, hist.getDimensionIndex(1, period*0.5-1.0));
-		assertEquals(1, hist.getDimensionIndex(1, period*1.5-1.0));
-		assertEquals(2, hist.getDimensionIndex(1, period*2.5-1.0));
+		assertEquals(0, hist.getDimensionIndex(1, -1.0));
+		assertEquals(5, hist.getDimensionIndex(1, 1.0));
+		assertEquals(0, hist.getDimensionIndex(1, period * 0.5 - 1.0));
+		assertEquals(1, hist.getDimensionIndex(1, period * 1.5 - 1.0));
+		assertEquals(2, hist.getDimensionIndex(1, period * 2.5 - 1.0));
+	}
+
+	@Test
+	public void getDimensionIndex_int() {
+		Histogram_F64 hist = new Histogram_F64(2,256,4);
+
+		hist.setRange(1, 0, 255);
+
+		assertEquals(0, hist.getDimensionIndex(1, 0));
+		assertEquals(255, hist.getDimensionIndex(1,255));
+		assertEquals(254, hist.getDimensionIndex(1,254));
+		assertEquals(101, hist.getDimensionIndex(1,101));
+
+		hist = new Histogram_F64(2,100,4);
+		hist.setRange(1, 0, 255);
+
+		assertEquals(0, hist.getDimensionIndex(1,0));
+		assertEquals(99, hist.getDimensionIndex(1,255));
+		assertEquals(99, hist.getDimensionIndex(1,254));
+		assertEquals(15, hist.getDimensionIndex(1,40));
 	}
 
 	@Test
