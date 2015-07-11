@@ -44,6 +44,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO also support computing likelihood of a color belonging to a histogram distribution
+	// TODO move distance functions into descriptor distance?
 public class GHistogramFeatureOps {
 
 	/**
@@ -79,14 +80,6 @@ public class GHistogramFeatureOps {
 	void histogram( MultiSpectral<T> image , Histogram_F64 histogram ) {
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
-
-
-		if( image.getNumBands() == 2 ) {
-			if( image.getBandType() == ImageFloat32.class ) {
-				HistogramFeatureOps.histogram((ImageFloat32) image.getBand(0), (ImageFloat32) image.getBand(1), histogram);
-				return;
-			}
-		}
 
 		if( image.getBandType() == ImageUInt8.class ) {
 			HistogramFeatureOps.histogram_U8((MultiSpectral<ImageUInt8>)image, histogram);

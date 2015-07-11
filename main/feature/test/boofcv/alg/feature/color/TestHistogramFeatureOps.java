@@ -27,7 +27,27 @@ import static org.junit.Assert.fail;
  */
 public class TestHistogramFeatureOps {
 	@Test
-	public void stuff() {
+	public void histogram_U8() {
+		fail("Implement");
+	}
+
+	@Test
+	public void histogram_U16() {
+		fail("Implement");
+	}
+
+	@Test
+	public void histogram_F32() {
+		fail("Implement");
+	}
+
+	@Test
+	public void histogram_MS_U8() {
+		fail("Implement");
+	}
+
+	@Test
+	public void histogram_MS_F32() {
 		fail("Implement");
 	}
 }

@@ -20,7 +20,7 @@ package boofcv.alg.feature.color;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -28,61 +28,118 @@ import static org.junit.Assert.fail;
 public class TestHistogram_F64 {
 	@Test
 	public void constructor() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,3,4);
+
+		assertEquals(2*3*4,hist.value.length);
+		assertEquals(2,hist.getLength(0));
+		assertEquals(3,hist.getLength(1));
+		assertEquals(4,hist.getLength(2));
 	}
 
 	@Test
 	public void isRangeSet() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,3,4);
+
+		assertFalse(hist.isRangeSet());
+		hist.setRange(1,-1,1);
+		assertFalse(hist.isRangeSet());
+		hist.setRange(0,-1,1);
+		assertFalse(hist.isRangeSet());
+		hist.setRange(2,-1,1);
+		assertTrue(hist.isRangeSet());
 	}
 
 	@Test
 	public void getDimensions() {
-		fail("implement");
-	}
+		Histogram_F64 hist = new Histogram_F64(2,3,4);
 
-	@Test
-	public void getLength() {
-		fail("implement");
+		assertEquals(3,hist.getDimensions());
 	}
 
 	@Test
 	public void setRange() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,3,4);
+
+		assertEquals(0,hist.getMinimum(1),1e-8);
+		assertEquals(0,hist.getMaximum(1),1e-8);
+
+		hist.setRange(1,-1,1);
+
+		assertEquals(-1,hist.getMinimum(1),1e-8);
+		assertEquals(1,hist.getMaximum(1),1e-8);
 	}
 
 	@Test
 	public void getDimensionIndex() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6,4);
+
+		hist.setRange(1,-1,1);
+
+		double period = 2.0/6.0;
+
+		assertEquals(0, hist.getDimensionIndex(1, -1));
+		assertEquals(5, hist.getDimensionIndex(1, 1));
+		assertEquals(0, hist.getDimensionIndex(1, period*0.5-1.0));
+		assertEquals(1, hist.getDimensionIndex(1, period*1.5-1.0));
+		assertEquals(2, hist.getDimensionIndex(1, period*2.5-1.0));
 	}
 
 	@Test
 	public void getIndex_two() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6);
+
+		assertEquals(0,hist.getIndex(0, 0));
+		assertEquals(2*6-1,hist.getIndex(1, 5));
+		assertEquals(6,hist.getIndex(1, 0));
+		assertEquals(1,hist.getIndex(0, 1));
 	}
 
 	@Test
 	public void getIndex_three() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6,4);
+
+		assertEquals(0,hist.getIndex(0, 0, 0));
+		assertEquals(2*6*4-1,hist.getIndex(1, 5, 3));
+		assertEquals(6*4, hist.getIndex(1, 0, 0));
+		assertEquals(4, hist.getIndex(0, 1, 0));
+		assertEquals(1, hist.getIndex(0, 0, 1));
 	}
 
 	@Test
 	public void getIndex_N() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6,4);
+
+		assertEquals(0,hist.getIndex(new int[]{0, 0, 0}));
+		assertEquals(2*6*4-1,hist.getIndex(new int[]{1, 5, 3}));
+		assertEquals(6*4, hist.getIndex(new int[]{1, 0, 0}));
+		assertEquals(4, hist.getIndex(new int[]{0, 1, 0}));
+		assertEquals(1, hist.getIndex(new int[]{0, 0, 1}));
+
+		hist = new Histogram_F64(5);
+		assertEquals(2, hist.getIndex(new int[]{2}));
 	}
 
 	@Test
 	public void get_two() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6);
+
+		hist.value[hist.getIndex(1,2)] = 2;
+		assertEquals(2,hist.get(1,2),1e-8);
 	}
 
 	@Test
 	public void get_three() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6,4);
+
+		hist.value[hist.getIndex(1,2,1)] = 2;
+		assertEquals(2, hist.get(1, 2,1), 1e-8);
 	}
 
 	@Test
 	public void get_N() {
-		fail("implement");
+		Histogram_F64 hist = new Histogram_F64(2,6,4);
+
+		hist.value[hist.getIndex(1,2,1)] = 2;
+		assertEquals(2, hist.get(new int[]{1, 2, 1}), 1e-8);
 	}
 }

@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.color;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt16;
@@ -123,38 +122,19 @@ public class HistogramFeatureOps {
 		}
 	}
 
-	public static void histogram( ImageFloat32 image0 , ImageFloat32 image1 , Histogram_F64 histogram )
-	{
-		InputSanityCheck.checkSameShape(image0, image1);
-
-		float min0 = (float)histogram.getMinimum(0);
-		float min1 = (float)histogram.getMinimum(1);
-		float divisor0 = (float)histogram.getMaximum(0)-min0;
-		float divisor1 = (float)histogram.getMaximum(1)-min1;
-
-		int bins0 = histogram.getLength(0);
-		int bins1 = histogram.getLength(1);
-
-		histogram.fill(0);
-
-		for( int y = 0; y < image0.height; y++ ) {
-
-			int index0 = image0.startIndex + y*image0.stride;
-			int index1 = image1.startIndex + y*image1.stride;
-
-			for( int x = 0; x < image0.width; x++ , index0++ , index1++) {
-				int which0 = (int)(bins0*(image0.data[index0]-min0)/divisor0);
-				int which1 = (int)(bins1*(image1.data[index1]-min1)/divisor1);
-
-				histogram.value[which1*bins0 + which0]++;
-			}
-		}
-	}
-
+	/**
+	 * Constructs an N-D histogram from a {@link MultiSpectral} {@link ImageFloat32} image.
+	 *
+	 * @param image input image
+	 * @param histogram preconfigured histogram to store the output
+	 */
 	public static void histogram_F32( MultiSpectral<ImageFloat32> image , Histogram_F64 histogram )
 	{
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
+
+		if( histogram.isRangeSet() )
+			throw new IllegalArgumentException("Must specify range along each dimension in histogram");
 
 		final int D = histogram.getDimensions();
 		int coordinate[] = new int[ D ];
@@ -172,10 +152,20 @@ public class HistogramFeatureOps {
 			}
 		}
 	}
+
+	/**
+	 * Constructs an N-D histogram from a {@link MultiSpectral} {@link ImageUInt8} image.
+	 *
+	 * @param image input image
+	 * @param histogram preconfigured histogram to store the output
+	 */
 	public static void histogram_U8( MultiSpectral<ImageUInt8> image , Histogram_F64 histogram )
 	{
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
+
+		if( histogram.isRangeSet() )
+			throw new IllegalArgumentException("Must specify range along each dimension in histogram");
 
 		final int D = histogram.getDimensions();
 		int coordinate[] = new int[ D ];
