@@ -47,7 +47,7 @@ public class ImageZoomPanel extends JScrollPane {
 		getViewport().setView(panel);
 	}
 
-	public void setScale( double scale ) {
+	public synchronized void setScale( double scale ) {
 
 		Rectangle r = panel.getVisibleRect();
 		double centerX = (r.x + r.width/2.0)/this.scale;
@@ -65,7 +65,7 @@ public class ImageZoomPanel extends JScrollPane {
 		centerView(centerX, centerY);
 	}
 
-	public void centerView( double cx , double cy ) {
+	public synchronized void centerView( double cx , double cy ) {
 		Rectangle r = panel.getVisibleRect();
 		int x = (int)(cx*scale-r.width/2);
 		int y = (int)(cy*scale-r.height/2);
@@ -80,7 +80,7 @@ public class ImageZoomPanel extends JScrollPane {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public void setBufferedImage(BufferedImage image) {
+	public synchronized void setBufferedImage(BufferedImage image) {
 		this.img = image;
 
 		Dimension prev = getPreferredSize();
@@ -126,10 +126,12 @@ public class ImageZoomPanel extends JScrollPane {
 
 			Graphics2D g2 = (Graphics2D)g;
 
-			AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
-			g2.drawImage(img,tran,null);
+			synchronized ( ImageZoomPanel.this ) {
+				AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
+				g2.drawImage(img, tran, null);
 
-			paintInPanel(tran, g2);
+				paintInPanel(tran, g2);
+			}
 		}
 	}
 }
