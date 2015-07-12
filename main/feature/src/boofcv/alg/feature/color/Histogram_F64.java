@@ -254,4 +254,14 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	public double get( int coordinate[]  ) {
 		return  value[getIndex(coordinate)];
 	}
+
+	public Histogram_F64 copy() {
+		Histogram_F64 out = new Histogram_F64(length);
+
+		for (int i = 0; i < length.length; i++) {
+			out.setRange(i,valueMin[i],valueMax[i]);
+		}
+
+		return out;
+	}
 }

@@ -225,7 +225,27 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 		return new MultiSpectral<T>(type,imgWidth,imgHeight,bands.length);
 	}
 
-	public void setType(Class<T> type) {
+	/**
+	 * Returns a new {@link MultiSpectral} which references the same internal single band images at this one.
+	 *
+	 * @param which List of bands which will comprise the new image
+	 * @return New image
+	 */
+	public MultiSpectral<T> partialSpectrum( int ...which ) {
+		MultiSpectral<T> out = new MultiSpectral<T>(getBandType(),which.length);
+
+		out.setWidth(width);
+		out.setHeight(height);
+		out.setStride(stride);
+
+		for (int i = 0; i < which.length; i++) {
+			out.setBand(i,getBand(which[i]));
+		}
+
+		return out;
+	}
+
+	public void setBandType(Class<T> type) {
 		this.type = type;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,19 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		add(bodyPanel);
 	}
 
-	public void reset() {
+	public synchronized void automaticPreferredSize() {
+		double width = 0;
+		double height = 0;
+
+		for (int i = 0; i < panels.size(); i++) {
+			Dimension d = panels.get(i).getPreferredSize();
+			width = Math.max(width,d.getWidth());
+			height = Math.max(height,d.getHeight());
+		}
+		bodyPanel.setPreferredSize(new Dimension((int) (width+scroll.getPreferredSize().getWidth())+10, (int) height));
+	}
+
+	public synchronized void reset() {
 		if( SwingUtilities.isEventDispatchThread() ) {
 			panels.clear();
 			listModel.removeAllElements();
@@ -102,10 +114,10 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param panel The panel being displayed
 	 * @param name Name of the image.  Shown in the list.
 	 */
-	public void addItem( final JPanel panel , final String name ) {
+	public synchronized void addItem( final JPanel panel , final String name ) {
+		panels.add(panel);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				panels.add(panel);
 				listModel.addElement(name);
 				if( listModel.size() == 1 ) {
 					listPanel.setSelectedIndex(0);
@@ -118,7 +130,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
+	public synchronized void valueChanged(ListSelectionEvent e) {
 		if( e.getValueIsAdjusting() )
 			return;
 
