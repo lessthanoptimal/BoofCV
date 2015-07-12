@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -72,7 +73,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 			width = Math.max(width,d.getWidth());
 			height = Math.max(height,d.getHeight());
 		}
-		bodyPanel.setPreferredSize(new Dimension((int) (width+scroll.getPreferredSize().getWidth())+10, (int) height));
+		bodyPanel.setPreferredSize(new Dimension((int) (width + scroll.getPreferredSize().getWidth()) + 10, (int) height));
 	}
 
 	public synchronized void reset() {
@@ -105,7 +106,11 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param name Name of the image.  Shown in the list.
 	 */
 	public void addImage( BufferedImage image , String name ) {
-		addItem(new ImagePanel(image,true), name );
+		addImage(image, name,ScaleOptions.DOWN );
+	}
+
+	public void addImage( BufferedImage image , String name , ScaleOptions scaling ) {
+		addItem(new ImagePanel(image, scaling), name );
 	}
 
 	/**

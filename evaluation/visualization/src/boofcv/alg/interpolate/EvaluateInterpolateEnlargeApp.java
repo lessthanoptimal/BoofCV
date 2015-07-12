@@ -23,6 +23,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
@@ -53,7 +54,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		super(1);
 		this.imageType = imageType;
 
-		panel.setResize(false);
+		panel.setScaling(ScaleOptions.NONE);
 		setMainGUI(panel);
 
 		color = new MultiSpectral<T>(imageType,1,1,3);

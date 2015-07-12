@@ -24,6 +24,7 @@ import boofcv.alg.feature.color.GHistogramFeatureOps;
 import boofcv.alg.feature.color.HistogramFeatureOps;
 import boofcv.alg.feature.color.Histogram_F64;
 import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -42,9 +43,17 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Example which demonstrates image retrieval using color histograms alone.  A target image is specified and the 10
- * most similar images are found.  This illustrates several concepts. 1) How to construct a histogram in 1D, 2D, 3D,
- * ..etc,  2) Histograms are just feature descriptors. 3) Advantages of different color spaces.
+ * Demonstration of how to find similar images using color histograms.  Image color histograms here are treated as
+ * features and extracted using a more flexible algorithm than when they are used for image processing.  It's
+ * more flexible in that the bin size can be varied and n-dimensions are supported.
+ *
+ * In this example, histograms for about 150 images are generated.  A target image is selected and the 10 most
+ * similar images, according to Euclidean distance of the histograms, are found. This illustrates several concepts;
+ * 1) How to construct a histogram in 1D, 2D, 3D, ..etc,  2) Histograms are just feature descriptors.
+ * 3) Advantages of different color spaces.
+ *
+ * Euclidean distance is used here since that's what the nearest-neighbor search uses.  It's possible to compare
+ * two histograms using any of the distance metrics in DescriptorDistance too.
  *
  * @author Peter Abeles
  */
@@ -57,11 +66,6 @@ public class ExampleColorHistogramFeature {
 	public static List<double[]> coupledHueSat( List<File> images  ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		// The number of bins is an important parameter.  Try adjusting it
-		Histogram_F64 histogram = new Histogram_F64(12,12);
-		histogram.setRange(0, 0, 2.0*Math.PI); // range of hue is from 0 to 2PI
-		histogram.setRange(1, 0, 1.0);         // range of saturation is from 0 to 1
-
 		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
 		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
 
@@ -71,24 +75,30 @@ public class ExampleColorHistogramFeature {
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
+
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 			ColorHsv.rgbToHsv_F32(rgb, hsv);
 
 			MultiSpectral<ImageFloat32> hs = hsv.partialSpectrum(0,1);
 
-			Histogram_F64 imageHist = histogram.copy();
-			GHistogramFeatureOps.histogram(hs,imageHist);
+			// The number of bins is an important parameter.  Try adjusting it
+			Histogram_F64 histogram = new Histogram_F64(12,12);
+			histogram.setRange(0, 0, 2.0*Math.PI); // range of hue is from 0 to 2PI
+			histogram.setRange(1, 0, 1.0);         // range of saturation is from 0 to 1
 
-			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
+			// Compute the histogram
+			GHistogramFeatureOps.histogram(hs,histogram);
 
-			points.add(imageHist.value);
+			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
+
+			points.add(histogram.value);
 		}
 
 		return points;
 	}
 
 	/**
-	 * Computes two independent histograms from hue and saturation.  Less affects by sparsity, but can produce worse
+	 * Computes two independent 1D histograms from hue and saturation.  Less affects by sparsity, but can produce
 	 * worse results since the basic assumption that hue and saturation are decoupled is most of the time false.
 	 */
 	public static List<double[]> independentHueSat( List<File> images  ) {
@@ -128,17 +138,11 @@ public class ExampleColorHistogramFeature {
 	}
 
 	/**
-	 * Constructs a 3D histogram using RGB.  While RGB is a popular color space the resulting histogram will
-	 * depend on lighting conditions and might not produce the most accurate results.
+	 * Constructs a 3D histogram using RGB.  RGB is a popular color space, but the resulting histogram will
+	 * depend on lighting conditions and might not produce the accurate results.
 	 */
 	public static List<double[]> coupledRGB( List<File> images ) {
 		List<double[]> points = new ArrayList<double[]>();
-
-		// The number of bins is an important parameter.  Try adjusting it
-		Histogram_F64 histogram = new Histogram_F64(10,10,10);
-		histogram.setRange(0, 0, 255);
-		histogram.setRange(1, 0, 255);
-		histogram.setRange(2, 0, 255);
 
 		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
 
@@ -149,12 +153,17 @@ public class ExampleColorHistogramFeature {
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 
-			Histogram_F64 imageHist = histogram.copy();
-			GHistogramFeatureOps.histogram(rgb,imageHist);
+			// The number of bins is an important parameter.  Try adjusting it
+			Histogram_F64 histogram = new Histogram_F64(10,10,10);
+			histogram.setRange(0, 0, 255);
+			histogram.setRange(1, 0, 255);
+			histogram.setRange(2, 0, 255);
 
-			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
+			GHistogramFeatureOps.histogram(rgb,histogram);
 
-			points.add(imageHist.value);
+			UtilFeature.normalizeL2(histogram); // normalize so that image size doesn't matter
+
+			points.add(histogram.value);
 		}
 
 		return points;
@@ -199,16 +208,16 @@ public class ExampleColorHistogramFeature {
 //		List<double[]> points = histogramGray(images);
 
 		// A few suggested image you can try searching for
-//		int target = 0;
+		int target = 0;
 //		int target = 28;
 //		int target = 38;
 //		int target = 46;
 //		int target = 65;
-		int target = 77;
+//		int target = 77;
 
 		double[] targetPoint = points.get(target);
 
-		// use a generic NN search algorithm.  Due to the data base side and the
+		// Use a generic NN search algorithm.  This uses Euclidean distance as a distance metric.
 		NearestNeighbor<File> nn = FactoryNearestNeighbor.exhaustive();
 		FastQueue<NnData<File>> results = new FastQueue(NnData.class,true);
 
@@ -219,7 +228,7 @@ public class ExampleColorHistogramFeature {
 		ListDisplayPanel gui = new ListDisplayPanel();
 
 		// Add the target which the other images are being matched against
-		gui.addImage(UtilImageIO.loadImage(images.get(target).getPath()), "Target");
+		gui.addImage(UtilImageIO.loadImage(images.get(target).getPath()), "Target", ScaleOptions.ALL);
 
 		// The results will be the 10 best matches, but their order can be arbitrary.  For display purposes
 		// it's better to do it from best fit to worst fit
@@ -235,13 +244,12 @@ public class ExampleColorHistogramFeature {
 			}
 		});
 
-		// Add images to GUI
-		// first match is always the target image, so skip it
+		// Add images to GUI -- first match is always the target image, so skip it
 		for (int i = 1; i < results.size; i++) {
 			File file = results.get(i).data;
+			double error = results.get(i).distance;
 			BufferedImage image = UtilImageIO.loadImage(file.getPath());
-			gui.addImage(image,"Match "+i);
-			System.out.println("Errors "+results.get(i).distance);
+			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
 		}
 
 		// resize window to show all images without scaling and display GUI

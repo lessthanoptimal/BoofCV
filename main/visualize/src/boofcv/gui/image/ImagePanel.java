@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,15 +33,15 @@ public class ImagePanel extends JPanel {
 	// the image being displayed
 	protected BufferedImage img;
 	// should it re-size the image based on the panel's size
-	protected boolean resize = true;
+	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
 	public ImagePanel(BufferedImage img) {
-		this(img,false);
+		this(img,ScaleOptions.NONE);
 	}
 
-	public ImagePanel(final BufferedImage img , boolean resize ) {
+	public ImagePanel(final BufferedImage img , ScaleOptions scaling ) {
 		this.img = img;
-		this.resize = resize;
+		this.scaling = scaling;
 		autoSetPreferredSize();
 	}
 
@@ -59,13 +59,14 @@ public class ImagePanel extends JPanel {
 
 		//draw the image
 		if (img != null) {
-			if( resize ) {
+			if( scaling != ScaleOptions.NONE ) {
 				double ratioW = (double)getWidth()/(double)img.getWidth();
 				double ratioH = (double)getHeight()/(double)img.getHeight();
 
 				double ratio = Math.min(ratioW,ratioH);
-				if( ratio >= 1 )
+				if( scaling == ScaleOptions.DOWN && ratio >= 1 )
 					ratio = 1;
+
 				if( ratio == 1 ) {
 					g.drawImage(img, 0, 0, this);
 				} else {
@@ -110,8 +111,8 @@ public class ImagePanel extends JPanel {
 		return img;
 	}
 
-	public void setResize(boolean resize) {
-		this.resize = resize;
+	public void setScaling(ScaleOptions scaling) {
+		this.scaling = scaling;
 	}
 
 	public void autoSetPreferredSize() {
