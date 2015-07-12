@@ -21,6 +21,7 @@ package boofcv.examples.features;
 import boofcv.alg.color.ColorHsv;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.color.GHistogramFeatureOps;
+import boofcv.alg.feature.color.HistogramFeatureOps;
 import boofcv.alg.feature.color.Histogram_F64;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
@@ -29,6 +30,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -40,43 +42,13 @@ import java.io.File;
 import java.util.*;
 
 /**
+ * Example which demonstrates image retrieval using color histograms alone.  A target image is specified and the 10
+ * most similar images are found.  This illustrates several concepts. 1) How to construct a histogram in 1D, 2D, 3D,
+ * ..etc,  2) Histograms are just feature descriptors. 3) Advantages of different color spaces.
+ *
  * @author Peter Abeles
  */
 public class ExampleColorHistogramFeature {
-
-	/**
-	 * Constructs a 3D histogram using RGB.  While RGB is a popular color space the resulting histogram will
-	 * depend on lighting conditions and might not produce the most accurate results.
-	 */
-	public static List<double[]> coupledRGB( List<File> images ) {
-		List<double[]> points = new ArrayList<double[]>();
-
-		// The number of bins is an important parameter.  Try adjusting it
-		Histogram_F64 histogram = new Histogram_F64(10,10,10);
-		histogram.setRange(0, 0, 255);
-		histogram.setRange(1, 0, 255);
-		histogram.setRange(2, 0, 255);
-
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
-
-		for( File f : images ) {
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null )
-				throw new RuntimeException("Can't load image!");
-
-			rgb.reshape(buffered.getWidth(), buffered.getHeight());
-			ConvertBufferedImage.convertFrom(buffered, rgb, true);
-
-			Histogram_F64 imageHist = histogram.copy();
-			GHistogramFeatureOps.histogram(rgb,imageHist);
-
-			UtilFeature.normalizeL2(imageHist);
-
-			points.add(imageHist.value);
-		}
-
-		return points;
-	}
 
 	/**
 	 * HSV stores color information in Hue and Saturation while intensity is in Value.  This computes a 2D histogram
@@ -95,8 +67,7 @@ public class ExampleColorHistogramFeature {
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null )
-				throw new RuntimeException("Can't load image!");
+			if( buffered == null ) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
@@ -120,7 +91,7 @@ public class ExampleColorHistogramFeature {
 	 * Computes two independent histograms from hue and saturation.  Less affects by sparsity, but can produce worse
 	 * worse results since the basic assumption that hue and saturation are decoupled is most of the time false.
 	 */
-	public static List<double[]> IndependentHueSat( List<File> images  ) {
+	public static List<double[]> independentHueSat( List<File> images  ) {
 		List<double[]> points = new ArrayList<double[]>();
 
 		// The number of bins is an important parameter.  Try adjusting it
@@ -135,8 +106,7 @@ public class ExampleColorHistogramFeature {
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if( buffered == null )
-				throw new RuntimeException("Can't load image!");
+			if( buffered == null ) throw new RuntimeException("Can't load image!");
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
@@ -157,22 +127,84 @@ public class ExampleColorHistogramFeature {
 		return points;
 	}
 
+	/**
+	 * Constructs a 3D histogram using RGB.  While RGB is a popular color space the resulting histogram will
+	 * depend on lighting conditions and might not produce the most accurate results.
+	 */
+	public static List<double[]> coupledRGB( List<File> images ) {
+		List<double[]> points = new ArrayList<double[]>();
+
+		// The number of bins is an important parameter.  Try adjusting it
+		Histogram_F64 histogram = new Histogram_F64(10,10,10);
+		histogram.setRange(0, 0, 255);
+		histogram.setRange(1, 0, 255);
+		histogram.setRange(2, 0, 255);
+
+		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
+
+		for( File f : images ) {
+			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
+			if( buffered == null ) throw new RuntimeException("Can't load image!");
+
+			rgb.reshape(buffered.getWidth(), buffered.getHeight());
+			ConvertBufferedImage.convertFrom(buffered, rgb, true);
+
+			Histogram_F64 imageHist = histogram.copy();
+			GHistogramFeatureOps.histogram(rgb,imageHist);
+
+			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
+
+			points.add(imageHist.value);
+		}
+
+		return points;
+	}
+
+	/**
+	 * Computes a histogram from the gray scale intensity image alone.  Probably the least effective at looking up
+	 * similar images.
+	 */
+	public static List<double[]> histogramGray( List<File> images ) {
+		List<double[]> points = new ArrayList<double[]>();
+
+		ImageUInt8 gray = new ImageUInt8(1,1);
+		for( File f : images ) {
+			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
+			if( buffered == null ) throw new RuntimeException("Can't load image!");
+
+			gray.reshape(buffered.getWidth(), buffered.getHeight());
+			ConvertBufferedImage.convertFrom(buffered, gray, true);
+
+			TupleDesc_F64 imageHist = new TupleDesc_F64(150);
+			HistogramFeatureOps.histogram(gray, 255, imageHist);
+
+			UtilFeature.normalizeL2(imageHist); // normalize so that image size doesn't matter
+
+			points.add(imageHist.value);
+		}
+
+		return points;
+	}
+
 	public static void main(String[] args) {
 
 		String regex = "../data/applet/recognition/vacation/^\\w*.jpg";
-
 		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
 		Collections.sort(images);
 
+		// Different color spaces you can try
 		List<double[]> points = coupledHueSat(images);
-//		List<double[]> points = IndependentHueSat(images);
+//		List<double[]> points = independentHueSat(images);
 //		List<double[]> points = coupledRGB(images);
+//		List<double[]> points = histogramGray(images);
 
+		// A few suggested image you can try searching for
 //		int target = 0;
 //		int target = 28;
 //		int target = 38;
 //		int target = 46;
-		int target = 74;
+//		int target = 65;
+		int target = 77;
 
 		double[] targetPoint = points.get(target);
 
@@ -189,7 +221,8 @@ public class ExampleColorHistogramFeature {
 		// Add the target which the other images are being matched against
 		gui.addImage(UtilImageIO.loadImage(images.get(target).getPath()), "Target");
 
-		// The results will be the 10 best matches, but their order can be arbitrary
+		// The results will be the 10 best matches, but their order can be arbitrary.  For display purposes
+		// it's better to do it from best fit to worst fit
 		Collections.sort(results.toList(), new Comparator<NnData>() {
 			@Override
 			public int compare(NnData o1, NnData o2) {
@@ -202,6 +235,7 @@ public class ExampleColorHistogramFeature {
 			}
 		});
 
+		// Add images to GUI
 		// first match is always the target image, so skip it
 		for (int i = 1; i < results.size; i++) {
 			File file = results.get(i).data;
@@ -210,6 +244,7 @@ public class ExampleColorHistogramFeature {
 			System.out.println("Errors "+results.get(i).distance);
 		}
 
+		// resize window to show all images without scaling and display GUI
 		gui.automaticPreferredSize();
 		ShowImages.showWindow(gui,"Matches",true);
 	}
