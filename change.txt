@@ -30,7 +30,7 @@ Version : Alpha 0.19
   * Fixed bug where the returned orientation was inconsistent with the JavaDoc
   * Fixed another bug that caused the sides to "flip" depending on view angle
 - PerspectiveOps
-  * Can render pixel in camera frame using InrinsicParameters
+  * Can render pixel in camera frame using IntrinsicParameters
 - Created FactoryMultiViewRobust for simplifying the creation of robust versions of
   solutions to PnP, essential, homography
 - Camera Model
@@ -83,11 +83,18 @@ Version : Alpha 0.19
   * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
   * Thanks thhart for pointing this out
 - ThresholdImageOps
-  * Changed threshold up from >= to >.  Turns out the original choice was bad.  Images were not inverses of each other
-    and it was possible the threshold an image with two values up and end up with all 0.
+  * Changed threshold up from >= to >.
+  * Turns out the original choice was bad.  Images were not inverses of each other
+  * Was possible the threshold an image with two values up and end up with all 0.
 - PyBoof has been added to integration
   * Python wrapper for BoofCV
-  * Thanks Romotive for allowing me to donate this code!
+  * Thanks Romotive allowing donating this code!
+- GHistogramFeatureOps, Histogram_F64, HistogramFeatureOps
+  * Computes color histograms with the intent that they can be used as features
+  * Supports an arbitrary number of color bands
+  * Can also be computed from a list of pixel values
+  * arbitrary min/max values and number of bins also supported
+  * Example added demonstrating how to look up images with similar histograms
 
 TODO
   * Distortion Model + Calibration

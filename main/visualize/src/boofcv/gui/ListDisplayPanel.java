@@ -45,6 +45,9 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 	JScrollPane scroll;
 
+	// stores the size the center element of body should be to contain all the images without resizing
+	private int bodyWidth,bodyHeight;
+
 	public ListDisplayPanel() {
 		setLayout(new BorderLayout());
 		listPanel = new JList(listModel);
@@ -62,18 +65,6 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		bodyPanel.add(scroll,BorderLayout.WEST);
 
 		add(bodyPanel);
-	}
-
-	public synchronized void automaticPreferredSize() {
-		double width = 0;
-		double height = 0;
-
-		for (int i = 0; i < panels.size(); i++) {
-			Dimension d = panels.get(i).getPreferredSize();
-			width = Math.max(width,d.getWidth());
-			height = Math.max(height,d.getHeight());
-		}
-		bodyPanel.setPreferredSize(new Dimension((int) (width + scroll.getPreferredSize().getWidth()) + 10, (int) height));
 	}
 
 	public synchronized void reset() {
@@ -120,15 +111,29 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param name Name of the image.  Shown in the list.
 	 */
 	public synchronized void addItem( final JPanel panel , final String name ) {
+
+		Dimension panelD = panel.getPreferredSize();
+
+		// make the preferred size large enough to hold all the images
+		bodyWidth = (int)Math.max(bodyWidth,panelD.getWidth());
+		bodyHeight = (int)Math.max(bodyHeight,panelD.getHeight());
+
 		panels.add(panel);
-		listModel.addElement(name);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				listModel.addElement(name);
 				if( listModel.size() == 1 ) {
 					listPanel.setSelectedIndex(0);
 				}
+				// update the list's size
 				Dimension d = listPanel.getMinimumSize();
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
+
+				// make sure it's preferred size is up to date
+				Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+				if( old != null )
+					old.setPreferredSize(new Dimension(bodyWidth,bodyHeight));
+
 				validate();
 			}
 		});
@@ -142,7 +147,9 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		final int index = listPanel.getSelectedIndex();
 		if( index >= 0 ) {
 			removeCenterBody();
-			bodyPanel.add(panels.get(index), BorderLayout.CENTER);
+			JPanel p = panels.get(index);
+			p.setPreferredSize(new Dimension(bodyWidth,bodyHeight));
+			bodyPanel.add(p, BorderLayout.CENTER);
 			bodyPanel.validate();
 			bodyPanel.repaint();
 		}

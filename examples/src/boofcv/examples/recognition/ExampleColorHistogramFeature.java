@@ -253,7 +253,6 @@ public class ExampleColorHistogramFeature {
 		}
 
 		// resize window to show all images without scaling and display GUI
-		gui.automaticPreferredSize();
 		ShowImages.showWindow(gui,"Similar Images",true);
 	}
 }
