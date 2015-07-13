@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.features;
+package boofcv.examples.recognition;
 
 import boofcv.alg.color.ColorHsv;
 import boofcv.alg.descriptor.UtilFeature;
@@ -254,6 +254,6 @@ public class ExampleColorHistogramFeature {
 
 		// resize window to show all images without scaling and display GUI
 		gui.automaticPreferredSize();
-		ShowImages.showWindow(gui,"Matches",true);
+		ShowImages.showWindow(gui,"Similar Images",true);
 	}
 }

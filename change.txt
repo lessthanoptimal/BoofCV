@@ -107,11 +107,8 @@ TODO
     - regression test
     - examples
 
-  * Histogram Comparison
-
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Look at Sandreas's NewWarp
-  * Histogram comparison
   * Documentation on how to build a single jar
 
 ---------------------------------------------

@@ -106,7 +106,7 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param name Name of the image.  Shown in the list.
 	 */
 	public void addImage( BufferedImage image , String name ) {
-		addImage(image, name,ScaleOptions.DOWN );
+		addImage(image, name, ScaleOptions.DOWN);
 	}
 
 	public void addImage( BufferedImage image , String name , ScaleOptions scaling ) {
@@ -121,9 +121,9 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 */
 	public synchronized void addItem( final JPanel panel , final String name ) {
 		panels.add(panel);
+		listModel.addElement(name);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				listModel.addElement(name);
 				if( listModel.size() == 1 ) {
 					listPanel.setSelectedIndex(0);
 				}
