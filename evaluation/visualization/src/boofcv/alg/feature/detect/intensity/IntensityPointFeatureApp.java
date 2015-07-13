@@ -23,8 +23,6 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.ImageGenerator;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -72,8 +70,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 		this.imageType = imageType;
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(imageType);
-		ImageGenerator<D> derivGen = FactoryImageGenerator.create(derivType);
-		deriv = new AnyImageDerivative<T,D>(GradientThree.getKernelX(isInteger),imageType,derivGen);
+		deriv = new AnyImageDerivative<T,D>(GradientThree.getKernelX(isInteger),imageType,derivType);
 
 		addAlgorithm(0, "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm(0, "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));

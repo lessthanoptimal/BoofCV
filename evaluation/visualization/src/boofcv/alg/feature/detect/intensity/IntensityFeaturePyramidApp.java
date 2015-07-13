@@ -23,7 +23,6 @@ import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -81,7 +80,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 		setMainGUI(gui);
 
-		anyDerivative = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		anyDerivative = GImageDerivativeOps.derivativeForScaleSpace(imageType,derivType);
 	}
 
 	@Override

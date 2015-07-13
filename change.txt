@@ -95,6 +95,10 @@ Version : Alpha 0.19
   * Can also be computed from a list of pixel values
   * arbitrary min/max values and number of bins also supported
   * Example added demonstrating how to look up images with similar histograms
+- GImageDerivativeOps
+  * General cleaning up the API
+  * Fewer functions, but uses enum for specific type
+  * Function for AnyImageDerivative is clearly named and more useful
 
 TODO
   * Distortion Model + Calibration

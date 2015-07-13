@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
@@ -171,7 +172,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		derivY.reshape(subGray.width, subGray.height);
 
 		// extended border to avoid false positives
-		GImageDerivativeOps.sobel(subGray, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL,subGray, derivX, derivY, BorderType.EXTENDED);
 
 		// detect interest points
 		intensityAlg.process(subGray, derivX, derivY, null, null, null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -90,7 +90,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		addAlgorithm(0, "Laplace Det", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT, derivType));
 		addAlgorithm(0, "Laplace Trace", FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE, derivType));
 
-		deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		deriv = GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL,imageType, derivType);
 
 		JPanel gui = new JPanel();
 		gui.setLayout(new BorderLayout());
@@ -259,7 +259,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Feature Extraction");
+		ShowImages.showWindow(app, "Feature Extraction", true);
 
 		System.out.println("Done");
 	}

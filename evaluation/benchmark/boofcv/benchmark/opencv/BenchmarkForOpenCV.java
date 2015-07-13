@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
@@ -91,7 +92,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 
 		@Override
 		public void process() {
-			GImageDerivativeOps.sobel(input, derivX, derivY, BorderType.EXTENDED);
+			GImageDerivativeOps.gradient(DerivativeType.SOBEL, input, derivX, derivY, BorderType.EXTENDED);
 		}
 	}
 
@@ -101,7 +102,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		GeneralFeatureDetector<T, D> detector;
 
 		public Harris() {
-			GImageDerivativeOps.sobel(input, derivX, derivY, BorderType.EXTENDED);
+			GImageDerivativeOps.gradient(DerivativeType.SOBEL, input, derivX, derivY, BorderType.EXTENDED);
 			detector = FactoryDetectPoint.createHarris(new ConfigGeneralDetector(-1,radius,1), false, derivType);
 		}
 
@@ -118,7 +119,7 @@ public class BenchmarkForOpenCV<T extends ImageSingleBand, D extends ImageSingle
 		DetectLineHoughPolar<T, D> detector;
 
 		public HoughLine() {
-			GImageDerivativeOps.sobel(input, derivX, derivY, BorderType.EXTENDED);
+			GImageDerivativeOps.gradient(DerivativeType.SOBEL, input, derivX, derivY, BorderType.EXTENDED);
 			detector = FactoryDetectLineAlgs.houghPolar(
 					new ConfigHoughPolar(2, 40, 2, Math.PI / 180, 150, -1), imageType, derivType);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.alg.feature.detect.extract.NonMaxBlockStrict;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -83,7 +84,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 			}
 
 			// compute the image gradient
-			GImageDerivativeOps.sobel(image, derivX, derivY, BoofDefaults.DERIV_BORDER_TYPE);
+			GImageDerivativeOps.gradient(DerivativeType.SOBEL, image, derivX, derivY, BoofDefaults.DERIV_BORDER_TYPE);
 		}
 
 		if (detector.getRequiresHessian()) {
@@ -94,7 +95,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 			}
 
 			// compute the image gradient
-			GImageDerivativeOps.hessianThree(image, derivXX, derivYY, derivXY, BoofDefaults.DERIV_BORDER_TYPE);
+			GImageDerivativeOps.hessian(DerivativeType.THREE, image, derivXX, derivYY, derivXY, BoofDefaults.DERIV_BORDER_TYPE);
 		}
 
 		detector.process(image, derivX, derivY, derivXX, derivYY, derivXY);

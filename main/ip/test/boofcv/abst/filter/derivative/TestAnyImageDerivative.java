@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,6 @@ package boofcv.abst.filter.derivative;
 
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.ImageGenerator;
-import boofcv.core.image.inst.SingleBandGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -39,8 +37,6 @@ public class TestAnyImageDerivative {
 	int width = 20;
 	int height = 30;
 
-	ImageGenerator<ImageFloat32> generator = new SingleBandGenerator<ImageFloat32>(ImageFloat32.class);
-
 	ImageFloat32 original = new ImageFloat32(width,height);
 
 	/**
@@ -49,7 +45,7 @@ public class TestAnyImageDerivative {
 	@Test
 	public void changeInputImageSize() {
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
-		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,generator);
+		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,ImageFloat32.class);
 		alg.setInput(original);
 		alg.getDerivative(true);
 
@@ -82,7 +78,7 @@ public class TestAnyImageDerivative {
 
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
 
-		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,generator);
+		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,ImageFloat32.class);
 		alg.setInput(original);
 
 		// do one out of order which will force it to meet all the dependencies

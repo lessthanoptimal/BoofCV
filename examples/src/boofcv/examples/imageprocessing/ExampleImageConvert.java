@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.examples.imageprocessing;
 
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.ImageStatistics;
@@ -96,7 +97,7 @@ public class ExampleImageConvert {
 		derivX = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
 		derivY = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
 
-		GImageDerivativeOps.sobel(gray,derivX,derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL, gray, derivX, derivY, BorderType.EXTENDED);
 	}
 
 	public static void main( String args[] ) {

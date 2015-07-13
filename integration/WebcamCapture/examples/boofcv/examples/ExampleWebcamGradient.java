@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.examples;
 
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.image.ImagePanel;
@@ -59,7 +60,7 @@ public class ExampleWebcamGradient {
 			ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
 
 			// compute the gradient
-			GImageDerivativeOps.sobel(gray, derivX, derivY, BorderType.EXTENDED);
+			GImageDerivativeOps.gradient(DerivativeType.SOBEL, gray, derivX, derivY, BorderType.EXTENDED);
 
 			// visualize and display
 			BufferedImage visualized = VisualizeImageData.colorizeGradient(derivX,derivY,-1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.ImageFloat32;
@@ -44,7 +43,7 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
 		ImageFunctionSparse<ImageFloat32> sparseLaplace =
 				FactoryDerivativeSparse.createLaplacian(ImageFloat32.class, null);
 		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv =  GImageDerivativeOps.
-				createDerivatives(ImageFloat32.class, FactoryImageGenerator.create(ImageFloat32.class));
+				derivativeForScaleSpace(ImageFloat32.class, ImageFloat32.class);
 
 		return new FeatureLaplacePyramid<ImageFloat32, ImageFloat32>(detector, sparseLaplace, deriv, 1);
 	}
