@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.filter.derivative;
 
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.alg.filter.kernel.GKernelMath;
-import boofcv.core.image.ImageGenerator;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.BoofDefaults;
@@ -32,7 +32,8 @@ import boofcv.struct.image.ImageSingleBand;
  * <p>
  * A helpful class which allows a derivative of any order to be computed from an input image using a simple to use
  * interface.  Higher order derivatives are computed from lower order derivatives.  Derivatives are computed
- * using convolution kernels and thus might not be as efficient as when using functions from {@link boofcv.factory.filter.derivative.FactoryDerivative}.
+ * using convolution kernels and thus might not be as efficient as when using functions from
+ * {@link boofcv.factory.filter.derivative.FactoryDerivative}.
  * </p>
  *
  * @author Peter Abeles
@@ -57,19 +58,18 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 	// if true then
 	private boolean[][] stale;
 
-	private ImageGenerator<D> derivGen;
+	private Class<D> derivType;
 
 	/**
 	 * Constructor for 1D kernels.
 	 *
 	 * @param deriv 1D convolution kernel for computing derivative along x and y axises.
 	 * @param inputType The type of input image.
-	 * @param derivGen Generator for derivative images.
+	 * @param derivType Derivative image type
 	 */
-	public AnyImageDerivative( Kernel1D deriv , Class<I> inputType , ImageGenerator<D> derivGen )
+	public AnyImageDerivative( Kernel1D deriv , Class<I> inputType , Class<D> derivType )
 	{
-		this.derivGen = derivGen;
-		Class<D> derivType = derivGen.getType();
+		this.derivType = derivType;
 
 		derivX = FactoryConvolve.convolve(deriv,inputType,derivType, borderDeriv,true);
 		derivY = FactoryConvolve.convolve(deriv,inputType,derivType, borderDeriv,false);
@@ -83,13 +83,12 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 	 *
 	 * @param derivX 2D convolution kernel for computing derivative along x axis
 	 * @param inputType The type of input image.
-	 * @param derivGen Generator for derivative images.
+	 * @param derivType Derivative image type
 	 */
-	public AnyImageDerivative( Kernel2D derivX , Class<I> inputType , ImageGenerator<D> derivGen )
+	public AnyImageDerivative( Kernel2D derivX , Class<I> inputType , Class<D> derivType )
 	{
-		this.derivGen = derivGen;
+		this.derivType = derivType;
 		Kernel2D derivY = GKernelMath.transpose(derivX);
-		Class<D> derivType = derivGen.getType();
 
 		this.derivX = FactoryConvolve.convolve(derivX,inputType,derivType, borderDeriv);
 		this.derivY = FactoryConvolve.convolve(derivY,inputType,derivType, borderDeriv);
@@ -106,13 +105,12 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 	 * @param derivXX Filter for computing derivative along x axis from input image.
 	 * @param derivYY Filter for computing derivative along y axis from input image.
 	 * @param inputType The type of input image.
-	 * @param derivGen Generator for derivative images.
 	 */
 	public AnyImageDerivative(ConvolveInterface<I, D> derivX , ConvolveInterface<I, D> derivY ,
 							  ConvolveInterface<D, D> derivXX , ConvolveInterface<D, D> derivYY ,
-							  Class<I> inputType , ImageGenerator<D> derivGen )
+							  Class<I> inputType , Class<D> derivType )
 	{
-		this.derivGen = derivGen;
+		this.derivType = derivType;
 
 		this.derivX = derivX;
 		this.derivY = derivY;
@@ -158,11 +156,7 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 
 			if( stale[level][index] ) {
 				stale[level][index] = false;
-				if( derivatives[level][index] == null ) {
-					derivatives[level][index] = derivGen.createInstance(inputImage.getWidth(),inputImage.getHeight());
-				} else {
-					derivatives[level][index].reshape(inputImage.getWidth(),inputImage.getHeight());
-				}
+				derivatives[level][index].reshape(inputImage.getWidth(),inputImage.getHeight());
 
 				if( level == 0 ) {
 					if( isX[level]) {
@@ -195,6 +189,7 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 			stale[i] = new boolean[N];
 			for( int j = 0; j < N; j++ ) {
 				stale[i][j] = true;
+				derivatives[i][j] = GeneralizedImageOps.createSingleBand(derivType,1,1);
 			}
 		}
 	}

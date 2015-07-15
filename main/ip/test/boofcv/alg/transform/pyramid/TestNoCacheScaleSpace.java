@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,6 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.ImageGenerator;
-import boofcv.core.image.inst.SingleBandGenerator;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.image.ImageFloat32;
@@ -42,8 +40,6 @@ public class TestNoCacheScaleSpace {
 	int width = 20;
 	int height = 30;
 
-	ImageGenerator<ImageFloat32> generator = new SingleBandGenerator<ImageFloat32>(ImageFloat32.class);
-
 	ImageFloat32 original = new ImageFloat32(width,height);
 
 	@Before
@@ -54,7 +50,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getScaledImage() {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator);
+				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 		int radius = FactoryKernelGaussian.radiusForSigma(1.2,0);
 		ImageFloat32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
@@ -70,7 +66,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getDerivative() {
 		NoCacheScaleSpace<ImageFloat32,ImageFloat32> alg =
-				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(generator,generator);
+				new NoCacheScaleSpace<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 		double target = 2.3;
 

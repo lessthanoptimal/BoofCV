@@ -23,6 +23,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.core.image.GeneralizedImageOps;
@@ -47,6 +48,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+// TODO show how to convolve instead of image derivative
 @SuppressWarnings({"unchecked"})
 public class ExampleImageFilter {
 
@@ -83,7 +85,7 @@ public class ExampleImageFilter {
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
-		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
@@ -126,7 +128,7 @@ public class ExampleImageFilter {
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
 
 		// Calculate image's derivative
-		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);

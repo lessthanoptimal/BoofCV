@@ -19,11 +19,9 @@
 package boofcv.examples.imageprocessing;
 
 import boofcv.abst.filter.derivative.AnyImageDerivative;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.border.BorderType;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -50,19 +48,18 @@ public class ExampleImageDerivative {
 		ImageFloat32 derivX = new ImageFloat32(grey.width,grey.height);
 		ImageFloat32 derivY = new ImageFloat32(grey.width,grey.height);
 
-		GImageDerivativeOps.sobel(grey, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL, grey, derivX, derivY, BorderType.EXTENDED);
 
 		// Second order derivative, also known as the Hessian
 		ImageFloat32 derivXX = new ImageFloat32(grey.width,grey.height);
 		ImageFloat32 derivXY = new ImageFloat32(grey.width,grey.height);
 		ImageFloat32 derivYY = new ImageFloat32(grey.width,grey.height);
 
-		GImageDerivativeOps.hessianSobel(derivX, derivY, derivXX, derivXY, derivYY, BorderType.EXTENDED);
+		GImageDerivativeOps.hessian(DerivativeType.SOBEL, derivX, derivY, derivXX, derivXY, derivYY, BorderType.EXTENDED);
 
 		// There's also a built in function for computing arbitrary derivatives
-		ImageGenerator<ImageFloat32> genSInt16 = FactoryImageGenerator.create(ImageFloat32.class);
 		AnyImageDerivative<ImageFloat32,ImageFloat32> derivative =
-				new AnyImageDerivative<ImageFloat32,ImageFloat32>(GradientSobel.getKernelX(false),ImageFloat32.class,genSInt16);
+				GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL, ImageFloat32.class, ImageFloat32.class);
 
 		// the boolean sequence indicates if its an X or Y derivative
 		derivative.setInput(grey);

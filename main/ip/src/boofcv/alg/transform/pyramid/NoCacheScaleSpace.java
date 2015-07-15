@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.filter.convolve.ConvolveInterface;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.core.image.ImageGenerator;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -47,7 +47,7 @@ public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleB
 	private I originalImage;
 
 	// types of input images
-	private ImageGenerator<I> inputGen;
+	private Class<I> inputType;
 
 	AnyImageDerivative<I,D> anyDeriv;
 
@@ -65,12 +65,12 @@ public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleB
 	/**
 	 * Declares internal data structures.
 	 *
-	 * @param inputGen Used to create image of the same type as the input.
-	 * @param derivGen Used to create derivative images.
+	 * @param inputType Type of input image
+	 * @param derivType Derivative image type.
 	 */
-	public NoCacheScaleSpace(ImageGenerator<I> inputGen, ImageGenerator<D> derivGen ) {
-		this.inputGen = inputGen;
-		anyDeriv = GImageDerivativeOps.createDerivatives(inputGen.getType(), derivGen);
+	public NoCacheScaleSpace(Class<I> inputType, Class<D> derivType) {
+		this.inputType = inputType;
+		anyDeriv = GImageDerivativeOps.derivativeForScaleSpace(inputType, derivType);
 	}
 
 	@Override
@@ -88,8 +88,8 @@ public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleB
 		this.originalImage = input;
 
 		if( scaledImage == null ) {
-			scaledImage = inputGen.createInstance(input.getWidth(),input.getHeight());
-			workImage = inputGen.createInstance(input.getWidth(),input.getHeight());
+			scaledImage = GeneralizedImageOps.createSingleBand(inputType, input.getWidth(), input.getHeight());
+			workImage = GeneralizedImageOps.createSingleBand(inputType, input.getWidth(), input.getHeight());
 		} else if( scaledImage.width != input.width || scaledImage.height != input.height ) {
 			scaledImage.reshape(input.width,input.height);
 			workImage.reshape(input.width,input.height);
@@ -100,9 +100,7 @@ public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleB
 	public void setActiveScale(int index) {
 		this.currentScale = index;
 		double sigma = scales[index];
-		int radius = FactoryKernelGaussian.radiusForSigma(sigma,0);
-
-		Class<I> inputType = inputGen.getType();
+		int radius = FactoryKernelGaussian.radiusForSigma(sigma, 0);
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
 

@@ -18,6 +18,7 @@
 
 package boofcv.alg.flow;
 
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
@@ -81,7 +82,7 @@ public class TestHornSchunckPyramid {
 		ImageMiscOps.fillRectangle(image1,40,4,0,3,height);
 		ImageMiscOps.fillRectangle(image2,40,5,0,3,height);
 
-		GImageDerivativeOps.two0(image2, deriv2X, deriv2Y, BorderType.EXTENDED);
+		GImageDerivativeOps.gradient(DerivativeType.TWO_0,image2, deriv2X, deriv2Y, BorderType.EXTENDED);
 
 		// have the smoothness constraint be weak
 		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.core.image.inst.FactoryImageGenerator;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -117,7 +116,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		RegionOrientation orientation = (RegionOrientation) cookie;
 
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.createDerivatives(imageType, FactoryImageGenerator.create(derivType));
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 		deriv.setInput(workImage);
 
 		int r = 2;
