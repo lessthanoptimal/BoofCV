@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,12 +140,10 @@ public class ExampleFundamentalMatrix {
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class,true);
-		AssociateDescription<SurfFeature> associate =
-				FactoryAssociation.greedy(scorer, 1, true);
+		AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
 
 		ExampleAssociatePoints<ImageFloat32,SurfFeature> findMatches =
-				new ExampleAssociatePoints<ImageFloat32,SurfFeature>
-						(detDesc, associate, ImageFloat32.class);
+				new ExampleAssociatePoints<ImageFloat32,SurfFeature> (detDesc, associate, ImageFloat32.class);
 
 		findMatches.associate(left,right);
 

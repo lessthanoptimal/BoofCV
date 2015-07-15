@@ -36,21 +36,6 @@ import java.lang.reflect.Method;
  * the image's derivative.
  * </p>
  *
- * <p>
- * If the image borders are processed then how the borders are used needs to be selected carefully.  Default
- * values are selected to maximize visual appearance, which means sacrificing some theoretical purity.
- * <ul>
- * <li>No border: The border is simply ignored.  This can be problematic when dealing with small images in an image pyramid.</li>
- * <li>Extended: Arguably introduces the fewest visible artifacts at the border by replicating the border pixels.
- * Has the undesirable affect of breaking the associative property, e.g. second derivatives XY and YX are not equal.<li>
- * <li>Wrap: Maintains the associative property but can introduce strange artifacts because the pixel values at the other end
- * of the image are only loosely correlated.<li>
- * <li>Reflect: Doesn't have any justification for its use in this application.<li>
- * <li>Normalized: Will generate complete garbage<li>
- * <li>Value: Is sometimes used and will generate significant artifacts along the border.<li>
- * </ul>
- * </p>
- *
  * @author Peter Abeles
  */
 public class FactoryDerivative {

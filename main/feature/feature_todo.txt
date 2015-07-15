@@ -1,3 +1,7 @@
+- Polygon Detector
+   * Polygon reject noisy edges
+   * See if removing the requirement that dark/light be known degrades results
+     - Wouldn't need to know if it's clockwise-counter clockwise any more...
 
 - Config class for detector/descriptors
   * Configuring those algorithms is a complex task

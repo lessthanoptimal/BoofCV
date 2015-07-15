@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,8 +102,8 @@ public class DetectLineHoughFoot <I extends ImageSingleBand, D extends ImageSing
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
-		derivX = gradient.getDerivType().createImage(1,1);
-		derivY = gradient.getDerivType().createImage(1, 1);
+		derivX = gradient.getDerivativeType().createImage(1,1);
+		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,8 @@ public class OrientationEvaluator <T extends ImageSingleBand,D extends ImageSing
 	@Override
 	public void extractInitial(BenchmarkAlgorithm alg, T image, List<Point2D_F64> points) {
 		if( derivX == null ) {
-			derivX = gradient.getDerivType().createImage(image.width, image.height);
-			derivY = gradient.getDerivType().createImage(image.width, image.height);
+			derivX = gradient.getDerivativeType().createImage(image.width, image.height);
+			derivY = gradient.getDerivativeType().createImage(image.width, image.height);
 		} else {
 			derivX.reshape(image.width,image.height);
 			derivY.reshape(image.width,image.height);

@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -29,6 +29,19 @@ public class TestGImageDerivativeOps {
 
 	@Test
 	public void lookupKernelX() {
-		fail("implement");
+		assertTrue(GradientPrewitt.kernelDerivX_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT,true));
+		assertTrue(GradientPrewitt.kernelDerivX_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.PREWITT,false));
+
+		assertTrue(GradientSobel.kernelDerivX_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL,true));
+		assertTrue(GradientSobel.kernelDerivX_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.SOBEL,false));
+
+		assertTrue(GradientThree.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.THREE,true));
+		assertTrue(GradientThree.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.THREE,false));
+
+		assertTrue(GradientTwo0.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0,true));
+		assertTrue(GradientTwo0.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_0,false));
+
+		assertTrue(GradientTwo1.kernelDeriv_I32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1,true));
+		assertTrue(GradientTwo1.kernelDeriv_F32==GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1,false));
 	}
 }

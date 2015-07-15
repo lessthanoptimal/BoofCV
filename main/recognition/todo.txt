@@ -1,0 +1,4 @@
+- Fiducial Square
+   - Compute threshold for binarization in base by scanning around the fiducal border.
+   - also provide a binarization in the base.
+   - Configurable width of black border?

@@ -116,8 +116,8 @@ public class DetectLineHoughFootSubimage<I extends ImageSingleBand, D extends Im
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
-		derivX = gradient.getDerivType().createImage(1, 1);
-		derivY = gradient.getDerivType().createImage(1, 1);
+		derivX = gradient.getDerivativeType().createImage(1, 1);
+		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override

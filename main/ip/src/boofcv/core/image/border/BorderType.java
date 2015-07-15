@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,8 @@ public enum BorderType {
 	SKIP,
 
 	/**
-	 * The pixels along the image border are extended outwards
+	 * The pixels along the image border are extended outwards.  This is recommended for computing the gradient
+	 * and many convolution operations.
 	 */
 	EXTENDED,
 
@@ -49,12 +50,15 @@ public enum BorderType {
 	REFLECT,
 
 	/**
-	 * Also known as periodic, an access outside of one border is wrapped around to the other border.
+	 * Also known as periodic. When a pixel outside of image is accessed it wraps around to the other side of the image
+	 * as if the image is a loop.  Primarily included for historical purposes and because other people use it.  In
+	 * most applications it has the potential of introducing structured noise, which is bad.
 	 */
 	WRAP,
 
 	/**
-	 * The image border is set to a fixed value
+	 * The image border is set to a fixed value.  Generates harsh edges that can cause artifacts in some applications.
+	 * If no mechanism is provided to let you specify the value then it will default to black.
 	 */
 	VALUE
 }

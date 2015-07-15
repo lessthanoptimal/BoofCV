@@ -18,18 +18,23 @@
 
 package boofcv.alg.descriptor;
 
+import boofcv.struct.feature.NccFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.feature.TupleDesc_U8;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestConvertDescriptors {
+
+	Random rand = new Random(234);
 
 	/**
 	 * General test with a known output
@@ -99,6 +104,20 @@ public class TestConvertDescriptors {
 
 	@Test
 	public void convertNcc_F64() {
-		fail("Implement");
+		TupleDesc_F64 desc = new TupleDesc_F64(100);
+
+		for (int i = 0; i < desc.size(); i++) {
+			desc.value[i] = rand.nextDouble()*2-1;
+		}
+
+		NccFeature found = new NccFeature(100);
+		ConvertDescriptors.convertNcc(desc,found);
+
+		for (int i = 0; i < desc.size(); i++) {
+			assertEquals(desc.value[i],found.value[i]+found.mean,1e-8);
+		}
+
+		// crude test.  just makes sure signa has been set really.
+		assertTrue(found.sigma>0);
 	}
 }

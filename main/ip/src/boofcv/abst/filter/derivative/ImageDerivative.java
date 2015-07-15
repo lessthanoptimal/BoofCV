@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,15 +24,18 @@ import boofcv.struct.image.ImageType;
 
 
 /**
+ * Abstract interface for computing image derivatives.  The default mechanism for handling image borders is
+ * {@link BorderType#EXTENDED}.
+ *
  * @author Peter Abeles
  */
 public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
 
 	/**
-	 * Overrides the default border behavior.  See {@link boofcv.factory.filter.derivative.FactoryDerivative} for a discussion
-	 * of the pros and cons of each border type.
+	 * Overrides using {@link BorderType#EXTENDED} along the image border.  Don't change this behavior unless
+	 * you know what you're doing.
 	 *
-	 * @param type How image borders are handled.
+	 * @param type Specify image border behavior
 	 */
 	public void setBorderType( BorderType type );
 
@@ -54,5 +57,5 @@ public interface ImageDerivative<T extends ImageBase, D extends ImageBase> {
 	/**
 	 * Image type for derivative output
 	 */
-	public ImageType<D> getDerivType();
+	public ImageType<D> getDerivativeType();
 }

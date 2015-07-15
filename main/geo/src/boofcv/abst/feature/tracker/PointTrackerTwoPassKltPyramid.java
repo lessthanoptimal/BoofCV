@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends I
 										 InterpolateRectangle<D> interpDeriv)
 	{
 		super(config, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv,
-				gradient.getDerivType().getImageClass());
+				gradient.getDerivativeType().getImageClass());
 	}
 
 	@Override

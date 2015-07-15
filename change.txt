@@ -105,14 +105,11 @@ TODO
     - calibration regression
        * Same data set include different terms in estimation
     - square pattern needs to pass unit tests
-  * Fiducial
-     * Detector
-        - Compute threshold for binarization in base by scanning around the fiducal border.
-        - Get corner fitting working again
+
   * Polygon Detector
-    - Polygon reject noisy edges
-    - See if removing the requirement that dark/light be known degrades results
-    - Regression with hand slected points
+    - Regression with hand selected points
+
+  * Update filter example
 
   * BOW Scene classification
     - regression test
