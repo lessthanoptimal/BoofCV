@@ -252,7 +252,6 @@ public class ExampleColorHistogramFeature {
 			gui.addImage(image, String.format("Error %6.3f", error), ScaleOptions.ALL);
 		}
 
-		// resize window to show all images without scaling and display GUI
 		ShowImages.showWindow(gui,"Similar Images",true);
 	}
 }

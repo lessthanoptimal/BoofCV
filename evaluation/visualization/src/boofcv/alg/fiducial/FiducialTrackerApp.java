@@ -187,17 +187,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 			String pathImg = new File(path,"../patterns").getPath();
 			List<String> names = new ArrayList<String>();
-			names.add("ke.png");
-			names.add("dog.png");
-			names.add("yu.png");
-			names.add("yu_inverted.png");
-			names.add("pentarose.png");
-			names.add("text_boofcv.png");
-			names.add("leaf01.png");
-			names.add("leaf02.png");
-			names.add("hand01.png");
 			names.add("chicken.png");
-			names.add("h2o.png");
 			names.add("yinyang.png");
 
 			for( String foo : names ) {

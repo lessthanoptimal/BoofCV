@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
+import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.UtilPolygons2D_I32;
 import georegression.struct.point.Point2D_F64;
@@ -215,5 +216,9 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 
 	public void setInsideBlack(boolean insideBlack) {
 		this.insideBlack = insideBlack;
+	}
+
+	public SnapToEdge<T> getSnapToEdge() {
+		return refineCorner.getSnapToEdge();
 	}
 }

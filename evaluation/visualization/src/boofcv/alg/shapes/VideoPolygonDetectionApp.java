@@ -20,12 +20,12 @@ package boofcv.alg.shapes;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.AdjustmentType;
-import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.PixelTransformCached_F32;
+import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -34,14 +34,17 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -63,15 +66,13 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 	ImagePanel panel = new ImagePanel();
 
-	IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
-	MultiSpectral<I> undistorted;
-	ImageDistort<MultiSpectral<I>,MultiSpectral<I>> undistorter;
-
 	I gray;
 
 	BinaryPolygonConvexDetector<I> detector;
 
 	IntrinsicParameters intrinsic;
+
+	PointTransform_F64 pointUndistToDist;
 
 	boolean processedInputImage = false;
 	boolean firstFrame = true;
@@ -107,14 +108,12 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 		periodSpinner.setValue(33);
 
-		undistorted = new MultiSpectral<I>(imageType,1,1,3);
-
 		ConfigPolygonDetector config = new ConfigPolygonDetector(4);
 		config.refineWithLines = true;
 		config.refineWithCorners = false;
 
 //		InputToBinary<I> inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
-		InputToBinary<I> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,imageType);
+		InputToBinary<I> inputToBinary = FactoryThresholdBinary.globalOtsu(0, 256, true, imageType);
 
 		detector = FactoryShapeDetector.polygon(inputToBinary,config,imageType);
 	}
@@ -157,8 +156,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 	@Override
 	protected void updateAlg(MultiSpectral<I> frame, BufferedImage buffImage) {
 
-		undistorter.apply(frame,undistorted);
-		GConvertImage.average(undistorted,gray);
+		GConvertImage.average(frame,gray);
 		detector.process(gray);
 
 		// frame 212 it isn't detecting a square
@@ -180,13 +178,20 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 			firstFrame = false;
 		}
 
-		ConvertBufferedImage.convertTo(undistorted, imageGUI, true);
 		Graphics2D g2 = imageGUI.createGraphics();
 
 		FastQueue<Polygon2D_F64> found = detector.getFound();
 		g2.setColor(new Color(255,0,0,200));
 		g2.setStroke(new BasicStroke(4));
+
 		for (int i = 0; i < found.size(); i++) {
+
+			Polygon2D_F64 poly = found.get(i);
+			for( int j = 0; j < poly.size(); j++ ) {
+				Point2D_F64 p = poly.get(j);
+				pointUndistToDist.compute(p.x,p.y,p);
+			}
+
 			VisualizeShapes.drawPolygon(found.get(i), true, g2);
 		}
 		panel.setBufferedImageSafe(imageGUI);
@@ -204,12 +209,21 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
 
-		undistorted.reshape(intrinsic.width,intrinsic.height);
-		undistorter = LensDistortionOps.imageRemoveDistortion(
-				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, intrinsicUndist, undistorted.getImageType());
-
-		undistorted.reshape(intrinsic.width,intrinsic.height);
 		gray.reshape(intrinsic.width,intrinsic.height);
+
+		this.pointUndistToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);
+
+		PointTransform_F32 pointDistToUndist = LensDistortionOps.
+				transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, false);
+		PointTransform_F32 pointUndistToDist = LensDistortionOps.
+				transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true);
+		PixelTransform_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+		PixelTransform_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+
+		distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
+		undistToDist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, undistToDist);
+
+		detector.setLensDistortion(intrinsic.width,intrinsic.height,distToUndist,undistToDist);
 
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
@@ -251,6 +265,6 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Tracking Square");
+		ShowImages.showWindow(app, "Tracking Square", true);
 	}
 }

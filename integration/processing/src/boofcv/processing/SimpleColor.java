@@ -128,9 +128,9 @@ public class SimpleColor extends SimpleImage<MultiSpectral>{
 
 	public PImage convert() {
 		PImage out = new PImage(image.width,image.height, PConstants.RGB);
-		if( image.getType() == ImageFloat32.class) {
+		if( image.getBandType() == ImageFloat32.class) {
 			ConvertProcessing.convert_MSF32_RGB(image, out);
-		} else if( image.getType() == ImageUInt8.class ) {
+		} else if( image.getBandType() == ImageUInt8.class ) {
 			ConvertProcessing.convert_MSU8_RGB(image,out);
 		} else {
 			throw new RuntimeException("Unknown image type");

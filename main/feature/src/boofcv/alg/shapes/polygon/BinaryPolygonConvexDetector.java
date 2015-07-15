@@ -213,6 +213,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		if( refineLine != null ) {
 			refineLine.getSnapToEdge().setTransform(toDistorted);
 		}
+
+		if( refineCorner != null ) {
+			refineCorner.getSnapToEdge().setTransform(toDistorted);
+		}
 	}
 
 	/**

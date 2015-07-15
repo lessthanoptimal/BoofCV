@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ConvertProcessing {
 		} else if( output instanceof ImageFloat32) {
 			convert_RGB_F32(input, (ImageFloat32) output);
 		} else if( output instanceof MultiSpectral ) {
-			Class bandType = ((MultiSpectral)output).getType();
+			Class bandType = ((MultiSpectral)output).getBandType();
 			if( bandType == ImageFloat32.class ) {
 				convert_RGB_MSF32(input,(MultiSpectral)output);
 			} else if( bandType == ImageUInt8.class ) {

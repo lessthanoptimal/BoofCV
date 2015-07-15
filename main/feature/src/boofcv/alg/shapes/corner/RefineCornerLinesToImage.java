@@ -41,7 +41,7 @@ import georegression.struct.point.Vector2D_F64;
  * </p>
  *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
- * and invoke {@link SnapToEdge#setTransform(int, int, PixelTransform_F32)}.</p>
+ * and invoke {@link SnapToEdge#setTransform(PixelTransform_F32)}}.</p>
  *
  * @author Peter Abeles
  */
