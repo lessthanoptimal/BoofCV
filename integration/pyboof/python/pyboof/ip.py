@@ -43,16 +43,17 @@ class GradientType:
 def gradient(input, derivX , derivY, type=GradientType.SOBEL, border=Border.EXTENDED):
     java_border = border_to_java(border)
     java_DerivativeOps = gateway.jvm.boofcv.alg.filter.derivative.GImageDerivativeOps
+    java_DerivativeType = gateway.jvm.boofcv.alg.filter.derivative.DerivativeType
     if type is GradientType.SOBEL:
-        java_DerivativeOps.sobel(input,derivX,derivY,java_border)
+        java_DerivativeOps.gradient(java_DerivativeType.SOBEL,input,derivX,derivY,java_border)
     elif type is GradientType.PREWITT:
-        java_DerivativeOps.prewitt(input,derivX,derivY,java_border)
+        java_DerivativeOps.gradient(java_DerivativeType.PREWITT,input,derivX,derivY,java_border)
     elif type is GradientType.THREE:
-        java_DerivativeOps.three(input,derivX,derivY,java_border)
+        java_DerivativeOps.gradient(java_DerivativeType.THREE,input,derivX,derivY,java_border)
     elif type is GradientType.TWO0:
-        java_DerivativeOps.two0(input,derivX,derivY,java_border)
+        java_DerivativeOps.gradient(java_DerivativeType.TWO_0,input,derivX,derivY,java_border)
     elif type is GradientType.TWO1:
-        java_DerivativeOps.two1(input,derivX,derivY,java_border)
+        java_DerivativeOps.gradient(java_DerivativeType.TWO_1,input,derivX,derivY,java_border)
     else:
         raise RuntimeError("Unknown gradient type "+type)
 
