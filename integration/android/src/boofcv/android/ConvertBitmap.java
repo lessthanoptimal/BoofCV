@@ -71,7 +71,7 @@ public class ConvertBitmap {
 
 			case MULTI_SPECTRAL:
 				MultiSpectral ms = (MultiSpectral)output;
-				bitmapToMS(input,ms,ms.getType(),storage);
+				bitmapToMS(input,ms,ms.getBandType(),storage);
 			break;
 
 			default:
@@ -281,9 +281,9 @@ public class ConvertBitmap {
 		if( storage == null )
 			storage = declareStorage(output,null);
 		
-		if( input.getType() == ImageUInt8.class )
+		if( input.getBandType() == ImageUInt8.class )
 			ImplConvertBitmap.multiToArray_U8((MultiSpectral)input, storage,output.getConfig());
-		else if( input.getType() == ImageFloat32.class )
+		else if( input.getBandType() == ImageFloat32.class )
 			ImplConvertBitmap.multiToArray_F32((MultiSpectral)input, storage,output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
