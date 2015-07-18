@@ -109,6 +109,8 @@ TODO
 
   * Polygon Detector
     - Regression with hand selected points
+    - try convex
+    - try detect multiple number of sides
 
   * Update filter example
 
@@ -117,7 +119,6 @@ TODO
     - examples
 
   * Android Demo:   Automatic Threshold.  Dim slider for global
-  * Look at Sandreas's NewWarp
   * Documentation on how to build a single jar
 
 ---------------------------------------------

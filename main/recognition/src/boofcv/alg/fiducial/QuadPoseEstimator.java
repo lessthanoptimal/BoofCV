@@ -39,7 +39,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Estimates the pose using P3P and iterative refinement from 4 points on a plane with known locations.
+ * Estimates the pose using P3P and iterative refinement from 4 points on a plane with known locations.  While
+ * this seems like it would be a trivial problem it actually takes several techniques to ensure accurate results.
+ * At a high level it uses P3P to provide an estimate.  If the error is large it then uses EPNP.  Which ever
+ * is better it then refines.  If the target is small and directly facing the camera it will enlarge the target
+ * to estimate it's orientation.  Otherwise it will over fit location since it takes a large change in orientation
+ * to influence the result.
  *
  * @author Peter Abeles
  */
@@ -53,7 +58,7 @@ public class QuadPoseEstimator {
 	public static final double SMALL_PIXELS = 60.0;
 
 	// the adjusted solution is accepted if it doesn't increase the pixel reprojection error more than this amount
-	public static final double FUDGE_FACTOR = 0.2;
+	public static final double FUDGE_FACTOR = 0.5;
 
 	// provides set of hypotheses from 3 points
 	private EstimateNofPnP p3p;
@@ -122,8 +127,8 @@ public class QuadPoseEstimator {
 	public void setIntrinsic( IntrinsicParameters intrinsic ) {
 		distortedToUndistorted =  LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,true);
 
-		intrinsicUndist.fsetK(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy,
-				intrinsic.width,intrinsic.height);
+		intrinsicUndist.fsetK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy,
+				intrinsic.width, intrinsic.height);
 
 		pixelToNorm = LensDistortionOps.transformPoint(intrinsicUndist).undistort_F64(true,false);
 		normToPixel = LensDistortionOps.transformPoint(intrinsicUndist).distort_F64(false, true);
@@ -182,6 +187,9 @@ public class QuadPoseEstimator {
 	 * change in orientation results in a large error.  The translational component is still estimated the
 	 * usual way.  To ensure that this technique isn't hurting the state estimate too much it checks to
 	 * see if the error has increased too much.
+	 *
+	 * TODO Potential improvement.  Non-linear refinement on translation only after estimating orientation.
+	 *      The location estimate uses the over fit result still in the code below.
 	 *
 	 * @return true if successful false if not
 	 */

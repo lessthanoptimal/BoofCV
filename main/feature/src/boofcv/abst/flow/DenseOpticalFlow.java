@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public interface DenseOpticalFlow<T extends ImageBase> {
 	 *
 	 * @param source (Input) First image
 	 * @param destination (Input) Second image
-	 * @param flow (Output) Computed flow information
+	 * @param flow (Output) Computed flow information from source to destination
 	 */
 	public void process( T source , T destination, ImageFlow flow );
 

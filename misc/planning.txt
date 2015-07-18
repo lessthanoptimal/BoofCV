@@ -1,0 +1,21 @@
+Alpha 0.20
+
+- BinaryPolygonConvexDetector
+  * Can detect shapes with various number of edges in the same detector
+
+- SnapToEdge
+  * Does it really need to know if left/right is darker/lighter?
+  * Can't it just maximize the difference
+  * Change RefineCornerLinesToImage and RefinePolygonLineToImage
+
+- Fiducial Square
+  * Have base class compute threshold, binarize, and have adjustable black rectangle width
+
+- QuadPoseEstimator
+  * For special case, optimize only translation and assume known rotation
+
+- Multi camera calibration using square binary patterns.
+
+- Sparse Bundle Adjustment?
+
+- Look at Sandreas's NewWarp?
