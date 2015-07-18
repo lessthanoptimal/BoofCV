@@ -286,26 +286,25 @@ def family_to_Java_Family( family ):
 
 def dtype_to_Class_SingleBand( dtype ):
     if dtype == np.uint8:
-        image = gateway.jvm.boofcv.struct.image.ImageUInt8()
+        class_path = "boofcv.struct.image.ImageUInt8"
     elif dtype == np.int8:
-        image = gateway.jvm.boofcv.struct.image.ImageSInt8()
+        class_path = "boofcv.struct.image.ImageSInt8"
     elif dtype == np.uint16:
-        image = gateway.jvm.boofcv.struct.image.ImageUInt16()
+        class_path = "boofcv.struct.image.ImageUInt16"
     elif dtype == np.int16:
-        image = gateway.jvm.boofcv.struct.image.ImageSInt16()
+        class_path = "boofcv.struct.image.ImageSInt16"
     elif dtype == np.int32:
-        image = gateway.jvm.boofcv.struct.image.ImageSInt32()
+        class_path = "boofcv.struct.image.ImageSInt32"
     elif dtype == np.int64:
-        image = gateway.jvm.boofcv.struct.image.ImageSInt64()
+        class_path = "boofcv.struct.image.ImageSInt64"
     elif dtype == np.float32:
-        image = gateway.jvm.boofcv.struct.image.ImageFloat32()
+        class_path = "boofcv.struct.image.ImageFloat32"
     elif dtype == np.float64:
-        image = gateway.jvm.boofcv.struct.image.ImageFloat64()
+        class_path = "boofcv.struct.image.ImageFloat64"
     else:
         raise Exception("No BoofCV equivalent. "+str(dtype))
 
-    # Can't access the field directly because class is a restricted keyword in python
-    return image.getClass() # TODO Remove this hack.
+    return gateway.jvm.java.lang.Class.forName(class_path)
 
 def ImageDataType_to_dtype( jdatatype ):
     if jdatatype == gateway.jvm.boofcv.struct.image.ImageDataType.U8:

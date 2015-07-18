@@ -27,6 +27,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -44,6 +45,16 @@ import java.util.List;
  */
 public class QuadPoseEstimator {
 
+	// if the target is less than or equals to this number of pixels along a side then it is considered small
+	// and a special case will be handled.
+	// I think this threshold should be valid across different resolution images.  Corner accuracy should be
+	// less than a pixel and it becomes unstable because changes in hangle result in an error of less than a pixel
+	// when the target is small
+	public static final double SMALL_PIXELS = 60.0;
+
+	// the adjusted solution is accepted if it doesn't increase the pixel reprojection error more than this amount
+	public static final double FUDGE_FACTOR = 0.2;
+
 	// provides set of hypotheses from 3 points
 	private EstimateNofPnP p3p;
 	// iterative refinement
@@ -52,6 +63,7 @@ public class QuadPoseEstimator {
 	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
+	private PointTransform_F64 distortedToUndistorted;
 	private PointTransform_F64 pixelToNorm;
 	private PointTransform_F64 normToPixel;
 
@@ -62,7 +74,7 @@ public class QuadPoseEstimator {
 
 	private List<Point2D3D> inputP3P = new ArrayList<Point2D3D>();
 	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64.class,true);
-	private Se3_F64 refinedFiducialToCamera = new Se3_F64();
+	private Se3_F64 outputFiducialToCamera = new Se3_F64();
 	private Se3_F64 foundEPNP = new Se3_F64();
 
 	private Point3D_F64 cameraP3 = new Point3D_F64();
@@ -71,6 +83,14 @@ public class QuadPoseEstimator {
 	// storage for when it searches for the best solution
 	protected double bestError;
 	protected Se3_F64 bestPose = new Se3_F64();
+
+	// predeclared internal work space.  Minimizing new memory
+	IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
+	Quadrilateral_F64 undistortedCorners = new Quadrilateral_F64();
+	Quadrilateral_F64 enlargedCorners = new Quadrilateral_F64();
+	Se3_F64 foundEnlarged = new Se3_F64();
+	Se3_F64 foundRegular = new Se3_F64();
+	Point2D_F64 center = new Point2D_F64();
 
 	/**
 	 * Constructor which picks reasonable and generally good algorithms for pose estimation.
@@ -100,8 +120,13 @@ public class QuadPoseEstimator {
 	 * @param intrinsic Intrinsic camera parameters
 	 */
 	public void setIntrinsic( IntrinsicParameters intrinsic ) {
-		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
-		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
+		distortedToUndistorted =  LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,true);
+
+		intrinsicUndist.fsetK(intrinsic.fx,intrinsic.fy,intrinsic.skew,intrinsic.cx,intrinsic.cy,
+				intrinsic.width,intrinsic.height);
+
+		pixelToNorm = LensDistortionOps.transformPoint(intrinsicUndist).undistort_F64(true,false);
+		normToPixel = LensDistortionOps.transformPoint(intrinsicUndist).distort_F64(false, true);
 	}
 
 	/**
@@ -125,6 +150,70 @@ public class QuadPoseEstimator {
 	 */
 	public boolean process( Quadrilateral_F64 corners ) {
 
+		// put quad into undistorted pixels so that weird stuff doesn't happen when it expands
+
+		distortedToUndistorted.compute(corners.a.x, corners.a.y, undistortedCorners.a);
+		distortedToUndistorted.compute(corners.b.x, corners.b.y, undistortedCorners.b);
+		distortedToUndistorted.compute(corners.c.x, corners.c.y, undistortedCorners.c);
+		distortedToUndistorted.compute(corners.d.x, corners.d.y, undistortedCorners.d);
+
+		double length0 =  undistortedCorners.getSideLength(0);
+		double length1 =  undistortedCorners.getSideLength(1);
+
+		double ratio = Math.max(length0,length1)/Math.min(length0,length1);
+
+		// this is mainly an optimization thing.  The handling of the pathological cause is only
+		// used if it doesn't add a bunch of error.  But this technique is only needed when certain conditions
+		// are meet.
+		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
+			return estimatePathological();
+		} else {
+			return estimate(undistortedCorners, outputFiducialToCamera);
+		}
+	}
+
+	/**
+	 * Estimating the orientation is difficult when looking directly at a fiducial head on.  Basically
+	 * when the target appears close to a perfect square.  What I believe is happening is that when
+	 * the target is small significant changes in orientation only cause a small change in reprojection
+	 * error.  So it over fits location and comes up with some crazy orientation.
+	 *
+	 * To add more emphasis on orientation  target is enlarged, which shouldn't change orientation, but now a small
+	 * change in orientation results in a large error.  The translational component is still estimated the
+	 * usual way.  To ensure that this technique isn't hurting the state estimate too much it checks to
+	 * see if the error has increased too much.
+	 *
+	 * @return true if successful false if not
+	 */
+	private boolean estimatePathological() {
+		enlargedCorners.set(undistortedCorners);
+		enlarge(enlargedCorners, 4);
+
+		if( !estimate(enlargedCorners, foundEnlarged) )
+			return false;
+
+		if( !estimate(undistortedCorners, foundRegular) )
+			return false;
+
+		double errorRegular = computeErrors(foundRegular);
+
+		outputFiducialToCamera.getT().set(foundRegular.getT());
+		outputFiducialToCamera.getR().set(foundEnlarged.getR());
+
+		double errorModified = computeErrors(outputFiducialToCamera);
+
+		// if the solutions are very similar go with the enlarged version
+		if (errorModified > errorRegular + FUDGE_FACTOR ) {
+			outputFiducialToCamera.set(foundRegular);
+		}
+		return true;
+	}
+
+	/**
+	 * Given the observed corners of the quad in the image in pixels estimate and store the results
+	 * of its pose
+	 */
+	protected boolean estimate( Quadrilateral_F64 corners , Se3_F64 foundFiducialToCamera ) {
 		// put it into a list to simplify algorithms
 		listObs.clear();
 		listObs.add( corners.a );
@@ -132,7 +221,7 @@ public class QuadPoseEstimator {
 		listObs.add( corners.c );
 		listObs.add( corners.d );
 
-		// convert obervations into normalized image coordinates which P3P requires
+		// convert observations into normalized image coordinates which P3P requires
 		pixelToNorm.compute(corners.a.x,corners.a.y,points[0].observation);
 		pixelToNorm.compute(corners.b.x,corners.b.y,points[1].observation);
 		pixelToNorm.compute(corners.c.x,corners.c.y,points[2].observation);
@@ -160,6 +249,7 @@ public class QuadPoseEstimator {
 			if (epnp.process(inputP3P, foundEPNP)) {
 				if( foundEPNP.T.z > 0 ) {
 					double error = computeErrors(foundEPNP);
+//					System.out.println("   error EPNP = "+error);
 					if (error < bestError) {
 						bestPose.set(foundEPNP);
 					}
@@ -167,9 +257,9 @@ public class QuadPoseEstimator {
 			}
 		}
 
-		if( !refine.fitModel(inputP3P,bestPose,refinedFiducialToCamera) ) {
+		if( !refine.fitModel(inputP3P,bestPose,foundFiducialToCamera) ) {
 			// us the previous estimate instead
-			refinedFiducialToCamera.set(bestPose);
+			foundFiducialToCamera.set(bestPose);
 			return true;
 		}
 
@@ -212,6 +302,24 @@ public class QuadPoseEstimator {
 	}
 
 	/**
+	 * Enlarges the quadrilateral to make it more sensitive to changes in orientation
+	 */
+	protected void enlarge( Quadrilateral_F64 corners, double scale ) {
+
+		UtilPolygons2D_F64.center(corners, center);
+
+		extend(center,corners.a,scale);
+		extend(center,corners.b,scale);
+		extend(center,corners.c,scale);
+		extend(center,corners.d,scale);
+	}
+
+	protected void extend( Point2D_F64 pivot , Point2D_F64 corner , double scale ) {
+		corner.x = pivot.x + (corner.x-pivot.x)*scale;
+		corner.y = pivot.y + (corner.y-pivot.y)*scale;
+	}
+
+	/**
 	 * Compute the sum of reprojection errors for all four points
 	 * @param fiducialToCamera Transform being evaluated
 	 * @return sum of Euclidean-squared errors
@@ -222,13 +330,13 @@ public class QuadPoseEstimator {
 			return Double.MAX_VALUE;
 		}
 
-		double error = 0;
+		double maxError = 0;
 
 		for( int i = 0; i < 4; i++ ) {
-			error += computePixelError(fiducialToCamera,points[i].location,listObs.get(i));
+			maxError = Math.max(maxError,computePixelError(fiducialToCamera, points[i].location, listObs.get(i)));
 		}
 
-		return error;
+		return maxError;
 	}
 
 	private double computePixelError( Se3_F64 fiducialToCamera , Point3D_F64 X , Point2D_F64 pixel ) {
@@ -236,10 +344,10 @@ public class QuadPoseEstimator {
 
 		normToPixel.compute( cameraP3.x/cameraP3.z , cameraP3.y/cameraP3.z , predicted );
 
-		return predicted.distance2(pixel);
+		return predicted.distance(pixel);
 	}
 
 	public Se3_F64 getWorldToCamera() {
-		return refinedFiducialToCamera;
+		return outputFiducialToCamera;
 	}
 }

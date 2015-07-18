@@ -22,7 +22,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -82,18 +81,17 @@ public class VisualizeFiducial {
 		corners[6] = new Point3D_F64( r, r,h);
 		corners[7] = new Point3D_F64(-r, r,h);
 
-		Point2D_I32 pixel[] = new Point2D_I32[8];
+		Point2D_F64 pixel[] = new Point2D_F64[8];
 		Point2D_F64 p = new Point2D_F64();
 		WorldToCameraToPixel transform = PerspectiveOps.createWorldToPixel(intrinsic,targetToCamera);
 		for (int i = 0; i < 8; i++) {
-			Point3D_F64 c = corners[i];
-			if( !transform.transform(c,p) )
+			if( !transform.transform(corners[i],p) )
 				throw new RuntimeException("Crap");
-			pixel[i] = new Point2D_I32((int)(p.x+0.5),(int)(p.y+0.5));
+			pixel[i] = p.copy();
 		}
 
 		Line2D.Double l = new Line2D.Double();
-		g2.setStroke(new BasicStroke(4));
+		g2.setStroke(new BasicStroke(2));
 		g2.setColor(Color.RED);
 
 		drawLine(g2,l,pixel[0].x, pixel[0].y, pixel[1].x, pixel[1].y);
@@ -117,7 +115,7 @@ public class VisualizeFiducial {
 		drawLine(g2,l,pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
 	}
 
-	private static void drawLine( Graphics2D g2 , Line2D.Double line , double x0 , double y0 , double x1 , double y1 ) {
+	public static void drawLine( Graphics2D g2 , Line2D.Double line , double x0 , double y0 , double x1 , double y1 ) {
 		line.setLine(x0,y0,x1,y1);
 		g2.draw(line);
 	}
