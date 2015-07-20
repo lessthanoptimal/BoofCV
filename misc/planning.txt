@@ -13,6 +13,7 @@ Alpha 0.20
 
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
+  * Or some how estimate both at same time.  using center seems to introduce translation error
 
 - Multi camera calibration using square binary patterns.
 
