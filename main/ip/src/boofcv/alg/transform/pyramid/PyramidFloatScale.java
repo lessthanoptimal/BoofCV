@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class PyramidFloatScale< T extends ImageSingleBand>
 			T layer = getLayer(i);
 
 			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev);
-			DistortImageOps.distortSingle(prev,layer,model,null,interpolate);
+			DistortImageOps.distortSingle(prev,layer, true, model,interpolate);
 		}
 	}
 

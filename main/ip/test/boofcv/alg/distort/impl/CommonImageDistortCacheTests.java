@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
@@ -48,7 +48,6 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	PixelTransformAffine_F32 tran = new PixelTransformAffine_F32(affine);
 
 	InterpolatePixelS<T> interp;
-	ImageBorder<T> border;
 
 	T src;
 	T dst0;
@@ -56,8 +55,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 
 	protected CommonImageDistortCacheTests(Class<T> imageType) {
 		this.imageType = imageType;
-		interp = FactoryInterpolation.bilinearPixelS(imageType);
-		border = FactoryImageBorder.value(imageType, 1);
+		interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
+		interp.setBorder(FactoryImageBorder.value(imageType, 1));
 
 		src = GeneralizedImageOps.createSingleBand(imageType,200,300);
 		dst0 = GeneralizedImageOps.createSingleBand(imageType,200,300);
@@ -69,8 +68,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareNoCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,border,imageType);
-		ImageDistortCache<T,T> alg = create(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,imageType);
+		ImageDistortCache<T,T> alg = create(interp,imageType);
 		
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -84,8 +83,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,border,imageType);
-		ImageDistortCache<T,T> alg = create(interp,border,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,imageType);
+		ImageDistortCache<T,T> alg = create(interp,imageType);
 
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -97,5 +96,5 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	}
 	
 	public abstract ImageDistortCache<T,T>
-	create(InterpolatePixelS<T> interp, ImageBorder<T> border , Class<T> imageType );
+	create(InterpolatePixelS<T> interp, Class<T> imageType );
 }

@@ -49,8 +49,8 @@ Version : Alpha 0.19
 - Calibration
   * A single class fully specifies the calibration target now
   * Intrinsic parameters can now use a flow style assignment of parameters
-- Interpolation actually can interpolate along the image border now
-  * Can specify a border and is automatically used if a pixel outside the image is requested
+- Interpolation
+  * Can specify a border handling algorithm now
 - PixelMath
   * Added minus(image,scalar)
   * Added minus(scalar,image)

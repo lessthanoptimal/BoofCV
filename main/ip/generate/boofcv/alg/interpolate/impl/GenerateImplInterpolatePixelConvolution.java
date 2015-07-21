@@ -41,7 +41,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 
 	private void createFile( AutoTypeImage inputType ) throws FileNotFoundException {
 		this.inputType = inputType;
-		borderType = inputType.isInteger() ? "I32" : inputType.getAbbreviatedType();
+		borderType = inputType.isInteger() ? "S32" : inputType.getAbbreviatedType();
 		setOutputFile("ImplInterpolatePixelConvolution_"+inputType.getAbbreviatedType());
 
 		printPreamble(className);
@@ -242,6 +242,10 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				"\tpublic int getFastBorderY() {\n" +
 				"\t\treturn kernel.getRadius();\n" +
 				"\t}\n" +
+				"\t@Override\n" +
+				"\tpublic ImageBorder<"+inputType.getSingleBandName()+"> getBorder() {\n" +
+				"\t\treturn border;\n" +
+				"\t}" +
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic ImageType<"+inputType.getSingleBandName()+"> getImageType() {\n" +

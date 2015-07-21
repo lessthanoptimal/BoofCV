@@ -26,7 +26,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.benchmark.feature.orientation.UtilOrientationBenchmark;
-import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
@@ -139,8 +139,9 @@ public class FactoryBenchmarkFeatureDistort {
 			Affine2D_F32 initToImage = StabilityEvaluatorPoint.createScale((float)scale,image.width,image.height);
 			Affine2D_F32 imageToInit = initToImage.invert(null);
 			PixelTransformAffine_F32 affine = new PixelTransformAffine_F32(imageToInit);
-			InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, imageType);
-			ImageDistort<T,T> distorter = FactoryDistort.distort(false,interp, FactoryImageBorder.value(imageType, 0), imageType);
+			InterpolatePixelS<T> interp = FactoryInterpolation.createPixelS(0, 255,
+					TypeInterpolate.BILINEAR, BorderType.VALUE, imageType);
+			ImageDistort<T,T> distorter = FactoryDistort.distort(false, interp, imageType);
 			distorter.setModel(affine);
 			distorter.apply(image,distortedImage);
 		}

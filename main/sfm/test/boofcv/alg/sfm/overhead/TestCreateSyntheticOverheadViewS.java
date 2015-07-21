@@ -20,6 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
@@ -54,7 +55,7 @@ public class TestCreateSyntheticOverheadViewS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 		CreateSyntheticOverheadViewS<ImageFloat32> alg = new CreateSyntheticOverheadViewS<ImageFloat32>(interp);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);

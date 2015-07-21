@@ -82,12 +82,17 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 	public void get_edges(T img) {
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
-		compare(interp,img, width-1, height/2);
-		compare(interp,img, 0, height/2);
-		compare(interp,img, width/2, height-1);
-		compare(interp,img, width/2, 0);
-		compare(interp, img, 0, 0);
-		compare(interp, img, width - 1, height - 1);
+		int borderX0 = interp.getFastBorderX();
+		int borderX1 = interp.getFastBorderX();
+		int borderY0 = interp.getFastBorderY();
+		int borderY1 = interp.getFastBorderY();
+
+		compare(interp,img, width-borderX1-1, height/2);
+		compare(interp,img, borderX0, height/2);
+		compare(interp,img, width/2, height-borderY1-1);
+		compare(interp,img, width/2, borderY0);
+		compare(interp,img, borderX0, borderY0);
+		compare(interp,img, width - borderX1-1, height - borderY1-1);
 	}
 
 	protected void compare( InterpolatePixelS<T> interp , T img , float x , float y )
@@ -243,12 +248,13 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 		T img = createImage(20, 30);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
+		interp.setBorder(FactoryImageBorder.value(img,0));
 
 		for( int off = 0; off < 5; off++ ) {
 			float frac = off/5.0f;
 
-			for( int y = 0; y < img.height-1; y++ ) {
-				for( int x = 0; x < img.width-1; x++ ) {
+			for( int y = 0; y < img.height; y++ ) {
+				for( int x = 0; x < img.width; x++ ) {
 					float v = interp.get(x+frac,y+frac);
 					assertTrue( v >= 0 && v <= 100 );
 				}
@@ -268,6 +274,9 @@ public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBan
 
 		T imgB = BoofTesting.createSubImageOf(imgA);
 		InterpolatePixelS<T> interpB = wrap(imgB, 0, 100);
+
+		interpA.setBorder(FactoryImageBorder.value(imgA,0));
+		interpB.setBorder(FactoryImageBorder.value(imgB,0));
 
 		for (int y = 0; y < 40; y++) {
 			for (int x = 0; x < 30; x++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.derivative.impl.GradientThree_Standard;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -70,7 +70,7 @@ public class GradientThree {
 	 */
 	public static void process(ImageUInt8 orig,
 							   ImageSInt16 derivX,
-							   ImageSInt16 derivY, ImageBorder_I32 border ) {
+							   ImageSInt16 derivY, ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 
@@ -90,7 +90,7 @@ public class GradientThree {
 	 */
 	public static void process(ImageSInt16 orig,
 							   ImageSInt16 derivX,
-							   ImageSInt16 derivY, ImageBorder_I32 border) {
+							   ImageSInt16 derivY, ImageBorder_S32 border) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldParameters;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageMultiBand;
@@ -109,7 +110,7 @@ public class FactoryTrackerObjectAlgs {
 		if( config == null )
 			config = new ConfigCirculantTracker();
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		return new CirculantTracker(
 				config.output_sigma_factor,config.sigma,config.lambda,config.interp_factor,

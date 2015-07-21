@@ -61,7 +61,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		scaledImage = new MultiSpectral<T>(imageType,1,1,3);
 
 		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixelS(imageType));
-		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixelS(imageType));
+		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED));
 		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubicS(-0.5f, 0, 255, imageType));
 		addAlgorithm(0, "Polynomial 5",FactoryInterpolation.polynomialS(5, 0, 255, imageType));
 

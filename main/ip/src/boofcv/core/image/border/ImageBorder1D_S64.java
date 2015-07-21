@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,11 @@ import boofcv.struct.image.ImageSInt64;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_I64 extends ImageBorder_I64 {
+public class ImageBorder1D_S64 extends ImageBorder_S64 {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_I64(Class<?> type ) {
+	public ImageBorder1D_S64(Class<?> type) {
 		try {
 			this.rowWrap = (BorderIndex1D)type.newInstance();
 			this.colWrap = (BorderIndex1D)type.newInstance();
@@ -39,12 +39,12 @@ public class ImageBorder1D_I64 extends ImageBorder_I64 {
 		}
 	}
 
-	public ImageBorder1D_I64(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_S64(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
 	}
 
-	public ImageBorder1D_I64(ImageSInt64 image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_S64(ImageSInt64 image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		super(image);
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;

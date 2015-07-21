@@ -15,10 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixel;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
@@ -56,7 +57,7 @@ public class NearestNeighborPixel_S32 extends NearestNeighborPixel<ImageSInt32> 
 	}
 
 	public float get_border(float x, float y) {
-		return ((ImageBorder_I32)border).get((int)Math.floor(x),(int)Math.floor(y));
+		return ((ImageBorder_S32)border).get((int)Math.floor(x),(int)Math.floor(y));
 	}
 
 	@Override

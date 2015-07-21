@@ -85,9 +85,9 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					GradientPrewitt.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
 				} else if( input instanceof ImageUInt8 ) {
-					GradientPrewitt.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientPrewitt.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else if( input instanceof ImageSInt16 ) {
-					GradientPrewitt.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientPrewitt.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -96,9 +96,9 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					GradientSobel.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
 				} else if( input instanceof ImageUInt8 ) {
-					GradientSobel.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientSobel.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else if( input instanceof ImageSInt16 ) {
-					GradientSobel.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientSobel.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -107,9 +107,9 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					GradientThree.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
 				} else if( input instanceof ImageUInt8 ) {
-					GradientThree.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientThree.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else if( input instanceof ImageSInt16 ) {
-					GradientThree.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_I32)border);
+					GradientThree.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -118,9 +118,9 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					GradientTwo0.process((ImageFloat32) input, (ImageFloat32) derivX, (ImageFloat32) derivY, (ImageBorder_F32) border);
 				} else if( input instanceof ImageUInt8 ) {
-					GradientTwo0.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_I32) border);
+					GradientTwo0.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
 				} else if( input instanceof ImageSInt16 ) {
-					GradientTwo0.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_I32) border);
+					GradientTwo0.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -129,9 +129,9 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					GradientTwo1.process((ImageFloat32) input, (ImageFloat32) derivX, (ImageFloat32) derivY, (ImageBorder_F32) border);
 				} else if( input instanceof ImageUInt8 ) {
-					GradientTwo1.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_I32) border);
+					GradientTwo1.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
 				} else if( input instanceof ImageSInt16 ) {
-					GradientTwo1.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_I32) border);
+					GradientTwo1.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -163,7 +163,7 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					HessianSobel.process((ImageFloat32) input, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
 				} else if( input instanceof ImageUInt8 ) {
-					HessianSobel.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_I32) border);
+					HessianSobel.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -173,7 +173,7 @@ public class GImageDerivativeOps {
 				if( input instanceof ImageFloat32 ) {
 					HessianThree.process((ImageFloat32) input, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
 				} else if( input instanceof ImageUInt8 ) {
-					HessianThree.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_I32) border);
+					HessianThree.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -204,7 +204,7 @@ public class GImageDerivativeOps {
 				if( derivX instanceof ImageFloat32 ) {
 					HessianFromGradient.hessianPrewitt((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
 				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianPrewitt((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_I32) border);
+					HessianFromGradient.hessianPrewitt((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}
@@ -214,7 +214,7 @@ public class GImageDerivativeOps {
 				if( derivX instanceof ImageFloat32 ) {
 					HessianFromGradient.hessianSobel((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
 				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianSobel((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_I32) border);
+					HessianFromGradient.hessianSobel((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}
@@ -224,7 +224,7 @@ public class GImageDerivativeOps {
 				if( derivX instanceof ImageFloat32 ) {
 					HessianFromGradient.hessianThree((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
 				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianThree((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_I32) border);
+					HessianFromGradient.hessianThree((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}

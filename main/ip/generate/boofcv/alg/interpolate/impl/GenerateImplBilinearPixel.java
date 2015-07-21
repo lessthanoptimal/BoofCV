@@ -52,7 +52,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 
 	private void createFile() throws FileNotFoundException {
 
-		borderType = image.isInteger() ? "I32" : image.getAbbreviatedType();
+		borderType = image.isInteger() ? "S32" : image.getAbbreviatedType();
 		floatType = !image.isInteger() && image.getNumBits()==64 ? "double" : "float";
 		f = !image.isInteger() && image.getNumBits()==64 ? "" : "f";
 
@@ -134,29 +134,10 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic float get(float x, float y) {\n" +
-				"\t\tif (x < 0 || y < 0 || x > width-1 || y > height-1)\n" +
+				"\t\tif (x < 0 || y < 0 || x > width-2 || y > height-2)\n" +
 				"\t\t\treturn get_border(x,y);\n" +
 				"\n" +
-				"\t\tint xt = (int) x;\n" +
-				"\t\tint yt = (int) y;\n" +
-				"\n" +
-				"\t\t"+floatType+" ax = x - xt;\n" +
-				"\t\t"+floatType+" ay = y - yt;\n" +
-				"\n" +
-				"\t\tint index = orig.startIndex + yt * stride + xt;\n" +
-				"\n" +
-				"\t\t// allows borders to be interpolated gracefully by double counting appropriate pixels\n" +
-				"\t\tint dx = xt == width - 1 ? 0 : 1;\n" +
-				"\t\tint dy = yt == height - 1 ? 0 : stride;\n" +
-				"\n" +
-				"\t\t"+image.getDataType()+"[] data = orig.data;\n" +
-				"\n" +
-				"\t\t"+floatType+" val = (1.0"+f+" - ax) * (1.0"+f+" - ay) * (data[index] "+bitWise+"); // (x,y)\n" +
-				"\t\tval += ax * (1.0"+f+" - ay) * (data[index + dx] "+bitWise+"); // (x+1,y)\n" +
-				"\t\tval += ax * ay * (data[index + dx + dy] "+bitWise+"); // (x+1,y+1)\n" +
-				"\t\tval += (1.0"+f+" - ax) * ay * (data[index + dy] "+bitWise+"); // (x,y+1)\n" +
-				"\n" +
-				"\t\treturn val;\n" +
+				"\t\treturn get_fast(x,y);\n" +
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +

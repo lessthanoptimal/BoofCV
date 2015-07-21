@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageMultiBand;
@@ -61,7 +62,7 @@ public class FactoryTrackerObjectQuad {
 
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
 		TldTracker<T,D> tracker = new TldTracker<T,D>(config.parameters,interpolate,gradient,imageType,derivType);
@@ -155,7 +156,7 @@ public class FactoryTrackerObjectQuad {
 			config = new ConfigComaniciu2003();
 
 		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
-				config.interpolation,imageType);
+				config.interpolation, BorderType.EXTENDED,imageType);
 
 		LocalWeightedHistogramRotRect<T> hist =
 				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,

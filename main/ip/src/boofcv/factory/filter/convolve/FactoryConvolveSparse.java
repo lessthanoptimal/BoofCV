@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.filter.convolve.ConvolveWithBorderSparse;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
@@ -76,7 +76,7 @@ public class FactoryConvolveSparse {
 
 		@Override
 		public double compute(int x, int y) {
-			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_I32)image,x,y);
+			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_S32)image,x,y);
 		}
 	}
 }

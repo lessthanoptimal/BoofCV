@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePyramidPanel;
@@ -51,7 +52,7 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 
 	public VisualizePyramidFloatApp( Class<T> imageType ) {
 		this.imageType = imageType;
-		interp = FactoryInterpolation.bilinearPixelS(imageType);
+		interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		setMainGUI(gui);
 	}

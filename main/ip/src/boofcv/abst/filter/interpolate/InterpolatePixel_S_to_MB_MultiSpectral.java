@@ -66,6 +66,11 @@ public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
 	}
 
 	@Override
+	public ImageBorder<MultiSpectral<T>> getBorder() {
+		throw new RuntimeException("Need to write code to handle this");
+	}
+
+	@Override
 	public void setImage(MultiSpectral<T> image) {
 		this.image = image;
 		// set it to use the first band by default so that other functions can work

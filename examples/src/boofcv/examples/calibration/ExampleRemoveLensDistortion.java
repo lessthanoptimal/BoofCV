@@ -91,7 +91,7 @@ public class ExampleRemoveLensDistortion {
 		MultiSpectral<ImageFloat32> undistortedImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				distortedImg.getWidth(),distortedImg.getHeight(),distortedImg.getNumBands());
 
-		allInside.apply(distortedImg,undistortedImg);
+		allInside.apply(distortedImg, undistortedImg);
 		BufferedImage out1 = ConvertBufferedImage.convertTo(undistortedImg, null,true);
 
 		fullView.apply(distortedImg,undistortedImg);
@@ -103,6 +103,6 @@ public class ExampleRemoveLensDistortion {
 		panel.addItem(new ImagePanel(out1), "Undistorted All Inside");
 		panel.addItem(new ImagePanel(out2), "Undistorted Full View");
 
-		ShowImages.showWindow(panel, "Removing Lens Distortion");
+		ShowImages.showWindow(panel, "Removing Lens Distortion", true);
 	}
 }

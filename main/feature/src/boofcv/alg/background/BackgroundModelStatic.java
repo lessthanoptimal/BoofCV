@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.interpolate;
+package boofcv.alg.background;
 
 /**
- * Computes the surface integral of a triangle over the image
- *
  * @author Peter Abeles
  */
-public class ImageTriangleSurfaceIntegral {
+public class BackgroundModelStatic {
 }

@@ -184,7 +184,7 @@ public class ExampleImageStitching {
 		// Used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
 		ImageDistort<MultiSpectral<ImageFloat32>,MultiSpectral<ImageFloat32>> distort =
-				DistortSupport.createDistortMS(ImageFloat32.class, model, new ImplBilinearPixel_F32(),false, null);
+				DistortSupport.createDistortMS(ImageFloat32.class, model, new ImplBilinearPixel_F32(),false);
 
 		// Render first image
 		model.set(fromWorkToA);

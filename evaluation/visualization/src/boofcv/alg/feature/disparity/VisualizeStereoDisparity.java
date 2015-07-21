@@ -24,6 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
@@ -244,8 +245,10 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
 
-		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(calib.left, rect1, activeAlg.getInputType());
-		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(calib.right, rect2, activeAlg.getInputType());
+		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
+				calib.left, rect1, BorderType.SKIP, activeAlg.getInputType());
+		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
+				calib.right, rect2, BorderType.SKIP, activeAlg.getInputType());
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

@@ -18,7 +18,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixel;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
@@ -70,7 +70,7 @@ public class ImplBilinearPixel_U8 extends BilinearPixel<ImageUInt8> {
 		float ax = x - xf;
 		float ay = y - yf;
 
-		ImageBorder_I32 border = (ImageBorder_I32)this.border;
+		ImageBorder_S32 border = (ImageBorder_S32)this.border;
 
 		float val = (1.0f - ax) * (1.0f - ay) * border.get(xt,yt); // (x,y)
 		val += ax * (1.0f - ay) *  border.get(xt + 1, yt);; // (x+1,y)
@@ -82,29 +82,10 @@ public class ImplBilinearPixel_U8 extends BilinearPixel<ImageUInt8> {
 
 	@Override
 	public float get(float x, float y) {
-		if (x < 0 || y < 0 || x > width-1 || y > height-1)
+		if (x < 0 || y < 0 || x > width-2 || y > height-2)
 			return get_border(x,y);
 
-		int xt = (int) x;
-		int yt = (int) y;
-
-		float ax = x - xt;
-		float ay = y - yt;
-
-		int index = orig.startIndex + yt * stride + xt;
-
-		// allows borders to be interpolated gracefully by double counting appropriate pixels
-		int dx = xt == width - 1 ? 0 : 1;
-		int dy = yt == height - 1 ? 0 : stride;
-
-		byte[] data = orig.data;
-
-		float val = (1.0f - ax) * (1.0f - ay) * (data[index] & 0xFF); // (x,y)
-		val += ax * (1.0f - ay) * (data[index + dx] & 0xFF); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] & 0xFF); // (x+1,y+1)
-		val += (1.0f - ax) * ay * (data[index + dy] & 0xFF); // (x,y+1)
-
-		return val;
+		return get_fast(x,y);
 	}
 
 	@Override

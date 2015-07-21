@@ -21,6 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
@@ -57,7 +58,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 
 	public void _update(ImageFloat32 img) {
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(img);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(img, BorderType.EXTENDED);
 
 		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
 
@@ -90,7 +91,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 		double sigmas[] = new double[ scales.length ];
 		for( int i = 0; i < sigmas.length; i++ )
 			sigmas[i] = i+1;
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(imageType,BorderType.EXTENDED);
 		return new PyramidFloatGaussianScale<ImageFloat32>(interp,a,sigmas,imageType);
 	}
 
@@ -100,7 +101,8 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 	 */
 	@Test
 	public void checkSigmas() {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.
+				bilinearPixelS(ImageFloat32.class,BorderType.EXTENDED);
 		double scales[] = new double[]{1,1};
 		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
 

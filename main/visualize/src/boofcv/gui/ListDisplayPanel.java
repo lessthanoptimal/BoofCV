@@ -20,6 +20,8 @@ package boofcv.gui;
 
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.ImageBase;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -88,6 +90,11 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
 	public int getListWidth(){
 		return (int)listPanel.getPreferredSize().getWidth();
+	}
+
+	public void addImage( ImageBase image , String name ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(image, null, true);
+		addImage(buff, name, ScaleOptions.DOWN);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public abstract class GenericImageBorderTests {
 	int width = 20;
 	int height = 25;
 
-	public abstract ImageBorder_I32 wrap( ImageUInt8 image );
+	public abstract ImageBorder_S32 wrap( ImageUInt8 image );
 
 	public abstract ImageBorder_F32 wrap( ImageFloat32 image );
 
@@ -60,7 +60,7 @@ public abstract class GenericImageBorderTests {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
 		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
 
-		ImageBorder_I32 fooA = wrap(imgA);
+		ImageBorder_S32 fooA = wrap(imgA);
 
 		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
 		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
@@ -108,7 +108,7 @@ public abstract class GenericImageBorderTests {
 		ImageUInt8 imgA = new ImageUInt8(width,height);
 		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
 
-		ImageBorder_I32 fooA = wrap(imgA);
+		ImageBorder_S32 fooA = wrap(imgA);
 
 		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
 		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);

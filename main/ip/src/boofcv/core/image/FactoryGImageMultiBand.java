@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,27 @@ public class FactoryGImageMultiBand {
 
 	public static class MS implements GImageMultiBand {
 		MultiSpectral image;
+		GImageSingleBand bandWrappers[];
 
 		public MS(MultiSpectral image) {
 			this.image = image;
+		}
+
+		@Override
+		public void wrap(ImageBase image) {
+			if( this.image == null ) {
+				this.image = (MultiSpectral) image;
+
+				bandWrappers = new GImageSingleBand[this.image.getNumBands()];
+				for (int i = 0; i < bandWrappers.length; i++) {
+					bandWrappers[i] = FactoryGImageSingleBand.wrap(this.image.getBand(i));
+				}
+			} else {
+				this.image = (MultiSpectral) image;
+				for (int i = 0; i < bandWrappers.length; i++) {
+					bandWrappers[i].wrap(this.image.getBand(i));
+				}
+			}
 		}
 
 		@Override
@@ -53,17 +71,27 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public void set(int x, int y, float[] value) {
-			for( int i = 0; i < image.getNumBands(); i++ ) {
-				ImageSingleBand band = image.getBand(i);
-				GeneralizedImageOps.set(band,x,y,value[i]);
-			}
+			int index = this.image.getIndex(x,y);
+			setF(index,value);
 		}
 
 		@Override
 		public void get(int x, int y, float[] value) {
+			int index = this.image.getIndex(x,y);
+			getF(index, value);
+		}
+
+		@Override
+		public void setF(int index, float[] value) {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
-				ImageSingleBand band = image.getBand(i);
-				value[i] = (float)GeneralizedImageOps.get(band,x,y);
+				bandWrappers[i].set(index, value[i]);
+			}
+		}
+
+		@Override
+		public void getF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				value[i] = bandWrappers[i].getF(index);
 			}
 		}
 
@@ -79,6 +107,15 @@ public class FactoryGImageMultiBand {
 
 		public GSingleToMB(GImageSingleBand sb) {
 			this.sb = sb;
+		}
+
+		@Override
+		public void wrap(ImageBase image) {
+			if( this.sb == null ) {
+				this.sb = FactoryGImageSingleBand.wrap((ImageSingleBand)image);
+			} else {
+				this.sb.wrap((ImageSingleBand)image);
+			}
 		}
 
 		@Override
@@ -98,6 +135,16 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			value[0]=sb.getF(y*sb.getWidth()+x);
+		}
+
+		@Override
+		public void setF(int index, float[] value) {
+			sb.set(index,value[0]);
+		}
+
+		@Override
+		public void getF(int index, float[] value) {
+			value[0] = sb.getF(index);
 		}
 
 		@Override

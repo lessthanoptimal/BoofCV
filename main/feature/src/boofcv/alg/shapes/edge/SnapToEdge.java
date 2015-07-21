@@ -24,8 +24,6 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GImageSingleBandDistorted;
 import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -117,9 +115,7 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
-		ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
-		interpolate.setBorder(border);
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
 	}
 

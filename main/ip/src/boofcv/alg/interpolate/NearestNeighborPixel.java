@@ -67,4 +67,9 @@ public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements
 	public int getFastBorderY() {
 		return 0;
 	}
+
+	@Override
+	public ImageBorder<T> getBorder() {
+		return border;
+	}
 }

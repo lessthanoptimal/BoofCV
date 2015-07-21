@@ -25,6 +25,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
@@ -215,9 +216,9 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// undistorted and rectify images
 		ImageDistort<ImageUInt8,ImageUInt8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.SKIP, ImageUInt8.class);
 		ImageDistort<ImageUInt8,ImageUInt8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.SKIP, ImageUInt8.class);
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
 		distortRight.apply(distortedRight, rectifiedRight);

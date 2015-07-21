@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,7 @@
  */package boofcv.alg.filter.convolve.border;
 
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -170,7 +170,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_S32 input, ImageInt16 output ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
@@ -202,7 +202,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageInt16 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_S32 input, ImageInt16 output ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
@@ -234,7 +234,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I32 input, ImageInt16 output ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageBorder_S32 input, ImageInt16 output ) {
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
@@ -300,7 +300,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, ImageBorder_S32 input, ImageSInt32 output ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
@@ -332,7 +332,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output ) {
+	public static void vertical(Kernel1D_I32 kernel, ImageBorder_S32 input, ImageSInt32 output ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 
@@ -364,7 +364,7 @@ public class ConvolveJustBorder_General {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageBorder_I32 input, ImageSInt32 output ) {
+	public static void convolve(Kernel2D_I32 kernel, ImageBorder_S32 input, ImageSInt32 output ) {
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
 

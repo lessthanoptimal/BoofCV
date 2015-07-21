@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.factory.transform.pyramid;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.PyramidDiscreteSampleBlur;
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -70,7 +71,7 @@ public class FactoryPyramid {
 	public static <T extends ImageSingleBand>
 	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		return new PyramidFloatGaussianScale<T>(interp,scaleFactors,sigmas,imageType);
 	}

@@ -19,7 +19,6 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -46,36 +45,7 @@ public class TestImageDistortCache {
 
 	@Test
 	public void applyBorder() {
-		Helper alg = new Helper(interp,new TestImageDistortBasic.DummyBorder());
-
-		offX=offY=0;
-		alg.reset();
-		interp.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
-		assertEquals(150,alg.getTotal());
-		assertEquals(0,interp.getTotalBorder());
-
-		offX=offY=0.1f;
-		alg.reset();
-		interp.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
-		assertEquals(150,alg.getTotal());
-		assertEquals(10+14,interp.getTotalBorder());
-
-		offX=offY=-0.1f;
-		alg.reset();
-		interp.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
-		assertEquals(150,alg.getTotal());
-		assertEquals(10+14,interp.getTotalBorder());
-	}
-
-	@Test
-	public void applyNoBorder() {
-		Helper alg = new Helper(interp,null);
+		Helper alg = new Helper(interp);
 
 		offX=offY=0;
 		alg.reset();
@@ -86,11 +56,37 @@ public class TestImageDistortCache {
 		offX=offY=0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
-		assertEquals(9*14,alg.getTotal());
+		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		assertEquals(150,alg.getTotal());
 
 		offX=offY=-0.1f;
 		alg.reset();
+		alg.setModel(tran);
+		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		assertEquals(150,alg.getTotal());
+	}
+
+	@Test
+	public void apply_setRenderAll() {
+		Helper alg = new Helper(interp);
+
+		offX=offY=0;
+		alg.reset();
+		alg.setRenderAll(true);
+		alg.setModel(tran);
+		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		assertEquals(150, alg.getTotal());
+
+		offX=offY=0.1f;
+		alg.reset();
+		alg.setRenderAll(false);
+		alg.setModel(tran);
+		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		assertEquals(9 * 14, alg.getTotal());
+
+		offX=offY=-0.1f;
+		alg.reset();
+		alg.setRenderAll(false);
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
 		assertEquals(9*14,alg.getTotal());
@@ -100,8 +96,8 @@ public class TestImageDistortCache {
 
 		int total = 0;
 
-		public Helper(InterpolatePixelS interp, ImageBorder border) {
-			super(interp, border);
+		public Helper(InterpolatePixelS interp) {
+			super(interp);
 		}
 
 		public void reset() {

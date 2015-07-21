@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
@@ -46,7 +47,11 @@ public class TestCirculantTracker {
 	int width = 60;
 	int height = 80;
 
-	InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+	InterpolatePixelS<ImageFloat32> interp;
+
+	public TestCirculantTracker() {
+		interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+	}
 
 	@Test
 	public void meanShift() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,6 @@ package boofcv.alg.distort;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.PerformerBase;
@@ -59,10 +57,9 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public HomographyBilinear_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
-			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 			
-			alg = FactoryDistort.distort(false,interp, border, imageType);
+			alg = FactoryDistort.distort(false,interp, imageType);
 			alg.setModel(tran);
 		}
 
@@ -77,10 +74,9 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public HomographyBilinearCrop_F32(Homography2D_F32 affine) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
-			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-			alg = FactoryDistort.distort(false,interp,border,imageType);
+			alg = FactoryDistort.distort(false,interp,imageType);
 			alg.setModel(tran);
 		}
 
@@ -95,10 +91,9 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 		public MapBilinear_F32( Homography2D_F32 homography ) {
 			PixelTransform_F32 tran = new PixelTransformHomography_F32(homography);
-			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
-			ImageBorder<T> border = FactoryImageBorder.general(imageType, BorderType.EXTENDED);
+			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-			alg = FactoryDistort.distort(true,interp,border,imageType);
+			alg = FactoryDistort.distort(true,interp,imageType);
 			alg.setModel(tran);
 		}
 

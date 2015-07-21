@@ -18,32 +18,32 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSInt64;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageInteger}.
+ * Child of {@link boofcv.core.image.border.ImageBorder} for {@link boofcv.struct.image.ImageInteger}.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_I32<T extends ImageInteger> extends ImageBorder<T> {
+public abstract class ImageBorder_S64 extends ImageBorder<ImageSInt64> {
 
-	public ImageBorder_I32(T image) {
+	public ImageBorder_S64(ImageSInt64 image) {
 		super(image);
 	}
 
-	protected ImageBorder_I32() {
+	protected ImageBorder_S64() {
 	}
 
-	public int get( int x , int y ) {
+	public long get( int x , int y ) {
 		if( image.isInBounds(x,y) )
 			return image.get(x,y);
 
 		return getOutside( x , y );
 	}
 
-	public abstract int getOutside( int x , int y );
+	public abstract long getOutside( int x , int y );
 
-	public void set( int x , int y , int value ) {
+	public void set( int x , int y , long value ) {
 		if( image.isInBounds(x,y) )
 			image.set(x,y,value);
 
@@ -55,5 +55,5 @@ public abstract class ImageBorder_I32<T extends ImageInteger> extends ImageBorde
 		return get(x,y);
 	}
 
-	public abstract void setOutside( int x , int y , int value );
+	public abstract void setOutside( int x , int y , long value );
 }

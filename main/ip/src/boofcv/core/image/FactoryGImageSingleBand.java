@@ -21,7 +21,7 @@ package boofcv.core.image;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_F64;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -101,7 +101,7 @@ public class FactoryGImageSingleBand {
 
 	public static GImageSingleBand wrap( ImageBorder image ) {
 		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
-			return new Border_I32( (ImageBorder_I32)image );
+			return new Border_I32( (ImageBorder_S32)image );
 		else if( image.getImage().getClass() == ImageFloat32.class )
 			return new Border_F32( (ImageBorder_F32)image );
 		else if( image.getImage().getClass() == ImageFloat64.class )
@@ -110,9 +110,9 @@ public class FactoryGImageSingleBand {
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static class Border_I32 extends GSingleBorder<ImageBorder_I32>
+	public static class Border_I32 extends GSingleBorder<ImageBorder_S32>
 	{
-		public Border_I32(ImageBorder_I32 image) {
+		public Border_I32(ImageBorder_S32 image) {
 			super(image);
 		}
 

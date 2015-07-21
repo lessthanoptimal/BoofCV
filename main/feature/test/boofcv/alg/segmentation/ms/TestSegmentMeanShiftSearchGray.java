@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -40,7 +41,7 @@ public class TestSegmentMeanShiftSearchGray {
 
 	Random rand = new Random(234);
 
-	InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+	InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 
 	/**
 	 * Process a random image and do a basic sanity check on the output

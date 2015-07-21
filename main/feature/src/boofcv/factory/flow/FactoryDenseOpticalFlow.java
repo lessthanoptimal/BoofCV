@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.flow.*;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
@@ -148,7 +149,7 @@ public class FactoryDenseOpticalFlow {
 			config = new ConfigHornSchunckPyramid();
 
 		InterpolatePixelS<ImageFloat32> interpolate =
-				FactoryInterpolation.createPixelS(0,255,config.interpolation, ImageFloat32.class);
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, ImageFloat32.class);
 
 		HornSchunckPyramid<T> alg = new HornSchunckPyramid<T>(config,interpolate);
 
@@ -162,7 +163,7 @@ public class FactoryDenseOpticalFlow {
 			config = new ConfigBroxWarping();
 
 		InterpolatePixelS<ImageFloat32> interpolate =
-				FactoryInterpolation.createPixelS(0,255,config.interpolation, ImageFloat32.class);
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, ImageFloat32.class);
 
 		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<T>(config,interpolate);
 

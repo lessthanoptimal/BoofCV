@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.filter.derivative.HessianFromGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
@@ -125,7 +125,7 @@ public class BenchmarkCornerAccuracy {
 
 		ConvertBufferedImage.convertFrom(workImg, image);
 		ImageMiscOps.addUniform(image, rand, -2, 2);
-		ImageBorder_I32<ImageUInt8> border = (ImageBorder_I32)FactoryImageBorder.general(image,BoofDefaults.DERIV_BORDER_TYPE);
+		ImageBorder_S32<ImageUInt8> border = (ImageBorder_S32)FactoryImageBorder.general(image,BoofDefaults.DERIV_BORDER_TYPE);
 		GradientSobel.process(image, derivX, derivY, border);
 	}
 

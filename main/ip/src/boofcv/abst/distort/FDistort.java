@@ -47,7 +47,6 @@ public class FDistort
 	// input and output images
 	ImageBase input,output;
 	// specifies how the borders are handled
-	ImageBorder border;
 	ImageDistort distorter;
 	InterpolatePixelS interp;
 	PixelTransform_F32 outputToInput;
@@ -67,8 +66,9 @@ public class FDistort
 		this.output = output;
 
 		ImageType inputType = input.getImageType();
-		interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, inputType.getImageClass());
+		interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR,null, inputType.getImageClass());
 
+		ImageBorder border;
 		switch( inputType.getFamily() ) {
 			case SINGLE_BAND:
 				border = FactoryImageBorder.value(inputType.getImageClass(), 0);
@@ -81,6 +81,8 @@ public class FDistort
 			default:
 				throw new IllegalArgumentException("Unsupported image type");
 		}
+		interp.setBorder(border);
+
 		cached = false;
 		distorter = null;
 		outputToInput = null;
@@ -115,11 +117,11 @@ public class FDistort
 	}
 
 	/**
-	 * Sets the border.  null means those pixels are skipped
+	 * Sets how the interpolation handles borders.
 	 */
 	public FDistort border( ImageBorder border ) {
 		distorter = null;
-		this.border = border;
+		interp.setBorder(border);
 		return this;
 	}
 
@@ -159,7 +161,7 @@ public class FDistort
 	 */
 	public FDistort interp(TypeInterpolate type) {
 		distorter = null;
-		this.interp = FactoryInterpolation.createPixelS(0, 255, type,
+		this.interp = FactoryInterpolation.createPixelS(0, 255, type, BorderType.EXTENDED,
 				input.getImageType().getImageClass());
 		;
 		return this;
@@ -257,11 +259,11 @@ public class FDistort
 			Class typeOut = output.getImageType().getImageClass();
 			switch( input.getImageType().getFamily() ) {
 				case SINGLE_BAND:
-					distorter = FactoryDistort.distort(cached, interp, border, typeOut);
+					distorter = FactoryDistort.distort(cached, interp, typeOut);
 					break;
 
 				case MULTI_SPECTRAL:
-					distorter = FactoryDistort.distortMS(cached, interp, border, typeOut);
+					distorter = FactoryDistort.distortMS(cached, interp, typeOut);
 					break;
 
 				default:

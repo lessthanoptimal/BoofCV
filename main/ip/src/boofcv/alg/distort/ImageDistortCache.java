@@ -19,7 +19,6 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
@@ -39,8 +38,6 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 	private Point2D_F32 map[];
 	// sub pixel interpolation
 	private InterpolatePixelS<Input> interp;
-	// handle the image border
-	private ImageBorder<Input> border;
 
 	// transform
 	private PixelTransform_F32 dstToSrc;
@@ -48,6 +45,8 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 	// crop boundary
 	private int x0,y0,x1,y1;
 
+	// should it render all pixels in the destination, even ones outside the input image
+	protected boolean renderAll = true;
 	protected Input srcImg;
 	protected Output dstImg;
 
@@ -57,12 +56,9 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 	 * Specifies configuration parameters
 	 *
 	 * @param interp Interpolation algorithm
-	 * @param border How borders are handled
 	 */
-	public ImageDistortCache(InterpolatePixelS<Input> interp,
-							 ImageBorder<Input> border) {
+	public ImageDistortCache(InterpolatePixelS<Input> interp) {
 		this.interp = interp;
-		this.border = border;
 	}
 
 	@Override
@@ -77,10 +73,10 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
-		if( border != null )
-			applyBorder();
+		if( renderAll )
+			renderAll();
 		else
-			applyNoBorder();
+			applyOnlyInside();
 	}
 
 	@Override
@@ -89,10 +85,10 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
 
-		if( border != null )
-			applyBorder();
+		if( renderAll )
+			renderAll();
 		else
-			applyNoBorder();
+			applyOnlyInside();
 	}
 
 	private void init(Input srcImg, Output dstImg) {
@@ -116,11 +112,10 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
-		interp.setBorder(border);
 		interp.setImage(srcImg);
 	}
 
-	public void applyBorder() {
+	public void renderAll() {
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
@@ -134,29 +129,31 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 		}
 	}
 
-	public void applyNoBorder() {
-		final float minInterpX = interp.getFastBorderX();
-		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
-
-		final float widthF = srcImg.getWidth()-1;
-		final float heightF = srcImg.getHeight()-1;
+	public void applyOnlyInside() {
+		float maxWidth = srcImg.getWidth()-1;
+		float maxHeight = srcImg.getHeight()-1;
 
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				if( s.x < minInterpX || s.x > maxInterpX || s.y < minInterpY || s.y > maxInterpY ) {
-					if( s.x >= 0f && s.x <= widthF && s.y >= 0f && s.y <= heightF )
-						assign(indexDst,interp.get(s.x, s.y));
-				} else {
-					assign(indexDst,interp.get_fast(s.x, s.y));
+				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
+					assign(indexDst,interp.get(s.x, s.y));
 				}
 			}
 		}
 	}
 
 	protected abstract void assign( int indexDst , float value );
+
+	@Override
+	public void setRenderAll(boolean renderAll) {
+		this.renderAll = renderAll;
+	}
+
+	@Override
+	public boolean getRenderAll() {
+		return renderAll;
+	}
 }

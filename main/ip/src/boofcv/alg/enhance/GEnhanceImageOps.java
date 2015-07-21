@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,6 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.enhance.impl.ImplEnhanceFilter;
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
-import boofcv.core.image.border.ImageBorder_I32;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.*;
 
 /**

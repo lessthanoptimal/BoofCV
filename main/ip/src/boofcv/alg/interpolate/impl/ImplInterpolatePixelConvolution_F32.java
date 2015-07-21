@@ -201,7 +201,10 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Im
 	public int getFastBorderY() {
 		return kernel.getRadius();
 	}
-
+	@Override
+	public ImageBorder<ImageFloat32> getBorder() {
+		return border;
+	}
 	@Override
 	public ImageType<ImageFloat32> getImageType() {
 		return ImageType.single(ImageFloat32.class);

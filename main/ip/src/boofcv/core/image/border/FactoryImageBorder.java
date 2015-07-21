@@ -47,9 +47,9 @@ public class FactoryImageBorder {
 		if( (Class)imageType == ImageFloat64.class )
 			return (Class)ImageBorder1D_F64.class;
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return (Class)ImageBorder1D_I32.class;
+			return (Class)ImageBorder1D_S32.class;
 		else if( (Class)imageType == ImageSInt64.class )
-			return (Class)ImageBorder1D_I64.class;
+			return (Class)ImageBorder1D_S64.class;
 		else
 			throw new IllegalArgumentException("Unknown image type");
 	}
@@ -68,8 +68,11 @@ public class FactoryImageBorder {
 		Class<?> borderClass;
 		switch(borderType) {
 			case SKIP:
-				borderClass = BorderIndex1D_Exception.class;
-				break;
+				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
+						"externally.  This might be a bug. Instead pass in EXTENDED and manually skip over the " +
+						"pixel in a loop some place.");
+//				borderClass = BorderIndex1D_Exception.class;
+//				break;
 
 			case NORMALIZED:
 				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
@@ -86,6 +89,9 @@ public class FactoryImageBorder {
 				borderClass = BorderIndex1D_Wrap.class;
 				break;
 
+			case VALUE:
+				return FactoryImageBorder.value(imageType,0);
+
 			default:
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
@@ -95,9 +101,9 @@ public class FactoryImageBorder {
 		if( imageType == ImageFloat64.class )
 			return (ImageBorder<T>)new ImageBorder1D_F64(borderClass);
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_I32((Class)borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_S32((Class)borderClass);
 		else if( imageType == ImageSInt64.class )
-			return (ImageBorder<T>)new ImageBorder1D_I64(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_S64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}

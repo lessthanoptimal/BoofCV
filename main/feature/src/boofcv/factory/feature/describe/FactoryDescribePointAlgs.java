@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.impl.*;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
@@ -89,7 +90,7 @@ public class FactoryDescribePointAlgs {
 	DescribePointBriefSO<T> briefso(BinaryCompareDefinition_I32 definition, BlurFilter<T> filterBlur) {
 		Class<T> imageType = filterBlur.getInputType().getImageClass();
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}

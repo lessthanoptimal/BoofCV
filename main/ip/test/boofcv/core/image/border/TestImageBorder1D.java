@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ public class TestImageBorder1D extends GenericImageBorderTests {
 	BorderIndex1D_Wrap wrap = new BorderIndex1D_Wrap();
 
 	@Override
-	public ImageBorder_I32 wrap(ImageUInt8 image) {
-		ImageBorder_I32 ret = new ImageBorder1D_I32(BorderIndex1D_Wrap.class);
+	public ImageBorder_S32 wrap(ImageUInt8 image) {
+		ImageBorder_S32 ret = new ImageBorder1D_S32(BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}

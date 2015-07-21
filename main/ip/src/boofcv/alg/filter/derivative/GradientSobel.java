@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.filter.derivative.impl.GradientSobel_Outer;
 import boofcv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
@@ -88,7 +88,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32<ImageUInt8> border ) {
+	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_S32<ImageUInt8> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
@@ -107,7 +107,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_I32<ImageSInt16> border ) {
+	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_S32<ImageSInt16> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 

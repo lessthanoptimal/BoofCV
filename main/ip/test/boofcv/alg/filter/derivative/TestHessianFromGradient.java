@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestHessianFromGradient {
 	public void hessianPrewitt_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_S32.class ));
 
 		validator.setKernel(0,GradientPrewitt.kernelDerivX_I32);
 		validator.setKernel(1,GradientPrewitt.kernelDerivY_I32);
@@ -81,7 +81,7 @@ public class TestHessianFromGradient {
 	public void hessianSobel_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_I32.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_S32.class ));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
@@ -121,7 +121,7 @@ public class TestHessianFromGradient {
 	public void hessianThree_I8() throws NoSuchMethodException {
 		CompareHessianToConvolution validator = new CompareHessianToConvolution();
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
-				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_I32.class ));
+				ImageSInt16.class,ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageSInt16.class,ImageBorder_S32.class ));
 
 		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
 		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.peak;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.weights.WeightPixel_F32;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -72,7 +73,7 @@ public class MeanShiftPeak<T extends ImageSingleBand> {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.weights = weights;
-		interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 	}
 
 	/**

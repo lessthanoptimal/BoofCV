@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -46,7 +47,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 	ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(2,ImageFloat32.class);
 	InterpolatePixelMB<MultiSpectral<ImageFloat32>> interp =
-			FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR,imageType);
+			FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
 
 	/**
 	 * Process a random image and do a basic sanity check on the output
@@ -153,8 +154,9 @@ public class TestSegmentMeanShiftSearchColor {
 
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(1,ImageFloat32.class);
 		InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpMB =
-				FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR,imageType);
-		InterpolatePixelS<ImageFloat32> interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+				FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
+		InterpolatePixelS<ImageFloat32> interpSB = FactoryInterpolation.bilinearPixelS(
+				ImageFloat32.class, BorderType.EXTENDED);
 
 		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> algMB =
 				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>

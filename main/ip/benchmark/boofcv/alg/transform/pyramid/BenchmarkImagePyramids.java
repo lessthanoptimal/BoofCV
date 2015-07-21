@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,8 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -73,7 +71,6 @@ public class BenchmarkImagePyramids {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
 		pyramidD = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,2,ImageFloat32.class,true,scalesD);
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
 		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, ImageFloat32.class);
 
 	}

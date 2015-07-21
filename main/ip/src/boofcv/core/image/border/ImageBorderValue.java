@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static ImageBorder_I64 wrap( ImageSInt64 image , long value ) {
+	public static ImageBorder_S64 wrap( ImageSInt64 image , long value ) {
 		return new Value_I64(image,value);
 	}
 
@@ -52,11 +52,11 @@ public class ImageBorderValue {
 		return new Value_F32(image,value);
 	}
 
-	public static ImageBorder_I32 wrap( ImageInteger image , int value ) {
+	public static ImageBorder_S32 wrap( ImageInteger image , int value ) {
 		return new Value_I(image,value);
 	}
 
-	public static class Value_I64 extends ImageBorder_I64 {
+	public static class Value_I64 extends ImageBorder_S64 {
 		long value;
 
 		public Value_I64( ImageSInt64 image , long value ) {
@@ -125,7 +125,7 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static class Value_I extends ImageBorder_I32 {
+	public static class Value_I extends ImageBorder_S32 {
 		int value;
 
 		public Value_I( ImageInteger image , int value ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.filter.interpolate;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
@@ -47,8 +48,10 @@ public class TestInterpolatePixel_S_to_MB_MultiSpectral {
 		ImageMiscOps.fillUniform(image0,rand,0,100);
 		ImageMiscOps.fillUniform(image1,rand,0,100);
 
-		InterpolatePixelS<ImageFloat32> interpA = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
-		InterpolatePixelS<ImageFloat32> interpB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpA =
+				FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS<ImageFloat32> interpB =
+				FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 
 		InterpolatePixelMB<MultiSpectral<ImageFloat32>> alg = new InterpolatePixel_S_to_MB_MultiSpectral<ImageFloat32>(interpB);
 

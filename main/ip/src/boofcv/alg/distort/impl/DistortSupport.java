@@ -21,7 +21,6 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
@@ -94,15 +93,13 @@ public class DistortSupport {
 	 *
 	 * @param dstToSrc Transform from dst to src image.
 	 * @param interp Which interpolation algorithm should be used.
-	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
-	 *               happens to pixels which have a source pixel outside the image.
 	 */
 	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
 	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
 	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
-					InterpolatePixelS<Input> interp, boolean cached , ImageBorder border)
+					InterpolatePixelS<Input> interp, boolean cached )
 	{
-		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(cached,interp, border, outputType);
+		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(cached,interp, outputType);
 		bandDistort.setModel(dstToSrc);
 		return new ImplImageDistort_MS<Input,Output>(bandDistort);
 	}

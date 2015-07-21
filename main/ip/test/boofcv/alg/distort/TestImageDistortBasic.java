@@ -20,8 +20,6 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
@@ -47,35 +45,33 @@ public class TestImageDistortBasic {
 	};
 
 	@Test
-	public void applyBorder() {
-		Helper alg = new Helper(interp,new DummyBorder());
+	public void applyRenderAll_true() {
+		Helper alg = new Helper(interp);
+		alg.setRenderAll(true);
 
-		offX=offY=0;
+		offX= offY=0;
 		alg.reset();
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
 		assertEquals(150, alg.getTotal());
-		assertEquals(0,interp.getTotalBorder());
 
-		offX=offY=0.1f;
+		offX=offY =0.1f;
 		alg.reset();
 		alg.setModel(tran);
 		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
 		assertEquals(150, alg.getTotal());
-		assertEquals(10+14,interp.getTotalBorder());
 
-		offX=offY=-0.1f;
-		interp.reset();
+		offX=offY = -0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
+		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10,15));
 		assertEquals(150,alg.getTotal());
-		assertEquals(10+14,interp.getTotalBorder());
 	}
 
 	@Test
-	public void applyNoBorder() {
-		Helper alg = new Helper(interp,null);
+	public void applyRenderAll_False() {
+		Helper alg = new Helper(interp);
+		alg.setRenderAll(false);
 
 		offX=offY=0;
 		alg.reset();
@@ -100,8 +96,8 @@ public class TestImageDistortBasic {
 
 		int total = 0;
 
-		public Helper(InterpolatePixelS interp, ImageBorder border) {
-			super(interp, border);
+		public Helper(InterpolatePixelS interp) {
+			super(interp);
 		}
 
 		public void reset() {
@@ -122,34 +118,12 @@ public class TestImageDistortBasic {
 	}
 
 	protected static class DummyInterpolate extends ImplBilinearPixel_F32 {
-		public int totalBorder = 0;
-
-		public void reset() {
-			totalBorder = 0;
-		}
 
 		@Override
 		public float get_border(float x, float y) {
-			totalBorder++;
 			return 1.1f;
 		}
-
-		public int getTotalBorder() {
-			return totalBorder;
-		}
 	}
 
-	protected static class DummyBorder extends ImageBorder_F32 {
-
-		@Override
-		public float getOutside(int x, int y) {
-			return 0;
-		}
-
-		@Override
-		public void setOutside(int x, int y, float val) {
-
-		}
-	}
 
 }

@@ -71,4 +71,9 @@ public abstract class BilinearPixel<T extends ImageSingleBand> implements Interp
 	public int getFastBorderY() {
 		return 1;
 	}
+
+	@Override
+	public ImageBorder<T> getBorder() {
+		return border;
+	}
 }

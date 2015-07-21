@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageUInt8;
 
@@ -36,9 +35,8 @@ public class TestImplImageDistort_I8 extends GeneralImageDistortTests<ImageUInt8
 
 	@Override
 	public ImageDistort<ImageUInt8,ImageUInt8> createDistort(PixelTransform_F32 dstToSrc,
-															 InterpolatePixelS<ImageUInt8> interp ,
-															 ImageBorder<ImageUInt8> border) {
-		ImageDistort<ImageUInt8,ImageUInt8> ret = new ImplImageDistort_I8<ImageUInt8,ImageUInt8>(interp,border);
+															 InterpolatePixelS<ImageUInt8> interp) {
+		ImageDistort<ImageUInt8,ImageUInt8> ret = new ImplImageDistort_I8<ImageUInt8,ImageUInt8>(interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

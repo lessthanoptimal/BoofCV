@@ -19,7 +19,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageType;
 public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<ImageSInt16>  {
 
 	// used to read outside the image border
-	private ImageBorder_I32 border;
+	private ImageBorder_S32 border;
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
@@ -56,7 +56,7 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 
 	@Override
 	public void setBorder(ImageBorder<ImageSInt16> border) {
-		this.border = (ImageBorder_I32)border;
+		this.border = (ImageBorder_S32)border;
 	}
 
 	@Override
@@ -201,7 +201,10 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 	public int getFastBorderY() {
 		return kernel.getRadius();
 	}
-
+	@Override
+	public ImageBorder<ImageSInt16> getBorder() {
+		return border;
+	}
 	@Override
 	public ImageType<ImageSInt16> getImageType() {
 		return ImageType.single(ImageSInt16.class);

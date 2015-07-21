@@ -22,6 +22,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyFundamental;
+import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
@@ -89,9 +90,9 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(rect1,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(rect1, BorderType.SKIP, ImageFloat32.class);
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(rect2,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(rect2, BorderType.SKIP, ImageFloat32.class);
 
 		DistortImageOps.distortMS(unrectLeft, rectLeft, imageDistortLeft);
 		DistortImageOps.distortMS(unrectRight, rectRight, imageDistortRight);

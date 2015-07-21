@@ -20,6 +20,7 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
@@ -51,7 +52,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 
 	public void _update(ImageFloat32 input) {
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
 		alg.process(input);
 
@@ -74,7 +75,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 
 	@Override
 	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 		double a[] = BoofMiscOps.convertTo_F64(scales);
 		return new PyramidFloatScale<ImageFloat32>(interp,a,imageType);
 	}
@@ -84,7 +85,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 	 */
 	@Test
 	public void checkSigmas() {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
 
 		for( int i = 0; i < 2; i++ ) {

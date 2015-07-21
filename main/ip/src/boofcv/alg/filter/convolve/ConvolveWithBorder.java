@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -100,7 +100,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								  ImageUInt8 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -118,7 +118,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								ImageUInt8 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -136,7 +136,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void convolve(Kernel2D_I32 kernel,
-								ImageUInt8 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								ImageUInt8 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -154,7 +154,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
+								  ImageUInt8 image, ImageSInt32 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -172,7 +172,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
+								ImageUInt8 image, ImageSInt32 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -190,7 +190,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void convolve(Kernel2D_I32 kernel,
-								ImageUInt8 image, ImageSInt32 dest , ImageBorder_I32 border ) {
+								ImageUInt8 image, ImageSInt32 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -208,7 +208,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void horizontal(Kernel1D_I32 kernel,
-								  ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								  ImageSInt16 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -226,7 +226,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void vertical(Kernel1D_I32 kernel,
-								ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								ImageSInt16 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);
@@ -244,7 +244,7 @@ public class ConvolveWithBorder {
 	 * @param border How the image borders are handled.
 	 */
 	public static void convolve(Kernel2D_I32 kernel,
-								ImageSInt16 image, ImageInt16 dest , ImageBorder_I32 border ) {
+								ImageSInt16 image, ImageInt16 dest , ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		border.setImage(image);

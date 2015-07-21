@@ -21,6 +21,7 @@ package boofcv.alg.fiducial;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.h.HomographyLinear4;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -130,8 +131,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
-		removePerspective = FactoryDistort.distort(false,FactoryInterpolation.nearestNeighborPixelS(inputType),
-				FactoryImageBorder.general(inputType, BorderType.EXTENDED),ImageFloat32.class);
+		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
+		interp.setBorder(FactoryImageBorder.general(inputType, BorderType.EXTENDED));
+		removePerspective = FactoryDistort.distort(false,interp,ImageFloat32.class);
 	}
 
 	/**
