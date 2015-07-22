@@ -19,9 +19,10 @@
 package boofcv.alg.background.models;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.FactoryGImageMultiBand;
+import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransformModel_F32;
@@ -37,8 +38,13 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	extends BackgroundMovingBasic<MultiSpectral<T>,Motion>
 {
 	MultiSpectral<ImageFloat32> background;
-	InterpolatePixelS<T> interpolation;
+	InterpolatePixelMB<MultiSpectral<T>> interpolationInput;
 	InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
+
+	GImageMultiBand backgroundWrapper;
+	GImageMultiBand inputWrapper;
+	float[] pixelInput;
+	float[] pixelBack;
 
 	public BackgroundMovingBasic_MS(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
@@ -46,14 +52,22 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 									ImageType<MultiSpectral<T>> imageType) {
 		super(learnRate, threshold,transform, imageType);
 
-		Class<T> type = imageType.getImageClass();
-		this.interpolation = FactoryInterpolation.bilinearPixelS(type, BorderType.EXTENDED);
+		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType,BorderType.EXTENDED,imageType);
 
 		int numBands = imageType.getNumBands();
 		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
 
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.ms(numBands, ImageFloat32.class));
+		this.interpolationBG.setImage(background);
+
+		pixelInput = new float[numBands];
+		pixelBack = new float[numBands];
+
+		backgroundWrapper = FactoryGImageMultiBand.create(ImageType.ms(numBands, ImageFloat32.class));
+		backgroundWrapper.wrap(background);
+
+		inputWrapper = FactoryGImageMultiBand.create(imageType);
 	}
 
 	/**
@@ -80,6 +94,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	protected void updateBackground(int x0, int y0, int x1, int y1, MultiSpectral<T> frame) {
 
 		transform.setModel(worldToCurrent);
+		interpolationInput.setImage(frame);
 
 		final int numBands = frame.getNumBands();
 		float minusLearn = 1.0f - learnRate;
@@ -91,17 +106,18 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 
 				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
 
-					for (int band = 0; band < numBands; band++) {
-						interpolation.setImage(frame.getBand(band));
-						ImageFloat32 backgroundBand = background.getBand(band);
+					interpolationInput.get(work.x,work.y, pixelInput);
+					backgroundWrapper.getF(indexBG,pixelBack);
 
-						float value = interpolation.get(work.x,work.y);
-						float bg = backgroundBand.data[indexBG];
+					for (int band = 0; band < numBands; band++) {
+
+						float value = pixelInput[band];
+						float bg = pixelBack[band];
 
 						if( bg == Float.MAX_VALUE ) {
-							backgroundBand.data[indexBG] = value;
+							pixelBack[indexBG] = value;
 						} else {
-							backgroundBand.data[indexBG] = minusLearn*value + learnRate*bg;
+							pixelBack[indexBG] = minusLearn*value + learnRate*bg;
 						}
 					}
 				}
@@ -111,42 +127,47 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 
 	@Override
 	protected void _segment(Motion currentToWorld, MultiSpectral<T> frame, ImageUInt8 segmented) {
-//		transform.setModel(worldToCurrent);
-//
-//		float thresholdSq = threshold*threshold;
-//
-//		int numBands = background.getNumBands();
-//
-//		for (int y = 0; y < frame.height; y++) {
-//			int indexFrame = frame.startIndex + y*frame.stride;
-//			int indexSegmented = segmented.startIndex + y*segmented.stride;
-//
-//			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
-//				transform.compute(x,y,work);
-//
-//				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-//
-//					double errorSq = 0;
-//					for (int band = 0; band < numBands; band++) {
-//						interpolationBG.setImage(background.getBand(band));
-//					}
-//
-//					float bg = interpolation.get(work.x,work.y);
-//					float pixelFrame = inputImageWrapper.getF(indexFrame);
-//
-//					if( bg == Float.MAX_VALUE ) {
-//						segmented.data[indexSegmented] = 0;
-//					} else {
-//						float diff = bg - pixelFrame;
-//						if (diff * diff <= thresholdSq) {
-//							segmented.data[indexSegmented] = 0;
-//						} else {
-//							segmented.data[indexSegmented] = 1;
-//						}
-//					}
-//				}
-//			}
-//		}
+		transform.setModel(worldToCurrent);
+		inputWrapper.wrap(frame);
+
+		float thresholdSq = threshold*threshold;
+
+		int numBands = background.getNumBands();
+
+		for (int y = 0; y < frame.height; y++) {
+			int indexFrame = frame.startIndex + y*frame.stride;
+			int indexSegmented = segmented.startIndex + y*segmented.stride;
+
+			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
+				transform.compute(x,y,work);
+
+				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+
+					interpolationBG.get(work.x,work.y,pixelBack);
+					inputWrapper.getF(indexFrame,pixelInput);
+
+					double sumErrorSq = 0;
+					for (int band = 0; band < numBands; band++) {
+						float bg = pixelBack[band];
+						float pixelFrame = pixelInput[band];
+
+						if( bg == Float.MAX_VALUE ) {
+							sumErrorSq = Float.MAX_VALUE;
+							break;
+						} else {
+							float diff = bg - pixelFrame;
+							sumErrorSq += diff*diff;
+						}
+					}
+
+					if ( sumErrorSq <= thresholdSq) {
+						segmented.data[indexSegmented] = 0;
+					} else {
+						segmented.data[indexSegmented] = 1;
+					}
+				}
+			}
+		}
 	}
 
 

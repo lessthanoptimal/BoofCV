@@ -45,7 +45,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	InterpolatePixelS<T> interpolation;
 	InterpolatePixelS<ImageFloat32> interpolationBG;
 
-	GImageSingleBand inputImageWrapper;
+	GImageSingleBand inputWrapper;
 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
@@ -60,7 +60,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 		this.interpolationBG.setBorder(FactoryImageBorder.general(ImageFloat32.class, BorderType.EXTENDED));
 		this.interpolationBG.setImage(background);
 
-		inputImageWrapper = FactoryGImageSingleBand.create(type);
+		inputWrapper = FactoryGImageSingleBand.create(type);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	@Override
 	protected void _segment(Motion currentToWorld, T frame, ImageUInt8 segmented) {
 		transform.setModel(worldToCurrent);
-		inputImageWrapper.wrap(frame);
+		inputWrapper.wrap(frame);
 
 		float thresholdSq = threshold*threshold;
 
@@ -125,7 +125,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 
 				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
 					float bg = interpolation.get(work.x,work.y);
-					float pixelFrame = inputImageWrapper.getF(indexFrame);
+					float pixelFrame = inputWrapper.getF(indexFrame);
 
 					if( bg == Float.MAX_VALUE ) {
 						segmented.data[indexSegmented] = 0;

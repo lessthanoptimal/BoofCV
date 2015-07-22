@@ -20,6 +20,7 @@ package boofcv.core.image;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 
 /**
@@ -31,6 +32,14 @@ public class FactoryGImageMultiBand {
 		return new GSingleToMB(FactoryGImageSingleBand.wrap(image));
 	}
 
+	public static GImageMultiBand create( ImageType imageType ) {
+		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			return new MS();
+		} else {
+			throw new RuntimeException("Add support for more families");
+		}
+	}
+
 	public static GImageMultiBand wrap( MultiSpectral image ) {
 		return new MS(image);
 	}
@@ -40,7 +49,10 @@ public class FactoryGImageMultiBand {
 		GImageSingleBand bandWrappers[];
 
 		public MS(MultiSpectral image) {
-			this.image = image;
+			wrap(image);
+		}
+
+		public MS() {
 		}
 
 		@Override
