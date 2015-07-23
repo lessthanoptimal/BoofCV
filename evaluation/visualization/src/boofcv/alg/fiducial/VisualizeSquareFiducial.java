@@ -98,7 +98,7 @@ public class VisualizeSquareFiducial {
 			Quadrilateral_F64 q = fiducials.get(i).location;
 
 			detector.computeTargetToWorld(q,0.1,targetToWorld);
-			VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, g2);
+			VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, 3, g2);
 
 			apply(add_p_to_p,q.a,q.a);
 			apply(add_p_to_p,q.b,q.b);

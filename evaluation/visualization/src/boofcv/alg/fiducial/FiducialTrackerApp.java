@@ -162,7 +162,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			int id = detector.getId(i);
 
 			VisualizeFiducial.drawNumbers(targetToSensor, intrinsic, id, g2);
-			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, g2);
+			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 3, g2);
 		}
 		panel.setBufferedImageSafe(imageGUI);
 		panel.repaint();

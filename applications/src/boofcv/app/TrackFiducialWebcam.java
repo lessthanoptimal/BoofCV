@@ -136,7 +136,7 @@ public class TrackFiducialWebcam {
 				VisualizeFiducial.drawNumbers(targetToSensor, param, id, g2);
 
 				// draw a cube to show orientation and location
-				VisualizeFiducial.drawCube(targetToSensor, param, width, g2);
+				VisualizeFiducial.drawCube(targetToSensor, param, width, 3, g2);
 			}
 			if( nameIntrinsic == null ) {
 				g2.setColor(Color.RED);
