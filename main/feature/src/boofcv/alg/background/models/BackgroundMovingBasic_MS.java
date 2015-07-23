@@ -37,14 +37,19 @@ import georegression.struct.InvertibleTransform;
 public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
 	extends BackgroundMovingBasic<MultiSpectral<T>,Motion>
 {
-	MultiSpectral<ImageFloat32> background;
-	InterpolatePixelMB<MultiSpectral<T>> interpolationInput;
-	InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
+	// where the background image is stored
+	protected MultiSpectral<ImageFloat32> background;
+	// interpolates the input image
+	protected InterpolatePixelMB<MultiSpectral<T>> interpolationInput;
+	// interpolates the background image
+	protected InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
 
-	GImageMultiBand backgroundWrapper;
-	GImageMultiBand inputWrapper;
-	float[] pixelInput;
-	float[] pixelBack;
+	// wrappers which provide abstraction across image types
+	protected GImageMultiBand backgroundWrapper;
+	protected GImageMultiBand inputWrapper;
+	// storage for multi-band pixel values
+	protected float[] pixelInput;
+	protected float[] pixelBack;
 
 	public BackgroundMovingBasic_MS(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
@@ -83,6 +88,12 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
 		background.reshape(backgroundWidth,backgroundHeight);
 		GImageMiscOps.fill(background, Float.MAX_VALUE);
+
+		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.invert(worldToHome);
+
+		this.backgroundWidth = backgroundWidth;
+		this.backgroundHeight = backgroundHeight;
 	}
 
 	@Override
@@ -115,11 +126,12 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 						float bg = pixelBack[band];
 
 						if( bg == Float.MAX_VALUE ) {
-							pixelBack[indexBG] = value;
+							pixelBack[band] = value;
 						} else {
-							pixelBack[indexBG] = minusLearn*value + learnRate*bg;
+							pixelBack[band] = minusLearn*value + learnRate*bg;
 						}
 					}
+					backgroundWrapper.setF(indexBG,pixelBack);
 				}
 			}
 		}
@@ -127,12 +139,12 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 
 	@Override
 	protected void _segment(Motion currentToWorld, MultiSpectral<T> frame, ImageUInt8 segmented) {
-		transform.setModel(worldToCurrent);
+		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
-		float thresholdSq = threshold*threshold;
-
 		int numBands = background.getNumBands();
+
+		float thresholdSq = numBands*threshold*threshold;
 
 		for (int y = 0; y < frame.height; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
@@ -141,6 +153,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
 				transform.compute(x,y,work);
 
+				escapeIf:
 				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
 
 					interpolationBG.get(work.x,work.y,pixelBack);
@@ -152,8 +165,8 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 						float pixelFrame = pixelInput[band];
 
 						if( bg == Float.MAX_VALUE ) {
-							sumErrorSq = Float.MAX_VALUE;
-							break;
+							segmented.data[indexSegmented] = unknownValue;
+							break escapeIf;
 						} else {
 							float diff = bg - pixelFrame;
 							sumErrorSq += diff*diff;
@@ -165,6 +178,9 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 					} else {
 						segmented.data[indexSegmented] = 1;
 					}
+				} else {
+					// there is no background here.  Just mark it as not moving to avoid false positives
+					segmented.data[indexSegmented] = unknownValue;
 				}
 			}
 		}

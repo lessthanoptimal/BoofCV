@@ -179,7 +179,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 			}
 		} else {
 			GConvertImage.convert(image1, normalized1);
-			GConvertImage.convert(image2,normalized2);
+			GConvertImage.convert(image2, normalized2);
 		}
 	}
 }

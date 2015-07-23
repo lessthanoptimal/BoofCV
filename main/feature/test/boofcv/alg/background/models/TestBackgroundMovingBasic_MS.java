@@ -18,16 +18,29 @@
 
 package boofcv.alg.background.models;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.background.BackgroundModelMoving;
+import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
+import georegression.struct.homography.Homography2D_F32;
 
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingBasic_MS {
-	@Test
-	public void foo() {
-		fail("implement");
+public class TestBackgroundMovingBasic_MS extends GenericBackgroundModelMovingChecks {
+	public TestBackgroundMovingBasic_MS() {
+		imageTypes.add(ImageType.ms(2, ImageUInt8.class));
+		imageTypes.add(ImageType.ms(3, ImageUInt8.class));
+		imageTypes.add(ImageType.ms(3, ImageFloat32.class));
+	}
+
+	@Override
+	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
+	create(ImageType<T> imageType) {
+		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
+		return new BackgroundMovingBasic_MS(0.8f, 10f, transform, TypeInterpolate.BILINEAR, imageType);
 	}
 }

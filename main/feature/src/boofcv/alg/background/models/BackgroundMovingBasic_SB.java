@@ -41,11 +41,15 @@ import georegression.struct.InvertibleTransform;
 public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
 	extends BackgroundMovingBasic<T,Motion>
 {
-	ImageFloat32 background = new ImageFloat32(1,1);
-	InterpolatePixelS<T> interpolation;
-	InterpolatePixelS<ImageFloat32> interpolationBG;
+	// storage for background image
+	protected ImageFloat32 background = new ImageFloat32(1,1);
+	// interpolates the input image
+	protected InterpolatePixelS<T> interpolation;
+	// interpolates the background image
+	protected InterpolatePixelS<ImageFloat32> interpolationBG;
 
-	GImageSingleBand inputWrapper;
+	// wrapper which provides abstraction across image types
+	protected GImageSingleBand inputWrapper;
 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
@@ -76,6 +80,12 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
 		background.reshape(backgroundWidth,backgroundHeight);
 		ImageMiscOps.fill(background,Float.MAX_VALUE);
+
+		this.homeToWorld.set(homeToWorld);
+		this.homeToWorld.invert(worldToHome);
+
+		this.backgroundWidth = backgroundWidth;
+		this.backgroundHeight = backgroundHeight;
 	}
 
 	@Override
@@ -111,7 +121,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 
 	@Override
 	protected void _segment(Motion currentToWorld, T frame, ImageUInt8 segmented) {
-		transform.setModel(worldToCurrent);
+		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
 		float thresholdSq = threshold*threshold;
@@ -124,11 +134,11 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 				transform.compute(x,y,work);
 
 				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					float bg = interpolation.get(work.x,work.y);
+					float bg = interpolationBG.get(work.x,work.y);
 					float pixelFrame = inputWrapper.getF(indexFrame);
 
 					if( bg == Float.MAX_VALUE ) {
-						segmented.data[indexSegmented] = 0;
+						segmented.data[indexSegmented] = unknownValue;
 					} else {
 						float diff = bg - pixelFrame;
 						if (diff * diff <= thresholdSq) {
@@ -137,6 +147,9 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 							segmented.data[indexSegmented] = 1;
 						}
 					}
+				} else {
+					// there is no background here.  Just mark it as not moving to avoid false positives
+					segmented.data[indexSegmented] = unknownValue;
 				}
 			}
 		}

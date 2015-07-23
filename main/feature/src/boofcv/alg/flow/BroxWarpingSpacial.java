@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,6 @@ import java.util.Arrays;
  * work of Brox [2] with implementation details taken from [1].
  * </p>
  *
- * <p>
  * <ol>
  * <li>
  * Javier Sánchez Pérez, Nelson Monzón López, and Agustín Salgado de la Nuez, Robust Optical Flow Estimation,
@@ -49,7 +48,6 @@ import java.util.Arrays;
  * pages 25–36, Prague, Czech Republic, May 2004. Springer.
  * </li>
  * </ol>
- * </p>
  *
  * @author Peter Abeles
  */
@@ -361,10 +359,8 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		float coef2 = 0.5f*(psiSmooth.data[ipy] + psi_index);
 		float coef3 = 0.5f*(psiSmooth.data[imy] + psi_index);
 
-		float div_du = coef0 * du.data[ipx] + coef1 * du.data[imx] +
-				coef2 * du.data[ipy] + coef3 * du.data[imy];
-		float div_dv = coef0 * dv.data[ipx] + coef1 * dv.data[imx] +
-				coef2 * dv.data[ipy] + coef3 * dv.data[imy] ;
+		float div_du = coef0 * du.data[ipx] + coef1 * du.data[imx] + coef2 * du.data[ipy] + coef3 * du.data[imy];
+		float div_dv = coef0 * dv.data[ipx] + coef1 * dv.data[imx] + coef2 * dv.data[ipy] + coef3 * dv.data[imy] ;
 
 		final float dui = du.data[i];
 		final float dvi = dv.data[i];
