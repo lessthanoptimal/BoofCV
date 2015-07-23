@@ -34,7 +34,7 @@ import georegression.struct.InvertibleTransform;
  * <br>
  * {@code B(i+1) = (1-&alpha;)*B(i) + &alpha;I(i)}<br>
  * Where B is the background image, I is the current observed image, and &alpha; is the learning rate 0 to 1.
- * Where 0 is instant learning and 1 is no learning.
+ * Where 0 is static and 1 is instant.
  * </p>
  * <p>
  * If a specific pixel has not been observed before it will be set to the value of the equivalent pixel in the
@@ -47,7 +47,7 @@ public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends 
 		extends BackgroundModelMoving<T,Motion> {
 
 	/**
-	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = very fast.  1.0 = fixed.
+	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
 	 */
 	protected float learnRate;
 

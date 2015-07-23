@@ -41,6 +41,6 @@ public class TestBackgroundMovingBasic_MS extends GenericBackgroundModelMovingCh
 	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		return new BackgroundMovingBasic_MS(0.8f, 10f, transform, TypeInterpolate.BILINEAR, imageType);
+		return new BackgroundMovingBasic_MS(0.05f, 10f, transform, TypeInterpolate.BILINEAR, imageType);
 	}
 }

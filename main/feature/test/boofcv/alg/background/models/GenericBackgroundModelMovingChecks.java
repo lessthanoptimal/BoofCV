@@ -70,7 +70,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 
 		alg.initialize(width*2,height*2,homeToWorld);
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 30; i++) {
 			Homography2D_F32 homeToCurrent = new Homography2D_F32();
 			if( i > 0 ) {
 				homeToCurrent.a13 = rand.nextFloat() * 5 - 2.5f;
@@ -89,6 +89,8 @@ public abstract class GenericBackgroundModelMovingChecks {
 		Homography2D_F32 homeToCurrent = new Homography2D_F32();
 		ImageUInt8 segmented = new ImageUInt8(width,height);
 		alg.segment(homeToCurrent, frame, segmented);
+
+//		segmented.printBinary();
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

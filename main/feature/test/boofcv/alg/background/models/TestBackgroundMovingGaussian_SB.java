@@ -30,9 +30,9 @@ import georegression.struct.homography.Homography2D_F32;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingBasic_SB extends GenericBackgroundModelMovingChecks
+public class TestBackgroundMovingGaussian_SB extends GenericBackgroundModelMovingChecks
 {
-	public TestBackgroundMovingBasic_SB() {
+	public TestBackgroundMovingGaussian_SB() {
 		imageTypes.add(ImageType.single(ImageUInt8.class));
 		imageTypes.add(ImageType.single(ImageFloat32.class));
 	}
@@ -41,6 +41,9 @@ public class TestBackgroundMovingBasic_SB extends GenericBackgroundModelMovingCh
 	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		return new BackgroundMovingBasic_SB(0.05f,10f,transform,TypeInterpolate.BILINEAR,imageType);
+		BackgroundMovingGaussian_SB alg =
+				new BackgroundMovingGaussian_SB(0.05f,50,transform, TypeInterpolate.BILINEAR,imageType);
+		alg.setInitialVariance(12);
+		return alg;
 	}
 }
