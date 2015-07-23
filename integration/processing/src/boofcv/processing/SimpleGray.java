@@ -33,6 +33,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GConvertImage;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
@@ -201,7 +202,7 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortSingle(image, output, pixelTransform, null, TypeInterpolate.BILINEAR);
+		DistortImageOps.distortSingle(image, output, pixelTransform, TypeInterpolate.BILINEAR, BorderType.SKIP);
 
 		return new SimpleGray(output);
 	}
@@ -309,7 +310,7 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 	}
 
 	private SimpleGradient gradient(ImageGradient gradient) {
-		SimpleGradient ret = new SimpleGradient(gradient.getDerivType(),image.width,image.height);
+		SimpleGradient ret = new SimpleGradient(gradient.getDerivativeType(),image.width,image.height);
 		gradient.process(image,ret.dx,ret.dy);
 
 		return ret;

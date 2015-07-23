@@ -293,6 +293,8 @@ public class VisualizeBinaryData {
 		} catch( SecurityException e ) {
 			_renderBinary(binaryImage, invert, out);
 		}
+		// hack so that it knows the buffer has been modified
+		out.setRGB(0,0,out.getRGB(0,0));
 		return out;
 	}
 

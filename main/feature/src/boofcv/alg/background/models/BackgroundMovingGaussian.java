@@ -42,7 +42,7 @@ import georegression.struct.InvertibleTransform;
  *
  * <p>Tuning Parameters:</p>
  * <ul>
- * <li><b>learnRate:</b>  Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.</li>
+ * <li><b>learnRate:</b>  Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant. Try 0.05</li>
  * <li><b>threshold:</b>  Pixel's with a Mahalanobis distance <= threshold are assumed to be background. Consult
  * a Chi-Squared table for theoretical values.  1-band try 10.  3-bands try 20. </li>
  * </ul>
@@ -71,14 +71,17 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion exten
 
 	/**
 	 * See class documentation for parameters definitions.
-	 * @param learnRate Specifies how quickly the background is updated
-	 * @param threshold Threshold for background.  >= 0
+	 * @param learnRate Specifies how quickly the background is updated Try 0.05
+	 * @param threshold Threshold for background.  >= 0.  Try 10
 	 * @param transform Used to convert pixel coordinates
 	 * @param imageType Type of input image
 	 */
 	public BackgroundMovingGaussian(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform, ImageType<T> imageType) {
 		super(transform, imageType);
+
+		if( threshold < 0 )
+			throw new IllegalArgumentException("Threshold must be more than 0");
 
 		this.learnRate = learnRate;
 		this.threshold = threshold;
