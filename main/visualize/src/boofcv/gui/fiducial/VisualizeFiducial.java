@@ -62,8 +62,8 @@ public class VisualizeFiducial {
 	 * Draws a flat cube to show where the square fiducial is on the image
 	 *
 	 */
-	public static void drawCube( Se3_F64 targetToCamera , IntrinsicParameters intrinsic , double width ,
-								 Graphics2D g2 )
+	public static void drawCube(Se3_F64 targetToCamera, IntrinsicParameters intrinsic, double width,
+								int lineThickness, Graphics2D g2)
 	{
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -91,7 +91,7 @@ public class VisualizeFiducial {
 		}
 
 		Line2D.Double l = new Line2D.Double();
-		g2.setStroke(new BasicStroke(2));
+		g2.setStroke(new BasicStroke(lineThickness));
 		g2.setColor(Color.RED);
 
 		drawLine(g2,l,pixel[0].x, pixel[0].y, pixel[1].x, pixel[1].y);
@@ -105,11 +105,11 @@ public class VisualizeFiducial {
 		drawLine(g2,l,pixel[2].x,pixel[2].y,pixel[6].x,pixel[6].y);
 		drawLine(g2,l,pixel[3].x,pixel[3].y,pixel[7].x,pixel[7].y);
 
-		g2.setColor(new Color(0x00,0xFF,0x00,125));
+		g2.setColor(new Color(0x00,0xFF,0x00,255));
 		drawLine(g2,l,pixel[4].x,pixel[4].y,pixel[5].x,pixel[5].y);
-		g2.setColor(new Color(0xC0,0x10,0xC0,125));
+		g2.setColor(new Color(0xC0,0x10,0xC0,255));
 		drawLine(g2,l,pixel[5].x,pixel[5].y,pixel[6].x,pixel[6].y);
-		g2.setColor(new Color(0x00,0xA0,0xC0,125));
+		g2.setColor(new Color(0x00,0xA0,0xC0,255));
 		drawLine(g2,l,pixel[6].x,pixel[6].y,pixel[7].x,pixel[7].y);
 		g2.setColor(Color.BLUE);
 		drawLine(g2,l,pixel[7].x,pixel[7].y,pixel[4].x,pixel[4].y);
