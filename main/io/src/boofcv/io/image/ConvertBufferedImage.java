@@ -23,6 +23,7 @@ import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
+import sun.awt.image.SunWritableRaster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -270,6 +271,8 @@ public class ConvertBufferedImage {
 				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else if( src.getRaster() instanceof SunWritableRaster ) {
+				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst);
 			}
@@ -334,6 +337,8 @@ public class ConvertBufferedImage {
 				ConvertRaster.bufferedToGray((ByteInterleavedRaster) src.getRaster(), dst);
 			} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 				ConvertRaster.bufferedToGray((IntegerInterleavedRaster) src.getRaster(), dst);
+			} else if( src.getRaster() instanceof SunWritableRaster ) {
+				ConvertRaster.bufferedToGray((SunWritableRaster) src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst);
 			}

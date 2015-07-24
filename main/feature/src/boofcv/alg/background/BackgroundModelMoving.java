@@ -49,7 +49,7 @@ import georegression.struct.point.Point2D_F32;
  * <p>
  * If a pixel in the current frame has no corresponding pixel in the background or the background
  * pixel hasn't been observed yet then it will be assigned a special value, which is user configurable.
- * The default value is 0, which is a background pixel. See {@link #setUnknownValue(byte)}
+ * The default value is 0, which is a background pixel. See {@link #setUnknownValue(int)}}
  * </p>
  *
  * @author Peter Abeles
@@ -188,9 +188,11 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 
 	/**
 	 * Specify the value of a segmented pixel which has no corresponding pixel in the background image.
-	 * @param unknownValue Value for pixels with out a background pixel
+	 * @param unknownValue Value for pixels with out a background pixel. 2 to 255, inclusive.
 	 */
 	public void setUnknownValue(int unknownValue) {
+		if( unknownValue < 2 || unknownValue > 255 )
+			throw new IllegalArgumentException("out of range. 2 to 255");
 		this.unknownValue = (byte)unknownValue;
 	}
 

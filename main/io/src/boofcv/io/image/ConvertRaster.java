@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,11 @@ import boofcv.struct.image.MultiSpectral;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
+import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 
 /**
@@ -54,49 +57,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					int ave = (r + g + b) / 3;
-
-					data[indexDst] = (byte) ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
-				System.arraycopy(srcData, 0, data, 0, size);
-			else {
-				for (int y = 0; y < dst.height; y++) {
-					int indexDst = dst.startIndex + dst.stride * y;
-					int indexSrc = srcOffset + srcStride * y;
-
-					System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
-				}
-			}
+			from_1BU8_to_U8(dst, srcData, data, size, srcStride, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					indexSrc++;
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					int ave = (r + g + b) / 3;
-
-					data[indexDst] = (byte) ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
 		}
@@ -147,50 +112,173 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					float ave = (r + g + b) / 3.0f;
-
-					data[indexDst] = ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				int indexSrc = srcOffset + srcStride * y;
-
-				for (; indexDst < indexDstEnd; indexDst++) {
-					data[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-			}
+			from_1BU8_to_F32(dst, srcData, data, srcStride, srcOffset);
 		} else if (numBands == 4) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					indexSrc++;
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					float ave = (r + g + b) / 3.0f;
-
-					data[indexDst] = ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(SunWritableRaster src, ImageUInt8 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		byte[] dstData = dst.data;
+
+		int numBands = src.getNumBands();
+
+		int srcStride = src.getWidth()*numBands;
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		int size = dst.getWidth() * dst.getHeight();
+
+		if (numBands == 3) {
+			from_3BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_U8(dst, srcData, dstData, size, srcStride, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(SunWritableRaster src, ImageFloat32 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		float[] dstData = dst.data;
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
+		}
+	}
+
+	private static void from_4BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				indexSrc++;
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				int ave = (r + g + b) / 3;
+
+				data[indexDst] = (byte) ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
+			System.arraycopy(srcData, 0, data, 0, size);
+		else {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + dst.stride * y;
+				int indexSrc = srcOffset + srcStride * y;
+
+				System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
+			}
+		}
+	}
+
+	private static void from_3BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] dstData, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				int ave = (r + g + b) / 3;
+
+				dstData[indexDst] = (byte) ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_4BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				indexSrc++;
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				float ave = (r + g + b) / 3.0f;
+
+				data[indexDst] = ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcStride, int srcOffset) {
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			int indexSrc = srcOffset + srcStride * y;
+
+			for (; indexDst < indexDstEnd; indexDst++) {
+				data[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+		}
+	}
+
+	private static void from_3BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				float ave = (r + g + b) / 3.0f;
+
+				data[indexDst] = ave;
+			}
+			indexSrc += srcStrideDiff;
 		}
 	}
 
@@ -207,48 +295,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			byte[] band1 = dst.getBand(0).data;
-			byte[] band2 = dst.getBand(1).data;
-			byte[] band3 = dst.getBand(2).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
-					band3[indexDst] = srcData[indexSrc++];
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			byte dstData[] = dst.getBand(0).data;
-
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexSrc = srcOffset + srcStride * y;
-
-				System.arraycopy(srcData, indexSrc, dstData, indexDst, dst.width);
-			}
+			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			byte[] band1 = dst.getBand(0).data;
-			byte[] band2 = dst.getBand(1).data;
-			byte[] band3 = dst.getBand(2).data;
-			byte[] band4 = dst.getBand(3).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
-					band3[indexDst] = srcData[indexSrc++];
-					band4[indexDst] = srcData[indexSrc++];
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -267,54 +318,172 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			float[] band1 = dst.getBand(0).data;
-			float[] band2 = dst.getBand(1).data;
-			float[] band3 = dst.getBand(2).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
-					band3[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			float[] data = dst.getBand(0).data;
-
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				int indexSrc = srcOffset + srcStride * y;
-
-				for (; indexDst < indexDstEnd; indexDst++) {
-					data[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-			}
+			from_1BU8_to_MSF32(dst, srcData, srcStride, srcStrideDiff);
 		} else if (numBands == 4) {
-			float[] band1 = dst.getBand(0).data;
-			float[] band2 = dst.getBand(1).data;
-			float[] band3 = dst.getBand(2).data;
-			float[] band4 = dst.getBand(3).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
-					band3[indexDst] = srcData[indexSrc++] & 0xFF;
-					band4[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToMulti_U8(SunWritableRaster src, MultiSpectral<ImageUInt8> dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToMulti_F32(SunWritableRaster src, MultiSpectral<ImageFloat32> dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	private static void from_4BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] band1 = dst.getBand(0).data;
+		float[] band2 = dst.getBand(1).data;
+		float[] band3 = dst.getBand(2).data;
+		float[] band4 = dst.getBand(3).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++] & 0xFF;
+				band2[indexDst] = srcData[indexSrc++] & 0xFF;
+				band3[indexDst] = srcData[indexSrc++] & 0xFF;
+				band4[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] data = dst.getBand(0).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+
+			for (; indexDst < indexDstEnd; indexDst++) {
+				data[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_3BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] band1 = dst.getBand(0).data;
+		float[] band2 = dst.getBand(1).data;
+		float[] band3 = dst.getBand(2).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++] & 0xFF;
+				band2[indexDst] = srcData[indexSrc++] & 0xFF;
+				band3[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_4BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte[] band1 = dst.getBand(0).data;
+		byte[] band2 = dst.getBand(1).data;
+		byte[] band3 = dst.getBand(2).data;
+		byte[] band4 = dst.getBand(3).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++];
+				band2[indexDst] = srcData[indexSrc++];
+				band3[indexDst] = srcData[indexSrc++];
+				band4[indexDst] = srcData[indexSrc++];
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte dstData[] = dst.getBand(0).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+
+			System.arraycopy(srcData, indexSrc, dstData, indexDst, dst.width);
+			indexSrc += dst.width + srcStrideDiff;
+		}
+	}
+
+	private static void from_3BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte[] band1 = dst.getBand(0).data;
+		byte[] band2 = dst.getBand(1).data;
+		byte[] band3 = dst.getBand(2).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++];
+				band2[indexDst] = srcData[indexSrc++];
+				band3[indexDst] = srcData[indexSrc++];
+			}
+			indexSrc += srcStrideDiff;
 		}
 	}
 
