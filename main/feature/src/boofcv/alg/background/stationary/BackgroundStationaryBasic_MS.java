@@ -20,33 +20,43 @@ package boofcv.alg.background.stationary;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.core.image.GImageMultiBand;
+import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundStationaryBasic} for {@link boofcv.struct.image.MultiSpectral}.
+ * Implementation of {@link BackgroundStationaryBasic} for {@link ImageSingleBand}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
-	extends BackgroundStationaryBasic<T>
+public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
+	extends BackgroundStationaryBasic<MultiSpectral<T>>
 {
 	// storage for background image
-	protected ImageFloat32 background = new ImageFloat32(1,1);
+	protected MultiSpectral<ImageFloat32> background;
 
 	// wrapper which provides abstraction across image types
-	protected GImageSingleBand inputWrapper;
+	protected GImageMultiBand inputWrapper;
+	protected GImageMultiBand bgWrapper;
 
-	public BackgroundStationaryBasic_SB(float learnRate, float threshold,
-										Class<T> imageType) {
-		super(learnRate, threshold, ImageType.single(imageType));
+	protected float inputPixels[];
+	protected float bgPixels[];
 
-		inputWrapper = FactoryGImageSingleBand.create(imageType);
+	public BackgroundStationaryBasic_MS(float learnRate, float threshold,
+										ImageType<MultiSpectral<T>> imageType) {
+		super(learnRate, threshold, imageType);
+
+		int numBands = imageType.getNumBands();
+
+		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
+		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
+		bgWrapper.wrap(background);
+
+		inputWrapper = FactoryGImageMultiBand.create(imageType);
+
+		inputPixels = new float[numBands];
+		bgPixels = new float[numBands];
 	}
 
 	/**
@@ -54,7 +64,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 	 *
 	 * @return background image.
 	 */
-	public ImageFloat32 getBackground() {
+	public MultiSpectral<ImageFloat32> getBackground() {
 		return background;
 	}
 
@@ -64,7 +74,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void updateBackground( T frame) {
+	public void updateBackground( MultiSpectral<T> frame) {
 		if( background.width == 1 ) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
@@ -75,6 +85,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 
 		inputWrapper.wrap(frame);
 
+		int numBands = background.getNumBands();
 		float minusLearn = 1.0f - learnRate;
 
 		int indexBG = 0;
@@ -82,16 +93,22 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 			int indexInput = frame.startIndex + y*frame.stride;
 			int end = indexInput + frame.width;
 			while( indexInput < end ) {
-				float value = inputWrapper.getF(indexInput++);
-				float bg = background.data[indexBG];
+				inputWrapper.getF(indexInput, inputPixels);
+				bgWrapper.getF(indexBG, bgPixels);
 
-				background.data[indexBG++] = minusLearn*bg + learnRate*value;
+				for (int band = 0; band < numBands; band++) {
+					bgPixels[band] = minusLearn*bgPixels[band] + learnRate*inputPixels[band];
+				}
+				bgWrapper.setF(indexBG,bgPixels);
+
+				indexInput++;
+				indexBG++;
 			}
 		}
 	}
 
 	@Override
-	public void segment(T frame, ImageUInt8 segmented) {
+	public void segment(MultiSpectral<T> frame, ImageUInt8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;
@@ -99,7 +116,8 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 		InputSanityCheck.checkSameShape(background,frame,segmented);
 		inputWrapper.wrap(frame);
 
-		float thresholdSq = threshold*threshold;
+		int numBands = background.getNumBands();
+		float thresholdSq = numBands*threshold*threshold;
 
 		int indexBG = 0;
 		for (int y = 0; y < frame.height; y++) {
@@ -108,11 +126,17 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 
 			int end = indexInput + frame.width;
 			while( indexInput < end ) {
-				float bg = background.data[indexBG];
-				float pixelFrame = inputWrapper.getF(indexInput);
+				inputWrapper.getF(indexInput, inputPixels);
+				bgWrapper.getF(indexBG, bgPixels);
 
-				float diff = bg - pixelFrame;
-				if (diff * diff <= thresholdSq) {
+				double sumErrorSq = 0;
+				for (int band = 0; band < numBands; band++) {
+					float diff = bgPixels[band] - inputPixels[band];
+					sumErrorSq += diff*diff;
+				}
+
+
+				if (sumErrorSq <= thresholdSq) {
 					segmented.data[indexSegmented] = 0;
 				} else {
 					segmented.data[indexSegmented] = 1;

@@ -16,25 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.moving;
+package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundAlgorithmGaussian;
 import boofcv.alg.background.BackgroundModelMoving;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.struct.InvertibleTransform;
 
 /**
- * <p>Implementation of {@link BackgroundAlgorithmGaussian} for stationary images.</p>
+ * <p>Implementation of {@link BackgroundAlgorithmGaussian} for moving images.</p>
  *
  * @see BackgroundAlgorithmGaussian
  * @see BackgroundModelMoving
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundModelMoving<T,Motion> implements BackgroundAlgorithmGaussian
+public abstract class BackgroundStationaryGaussian<T extends ImageBase>
+		extends BackgroundModelStationary<T> implements BackgroundAlgorithmGaussian
 {
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
@@ -57,12 +56,10 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion exten
 	 * See class documentation for parameters definitions.
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
 	 * @param threshold Threshold for background.  >= 0.  Try 10
-	 * @param transform Used to convert pixel coordinates
 	 * @param imageType Type of input image
 	 */
-	public BackgroundMovingGaussian(float learnRate, float threshold,
-									PointTransformModel_F32<Motion> transform, ImageType<T> imageType) {
-		super(transform, imageType);
+	public BackgroundStationaryGaussian(float learnRate, float threshold,ImageType<T> imageType) {
+		super(imageType);
 
 		if( threshold < 0 )
 			throw new IllegalArgumentException("Threshold must be more than 0");

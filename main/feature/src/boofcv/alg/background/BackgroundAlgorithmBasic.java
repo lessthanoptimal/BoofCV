@@ -41,13 +41,13 @@ public interface BackgroundAlgorithmBasic {
 
 	/**
 	 * Returns the learning rate.
-	 * @return Float 0 to 1.0.  0 = very fast learning.  1.0 = no learning, fixed.
+	 * @return 0 (slow) to 1 (fast)
 	 */
 	float getLearnRate();
 
 	/**
 	 * Specifies the learning rate
-	 * @param learnRate 0 to 1
+	 * @param learnRate 0 (slow) to 1 (fast)
 	 */
 	void setLearnRate(float learnRate);
 

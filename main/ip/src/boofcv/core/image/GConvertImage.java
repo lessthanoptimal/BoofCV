@@ -49,43 +49,46 @@ public class GConvertImage {
 	 * @return Converted image.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
-		if( input.getClass() == output.getClass() ) {
-			output.setTo(input);
-			return;
-		} else {
-			if( input instanceof ImageSingleBand && output instanceof ImageSingleBand )  {
+		if( input instanceof ImageSingleBand && output instanceof ImageSingleBand )  {
+			if( input.getClass() == output.getClass() ) {
+				output.setTo(input);
+			} else {
 				try {
-					Method m = ConvertImage.class.getMethod("convert",input.getClass(),output.getClass());
-					m.invoke(null,input,output);
-					return;
+					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+					m.invoke(null, input, output);
 				} catch (Exception e) {
 					throw new IllegalArgumentException("Unknown conversion");
 				}
-			} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
-				MultiSpectral mi = (MultiSpectral)input;
-				ImageSingleBand so = (ImageSingleBand)output;
+			}
+		} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
+			MultiSpectral mi = (MultiSpectral)input;
+			ImageSingleBand so = (ImageSingleBand)output;
 
-				if( mi.getImageType().getDataType() != so.getDataType() ) {
-					int w = output.width;
-					int h = output.height;
-					ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
-					average(mi,tmp);
-					convert(tmp,so);
-				} else {
-					average(mi,so);
-				}
+			if( mi.getImageType().getDataType() != so.getDataType() ) {
+				int w = output.width;
+				int h = output.height;
+				ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
+				average(mi,tmp);
+				convert(tmp,so);
+			} else {
+				average(mi,so);
+			}
 
-				return;
-			} else if( input instanceof MultiSpectral && output instanceof MultiSpectral )  {
-				MultiSpectral mi = (MultiSpectral)input;
-				MultiSpectral mo = (MultiSpectral)output;
+			return;
+		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral )  {
+			MultiSpectral mi = (MultiSpectral)input;
+			MultiSpectral mo = (MultiSpectral)output;
 
-				for( int i = 0; i < mi.getNumBands(); i++ ) {
-					convert(mi.getBand(i),mo.getBand(i));
+			if( mi.getBandType() == mo.getBandType() ) {
+				mo.setTo(mi);
+			} else {
+				for (int i = 0; i < mi.getNumBands(); i++) {
+					convert(mi.getBand(i), mo.getBand(i));
 				}
 			}
+		} else {
+			throw new IllegalArgumentException("Don't know how to convert between input types");
 		}
-		throw new IllegalArgumentException("Don't know how to convert between input types");
 	}
 
 	/**

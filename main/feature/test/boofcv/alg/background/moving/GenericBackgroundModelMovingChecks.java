@@ -46,7 +46,6 @@ public abstract class GenericBackgroundModelMovingChecks {
 
 	protected List<ImageType> imageTypes = new ArrayList<ImageType>();
 
-
 	public abstract<T extends ImageBase>
 	BackgroundModelMoving<T,Homography2D_F32> create( ImageType<T> imageType );
 

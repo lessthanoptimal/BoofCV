@@ -112,7 +112,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 					if( bg == Float.MAX_VALUE ) {
 						background.data[indexBG] = value;
 					} else {
-						background.data[indexBG] = minusLearn*value + learnRate*bg;
+						background.data[indexBG] = minusLearn*bg + learnRate*value;
 					}
 				}
 			}

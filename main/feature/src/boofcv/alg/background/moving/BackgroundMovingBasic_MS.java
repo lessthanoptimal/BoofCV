@@ -128,7 +128,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 						if( bg == Float.MAX_VALUE ) {
 							pixelBack[band] = value;
 						} else {
-							pixelBack[band] = minusLearn*value + learnRate*bg;
+							pixelBack[band] = minusLearn*bg + learnRate*value;
 						}
 					}
 					backgroundWrapper.setF(indexBG,pixelBack);
