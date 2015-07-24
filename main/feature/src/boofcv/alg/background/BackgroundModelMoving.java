@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F32;
 /**
  * <p>
  * Base class for classifying pixels and background based on the apparent motion of pixels when the camera is moving.
- * The motion estimate comes from an external class with the results passed on.
+ * The camera motion is provided externally.
  * </p>
  *
  * There are three coordinate systems.
@@ -55,10 +55,9 @@ import georegression.struct.point.Point2D_F32;
  * @author Peter Abeles
  */
 public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel extends InvertibleTransform<MotionModel>>
+	extends BackgroundModel<T>
 {
 
-	// type of input image
-	protected ImageType<T> imageType;
 	// Convert the motion model into a usable format
 	protected PointTransformModel_F32<MotionModel> transform;
 
@@ -78,8 +77,6 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 	// storage for transformed coordinate
 	protected Point2D_F32 work = new Point2D_F32();
 
-	// value assigned to pixels outside the image.  Default to 0, which is background
-	protected byte unknownValue;
 
 	/**
 	 * Constructor which provides the motion model and image type
@@ -87,8 +84,8 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 	 * @param imageType Type of input image
 	 */
 	public BackgroundModelMoving(PointTransformModel_F32<MotionModel> transform, ImageType<T> imageType) {
+		super(imageType);
 		this.transform = transform;
-		this.imageType = imageType;
 
 		this.homeToWorld = transform.newInstanceModel();
 		this.worldToHome = transform.newInstanceModel();
@@ -102,18 +99,13 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 
 	/**
 	 * Initializes background model.  Specifies the size of the background image and transform from the "home" image
-	 * to the background "world"/
+	 * to the background "world"
 	 *
 	 * @param backgroundWidth Width of background
 	 * @param backgroundHeight Height of background
 	 * @param homeToWorld Transform from home to world.
 	 */
 	public abstract void initialize( int backgroundWidth , int backgroundHeight , MotionModel homeToWorld );
-
-	/**
-	 * Resets model to its original state
-	 */
-	public abstract void reset();
 
 	/**
 	 * Updates the background with new image information.
@@ -181,22 +173,4 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 	}
 
 	protected abstract void _segment( MotionModel currentToWorld , T frame , ImageUInt8 segmented );
-
-	public int getUnknownValue() {
-		return unknownValue & 0xff;
-	}
-
-	/**
-	 * Specify the value of a segmented pixel which has no corresponding pixel in the background image.
-	 * @param unknownValue Value for pixels with out a background pixel. 2 to 255, inclusive.
-	 */
-	public void setUnknownValue(int unknownValue) {
-		if( unknownValue < 2 || unknownValue > 255 )
-			throw new IllegalArgumentException("out of range. 2 to 255");
-		this.unknownValue = (byte)unknownValue;
-	}
-
-	public ImageType<T> getImageType() {
-		return imageType;
-	}
 }

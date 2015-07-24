@@ -219,6 +219,7 @@ public class QuadPoseEstimator {
 
 		double errorModified = computeErrors(outputFiducialToCamera);
 
+		// todo do a weighted average of the two estimates so the transition is smooth
 		// if the solutions are very similar go with the enlarged version
 		if (errorModified > errorRegular + FUDGE_FACTOR ) {
 			outputFiducialToCamera.set(foundRegular);

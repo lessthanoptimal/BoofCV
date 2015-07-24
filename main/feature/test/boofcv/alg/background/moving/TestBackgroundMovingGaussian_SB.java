@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.models;
+package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;

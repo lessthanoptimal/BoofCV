@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.models;
+package boofcv.alg.background.moving;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -30,67 +30,64 @@ import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 
 /**
- * Implementation of {@link BackgroundMovingGaussian} for {@link MultiSpectral}.
+ * Implementation of {@link BackgroundMovingBasic} for {@link MultiSpectral}.
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundMovingGaussian<MultiSpectral<T>,Motion>
+public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
+	extends BackgroundMovingBasic<MultiSpectral<T>,Motion>
 {
-
+	// where the background image is stored
+	protected MultiSpectral<ImageFloat32> background;
 	// interpolates the input image
-	protected InterpolatePixelMB<MultiSpectral<T>> interpolateInput;
+	protected InterpolatePixelMB<MultiSpectral<T>> interpolationInput;
 	// interpolates the background image
 	protected InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
 
 	// wrappers which provide abstraction across image types
+	protected GImageMultiBand backgroundWrapper;
 	protected GImageMultiBand inputWrapper;
 	// storage for multi-band pixel values
-	protected float[] pixelBG;
 	protected float[] pixelInput;
+	protected float[] pixelBack;
 
-	// background is composed of bands*2 channels.  even = mean, odd = variance
-	MultiSpectral<ImageFloat32> background;
+	public BackgroundMovingBasic_MS(float learnRate, float threshold,
+									PointTransformModel_F32<Motion> transform,
+									TypeInterpolate interpType,
+									ImageType<MultiSpectral<T>> imageType) {
+		super(learnRate, threshold,transform, imageType);
 
-	/**
-	 * Configurations background removal.
-	 *
-	 * @param learnRate Specifies how quickly the background is updated.  0 = static  1.0 = instant.  Try 0.05
-	 * @param threshold Threshold for background.  Consult a chi-square table for reasonably values.
-	 *                  10 to 16 for 1 to 3 bands.
-	 * @param transform Used to apply motion model
-	 * @param interpType Type of interpolation.  BILINEAR recommended for accuracy. NEAREST_NEIGHBOR for speed. .
-	 * @param imageType Type of input image.
-	 */
-	public BackgroundMovingGaussian_MS(float learnRate, float threshold,
-									   PointTransformModel_F32<Motion> transform,
-									   TypeInterpolate interpType,
-									   ImageType<MultiSpectral<T>> imageType)
-	{
-		super(learnRate, threshold, transform, imageType);
+		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType,BorderType.EXTENDED,imageType);
 
 		int numBands = imageType.getNumBands();
+		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
 
-		this.interpolateInput = FactoryInterpolation.createPixelMB(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
-
-		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,2*numBands);
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
-				0, 255, interpType, BorderType.EXTENDED, background.getImageType());
+				0, 255, interpType, BorderType.EXTENDED, ImageType.ms(numBands, ImageFloat32.class));
 		this.interpolationBG.setImage(background);
-		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
-		pixelBG = new float[2*numBands];
 		pixelInput = new float[numBands];
+		pixelBack = new float[numBands];
+
+		backgroundWrapper = FactoryGImageMultiBand.create(ImageType.ms(numBands, ImageFloat32.class));
+		backgroundWrapper.wrap(background);
+
+		inputWrapper = FactoryGImageMultiBand.create(imageType);
+	}
+
+	/**
+	 * Returns the background image.  Pixels which haven't been assigned yet are marked with {@link Float#MAX_VALUE}.
+	 *
+	 * @return background image.
+	 */
+	public MultiSpectral<ImageFloat32> getBackground() {
+		return background;
 	}
 
 	@Override
 	public void initialize(int backgroundWidth, int backgroundHeight, Motion homeToWorld) {
 		background.reshape(backgroundWidth,backgroundHeight);
-		for (int i = 0; i < background.getNumBands(); i+=2) {
-			GImageMiscOps.fill(background.getBand(i),0);
-			GImageMiscOps.fill(background.getBand(i+1),-1);
-		}
+		GImageMiscOps.fill(background, Float.MAX_VALUE);
 
 		this.homeToWorld.set(homeToWorld);
 		this.homeToWorld.invert(worldToHome);
@@ -101,20 +98,17 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 
 	@Override
 	public void reset() {
-		for (int i = 0; i < background.getNumBands(); i+=2) {
-			GImageMiscOps.fill(background.getBand(i),0);
-			GImageMiscOps.fill(background.getBand(i+1),-1);
-		}
+		GImageMiscOps.fill(background,Float.MAX_VALUE);
 	}
 
 	@Override
 	protected void updateBackground(int x0, int y0, int x1, int y1, MultiSpectral<T> frame) {
+
 		transform.setModel(worldToCurrent);
-		interpolateInput.setImage(frame);
+		interpolationInput.setImage(frame);
 
+		final int numBands = frame.getNumBands();
 		float minusLearn = 1.0f - learnRate;
-
-		final int numBands = background.getNumBands()/2;
 
 		for (int y = y0; y < y1; y++) {
 			int indexBG = background.startIndex + y*background.stride + x0;
@@ -122,25 +116,22 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 				transform.compute(x,y,work);
 
 				if( work.x >= 0 && work.x < frame.width && work.y >= 0 && work.y < frame.height) {
-					interpolateInput.get(work.x,work.y,pixelInput);
+
+					interpolationInput.get(work.x,work.y, pixelInput);
+					backgroundWrapper.getF(indexBG,pixelBack);
 
 					for (int band = 0; band < numBands; band++) {
-						ImageFloat32 backgroundMean = background.getBand(band*2);
-						ImageFloat32 backgroundVar = background.getBand(band*2+1);
 
-						float inputValue = pixelInput[band];
-						float meanBG = backgroundMean.data[indexBG];
-						float varianceBG = backgroundVar.data[indexBG];
+						float value = pixelInput[band];
+						float bg = pixelBack[band];
 
-						if( varianceBG < 0) {
-							backgroundMean.data[indexBG] = inputValue;
-							backgroundVar.data[indexBG] = initialVariance;
+						if( bg == Float.MAX_VALUE ) {
+							pixelBack[band] = value;
 						} else {
-							float diff = meanBG-inputValue;
-							backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
-							backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
+							pixelBack[band] = minusLearn*value + learnRate*bg;
 						}
 					}
+					backgroundWrapper.setF(indexBG,pixelBack);
 				}
 			}
 		}
@@ -151,7 +142,9 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 
-		final int numBands = background.getNumBands()/2;
+		int numBands = background.getNumBands();
+
+		float thresholdSq = numBands*threshold*threshold;
 
 		for (int y = 0; y < frame.height; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
@@ -160,26 +153,27 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 			for (int x = 0; x < frame.width; x++, indexFrame++ , indexSegmented++ ) {
 				transform.compute(x,y,work);
 
-				escapeIf:if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
-					interpolationBG.get(work.x,work.y,pixelBG);
+				escapeIf:
+				if( work.x >= 0 && work.x < background.width && work.y >= 0 && work.y < background.height) {
+
+					interpolationBG.get(work.x,work.y,pixelBack);
 					inputWrapper.getF(indexFrame,pixelInput);
 
-					float mahalanobis = 0;
+					double sumErrorSq = 0;
 					for (int band = 0; band < numBands; band++) {
+						float bg = pixelBack[band];
+						float pixelFrame = pixelInput[band];
 
-						float meanBG = pixelBG[0];
-						float varBG = pixelBG[1];
-
-						if (varBG < 0) {
+						if( bg == Float.MAX_VALUE ) {
 							segmented.data[indexSegmented] = unknownValue;
 							break escapeIf;
 						} else {
-							float diff = meanBG - pixelInput[band];
-							mahalanobis += diff * diff / varBG;
+							float diff = bg - pixelFrame;
+							sumErrorSq += diff*diff;
 						}
 					}
 
-					if (mahalanobis <= threshold) {
+					if ( sumErrorSq <= thresholdSq) {
 						segmented.data[indexSegmented] = 0;
 					} else {
 						segmented.data[indexSegmented] = 1;
@@ -191,4 +185,6 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 			}
 		}
 	}
+
+
 }

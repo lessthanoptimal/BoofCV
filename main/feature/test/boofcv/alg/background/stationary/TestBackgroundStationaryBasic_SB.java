@@ -16,10 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background;
+package boofcv.alg.background.stationary;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class BackgroundModelStatic {
+public class TestBackgroundStationaryBasic_SB {
+	@Test
+	public void foo() {
+		fail("implement");
+	}
 }

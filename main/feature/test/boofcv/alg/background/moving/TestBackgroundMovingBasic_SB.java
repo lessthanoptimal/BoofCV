@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.models;
+package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
@@ -30,17 +30,17 @@ import georegression.struct.homography.Homography2D_F32;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingBasic_MS extends GenericBackgroundModelMovingChecks {
-	public TestBackgroundMovingBasic_MS() {
-		imageTypes.add(ImageType.ms(2, ImageUInt8.class));
-		imageTypes.add(ImageType.ms(3, ImageUInt8.class));
-		imageTypes.add(ImageType.ms(3, ImageFloat32.class));
+public class TestBackgroundMovingBasic_SB extends GenericBackgroundModelMovingChecks
+{
+	public TestBackgroundMovingBasic_SB() {
+		imageTypes.add(ImageType.single(ImageUInt8.class));
+		imageTypes.add(ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
 	public <T extends ImageBase> BackgroundModelMoving<T, Homography2D_F32>
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
-		return new BackgroundMovingBasic_MS(0.05f, 10f, transform, TypeInterpolate.BILINEAR, imageType);
+		return new BackgroundMovingBasic_SB(0.05f,10f,transform,TypeInterpolate.BILINEAR,imageType);
 	}
 }

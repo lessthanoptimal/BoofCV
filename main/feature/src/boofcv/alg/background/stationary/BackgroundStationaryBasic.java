@@ -16,35 +16,23 @@
  * limitations under the License.
  */
 
-package boofcv.alg.background.models;
+package boofcv.alg.background.stationary;
 
-import boofcv.alg.background.BackgroundModelMoving;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.alg.background.BackgroundAlgorithmBasic;
+import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.struct.InvertibleTransform;
 
 /**
- * <p>
- * Performs basic background subtraction on a moving image.
- * </p>
- * <p>
- * One of the most basic ways and easiest to perform background detection.  A simple image is used to represent
- * the background.  each pixel is updated individually using the formula below:<br>
- * <br>
- * {@code B(i+1) = (1-&alpha;)*B(i) + &alpha;I(i)}<br>
- * Where B is the background image, I is the current observed image, and &alpha; is the learning rate 0 to 1.
- * Where 0 is static and 1 is instant.
- * </p>
- * <p>
- * If a specific pixel has not been observed before it will be set to the value of the equivalent pixel in the
- * input image.
- * </p>
+ * <p>Implementation of {@link BackgroundAlgorithmBasic} for stationary images.</p>
+ *
+ * @see BackgroundAlgorithmBasic
+ * @see BackgroundModelStationary
  *
  * @author Peter Abeles
  */
-public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundModelMoving<T,Motion> {
+public abstract class BackgroundStationaryBasic<T extends ImageBase>
+		extends BackgroundModelStationary<T> implements BackgroundAlgorithmBasic {
 
 	/**
 	 * Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant.
@@ -62,12 +50,10 @@ public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends 
 	 *
 	 * @param learnRate learning rate, 0 to 1.  0 = fastest and 1 = slowest.
 	 * @param threshold Euclidean distance threshold.  Background is <= this value
-	 * @param transform Point transform
 	 * @param imageType Type of input image
 	 */
-	public BackgroundMovingBasic(float learnRate , float threshold,
-								 PointTransformModel_F32<Motion> transform, ImageType<T> imageType) {
-		super(transform, imageType);
+	public BackgroundStationaryBasic(float learnRate, float threshold, ImageType<T> imageType) {
+		super(imageType);
 
 		if( learnRate < 0 || learnRate > 1f )
 			throw new IllegalArgumentException("LearnRate must be 0 <= rate <= 1.0f");
@@ -80,6 +66,7 @@ public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends 
 	 * Returns the learning rate.
 	 * @return Float 0 to 1.0.  0 = very fast learning.  1.0 = no learning, fixed.
 	 */
+	@Override
 	public float getLearnRate() {
 		return learnRate;
 	}
@@ -88,14 +75,17 @@ public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends 
 	 * Specifies the learning rate
 	 * @param learnRate 0 to 1
 	 */
+	@Override
 	public void setLearnRate(float learnRate) {
 		this.learnRate = learnRate;
 	}
 
+	@Override
 	public float getThreshold() {
 		return threshold;
 	}
 
+	@Override
 	public void setThreshold(float threshold) {
 		this.threshold = threshold;
 	}
