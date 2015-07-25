@@ -23,13 +23,10 @@ import boofcv.alg.background.stationary.BackgroundStationaryBasic_SB;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.image.ImageBinaryPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.MediaManager;
-import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.struct.homography.Homography2D_F32;
 
 /**
  * @author Peter Abeles
@@ -41,50 +38,55 @@ public class ExampleBackgroundRemovalStationary {
 
 
 		BackgroundModelStationary background =
-				new BackgroundStationaryBasic_SB(0.05f,30,ImageFloat32.class);
-//				new BackgroundMovingBasic_MS(0.1f,30,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-//		BackgroundMovingGaussian background =
-//				new BackgroundMovingGaussian_SB(0.01f,10,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-//				new BackgroundMovingGaussian_MS(0.01f,40,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
+				new BackgroundStationaryBasic_SB(0.005f,30,ImageFloat32.class);
+//				new BackgroundStationaryBasic_MS(0.005f,30, ImageType.ms(3, ImageFloat32.class));
+//		BackgroundStationaryGaussian background =
+//				new BackgroundStationaryGaussian_SB(0.001f,10, ImageFloat32.class);
+//				new BackgroundStationaryGaussian_MS(0.001f,30,ImageType.ms(3, ImageFloat32.class));
 //		background.setInitialVariance(64);
+//		background.setMinimumDifference(12);
 
-		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/shake.mjpeg";
-		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
+//		MediaManager media = DefaultMediaManager.INSTANCE;
+//		String fileName = "../data/applet/shake.mjpeg";
+//		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
+		LoadFileImageSequence video = new LoadFileImageSequence(background.getImageType(),"/home/pabeles/romotive/Vision/DetectLanding/output","jpg");
+
+		video.setLoop(true);
+//		video.setIndex(500);
 
 		ImageUInt8 segmented = new ImageUInt8(1,1);
 
 		ImageBinaryPanel gui = null;
+
+		double fps = 0;
+		double alpha = 0.01;
 
 		while( video.hasNext() ) {
 			ImageBase input = video.next();
 
 			if( segmented.width != input.width ) {
 				segmented.reshape(input.width,input.height);
-				Homography2D_F32 homeToWorld = new Homography2D_F32();
-				homeToWorld.a13 = input.width/2;
-				homeToWorld.a23 = input.height/2;
-
 				gui = new ImageBinaryPanel(segmented);
 				ShowImages.showWindow(gui,"Detections",true);
 			}
 
+			long before = System.nanoTime();
 			background.segment(input,segmented);
 			background.updateBackground(input);
+			long after = System.nanoTime();
 
-			System.out.println("sum = "+ ImageStatistics.sum(segmented)+" "+ImageStatistics.max(segmented));
+			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
+
+			System.out.println("sum = " + ImageStatistics.sum(segmented) + " " + ImageStatistics.max(segmented)+"  "+fps);
 			gui.setBinaryImage(segmented);
 			gui.repaint();
 			System.out.println("Processed!!");
 
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-
-			}
+//			try {
+//				Thread.sleep(5);
+//			} catch (InterruptedException e) {
+//
+//			}
 		}
 	}
 }

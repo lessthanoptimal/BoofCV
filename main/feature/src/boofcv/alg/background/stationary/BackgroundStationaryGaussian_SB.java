@@ -130,7 +130,10 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 				if (chisq <= threshold) {
 					segmented.data[indexSegmented] = 0;
 				} else {
-					segmented.data[indexSegmented] = 1;
+					if( diff > minimumDifference || -diff > minimumDifference )
+						segmented.data[indexSegmented] = 1;
+					else
+						segmented.data[indexSegmented] = 0;
 				}
 
 				indexInput++;

@@ -119,12 +119,38 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		alg.segment(frame,segmented);
 		BoofTesting.assertEquals(expected, segmented, 1e-8);
 
-		GImageMiscOps.fill(frame,100);
+		GImageMiscOps.fill(frame, 100);
 		ImageMiscOps.fill(expected, 1);
 
 		// it should be all changed.  really just a sanity check
 		alg.segment(frame,segmented);
 		BoofTesting.assertEquals(expected,segmented,1e-8);
+	}
+
+	/**
+	 * The user tries to segment before specifying the background
+	 */
+	@Test
+	public void segmentBeforeUpdateBackGround() {
+		for( ImageType type : imageTypes ) {
+			segmentBeforeUpdateBackGround(type);
+		}
+	}
+
+	private <T extends ImageBase>
+	void segmentBeforeUpdateBackGround( ImageType<T> imageType ) {
+		T frame = imageType.createImage(width, height);
+
+		BackgroundModelStationary<T> alg = create(frame.getImageType());
+
+		alg.setUnknownValue(2);
+
+		ImageUInt8 segmented = new ImageUInt8(width,height);
+		ImageUInt8 expected = new ImageUInt8(width,height);
+		ImageMiscOps.fill(expected, 2);
+
+		alg.segment(frame, segmented);
+		BoofTesting.assertEquals(expected, segmented, 1e-8);
 	}
 
 	@Test

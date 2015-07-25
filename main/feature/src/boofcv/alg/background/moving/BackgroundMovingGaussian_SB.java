@@ -157,7 +157,10 @@ public class BackgroundMovingGaussian_SB <T extends ImageSingleBand, Motion exte
 						if (chisq <= threshold) {
 							segmented.data[indexSegmented] = 0;
 						} else {
-							segmented.data[indexSegmented] = 1;
+							if( diff > minimumDifference || -diff > minimumDifference )
+								segmented.data[indexSegmented] = 1;
+							else
+								segmented.data[indexSegmented] = 0;
 						}
 					}
 				} else {

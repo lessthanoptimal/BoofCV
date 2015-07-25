@@ -38,10 +38,8 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 
 	// wrapper which provides abstraction across image types
 	protected GImageMultiBand inputWrapper;
-	protected GImageMultiBand bgWrapper;
 
 	protected float inputPixels[];
-	protected float bgPixels[];
 
 	public BackgroundStationaryBasic_MS(float learnRate, float threshold,
 										ImageType<MultiSpectral<T>> imageType) {
@@ -50,13 +48,10 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 		int numBands = imageType.getNumBands();
 
 		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
-		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
-		bgWrapper.wrap(background);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
 		inputPixels = new float[numBands];
-		bgPixels = new float[numBands];
 	}
 
 	/**
@@ -94,12 +89,11 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 			int end = indexInput + frame.width;
 			while( indexInput < end ) {
 				inputWrapper.getF(indexInput, inputPixels);
-				bgWrapper.getF(indexBG, bgPixels);
 
 				for (int band = 0; band < numBands; band++) {
-					bgPixels[band] = minusLearn*bgPixels[band] + learnRate*inputPixels[band];
+					ImageFloat32 backgroundBand = background.getBand(band);
+					backgroundBand.data[indexBG] = minusLearn*backgroundBand.data[indexBG] + learnRate*inputPixels[band];
 				}
-				bgWrapper.setF(indexBG,bgPixels);
 
 				indexInput++;
 				indexBG++;
@@ -127,14 +121,12 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 			int end = indexInput + frame.width;
 			while( indexInput < end ) {
 				inputWrapper.getF(indexInput, inputPixels);
-				bgWrapper.getF(indexBG, bgPixels);
 
 				double sumErrorSq = 0;
 				for (int band = 0; band < numBands; band++) {
-					float diff = bgPixels[band] - inputPixels[band];
+					float diff = background.getBand(band).data[indexBG] - inputPixels[band];
 					sumErrorSq += diff*diff;
 				}
-
 
 				if (sumErrorSq <= thresholdSq) {
 					segmented.data[indexSegmented] = 0;

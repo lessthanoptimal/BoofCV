@@ -152,6 +152,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 		inputWrapper.wrap(frame);
 
 		final int numBands = background.getNumBands()/2;
+		float adjustedMinimumDifference = minimumDifference*numBands;
 
 		for (int y = 0; y < frame.height; y++) {
 			int indexFrame = frame.startIndex + y*frame.stride;
@@ -165,10 +166,10 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 					inputWrapper.getF(indexFrame,pixelInput);
 
 					float mahalanobis = 0;
-					for (int band = 0; band < numBands; band++) {
 
-						float meanBG = pixelBG[0];
-						float varBG = pixelBG[1];
+					for (int band = 0; band < numBands; band++) {
+						float meanBG = pixelBG[band*2];
+						float varBG = pixelBG[band*2+1];
 
 						if (varBG < 0) {
 							segmented.data[indexSegmented] = unknownValue;
@@ -182,7 +183,19 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 					if (mahalanobis <= threshold) {
 						segmented.data[indexSegmented] = 0;
 					} else {
-						segmented.data[indexSegmented] = 1;
+						if( minimumDifference > 0 ) {
+							float sumAbsDiff = 0;
+							for (int band = 0; band < numBands; band++) {
+								sumAbsDiff += Math.abs(pixelBG[band * 2] - pixelInput[band]);
+							}
+							if (sumAbsDiff >= adjustedMinimumDifference) {
+								segmented.data[indexSegmented] = 1;
+							} else {
+								segmented.data[indexSegmented] = 0;
+							}
+						} else {
+							segmented.data[indexSegmented] = 1;
+						}
 					}
 				} else {
 					// there is no background here.  Just mark it as not moving to avoid false positives

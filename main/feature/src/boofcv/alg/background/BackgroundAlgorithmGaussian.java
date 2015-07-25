@@ -72,4 +72,8 @@ public interface BackgroundAlgorithmGaussian {
 	float getThreshold();
 
 	void setThreshold(float threshold);
+
+	public float getMinimumDifference();
+
+	public void setMinimumDifference(float minimumDifference);
 }

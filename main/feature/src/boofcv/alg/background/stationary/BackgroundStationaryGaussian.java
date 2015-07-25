@@ -52,6 +52,8 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase>
 	 */
 	protected float initialVariance = 0;
 
+	protected float minimumDifference = 0;
+
 	/**
 	 * See class documentation for parameters definitions.
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
@@ -96,5 +98,15 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase>
 	@Override
 	public void setThreshold(float threshold) {
 		this.threshold = threshold;
+	}
+
+	@Override
+	public float getMinimumDifference() {
+		return minimumDifference;
+	}
+
+	@Override
+	public void setMinimumDifference(float minimumDifference) {
+		this.minimumDifference = minimumDifference;
 	}
 }
