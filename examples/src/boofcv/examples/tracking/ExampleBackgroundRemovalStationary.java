@@ -19,14 +19,15 @@
 package boofcv.examples.tracking;
 
 import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.alg.background.stationary.BackgroundStationaryBasic_SB;
+import boofcv.alg.background.stationary.BackgroundStationaryBasic_IL;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.image.ImageBinaryPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
@@ -38,20 +39,22 @@ public class ExampleBackgroundRemovalStationary {
 
 
 		BackgroundModelStationary background =
-				new BackgroundStationaryBasic_SB(0.005f,30,ImageFloat32.class);
+//				new BackgroundStationaryBasic_SB(0.005f,30,ImageFloat32.class);
 //				new BackgroundStationaryBasic_MS(0.005f,30, ImageType.ms(3, ImageFloat32.class));
+				new BackgroundStationaryBasic_IL(0.005f,30, ImageType.il(3, InterleavedF32.class));
+
 //		BackgroundStationaryGaussian background =
 //				new BackgroundStationaryGaussian_SB(0.001f,10, ImageFloat32.class);
-//				new BackgroundStationaryGaussian_MS(0.001f,30,ImageType.ms(3, ImageFloat32.class));
+//				new BackgroundStationaryGaussian_MS(0.001f,30, ImageType.ms(3, ImageFloat32.class));
 //		background.setInitialVariance(64);
 //		background.setMinimumDifference(12);
 
 //		MediaManager media = DefaultMediaManager.INSTANCE;
 //		String fileName = "../data/applet/shake.mjpeg";
 //		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
-		LoadFileImageSequence video = new LoadFileImageSequence(background.getImageType(),"/home/pabeles/romotive/Vision/DetectLanding/output","jpg");
+		LoadFileImageSequence video = new LoadFileImageSequence(background.getImageType(),"/home/pja/romotive/Vision/DetectLanding/output","jpg");
 
-		video.setLoop(true);
+//		video.setLoop(true);
 //		video.setIndex(500);
 
 		ImageUInt8 segmented = new ImageUInt8(1,1);
@@ -88,5 +91,6 @@ public class ExampleBackgroundRemovalStationary {
 //
 //			}
 		}
+		System.out.println("done!");
 	}
 }

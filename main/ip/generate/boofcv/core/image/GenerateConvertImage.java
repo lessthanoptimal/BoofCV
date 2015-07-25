@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,8 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				if( in == out )
 					continue;
 
-				printConvert(in,out);
+				printConvertSingle(in, out);
+				printConvertInterleaved(in, out);
 			}
 			printAverage(in);
 		}
@@ -74,7 +75,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printConvert( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
+	private void printConvertSingle(AutoTypeImage imageIn, AutoTypeImage imageOut) {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
@@ -88,6 +89,30 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\tpublic static "+imageOut.getSingleBandName()+" convert("+imageIn.getSingleBandName()+" input, "+imageOut.getSingleBandName()+" output) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageOut.getSingleBandName()+"(input.width, input.height);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tImplConvertImage.convert(input, output);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void printConvertInterleaved(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Converts an {@link boofcv.struct.image."+imageIn.getInterleavedName()+"} into a {@link boofcv.struct.image."+imageOut.getInterleavedName()+"}.\n" +
+				"\t * </p>\n" +
+				"\t *\n" +
+				"\t * @param input Input image which is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static "+imageOut.getInterleavedName()+" convert("+imageIn.getInterleavedName()+" input, "+imageOut.getInterleavedName()+" output) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new "+imageOut.getInterleavedName()+"(input.width, input.height, input.numBands);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\t\t}\n" +

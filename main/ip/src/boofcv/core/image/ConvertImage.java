@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
@@ -60,6 +59,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedU8 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageUInt16}.
 	 * </p>
 	 *
@@ -70,6 +90,27 @@ public class ConvertImage {
 	public static ImageUInt16 convert(ImageUInt8 input, ImageUInt16 output) {
 		if (output == null) {
 			output = new ImageUInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedU8 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -102,6 +143,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedU8 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageSInt32}.
 	 * </p>
 	 *
@@ -112,6 +174,27 @@ public class ConvertImage {
 	public static ImageSInt32 convert(ImageUInt8 input, ImageSInt32 output) {
 		if (output == null) {
 			output = new ImageSInt32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedU8 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -144,6 +227,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedU8 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -165,6 +269,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedU8 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -175,6 +300,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageUInt8 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU8} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedU8 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -226,6 +372,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedS8 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageUInt16}.
 	 * </p>
 	 *
@@ -236,6 +403,27 @@ public class ConvertImage {
 	public static ImageUInt16 convert(ImageSInt8 input, ImageUInt16 output) {
 		if (output == null) {
 			output = new ImageUInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedS8 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -268,6 +456,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedS8 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageSInt32}.
 	 * </p>
 	 *
@@ -278,6 +487,27 @@ public class ConvertImage {
 	public static ImageSInt32 convert(ImageSInt8 input, ImageSInt32 output) {
 		if (output == null) {
 			output = new ImageSInt32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedS8 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -310,6 +540,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedS8 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -331,6 +582,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedS8 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -341,6 +613,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageSInt8 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS8} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedS8 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -392,6 +685,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedU16 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -402,6 +716,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageUInt16 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedU16 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -434,6 +769,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedU16 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt32}.
 	 * </p>
 	 *
@@ -444,6 +800,27 @@ public class ConvertImage {
 	public static ImageSInt32 convert(ImageUInt16 input, ImageSInt32 output) {
 		if (output == null) {
 			output = new ImageSInt32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedU16 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -476,6 +853,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedU16 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -497,6 +895,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedU16 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -507,6 +926,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageUInt16 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedU16} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedU16 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -558,6 +998,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedS16 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -568,6 +1029,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageSInt16 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedS16 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -600,6 +1082,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedS16 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageSInt32}.
 	 * </p>
 	 *
@@ -610,6 +1113,27 @@ public class ConvertImage {
 	public static ImageSInt32 convert(ImageSInt16 input, ImageSInt32 output) {
 		if (output == null) {
 			output = new ImageSInt32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedS16 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -642,6 +1166,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedS16 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -663,6 +1208,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedS16 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -673,6 +1239,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageSInt16 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS16} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedS16 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -724,6 +1311,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedS32 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -734,6 +1342,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageSInt32 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedS32 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -766,6 +1395,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedS32 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageSInt16}.
 	 * </p>
 	 *
@@ -776,6 +1426,27 @@ public class ConvertImage {
 	public static ImageSInt16 convert(ImageSInt32 input, ImageSInt16 output) {
 		if (output == null) {
 			output = new ImageSInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedS32 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -808,6 +1479,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedS32 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -829,6 +1521,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedS32 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -839,6 +1552,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageSInt32 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS32} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedS32 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -890,6 +1624,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedS64 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -900,6 +1655,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageSInt64 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedS64 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -932,6 +1708,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedS64 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageSInt16}.
 	 * </p>
 	 *
@@ -942,6 +1739,27 @@ public class ConvertImage {
 	public static ImageSInt16 convert(ImageSInt64 input, ImageSInt16 output) {
 		if (output == null) {
 			output = new ImageSInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedS64 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -974,6 +1792,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedS64 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -995,6 +1834,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedS64 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -1005,6 +1865,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageSInt64 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedS64} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedS64 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1056,6 +1937,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedF32 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -1066,6 +1968,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageFloat32 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedF32 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1098,6 +2021,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedF32 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt16}.
 	 * </p>
 	 *
@@ -1108,6 +2052,27 @@ public class ConvertImage {
 	public static ImageSInt16 convert(ImageFloat32 input, ImageSInt16 output) {
 		if (output == null) {
 			output = new ImageSInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedF32 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1140,6 +2105,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedF32 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt64}.
 	 * </p>
 	 *
@@ -1161,6 +2147,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedF32 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageFloat64}.
 	 * </p>
 	 *
@@ -1171,6 +2178,27 @@ public class ConvertImage {
 	public static ImageFloat64 convert(ImageFloat32 input, ImageFloat64 output) {
 		if (output == null) {
 			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF32} into a {@link boofcv.struct.image.InterleavedF64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF64 convert(InterleavedF32 input, InterleavedF64 output) {
+		if (output == null) {
+			output = new InterleavedF64(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1222,6 +2250,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedU8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convert(InterleavedF64 input, InterleavedU8 output) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt8}.
 	 * </p>
 	 *
@@ -1232,6 +2281,27 @@ public class ConvertImage {
 	public static ImageSInt8 convert(ImageFloat64 input, ImageSInt8 output) {
 		if (output == null) {
 			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedS8}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS8 convert(InterleavedF64 input, InterleavedS8 output) {
+		if (output == null) {
+			output = new InterleavedS8(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1264,6 +2334,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedU16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU16 convert(InterleavedF64 input, InterleavedU16 output) {
+		if (output == null) {
+			output = new InterleavedU16(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt16}.
 	 * </p>
 	 *
@@ -1274,6 +2365,27 @@ public class ConvertImage {
 	public static ImageSInt16 convert(ImageFloat64 input, ImageSInt16 output) {
 		if (output == null) {
 			output = new ImageSInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedS16}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS16 convert(InterleavedF64 input, InterleavedS16 output) {
+		if (output == null) {
+			output = new InterleavedS16(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1306,6 +2418,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedS32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS32 convert(InterleavedF64 input, InterleavedS32 output) {
+		if (output == null) {
+			output = new InterleavedS32(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt64}.
 	 * </p>
 	 *
@@ -1327,6 +2460,27 @@ public class ConvertImage {
 
 	/**
 	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedS64}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedS64 convert(InterleavedF64 input, InterleavedS64 output) {
+		if (output == null) {
+			output = new InterleavedS64(input.width, input.height, input.numBands);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageFloat32}.
 	 * </p>
 	 *
@@ -1337,6 +2491,27 @@ public class ConvertImage {
 	public static ImageFloat32 convert(ImageFloat64 input, ImageFloat32 output) {
 		if (output == null) {
 			output = new ImageFloat32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ImplConvertImage.convert(input, output);
+
+		return output;
+	}
+
+	/**
+	 * <p>
+	 * Converts an {@link boofcv.struct.image.InterleavedF64} into a {@link boofcv.struct.image.InterleavedF32}.
+	 * </p>
+	 *
+	 * @param input Input image which is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convert(InterleavedF64 input, InterleavedF32 output) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height, input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}

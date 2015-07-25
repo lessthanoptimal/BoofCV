@@ -57,7 +57,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
 	}
 
-	public static <I extends ImageInterleaved> ImageType<I> interleaved( int numBands , Class<I> imageType ) {
+	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, Class<I> imageType) {
 		return new ImageType<I>(Family.INTERLEAVED, ImageDataType.classToType(imageType),numBands);
 	}
 

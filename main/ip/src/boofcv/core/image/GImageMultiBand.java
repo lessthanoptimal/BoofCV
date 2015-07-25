@@ -41,6 +41,7 @@ public interface GImageMultiBand {
 
 	void setF( int index , float[] value );
 	void getF( int index , float[] value );
+	float getF( int index );
 
 	<T extends ImageBase>T getImage();
 }

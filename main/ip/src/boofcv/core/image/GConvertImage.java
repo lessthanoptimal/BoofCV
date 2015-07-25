@@ -49,7 +49,18 @@ public class GConvertImage {
 	 * @return Converted image.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
-		if( input instanceof ImageSingleBand && output instanceof ImageSingleBand )  {
+		if( input instanceof ImageSingleBand && output instanceof ImageSingleBand ) {
+			if (input.getClass() == output.getClass()) {
+				output.setTo(input);
+			} else {
+				try {
+					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+					m.invoke(null, input, output);
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Unknown conversion");
+				}
+			}
+		} else if( input instanceof ImageInterleaved && output instanceof ImageInterleaved )  {
 			if( input.getClass() == output.getClass() ) {
 				output.setTo(input);
 			} else {
@@ -73,19 +84,23 @@ public class GConvertImage {
 			} else {
 				average(mi,so);
 			}
+		} else if( input instanceof MultiSpectral && output instanceof ImageInterleaved )  {
+			throw new RuntimeException("Now would be a good time to code this conversion");
+		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral ) {
+			MultiSpectral mi = (MultiSpectral) input;
+			MultiSpectral mo = (MultiSpectral) output;
 
-			return;
-		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral )  {
-			MultiSpectral mi = (MultiSpectral)input;
-			MultiSpectral mo = (MultiSpectral)output;
-
-			if( mi.getBandType() == mo.getBandType() ) {
+			if (mi.getBandType() == mo.getBandType()) {
 				mo.setTo(mi);
 			} else {
 				for (int i = 0; i < mi.getNumBands(); i++) {
 					convert(mi.getBand(i), mo.getBand(i));
 				}
 			}
+		} else if( input instanceof ImageInterleaved && output instanceof MultiSpectral )  {
+			throw new RuntimeException("Now would be a good time to code this conversion");
+		} else if( input instanceof ImageInterleaved && output instanceof ImageSingleBand )  {
+			throw new RuntimeException("Now would be a good time to code this conversion");
 		} else {
 			throw new IllegalArgumentException("Don't know how to convert between input types");
 		}

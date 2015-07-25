@@ -54,7 +54,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		this.numBands = numBands;
 		this.width = width;
 		this.height = height;
-		this.imageType = (ImageType)ImageType.interleaved(numBands, getClass());
+		this.imageType = (ImageType)ImageType.il(numBands, getClass());
 	}
 
 	protected ImageInterleaved() {

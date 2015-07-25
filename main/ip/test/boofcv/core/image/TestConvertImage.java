@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -68,10 +65,18 @@ public class TestConvertImage {
 			count++;
 		}
 
-		assertEquals(8*7+8,count);
+		assertEquals(8*7 + 8*7+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
+		if( ImageSingleBand.class.isAssignableFrom(inputType) ) {
+			checkConvertSingle(m,inputType,outputType);
+		} else {
+			checkConvertInterleaved(m, inputType, outputType);
+		}
+
+	}
+	private void checkConvertSingle( Method m , Class inputType , Class outputType ) {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
@@ -90,10 +95,32 @@ public class TestConvertImage {
 			GImageMiscOps.fillUniform(input, rand, 0, 20);
 		}
 
-		BoofTesting.checkSubImage(this,"checkConvert",true,m,input,output);
+		BoofTesting.checkSubImage(this,"checkConvertSingle",true,m,input,output);
 	}
 
-	public void checkConvert( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
+	private void checkConvertInterleaved( Method m , Class inputType , Class outputType ) {
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType, imgWidth, imgHeight,2);
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(outputType, imgWidth, imgHeight, 2);
+
+		boolean inputSigned = true;
+		boolean outputSigned = true;
+
+		if( input.getImageType().getDataType().isInteger() )
+			inputSigned = input.getDataType().isSigned();
+		if( output.getImageType().getDataType().isInteger() )
+			outputSigned = output.getDataType().isSigned();
+
+		// only provide signed numbers of both data types can handle them
+		if( inputSigned && outputSigned ) {
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+		}
+
+		BoofTesting.checkSubImage(this,"checkConvertInterleaved",true,m,input,output);
+	}
+
+	public void checkConvertSingle( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
 		try {
 			double tol = selectTolerance(input,output);
 
@@ -104,6 +131,26 @@ public class TestConvertImage {
 
 			// check it with a null output
 			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			BoofTesting.assertEquals(input, ret, tol);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void checkConvertInterleaved( Method m , ImageInterleaved<?> input , ImageInterleaved<?> output ) {
+		try {
+			double tol = selectTolerance(input,output);
+
+			// check it with a non-null output
+			ImageInterleaved<?> ret = (ImageInterleaved<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
+
+			// check it with a null output
+			ret = (ImageInterleaved<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
 		} catch (IllegalAccessException e) {
@@ -173,6 +220,16 @@ public class TestConvertImage {
 	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
 	 */
 	private double selectTolerance( ImageSingleBand a , ImageSingleBand b ) {
+		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
+			return 1e-4;
+		else
+			return 1;
+	}
+
+	/**
+	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
+	 */
+	private double selectTolerance( ImageInterleaved a , ImageInterleaved b ) {
 		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
 			return 1e-4;
 		else

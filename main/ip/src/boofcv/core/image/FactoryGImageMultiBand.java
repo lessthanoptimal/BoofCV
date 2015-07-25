@@ -139,6 +139,11 @@ public class FactoryGImageMultiBand {
 		}
 
 		@Override
+		public float getF(int index) {
+			throw new RuntimeException("Not supported for MultiSpectral images.  Would be slow.");
+		}
+
+		@Override
 		public <T extends ImageBase> T getImage() {
 			return (T)image;
 		}
@@ -188,6 +193,11 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void getF(int index, float[] value) {
 			value[0] = sb.getF(index);
+		}
+
+		@Override
+		public float getF(int index) {
+			return sb.getF(index);
 		}
 
 		@Override
@@ -249,6 +259,11 @@ public class FactoryGImageMultiBand {
 				value[i] = image.data[index++] & 0xFF;
 			}
 		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index] & 0xFF;
+		}
 	}
 
 	public static class IL_S8 extends IL<InterleavedS8> {
@@ -281,6 +296,11 @@ public class FactoryGImageMultiBand {
 				value[i] = image.data[index++];
 			}
 		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
+		}
 	}
 
 	public static class IL_F32 extends IL<InterleavedF32> {
@@ -312,6 +332,11 @@ public class FactoryGImageMultiBand {
 			for( int i = 0; i < image.getNumBands(); i++ ) {
 				value[i] = image.data[index++];
 			}
+		}
+
+		@Override
+		public float getF(int index) {
+			return image.data[index];
 		}
 	}
 }
