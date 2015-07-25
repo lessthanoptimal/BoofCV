@@ -221,11 +221,34 @@ public class GeneralizedImageOps {
 
 	public static void set( ImageMultiBand img , int x , int y , double ...value ) {
 		if( img instanceof MultiSpectral ) {
-			MultiSpectral ms = (MultiSpectral)img;
+			MultiSpectral ms = (MultiSpectral) img;
 
 			for (int i = 0; i < value.length; i++) {
-				set(ms.getBand(i),x,y,value[i]);
+				set(ms.getBand(i), x, y, value[i]);
 			}
+		} else if( img instanceof ImageInterleaved ) {
+			for (int band = 0; band < value.length; band++) {
+				if (img instanceof InterleavedU8) {
+					((InterleavedU8) img).setBand(x, y, band, (byte)value[band]);
+				} else if (img instanceof InterleavedS8) {
+					((InterleavedS8) img).setBand(x, y, band, (byte)value[band]);
+				} else if (img instanceof InterleavedS16) {
+					((InterleavedS16) img).setBand(x, y, band, (short)value[band]);
+				} else if (img instanceof InterleavedU16) {
+					((InterleavedU16) img).setBand(x, y, band, (short)value[band]);
+				} else if (img instanceof InterleavedS32) {
+					((InterleavedS32) img).setBand(x, y, band, (int)value[band]);
+				} else if (img instanceof InterleavedS64) {
+					((InterleavedS64) img).setBand(x, y, band, (long)value[band]);
+				} else if (img instanceof InterleavedF32) {
+					((InterleavedF32) img).setBand(x, y, band, (float)value[band]);
+				} else if (img instanceof InterleavedF64) {
+					((InterleavedF64) img).setBand(x, y, band, value[band]);
+				} else {
+					throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+				}
+			}
+
 		} else {
 			throw new IllegalArgumentException("Add support for this image type!");
 		}

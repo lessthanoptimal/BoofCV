@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class InterleavedS8 extends InterleavedI8 {
+public class InterleavedS8 extends InterleavedI8<InterleavedS8> {
 
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class InterleavedI8 extends ImageInterleaved<InterleavedI8> {
+public abstract class InterleavedI8<T extends InterleavedI8> extends ImageInterleaved<T> {
 
 	public byte data[];
 

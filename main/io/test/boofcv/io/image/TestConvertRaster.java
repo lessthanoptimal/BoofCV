@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -183,14 +183,14 @@ public class TestConvertRaster {
 		if (paramType == ByteInterleavedRaster.class) {
 			// the code is handled different when a different number of channels is used
 			input = new BufferedImage[]{
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
 		} else if (paramType == IntegerInterleavedRaster.class) {
 			input = new BufferedImage[]{
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
-					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_BGR, rand),
-					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_RGB, rand)};
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB, rand)};
 		} else if( paramType == ShortInterleavedRaster.class ) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
@@ -278,7 +278,7 @@ public class TestConvertRaster {
 		return ret;
 	}
 
-	public static BufferedImage createByteBuffByType(int width, int height, int type, Random rand) {
+	public static BufferedImage createBufferedByType(int width, int height, int type, Random rand) {
 		BufferedImage ret = new BufferedImage(width, height, type);
 
 		randomize(ret, rand);

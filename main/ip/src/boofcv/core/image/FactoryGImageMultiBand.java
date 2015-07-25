@@ -18,15 +18,22 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 
 /**
  * @author Peter Abeles
  */
 public class FactoryGImageMultiBand {
+
+	public static GImageMultiBand wrap( ImageBase image ) {
+		if( image instanceof ImageSingleBand )
+			return wrap((ImageSingleBand)image);
+		else if( image instanceof MultiSpectral )
+			return wrap((MultiSpectral)image);
+		else if( image instanceof ImageInterleaved )
+			return wrap((ImageInterleaved)image);
+		throw new RuntimeException("Unknown image type");
+	}
 
 	public static GImageMultiBand wrap( ImageSingleBand image ) {
 		return new GSingleToMB(FactoryGImageSingleBand.wrap(image));
@@ -35,6 +42,17 @@ public class FactoryGImageMultiBand {
 	public static GImageMultiBand create( ImageType imageType ) {
 		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
 			return new MS();
+		} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
+			switch( imageType.getDataType() ) {
+				case U8:
+					return new IL_U8();
+				case S8:
+					return new IL_S8();
+				case F32:
+					return new IL_F32();
+				default:
+					throw new IllegalArgumentException("Need to support more data types");
+			}
 		} else {
 			throw new RuntimeException("Add support for more families");
 		}
@@ -42,6 +60,19 @@ public class FactoryGImageMultiBand {
 
 	public static GImageMultiBand wrap( MultiSpectral image ) {
 		return new MS(image);
+	}
+
+	public static GImageMultiBand wrap( ImageInterleaved image ) {
+		switch( image.getDataType() ) {
+			case U8:
+				return new IL_U8((InterleavedU8)image);
+			case S8:
+				return new IL_S8((InterleavedS8)image);
+			case F32:
+				return new IL_F32((InterleavedF32)image);
+			default:
+				throw new IllegalArgumentException("Need to support more data types");
+		}
 	}
 
 	public static class MS implements GImageMultiBand {
@@ -162,6 +193,125 @@ public class FactoryGImageMultiBand {
 		@Override
 		public <T extends ImageBase> T getImage() {
 			return (T)sb.getImage();
+		}
+	}
+
+	public static abstract class IL<T extends ImageInterleaved<T>> implements GImageMultiBand {
+		T image;
+
+		@Override
+		public void wrap(ImageBase image) {
+			this.image = (T) image;
+		}
+
+		@Override
+		public int getWidth() {return image.getWidth();}
+
+		@Override
+		public int getHeight() {return image.getHeight();}
+
+		@Override
+		public int getNumberOfBands() {return image.getNumBands();}
+
+		@Override
+		public <T extends ImageBase> T getImage() {
+			return (T)image;
+		}
+	}
+
+	public static class IL_U8 extends IL<InterleavedU8> {
+		public IL_U8(InterleavedU8 image) {
+			wrap(image);
+		}
+
+		public IL_U8() {}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			setF(image.getIndex(x,y),value);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public void setF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				image.data[index++] = (byte)value[i];
+			}
+		}
+
+		@Override
+		public void getF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				value[i] = image.data[index++] & 0xFF;
+			}
+		}
+	}
+
+	public static class IL_S8 extends IL<InterleavedS8> {
+		public IL_S8(InterleavedS8 image) {
+			wrap(image);
+		}
+
+		public IL_S8() {}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			setF(image.getIndex(x,y),value);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public void setF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				image.data[index++] = (byte)value[i];
+			}
+		}
+
+		@Override
+		public void getF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				value[i] = image.data[index++];
+			}
+		}
+	}
+
+	public static class IL_F32 extends IL<InterleavedF32> {
+		public IL_F32(InterleavedF32 image) {
+			wrap(image);
+		}
+
+		public IL_F32() {}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			setF(image.getIndex(x,y),value);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			getF(image.getIndex(x,y), value);
+		}
+
+		@Override
+		public void setF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				image.data[index++] = value[i];
+			}
+		}
+
+		@Override
+		public void getF(int index, float[] value) {
+			for( int i = 0; i < image.getNumBands(); i++ ) {
+				value[i] = image.data[index++];
+			}
 		}
 	}
 }

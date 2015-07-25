@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,7 @@
 
 package boofcv.testing;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.*;
 import boofcv.struct.image.*;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -660,10 +658,10 @@ public class BoofTesting {
 			checkEquals( imgA, (ImageInt16) imgB );
 		} else if (ImageFloat32.class == imgB.getClass()) {
 			checkEquals(imgA, (ImageFloat32) imgB, (float) tol);
-		} else if (InterleavedU8.class == imgB.getClass()) {
-			checkEquals(imgA, (InterleavedU8) imgB);
+		} else if (ImageInterleaved.class.isInstance(imgB) ) {
+			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder, (float)tol );
 		} else if (MultiSpectral.class == imgB.getClass()) {
-			checkEquals(imgA, (MultiSpectral) imgB, boofcvBandOrder,(float) tol);
+			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder,(float) tol);
 		} else {
 			throw new IllegalArgumentException("Unknown");
 		}
@@ -830,51 +828,10 @@ public class BoofTesting {
 		}
 	}
 
-	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
-	 *
-	 * @param imgA BufferedImage
-	 * @param imgB ImageUInt8
-	 */
-	public static void checkEquals(BufferedImage imgA, InterleavedU8 imgB) {
+	public static void checkEquals(WritableRaster imgA, ImageMultiBand imgB, float tol) {
 
-		if (imgA.getRaster() instanceof ByteInterleavedRaster) {
-			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
-
-			if (raster.getNumBands() == 1) {
-				// handle a special case where the RGB conversion is screwed
-				for (int i = 0; i < imgA.getHeight(); i++) {
-					for (int j = 0; j < imgA.getWidth(); j++) {
-						int valB = imgB.getBand(j, i, 0);
-						int valA = raster.getDataStorage()[i * imgA.getWidth() + j] & 0xFF;
-
-						if (valA != valB)
-							throw new RuntimeException("Images are not equal");
-					}
-				}
-				return;
-			}
-		}
-
-		for (int y = 0; y < imgA.getHeight(); y++) {
-			for (int x = 0; x < imgA.getWidth(); x++) {
-				int rgb = imgA.getRGB(x, y);
-
-				int r = (rgb >>> 16) & 0xFF;
-				int g = (rgb >>> 8) & 0xFF;
-				int b = rgb & 0xFF;
-
-				if (Math.abs(b - imgB.getBand(x, y, 0) & 0xFF) != 0)
-					throw new RuntimeException("images are not equal: ");
-				if (Math.abs(g - imgB.getBand(x, y, 1) & 0xFF) != 0)
-					throw new RuntimeException("images are not equal: ");
-				if (Math.abs(r - imgB.getBand(x, y, 2) & 0xFF) != 0)
-					throw new RuntimeException("images are not equal: ");
-			}
-		}
-	}
-
-	public static void checkEquals(WritableRaster imgA, MultiSpectral imgB, float tol) {
+		GImageMultiBand genericB = FactoryGImageMultiBand.wrap(imgB);
+		float pixelB[] = new float[ imgB.getNumBands() ];
 
 		if( imgA.getNumBands() != imgB.getNumBands()) {
 			throw new RuntimeException("Number of bands not equals");
@@ -892,9 +849,10 @@ public class BoofTesting {
 				int indexA = offsetA + strideA * y;
 
 				for (int x = 0; x < imgA.getWidth(); x++) {
+					genericB.get(x,y,pixelB);
 					for( int k = 0; k < imgB.getNumBands(); k++ ) {
 						int valueA = dataA[indexA++] & 0xFF;
-						double valueB = GeneralizedImageOps.get(imgB.getBand(k),x,y);
+						double valueB = pixelB[k];
 						if( Math.abs(valueA- valueB) > tol )
 							throw new RuntimeException("Images are not equal: A = " + valueA + " B = " + valueB);
 					}
@@ -913,6 +871,7 @@ public class BoofTesting {
 				int indexA = offsetA + strideA * y;
 
 				for (int x = 0; x < imgA.getWidth(); x++) {
+					genericB.get(x,y,pixelB);
 					int valueA = dataA[indexA++];
 					if( imgB.getNumBands() == 4 ) {
 						int found0 = (valueA >> 24) & 0xFF;
@@ -920,33 +879,24 @@ public class BoofTesting {
 						int found2 = (valueA >> 8) & 0xFF;
 						int found3 = valueA & 0xFF;
 
-						double expected0 = GeneralizedImageOps.get(imgB.getBand(0),x,y);
-						double expected1 = GeneralizedImageOps.get(imgB.getBand(1),x,y);
-						double expected2 = GeneralizedImageOps.get(imgB.getBand(2),x,y);
-						double expected3 = GeneralizedImageOps.get(imgB.getBand(3),x,y);
-
-						if( Math.abs(found0-expected0) > tol )
+						if( Math.abs(found0-pixelB[0]) > tol )
 							throw new RuntimeException("Images are not equal");
-						if( Math.abs(found1-expected1) > tol )
+						if( Math.abs(found1-pixelB[1]) > tol )
 							throw new RuntimeException("Images are not equal");
-						if( Math.abs(found2-expected2) > tol )
+						if( Math.abs(found2-pixelB[2]) > tol )
 							throw new RuntimeException("Images are not equal");
-						if( Math.abs(found3-expected3) > tol )
+						if( Math.abs(found3-pixelB[3]) > tol )
 							throw new RuntimeException("Images are not equal");
 					} else if( imgB.getNumBands() == 3 ) {
 						int found0 = (valueA >> 16) & 0xFF;
 						int found1 = (valueA >> 8) & 0xFF;
 						int found2 = valueA & 0xFF;
 
-						double expected0 = GeneralizedImageOps.get(imgB.getBand(0),x,y);
-						double expected1 = GeneralizedImageOps.get(imgB.getBand(1),x,y);
-						double expected2 = GeneralizedImageOps.get(imgB.getBand(2),x,y);
-
-						if( Math.abs(found0-expected0) > tol )
+						if( Math.abs(found0-pixelB[0]) > tol )
 							throw new RuntimeException("Images are not equal");
-						if( Math.abs(found1-expected1) > tol )
+						if( Math.abs(found1-pixelB[1]) > tol )
 							throw new RuntimeException("Images are not equal");
-						if( Math.abs(found2-expected2) > tol )
+						if( Math.abs(found2-pixelB[2]) > tol )
 							throw new RuntimeException("Images are not equal");
 					} else {
 						throw new RuntimeException("Unexpectd number of bands");
@@ -959,22 +909,24 @@ public class BoofTesting {
 
 	}
 
-	public static void checkEquals(BufferedImage imgA, MultiSpectral imgB, boolean boofcvBandOrder , float tol) {
+	public static void checkEquals(BufferedImage imgA, ImageMultiBand imgB, boolean boofcvBandOrder , float tol) {
+
+		GImageMultiBand genericB = FactoryGImageMultiBand.wrap(imgB);
+		float pixelB[] = new float[ imgB.getNumBands() ];
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
 				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) imgA.getRaster();
 
 			if (raster.getNumBands() == 1) {
-				GImageSingleBand band = FactoryGImageSingleBand.wrap(imgB.getBand(0));
-
 				int strideA = raster.getScanlineStride();
 				int offsetA = raster.getDataOffset(0)-raster.getPixelStride()+1;
 
 				// handle a special case where the RGB conversion is screwed
 				for (int i = 0; i < imgA.getHeight(); i++) {
 					for (int j = 0; j < imgA.getWidth(); j++) {
-						double valB = band.get(j, i).doubleValue();
+						genericB.get(j,i,pixelB);
+						double valB = pixelB[0];
 						int valA = raster.getDataStorage()[offsetA + i * strideA + j];
 						valA &= 0xFF;
 
@@ -1022,24 +974,25 @@ public class BoofTesting {
 				expected[3] = (rgb & 0xFF);          // blue
 
 				if( imgB.getNumBands() == 4 ) {
-
+					genericB.get(x,y,pixelB);
 					for( int i = 0; i < 4; i++ ) {
-						double found = GeneralizedImageOps.get(imgB.getBand(bandOrder[i]),x,y);
+
+						double found = pixelB[bandOrder[i]];
 						if( Math.abs(Math.exp(expected[i]- found)) > tol ) {
 							for( int j = 0; j < 4; j++ ) {
-								System.out.println(expected[j]+" "+GeneralizedImageOps.get(imgB.getBand(bandOrder[j]),x,y));
+								System.out.println(expected[j]+" "+pixelB[bandOrder[j]]);
 							}
 							throw new RuntimeException("Images are not equal: band - "+i+" type "+imgA.getType());
 						}
 					}
 
 				} else if( imgB.getNumBands() == 3 ) {
-
+					genericB.get(x,y,pixelB);
 					for( int i = 0; i < 3; i++ ) {
-						double found = GeneralizedImageOps.get(imgB.getBand(bandOrder[i]),x,y);
+						double found = pixelB[bandOrder[i]];
 						if( Math.abs(expected[i+1]- found) > tol ) {
 							for( int j = 0; j < 3; j++ ) {
-								System.out.println(expected[j+1]+" "+GeneralizedImageOps.get(imgB.getBand(bandOrder[j]),x,y));
+								System.out.println(expected[j+1]+" "+pixelB[bandOrder[j]]);
 							}
 							throw new RuntimeException("Images are not equal: band - "+i+" type "+imgA.getType());
 						}

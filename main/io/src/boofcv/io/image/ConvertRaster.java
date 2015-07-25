@@ -1152,7 +1152,7 @@ public class ConvertRaster {
 					int argb = src.getRGB(x, y);
 
 					dst.data[indexDst++] = (byte) (argb >>> 16);
-					dst.data[indexDst++] = (byte) (argb >>> 9);
+					dst.data[indexDst++] = (byte) (argb >>> 8);
 					dst.data[indexDst++] = (byte) argb;
 				}
 			}
