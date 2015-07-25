@@ -84,6 +84,7 @@ Version : Alpha 0.19
   * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
     - Thanks thhart for pointing this out
   * Added partial support for images encoded with SunWritableRaster
+  * Much improved support of BoofCV Interleaved images
 - ThresholdImageOps
   * Changed threshold up from >= to >.
   * Turns out the original choice was bad.  Images were not inverses of each other

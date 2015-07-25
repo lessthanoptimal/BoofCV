@@ -58,7 +58,7 @@ public class TestConvertBufferedImage {
 
 		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
 		// gray input image with pixel values from 0 to 255
-		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10, 10), null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
 		found = ConvertBufferedImage.checkInputs(new ImageFloat64(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
@@ -248,6 +248,11 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
+	public void convertFrom_single_interlaced_orderRgb() {
+		fail("implement");
+	}
+
+	@Test
 	public void convertFromSingle() {
 		BufferedImage origImg;
 
@@ -340,6 +345,11 @@ public class TestConvertBufferedImage {
 		}
 	}
 
+	@Test
+	public void convertFromInterlaced() {
+		fail("implement");
+	}
+
 	/**
 	 * Create an image and convert it into a buffered image
 	 */
@@ -362,6 +372,11 @@ public class TestConvertBufferedImage {
 				BoofTesting.checkSubImage(this, "convertTo_single_ms", false, image);
 			}
 		}
+	}
+
+	@Test
+	public void convertTo_single_interlaced() {
+		fail("Implement");
 	}
 
 	public void convertTo_single_ms(ImageBase srcImg) {
@@ -410,7 +425,7 @@ public class TestConvertBufferedImage {
 
 		if( reorder ) {
 			if( numBands == 4 ) {
-				assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB.getBand(3), 5, 6)) < 1e-8 );
+				assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB.getBand(3),5,6)) < 1e-8 );
 				assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
 				assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
 				assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
@@ -446,6 +461,11 @@ public class TestConvertBufferedImage {
 				}
 			}
 		}
+	}
+
+	@Test
+	public void convertTo_single_interleaved_orderRgb() {
+		fail("Implement");
 	}
 
 	@Test
