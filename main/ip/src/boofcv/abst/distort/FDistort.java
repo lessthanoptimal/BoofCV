@@ -71,11 +71,11 @@ public class FDistort
 		ImageBorder border;
 		switch( inputType.getFamily() ) {
 			case SINGLE_BAND:
-				border = FactoryImageBorder.value(inputType.getImageClass(), 0);
+				border = FactoryImageBorder.singleValue(inputType.getImageClass(), 0);
 				break;
 
 			case MULTI_SPECTRAL:
-				border = FactoryImageBorder.value(inputType.getImageClass(), 0);
+				border = FactoryImageBorder.singleValue(inputType.getImageClass(), 0);
 				break;
 
 			default:
@@ -129,14 +129,14 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
-		return border(FactoryImageBorder.general(input.getImageType().getImageClass(), type));
+		return border(FactoryImageBorder.single(input.getImageType().getImageClass(), type));
 	}
 
 	/**
 	 * Sets the border to a fixed gray-scale value
 	 */
 	public FDistort border( double value ) {
-		return border(FactoryImageBorder.value(input.getImageType().getImageClass(), value));
+		return border(FactoryImageBorder.singleValue(input.getImageType().getImageClass(), value));
 	}
 
 	/**

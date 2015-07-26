@@ -56,7 +56,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	protected CommonImageDistortCacheTests(Class<T> imageType) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		interp.setBorder(FactoryImageBorder.value(imageType, 1));
+		interp.setBorder(FactoryImageBorder.singleValue(imageType, 1));
 
 		src = GeneralizedImageOps.createSingleBand(imageType,200,300);
 		dst0 = GeneralizedImageOps.createSingleBand(imageType,200,300);

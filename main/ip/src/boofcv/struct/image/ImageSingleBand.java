@@ -117,7 +117,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		}
 
 		subimage._setData(_getData());
-		subimage.stride = Math.max(width, stride);
+		subimage.stride = Math.max(width, stride);// ok why is this done?!?!  Shouldn't it always be stride?
 		subimage.width = x1 - x0;
 		subimage.height = y1 - y0;
 		subimage.startIndex = startIndex + y0 * stride + x0;

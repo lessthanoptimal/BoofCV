@@ -20,6 +20,8 @@ package boofcv.core.image.border;
 
 import boofcv.struct.image.*;
 
+import java.util.Arrays;
+
 /**
  * All points outside of the image will return the specified value
  *
@@ -37,6 +39,14 @@ public class ImageBorderValue {
 			return wrap((ImageFloat32)image,(float)value);
 		} else {
 			return wrap((ImageFloat64)image,value);
+		}
+	}
+
+	public static ImageBorder wrap( ImageInterleaved image , double value ) {
+		if( image instanceof InterleavedF32 ) {
+			return new Value_ILF32((InterleavedF32)image,(float)value);
+		} else {
+			throw new RuntimeException("Add support for more types");
 		}
 	}
 
@@ -146,5 +156,27 @@ public class ImageBorderValue {
 		public void setOutside(int x, int y, int value) {
 			// do nothing since it is a constant
 		}
+	}
+
+	public static class Value_ILF32 extends ImageBorder_ILF32 {
+		float value;
+
+		public Value_ILF32( InterleavedF32 image , float value ) {
+			super(image);
+			this.value = value;
+		}
+
+		public Value_ILF32(float value) {
+			this.value = value;
+		}
+
+
+		@Override
+		public void getOutside(int x, int y, float[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, float[] pixel) {}
 	}
 }

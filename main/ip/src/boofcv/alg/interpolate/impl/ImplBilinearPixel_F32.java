@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.BilinearPixel;
+import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -25,7 +26,7 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * Implementation of {@link BilinearPixel} for a specific image type.
+ * Implementation of {@link BilinearPixelS} for a specific image type.
  * </p>
  *
  * <p>
@@ -34,7 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_F32 extends BilinearPixel<ImageFloat32> {
+public class ImplBilinearPixel_F32 extends BilinearPixelS<ImageFloat32> {
 
 	public ImplBilinearPixel_F32() {
 	}

@@ -133,7 +133,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		ret[0][0] = createKernel(paramTypes[0], kernelWidth, kernelOffset);
 		ret[0][1] = src;
 		ret[0][2] = dst;
-		ret[0][3] = FactoryImageBorder.general(src, BorderType.EXTENDED);
+		ret[0][3] = FactoryImageBorder.single(src, BorderType.EXTENDED);
 
 		return ret;
 	}

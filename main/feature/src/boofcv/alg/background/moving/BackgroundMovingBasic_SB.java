@@ -61,7 +61,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(type, BorderType.EXTENDED);
 
 		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, ImageFloat32.class);
-		this.interpolationBG.setBorder(FactoryImageBorder.general(ImageFloat32.class, BorderType.EXTENDED));
+		this.interpolationBG.setBorder(FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED));
 		this.interpolationBG.setImage(background);
 
 		inputWrapper = FactoryGImageSingleBand.create(type);

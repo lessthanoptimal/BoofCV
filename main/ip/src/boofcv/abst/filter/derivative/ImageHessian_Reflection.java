@@ -63,7 +63,7 @@ public class ImageHessian_Reflection<Output extends ImageSingleBand>
 	public void setBorderType(BorderType type) {
 		this.borderType = type;
 		Class imageType = m.getParameterTypes()[0];
-		border = FactoryImageBorder.general(imageType,borderType);
+		border = FactoryImageBorder.single(imageType, borderType);
 	}
 
 	@Override

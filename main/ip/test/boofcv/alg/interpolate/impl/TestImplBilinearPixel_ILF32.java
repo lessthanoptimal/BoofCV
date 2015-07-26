@@ -16,36 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.InterleavedF32;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
- *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageBase> {
-
-	T image;
-
-	protected ImageBorder(T image) {
-		setImage(image);
+public class TestImplBilinearPixel_ILF32 extends GeneralBilinearPixelMultiChecks<InterleavedF32>
+{
+	@Override
+	protected InterleavedF32 createImage(int width, int height, int numBands) {
+		return new InterleavedF32(width, height, numBands);
 	}
-
-	protected ImageBorder() {
-	}
-
-	public void setImage( T image ) {
-		this.image = image;
-	}
-
-	public T getImage() {
-		return image;
-	}
-
-	public abstract void getGeneral(int x, int y, double[] pixel);
-
-	public abstract void setGeneral(int x, int y, double[] pixel);
 }

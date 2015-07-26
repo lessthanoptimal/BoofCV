@@ -538,7 +538,7 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public void wrap(ImageSingleBand image) {
-			throw new RuntimeException("Not supported for GSingleBorder.  Needs a bit of a resdesign");
+			this.image.setImage(image);
 		}
 
 		@Override

@@ -19,46 +19,21 @@
 package boofcv.core.image.border;
 
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
- * Child of {@link ImageBorder} for {@link ImageFloat32}.
- *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_F32 extends ImageBorder<ImageFloat32> {
+public class TestImageBorder1D_F32 extends GenericImageBorder1DTests<ImageFloat32> {
 
-	public ImageBorder_F32(ImageFloat32 image) {
-		super(image);
-	}
-
-	protected ImageBorder_F32() {
-	}
-
-	public void set( int x , int y , float val ) {
-		if( image.isInBounds(x,y) )
-			image.set(x,y,val);
-
-		setOutside(x,y,val);
-	}
-
-	public float get( int x , int y ) {
-		if( image.isInBounds(x,y) )
-			return image.get(x,y);
-
-		return getOutside( x , y );
+	public TestImageBorder1D_F32() {
+		super(ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
-	public void getGeneral(int x, int y, double[] pixel ) {
-		pixel[0] = get(x, y);
+	public ImageBorder<ImageFloat32> wrap(ImageFloat32 image) {
+		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
 	}
-
-	@Override
-	public void setGeneral(int x, int y, double[] pixel ) {
-		set(x, y, (int)pixel[0]);
-	}
-
-	public abstract float getOutside( int x , int y );
-
-	public abstract void setOutside( int x , int y , float val );
 }

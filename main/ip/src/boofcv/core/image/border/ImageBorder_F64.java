@@ -49,8 +49,13 @@ public abstract class ImageBorder_F64 extends ImageBorder<ImageFloat64> {
 	}
 
 	@Override
-	public double getGeneral(int x, int y, int band) {
-		return get(x,y);
+	public void getGeneral(int x, int y, double[] pixel ) {
+		pixel[0] = get(x, y);
+	}
+
+	@Override
+	public void setGeneral(int x, int y, double[] pixel ) {
+		set(x, y, (int)pixel[0]);
 	}
 
 	public abstract double getOutside( int x , int y );

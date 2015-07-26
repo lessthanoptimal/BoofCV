@@ -136,15 +136,17 @@ public class TestImageInterleaved {
 		DummyImage a = new DummyImage(10, 20, 3);
 		assertFalse(a.isSubimage());
 
-		a = a.subimage(2, 3, 8, 10, null);
+		DummyImage b = a.subimage(2, 3, 8, 10, null);
 
-		assertTrue(a.isSubimage());
-		assertEquals(10 * 20 * 3, a.data.length);
-		assertEquals(6, a.getWidth());
-		assertEquals(7, a.getHeight());
-		assertEquals(3, a.getNumBands());
-		assertEquals(30, a.getStride());
-		assertEquals(3 * 30 + 2 * 3, a.getStartIndex());
+		assertTrue(b.isSubimage());
+		assertTrue(a.getImageType()==b.getImageType());
+		assertTrue(a._getData()==b._getData());
+		assertEquals(10 * 20 * 3, b.data.length);
+		assertEquals(6, b.getWidth());
+		assertEquals(7, b.getHeight());
+		assertEquals(3, b.getNumBands());
+		assertEquals(30, b.getStride());
+		assertEquals(3 * 30 + 2 * 3, b.getStartIndex());
 	}
 
 	@Test

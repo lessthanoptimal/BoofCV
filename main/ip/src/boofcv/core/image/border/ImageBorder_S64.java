@@ -51,8 +51,13 @@ public abstract class ImageBorder_S64 extends ImageBorder<ImageSInt64> {
 	}
 
 	@Override
-	public double getGeneral(int x, int y, int band) {
-		return get(x,y);
+	public void getGeneral(int x, int y, double[] pixel ) {
+		pixel[0] = get(x, y);
+	}
+
+	@Override
+	public void setGeneral(int x, int y, double[] pixel ) {
+		set(x, y, (long)pixel[0]);
 	}
 
 	public abstract void setOutside( int x , int y , long value );

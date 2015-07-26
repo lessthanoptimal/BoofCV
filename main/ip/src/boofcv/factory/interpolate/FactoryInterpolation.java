@@ -91,7 +91,7 @@ public class FactoryInterpolation {
 		}
 
 		if( borderType != null )
-			alg.setBorder(FactoryImageBorder.general(imageType, borderType));
+			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
 		return alg;
 	}
 
@@ -162,7 +162,38 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+ typeName(imageType));
 
 		if( borderType != null )
-			alg.setBorder(FactoryImageBorder.general(imageType, borderType));
+			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
+
+		return alg;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> bilinearPixelMB(T image, BorderType borderType) {
+
+		InterpolatePixelMB<T> ret = bilinearPixelMB( image.getImageType(), borderType);
+		ret.setImage(image);
+
+		return ret;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> bilinearPixelMB(ImageType<T> imageType, BorderType borderType ) {
+		InterpolatePixelMB<T> alg;
+
+		int numBands = imageType.getNumBands();
+		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
+			switch( imageType.getDataType()) {
+				case F32:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_ILF32(numBands);
+					break;
+
+				default:
+					throw new IllegalArgumentException("Add support");
+			}
+
+			if( borderType != null )
+				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+		} else {
+			throw new IllegalArgumentException("Only interleaved current supported here");
+		}
 
 		return alg;
 	}

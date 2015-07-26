@@ -18,34 +18,22 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageType;
 
 /**
- * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
- * boundary.  The additional sanity checks can significantly slow down algorithms and should only be used when needed.
- *
  * @author Peter Abeles
  */
-public abstract class ImageBorder<T extends ImageBase> {
+public class TestImageBorder1D_S64 extends GenericImageBorder1DTests<ImageSInt64> {
 
-	T image;
-
-	protected ImageBorder(T image) {
-		setImage(image);
+	public TestImageBorder1D_S64() {
+		super(ImageType.single(ImageSInt64.class));
 	}
 
-	protected ImageBorder() {
+	@Override
+	public ImageBorder<ImageSInt64> wrap(ImageSInt64 image) {
+		ImageBorder1D_S64 ret = new ImageBorder1D_S64(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
 	}
-
-	public void setImage( T image ) {
-		this.image = image;
-	}
-
-	public T getImage() {
-		return image;
-	}
-
-	public abstract void getGeneral(int x, int y, double[] pixel);
-
-	public abstract void setGeneral(int x, int y, double[] pixel);
 }

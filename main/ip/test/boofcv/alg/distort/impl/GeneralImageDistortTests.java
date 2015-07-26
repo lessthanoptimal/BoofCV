@@ -57,7 +57,7 @@ public abstract class GeneralImageDistortTests<T extends ImageSingleBand> {
 	public GeneralImageDistortTests( Class<T> imageType ) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.nearestNeighborPixelS(imageType);
-		interp.setBorder(FactoryImageBorder.general(imageType,BorderType.VALUE));
+		interp.setBorder(FactoryImageBorder.single(imageType, BorderType.VALUE));
 		generator = FactoryImageGenerator.create((Class<T>) imageType);
 	}
 

@@ -132,7 +132,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
-		interp.setBorder(FactoryImageBorder.general(inputType, BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(inputType, BorderType.EXTENDED));
 		removePerspective = FactoryDistort.distort(false,interp,ImageFloat32.class);
 	}
 

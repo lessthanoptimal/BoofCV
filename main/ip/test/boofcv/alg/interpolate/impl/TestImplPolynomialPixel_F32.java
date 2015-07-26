@@ -59,14 +59,14 @@ public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixel
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
-		alg.setBorder(FactoryImageBorder.value(ImageFloat32.class, 0));
+		alg.setBorder(FactoryImageBorder.singleValue(ImageFloat32.class, 0));
 
 		ImageDistort<ImageFloat32,ImageFloat32> distorter = FactoryDistort.distort(false,alg, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
 		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixelS(ImageFloat32.class,null);
-		bilinear.setBorder(FactoryImageBorder.value(ImageFloat32.class, 0));
+		bilinear.setBorder(FactoryImageBorder.singleValue(ImageFloat32.class, 0));
 
 		distorter = FactoryDistort.distort(false,bilinear, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));

@@ -53,7 +53,7 @@ public class FactoryDerivativeSparse {
 	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
-			border = FactoryImageBorder.general(imageType,BorderType.EXTENDED);
+			border = FactoryImageBorder.single(imageType, BorderType.EXTENDED);
 		}
 
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {

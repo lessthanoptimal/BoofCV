@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class ExampleConvolution {
 	 * Convolves a 1D kernel horizontally and vertically
 	 */
 	private static void convolve1D(ImageUInt8 gray) {
-		ImageBorder<ImageUInt8> border = FactoryImageBorder.general(gray, BorderType.EXTENDED);
+		ImageBorder<ImageUInt8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
 		Kernel1D_I32 kernel = new Kernel1D_I32(2);
 		kernel.offset = 1; // specify the kernel's origin
 		kernel.data[0] = 1;
@@ -83,7 +83,7 @@ public class ExampleConvolution {
 
 		// Output needs to handle the increased domain after convolution.  Can't be 8bit
 		ImageSInt16 output = new ImageSInt16(gray.width,gray.height);
-		ImageBorder<ImageUInt8> border = FactoryImageBorder.general(gray, BorderType.EXTENDED);
+		ImageBorder<ImageUInt8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
 
 		GConvolveImageOps.convolve(kernel, gray, output, border);
 		ShowImages.showWindow(VisualizeImageData.standard(output, null), "2D Kernel");

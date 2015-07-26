@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> extends GeneralChecksInterpolationPixelS<T> {
+public abstract class GeneralBilinearPixelSingleChecks<T extends ImageSingleBand> extends GeneralChecksInterpolationPixelS<T> {
 
 	@Override
 	protected InterpolatePixelS<T> wrap(T image, int minValue, int maxValue) {
@@ -42,9 +42,8 @@ public abstract class GeneralBilinearPixelChecks<T extends ImageSingleBand> exte
 
 	@Override
 	protected float compute(T _img, float x, float y) {
-		ImageBorder<?> imgB = FactoryImageBorder.general(_img, BorderType.EXTENDED);
+		ImageBorder<?> imgB = FactoryImageBorder.single(_img, BorderType.EXTENDED);
 		GImageSingleBand img = FactoryGImageSingleBand.wrap(imgB);
-
 
 		int gX = (int) x;
 		int gY = (int) y;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class GenericConvolve<Input extends ImageSingleBand, Output extends Image
 		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
 			this.borderRule = null;
 		else
-			borderRule = FactoryImageBorder.general((Class)params[1],type);
+			borderRule = FactoryImageBorder.single((Class) params[1], type);
 	}
 
 	@Override

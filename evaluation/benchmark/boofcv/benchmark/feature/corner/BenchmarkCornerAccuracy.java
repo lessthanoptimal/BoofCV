@@ -125,7 +125,7 @@ public class BenchmarkCornerAccuracy {
 
 		ConvertBufferedImage.convertFrom(workImg, image);
 		ImageMiscOps.addUniform(image, rand, -2, 2);
-		ImageBorder_S32<ImageUInt8> border = (ImageBorder_S32)FactoryImageBorder.general(image,BoofDefaults.DERIV_BORDER_TYPE);
+		ImageBorder_S32<ImageUInt8> border = (ImageBorder_S32)FactoryImageBorder.single(image, BoofDefaults.DERIV_BORDER_TYPE);
 		GradientSobel.process(image, derivX, derivY, border);
 	}
 

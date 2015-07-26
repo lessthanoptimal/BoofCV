@@ -18,6 +18,8 @@
 
 package boofcv.core.image;
 
+import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.ImageBorder_ILF32;
 import boofcv.struct.image.*;
 
 /**
@@ -338,5 +340,72 @@ public class FactoryGImageMultiBand {
 		public float getF(int index) {
 			return image.data[index];
 		}
+	}
+
+	public static GImageMultiBand wrap( ImageBorder image ) {
+		if( image instanceof ImageBorder_ILF32 ) {
+			return new Border_ILF32((ImageBorder_ILF32) image);
+		} else {
+			throw new IllegalArgumentException("Not supported yet?");
+		}
+	}
+
+	public static class Border_ILF32 extends GMultiBorder<ImageBorder_ILF32> {
+
+		public Border_ILF32(ImageBorder_ILF32 image) {
+			super(image);
+		}
+
+		@Override
+		public int getNumberOfBands() {
+			return ((ImageMultiBand)image.getImage()).getNumBands();
+		}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			image.set(x,y,value);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			image.get(x,y,value);
+		}
+	}
+
+	public static abstract class GMultiBorder<T extends ImageBorder> implements GImageMultiBand {
+
+		protected T image;
+
+		public GMultiBorder(T image) {
+			this.image = image;
+		}
+
+		@Override
+		public void wrap(ImageBase image) {
+			this.image.setImage(image);
+		}
+
+		@Override
+		public int getWidth() {
+			return image.getImage().getWidth();
+		}
+
+		@Override
+		public int getHeight() {
+			return image.getImage().getHeight();
+		}
+
+		@Override
+		public ImageMultiBand getImage() {
+			return (ImageMultiBand)image.getImage();
+		}
+
+		public void setF(int index, float[] value) {throw new RuntimeException("Not supported");}
+
+		@Override
+		public void getF(int index, float[] value) {throw new RuntimeException("Not supported");}
+
+		@Override
+		public float getF(int index) {throw new RuntimeException("Not supported");}
 	}
 }

@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageInterleaved;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class BilinearPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
+public abstract class BilinearPixelMB<T extends ImageInterleaved> implements InterpolatePixelMB<T> {
 
 	protected ImageBorder<T> border;
 	protected T orig;
