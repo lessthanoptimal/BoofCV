@@ -82,7 +82,7 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogram() {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
 				ImageFloat32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
@@ -118,7 +118,7 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogramBorder_compare() {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
 				ImageFloat32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);

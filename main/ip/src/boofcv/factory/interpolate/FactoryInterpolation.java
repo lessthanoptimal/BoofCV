@@ -19,10 +19,7 @@
 package boofcv.factory.interpolate;
 
 import boofcv.abst.filter.interpolate.InterpolatePixel_S_to_MB_MultiSpectral;
-import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.*;
 import boofcv.alg.interpolate.impl.*;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
 import boofcv.core.image.border.BorderType;
@@ -55,6 +52,21 @@ public class FactoryInterpolation {
 		return createPixelS(min,max,type,borderType,t);
 	}
 
+	public static <T extends ImageBase> InterpolatePixel<T>
+	createPixel(double min, double max, TypeInterpolate type, BorderType borderType, ImageType<T> imageType) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+			case MULTI_SPECTRAL:
+				return createPixelS(min, max, type, borderType, imageType.getImageClass());
+
+			case INTERLEAVED:
+				return createPixelMB(min,max,type,borderType,(ImageType)imageType);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
+	}
+
 	/**
 	 * Creates an interpolation class of the specified type for the specified image type.
 	 *
@@ -79,7 +91,7 @@ public class FactoryInterpolation {
 				return bilinearPixelS(imageType, borderType);
 
 			case BICUBIC:
-				alg = bicubicS(0.5f, (float) min, (float) max, imageType);
+				alg = bicubicS(-0.5f, (float) min, (float) max, imageType);
 				break;
 
 			case POLYNOMIAL4:
@@ -109,14 +121,22 @@ public class FactoryInterpolation {
 		switch (imageType.getFamily()) {
 
 			case MULTI_SPECTRAL:
-				return (InterpolatePixelMB)createPixelMB(createPixelS(min,max,type,borderType,imageType.getDataType()));
+				return (InterpolatePixelMB) createPixelMS(createPixelS(min, max, type, borderType, imageType.getDataType()));
 
 			case SINGLE_BAND:
 				throw new IllegalArgumentException("Need to specify a multi-band image type");
 
 			case INTERLEAVED:
-				throw new IllegalArgumentException("Not yet supported.  Post a message letting us know you need this." +
-						"  Use MultiSpectral instead for now.");
+				switch( type ) {
+					case NEAREST_NEIGHBOR:
+						return nearestNeighborPixelMB(imageType,borderType);
+
+					case BILINEAR:
+						return bilinearPixelMB(imageType,borderType);
+
+					default:
+						throw new IllegalArgumentException("Interpolate type not yet support for ImageInterleaved");
+				}
 
 			default:
 				throw new IllegalArgumentException("Add type: "+type);
@@ -133,13 +153,13 @@ public class FactoryInterpolation {
 	 * @return Interpolation for MultiSpectral images
 	 */
 	public static <T extends ImageSingleBand> InterpolatePixelMB<MultiSpectral<T>>
-	createPixelMB( InterpolatePixelS<T> singleBand ) {
+	createPixelMS(InterpolatePixelS<T> singleBand) {
 		return new InterpolatePixel_S_to_MB_MultiSpectral<T>(singleBand);
 	}
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {
 
-		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass(),borderType);
+		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass(), borderType);
 		ret.setImage(image);
 
 		return ret;
@@ -169,7 +189,7 @@ public class FactoryInterpolation {
 
 	public static <T extends ImageMultiBand> InterpolatePixelMB<T> bilinearPixelMB(T image, BorderType borderType) {
 
-		InterpolatePixelMB<T> ret = bilinearPixelMB( image.getImageType(), borderType);
+		InterpolatePixelMB<T> ret = bilinearPixelMB(image.getImageType(), borderType);
 		ret.setImage(image);
 
 		return ret;
@@ -182,7 +202,30 @@ public class FactoryInterpolation {
 		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType()) {
 				case F32:
-					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_ILF32(numBands);
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_F32(numBands);
+					break;
+
+				default:
+					throw new IllegalArgumentException("Add support");
+			}
+
+			if( borderType != null )
+				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+		} else {
+			throw new IllegalArgumentException("Only interleaved current supported here");
+		}
+
+		return alg;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> nearestNeighborPixelMB(ImageType<T> imageType, BorderType borderType ) {
+		InterpolatePixelMB<T> alg;
+
+		int numBands = imageType.getNumBands();
+		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
+			switch( imageType.getDataType()) {
+				case F32:
+					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_F32();
 					break;
 
 				default:

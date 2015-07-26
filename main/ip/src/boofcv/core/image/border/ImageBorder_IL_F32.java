@@ -25,13 +25,13 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_ILF32 extends ImageBorder<InterleavedF32> {
+public abstract class ImageBorder_IL_F32 extends ImageBorder<InterleavedF32> {
 
-	public ImageBorder_ILF32(InterleavedF32 image) {
+	public ImageBorder_IL_F32(InterleavedF32 image) {
 		super(image);
 	}
 
-	protected ImageBorder_ILF32() {
+	protected ImageBorder_IL_F32() {
 	}
 
 	public void set( int x , int y , float[] pixel ) {
@@ -69,6 +69,6 @@ public abstract class ImageBorder_ILF32 extends ImageBorder<InterleavedF32> {
 		for (int i = 0; i < pixel.length; i++) {
 			tmp[i] = (float)pixel[i];
 		}
-		set(x,y,tmp);
+		set(x, y, tmp);
 	}
 }

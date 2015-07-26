@@ -16,24 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.distort.ImageDistortCache_SB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<ImageFloat32> {
+public class TestNearestNeighborPixel_IL_F32 extends GeneralChecksInterpolationPixelMB<InterleavedF32> {
 
-	public TestImplImageDistortCache_F32() {
-		super(ImageFloat32.class);
+	@Override
+	protected InterleavedF32 createImage(int width, int height, int numBands) {
+		return new InterleavedF32(width,height,numBands);
 	}
 
 	@Override
-	public ImageDistortCache_SB<ImageFloat32,ImageFloat32> create(InterpolatePixelS<ImageFloat32> interp,
-															   Class<ImageFloat32> imageType) {
-		return new ImplImageDistortCache_F32(interp);
+	protected InterpolatePixelMB<InterleavedF32> wrap(InterleavedF32 image, int minValue, int maxValue) {
+		return new NearestNeighborPixel_IL_F32(image);
+	}
+
+	@Override
+	protected void compute(InterleavedF32 img, float x, float y, float[] pixel) {
+		int xx = (int)x;
+		int yy = (int)y;
+
+		img.get(xx,yy,pixel);
 	}
 }

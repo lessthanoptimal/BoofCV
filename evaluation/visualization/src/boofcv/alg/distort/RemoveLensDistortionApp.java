@@ -97,7 +97,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		// Set up image distort
 		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.VALUE);
 		ImageDistort<ImageFloat32,ImageFloat32> undistorter =
-				FactoryDistort.distort(false,interp, ImageFloat32.class);
+				FactoryDistort.distortSB(false, interp, ImageFloat32.class);
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
 		DistortImageOps.distortMS(dist, undist, undistorter);

@@ -409,7 +409,7 @@ public class RectifyImageOps {
 		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
 		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
-		ImageDistort<T,T> ret = FactoryDistort.distort(false,interp, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortSB(false, interp, imageType);
 		ret.setRenderAll(!skip);
 
 		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
@@ -436,7 +436,7 @@ public class RectifyImageOps {
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 
 		// only compute the transform once
-		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortSB(true, interp, imageType);
 		ret.setRenderAll(!skip);
 
 		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);

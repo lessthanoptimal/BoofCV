@@ -18,20 +18,20 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistortBasic;
+import boofcv.alg.distort.ImageDistortBasic_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageInt8;
 import boofcv.struct.image.ImageSingleBand;
 
 
 /**
- * <p>Implementation of {@link boofcv.alg.distort.ImageDistort}.</p>
+ * <p>Implementation of {@link boofcv.alg.distort.ImageDistortBasic_SB}.</p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"UnnecessaryLocalVariable"})
 public class ImplImageDistort_I8<Input extends ImageSingleBand, Output extends ImageInt8>
-		extends ImageDistortBasic<Input,Output> {
+		extends ImageDistortBasic_SB<Input,Output> {
 
 	public ImplImageDistort_I8(InterpolatePixelS<Input> interp) {
 		super(interp);

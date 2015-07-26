@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortCache<Input extends ImageSingleBand,Output extends ImageSingleBand>
+public abstract class ImageDistortCache_SB<Input extends ImageSingleBand,Output extends ImageSingleBand>
 		implements ImageDistort<Input,Output> {
 
 	// size of output image
@@ -57,7 +57,7 @@ public abstract class ImageDistortCache<Input extends ImageSingleBand,Output ext
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortCache(InterpolatePixelS<Input> interp) {
+	public ImageDistortCache_SB(InterpolatePixelS<Input> interp) {
 		this.interp = interp;
 	}
 

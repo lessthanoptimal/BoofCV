@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelMB;
 import boofcv.alg.interpolate.BilinearPixelS;
-import boofcv.core.image.border.ImageBorder_ILF32;
+import boofcv.core.image.border.ImageBorder_IL_F32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
 
@@ -36,21 +36,21 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_ILF32 extends BilinearPixelMB<InterleavedF32> {
+public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 
 	float temp0[];
 	float temp1[];
 	float temp2[];
 	float temp3[];
 
-	public ImplBilinearPixel_ILF32(int numBands ) {
+	public ImplBilinearPixel_IL_F32(int numBands) {
 		this.temp0 = new float[numBands];
 		this.temp1 = new float[numBands];
 		this.temp2 = new float[numBands];
 		this.temp3 = new float[numBands];
 	}
 
-	public ImplBilinearPixel_ILF32(InterleavedF32 orig) {
+	public ImplBilinearPixel_IL_F32(InterleavedF32 orig) {
 		this(orig.getNumBands());
 		setImage(orig);
 	}
@@ -93,7 +93,7 @@ public class ImplBilinearPixel_ILF32 extends BilinearPixelMB<InterleavedF32> {
 		float ax = x - xf;
 		float ay = y - yf;
 
-		ImageBorder_ILF32 border = (ImageBorder_ILF32)this.border;
+		ImageBorder_IL_F32 border = (ImageBorder_IL_F32)this.border;
 		border.get(xt,yt,temp0);
 		border.get(xt+1,yt,temp1);
 		border.get(xt+1,yt+1,temp2);

@@ -158,7 +158,7 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static class Value_ILF32 extends ImageBorder_ILF32 {
+	public static class Value_ILF32 extends ImageBorder_IL_F32 {
 		float value;
 
 		public Value_ILF32( InterleavedF32 image , float value ) {

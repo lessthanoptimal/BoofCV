@@ -20,15 +20,14 @@ package boofcv.alg.interpolate;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -40,30 +39,30 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
+public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 	extends SelectAlgorithmAndInputPanel implements ComponentListener
 {
-	Class<T> imageType;
-	MultiSpectral<T> color;
-	MultiSpectral<T> scaledImage;
+	ImageType<T> imageType;
+	T color;
+	T scaledImage;
 
 	ImagePanel panel = new ImagePanel();
 	boolean hasProcessed = false;
 
-	public EvaluateInterpolateEnlargeApp( Class<T> imageType ) {
+	public EvaluateInterpolateEnlargeApp( ImageType<T> imageType ) {
 		super(1);
 		this.imageType = imageType;
 
 		panel.setScaling(ScaleOptions.NONE);
 		setMainGUI(panel);
 
-		color = new MultiSpectral<T>(imageType,1,1,3);
-		scaledImage = new MultiSpectral<T>(imageType,1,1,3);
+		color = imageType.createImage(1,1);
+		scaledImage = imageType.createImage(1,1);
 
-		addAlgorithm(0, "Nearest Neighbor",FactoryInterpolation.nearestNeighborPixelS(imageType));
-		addAlgorithm(0, "Bilinear",FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED));
-		addAlgorithm(0, "Bicubic Kernel",FactoryInterpolation.bicubicS(-0.5f, 0, 255, imageType));
-		addAlgorithm(0, "Polynomial 5",FactoryInterpolation.polynomialS(5, 0, 255, imageType));
+		addAlgorithm(0, "Nearest Neighbor",TypeInterpolate.NEAREST_NEIGHBOR);
+		addAlgorithm(0, "Bilinear",TypeInterpolate.BILINEAR);
+		addAlgorithm(0, "Bicubic Kernel",TypeInterpolate.BICUBIC);
+		addAlgorithm(0, "Polynomial 4",TypeInterpolate.POLYNOMIAL4);
 
 		setPreferredSize(new Dimension(300,300));
 		addComponentListener(this);
@@ -73,7 +72,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 		setInputImage(image);
 
 		color.reshape(image.getWidth(),image.getHeight());
-		ConvertBufferedImage.convertFromMulti(image,color,true,imageType);
+		ConvertBufferedImage.convertFrom(image, color, true);
 
 		hasProcessed = true;
 		doRefreshAll();
@@ -93,10 +92,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 			return;
 		}
 
-		InterpolatePixelS<T> interp = (InterpolatePixelS<T>)cookie;
+		TypeInterpolate typeInterpolate = (TypeInterpolate)cookie;
 
 		scaledImage.reshape(panel.getWidth(),panel.getHeight());
-		new FDistort(color,scaledImage).interp(interp).border(BorderType.EXTENDED).scale().apply();
+		new FDistort(color,scaledImage).interp(typeInterpolate).border(BorderType.EXTENDED).scale().apply();
 
 		BufferedImage out = ConvertBufferedImage.convertTo(scaledImage,null,true);
 		panel.setBufferedImage(out);
@@ -132,8 +131,13 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageSingleBand>
 	public void componentHidden(ComponentEvent e) {}
 
 	public static void main( String args[] ) {
-		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageFloat32.class);
-//		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(ImageUInt8.class);
+
+//		ImageType type = ImageType.ms(3,ImageFloat32.class);
+//		ImageType type = ImageType.ms(3,ImageUInt8.class);
+//		ImageType type = ImageType.single(ImageUInt8.class);
+		ImageType type = ImageType.il(3, InterleavedF32.class);
+
+		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(type);
 
 		app.setPreferredSize(new Dimension(500,500));
 

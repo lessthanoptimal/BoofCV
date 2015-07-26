@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,6 +72,13 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		return storage;
 	}
 
+	public void get_unsafe( int x, int y, float[] storage ) {
+		int index = getIndex(x, y, 0);
+		for (int i = 0; i < numBands; i++, index++) {
+			storage[i] = data[index];
+		}
+	}
+
 	/**
 	 * Sets the pixel's value for all the bands using an array.
 	 *
@@ -83,6 +90,13 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
+		int index = getIndex(x, y, 0);
+		for (int i = 0; i < numBands; i++, index++) {
+			data[index] = value[i];
+		}
+	}
+
+	public void set_unsafe(int x, int y, float[] value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];

@@ -18,18 +18,18 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistortCache;
+import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Implementation of {@link boofcv.alg.distort.ImageDistortCache} for {@link ImageFloat32}.
+ * Implementation of {@link ImageDistortCache_SB} for {@link ImageFloat32}.
  * 
  * @author Peter Abeles
  */
 public class ImplImageDistortCache_F32<Input extends ImageSingleBand>
-		extends ImageDistortCache<Input,ImageFloat32> {
+		extends ImageDistortCache_SB<Input,ImageFloat32> {
 	public ImplImageDistortCache_F32(InterpolatePixelS<Input> interp)
 	{
 		super(interp);

@@ -16,24 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.distort;
 
-import boofcv.alg.distort.ImageDistortCache_SB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<ImageFloat32> {
-
-	public TestImplImageDistortCache_F32() {
-		super(ImageFloat32.class);
-	}
-
-	@Override
-	public ImageDistortCache_SB<ImageFloat32,ImageFloat32> create(InterpolatePixelS<ImageFloat32> interp,
-															   Class<ImageFloat32> imageType) {
-		return new ImplImageDistortCache_F32(interp);
+public class TestImageDistortBasic_IL {
+	@Test
+	public void foo() {
+		fail("implement");
 	}
 }

@@ -190,7 +190,7 @@ public class TestStitchingFromMotion2D {
 		HelperMotion motion = new HelperMotion();
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
 				TypeInterpolate.BILINEAR, BorderType.EXTENDED, ImageFloat32.class);
-		ImageDistort distorter = FactoryDistort.distort(false,interp, ImageFloat32.class);
+		ImageDistort distorter = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 

@@ -20,6 +20,7 @@ package boofcv.factory.distort;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.*;
 
@@ -37,7 +38,7 @@ public class FactoryDistort {
 	 * @param outputType Type of output image.
 	 */
 	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
-	ImageDistort<Input, Output> distort( boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
+	ImageDistort<Input, Output> distortSB(boolean cached, InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		if( cached ) {
 			if( outputType == ImageFloat32.class ) {
@@ -78,7 +79,24 @@ public class FactoryDistort {
 	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
 	distortMS( boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
-		ImageDistort<Input, Output> distortSingle = distort(cached,interp,outputType);
+		ImageDistort<Input, Output> distortSingle = distortSB(cached, interp, outputType);
 		return new ImplImageDistort_MS<Input, Output>(distortSingle);
+	}
+
+	public static <Input extends ImageInterleaved, Output extends ImageInterleaved>
+	ImageDistort<Input, Output>
+	distortIL(boolean cached, InterpolatePixelMB<Input> interp, ImageType<Output> outputType)
+	{
+		if( cached ) {
+			throw new IllegalArgumentException("Cached not supported yet");
+		} else {
+			switch( outputType.getDataType() ) {
+				case F32:
+					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
+
+				default:
+					throw new IllegalArgumentException("Not supported yet");
+			}
+		}
 	}
 }

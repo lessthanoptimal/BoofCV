@@ -144,7 +144,7 @@ public class FactoryMotion2D {
 		}
 
 		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
-		ImageDistort<I,I> distorter = FactoryDistort.distort(false,interp, imageType);
+		ImageDistort<I,I> distorter = FactoryDistort.distortSB(false, interp, imageType);
 		distorter.setRenderAll(false);
 
 		return new StitchingFromMotion2D<I, IT>(motion2D,distorter,transform,maxJumpFraction );

@@ -99,7 +99,7 @@ public class DistortSupport {
 	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )
 	{
-		ImageDistort<Input,Output> bandDistort = FactoryDistort.distort(cached,interp, outputType);
+		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
 		bandDistort.setModel(dstToSrc);
 		return new ImplImageDistort_MS<Input,Output>(bandDistort);
 	}

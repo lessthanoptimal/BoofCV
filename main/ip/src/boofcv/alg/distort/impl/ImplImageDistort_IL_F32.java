@@ -16,17 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.interpolate.impl;
+package boofcv.alg.distort.impl;
 
+import boofcv.alg.distort.ImageDistortBasic_IL;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.struct.image.InterleavedF32;
 
 /**
+ * <p>Implementation of {@link boofcv.alg.distort.ImageDistortBasic_IL}.</p>
+ *
  * @author Peter Abeles
  */
-public class TestImplBilinearPixel_ILF32 extends GeneralBilinearPixelMultiChecks<InterleavedF32>
-{
+public class ImplImageDistort_IL_F32 extends ImageDistortBasic_IL<InterleavedF32,InterleavedF32> {
+
+	public ImplImageDistort_IL_F32(InterpolatePixelMB<InterleavedF32> interp) {
+		super(interp);
+	}
+
 	@Override
-	protected InterleavedF32 createImage(int width, int height, int numBands) {
-		return new InterleavedF32(width, height, numBands);
+	protected void assign(int indexDst, float[] value) {
+		for( int i = 0; i < dstImg.numBands; i++ ) {
+			dstImg.data[indexDst+1] = value[i];
+		}
 	}
 }

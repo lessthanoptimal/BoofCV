@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.ImageDistortCache;
+import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
@@ -68,8 +68,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareNoCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,imageType);
-		ImageDistortCache<T,T> alg = create(interp,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
+		ImageDistortCache_SB<T,T> alg = create(interp,imageType);
 		
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -83,8 +83,8 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 	@Test
 	public void compareCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distort(false,interp,imageType);
-		ImageDistortCache<T,T> alg = create(interp,imageType);
+		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
+		ImageDistortCache_SB<T,T> alg = create(interp,imageType);
 
 		standard.setModel(tran);
 		alg.setModel(tran);
@@ -95,6 +95,6 @@ public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
 		BoofTesting.assertEquals(dst0, dst1, 1e-4);
 	}
 	
-	public abstract ImageDistortCache<T,T>
+	public abstract ImageDistortCache_SB<T,T>
 	create(InterpolatePixelS<T> interp, Class<T> imageType );
 }

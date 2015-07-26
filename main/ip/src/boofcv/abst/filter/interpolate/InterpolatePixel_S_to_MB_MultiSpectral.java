@@ -62,7 +62,7 @@ public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
 
 	@Override
 	public void setBorder(ImageBorder<MultiSpectral<T>> border) {
-		throw new RuntimeException("Need to write code to handle this");
+		this.alg.setBorder((ImageBorder)border);
 	}
 
 	@Override

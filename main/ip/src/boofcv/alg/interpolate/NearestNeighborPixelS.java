@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class NearestNeighborPixel<T extends ImageSingleBand> implements InterpolatePixelS<T> {
+public abstract class NearestNeighborPixelS<T extends ImageSingleBand> implements InterpolatePixelS<T> {
 	protected ImageBorder<T> border;
 	protected T orig;
 	protected int stride;

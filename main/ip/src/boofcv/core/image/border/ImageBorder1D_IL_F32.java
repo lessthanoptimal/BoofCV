@@ -24,11 +24,11 @@ import boofcv.struct.image.InterleavedF32;
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_ILF32 extends ImageBorder_ILF32 {
+public class ImageBorder1D_IL_F32 extends ImageBorder_IL_F32 {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_ILF32(Class<?> type) {
+	public ImageBorder1D_IL_F32(Class<?> type) {
 		try {
 			this.rowWrap = (BorderIndex1D)type.newInstance();
 			this.colWrap = (BorderIndex1D)type.newInstance();
@@ -39,7 +39,7 @@ public class ImageBorder1D_ILF32 extends ImageBorder_ILF32 {
 		}
 	}
 
-	public ImageBorder1D_ILF32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_IL_F32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
 	}

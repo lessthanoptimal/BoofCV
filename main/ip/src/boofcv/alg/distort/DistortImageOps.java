@@ -108,7 +108,7 @@ public class DistortImageOps {
 		Class<Output> outputType = (Class<Output>)input.getClass();
 		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, borderType, inputType);
 
-		ImageDistort<Input,Output> distorter = FactoryDistort.distort(false,interp, outputType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distortSB(false, interp, outputType);
 		distorter.setRenderAll(!skip);
 		distorter.setModel(transform);
 		distorter.apply(input,output);
@@ -128,7 +128,7 @@ public class DistortImageOps {
 					   InterpolatePixelS<Input> interp)
 	{
 		Class<Output> inputType = (Class<Output>)input.getClass();
-		ImageDistort<Input,Output> distorter = FactoryDistort.distort(false,interp, inputType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distortSB(false, interp, inputType);
 		distorter.setRenderAll(renderAll);
 		distorter.setModel(transform);
 		distorter.apply(input,output);
@@ -153,7 +153,7 @@ public class DistortImageOps {
 		Class<Output> outputBandType = output.getBandType();
 		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType, borderType, inputBandType);
 
-		ImageDistort<Input,Output> distorter = FactoryDistort.distort(false,interp, outputBandType);
+		ImageDistort<Input,Output> distorter = FactoryDistort.distortSB(false, interp, outputBandType);
 		distorter.setModel(transform);
 
 		distortMS(input,output,distorter);
@@ -178,7 +178,7 @@ public class DistortImageOps {
 	{
 		InterpolatePixelS<Input> interp = FactoryInterpolation.createPixelS(0, 255, interpType,borderType, inputType);
 		ImageDistort<Input,Output> distorter =
-				FactoryDistort.distort(true, interp,outputType);
+				FactoryDistort.distortSB(true, interp, outputType);
 		distorter.setModel(new PointToPixelTransform_F32(transform));
 
 		return distorter;

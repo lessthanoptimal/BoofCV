@@ -18,112 +18,16 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestImageDistortBasic {
-
-	DummyInterpolate interp = new DummyInterpolate();
-
-	float offX=0,offY=0;
-
-	PixelTransform_F32 tran = new PixelTransform_F32() {
-		@Override
-		public void compute(int x, int y) {
-			distX = x+offX;
-			distY = y+offY;
-		}
-	};
-
 	@Test
-	public void applyRenderAll_true() {
-		Helper alg = new Helper(interp);
-		alg.setRenderAll(true);
-
-		offX= offY=0;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
-		assertEquals(150, alg.getTotal());
-
-		offX=offY =0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
-		assertEquals(150, alg.getTotal());
-
-		offX=offY = -0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10,15));
-		assertEquals(150,alg.getTotal());
+	public void foo() {
+		fail("implement");
 	}
-
-	@Test
-	public void applyRenderAll_False() {
-		Helper alg = new Helper(interp);
-		alg.setRenderAll(false);
-
-		offX=offY=0;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
-		assertEquals(150,alg.getTotal());
-
-		offX=offY=0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10,15),new ImageFloat32(10,15));
-		assertEquals(9*14,alg.getTotal());
-
-		offX=offY=-0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
-		assertEquals(9*14,alg.getTotal());
-	}
-
-	private static class Helper extends ImageDistortBasic {
-
-		int total = 0;
-
-		public Helper(InterpolatePixelS interp) {
-			super(interp);
-		}
-
-		public void reset() {
-			total = 0;
-		}
-
-		private int getTotal() {
-			return total;
-		}
-
-		@Override
-		protected void assign(int indexDst, float value) {
-			total++;
-			int x = (indexDst - dstImg.startIndex)%dstImg.stride;
-			int y = (indexDst - dstImg.startIndex)/dstImg.stride;
-			assertTrue(dstImg.isInBounds(x,y));
-		}
-	}
-
-	protected static class DummyInterpolate extends ImplBilinearPixel_F32 {
-
-		@Override
-		public float get_border(float x, float y) {
-			return 1.1f;
-		}
-	}
-
-
 }

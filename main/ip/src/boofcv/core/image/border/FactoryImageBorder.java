@@ -60,6 +60,40 @@ public class FactoryImageBorder {
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
+	public static <T extends ImageBase> ImageBorder<T>
+	generic( BorderType borderType, ImageType<T> imageType ) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				return single(imageType.getImageClass(),borderType);
+
+			case MULTI_SPECTRAL:
+				return single(imageType.getImageClass(),borderType);
+
+			case INTERLEAVED:
+				return interleaved(imageType.getImageClass(),borderType);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
+	}
+
+	public static <T extends ImageBase> ImageBorder<T>
+	genericValue( double value, ImageType<T> imageType ) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				return singleValue(imageType.getImageClass(), value);
+
+			case MULTI_SPECTRAL:
+				return singleValue(imageType.getImageClass(),value);
+
+			case INTERLEAVED:
+				return interleavedValue(imageType.getImageClass(),value);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
+	}
+
 	/**
 	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageSingleBand}.  If type
 	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
@@ -159,7 +193,7 @@ public class FactoryImageBorder {
 		}
 
 		if( imageType == InterleavedF32.class )
-			return (ImageBorder<T>)new ImageBorder1D_ILF32(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_IL_F32(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}

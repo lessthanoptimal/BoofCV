@@ -16,24 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.core.image.border;
+package boofcv.alg.distort.impl;
 
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedF32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageBorder1D_ILF32 extends GenericImageBorder1DTests<InterleavedF32> {
-
-	public TestImageBorder1D_ILF32() {
-		super(ImageType.il(2, InterleavedF32.class));
-	}
-
-	@Override
-	public ImageBorder<InterleavedF32> wrap(InterleavedF32 image) {
-		ImageBorder1D_ILF32 ret = new ImageBorder1D_ILF32(BorderIndex1D_Wrap.class);
-		ret.setImage(image);
-		return ret;
+public class TestImplImageDistort_IL_F32 {
+	@Test
+	public void foo() {
+		fail("implement");
 	}
 }

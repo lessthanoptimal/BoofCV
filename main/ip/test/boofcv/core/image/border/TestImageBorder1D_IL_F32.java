@@ -16,24 +16,24 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.core.image.border;
 
-import boofcv.alg.distort.ImageDistortCache_SB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<ImageFloat32> {
+public class TestImageBorder1D_IL_F32 extends GenericImageBorder1DTests<InterleavedF32> {
 
-	public TestImplImageDistortCache_F32() {
-		super(ImageFloat32.class);
+	public TestImageBorder1D_IL_F32() {
+		super(ImageType.il(2, InterleavedF32.class));
 	}
 
 	@Override
-	public ImageDistortCache_SB<ImageFloat32,ImageFloat32> create(InterpolatePixelS<ImageFloat32> interp,
-															   Class<ImageFloat32> imageType) {
-		return new ImplImageDistortCache_F32(interp);
+	public ImageBorder<InterleavedF32> wrap(InterleavedF32 image) {
+		ImageBorder1D_IL_F32 ret = new ImageBorder1D_IL_F32(BorderIndex1D_Wrap.class);
+		ret.setImage(image);
+		return ret;
 	}
 }

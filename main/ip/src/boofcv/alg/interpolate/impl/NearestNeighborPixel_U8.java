@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.NearestNeighborPixel;
+import boofcv.alg.interpolate.NearestNeighborPixelS;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_U8 extends NearestNeighborPixel<ImageUInt8> {
+public class NearestNeighborPixel_U8 extends NearestNeighborPixelS<ImageUInt8> {
 
 	private byte data[];
 	public NearestNeighborPixel_U8() {

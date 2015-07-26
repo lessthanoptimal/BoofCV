@@ -29,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortCache {
+public class TestImageDistortCache_SB {
 
-	TestImageDistortBasic.DummyInterpolate interp = new TestImageDistortBasic.DummyInterpolate();
+	TestImageDistortBasic_SB.DummyInterpolate interp = new TestImageDistortBasic_SB.DummyInterpolate();
 
 	float offX=0,offY=0;
 
@@ -92,7 +92,7 @@ public class TestImageDistortCache {
 		assertEquals(9*14,alg.getTotal());
 	}
 
-	private static class Helper extends ImageDistortCache {
+	private static class Helper extends ImageDistortCache_SB {
 
 		int total = 0;
 

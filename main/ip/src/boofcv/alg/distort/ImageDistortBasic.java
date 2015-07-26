@@ -18,9 +18,9 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * Most basic implementation of {@link ImageDistort}. Computes the distortion from the dst to src image
@@ -28,13 +28,13 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output extends ImageSingleBand>
+public abstract class ImageDistortBasic<Input extends ImageBase,Output extends ImageBase,Interpolate extends InterpolatePixel<Input>>
 		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image
 	protected PixelTransform_F32 dstToSrc;
 	// sub pixel interpolation
-	protected InterpolatePixelS<Input> interp;
+	protected Interpolate interp;
 
 	// crop boundary
 	protected int x0,y0,x1,y1;
@@ -49,7 +49,7 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic( InterpolatePixelS<Input> interp ) {
+	public ImageDistortBasic( Interpolate interp ) {
 		this.interp = interp;
 	}
 
@@ -82,45 +82,15 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 			applyOnlyInside();
 	}
 
-	private void init(Input srcImg, Output dstImg) {
+	protected void init(Input srcImg, Output dstImg) {
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
 		interp.setImage(srcImg);
 	}
 
-	public void applyAll() {
+	protected abstract void applyAll();
 
-		// todo TO make this faster first apply inside the region which can process the fast border
-		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-			}
-		}
-	}
-
-	public void applyOnlyInside() {
-
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
-
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
-						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
-					assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-				}
-			}
-		}
-	}
-
-	protected abstract void assign( int indexDst , float value );
+	protected abstract void applyOnlyInside();
 
 	@Override
 	public void setRenderAll(boolean renderAll) {

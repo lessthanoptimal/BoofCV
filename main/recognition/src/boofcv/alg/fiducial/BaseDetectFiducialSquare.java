@@ -133,7 +133,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// is sent to fiducial decoder
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
 		interp.setBorder(FactoryImageBorder.single(inputType, BorderType.EXTENDED));
-		removePerspective = FactoryDistort.distort(false,interp,ImageFloat32.class);
+		removePerspective = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
 	}
 
 	/**

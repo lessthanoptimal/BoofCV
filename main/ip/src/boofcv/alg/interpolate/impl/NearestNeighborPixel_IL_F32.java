@@ -18,10 +18,10 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.NearestNeighborPixelS;
-import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.alg.interpolate.NearestNeighborPixelMB;
+import boofcv.core.image.border.ImageBorder_IL_F32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 
 /**
@@ -30,49 +30,42 @@ import boofcv.struct.image.ImageType;
  * </p>
  *
  * <p>
- * NOTE: This code was automatically generated using {@link GenerateNearestNeighborPixel}.
+ * TODO write auto generate code for this
  * </p>
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_S16 extends NearestNeighborPixelS<ImageSInt16> {
+public class NearestNeighborPixel_IL_F32 extends NearestNeighborPixelMB<InterleavedF32> {
 
-	private short data[];
-	public NearestNeighborPixel_S16() {
+	public NearestNeighborPixel_IL_F32() {
 	}
 
-	public NearestNeighborPixel_S16(ImageSInt16 orig) {
+	public NearestNeighborPixel_IL_F32(InterleavedF32 orig) {
 
 		setImage(orig);
 	}
-	@Override
-	public void setImage(ImageSInt16 image) {
-		super.setImage(image);
-		this.data = orig.data;
-	}
 
 	@Override
-	public float get_fast(float x, float y) {
-		return data[ orig.startIndex + ((int)y)*stride + (int)x];
-	}
-
-	public float get_border(float x, float y) {
-		return ((ImageBorder_S32)border).get((int)Math.floor(x),(int)Math.floor(y));
-	}
-
-	@Override
-	public float get(float x, float y) {
+	public void get(float x, float y, float[] values) {
 		if (x < 0 || y < 0 || x > width-1 || y > height-1 )
-			return get_border(x,y);
+			((ImageBorder_IL_F32)border).get((int) Math.floor(x), (int) Math.floor(y), values);
+		else {
+			get_fast(x,y,values);
+		}
+	}
+
+	@Override
+	public void get_fast(float x, float y, float[] values) {
 		int xx = (int)x;
 		int yy = (int)y;
 
-		return data[ orig.startIndex + yy*stride + xx];
+		orig.get_unsafe(xx,yy,values);
 	}
 
 	@Override
-	public ImageType<ImageSInt16> getImageType() {
-		return ImageType.single(ImageSInt16.class);
+	public ImageType<InterleavedF32> getImageType() {
+		return orig.getImageType();
 	}
+
 
 }

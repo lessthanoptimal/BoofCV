@@ -90,7 +90,7 @@ public class LensDistortionOps {
 
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
-				distort = FactoryDistort.distort(true,interp, bandType);
+				distort = FactoryDistort.distortSB(true, interp, bandType);
 				break;
 
 			case MULTI_SPECTRAL:

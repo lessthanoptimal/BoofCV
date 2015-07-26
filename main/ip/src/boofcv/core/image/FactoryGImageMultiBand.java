@@ -19,7 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_ILF32;
+import boofcv.core.image.border.ImageBorder_IL_F32;
 import boofcv.struct.image.*;
 
 /**
@@ -343,16 +343,16 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( ImageBorder image ) {
-		if( image instanceof ImageBorder_ILF32 ) {
-			return new Border_ILF32((ImageBorder_ILF32) image);
+		if( image instanceof ImageBorder_IL_F32) {
+			return new Border_ILF32((ImageBorder_IL_F32) image);
 		} else {
 			throw new IllegalArgumentException("Not supported yet?");
 		}
 	}
 
-	public static class Border_ILF32 extends GMultiBorder<ImageBorder_ILF32> {
+	public static class Border_ILF32 extends GMultiBorder<ImageBorder_IL_F32> {
 
-		public Border_ILF32(ImageBorder_ILF32 image) {
+		public Border_ILF32(ImageBorder_IL_F32 image) {
 			super(image);
 		}
 

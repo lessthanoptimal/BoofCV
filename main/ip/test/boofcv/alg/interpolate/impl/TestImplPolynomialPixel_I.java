@@ -62,13 +62,13 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
 		InterpolatePixelS<ImageUInt8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
 		alg.setBorder( FactoryImageBorder.singleValue(ImageUInt8.class, 0));
 
-		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distort(false,alg, ImageUInt8.class);
+		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distortSB(false, alg, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
 		InterpolatePixelS<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixelS(ImageUInt8.class, BorderType.VALUE);
 
-		distorter = FactoryDistort.distort(false,bilinear,ImageUInt8.class);
+		distorter = FactoryDistort.distortSB(false, bilinear, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 
