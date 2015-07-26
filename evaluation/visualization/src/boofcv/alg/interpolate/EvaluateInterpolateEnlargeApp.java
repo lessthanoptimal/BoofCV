@@ -26,8 +26,8 @@ import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedF32;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -132,10 +132,10 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 	public static void main( String args[] ) {
 
-//		ImageType type = ImageType.ms(3,ImageFloat32.class);
+		ImageType type = ImageType.ms(3,ImageFloat32.class);
 //		ImageType type = ImageType.ms(3,ImageUInt8.class);
 //		ImageType type = ImageType.single(ImageUInt8.class);
-		ImageType type = ImageType.il(3, InterleavedF32.class);
+//		ImageType type = ImageType.il(3, InterleavedF32.class);
 
 		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(type);
 

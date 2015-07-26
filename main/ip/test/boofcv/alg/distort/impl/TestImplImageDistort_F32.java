@@ -19,9 +19,11 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -30,13 +32,13 @@ import boofcv.struct.image.ImageFloat32;
 public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
 
 	public TestImplImageDistort_F32() {
-		super(ImageFloat32.class);
+		super(ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
 	public ImageDistort<ImageFloat32,ImageFloat32> createDistort(PixelTransform_F32 dstToSrc,
-																 InterpolatePixelS<ImageFloat32> interp) {
-		ImageDistort<ImageFloat32,ImageFloat32> ret = new ImplImageDistort_F32(interp);
+																 InterpolatePixel<ImageFloat32> interp) {
+		ImageDistort<ImageFloat32,ImageFloat32> ret = new ImplImageDistort_F32((InterpolatePixelS)interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

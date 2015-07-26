@@ -26,6 +26,7 @@ import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
+import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -196,6 +197,11 @@ public class TestConvertRaster {
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
 			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
+		} else if( paramType == SunWritableRaster.class ) {
+			// ByteInterleavedRaster extends SunWritableRaster
+			input = new BufferedImage[]{
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand)};
+
 		} else {
 			throw new RuntimeException("Unknown raster type: " + paramType.getSimpleName());
 		}
@@ -208,7 +214,7 @@ public class TestConvertRaster {
 				m.invoke(null, input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
-				if( MultiSpectral.class.isAssignableFrom(output.getClass()) )
+				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
 					BoofTesting.checkEquals(input.getRaster(),(MultiSpectral)output,1);
 				else
 					BoofTesting.checkEquals(input, output, false, 1f);

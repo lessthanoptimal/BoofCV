@@ -18,16 +18,27 @@
 
 package boofcv.alg.distort.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistort_IL_F32 {
-	@Test
-	public void foo() {
-		fail("implement");
+public class TestImplImageDistort_IL_F32 extends GeneralImageDistortTests<InterleavedF32>{
+
+	public TestImplImageDistort_IL_F32() {
+		super(ImageType.il(2,InterleavedF32.class));
+	}
+
+	@Override
+	public ImageDistort<InterleavedF32, InterleavedF32>
+	createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<InterleavedF32> interp) {
+		ImageDistort<InterleavedF32,InterleavedF32> ret = new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
+		ret.setModel(dstToSrc);
+		return ret;
 	}
 }

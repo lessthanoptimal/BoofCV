@@ -36,7 +36,7 @@ public class ImplImageDistort_IL_F32 extends ImageDistortBasic_IL<InterleavedF32
 	@Override
 	protected void assign(int indexDst, float[] value) {
 		for( int i = 0; i < dstImg.numBands; i++ ) {
-			dstImg.data[indexDst+1] = value[i];
+			dstImg.data[indexDst+i] = value[i];
 		}
 	}
 }
