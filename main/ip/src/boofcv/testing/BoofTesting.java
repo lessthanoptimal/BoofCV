@@ -242,7 +242,6 @@ public class BoofTesting {
 				paramDesc[i] = inputParam[i].getClass();
 			}
 
-
 			// first try it with the original image
 			Method m = findMethod(testClass.getClass(), function, paramDesc);
 
@@ -469,7 +468,7 @@ public class BoofTesting {
 				throw new RuntimeException("Number of bands not equal");
 
 			for( int band = 0; band < a.getNumBands(); band++ ) {
-				assertEquals(a.getBand(band),b.getBand(band),tol );
+				assertEquals(a.getBand(band), b.getBand(band), tol);
 			}
 		} else if( imgA instanceof ImageInterleaved ) {
 			ImageInterleaved a = (ImageInterleaved)imgA;
@@ -530,7 +529,7 @@ public class BoofTesting {
 				throw new RuntimeException("Number of bands not equal");
 
 			for( int band = 0; band < a.getNumBands(); band++ ) {
-				assertEqualsInner(a.getBand(band),b.getBand(band),tol,borderX,borderY,relative );
+				assertEqualsInner(a.getBand(band), b.getBand(band), tol, borderX, borderY, relative);
 			}
 		} else {
 			throw new RuntimeException("Unknown image type");
@@ -570,7 +569,7 @@ public class BoofTesting {
 				throw new RuntimeException("Number of bands not equal");
 
 			for( int band = 0; band < a.getNumBands(); band++ ) {
-				assertEqualsInner(a.getBand(band),b.getBand(band),tol,borderX0,borderY0,borderX1,borderY1,relative );
+				assertEqualsInner(a.getBand(band), b.getBand(band), tol, borderX0, borderY0, borderX1, borderY1, relative);
 			}
 		} else {
 			throw new RuntimeException("Unknown image type");
@@ -987,19 +986,25 @@ public class BoofTesting {
 					}
 
 				} else if( imgB.getNumBands() == 3 ) {
-					genericB.get(x,y,pixelB);
-					for( int i = 0; i < 3; i++ ) {
+					genericB.get(x, y, pixelB);
+					for (int i = 0; i < 3; i++) {
 						double found = pixelB[bandOrder[i]];
-						if( Math.abs(expected[i+1]- found) > tol ) {
-							for( int j = 0; j < 3; j++ ) {
-								System.out.println(expected[j+1]+" "+pixelB[bandOrder[j]]);
+						if (Math.abs(expected[i + 1] - found) > tol) {
+							for (int j = 0; j < 3; j++) {
+								System.out.println(expected[j + 1] + " " + pixelB[bandOrder[j]]);
 							}
-							throw new RuntimeException("Images are not equal: band - "+i+" type "+imgA.getType());
+							throw new RuntimeException("Images are not equal: band - " + i + " type " + imgA.getType());
 						}
 					}
+				} else if( imgB.getNumBands() == 1 ) {
+					genericB.get(x, y, pixelB);
+					double expectedGray = (expected[1]+expected[2]+expected[3])/3.0;
 
+					if (Math.abs(expectedGray - pixelB[0]) > tol) {
+						throw new RuntimeException("Images are not equal:  "+imgA.getType()+" single band multi banded");
+					}
 				} else {
-					throw new RuntimeException("Unexpectd number of bands");
+					throw new RuntimeException("Unexpected number of bands");
 				}
 			}
 		}

@@ -47,7 +47,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 30;
+	int numMethods = 50;
 
 	/**
 	 * Use reflections to test all the functions.
@@ -62,7 +62,7 @@ public class TestConvertRaster {
 			if (!isTestMethod(m))
 				continue;
 
-			System.out.println("Examining: " + m.getName());
+//			System.out.println("Examining: " + m.getName()+" "+m.getParameterTypes()[0].getSimpleName()+" "+m.getParameterTypes()[1].getSimpleName());
 			if (m.getName().contains("bufferedTo"))
 				testBufferedTo(m);
 			else if (m.getName().contains("ToBuffered"))
@@ -142,15 +142,22 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
+		boolean canSubImage = true;
+		if( paramTypes[0] == SunWritableRaster.class ) {
+			canSubImage = false;
+		}
+
 		for (int i = 0; i < input.length; i++) {
 			// regular image
 			ImageBase output = createImage(m, paramTypes[1], input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
-			// subimage input
-			BufferedImage subimage = input[i].getSubimage(1,2,imgWidth-1,imgHeight-2);
-			output = createImage(m, paramTypes[1], subimage);
-			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
+			if( canSubImage ) {
+				// subimage input
+				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
+				output = createImage(m, paramTypes[1], subimage);
+				BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
+			}
 		}
 	}
 
@@ -161,6 +168,12 @@ public class TestConvertRaster {
 		ImageBase output;
 		if (ImageSingleBand.class.isAssignableFrom(imageType)) {
 			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
+		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
+			if( m.getName().contains("Gray")) {
+				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), 1);
+			} else {
+				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
+			}
 		} else {
 			Class type;
 			if (m.getName().contains("U8")) {
@@ -215,7 +228,7 @@ public class TestConvertRaster {
 
 				// read directly from raster if the raster is an input
 				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
-					BoofTesting.checkEquals(input.getRaster(),(MultiSpectral)output,1);
+					BoofTesting.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
 				else
 					BoofTesting.checkEquals(input, output, false, 1f);
 			} else {

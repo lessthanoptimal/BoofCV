@@ -19,10 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.struct.image.*;
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.SunWritableRaster;
+import sun.awt.image.*;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -50,7 +47,7 @@ public class ConvertRaster {
 		int size = dst.getWidth() * dst.getHeight();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
@@ -75,7 +72,7 @@ public class ConvertRaster {
 		int size = dst.getWidth() * dst.getHeight();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 1) {
@@ -105,7 +102,7 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
@@ -288,7 +285,7 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
@@ -311,13 +308,13 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
 			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_MSF32(dst, srcData, srcStride, srcStrideDiff);
+			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
 			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
@@ -332,7 +329,7 @@ public class ConvertRaster {
 		byte[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -353,7 +350,7 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcOffset = getOffset(src);
 
 		int length = dst.width*dst.numBands;
 		for (int y = 0; y < dst.height; y++) {
@@ -526,15 +523,13 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(SunWritableRaster src, InterleavedU8 dst) {
+	public static void bufferedToInterleaved(SunWritableRaster src, InterleavedU8 dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
 		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
 
 		byte[] srcData = byteBuffer.getData();
-
-		int numBands = src.getNumBands();
 
 		int srcOffset = 0;
 		int srcStrideDiff = 0;
@@ -545,7 +540,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(SunWritableRaster src, InterleavedF32 dst) {
+	public static void bufferedToInterleaved(SunWritableRaster src, InterleavedF32 dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
@@ -564,7 +559,7 @@ public class ConvertRaster {
 
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
-			int indexSrc = srcOffset + y*(dst.stride + srcStrideDiff);
+			int indexSrc = srcOffset + y*(length + srcStrideDiff);
 
 			System.arraycopy(srcData,indexSrc,dst.data,indexDst,length);
 		}
@@ -575,7 +570,7 @@ public class ConvertRaster {
 
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
-			int indexSrc = srcOffset + y*(dst.stride + srcStrideDiff);
+			int indexSrc = srcOffset + y*(length + srcStrideDiff);
 
 			int indexDstEnd = indexDst+length;
 			while( indexDst < indexDstEnd ) {
@@ -595,7 +590,7 @@ public class ConvertRaster {
 		byte[] data = dst.data;
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -626,7 +621,7 @@ public class ConvertRaster {
 		float[] data = dst.data;
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -655,7 +650,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int numBands = src.getNumBands();
@@ -706,7 +701,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		float[] data1 = dst.getBand(0).data;
@@ -758,7 +753,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int numBands = src.getNumBands();
@@ -801,7 +796,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -1808,7 +1803,7 @@ public class ConvertRaster {
 
 		final int numBands = dst.getNumBands();
 		int dstStride = dst.getScanlineStride();
-		int dstOffset = dst.getDataOffset(0)-dst.getPixelStride()+1;
+		int dstOffset = getOffset(dst);
 
 		if (numBands == 3) {
 
@@ -1855,7 +1850,7 @@ public class ConvertRaster {
 		final int length = src.width*numBands;
 
 		int dstStride = dst.getScanlineStride();
-		int dstOffset = dst.getDataOffset(0)-dst.getPixelStride()+1;
+		int dstOffset = getOffset(dst);
 
 		for (int y = 0; y < src.height; y++) {
 			int indexSrc = src.startIndex + src.stride * y;
@@ -1897,7 +1892,7 @@ public class ConvertRaster {
 
 		final int numBands = dst.getNumBands();
 		int dstStride = dst.getScanlineStride();
-		int dstOffset = dst.getDataOffset(0)-dst.getPixelStride()+1;
+		int dstOffset = getOffset(dst);
 
 		if (numBands == 3) {
 
@@ -1944,7 +1939,7 @@ public class ConvertRaster {
 		final int length = src.width*numBands;
 
 		int dstStride = dst.getScanlineStride();
-		int dstOffset = dst.getDataOffset(0)-dst.getPixelStride()+1;
+		int dstOffset = getOffset(dst);
 
 		for (int y = 0; y < src.height; y++) {
 			int indexSrc = src.startIndex + src.stride * y;
@@ -1978,5 +1973,29 @@ public class ConvertRaster {
 				dst.setRGB(x, y, argb);
 			}
 		}
+	}
+
+	private static int getOffset( ByteComponentRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
+	}
+
+	private static int getOffset( IntegerInterleavedRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
+	}
+
+	private static int getOffset( ShortInterleavedRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
 	}
 }

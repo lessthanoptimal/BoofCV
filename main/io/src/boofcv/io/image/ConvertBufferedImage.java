@@ -482,6 +482,8 @@ public class ConvertBufferedImage {
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedU8) dst);
+				} else if (src.getRaster() instanceof SunWritableRaster) {
+					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedU8) dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
 				}
@@ -495,6 +497,8 @@ public class ConvertBufferedImage {
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedF32) dst);
+				} else if (src.getRaster() instanceof SunWritableRaster) {
+					ConvertRaster.bufferedToInterleaved((SunWritableRaster) src.getRaster(), (InterleavedF32) dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedF32) dst);
 				}
