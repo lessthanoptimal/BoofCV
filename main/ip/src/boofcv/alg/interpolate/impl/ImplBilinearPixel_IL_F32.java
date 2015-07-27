@@ -74,12 +74,19 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 
 		float[] data = orig.data;
 
+		// computing this just once doesn't seem to change speed very much.  Keeping it here to avoid trying
+		// it again in the future
+		float a00 = (1.0f - ax) * (1.0f - ay);
+		float a10 = ax * (1.0f - ay);
+		float a11 = ax * ay;
+		float a01 = (1.0f - ax) * ay;
+
 		for( int i = 0; i < numBands; i++ ) {
 			int indexBand = index+i;
-			float val = (1.0f - ax) * (1.0f - ay) * (data[indexBand] ); // (x,y)
-			val += ax * (1.0f - ay) * (data[indexBand + numBands ] );   // (x+1,y)
-			val += ax * ay * (data[indexBand + numBands + stride] );    // (x+1,y+1)
-			val += (1.0f - ax) * ay * (data[indexBand + stride] );      // (x,y+1)
+			float val = a00 * (data[indexBand] );                // (x,y)
+			val += a10 * (data[indexBand + numBands ] );         // (x+1,y)
+			val += a11 * (data[indexBand + numBands + stride] ); // (x+1,y+1)
+			val += a01 * (data[indexBand + stride] );            // (x,y+1)
 
 			values[i] = val;
 		}

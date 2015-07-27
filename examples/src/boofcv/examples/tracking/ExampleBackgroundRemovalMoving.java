@@ -21,11 +21,10 @@ package boofcv.examples.tracking;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.alg.background.moving.BackgroundMovingGaussian;
-import boofcv.alg.background.moving.BackgroundMovingGaussian_MS;
+import boofcv.alg.background.BackgroundModelMoving;
+import boofcv.alg.background.moving.BackgroundMovingBasic_IL;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
@@ -34,10 +33,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography;
@@ -64,17 +60,20 @@ public class ExampleBackgroundRemovalMoving {
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(250, 2, 2, 30, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
-//		BackgroundModelMoving background =
+		// TODO IL and MS don't produce identical results
+		BackgroundModelMoving background =
 //				new BackgroundMovingBasic_SB(0.05f,30,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
+				new BackgroundMovingBasic_IL(0.1f,30,new PointTransformHomography_F32(),
+						TypeInterpolate.BILINEAR, ImageType.il(3, InterleavedF32.class));
 //				new BackgroundMovingBasic_MS(0.1f,30,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-		BackgroundMovingGaussian background =
+//		BackgroundMovingGaussian background =
 //				new BackgroundMovingGaussian_SB(0.01f,10,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-				new BackgroundMovingGaussian_MS(0.01f,40,new PointTransformHomography_F32(),
-						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-		background.setInitialVariance(64);
+//				new BackgroundMovingGaussian_MS(0.01f,40,new PointTransformHomography_F32(),
+//						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
+//		background.setInitialVariance(64);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = "../data/applet/shake.mjpeg";
@@ -86,6 +85,9 @@ public class ExampleBackgroundRemovalMoving {
 		Homography2D_F32 firstToCurrent32 = new Homography2D_F32();
 
 		ImageBinaryPanel gui = null;
+
+		double fps = 30;
+		double alpha = 0.05;
 
 		while( video.hasNext() ) {
 			ImageBase input = video.next();
@@ -102,6 +104,7 @@ public class ExampleBackgroundRemovalMoving {
 				ShowImages.showWindow(gui,"Detections",true);
 			}
 
+			long before = System.nanoTime();
 			GConvertImage.convert(input, grey);
 
 			if( !motion2D.process(grey) )
@@ -110,15 +113,16 @@ public class ExampleBackgroundRemovalMoving {
 			Homography2D_F64 firstToCurrent64 = motion2D.getFirstToCurrent();
 			UtilHomography.convert(firstToCurrent64,firstToCurrent32);
 
-			System.out.println(firstToCurrent32);
-
 			background.segment(firstToCurrent32,input,segmented);
 			background.updateBackground(firstToCurrent32,input);
+			long after = System.nanoTime();
 
-			System.out.println("sum = "+ ImageStatistics.sum(segmented)+" "+ImageStatistics.max(segmented));
+			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
+
+//			System.out.println("sum = "+ ImageStatistics.sum(segmented)+" "+ImageStatistics.max(segmented));
 			gui.setBinaryImage(segmented);
 			gui.repaint();
-			System.out.println("Processed!!");
+			System.out.println("Processed!!  fps = "+fps);
 
 			try {
 				Thread.sleep(100);

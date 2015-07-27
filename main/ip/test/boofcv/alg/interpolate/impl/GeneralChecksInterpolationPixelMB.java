@@ -193,7 +193,7 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 		}
 		interp.get(-10, 23, tmp0);
 		for (int i = 0; i < numBands; i++) { assertEquals(tmp0[i],tmp1[i],1e-4); }
-		interp.get( 5, 2330, tmp1);
+		interp.get(5, 2330, tmp1);
 		for (int i = 0; i < numBands; i++) { assertEquals(tmp0[i],tmp1[i],1e-4); }
 	}
 
@@ -327,5 +327,13 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 				}
 			}
 		}
+	}
+
+	/**
+	 * Compares interpolation to two single band images and sees if they produce nearly identical results
+	 */
+	@Test
+	public void compareToSingleBand() {
+		fail("Implement");
 	}
 }
