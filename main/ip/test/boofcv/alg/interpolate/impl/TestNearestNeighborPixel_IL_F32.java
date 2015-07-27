@@ -19,6 +19,9 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.InterleavedF32;
 
 /**
@@ -34,6 +37,12 @@ public class TestNearestNeighborPixel_IL_F32 extends GeneralChecksInterpolationP
 	@Override
 	protected InterpolatePixelMB<InterleavedF32> wrap(InterleavedF32 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_IL_F32(image);
+	}
+
+	@Override
+	protected <SB extends ImageSingleBand> InterpolatePixelS<SB>
+	wrapSingle(SB image, int minValue, int maxValue) {
+		return (InterpolatePixelS)new NearestNeighborPixel_F32((ImageFloat32)image);
 	}
 
 	@Override

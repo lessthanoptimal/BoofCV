@@ -144,15 +144,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedI8 img, byte value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -213,6 +241,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (int)(rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = (byte)value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedI8 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
+		byte[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				int value = (int)(rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -472,15 +529,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedI16 img, short value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -541,6 +626,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (int)(rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = (short)value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedI16 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
+		short[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				int value = (int)(rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -800,15 +914,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedS32 img, int value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -869,6 +1011,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (int)(rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedS32 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
+		int[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				int value = (int)(rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -1128,15 +1299,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedS64 img, long value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -1197,6 +1396,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				long value = (long)(rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedS64 input, Random rand , double mean , double sigma , long lowerBound , long upperBound ) {
+		long[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				long value = (long)(rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -1456,15 +1684,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedF32 img, float value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -1525,6 +1781,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				float value = (float)(rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedF32 input, Random rand , double mean , double sigma , float lowerBound , float upperBound ) {
+		float[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				float value = (float)(rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -1784,15 +2069,43 @@ public class ImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( img.isInBounds(x,y ))
-					img.set(x, y, value);
+				img.set(x, y, value);
 			}
 		}
 	}
 
 	/**
+	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
+	 * are filled with the same value.
+	 *
+	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param value Value of the rectangle
+	 * @param x0 Top left x-coordinate
+	 * @param y0 Top left y-coordinate
+	 * @param width Rectangle width
+	 * @param height Rectangle height
+	 */
+	public static void fillRectangle(InterleavedF64 img, double value, int x0, int y0, int width, int height) {
+		int x1 = x0 + width;
+		int y1 = y0 + height;
+
+		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
+		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
+
+		int length = (x1-x0)*img.numBands;
+		for (int y = y0; y < y1; y++) {
+			int index = img.startIndex + y*img.stride + x0*img.numBands;
+			int indexEnd = index + length;
+			while( index < indexEnd ) {
+				img.data[index++] = value;
+			}
+		}
+	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
 	 *
 	 * @param img Image which is to be filled.  Modified,
@@ -1853,6 +2166,35 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				double value = (rand.nextGaussian()*sigma+mean);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				data[index++] = value;
+			}
+		}
+	}
+
+	/**
+	 * Sets each value in the image to a value drawn from a Gaussian distribution.  A user
+	 * specified lower and upper bound is provided to ensure that the values are within a legal
+	 * range.  A drawn value outside the allowed range will be set to the closest bound.
+	 * 
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator
+	 * @param mean Distribution's mean.
+	 * @param sigma Distribution's standard deviation.
+	 * @param lowerBound Lower bound of value clip
+	 * @param upperBound Upper bound of value clip
+	 */
+	public static void fillGaussian(InterleavedF64 input, Random rand , double mean , double sigma , double lowerBound , double upperBound ) {
+		double[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+
+			while( index < indexEnd ) {
 				double value = (rand.nextGaussian()*sigma+mean);
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
@@ -2020,6 +2362,29 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedU8 input, Random rand , int min , int max) {
+		int range = max-min;
+
+		byte[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
+				int value = (data[index] & 0xFF) + rand.nextInt(range)+min;
+				if( value < 0 ) value = 0;
+				if( value > 255 ) value = 255;
+
+				data[index++] = (byte) value;
+			}
+		}
+	}
+
+	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
 	 * @param input Input image.  Modified.
@@ -2042,6 +2407,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedU8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				int value = (input.data[index]& 0xFF) + (int)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = (byte)value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt8 input, Random rand , int min , int max) {
@@ -2052,6 +2442,29 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (data[index] ) + rand.nextInt(range)+min;
+				if( value < -128 ) value = -128;
+				if( value > 127 ) value = 127;
+
+				data[index++] = (byte) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedS8 input, Random rand , int min , int max) {
+		int range = max-min;
+
+		byte[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				int value = (data[index] ) + rand.nextInt(range)+min;
 				if( value < -128 ) value = -128;
 				if( value > 127 ) value = 127;
@@ -2084,6 +2497,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedS8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = (byte)value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageUInt16 input, Random rand , int min , int max) {
@@ -2094,6 +2532,29 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (data[index] & 0xFFFF) + rand.nextInt(range)+min;
+				if( value < 0 ) value = 0;
+				if( value > 65535 ) value = 65535;
+
+				data[index++] = (short) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedU16 input, Random rand , int min , int max) {
+		int range = max-min;
+
+		short[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				int value = (data[index] & 0xFFFF) + rand.nextInt(range)+min;
 				if( value < 0 ) value = 0;
 				if( value > 65535 ) value = 65535;
@@ -2126,6 +2587,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedU16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				int value = (input.data[index]& 0xFFFF) + (int)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = (short)value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt16 input, Random rand , int min , int max) {
@@ -2136,6 +2622,29 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (data[index] ) + rand.nextInt(range)+min;
+				if( value < -32768 ) value = -32768;
+				if( value > 32767 ) value = 32767;
+
+				data[index++] = (short) value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedS16 input, Random rand , int min , int max) {
+		int range = max-min;
+
+		short[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				int value = (data[index] ) + rand.nextInt(range)+min;
 				if( value < -32768 ) value = -32768;
 				if( value > 32767 ) value = 32767;
@@ -2168,6 +2677,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedS16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = (short)value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt32 input, Random rand , int min , int max) {
@@ -2178,6 +2712,26 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				int value = (data[index] ) + rand.nextInt(range)+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedS32 input, Random rand , int min , int max) {
+		int range = max-min;
+
+		int[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				int value = (data[index] ) + rand.nextInt(range)+min;
 				data[index++] =  value;
 			}
@@ -2207,6 +2761,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedS32 input, Random rand , double sigma , int lowerBound , int upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageSInt64 input, Random rand , long min , long max) {
@@ -2217,6 +2796,26 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				long value = data[index] + rand.nextInt((int)range)+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedS64 input, Random rand , long min , long max) {
+		long range = max-min;
+
+		long[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				long value = data[index] + rand.nextInt((int)range)+min;
 				data[index++] =  value;
 			}
@@ -2246,6 +2845,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedS64 input, Random rand , double sigma , long lowerBound , long upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				long value = (input.data[index]) + (long)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageFloat32 input, Random rand , float min , float max) {
@@ -2256,6 +2880,26 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				float value = data[index] + rand.nextFloat()*range+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedF32 input, Random rand , float min , float max) {
+		float range = max-min;
+
+		float[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				float value = data[index] + rand.nextFloat()*range+min;
 				data[index++] =  value;
 			}
@@ -2285,6 +2929,31 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedF32 input, Random rand , double sigma , float lowerBound , float upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				float value = (input.data[index]) + (float)(rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = value;
+			}
+		}
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
 	 */
 	public static void addUniform(ImageFloat64 input, Random rand , double min , double max) {
@@ -2295,6 +2964,26 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y * input.getStride();
 			for (int x = 0; x < input.width; x++) {
+				double value = data[index] + rand.nextDouble()*range+min;
+				data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 */
+	public static void addUniform(InterleavedF64 input, Random rand , double min , double max) {
+		double range = max-min;
+
+		double[] data = input.data;
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+
+				int indexEnd = index+length;
+				while( index < indexEnd ) {
 				double value = data[index] + rand.nextDouble()*range+min;
 				data[index++] =  value;
 			}
@@ -2319,6 +3008,31 @@ public class ImageMiscOps {
 				if( value < lowerBound ) value = lowerBound;
 				if( value > upperBound ) value = upperBound;
 				input.data[index++] =  value;
+			}
+		}
+	}
+
+	/**
+	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
+	 * it will be set to the closest bound.
+	 * @param input Input image.  Modified.
+	 * @param rand Random number generator.
+	 * @param sigma Distributions standard deviation.
+	 * @param lowerBound Allowed lower bound
+	 * @param upperBound Allowed upper bound
+	 */
+	public static void addGaussian(InterleavedF64 input, Random rand , double sigma , double lowerBound , double upperBound ) {
+
+		int length = input.width*input.numBands;
+
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride();
+			int indexEnd = index+length;
+			while( index < indexEnd ) {
+				double value = (input.data[index]) + (rand.nextGaussian()*sigma);
+				if( value < lowerBound ) value = lowerBound;
+				if( value > upperBound ) value = upperBound;
+				input.data[index++] = value;
 			}
 		}
 	}

@@ -18,16 +18,26 @@
 
 package boofcv.alg.background.stationary;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundStationaryBasic_IL {
-	@Test
-	public void foo() {
-		fail("implement");
+public class TestBackgroundStationaryBasic_IL extends GenericBackgroundModelStationaryChecks {
+
+	public TestBackgroundStationaryBasic_IL() {
+		imageTypes.add(ImageType.il(2, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedU8.class));
+		imageTypes.add(ImageType.il(3, InterleavedF32.class));
+	}
+
+	@Override
+	public <T extends ImageBase> BackgroundModelStationary<T>
+	create(ImageType<T> imageType) {
+		return new BackgroundStationaryBasic_IL(0.05f,10f,imageType);
 	}
 }

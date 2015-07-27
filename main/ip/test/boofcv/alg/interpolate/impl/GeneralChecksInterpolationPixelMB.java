@@ -21,10 +21,13 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -53,6 +56,12 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 	protected abstract T createImage( int width , int height , int numBands );
 
 	protected abstract InterpolatePixelMB<T> wrap(T image, int minValue, int maxValue);
+
+	/**
+	 * Creates the equivalent single band interpolation algorithm. If none exist then return null
+	 */
+	protected abstract<SB extends ImageSingleBand>
+	InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue);
 
 	/**
 	 * Checks value returned by get() against values computed using
@@ -334,6 +343,49 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 	 */
 	@Test
 	public void compareToSingleBand() {
-		fail("Implement");
+
+		T origMB = createImage(30, 40, 2);
+		GImageMiscOps.fillUniform(origMB, rand, 0, 100);
+
+		ImageDataType dataType = origMB.getImageType().getDataType();
+		ImageSingleBand band0 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
+		ImageSingleBand band1 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
+
+		for (int y = 0; y < origMB.height; y++) {
+			for (int x = 0; x < origMB.width; x++) {
+				double val0 = GeneralizedImageOps.get(origMB,x,y,0);
+				double val1 = GeneralizedImageOps.get(origMB,x,y,1);
+
+				GeneralizedImageOps.set(band0,x,y,val0);
+				GeneralizedImageOps.set(band1,x,y,val1);
+			}
+		}
+
+		InterpolatePixelS interpBand0 = wrapSingle(band0,0,255);
+		InterpolatePixelS interpBand1 = wrapSingle(band1,0,255);
+
+		InterpolatePixelMB<T> interpMB = wrap(origMB,0,255);
+
+		interpBand0.setBorder(FactoryImageBorder.genericValue(0,band0.getImageType()));
+		interpBand1.setBorder(FactoryImageBorder.genericValue(0,band1.getImageType()));
+		interpMB.setBorder(FactoryImageBorder.genericValue(0,interpMB.getImageType()));
+
+		interpBand0.setImage(band0);
+		interpBand1.setImage(band1);
+		interpMB.setImage(origMB);
+
+
+		float values[] = new float[2];
+		for (int y = 0; y < origMB.height-1; y++) {
+			for (int x = 0; x < origMB.width-1; x++) {
+				float val0 = interpBand0.get(x+0.2f,y+0.3f);
+				float val1 = interpBand1.get(x+0.2f,y+0.3f);
+
+				interpMB.get(x+0.2f,y+0.3f,values);
+
+				assertEquals(val0,values[0],1e-6f);
+				assertEquals(val1,values[1],1e-6f);
+			}
+		}
 	}
 }

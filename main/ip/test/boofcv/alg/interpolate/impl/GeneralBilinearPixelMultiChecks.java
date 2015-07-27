@@ -19,6 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
@@ -26,6 +27,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -38,6 +40,11 @@ public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved
 	@Override
 	protected InterpolatePixelMB<T> wrap(T image, int minValue, int maxValue) {
 		return FactoryInterpolation.bilinearPixelMB(image, null);
+	}
+
+	@Override
+	protected <SB extends ImageSingleBand> InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue) {
+		return FactoryInterpolation.bilinearPixelS(image, null);
 	}
 
 	@Override

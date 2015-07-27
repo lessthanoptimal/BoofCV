@@ -473,12 +473,15 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
 
 			if( dst instanceof InterleavedU8 ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
-						ConvertRaster.bufferedToGray(src,(InterleavedU8)dst);
+				if (src.getRaster() instanceof ByteInterleavedRaster ){
+					if(src.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+							ConvertRaster.bufferedToGray(src, (InterleavedU8) dst);
+						} else {
+							ConvertRaster.bufferedToInterleaved((ByteInterleavedRaster) src.getRaster(), (InterleavedU8) dst);
+						}
 					} else {
-						ConvertRaster.bufferedToInterleaved((ByteInterleavedRaster) src.getRaster(), (InterleavedU8) dst);
+						ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedU8) dst);
@@ -488,12 +491,15 @@ public class ConvertBufferedImage {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedU8) dst);
 				}
 			} else if( dst instanceof InterleavedF32 ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
-					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
-						ConvertRaster.bufferedToGray(src,(InterleavedF32)dst);
+				if (src.getRaster() instanceof ByteInterleavedRaster ) {
+					if(src.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
+						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+							ConvertRaster.bufferedToGray(src, (InterleavedF32) dst);
+						} else {
+							ConvertRaster.bufferedToInterleaved((ByteInterleavedRaster) src.getRaster(), (InterleavedF32) dst);
+						}
 					} else {
-						ConvertRaster.bufferedToInterleaved((ByteInterleavedRaster) src.getRaster(), (InterleavedF32) dst);
+						ConvertRaster.bufferedToInterleaved(src, (InterleavedF32) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
 					ConvertRaster.bufferedToInterleaved((IntegerInterleavedRaster) src.getRaster(), (InterleavedF32) dst);

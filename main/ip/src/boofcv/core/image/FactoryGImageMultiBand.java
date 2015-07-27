@@ -73,7 +73,7 @@ public class FactoryGImageMultiBand {
 			case F32:
 				return new IL_F32((InterleavedF32)image);
 			default:
-				throw new IllegalArgumentException("Need to support more data types");
+				throw new IllegalArgumentException("Need to support more data types: "+image.getDataType());
 		}
 	}
 

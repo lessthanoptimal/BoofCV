@@ -561,7 +561,11 @@ public class ConvertRaster {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexSrc = srcOffset + y*(length + srcStrideDiff);
 
-			System.arraycopy(srcData,indexSrc,dst.data,indexDst,length);
+			try {
+				System.arraycopy(srcData, indexSrc, dst.data, indexDst, length);
+			} catch( ArrayIndexOutOfBoundsException e ) {
+				System.out.println();
+			}
 		}
 	}
 
