@@ -18,6 +18,7 @@
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.core.image.impl.ConvertInterleavedToSingle;
 import boofcv.core.image.impl.ImplConvertImage;
 import boofcv.core.image.impl.ImplConvertMsToSingle;
 import boofcv.struct.image.*;
@@ -350,6 +351,25 @@ public class ConvertImage {
 		return output;
 	}
 	/**
+	 * Converts a {@link InterleavedU8} into a {@link ImageUInt8} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageUInt8 average( InterleavedU8 input , ImageUInt8 output ) {
+		if (output == null) {
+			output = new ImageUInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
+
+		return output;
+	}
+	/**
 	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageUInt8}.
 	 * </p>
@@ -659,6 +679,25 @@ public class ConvertImage {
 		}
 
 		ImplConvertMsToSingle.average(input, output);
+
+		return output;
+	}
+	/**
+	 * Converts a {@link InterleavedS8} into a {@link ImageSInt8} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageSInt8 average( InterleavedS8 input , ImageSInt8 output ) {
+		if (output == null) {
+			output = new ImageSInt8(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
 
 		return output;
 	}
@@ -976,6 +1015,25 @@ public class ConvertImage {
 		return output;
 	}
 	/**
+	 * Converts a {@link InterleavedU16} into a {@link ImageUInt16} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageUInt16 average( InterleavedU16 input , ImageUInt16 output ) {
+		if (output == null) {
+			output = new ImageUInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
+
+		return output;
+	}
+	/**
 	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageUInt8}.
 	 * </p>
@@ -1285,6 +1343,25 @@ public class ConvertImage {
 		}
 
 		ImplConvertMsToSingle.average(input, output);
+
+		return output;
+	}
+	/**
+	 * Converts a {@link InterleavedS16} into a {@link ImageSInt16} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageSInt16 average( InterleavedS16 input , ImageSInt16 output ) {
+		if (output == null) {
+			output = new ImageSInt16(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
 
 		return output;
 	}
@@ -1602,6 +1679,25 @@ public class ConvertImage {
 		return output;
 	}
 	/**
+	 * Converts a {@link InterleavedS32} into a {@link ImageSInt32} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageSInt32 average( InterleavedS32 input , ImageSInt32 output ) {
+		if (output == null) {
+			output = new ImageSInt32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
+
+		return output;
+	}
+	/**
 	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageUInt8}.
 	 * </p>
@@ -1911,6 +2007,25 @@ public class ConvertImage {
 		}
 
 		ImplConvertMsToSingle.average(input, output);
+
+		return output;
+	}
+	/**
+	 * Converts a {@link InterleavedS64} into a {@link ImageSInt64} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageSInt64 average( InterleavedS64 input , ImageSInt64 output ) {
+		if (output == null) {
+			output = new ImageSInt64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
 
 		return output;
 	}
@@ -2228,6 +2343,25 @@ public class ConvertImage {
 		return output;
 	}
 	/**
+	 * Converts a {@link InterleavedF32} into a {@link ImageFloat32} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageFloat32 average( InterleavedF32 input , ImageFloat32 output ) {
+		if (output == null) {
+			output = new ImageFloat32(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
+
+		return output;
+	}
+	/**
 	 * <p>
 	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageUInt8}.
 	 * </p>
@@ -2537,6 +2671,25 @@ public class ConvertImage {
 		}
 
 		ImplConvertMsToSingle.average(input, output);
+
+		return output;
+	}
+	/**
+	 * Converts a {@link InterleavedF64} into a {@link ImageFloat64} by computing the average value of each pixel
+	 * across all the bands.
+	 * 
+	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static ImageFloat64 average( InterleavedF64 input , ImageFloat64 output ) {
+		if (output == null) {
+			output = new ImageFloat64(input.width, input.height);
+		} else {
+			InputSanityCheck.checkSameShape(input, output);
+		}
+
+		ConvertInterleavedToSingle.average(input, output);
 
 		return output;
 	}

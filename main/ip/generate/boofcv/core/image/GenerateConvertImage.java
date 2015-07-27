@@ -47,7 +47,8 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				printConvertSingle(in, out);
 				printConvertInterleaved(in, out);
 			}
-			printAverage(in);
+			printMultiAverage(in);
+			printInterleaveAverage(in);
 		}
 
 		out.print("\n" +
@@ -58,6 +59,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.core.image.impl.ImplConvertImage;\n" +
 				"import boofcv.core.image.impl.ImplConvertMsToSingle;\n" +
+				"import boofcv.core.image.impl.ConvertInterleavedToSingle;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
@@ -123,7 +125,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printAverage( AutoTypeImage imageIn ) {
+	private void printMultiAverage(AutoTypeImage imageIn) {
 
 		String imageName = imageIn.getSingleBandName();
 
@@ -143,6 +145,32 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertMsToSingle.average(input, output);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n");
+	}
+
+	private void printInterleaveAverage(AutoTypeImage imageIn) {
+
+		String inputName = imageIn.getInterleavedName();
+		String outputName = imageIn.getSingleBandName();
+
+		out.print("\t/**\n" +
+				"\t * Converts a {@link "+inputName+"} into a {@link "+outputName+"} by computing the average value of each pixel\n" +
+				"\t * across all the bands.\n" +
+				"\t * \n" +
+				"\t * @param input (Input) The ImageInterleaved that is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The single band output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static "+outputName+" average( "+inputName+" input , "+outputName+" output ) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new "+outputName+"(input.width, input.height);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tConvertInterleavedToSingle.average(input, output);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n");

@@ -60,12 +60,15 @@ public class TestConvertImage {
 			if( m.getName().contains("convert") ) {
 				checkConvert(m,inputType,outputType);
 			} else {
-				checkAverage(m,inputType,outputType);
+				if( inputType == MultiSpectral.class )
+					checkMultiAverage(m, inputType, outputType);
+				else
+					checkInterleavedAverage(m, inputType, outputType);
 			}
 			count++;
 		}
 
-		assertEquals(8*7 + 8*7+8,count);
+		assertEquals(8*7 + 8*7+8+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
@@ -117,7 +120,7 @@ public class TestConvertImage {
 			GImageMiscOps.fillUniform(input, rand, 0, 20);
 		}
 
-		BoofTesting.checkSubImage(this,"checkConvertInterleaved",true,m,input,output);
+		BoofTesting.checkSubImage(this, "checkConvertInterleaved", true, m, input, output);
 	}
 
 	public void checkConvertSingle( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
@@ -160,7 +163,7 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkAverage( Method m , Class inputType , Class outputType ) {
+	private void checkMultiAverage(Method m, Class inputType, Class outputType) {
 		if( inputType != MultiSpectral.class )
 			fail("Expected MultiSpectral image");
 
@@ -181,20 +184,20 @@ public class TestConvertImage {
 				GImageMiscOps.fillUniform(input, rand, 0, 20);
 			}
 
-			BoofTesting.checkSubImage(this,"checkAverage",true,m,input,output);
+			BoofTesting.checkSubImage(this,"checkMultiAverage",true,m,input,output);
 		}
 	}
 
-	public void checkAverage( Method m , MultiSpectral<?> input , ImageSingleBand<?> output ) {
+	public void checkMultiAverage(Method m, MultiSpectral<?> input, ImageSingleBand<?> output) {
 		try {
 			// check it with a non-null output
 			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
-			checkAverage(input, ret);
+			checkMultiAverage(input, ret);
 
 			// check it with a null output
 			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
-			checkAverage(input, ret);
+			checkMultiAverage(input, ret);
 
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -203,13 +206,69 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkAverage(  MultiSpectral<?> input , ImageSingleBand<?> found ) {
+	private void checkMultiAverage(MultiSpectral<?> input, ImageSingleBand<?> found) {
 		int numBands = input.getNumBands();
 		for( int y = 0; y < imgHeight; y++ ){
 			for( int x = 0; x < imgWidth; x++ ) {
 				double sum = 0;
 				for( int b = 0; b < numBands; b++ ) {
 					sum += GeneralizedImageOps.get(input.getBand(b),x,y);
+				}
+				assertEquals(sum/numBands,GeneralizedImageOps.get(found, x, y),1);
+			}
+		}
+	}
+
+	private void checkInterleavedAverage(Method m, Class inputType, Class outputType) {
+		if( inputType.isAssignableFrom(ImageInterleaved.class) )
+			fail("Expected ImageInterleaved image");
+
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+
+		boolean signed = true;
+
+		if( ImageInteger.class.isAssignableFrom(outputType) )
+			signed = output.getDataType().isSigned();
+
+		for( int numBands = 1; numBands <= 3; numBands++ ) {
+			ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType,imgWidth,imgHeight,numBands);
+
+			// only provide signed numbers of both data types can handle them
+			if( signed ) {
+				GImageMiscOps.fillUniform(input, rand, -10, 10);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, 0, 20);
+			}
+
+			BoofTesting.checkSubImage(this,"checkInterleavedAverage",true,m,input,output);
+		}
+	}
+
+	public void checkInterleavedAverage(Method m, ImageInterleaved input, ImageSingleBand<?> output) {
+		try {
+			// check it with a non-null output
+			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			checkInterleavedAverage(input, ret);
+
+			// check it with a null output
+			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			checkInterleavedAverage(input, ret);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkInterleavedAverage(ImageInterleaved input, ImageSingleBand<?> found) {
+		int numBands = input.getNumBands();
+		for( int y = 0; y < imgHeight; y++ ){
+			for( int x = 0; x < imgWidth; x++ ) {
+				double sum = 0;
+				for( int b = 0; b < numBands; b++ ) {
+					sum += GeneralizedImageOps.get(input,x,y,b);
 				}
 				assertEquals(sum/numBands,GeneralizedImageOps.get(found, x, y),1);
 			}
