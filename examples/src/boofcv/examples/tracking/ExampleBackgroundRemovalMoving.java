@@ -21,8 +21,8 @@ package boofcv.examples.tracking;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.alg.background.BackgroundModelMoving;
-import boofcv.alg.background.moving.BackgroundMovingBasic_IL;
+import boofcv.alg.background.moving.BackgroundMovingGaussian;
+import boofcv.alg.background.moving.BackgroundMovingGaussian_SB;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GConvertImage;
@@ -33,7 +33,10 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.image.*;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography;
@@ -45,11 +48,15 @@ import georegression.struct.homography.UtilHomography;
 // TODO Visualization.  Show input image in a window,  Difference + color in another
 public class ExampleBackgroundRemovalMoving {
 	public static void main(String[] args) {
+
+		String fileName = "../data/applet/background/horse_jitter.mjpg";
+//		String fileName = "../data/applet/shake.mjpeg";
+
 		// Configure the feature detector
 		ConfigGeneralDetector confDetector = new ConfigGeneralDetector();
-		confDetector.threshold = 5;
-		confDetector.maxFeatures = 400;
-		confDetector.radius = 4;
+		confDetector.threshold = 10;
+		confDetector.maxFeatures = 300;
+		confDetector.radius = 6;
 
 		// Use a KLT tracker
 		PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(new int[]{1, 2, 4, 8}, confDetector, 3,
@@ -58,25 +65,25 @@ public class ExampleBackgroundRemovalMoving {
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
-				FactoryMotion2D.createMotion2D(250, 2, 2, 30, 0.6, 0.5, false, tracker, new Homography2D_F64());
+				FactoryMotion2D.createMotion2D(500, 0.5, 3, 100, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
 		// TODO IL and MS don't produce identical results
-		BackgroundModelMoving background =
+//		BackgroundModelMoving background =
 //				new BackgroundMovingBasic_SB(0.05f,30,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-				new BackgroundMovingBasic_IL(0.1f,30,new PointTransformHomography_F32(),
-						TypeInterpolate.BILINEAR, ImageType.il(3, InterleavedF32.class));
+//				new BackgroundMovingBasic_IL(0.05f,30,new PointTransformHomography_F32(),
+//						TypeInterpolate.BILINEAR, ImageType.il(3, InterleavedF32.class));
 //				new BackgroundMovingBasic_MS(0.1f,30,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-//		BackgroundMovingGaussian background =
-//				new BackgroundMovingGaussian_SB(0.01f,10,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-//				new BackgroundMovingGaussian_MS(0.01f,40,new PointTransformHomography_F32(),
+		BackgroundMovingGaussian background =
+				new BackgroundMovingGaussian_SB(0.001f,20,new PointTransformHomography_F32(),
+						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
+//				new BackgroundMovingGaussian_MS(0.001f,40,new PointTransformHomography_F32(),
 //						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-//		background.setInitialVariance(64);
+		background.setInitialVariance(100);
+		background.setMinimumDifference(5);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/shake.mjpeg";
 		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
 
 		ImageUInt8 segmented = new ImageUInt8(1,1);
@@ -124,11 +131,9 @@ public class ExampleBackgroundRemovalMoving {
 			gui.repaint();
 			System.out.println("Processed!!  fps = "+fps);
 
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-
-			}
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException ignore) {}
 		}
 	}
 }

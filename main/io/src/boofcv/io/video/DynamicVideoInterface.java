@@ -60,7 +60,8 @@ public class DynamicVideoInterface implements VideoInterface {
 				return jcodec.load(fileName,imageType);
 			}
 		}
-		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ) {
+		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
+				fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
 			try {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(new FileInputStream(fileName));

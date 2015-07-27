@@ -18,16 +18,17 @@
 
 package boofcv.examples.tracking;
 
-import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.alg.background.stationary.BackgroundStationaryBasic_IL;
+import boofcv.alg.background.stationary.BackgroundStationaryGaussian;
+import boofcv.alg.background.stationary.BackgroundStationaryGaussian_SB;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.image.ImageBinaryPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.wrapper.images.LoadFileImageSequence;
+import boofcv.io.MediaManager;
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
@@ -37,22 +38,21 @@ import boofcv.struct.image.InterleavedF32;
 public class ExampleBackgroundRemovalStationary {
 	public static void main(String[] args) {
 
+		String fileName = "../data/applet/background/horse_jitter.mjpg";
 
-		BackgroundModelStationary background =
+//		BackgroundModelStationary background =
 //				new BackgroundStationaryBasic_SB(0.005f,30,ImageFloat32.class);
 //				new BackgroundStationaryBasic_MS(0.005f,30, ImageType.ms(3, ImageFloat32.class));
-				new BackgroundStationaryBasic_IL(0.005f,30, ImageType.il(3, InterleavedF32.class));
+//				new BackgroundStationaryBasic_IL(0.005f,30, ImageType.il(3, InterleavedF32.class));
 
-//		BackgroundStationaryGaussian background =
-//				new BackgroundStationaryGaussian_SB(0.001f,10, ImageFloat32.class);
+		BackgroundStationaryGaussian background =
+				new BackgroundStationaryGaussian_SB(0.001f,20, ImageFloat32.class);
 //				new BackgroundStationaryGaussian_MS(0.001f,30, ImageType.ms(3, ImageFloat32.class));
-//		background.setInitialVariance(64);
-//		background.setMinimumDifference(12);
-
-//		MediaManager media = DefaultMediaManager.INSTANCE;
-//		String fileName = "../data/applet/shake.mjpeg";
-//		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
-		LoadFileImageSequence video = new LoadFileImageSequence(background.getImageType(),"/home/pja/romotive/Vision/DetectLanding/output","jpg");
+		background.setInitialVariance(64);
+		background.setMinimumDifference(5);
+//
+		MediaManager media = DefaultMediaManager.INSTANCE;
+		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
 
 //		video.setLoop(true);
 //		video.setIndex(500);
