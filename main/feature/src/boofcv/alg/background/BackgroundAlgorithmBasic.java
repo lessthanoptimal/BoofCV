@@ -51,7 +51,15 @@ public interface BackgroundAlgorithmBasic {
 	 */
 	void setLearnRate(float learnRate);
 
+	/**
+	 * Returns the threshold for background/moving object.
+	 * @return background threshold
+	 */
 	float getThreshold();
 
+	/**
+	 * Sets the threshold for background/moving object
+	 * @param threshold background threshold
+	 */
 	void setThreshold(float threshold);
 }

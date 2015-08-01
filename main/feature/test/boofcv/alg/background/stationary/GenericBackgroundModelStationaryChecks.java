@@ -21,6 +21,7 @@ package boofcv.alg.background.stationary;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -28,6 +29,7 @@ import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -196,8 +198,64 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		alg.segment(frame, segmented);
 	}
 
-	private void noise( double mean , double range , ImageBase image ) {
+	/**
+	 * For each band in the image have all put one be filled with a constant uniform color.
+	 * Alternate which band has motion in it.
+	 */
+	@Test
+	public void checkBandsUsed() {
+		for( ImageType type : imageTypes ) {
+			checkBandsUsed(type);
+		}
+	}
+
+	private <T extends ImageBase> void checkBandsUsed( ImageType<T> imageType ) {
+
+		BackgroundModelStationary<T> alg = create(imageType);
+		T frame = imageType.createImage(width,height);
+
+		int numBands = imageType.getNumBands();
+		for (int band = 0; band < numBands; band++) {
+			alg.reset();
+			for (int i = 0; i < 30; i++) {
+				noiseBand(100, 2, frame, band);
+				alg.updateBackground(frame);
+			}
+
+			ImageUInt8 segmented = new ImageUInt8(width,height);
+
+			// segment with the current frame.  should be no motion
+			alg.segment(frame, segmented);
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					assertEquals(0,segmented.get(x,y));
+				}
+			}
+
+			// now the whole image should report motion
+			noiseBand(200, 2, frame, band);
+			alg.segment(frame, segmented);
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					assertEquals(1,segmented.get(x,y));
+				}
+			}
+		}
+	}
+
+	protected void noiseBand( double mean , double range , ImageBase image , int band ) {
+		double pixel[] = new double[ image.getImageType().getNumBands() ];
+		Arrays.fill(pixel,10);
+		for (int y = 0; y < image.height; y++) {
+			for (int x = 0; x < image.width; x++) {
+				pixel[band] = mean + rand.nextDouble()*2*range-range;
+				GeneralizedImageOps.setM(image,x,y,pixel);
+			}
+		}
+	}
+
+	protected void noise( double mean , double range , ImageBase image ) {
 		GImageMiscOps.fill(image, mean);
-		GImageMiscOps.addUniform(image,rand,-range,range);
+		GImageMiscOps.addUniform(image, rand, -range, range);
 	}
 }

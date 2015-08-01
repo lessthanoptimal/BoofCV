@@ -37,8 +37,6 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 {
 	// wrappers which provide abstraction across image types
 	protected GImageSingleBand inputWrapper;
-	// storage for multi-band pixel values
-	protected float[] pixelBG = new float[2];
 
 	// background is composed of two channels.  0 = mean, 1 = variance
 	MultiSpectral<ImageFloat32> background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,2);
@@ -130,7 +128,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 				if (chisq <= threshold) {
 					segmented.data[indexSegmented] = 0;
 				} else {
-					if( diff > minimumDifference || -diff > minimumDifference )
+					if( diff >= minimumDifference || -diff >= minimumDifference )
 						segmented.data[indexSegmented] = 1;
 					else
 						segmented.data[indexSegmented] = 0;

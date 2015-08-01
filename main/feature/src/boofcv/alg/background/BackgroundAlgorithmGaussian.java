@@ -39,6 +39,8 @@ package boofcv.alg.background;
  * <li><b>learnRate:</b>  Specifies how fast it will adapt. 0 to 1, inclusive.  0 = static  1.0 = instant. Try 0.05</li>
  * <li><b>threshold:</b>  Pixel's with a Mahalanobis distance <= threshold are assumed to be background. Consult
  * a Chi-Squared table for theoretical values.  1-band try 10.  3-bands try 20. </li>
+ * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed.  By default this is
+ * Float.MIN_VALUE.
  * </ul>
  *
  * @author Peter Abeles

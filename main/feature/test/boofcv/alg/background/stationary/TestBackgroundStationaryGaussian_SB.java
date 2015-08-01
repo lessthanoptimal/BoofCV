@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageUInt8;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundStationaryGaussian_SB extends GenericBackgroundModelStationaryChecks {
+public class TestBackgroundStationaryGaussian_SB extends GenericBackgroundStationaryGaussianChecks {
 
 	public TestBackgroundStationaryGaussian_SB() {
 		imageTypes.add(ImageType.single(ImageUInt8.class));
@@ -38,7 +38,8 @@ public class TestBackgroundStationaryGaussian_SB extends GenericBackgroundModelS
 	public <T extends ImageBase> BackgroundModelStationary<T>
 	create(ImageType<T> imageType) {
 		BackgroundStationaryGaussian alg = new BackgroundStationaryGaussian_SB(0.05f,10f,imageType.getImageClass());
-		alg.setInitialVariance(12);
+		if( !Float.isNaN(initialVariance))
+			alg.setInitialVariance(initialVariance);
 		return alg;
 	}
 }

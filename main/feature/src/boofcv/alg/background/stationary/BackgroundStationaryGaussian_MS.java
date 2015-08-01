@@ -78,6 +78,7 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 	public void updateBackground( MultiSpectral<T> frame) {
 		if( background.width == 1 ) {
 			background.reshape(frame.width, frame.height);
+			// initialize the mean to the current image and the initial variance is whatever it is set to
 			for (int band = 0; band < background.getNumBands(); band += 2) {
 				GConvertImage.convert(frame.getBand(band / 2), background.getBand(band));
 				GImageMiscOps.fill(background.getBand(band + 1), initialVariance);
@@ -108,14 +109,9 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 					float meanBG = backgroundMean.data[indexBG];
 					float varianceBG = backgroundVar.data[indexBG];
 
-					if( varianceBG < 0) {
-						backgroundMean.data[indexBG] = inputValue;
-						backgroundVar.data[indexBG] = initialVariance;
-					} else {
-						float diff = meanBG-inputValue;
-						backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
-						backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
-					}
+					float diff = meanBG-inputValue;
+					backgroundMean.data[indexBG] = minusLearn*meanBG + learnRate*inputValue;
+					backgroundVar.data[indexBG] = minusLearn*varianceBG + learnRate*diff*diff;
 				}
 
 				indexInput++;
@@ -159,7 +155,6 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 				}
 
 				if (mahalanobis <= threshold) {
-
 					segmented.data[indexSegmented] = 0;
 				} else {
 					if( minimumDifference == 0) {

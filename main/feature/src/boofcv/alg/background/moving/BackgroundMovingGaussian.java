@@ -51,7 +51,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion exten
 	 * The initial variance assigned to a new pixel.  Larger values to reduce false positives due to
 	 * under sampling
 	 */
-	protected float initialVariance = 0;
+	protected float initialVariance = Float.MIN_VALUE;
 
 	protected float minimumDifference = 0;
 

@@ -473,7 +473,7 @@ public class TestConvertBufferedImage {
 		for (int i = 0; i < numBands; i++) {
 			pixel[i] = (i+1)*10;
 		}
-		GeneralizedImageOps.set(input,5,6,pixel);
+		GeneralizedImageOps.setM(input, 5, 6, pixel);
 
 		ConvertBufferedImage.convertTo(input, output, reorder);
 
@@ -509,7 +509,7 @@ public class TestConvertBufferedImage {
 		for (int i = 0; i < numBands; i++) {
 			pixel[i] = (i+1)*10;
 		}
-		GeneralizedImageOps.set(input,5,6,pixel);
+		GeneralizedImageOps.setM(input, 5, 6, pixel);
 
 		ConvertBufferedImage.convertTo(input, output, reorder);
 

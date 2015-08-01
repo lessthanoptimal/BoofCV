@@ -62,19 +62,11 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase>
 		this.threshold = threshold;
 	}
 
-	/**
-	 * Returns the learning rate.
-	 * @return Float 0 to 1.0.  0 = very fast learning.  1.0 = no learning, fixed.
-	 */
 	@Override
 	public float getLearnRate() {
 		return learnRate;
 	}
 
-	/**
-	 * Specifies the learning rate
-	 * @param learnRate 0 to 1
-	 */
 	@Override
 	public void setLearnRate(float learnRate) {
 		this.learnRate = learnRate;

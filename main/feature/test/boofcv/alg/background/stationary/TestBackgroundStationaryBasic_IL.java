@@ -27,7 +27,7 @@ import boofcv.struct.image.InterleavedU8;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundStationaryBasic_IL extends GenericBackgroundModelStationaryChecks {
+public class TestBackgroundStationaryBasic_IL extends GenericBackgroundStationaryBasicChecks {
 
 	public TestBackgroundStationaryBasic_IL() {
 		imageTypes.add(ImageType.il(2, InterleavedU8.class));

@@ -219,7 +219,7 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static void set( ImageMultiBand img , int x , int y , double ...value ) {
+	public static void setM(ImageBase img, int x, int y, double... value) {
 		if( img instanceof MultiSpectral ) {
 			MultiSpectral ms = (MultiSpectral) img;
 
@@ -229,26 +229,29 @@ public class GeneralizedImageOps {
 		} else if( img instanceof ImageInterleaved ) {
 			for (int band = 0; band < value.length; band++) {
 				if (img instanceof InterleavedU8) {
-					((InterleavedU8) img).setBand(x, y, band, (byte)value[band]);
+					((InterleavedU8) img).setBand(x, y, band, (byte) value[band]);
 				} else if (img instanceof InterleavedS8) {
-					((InterleavedS8) img).setBand(x, y, band, (byte)value[band]);
+					((InterleavedS8) img).setBand(x, y, band, (byte) value[band]);
 				} else if (img instanceof InterleavedS16) {
-					((InterleavedS16) img).setBand(x, y, band, (short)value[band]);
+					((InterleavedS16) img).setBand(x, y, band, (short) value[band]);
 				} else if (img instanceof InterleavedU16) {
-					((InterleavedU16) img).setBand(x, y, band, (short)value[band]);
+					((InterleavedU16) img).setBand(x, y, band, (short) value[band]);
 				} else if (img instanceof InterleavedS32) {
-					((InterleavedS32) img).setBand(x, y, band, (int)value[band]);
+					((InterleavedS32) img).setBand(x, y, band, (int) value[band]);
 				} else if (img instanceof InterleavedS64) {
-					((InterleavedS64) img).setBand(x, y, band, (long)value[band]);
+					((InterleavedS64) img).setBand(x, y, band, (long) value[band]);
 				} else if (img instanceof InterleavedF32) {
-					((InterleavedF32) img).setBand(x, y, band, (float)value[band]);
+					((InterleavedF32) img).setBand(x, y, band, (float) value[band]);
 				} else if (img instanceof InterleavedF64) {
 					((InterleavedF64) img).setBand(x, y, band, value[band]);
 				} else {
 					throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 				}
 			}
-
+		} else if( img instanceof ImageSingleBand ) {
+			if( value.length != 1 )
+				throw new IllegalArgumentException("For a single band image the input pixel must have 1 band");
+			set((ImageSingleBand)img,x,y,value[0]);
 		} else {
 			throw new IllegalArgumentException("Add support for this image type!");
 		}

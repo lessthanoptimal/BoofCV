@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageUInt8;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundStationaryBasic_SB extends GenericBackgroundModelStationaryChecks {
+public class TestBackgroundStationaryBasic_SB extends GenericBackgroundStationaryBasicChecks {
 
 	public TestBackgroundStationaryBasic_SB() {
 		imageTypes.add(ImageType.single(ImageUInt8.class));
