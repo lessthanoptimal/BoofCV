@@ -126,6 +126,8 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved, Motion extends
 							background.data[indexBG] = minusLearn*bg + learnRate*value;
 						}
 					}
+				} else {
+					indexBG += numBands;
 				}
 			}
 		}

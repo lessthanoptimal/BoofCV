@@ -26,6 +26,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.homography.Homography2D_F32;
+import georegression.struct.point.Point2D_F32;
+import georegression.transform.homography.HomographyPointOps_F32;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -43,6 +46,8 @@ public abstract class GenericBackgroundModelMovingChecks {
 
 	int width = 60;
 	int height = 50;
+
+	protected double backgroundOutsideTol = 0.01;
 
 	protected List<ImageType> imageTypes = new ArrayList<ImageType>();
 
@@ -103,7 +108,8 @@ public abstract class GenericBackgroundModelMovingChecks {
 	}
 
 	/**
-	 * The current image is partially outside of the background image.  Just see if it blows up.
+	 * The current image is partially outside of the background image.  Check to see if it blows up
+	 * and that segmented pixels are correctly marked as inside or outside
 	 */
 	@Test
 	public void currentOutsideBackground() {
@@ -120,21 +126,69 @@ public abstract class GenericBackgroundModelMovingChecks {
 		BackgroundModelMoving<T, Homography2D_F32> alg = create(frame.getImageType());
 		Homography2D_F32 homeToWorld = new Homography2D_F32();
 		alg.initialize(width, height, homeToWorld);
+		alg.setUnknownValue(2);
+
+		double translationTol = backgroundOutsideTol/2;
 
 		Homography2D_F32 homeToCurrent = new Homography2D_F32();
+
 		homeToCurrent.a13 = 5;
-		alg.updateBackground(homeToCurrent,frame);
-		alg.segment(homeToCurrent,frame,segmented);
+		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
+
 		homeToCurrent.a13 = -5;
-		alg.updateBackground(homeToCurrent,frame);
-		alg.segment(homeToCurrent,frame,segmented);
+		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
+
 		homeToCurrent.a13 = 0;
 		homeToCurrent.a23 = 5;
-		alg.updateBackground(homeToCurrent,frame);
-		alg.segment(homeToCurrent,frame,segmented);
+		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
+
 		homeToCurrent.a23 = -5;
-		alg.updateBackground(homeToCurrent,frame);
-		alg.segment(homeToCurrent,frame,segmented);
+		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
+
+		// make it more interesting
+		homeToCurrent.set(1.5f, 0.1f, 4, -0.05f, 0.9f, -1f, 0, 0, 1);
+		checkTransform(frame, segmented, alg, homeToCurrent, backgroundOutsideTol);
+	}
+
+	private <T extends ImageBase> void checkTransform(T frame, ImageUInt8 segmented,
+													  BackgroundModelMoving<T, Homography2D_F32> alg,
+													  Homography2D_F32 homeToCurrent , double tol ) {
+
+		Homography2D_F32 currentToHome = homeToCurrent.invert(null);
+
+		alg.reset();
+		alg.updateBackground(homeToCurrent, frame);
+		alg.segment(homeToCurrent, frame, segmented);
+		checkSegmented(currentToHome, segmented,tol);
+		alg.segment(new Homography2D_F32(), frame, segmented);
+		checkSegmented(homeToCurrent, segmented,tol);
+	}
+
+	/**
+	 * Checks to see if pixels outside of BG are marked as unknown
+	 */
+	private void checkSegmented( Homography2D_F32 transform , ImageUInt8 segmented , double tol ) {
+
+		Point2D_F32 p = new Point2D_F32();
+
+		int numErrors = 0;
+		for (int y = 0; y < segmented.height; y++) {
+			for (int x = 0; x < segmented.width; x++) {
+				HomographyPointOps_F32.transform(transform,x,y,p);
+				int xx = (int)Math.floor(p.x);
+				int yy = (int)Math.floor(p.y);
+
+				if( segmented.isInBounds(xx,yy)) {
+					if( segmented.get(x, y) == 2)
+						numErrors++;
+				}else {
+					if( segmented.get(x, y) != 2)
+						numErrors++;
+				}
+			}
+		}
+
+		assertTrue( numErrors/(double)(segmented.width*segmented.height) <=tol );
 	}
 
 	/**

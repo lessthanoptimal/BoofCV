@@ -30,7 +30,7 @@ import georegression.struct.homography.Homography2D_F32;
 /**
  * @author Peter Abeles
  */
-public class TestBackgroundMovingBasic_MS extends GenericBackgroundModelMovingChecks {
+public class TestBackgroundMovingBasic_MS extends GenericBackgroundMovingBasicChecks {
 	public TestBackgroundMovingBasic_MS() {
 		imageTypes.add(ImageType.ms(2, ImageUInt8.class));
 		imageTypes.add(ImageType.ms(3, ImageUInt8.class));
