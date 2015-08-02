@@ -146,7 +146,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		checkTransform(frame, segmented, alg, homeToCurrent,translationTol);
 
 		// make it more interesting
-		homeToCurrent.set(1.5f, 0.1f, 4, -0.05f, 0.9f, -1f, 0, 0, 1);
+		homeToCurrent.set(1.0f, 0.6f, 20, -0.6f, 0.95f, 20, 0, 0, 1);
 		checkTransform(frame, segmented, alg, homeToCurrent, backgroundOutsideTol);
 	}
 
