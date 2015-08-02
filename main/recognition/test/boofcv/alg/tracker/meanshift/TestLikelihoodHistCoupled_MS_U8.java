@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLikelihoodHistCoupled_U8 {
+public class TestLikelihoodHistCoupled_MS_U8 {
 
 	@Test
 	public void numBins() {
-		LikelihoodHistCoupled_U8 alg = new LikelihoodHistCoupled_U8(255,30);
+		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,30);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 
@@ -49,7 +49,7 @@ public class TestLikelihoodHistCoupled_U8 {
 
 	@Test
 	public void singleColor() {
-		LikelihoodHistCoupled_U8 alg = new LikelihoodHistCoupled_U8(255,11);
+		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,11);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 
@@ -67,7 +67,7 @@ public class TestLikelihoodHistCoupled_U8 {
 
 	@Test
 	public void multipleColors() {
-		LikelihoodHistCoupled_U8 alg = new LikelihoodHistCoupled_U8(255,11);
+		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,11);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 

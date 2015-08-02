@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
-public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpectral<ImageUInt8>>
+public class LikelihoodHueSatHistCoupled_MS_U8 implements PixelLikelihood<MultiSpectral<ImageUInt8>>
 {
 	// each band in the image
 	private ImageUInt8 imageRed;
@@ -64,7 +64,7 @@ public class LikelihoodHueSatHistCoupled_U8 implements PixelLikelihood<MultiSpec
 	 * @param maxPixelValue The maximum intensity value a pixel can take on.
 	 * @param numHistogramBins Number of bins in the Hue and Saturation histogram.
 	 */
-	public LikelihoodHueSatHistCoupled_U8(int maxPixelValue, int numHistogramBins) {
+	public LikelihoodHueSatHistCoupled_MS_U8(int maxPixelValue, int numHistogramBins) {
 		minimumValue = (maxPixelValue+1)*0.01f;
 		this.numHistogramBins = numHistogramBins;
 

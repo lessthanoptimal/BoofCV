@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.struct.RectangleRotate_F32;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Quadrilateral_F64;
 
@@ -29,7 +29,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageMultiBand>
+public class Comaniciu2003_to_TrackerObjectQuad<T extends ImageBase>
 		implements TrackerObjectQuad<T>
 {
 	TrackerMeanShiftComaniciu2003<T> alg;

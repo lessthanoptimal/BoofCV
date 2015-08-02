@@ -31,14 +31,14 @@ import boofcv.struct.image.MultiSpectral;
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_S_to_MB_MultiSpectral<T extends ImageSingleBand>
+public class InterpolatePixel_MS_using_SB<T extends ImageSingleBand>
 		implements InterpolatePixelMB<MultiSpectral<T>>
 {
 	InterpolatePixelS<T> alg;
 
 	MultiSpectral<T> image;
 
-	public InterpolatePixel_S_to_MB_MultiSpectral(InterpolatePixelS<T> alg) {
+	public InterpolatePixel_MS_using_SB(InterpolatePixelS<T> alg) {
 		this.alg = alg;
 	}
 

@@ -34,7 +34,7 @@ import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -107,7 +107,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
 	 */
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageBase>
 	TrackerObjectQuad<T> meanShiftLikelihood(int maxIterations,
 											 int numBins,
 											 double maxPixelValue,
@@ -121,11 +121,16 @@ public class FactoryTrackerObjectQuad {
 				break;
 
 			case HISTOGRAM_INDEPENDENT_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue,numBins,imageType);
+				if( imageType.getNumBands() != 3 )
+					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
+				likelihood = FactoryTrackerObjectAlgs.
+						likelihoodHueSatHistIndependent(maxPixelValue, numBins, (ImageType) imageType);
 				break;
 
 			case HISTOGRAM_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,imageType);
+				if( imageType.getNumBands() != 3 )
+					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,(ImageType)imageType);
 				break;
 
 			default:
@@ -149,7 +154,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <T> Image type
 	 * @return TrackerObjectQuad based on Comaniciu2003
 	 */
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageBase>
 	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
 		if( config == null )

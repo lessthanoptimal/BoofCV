@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.tracker.meanshift;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.RectangleRotate_F32;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.stats.UtilGaussian;
 
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
 **/
-public class LocalWeightedHistogramRotRect<T extends ImageMultiBand> {
+public class LocalWeightedHistogramRotRect<T extends ImageBase> {
 
 	// Interpolation function
 	private InterpolatePixelMB<T> interpolate;

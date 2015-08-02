@@ -18,7 +18,7 @@
 
 package boofcv.factory.interpolate;
 
-import boofcv.abst.filter.interpolate.InterpolatePixel_S_to_MB_MultiSpectral;
+import boofcv.abst.filter.interpolate.InterpolatePixel_MS_using_SB;
 import boofcv.alg.interpolate.*;
 import boofcv.alg.interpolate.impl.*;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
@@ -115,7 +115,7 @@ public class FactoryInterpolation {
 	 * @param type Interpolation type
 	 * @param imageType Type of input image
 	 */
-	public static <T extends ImageMultiBand> InterpolatePixelMB<T>
+	public static <T extends ImageBase> InterpolatePixelMB<T>
 	createPixelMB(double min, double max, TypeInterpolate type, BorderType borderType, ImageType<T> imageType )
 	{
 		switch (imageType.getFamily()) {
@@ -123,16 +123,18 @@ public class FactoryInterpolation {
 			case MULTI_SPECTRAL:
 				return (InterpolatePixelMB) createPixelMS(createPixelS(min, max, type, borderType, imageType.getDataType()));
 
-			case SINGLE_BAND:
-				throw new IllegalArgumentException("Need to specify a multi-band image type");
+			case SINGLE_BAND:{
+				InterpolatePixelS interpS = createPixelS(min,max,type,borderType,imageType.getImageClass());
+				return new InterpolatePixel_S_to_MB(interpS);
+			}
 
 			case INTERLEAVED:
 				switch( type ) {
 					case NEAREST_NEIGHBOR:
-						return nearestNeighborPixelMB(imageType,borderType);
+						return nearestNeighborPixelMB((ImageType) imageType, borderType);
 
 					case BILINEAR:
-						return bilinearPixelMB(imageType,borderType);
+						return bilinearPixelMB((ImageType)imageType,borderType);
 
 					default:
 						throw new IllegalArgumentException("Interpolate type not yet support for ImageInterleaved");
@@ -154,7 +156,7 @@ public class FactoryInterpolation {
 	 */
 	public static <T extends ImageSingleBand> InterpolatePixelMB<MultiSpectral<T>>
 	createPixelMS(InterpolatePixelS<T> singleBand) {
-		return new InterpolatePixel_S_to_MB_MultiSpectral<T>(singleBand);
+		return new InterpolatePixel_MS_using_SB<T>(singleBand);
 	}
 
 	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {

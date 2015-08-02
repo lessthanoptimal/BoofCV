@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,24 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
- * Creates a histogram in a color image.  The histogram is computed in N-dimensional space, where N is the number
- * of bands in the color image.  The number of bins for each band is specified in the constructor.  There
- * is a total of N*numBins elements in the histogram.
+ * <p>
+ * Creates a histogram in a gray scale image which is then used to compute the likelihood of a color being a
+ * member of the original distribution based on its frequency.
+ * </p>
  *
+ * <p>
+ * Design Note:<br>
+ * The reason operations in {@link boofcv.alg.feature.color.GHistogramFeatureOps} is not used internally is because
+ * those are for histograms stored in double arrays, while this has to use floats/
+ * </p>
  * @author Peter Abeles
  */
-public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<ImageUInt8>>
+public class LikelihoodHistCoupled_SB_U8 implements PixelLikelihood<ImageUInt8>
 {
-	MultiSpectral<ImageUInt8> image;
+	ImageUInt8 image;
 
 	// maximum value a pixel can have.
 	int maxPixelValue;
@@ -39,22 +44,17 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	int numBins;
 	float hist[] = new float[0];
 
-	public LikelihoodHistCoupled_U8(int maxPixelValue, int numBins) {
+	public LikelihoodHistCoupled_SB_U8(int maxPixelValue, int numBins) {
 		this.maxPixelValue = maxPixelValue+1;
 		this.numBins = numBins;
 	}
 
 	@Override
-	public void setImage(MultiSpectral<ImageUInt8> image) {
+	public void setImage(ImageUInt8 image) {
 		this.image = image;
 
-		int histElements = 1;
-		for( int i = 0; i < image.getNumBands(); i++ ) {
-			histElements *= numBins;
-		}
-
-		if( hist.length != histElements ) {
-			hist = new float[histElements];
+		if( hist.length != numBins ) {
+			hist = new float[numBins];
 		}
 	}
 
@@ -69,18 +69,9 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 
 			int index = image.startIndex + (y+target.y0)*image.stride + target.x0;
 			for( int x = 0; x < target.width; x++ , index++ ) {
-				int indexBin = 0;
-				int binStride = 1;
-				for( int i = 0; i < image.getNumBands(); i++ ) {
-					ImageUInt8 band = image.getBand(i);
-					int value = band.data[index] & 0xFF;
-					int bin = numBins*value/maxPixelValue;
-
-					indexBin += bin*binStride;
-					binStride *= numBins;
-				}
-
-				hist[indexBin]++;
+				int value = image.data[index] & 0xFF;
+				int bin = numBins*value/maxPixelValue;
+				hist[bin]++;
 			}
 		}
 
@@ -93,18 +84,8 @@ public class LikelihoodHistCoupled_U8 implements PixelLikelihood<MultiSpectral<I
 	@Override
 	public float compute(int x, int y) {
 		int index = image.startIndex + y*image.stride + x;
-
-		int indexBin = 0;
-		int binStride = 1;
-		for( int i = 0; i < image.getNumBands(); i++ ) {
-			ImageUInt8 band = image.getBand(i);
-			int value = band.data[index] & 0xFF;
-			int bin = numBins*value/maxPixelValue;
-
-			indexBin += bin*binStride;
-			binStride *= numBins;
-		}
-
-		return hist[indexBin];
+		int value = image.data[index] & 0xFF;
+		int bin = numBins*value/maxPixelValue;
+		return hist[bin];
 	}
 }

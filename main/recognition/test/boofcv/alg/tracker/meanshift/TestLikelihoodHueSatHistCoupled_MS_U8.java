@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,18 +24,18 @@ import boofcv.struct.image.MultiSpectral;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
-import static boofcv.alg.tracker.meanshift.TestLikelihoodHistCoupled_U8.setColor;
+import static boofcv.alg.tracker.meanshift.TestLikelihoodHistCoupled_MS_U8.setColor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestLikelihoodHueSatHistInd_U8 {
+public class TestLikelihoodHueSatHistCoupled_MS_U8 {
 
 	@Test
 	public void numBins() {
-		LikelihoodHueSatHistInd_U8 alg = new LikelihoodHueSatHistInd_U8(255,30);
+		LikelihoodHueSatHistCoupled_MS_U8 alg = new LikelihoodHueSatHistCoupled_MS_U8(255,30);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 
@@ -44,8 +44,8 @@ public class TestLikelihoodHueSatHistInd_U8 {
 		alg.setImage(image);
 		alg.createModel(new RectangleLength2D_I32(5,6,1,1));
 
-		assertEquals(30 , alg.binsH.length);
-		assertEquals(30 , alg.binsS.length);
+		assertEquals(30 , alg.numHistogramBins);
+		assertEquals(30 * 30 , alg.bins.length);
 
 		// it comes out to a slightly larger size on purpose
 		assertEquals(2*Math.PI,alg.sizeH*30,0.01);
@@ -54,7 +54,7 @@ public class TestLikelihoodHueSatHistInd_U8 {
 
 	@Test
 	public void convertToHueSat() {
-		LikelihoodHueSatHistInd_U8 alg = new LikelihoodHueSatHistInd_U8(255,30);
+		LikelihoodHueSatHistCoupled_MS_U8 alg = new LikelihoodHueSatHistCoupled_MS_U8(255,30);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 		setColor(image,5,6,120,50,255);
@@ -62,18 +62,18 @@ public class TestLikelihoodHueSatHistInd_U8 {
 		alg.createModel(new RectangleLength2D_I32(5,6,1,1));
 
 		float hsv[] = new float[3];
-		ColorHsv.rgbToHsv(120, 50, 255, hsv);
+		ColorHsv.rgbToHsv(120,50,255,hsv);
 
 		int indexH = (int)(hsv[0]/alg.sizeH);
 		int indexS = (int)(hsv[1]/alg.sizeS);
 
-		assertEquals(1.0,alg.binsH[indexH],1e-4);
-		assertEquals(1.0,alg.binsS[indexS],1e-4);
+		int index = indexH*30 + indexS;
+		assertEquals(1.0,alg.bins[index],1e-4);
 	}
 
 	@Test
 	public void singleColor() {
-		LikelihoodHueSatHistInd_U8 alg = new LikelihoodHueSatHistInd_U8(255,5);
+		LikelihoodHueSatHistCoupled_MS_U8 alg = new LikelihoodHueSatHistCoupled_MS_U8(255,5);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 
@@ -90,7 +90,7 @@ public class TestLikelihoodHueSatHistInd_U8 {
 
 	@Test
 	public void multipleColors() {
-		LikelihoodHueSatHistInd_U8 alg = new LikelihoodHueSatHistInd_U8(255,5);
+		LikelihoodHueSatHistCoupled_MS_U8 alg = new LikelihoodHueSatHistCoupled_MS_U8(255,5);
 
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
 
@@ -108,6 +108,7 @@ public class TestLikelihoodHueSatHistInd_U8 {
 		float v0 = alg.compute(3, 4);
 		float v1 = alg.compute(11, 4);
 
+		assertEquals(1.0f,v0+v1,1e-4);
 		assertTrue(v0>v1);
 	}
 

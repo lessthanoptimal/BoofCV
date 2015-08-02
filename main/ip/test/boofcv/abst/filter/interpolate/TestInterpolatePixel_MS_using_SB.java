@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestInterpolatePixel_S_to_MB_MultiSpectral {
+public class TestInterpolatePixel_MS_using_SB {
 
 	Random rand = new Random(234);
 	int width = 30;
@@ -53,7 +53,7 @@ public class TestInterpolatePixel_S_to_MB_MultiSpectral {
 		InterpolatePixelS<ImageFloat32> interpB =
 				FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 
-		InterpolatePixelMB<MultiSpectral<ImageFloat32>> alg = new InterpolatePixel_S_to_MB_MultiSpectral<ImageFloat32>(interpB);
+		InterpolatePixelMB<MultiSpectral<ImageFloat32>> alg = new InterpolatePixel_MS_using_SB<ImageFloat32>(interpB);
 
 		MultiSpectral<ImageFloat32> mb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,2);
 		mb.bands[0] = image0;
