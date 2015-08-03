@@ -26,6 +26,7 @@ import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 16*6 + 4*8;
+		int numExpected = 17*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -138,7 +139,10 @@ public class TestImageMiscOps {
 		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
 			testFill_Single(m);
 		} else {
-			testFill_Interleaved(m);
+			if( paramTypes[1].isArray())
+				testFill_Interleaved_array(m);
+			else
+				testFill_Interleaved(m);
 		}
 	}
 
@@ -164,7 +168,7 @@ public class TestImageMiscOps {
 	private void testFill_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
-		GImageMiscOps.fillUniform(orig, rand, 0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
 		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
@@ -177,6 +181,27 @@ public class TestImageMiscOps {
 				for( int band = 0; band < numBands; band++ ) {
 					double value = GeneralizedImageOps.get(orig,j,i,band);
 					assertEquals(10.0,value,1e-4);
+				}
+			}
+		}
+	}
+
+	private void testFill_Interleaved_array(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+		GImageMiscOps.fillUniform(orig, rand, 0,20);
+
+		Object array = Array.newInstance(paramTypes[1].getComponentType(),numBands);
+		for (int i = 0; i < numBands; i++) {
+			Array.set(array, i, 2 * i + 1);
+		}
+		m.invoke(null,orig,array);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for( int band = 0; band < numBands; band++ ) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					assertEquals(2*band+1,value,1e-4);
 				}
 			}
 		}

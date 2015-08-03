@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Random;
 
@@ -41,7 +42,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(14);
+		performTests(15);
 	}
 
 	@Override
@@ -84,8 +85,17 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][7] = inputB;
 
 		} else if( name.equals("fill")) {
-			ret[0][0] = inputA;
-			ret[0][1] = 3;
+			if( param[1].isArray() ) {
+				Object array = Array.newInstance(param[1].getComponentType(), numBands);
+				for (int i = 0; i < numBands; i++) {
+					Array.set(array, i, 2 * i + 1);
+				}
+				ret[0][0] = inputA;
+				ret[0][1] = array;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+			}
 		} else if( name.equals("fillBorder")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;

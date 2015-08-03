@@ -72,6 +72,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printCopy();
 			printFill();
 			printFillInterleaved();
+			printFillInterleaved_band();
 			printFillBorder();
 			printFillRectangle();
 			printFillRectangleInterleaved();
@@ -173,6 +174,33 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\tint end = index + input.width*input.numBands;\n" +
 				"\t\t\tfor (; index < end; index++ ) {\n" +
 				"\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printFillInterleaved_band()
+	{
+		String imageName = imageType.getInterleavedName();
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print(
+				"\t/**\n" +
+				"\t * Fills each band in the image with the specified values\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param values Array which contains the values each band is to be filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+"[] values) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = input.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tfor( int band = 0; band < numBands; band++ ) {\n" +
+				"\t\t\t\tint index = input.getStartIndex() + y * input.getStride() + band;\n" +
+				"\t\t\t\tint end = index + input.width*numBands;\n" +
+				"\t\t\t\t"+imageType.getSumType()+" value = values[band];\n" +
+				"\t\t\t\tfor (; index < end; index += numBands ) {\n" +
+				"\t\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
+				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
