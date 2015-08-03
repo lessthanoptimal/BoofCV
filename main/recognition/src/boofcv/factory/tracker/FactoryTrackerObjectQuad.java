@@ -21,10 +21,8 @@ package boofcv.factory.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
@@ -157,18 +155,7 @@ public class FactoryTrackerObjectQuad {
 	public static <T extends ImageBase>
 	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
-		if( config == null )
-			config = new ConfigComaniciu2003();
-
-		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
-				config.interpolation, BorderType.EXTENDED,imageType);
-
-		LocalWeightedHistogramRotRect<T> hist =
-				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
-						imageType.getNumBands(),config.maxPixelValue,interp);
-		TrackerMeanShiftComaniciu2003<T> alg = new TrackerMeanShiftComaniciu2003<T>(
-				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
-				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
+		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config,imageType);
 
 		return new Comaniciu2003_to_TrackerObjectQuad<T>(alg,imageType);
 	}

@@ -20,6 +20,8 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.ConfigCirculantTracker;
+import boofcv.abst.tracker.ConfigComaniciu2003;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
 import boofcv.alg.tracker.meanshift.*;
@@ -119,5 +121,23 @@ public class FactoryTrackerObjectAlgs {
 				config.padding,
 				config.workSpace,
 				config.maxPixelValue,interp);
+	}
+
+	public static <T extends ImageBase>
+	TrackerMeanShiftComaniciu2003<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
+
+		if( config == null )
+			config = new ConfigComaniciu2003();
+
+		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
+				config.interpolation, BorderType.EXTENDED,imageType);
+
+		LocalWeightedHistogramRotRect<T> hist =
+				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
+						imageType.getNumBands(),config.maxPixelValue,interp);
+
+		return new TrackerMeanShiftComaniciu2003<T>(
+				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
+				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
 	}
 }
