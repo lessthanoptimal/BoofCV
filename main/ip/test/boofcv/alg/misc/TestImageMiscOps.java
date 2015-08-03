@@ -31,8 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -47,7 +46,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 17*6 + 4*8;
+		int numExpected = 19*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -61,6 +60,10 @@ public class TestImageMiscOps {
 					testCopy(m);
 				} else if( m.getName().compareTo("fill") == 0 ) {
 					testFill(m);
+				} else if( m.getName().compareTo("fillBand") == 0 ) {
+					testFillBand(m);
+				} else if( m.getName().compareTo("insertBand") == 0 ) {
+					testInsertBand(m);
 				} else if( m.getName().compareTo("fillBorder") == 0 ) {
 					testFillBorder(m);
 				} else if( m.getName().compareTo("fillRectangle") == 0 ) {
@@ -149,7 +152,7 @@ public class TestImageMiscOps {
 	private void testFill_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GImageMiscOps.fillUniform(orig, rand, 0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
 		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
@@ -191,11 +194,11 @@ public class TestImageMiscOps {
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 		GImageMiscOps.fillUniform(orig, rand, 0,20);
 
-		Object array = Array.newInstance(paramTypes[1].getComponentType(),numBands);
+		Object array = Array.newInstance(paramTypes[1].getComponentType(), numBands);
 		for (int i = 0; i < numBands; i++) {
 			Array.set(array, i, 2 * i + 1);
 		}
-		m.invoke(null,orig,array);
+		m.invoke(null, orig, array);
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -204,6 +207,68 @@ public class TestImageMiscOps {
 					assertEquals(2*band+1,value,1e-4);
 				}
 			}
+		}
+	}
+
+	private void testFillBand(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+
+		for (int band = 0; band < numBands; band++) {
+			GImageMiscOps.fillUniform(orig, rand, 0, 20);
+			if( orig.getDataType().isInteger()) {
+				m.invoke(null,orig,band,10);
+			} else {
+				m.invoke(null,orig,band,10.0f);
+			}
+
+			int numMatch = 0;
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					for (int k = 0; k < numBands; k++) {
+						double value = GeneralizedImageOps.get(orig,j,i,k);
+						if( k == band ) {
+							assertEquals(10.0,value,1e-4);
+						} else {
+							if( 10.0 == value ) numMatch++;
+						}
+					}
+				}
+			}
+
+			assertFalse(numMatch > width * height * (numBands - 1) / 5);
+		}
+	}
+
+	private void testInsertBand(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(paramTypes[2], width, height, numBands);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		for (int band = 0; band < numBands; band++) {
+			GImageMiscOps.fillUniform(output, rand, 0, 20);
+
+			m.invoke(null, input, band, output);
+
+			int numMatch = 0;
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					double valueIn = GeneralizedImageOps.get(input,j,i);
+
+					for (int k = 0; k < numBands; k++) {
+						double valueOut = GeneralizedImageOps.get(output,j,i,k);
+						if( k == band ) {
+							assertEquals(valueIn,valueOut,1e-4);
+						} else {
+							if( valueIn == valueOut ) numMatch++;
+						}
+					}
+				}
+			}
+
+			assertFalse(numMatch > width * height * (numBands - 1) / 5);
 		}
 	}
 

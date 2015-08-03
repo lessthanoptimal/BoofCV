@@ -102,6 +102,10 @@ Version : Alpha 0.19
   * General cleaning up the API
   * Fewer functions, but uses enum for specific type
   * Function for AnyImageDerivative is clearly named and more useful
+- ImageMiscOps
+  * fill band
+  * fill bands
+  * insert band
 
 TODO
   * Distortion Model + Calibration

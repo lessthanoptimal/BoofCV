@@ -107,11 +107,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				int value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = (byte)value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedI8 input, int band , int value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = (byte)value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageInt8 input, int band , InterleavedI8 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}
@@ -513,11 +552,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				int value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = (short)value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedI16 input, int band , int value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = (short)value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageInt16 input, int band , InterleavedI16 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}
@@ -919,11 +997,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				int value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedS32 input, int band , int value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageSInt32 input, int band , InterleavedS32 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}
@@ -1325,11 +1442,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				long value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedS64 input, int band , long value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageSInt64 input, int band , InterleavedS64 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}
@@ -1731,11 +1887,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				float value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedF32 input, int band , float value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageFloat32 input, int band , InterleavedF32 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}
@@ -2137,11 +2332,50 @@ public class ImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands;
+				int end = index + input.width*numBands - band;
 				double value = values[band];
 				for (; index < end; index += numBands ) {
 					input.data[index] = value;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Fills one band in the image with the specified value
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value   
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand(InterleavedF64 input, int band , double value) {
+
+		final int numBands = input.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int index = input.getStartIndex() + y * input.getStride() + band;
+			int end = index + input.width*numBands - band;
+			for (; index < end; index += numBands ) {
+				input.data[index] = value;
+			}
+		}
+	}
+
+	/**
+	 * Inserts a single band into into one of the bands in a multi-band image
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageFloat64 input, int band , InterleavedF64 output) {
+
+		final int numBands = output.numBands;
+		for (int y = 0; y < input.height; y++) {
+			int indexIn = input.getStartIndex() + y * input.getStride();
+			int indexOut = output.getStartIndex() + y * output.getStride() + band;
+			int end = indexOut + output.width*numBands - band;
+			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
+				output.data[indexOut] = input.data[indexIn];
 			}
 		}
 	}

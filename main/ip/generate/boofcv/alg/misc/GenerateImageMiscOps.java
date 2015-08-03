@@ -72,7 +72,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printCopy();
 			printFill();
 			printFillInterleaved();
-			printFillInterleaved_band();
+			printFillInterleaved_bands();
+			printFillBand_Interleaved();
+			printInsertBandInterleaved();
 			printFillBorder();
 			printFillRectangle();
 			printFillRectangleInterleaved();
@@ -179,7 +181,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printFillInterleaved_band()
+	public void printFillInterleaved_bands()
 	{
 		String imageName = imageType.getInterleavedName();
 		String typeCast = imageType.getTypeCastFromSum();
@@ -196,11 +198,62 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tfor( int band = 0; band < numBands; band++ ) {\n" +
 				"\t\t\t\tint index = input.getStartIndex() + y * input.getStride() + band;\n" +
-				"\t\t\t\tint end = index + input.width*numBands;\n" +
+				"\t\t\t\tint end = index + input.width*numBands - band;\n" +
 				"\t\t\t\t"+imageType.getSumType()+" value = values[band];\n" +
 				"\t\t\t\tfor (; index < end; index += numBands ) {\n" +
 				"\t\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
 				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printFillBand_Interleaved()
+	{
+		String imageName = imageType.getInterleavedName();
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print(
+				"\t/**\n" +
+				"\t * Fills one band in the image with the specified value\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param band Which band is to be filled with the specified value   \n" +
+				"\t * @param value The value that the image is being filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void fillBand("+imageName+" input, int band , "+imageType.getSumType()+" value) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = input.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride() + band;\n" +
+				"\t\t\tint end = index + input.width*numBands - band;\n" +
+				"\t\t\tfor (; index < end; index += numBands ) {\n" +
+				"\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printInsertBandInterleaved()
+	{
+		String singleName = imageType.getSingleBandName();
+		String interleavedName = imageType.getInterleavedName();
+		out.print(
+				"\t/**\n" +
+				"\t * Inserts a single band into into one of the bands in a multi-band image\n" +
+				"\t *\n" +
+				"\t * @param input Single band image\n" +
+				"\t * @param band Which band the image is to be inserted into\n" +
+				"\t * @param output The multi-band image which the input image is to be inserted into\n" +
+				"\t */\n" +
+				"\tpublic static void insertBand( "+singleName+" input, int band , "+interleavedName+" output) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = output.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint indexIn = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride() + band;\n" +
+				"\t\t\tint end = indexOut + output.width*numBands - band;\n" +
+				"\t\t\tfor (; indexOut < end; indexOut += numBands , indexIn++ ) {\n" +
+				"\t\t\t\toutput.data[indexOut] = input.data[indexIn];\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

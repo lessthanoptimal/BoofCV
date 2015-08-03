@@ -168,6 +168,70 @@ public class GImageMiscOps {
 	}
 
 	/**
+	 * Computes the mean of the absolute value of the difference between the two images.
+	 *
+	 * @param input An image.
+	 * @param band Which band is to be filled with the specified value
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void fillBand( ImageMultiBand input , int band , double value ) {
+		if( input instanceof ImageInterleaved ) {
+			if( InterleavedI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBand((InterleavedI8) input, band, (int) value);
+			} else if( InterleavedI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBand((InterleavedI16) input, band, (int) value);
+			} else if( InterleavedS32.class == input.getClass() ) {
+				ImageMiscOps.fillBand((InterleavedS32) input, band, (int) value);
+			} else if( InterleavedS64.class == input.getClass() ) {
+				ImageMiscOps.fillBand((InterleavedS64) input, band, (long) value);
+			} else if( InterleavedF32.class == input.getClass() ) {
+				ImageMiscOps.fillBand((InterleavedF32) input, band, (float) value);
+			} else if( InterleavedF64.class == input.getClass() ) {
+				ImageMiscOps.fillBand((InterleavedF64) input, band, value);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)input;
+			fill(m.getBand(band),value);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Computes the mean of the absolute value of the difference between the two images.
+	 *
+	 * @param input Single band image
+	 * @param band Which band the image is to be inserted into
+	 * @param output The multi-band image which the input image is to be inserted into
+	 */
+	public static void insertBand( ImageSingleBand input , int band , ImageMultiBand output ) {
+		if( output instanceof ImageInterleaved ) {
+			if( InterleavedI8.class.isAssignableFrom(output.getClass()) ) {
+				ImageMiscOps.insertBand((ImageInt8) input, band, (InterleavedI8) output);
+			} else if( InterleavedI16.class.isAssignableFrom(output.getClass()) ) {
+				ImageMiscOps.insertBand((ImageInt16) input, band, (InterleavedI16) output);
+			} else if( InterleavedS32.class == output.getClass() ) {
+				ImageMiscOps.insertBand((ImageSInt32) input, band, (InterleavedS32) output);
+			} else if( InterleavedS64.class == output.getClass() ) {
+				ImageMiscOps.insertBand((ImageSInt64) input, band, (InterleavedS64) output);
+			} else if( InterleavedF32.class == output.getClass() ) {
+				ImageMiscOps.insertBand((ImageFloat32) input, band, (InterleavedF32) output);
+			} else if( InterleavedF64.class == output.getClass() ) {
+				ImageMiscOps.insertBand((ImageFloat64) input, band, (InterleavedF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( output instanceof MultiSpectral ) {
+			MultiSpectral m = (MultiSpectral)output;
+			m.getBand(band).setTo(input);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * Fills the outside border with the specified value
 	 *
 	 * @param input An image.
