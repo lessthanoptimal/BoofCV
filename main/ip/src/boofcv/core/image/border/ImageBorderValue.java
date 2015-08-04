@@ -43,8 +43,14 @@ public class ImageBorderValue {
 	}
 
 	public static ImageBorder wrap( ImageInterleaved image , double value ) {
-		if( image instanceof InterleavedF32 ) {
-			return new Value_ILF32((InterleavedF32)image,(float)value);
+		if (image instanceof InterleavedF32) {
+			return new Value_IL_F32((InterleavedF32) image, (float) value);
+		} else if (image instanceof InterleavedF64) {
+			return new Value_IL_F64((InterleavedF64) image, value);
+		} else if (InterleavedInteger.class.isAssignableFrom(image.getClass())) {
+			return new Value_IL_S32((InterleavedInteger)image,(int)value );
+		} else if( image instanceof InterleavedS64 ) {
+			return new Value_IL_S64((InterleavedS64)image,(long)value );
 		} else {
 			throw new RuntimeException("Add support for more types");
 		}
@@ -158,18 +164,12 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static class Value_ILF32 extends ImageBorder_IL_F32 {
+	public static class Value_IL_F32 extends ImageBorder_IL_F32 {
 		float value;
 
-		public Value_ILF32( InterleavedF32 image , float value ) {
-			super(image);
-			this.value = value;
-		}
+		public Value_IL_F32(InterleavedF32 image, float value) {super(image); this.value = value; }
 
-		public Value_ILF32(float value) {
-			this.value = value;
-		}
-
+		public Value_IL_F32(float value) { this.value = value; }
 
 		@Override
 		public void getOutside(int x, int y, float[] pixel) {
@@ -178,5 +178,53 @@ public class ImageBorderValue {
 
 		@Override
 		public void setOutside(int x, int y, float[] pixel) {}
+	}
+
+	public static class Value_IL_F64 extends ImageBorder_IL_F64 {
+		double value;
+
+		public Value_IL_F64(InterleavedF64 image, double value) {super(image); this.value = value; }
+
+		public Value_IL_F64(double value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, double[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, double[] pixel) {}
+	}
+
+	public static class Value_IL_S32 extends ImageBorder_IL_S32 {
+		int value;
+
+		public Value_IL_S32(InterleavedInteger image, int value) {super(image); this.value = value; }
+
+		public Value_IL_S32(int value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, int[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, int[] pixel) {}
+	}
+
+	public static class Value_IL_S64 extends ImageBorder_IL_S64 {
+		long value;
+
+		public Value_IL_S64(InterleavedS64 image, long value) {super(image); this.value = value; }
+
+		public Value_IL_S64(long value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, long[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, long[] pixel) {}
 	}
 }

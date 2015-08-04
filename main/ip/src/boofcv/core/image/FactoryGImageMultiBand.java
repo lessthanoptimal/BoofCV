@@ -20,6 +20,9 @@ package boofcv.core.image;
 
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_IL_F32;
+import boofcv.core.image.border.ImageBorder_IL_F64;
+import boofcv.core.image.border.ImageBorder_IL_S32;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 
 /**
@@ -343,16 +346,45 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( ImageBorder image ) {
-		if( image instanceof ImageBorder_IL_F32) {
-			return new Border_ILF32((ImageBorder_IL_F32) image);
+		if( image instanceof ImageBorder_IL_S32) {
+			return new Border_IL_S32((ImageBorder_IL_S32) image);
+		} else if( image instanceof ImageBorder_IL_F32) {
+			return new Border_IL_F32((ImageBorder_IL_F32) image);
+		} else if( image instanceof ImageBorder_IL_F64) {
+			return new Border_IL_F64((ImageBorder_IL_F64) image);
 		} else {
 			throw new IllegalArgumentException("Not supported yet?");
 		}
 	}
 
-	public static class Border_ILF32 extends GMultiBorder<ImageBorder_IL_F32> {
+	public static class Border_IL_S32 extends GMultiBorder<ImageBorder_IL_S32> {
 
-		public Border_ILF32(ImageBorder_IL_F32 image) {
+		public Border_IL_S32(ImageBorder_IL_S32 image) {
+			super(image);
+		}
+
+		@Override
+		public int getNumberOfBands() {
+			return ((ImageMultiBand)image.getImage()).getNumBands();
+		}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			int value_d[] = BoofMiscOps.convertArray(value,(int[])null);
+			image.set(x,y,value_d);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			int value_d[] = new int[value.length];
+			image.get(x,y,value_d);
+			BoofMiscOps.convertArray(value_d,value);
+		}
+	}
+
+	public static class Border_IL_F32 extends GMultiBorder<ImageBorder_IL_F32> {
+
+		public Border_IL_F32(ImageBorder_IL_F32 image) {
 			super(image);
 		}
 
@@ -369,6 +401,31 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void get(int x, int y, float[] value) {
 			image.get(x,y,value);
+		}
+	}
+
+	public static class Border_IL_F64 extends GMultiBorder<ImageBorder_IL_F64> {
+
+		public Border_IL_F64(ImageBorder_IL_F64 image) {
+			super(image);
+		}
+
+		@Override
+		public int getNumberOfBands() {
+			return ((ImageMultiBand)image.getImage()).getNumBands();
+		}
+
+		@Override
+		public void set(int x, int y, float[] value) {
+			double value_d[] = BoofMiscOps.convertArray(value,(double[])null);
+			image.set(x,y,value_d);
+		}
+
+		@Override
+		public void get(int x, int y, float[] value) {
+			double value_d[] = new double[value.length];
+			image.get(x,y,value_d);
+			BoofMiscOps.convertArray(value_d,value);
 		}
 	}
 

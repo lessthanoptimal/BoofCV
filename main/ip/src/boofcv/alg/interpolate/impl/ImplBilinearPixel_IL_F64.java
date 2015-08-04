@@ -18,9 +18,9 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelMB;
-import boofcv.core.image.border.ImageBorder_IL_F32;
+import boofcv.core.image.border.ImageBorder_IL_F64;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedF64;
 
 
 /**
@@ -34,26 +34,26 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
-	float temp0[];
-	float temp1[];
-	float temp2[];
-	float temp3[];
+public class ImplBilinearPixel_IL_F64 extends BilinearPixelMB<InterleavedF64> {
+	double temp0[];
+	double temp1[];
+	double temp2[];
+	double temp3[];
 
-	public ImplBilinearPixel_IL_F32(int numBands) {
-		this.temp0 = new float[numBands];
-		this.temp1 = new float[numBands];
-		this.temp2 = new float[numBands];
-		this.temp3 = new float[numBands];
+	public ImplBilinearPixel_IL_F64(int numBands) {
+		this.temp0 = new double[numBands];
+		this.temp1 = new double[numBands];
+		this.temp2 = new double[numBands];
+		this.temp3 = new double[numBands];
 	}
 
-	public ImplBilinearPixel_IL_F32(InterleavedF32 orig) {
+	public ImplBilinearPixel_IL_F64(InterleavedF64 orig) {
 		this(orig.getNumBands());
 		setImage(orig);
 	}
 
 	@Override
-	public void setImage(InterleavedF32 image) {
+	public void setImage(InterleavedF64 image) {
 		if( image.getNumBands() != temp0.length )
 			throw new IllegalArgumentException("Number of bands doesn't match");
 		super.setImage(image);
@@ -62,29 +62,29 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 	public void get_fast(float x, float y, float[] values) {
 		int xt = (int) x;
 		int yt = (int) y;
-		float ax = x - xt;
-		float ay = y - yt;
+		double ax = x - xt;
+		double ay = y - yt;
 
 		final int numBands = orig.numBands;
 		int index = orig.startIndex + yt * stride + xt*numBands;
 
-		float[] data = orig.data;
+		double[] data = orig.data;
 
 		// computing this just once doesn't seem to change speed very much.  Keeping it here to avoid trying
 		// it again in the future
-		float a00 = (1.0f - ax) * (1.0f - ay);
-		float a10 = ax * (1.0f - ay);
-		float a11 = ax * ay;
-		float a01 = (1.0f - ax) * ay;
+		double a00 = (1.0f - ax) * (1.0f - ay);
+		double a10 = ax * (1.0f - ay);
+		double a11 = ax * ay;
+		double a01 = (1.0f - ax) * ay;
 
 		for( int i = 0; i < numBands; i++ ) {
 			int indexBand = index+i;
-			float val = a00 * (data[indexBand] );                // (x,y)
+			double val = a00 * (data[indexBand] );                // (x,y)
 			val += a10 * (data[indexBand + numBands ] );         // (x+1,y)
 			val += a11 * (data[indexBand + numBands + stride] ); // (x+1,y+1)
 			val += a01 * (data[indexBand + stride] );            // (x,y+1)
 
-			values[i] = val;
+			values[i] = (float)val;
 		}
 	}
 
@@ -96,7 +96,7 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 		float ax = x - xf;
 		float ay = y - yf;
 
-		ImageBorder_IL_F32 border = (ImageBorder_IL_F32)this.border;
+		ImageBorder_IL_F64 border = (ImageBorder_IL_F64)this.border;
 		border.get(xt   , yt  , temp0);
 		border.get(xt+1 , yt  , temp1);
 		border.get(xt+1 , yt+1, temp2);
@@ -105,10 +105,10 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 		final int numBands = orig.numBands;
 
 		for( int i = 0; i < numBands; i++ ) {
-			float val = (1.0f - ax) * (1.0f - ay) * temp0[i]; // (x,y)
-			val += ax * (1.0f - ay) * temp1[i];               // (x+1,y)
-			val += ax * ay * temp2[i];                        // (x+1,y+1)
-			val += (1.0f - ax) * ay * temp3[i];               // (x,y+1)
+			float val = (1.0f - ax) * (1.0f - ay) * (float)temp0[i]; // (x,y)
+			val += ax * (1.0f - ay) * (float)temp1[i];               // (x+1,y)
+			val += ax * ay * (float)temp2[i];                        // (x+1,y+1)
+			val += (1.0f - ax) * ay * (float)temp3[i];               // (x,y+1)
 
 			values[i] = val;
 		}
@@ -123,7 +123,7 @@ public class ImplBilinearPixel_IL_F32 extends BilinearPixelMB<InterleavedF32> {
 	}
 
 	@Override
-	public ImageType<InterleavedF32> getImageType() {
+	public ImageType<InterleavedF64> getImageType() {
 		return orig.getImageType();
 	}
 

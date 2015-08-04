@@ -19,22 +19,23 @@
 package boofcv.core.image.border;
 
 import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedF64;
 
 /**
  * Child of {@link ImageBorder} for {@link InterleavedF32}.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_IL_F32 extends ImageBorder<InterleavedF32> {
+public abstract class ImageBorder_IL_F64 extends ImageBorder<InterleavedF64> {
 
-	public ImageBorder_IL_F32(InterleavedF32 image) {
+	public ImageBorder_IL_F64(InterleavedF64 image) {
 		super(image);
 	}
 
-	protected ImageBorder_IL_F32() {
+	protected ImageBorder_IL_F64() {
 	}
 
-	public void set( int x , int y , float[] pixel ) {
+	public void set( int x , int y , double[] pixel ) {
 		if (image.isInBounds(x, y)) {
 			image.set_unsafe(x, y, pixel);
 		} else {
@@ -42,7 +43,7 @@ public abstract class ImageBorder_IL_F32 extends ImageBorder<InterleavedF32> {
 		}
 	}
 
-	public void get( int x , int y , float[] pixel ) {
+	public void get( int x , int y , double[] pixel ) {
 		if( image.isInBounds(x,y) ) {
 			image.get_unsafe(x, y, pixel);
 		} else {
@@ -50,13 +51,13 @@ public abstract class ImageBorder_IL_F32 extends ImageBorder<InterleavedF32> {
 		}
 	}
 
-	public abstract void getOutside( int x , int y , float[] pixel);
+	public abstract void getOutside( int x , int y , double[] pixel);
 
-	public abstract void setOutside( int x , int y , float[] pixel);
+	public abstract void setOutside( int x , int y , double[] pixel);
 
 	@Override
 	public void getGeneral(int x, int y, double[] pixel ) {
-		float[] tmp = new float[pixel.length];
+		double[] tmp = new double[pixel.length];
 		get(x,y,tmp);
 		for (int i = 0; i < pixel.length; i++) {
 			pixel[i] = tmp[i];
@@ -65,9 +66,9 @@ public abstract class ImageBorder_IL_F32 extends ImageBorder<InterleavedF32> {
 
 	@Override
 	public void setGeneral(int x, int y, double[] pixel ) {
-		float[] tmp = new float[pixel.length];
+		double[] tmp = new double[pixel.length];
 		for (int i = 0; i < pixel.length; i++) {
-			tmp[i] = (float)pixel[i];
+			tmp[i] = pixel[i];
 		}
 		set(x, y, tmp);
 	}

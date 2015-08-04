@@ -37,7 +37,14 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 				ImageType.single(ImageSInt64.class),
 				ImageType.single(ImageFloat32.class),
 				ImageType.single(ImageFloat64.class),
-				ImageType.il(2,InterleavedF32.class));
+				ImageType.il(2,InterleavedU8.class),
+				ImageType.il(2,InterleavedU16.class),
+				ImageType.il(2,InterleavedS32.class),
+				ImageType.il(2,InterleavedS64.class),
+				ImageType.il(2,InterleavedF32.class),
+				ImageType.il(2,InterleavedF64.class)
+				);
+
 	}
 
 	@Override

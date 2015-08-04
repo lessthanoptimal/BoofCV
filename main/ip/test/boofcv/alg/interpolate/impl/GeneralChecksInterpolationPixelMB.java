@@ -383,8 +383,8 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 
 				interpMB.get(x+0.2f,y+0.3f,values);
 
-				assertEquals(val0,values[0],1e-6f);
-				assertEquals(val1,values[1],1e-6f);
+				assertEquals(val0,values[0],1e-4f);
+				assertEquals(val1,values[1],1e-4f);
 			}
 		}
 	}

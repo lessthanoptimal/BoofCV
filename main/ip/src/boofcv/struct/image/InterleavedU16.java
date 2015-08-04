@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class InterleavedU16 extends InterleavedI16 {
+public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 
 	/**
 	 * Creates a new image with an arbitrary number of bands/colors.
@@ -44,6 +44,14 @@ public class InterleavedU16 extends InterleavedI16 {
 	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.U16;
+	}
+
+	@Override
+	public void get_unsafe(int x, int y, int[] storage) {
+		int index = getIndex(x, y, 0);
+		for (int i = 0; i < numBands; i++, index++) {
+			storage[i] = data[index] & 0xFFFF;
+		}
 	}
 
 	/**

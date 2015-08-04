@@ -203,8 +203,24 @@ public class FactoryInterpolation {
 		int numBands = imageType.getNumBands();
 		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType()) {
+				case U8:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_U8(numBands);
+					break;
+
+				case S16:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_S16(numBands);
+					break;
+
+				case S32:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_S32(numBands);
+					break;
+
 				case F32:
 					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_F32(numBands);
+					break;
+
+				case F64:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_F64(numBands);
 					break;
 
 				default:

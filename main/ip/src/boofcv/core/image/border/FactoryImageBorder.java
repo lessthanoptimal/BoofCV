@@ -194,6 +194,12 @@ public class FactoryImageBorder {
 
 		if( imageType == InterleavedF32.class )
 			return (ImageBorder<T>)new ImageBorder1D_IL_F32(borderClass);
+		else if( imageType == InterleavedF64.class )
+			return (ImageBorder<T>)new ImageBorder1D_IL_F64(borderClass);
+		else if( InterleavedInteger.class.isAssignableFrom(imageType) )
+			return (ImageBorder<T>)new ImageBorder1D_IL_S32(borderClass);
+		else if( imageType == InterleavedS64.class )
+			return (ImageBorder<T>)new ImageBorder1D_IL_S64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
@@ -260,7 +266,13 @@ public class FactoryImageBorder {
 	 */
 	public static <T extends ImageInterleaved> ImageBorder<T> interleavedValue(Class<T> imageType, double value) {
 		if( imageType == InterleavedF32.class ) {
-			return (ImageBorder<T>)new ImageBorderValue.Value_ILF32((float)value);
+			return (ImageBorder<T>) new ImageBorderValue.Value_IL_F32((float) value);
+		} else if( imageType == InterleavedF64.class ) {
+				return (ImageBorder<T>)new ImageBorderValue.Value_IL_F64(value);
+		} else if( InterleavedInteger.class.isAssignableFrom(imageType) ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_IL_S32((int)value);
+		} else if( imageType == InterleavedS64.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_IL_S64((long)value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}

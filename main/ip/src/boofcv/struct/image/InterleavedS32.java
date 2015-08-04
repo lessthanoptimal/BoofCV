@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
+public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 
 	public int data[];
 
@@ -48,28 +48,13 @@ public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
 		return ImageDataType.S32;
 	}
 
-	/**
-	 * Returns the pixel's value for all the bands as an array.
-	 *
-	 * @param x	   pixel coordinate.
-	 * @param y	   pixel coordinate.
-	 * @param storage If not null then the pixel's value is written here.  If null a new array is created.
-	 * @return The pixel's value.
-	 */
-	public int[] get(int x, int y, int[] storage) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		if (storage == null) {
-			storage = new int[numBands];
-		}
-
+	@Override
+	public void get_unsafe(int x, int y, int[] storage) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
 		}
-
-		return storage;
 	}
 
 	/**
@@ -79,10 +64,8 @@ public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value for each band.
 	 */
-	public void set(int x, int y, int... value) {
-		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
-
+	@Override
+	public void set_unsafe(int x, int y, int... value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];
@@ -97,6 +80,7 @@ public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
 	 * @param band which color band in the pixel
 	 * @return an intensity value.
 	 */
+	@Override
 	public int getBand(int x, int y, int band) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");
@@ -114,6 +98,7 @@ public class InterleavedS32 extends ImageInterleaved<InterleavedS32> {
 	 * @param band  which color band in the pixel
 	 * @param value The new value of the element.
 	 */
+	@Override
 	public void setBand(int x, int y, int band, int value) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds.");

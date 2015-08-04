@@ -18,17 +18,17 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedInteger;
 
 
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_IL_F32 extends ImageBorder_IL_F32 {
+public class ImageBorder1D_IL_S32<T extends InterleavedInteger> extends ImageBorder_IL_S32<T> {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 
-	public ImageBorder1D_IL_F32(Class<?> type) {
+	public ImageBorder1D_IL_S32(Class<?> type) {
 		try {
 			this.rowWrap = (BorderIndex1D)type.newInstance();
 			this.colWrap = (BorderIndex1D)type.newInstance();
@@ -39,7 +39,7 @@ public class ImageBorder1D_IL_F32 extends ImageBorder_IL_F32 {
 		}
 	}
 
-	public ImageBorder1D_IL_F32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_IL_S32(BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
 	}
@@ -53,19 +53,19 @@ public class ImageBorder1D_IL_F32 extends ImageBorder_IL_F32 {
 	}
 
 	@Override
-	public void setImage( InterleavedF32 image ) {
+	public void setImage(T image) {
 		super.setImage(image);
 		colWrap.setLength(image.width);
 		rowWrap.setLength(image.height);
 	}
 
 	@Override
-	public void getOutside(int x, int y, float pixel[] ) {
+	public void getOutside(int x, int y, int pixel[] ) {
 		image.get_unsafe(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}
 
 	@Override
-	public void setOutside(int x, int y, float[] pixel) {
-		image.set_unsafe(colWrap.getIndex(x) , rowWrap.getIndex(y),pixel);
+	public void setOutside(int x, int y, int[] pixel) {
+		image.set_unsafe(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}
 }
