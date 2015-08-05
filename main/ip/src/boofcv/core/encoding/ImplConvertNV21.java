@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.android;
+package boofcv.core.encoding;
 
 import boofcv.struct.image.*;
 
