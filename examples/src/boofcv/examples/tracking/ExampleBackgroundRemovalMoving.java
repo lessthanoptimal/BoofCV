@@ -21,11 +21,12 @@ package boofcv.examples.tracking;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.alg.background.moving.BackgroundMovingGaussian;
-import boofcv.alg.background.moving.BackgroundMovingGaussian_SB;
+import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GConvertImage;
+import boofcv.factory.background.ConfigBackgroundBasic;
+import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.gui.image.ImageBinaryPanel;
@@ -52,6 +53,11 @@ public class ExampleBackgroundRemovalMoving {
 		String fileName = "../data/applet/background/horse_jitter.mjpg";
 //		String fileName = "../data/applet/shake.mjpeg";
 
+		ImageType imageType = ImageType.single(ImageFloat32.class);
+//		ImageType imageType = ImageType.ms(3, ImageFloat32.class);
+//		ImageType imageType = ImageType.il(3, InterleavedF32.class);
+//		ImageType imageType = ImageType.il(3, InterleavedU8.class);
+
 		// Configure the feature detector
 		ConfigGeneralDetector confDetector = new ConfigGeneralDetector();
 		confDetector.threshold = 10;
@@ -59,29 +65,24 @@ public class ExampleBackgroundRemovalMoving {
 		confDetector.radius = 6;
 
 		// Use a KLT tracker
-		PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(new int[]{1, 2, 4, 8}, confDetector, 3,
-				ImageFloat32.class, ImageFloat32.class);
+		PointTracker tracker = FactoryPointTracker.klt(new int[]{1, 2, 4, 8}, confDetector, 3,
+				ImageFloat32.class, null);
 
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(500, 0.5, 3, 100, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
-		// TODO IL and MS don't produce identical results
-//		BackgroundModelMoving background =
-//				new BackgroundMovingBasic_SB(0.05f,30,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-//				new BackgroundMovingBasic_IL(0.05f,30,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.il(3, InterleavedF32.class));
-//				new BackgroundMovingBasic_MS(0.1f,30,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-		BackgroundMovingGaussian background =
-				new BackgroundMovingGaussian_SB(0.001f,20,new PointTransformHomography_F32(),
-						TypeInterpolate.BILINEAR, ImageType.single(ImageFloat32.class));
-//				new BackgroundMovingGaussian_MS(0.001f,40,new PointTransformHomography_F32(),
-//						TypeInterpolate.BILINEAR, ImageType.ms(3, ImageFloat32.class));
-		background.setInitialVariance(100);
-		background.setMinimumDifference(5);
+		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.05f);
+
+		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(40,0.001f);
+		configGaussian.initialVariance = 64;
+		configGaussian.minimumDifference = 5;
+
+		BackgroundModelMoving background =
+//				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
+				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
+
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
@@ -93,8 +94,8 @@ public class ExampleBackgroundRemovalMoving {
 
 		ImageBinaryPanel gui = null;
 
-		double fps = 30;
-		double alpha = 0.05;
+		double fps = 0;
+		double alpha = 0.01; // smoothing factor for FPS
 
 		while( video.hasNext() ) {
 			ImageBase input = video.next();
@@ -126,14 +127,11 @@ public class ExampleBackgroundRemovalMoving {
 
 			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
 
-//			System.out.println("sum = "+ ImageStatistics.sum(segmented)+" "+ImageStatistics.max(segmented));
 			gui.setBinaryImage(segmented);
 			gui.repaint();
-			System.out.println("Processed!!  fps = "+fps);
+			System.out.println("FPS = "+fps);
 
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException ignore) {}
+			try {Thread.sleep(5);} catch (InterruptedException e) {}
 		}
 	}
 }

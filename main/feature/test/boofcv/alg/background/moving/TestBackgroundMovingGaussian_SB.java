@@ -42,7 +42,7 @@ public class TestBackgroundMovingGaussian_SB extends GenericBackgroundMovingGaus
 	create(ImageType<T> imageType) {
 		PointTransformHomography_F32 transform = new PointTransformHomography_F32();
 		BackgroundMovingGaussian_SB alg =
-				new BackgroundMovingGaussian_SB(0.05f,50,transform, TypeInterpolate.BILINEAR,imageType);
+				new BackgroundMovingGaussian_SB(0.05f,50,transform, TypeInterpolate.BILINEAR,imageType.getImageClass());
 		alg.setInitialVariance(12);
 		return alg;
 	}

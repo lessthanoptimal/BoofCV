@@ -18,9 +18,10 @@
 
 package boofcv.examples.tracking;
 
-import boofcv.alg.background.stationary.BackgroundStationaryGaussian;
-import boofcv.alg.background.stationary.BackgroundStationaryGaussian_SB;
-import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.factory.background.ConfigBackgroundBasic;
+import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.image.ImageBinaryPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
@@ -28,6 +29,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -40,29 +42,29 @@ public class ExampleBackgroundRemovalStationary {
 
 		String fileName = "../data/applet/background/horse_jitter.mjpg";
 
-//		BackgroundModelStationary background =
-//				new BackgroundStationaryBasic_SB(0.005f,30,ImageFloat32.class);
-//				new BackgroundStationaryBasic_MS(0.005f,30, ImageType.ms(3, ImageFloat32.class));
-//				new BackgroundStationaryBasic_IL(0.005f,30, ImageType.il(3, InterleavedF32.class));
+		ImageType imageType = ImageType.single(ImageFloat32.class);
+//		ImageType imageType = ImageType.ms(3, ImageFloat32.class);
+//		ImageType imageType = ImageType.il(3, InterleavedF32.class);
+//		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
-		BackgroundStationaryGaussian background =
-				new BackgroundStationaryGaussian_SB(0.001f,20, ImageFloat32.class);
-//				new BackgroundStationaryGaussian_MS(0.001f,30, ImageType.ms(3, ImageFloat32.class));
-		background.setInitialVariance(64);
-		background.setMinimumDifference(5);
-//
+		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(20,0.001f);
+		configGaussian.initialVariance = 64;
+		configGaussian.minimumDifference = 5;
+
+		BackgroundModelStationary background =
+				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
+//				FactoryBackgroundModel.stationaryGaussian(configGaussian, imageType);
+
+
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
-
-//		video.setLoop(true);
-//		video.setIndex(500);
 
 		ImageUInt8 segmented = new ImageUInt8(1,1);
 
 		ImageBinaryPanel gui = null;
 
 		double fps = 0;
-		double alpha = 0.01;
+		double alpha = 0.01; // smoothing factor for FPS
 
 		while( video.hasNext() ) {
 			ImageBase input = video.next();
@@ -80,16 +82,11 @@ public class ExampleBackgroundRemovalStationary {
 
 			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
 
-			System.out.println("sum = " + ImageStatistics.sum(segmented) + " " + ImageStatistics.max(segmented)+"  "+fps);
 			gui.setBinaryImage(segmented);
 			gui.repaint();
-			System.out.println("Processed!!");
+			System.out.println("FPS = "+fps);
 
-//			try {
-//				Thread.sleep(5);
-//			} catch (InterruptedException e) {
-//
-//			}
+			try {Thread.sleep(5);} catch (InterruptedException e) {}
 		}
 		System.out.println("done!");
 	}

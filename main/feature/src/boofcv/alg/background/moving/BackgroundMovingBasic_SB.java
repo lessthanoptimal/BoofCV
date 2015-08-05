@@ -54,17 +54,16 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
 									TypeInterpolate interpType,
-									ImageType<T> imageType) {
-		super(learnRate, threshold, transform, imageType);
+									Class<T> imageType) {
+		super(learnRate, threshold, transform, ImageType.single(imageType));
 
-		Class<T> type = imageType.getImageClass();
-		this.interpolateInput = FactoryInterpolation.bilinearPixelS(type, BorderType.EXTENDED);
+		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, ImageFloat32.class);
 		this.interpolationBG.setBorder(FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED));
 		this.interpolationBG.setImage(background);
 
-		inputWrapper = FactoryGImageSingleBand.create(type);
+		inputWrapper = FactoryGImageSingleBand.create(imageType);
 	}
 
 	/**
