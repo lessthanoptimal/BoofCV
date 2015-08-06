@@ -18,8 +18,16 @@
 
 package boofcv.core.encoding;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
 public class TestConvertYV12 {
+	@Test
+	public void foo() {
+		fail("implement");
+	}
 }
