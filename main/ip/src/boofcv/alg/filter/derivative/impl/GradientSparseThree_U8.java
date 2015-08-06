@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.sparse.GradientValue_I32;
 import boofcv.struct.sparse.SparseImageGradient;
@@ -33,7 +33,7 @@ public class GradientSparseThree_U8 implements SparseImageGradient<ImageUInt8,Gr
 	// image being processed
 	ImageUInt8 input;
 	// specifies how the image border is handled
-	ImageBorder_I32<ImageUInt8> border;
+	ImageBorder_S32<ImageUInt8> border;
 	// storage for computed gradient
 	GradientValue_I32 gradient = new GradientValue_I32();
 
@@ -41,7 +41,7 @@ public class GradientSparseThree_U8 implements SparseImageGradient<ImageUInt8,Gr
 	 * Specifies how border pixels are handled.  If null then the border is not handled.
 	 * @param border how borders are handled
 	 */
-	public GradientSparseThree_U8(ImageBorder_I32<ImageUInt8> border) {
+	public GradientSparseThree_U8(ImageBorder_S32<ImageUInt8> border) {
 		this.border = border;
 	}
 

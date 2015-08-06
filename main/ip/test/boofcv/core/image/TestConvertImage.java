@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -63,15 +60,26 @@ public class TestConvertImage {
 			if( m.getName().contains("convert") ) {
 				checkConvert(m,inputType,outputType);
 			} else {
-				checkAverage(m,inputType,outputType);
+				if( inputType == MultiSpectral.class )
+					checkMultiAverage(m, inputType, outputType);
+				else
+					checkInterleavedAverage(m, inputType, outputType);
 			}
 			count++;
 		}
 
-		assertEquals(8*7+8,count);
+		assertEquals(8*7 + 8*7+8+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
+		if( ImageSingleBand.class.isAssignableFrom(inputType) ) {
+			checkConvertSingle(m,inputType,outputType);
+		} else {
+			checkConvertInterleaved(m, inputType, outputType);
+		}
+
+	}
+	private void checkConvertSingle( Method m , Class inputType , Class outputType ) {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
@@ -90,10 +98,32 @@ public class TestConvertImage {
 			GImageMiscOps.fillUniform(input, rand, 0, 20);
 		}
 
-		BoofTesting.checkSubImage(this,"checkConvert",true,m,input,output);
+		BoofTesting.checkSubImage(this,"checkConvertSingle",true,m,input,output);
 	}
 
-	public void checkConvert( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
+	private void checkConvertInterleaved( Method m , Class inputType , Class outputType ) {
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType, imgWidth, imgHeight,2);
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(outputType, imgWidth, imgHeight, 2);
+
+		boolean inputSigned = true;
+		boolean outputSigned = true;
+
+		if( input.getImageType().getDataType().isInteger() )
+			inputSigned = input.getDataType().isSigned();
+		if( output.getImageType().getDataType().isInteger() )
+			outputSigned = output.getDataType().isSigned();
+
+		// only provide signed numbers of both data types can handle them
+		if( inputSigned && outputSigned ) {
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+		}
+
+		BoofTesting.checkSubImage(this, "checkConvertInterleaved", true, m, input, output);
+	}
+
+	public void checkConvertSingle( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
 		try {
 			double tol = selectTolerance(input,output);
 
@@ -113,7 +143,27 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkAverage( Method m , Class inputType , Class outputType ) {
+	public void checkConvertInterleaved( Method m , ImageInterleaved<?> input , ImageInterleaved<?> output ) {
+		try {
+			double tol = selectTolerance(input,output);
+
+			// check it with a non-null output
+			ImageInterleaved<?> ret = (ImageInterleaved<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
+
+			// check it with a null output
+			ret = (ImageInterleaved<?>)m.invoke(null,input,null);
+			BoofTesting.assertEquals(input, ret, tol);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkMultiAverage(Method m, Class inputType, Class outputType) {
 		if( inputType != MultiSpectral.class )
 			fail("Expected MultiSpectral image");
 
@@ -134,20 +184,20 @@ public class TestConvertImage {
 				GImageMiscOps.fillUniform(input, rand, 0, 20);
 			}
 
-			BoofTesting.checkSubImage(this,"checkAverage",true,m,input,output);
+			BoofTesting.checkSubImage(this,"checkMultiAverage",true,m,input,output);
 		}
 	}
 
-	public void checkAverage( Method m , MultiSpectral<?> input , ImageSingleBand<?> output ) {
+	public void checkMultiAverage(Method m, MultiSpectral<?> input, ImageSingleBand<?> output) {
 		try {
 			// check it with a non-null output
 			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
-			checkAverage(input, ret);
+			checkMultiAverage(input, ret);
 
 			// check it with a null output
 			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
-			checkAverage(input, ret);
+			checkMultiAverage(input, ret);
 
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -156,7 +206,7 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkAverage(  MultiSpectral<?> input , ImageSingleBand<?> found ) {
+	private void checkMultiAverage(MultiSpectral<?> input, ImageSingleBand<?> found) {
 		int numBands = input.getNumBands();
 		for( int y = 0; y < imgHeight; y++ ){
 			for( int x = 0; x < imgWidth; x++ ) {
@@ -169,10 +219,76 @@ public class TestConvertImage {
 		}
 	}
 
+	private void checkInterleavedAverage(Method m, Class inputType, Class outputType) {
+		if( inputType.isAssignableFrom(ImageInterleaved.class) )
+			fail("Expected ImageInterleaved image");
+
+		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+
+		boolean signed = true;
+
+		if( ImageInteger.class.isAssignableFrom(outputType) )
+			signed = output.getDataType().isSigned();
+
+		for( int numBands = 1; numBands <= 3; numBands++ ) {
+			ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType,imgWidth,imgHeight,numBands);
+
+			// only provide signed numbers of both data types can handle them
+			if( signed ) {
+				GImageMiscOps.fillUniform(input, rand, -10, 10);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, 0, 20);
+			}
+
+			BoofTesting.checkSubImage(this,"checkInterleavedAverage",true,m,input,output);
+		}
+	}
+
+	public void checkInterleavedAverage(Method m, ImageInterleaved input, ImageSingleBand<?> output) {
+		try {
+			// check it with a non-null output
+			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			checkInterleavedAverage(input, ret);
+
+			// check it with a null output
+			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			checkInterleavedAverage(input, ret);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkInterleavedAverage(ImageInterleaved input, ImageSingleBand<?> found) {
+		int numBands = input.getNumBands();
+		for( int y = 0; y < imgHeight; y++ ){
+			for( int x = 0; x < imgWidth; x++ ) {
+				double sum = 0;
+				for( int b = 0; b < numBands; b++ ) {
+					sum += GeneralizedImageOps.get(input,x,y,b);
+				}
+				assertEquals(sum/numBands,GeneralizedImageOps.get(found, x, y),1);
+			}
+		}
+	}
+
 	/**
 	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
 	 */
 	private double selectTolerance( ImageSingleBand a , ImageSingleBand b ) {
+		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
+			return 1e-4;
+		else
+			return 1;
+	}
+
+	/**
+	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
+	 */
+	private double selectTolerance( ImageInterleaved a , ImageInterleaved b ) {
 		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
 			return 1e-4;
 		else

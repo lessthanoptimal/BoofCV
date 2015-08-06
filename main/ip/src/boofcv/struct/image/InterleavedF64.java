@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,12 +64,16 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 			storage = new double[numBands];
 		}
 
+		get_unsafe(x,y,storage);
+
+		return storage;
+	}
+
+	public void get_unsafe(int x, int y, double[] storage) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
 		}
-
-		return storage;
 	}
 
 	/**
@@ -83,6 +87,10 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
+		set_unsafe(x,y,value);
+	}
+
+	public void set_unsafe(int x, int y, double... value) {
 		int index = getIndex(x, y, 0);
 		for (int i = 0; i < numBands; i++, index++) {
 			data[index] = value[i];

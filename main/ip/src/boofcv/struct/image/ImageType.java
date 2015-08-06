@@ -53,12 +53,24 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		return new ImageType<I>(Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
 	}
 
+	public static <I extends ImageSingleBand> ImageType<I> single( ImageDataType type ) {
+		return new ImageType<I>(Family.SINGLE_BAND, type,1);
+	}
+
 	public static <I extends ImageSingleBand> ImageType<MultiSpectral<I>> ms( int numBands , Class<I> imageType ) {
 		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
 	}
 
-	public static <I extends ImageInterleaved> ImageType<I> interleaved( int numBands , Class<I> imageType ) {
+	public static <I extends ImageSingleBand> ImageType<MultiSpectral<I>> ms( int numBands , ImageDataType type ) {
+		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, type,numBands);
+	}
+
+	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, Class<I> imageType) {
 		return new ImageType<I>(Family.INTERLEAVED, ImageDataType.classToType(imageType),numBands);
+	}
+
+	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, ImageDataType type) {
+		return new ImageType<I>(Family.INTERLEAVED, type,numBands);
 	}
 
 	public ImageDataType getDataType() {

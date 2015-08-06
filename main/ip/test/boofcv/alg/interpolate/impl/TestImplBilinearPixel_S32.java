@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSInt32;
 /**
  * @author Peter Abeles
  */
-public class TestImplBilinearPixel_S32 extends GeneralBilinearPixelChecks<ImageSInt32>
+public class TestImplBilinearPixel_S32 extends GeneralBilinearPixelSingleChecks<ImageSInt32>
 {
 
 	@Override

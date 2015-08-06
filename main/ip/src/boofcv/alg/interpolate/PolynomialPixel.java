@@ -109,4 +109,9 @@ public abstract class PolynomialPixel<T extends ImageSingleBand> implements Inte
 	public int getFastBorderY() {
 		return M;
 	}
+
+	@Override
+	public ImageBorder<T> getBorder() {
+		return border;
+	}
 }

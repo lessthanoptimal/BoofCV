@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,19 +29,17 @@ import boofcv.struct.pyramid.ImagePyramid;
 
 /**
  * <p>
- * Pyramidal implementation of Horn-Schunck based on the discussion in [1].  The problem formulation has been
+ * Pyramidal implementation of Horn-Schunck [2] based on the discussion in [1].  The problem formulation has been
  * modified from the original found in [2] to account for larger displacements.  The Euler-Lagrange equations
  * are solved using Successive Over-Relaxation (SOR).
  * </p>
  *
- * <p>
  * <ol>
  * <li>Meinhardt-Llopis, Enric and Sánchez Pérez, Javier and Kondermann, Daniel,
  * "Horn-Schunck Optical Flow with a Multi-Scale Strategy" vol 3, 2013, Image Processing On Line</li>
  * <li>Horn, Berthold K., and Brian G. Schunck. "Determining optical flow."
  * 1981 Technical Symposium East. International Society for Optics and Photonics, 1981.</li>
  * </ol>
- * </p>
  *
  *
  * @author Peter Abeles

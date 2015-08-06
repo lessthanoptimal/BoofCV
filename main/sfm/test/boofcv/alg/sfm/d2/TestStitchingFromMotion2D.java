@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -187,8 +188,9 @@ public class TestStitchingFromMotion2D {
 	@Test
 	public void resizeStitchImage_Transform() {
 		HelperMotion motion = new HelperMotion();
-		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, ImageFloat32.class);
-		ImageDistort distorter = FactoryDistort.distort(false,interp, null, ImageFloat32.class);
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
+				TypeInterpolate.BILINEAR, BorderType.EXTENDED, ImageFloat32.class);
+		ImageDistort distorter = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
@@ -308,5 +310,11 @@ public class TestStitchingFromMotion2D {
 		public void apply(ImageBase srcImg, ImageBase dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 			numApply++;
 		}
+
+		@Override
+		public void setRenderAll(boolean renderAll) {}
+
+		@Override
+		public boolean getRenderAll() {return false;}
 	}
 }

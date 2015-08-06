@@ -103,7 +103,7 @@ public class TestLinearContourLabelChang2004 {
 		alg.process(input, labeled);
 
 		assertEquals(2, alg.getContours().size);
-		checkContour(alg, labeled,4);
+		checkContour(alg, labeled, 4);
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class TestLinearContourLabelChang2004 {
 		checkContour(alg, labeled,8);
 
 		Contour c = alg.getContours().get(0);
-		assertEquals(10,c.external.size());
+		assertEquals(10, c.external.size());
 		assertEquals(1,c.internal.size());
 		assertEquals(4, c.internal.get(0).size());
 	}
@@ -245,7 +245,7 @@ public class TestLinearContourLabelChang2004 {
 	private List<Point2D_I32> findContour8(ImageSInt32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
 
-		ImageBorder<ImageSInt32> border = FactoryImageBorder.value(labeled, 0);
+		ImageBorder<ImageSInt32> border = FactoryImageBorder.singleValue(labeled, 0);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {
@@ -256,19 +256,19 @@ public class TestLinearContourLabelChang2004 {
 						Point2D_I32 a = local.get(i);
 						Point2D_I32 b = local.get(i+1);
 
-						if( border.getGeneral(x+a.x,y+a.y, 0) != target && border.getGeneral(x+b.x,y+b.y, 0) != target ) {
+						if( get(border, x + a.x, y + a.y) != target && get(border, x + b.x, y + b.y) != target ) {
 							isContour = true;
 							break;
 						}
 					}
 
-					if( !isContour && border.getGeneral(x+1,y, 0) != target)
+					if( !isContour && get(border, x + 1, y) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x-1,y, 0) != target)
+					if( !isContour && get(border, x - 1, y) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x,y+1, 0) != target)
+					if( !isContour && get(border, x, y + 1) != target)
 						isContour = true;
-					if( !isContour && border.getGeneral(x,y-1, 0) != target)
+					if( !isContour && get(border, x, y - 1) != target)
 						isContour = true;
 
 					if( isContour )
@@ -279,13 +279,19 @@ public class TestLinearContourLabelChang2004 {
 		return list;
 	}
 
+	private float get( ImageBorder<ImageSInt32> border , int x , int y ) {
+		double tmp0[] = new double[1];
+		border.getGeneral(x, y, tmp0);
+		return (float)tmp0[0];
+	}
+
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
 	private List<Point2D_I32> findContour4(ImageSInt32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
 
-		ImageBorder<ImageSInt32> border = FactoryImageBorder.value(labeled, 0);
+		ImageBorder<ImageSInt32> border = FactoryImageBorder.singleValue(labeled, 0);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {
@@ -294,7 +300,7 @@ public class TestLinearContourLabelChang2004 {
 					boolean isContour = false;
 					for( int i = 0; i < local.size(); i++ ) {
 						Point2D_I32 a = local.get(i);
-						if( border.getGeneral(x+a.x,y+a.y, 0) != target ) {
+						if( get(border, x + a.x, y + a.y) != target ) {
 							isContour = true;
 						}
 					}

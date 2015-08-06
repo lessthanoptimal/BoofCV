@@ -45,8 +45,7 @@ public abstract class ImageBorder<T extends ImageBase> {
 		return image;
 	}
 
-	/**
-	 * Generalized non image type specific set.  This can be very slow
-	 */
-	public abstract double getGeneral(int x, int y, int band);
+	public abstract void getGeneral(int x, int y, double[] pixel);
+
+	public abstract void setGeneral(int x, int y, double[] pixel);
 }

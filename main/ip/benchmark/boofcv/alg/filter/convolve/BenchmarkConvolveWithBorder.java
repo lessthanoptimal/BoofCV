@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class BenchmarkConvolveWithBorder {
 	static private ImageUInt8 out_I8;
 	static private ImageSInt16 out_I16;
 	static private ImageSInt32 out_I32;
-	static private ImageBorder_I32 border_I32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+	static private ImageBorder_S32 border_I32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 	static private ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 
 	// iterate through different sized kernel radius

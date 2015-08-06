@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public abstract class GenericCornerIntensityGradientTests extends GenericCornerI
 	protected ImageFloat32 derivXY_F32 = new ImageFloat32(width,height);
 
 	ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
-	ImageBorder_I32 borderI32 = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+	ImageBorder_S32 borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 
 	@Override
 	protected void computeDerivatives() {

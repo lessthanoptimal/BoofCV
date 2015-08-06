@@ -54,7 +54,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		this.numBands = numBands;
 		this.width = width;
 		this.height = height;
-		this.imageType = (ImageType)ImageType.interleaved(numBands, getClass());
+		this.imageType = (ImageType)ImageType.il(numBands, getClass());
 	}
 
 	protected ImageInterleaved() {
@@ -77,12 +77,13 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
 		T ret = _createNew(-1, -1);
 		ret._setData(_getData());
-		ret.stride = Math.max(width * numBands, stride);
+		ret.stride = Math.max(width * numBands, stride); // ok why is this done?!?!  Shouldn't it always be stride?
 		ret.width = x1 - x0;
 		ret.height = y1 - y0;
 		ret.numBands = numBands;
 		ret.startIndex = startIndex + y0 * stride + x0 * numBands;
 		ret.subImage = true;
+		ret.imageType = imageType;
 
 		return ret;
 	}

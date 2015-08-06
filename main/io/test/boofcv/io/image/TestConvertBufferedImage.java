@@ -58,7 +58,7 @@ public class TestConvertBufferedImage {
 
 		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
 		// gray input image with pixel values from 0 to 255
-		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10, 10), null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
 		found = ConvertBufferedImage.checkInputs(new ImageFloat64(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
@@ -164,13 +164,13 @@ public class TestConvertBufferedImage {
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
 
-		BoofTesting.checkEquals(img, srcImg);
+		BoofTesting.checkEquals(img, srcImg,false,1e-4f);
 
 		// now test it with a single band
 		srcImg = new InterleavedU8(imgWidth, imgHeight, 1);
 		ImageInterleavedTestingOps.randomize(srcImg, rand);
 		img = ConvertBufferedImage.extractBuffered(srcImg);
-		BoofTesting.checkEquals(img, srcImg);
+		BoofTesting.checkEquals(img, srcImg,false,1e-4f);
 
 	}
 
@@ -186,60 +186,63 @@ public class TestConvertBufferedImage {
 	}
 
 	/**
-	 * Predeclare an image to convert the buffered image into and step through each data type and image type
-	 */
-	@Test
-	public void convertFrom_single_ms() {
-		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
-
-		for (Class t : types) {
-			for (int i = 0; i < 2; i++) {
-				ImageBase image;
-				if (i == 0) {
-					image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
-				} else {
-					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
-				}
-
-				BoofTesting.checkSubImage(this, "convertFrom_single_ms", false, image);
-			}
-		}
-	}
-
-	public void convertFrom_single_ms(ImageBase dstImg) {
-		BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
-		ConvertBufferedImage.convertFrom(origImg, dstImg,false);
-
-		BoofTesting.checkEquals(origImg, dstImg, false, 1e-3f);
-	}
-
-	/**
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
 	@Test
-	public void convertFrom_single_ms_orderRgb() {
+	public void convertFrom_ms_orderRgb() {
 		Class []bandTypes = new Class[]{ImageUInt8.class,ImageFloat32.class};
 		for( Class b : bandTypes ) {
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR,b,true);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR,b,true);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_ARGB,b,true);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_RGB,b,true);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_BGR,b,true);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR,b,false);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR,b,false);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_ARGB,b,false);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_RGB,b,false);
-			convertFrom_single_ms_orderRgb(BufferedImage.TYPE_INT_BGR,b,false);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
 	}
 
-	public void convertFrom_single_ms_orderRgb( int buffType , Class bandType , boolean reorder ) {
-		BufferedImage input = TestConvertRaster.createByteBuffByType(imgWidth, imgHeight, buffType, rand);
+	public void convertFrom_ms_orderRgb(int buffType, Class bandType, boolean reorder) {
+		BufferedImage input = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
 
 		int numBands = input.getRaster().getNumBands();
 
 		MultiSpectral output = new MultiSpectral(bandType,imgWidth,imgHeight,numBands);
+
+		ConvertBufferedImage.convertFrom(input, output, reorder);
+
+		// this always returns it in ARGB order
+		checkBandOrder(buffType, reorder, input, numBands, output);
+	}
+
+	@Test
+	public void convertFrom_interlaced_orderRgb() {
+		Class []bandTypes = new Class[]{InterleavedU8.class,InterleavedF32.class};
+		for( Class b : bandTypes ) {
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
+
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
+		}
+	}
+
+	public void convertFrom_interlaced_orderRgb(int buffType, Class type, boolean reorder) {
+		BufferedImage input = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
+
+		int numBands = input.getRaster().getNumBands();
+
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(type,imgWidth, imgHeight,numBands);
 
 		ConvertBufferedImage.convertFrom(input, output, reorder);
 
@@ -340,109 +343,221 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	/**
-	 * Create an image and convert it into a buffered image
-	 */
 	@Test
-	public void convertTo_single_ms() {
-		Class[] types = new Class[]{ImageUInt8.class, ImageUInt16.class, ImageFloat32.class};
+	public void convertFromInterleaved() {
+		BufferedImage origImg;
 
-		for (Class t : types) {
-			for (int i = 0; i < 2; i++) {
-				ImageBase image;
-				if (i == 0) {
-					image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
-				} else {
-					if( t == ImageUInt16.class )
-						continue; // convert into 16bit gray scale buffered images isn't supported yet
-					image = new MultiSpectral(t, imgWidth, imgHeight, 3);
+		for( int i = 0; i < 4; i++ ) {
+
+			int numBands;
+			if (i == 0) {
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
+				numBands = 1;
+			} else if (i == 1) {
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
+				numBands = 3;
+			} else if (i == 2) {
+				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 4, rand);
+				numBands = 4;
+			} else if( i == 3 ) {
+				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand);
+				numBands = 3;
+			} else {
+				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
+				numBands = 3;
+			}
+
+			InterleavedU8 imgInt8 = new InterleavedU8(imgWidth,imgHeight,numBands);
+			InterleavedF32 imgF32 = new InterleavedF32(imgWidth,imgHeight,numBands);
+
+			for( int j = 0; j < 2; j++ ) {
+				if( j == 1 ) {
+					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
+					imgInt8 = imgInt8.subimage(1,2,imgWidth,imgHeight);
+					imgF32 = imgF32.subimage(1,2,imgWidth,imgHeight);
 				}
-				GImageMiscOps.fillUniform(image, rand, 0, 100);
+//				System.out.println(i+" "+j);
+				ConvertBufferedImage.convertFromInterleaved(origImg, imgInt8, false);
+				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
 
-				BoofTesting.checkSubImage(this, "convertTo_single_ms", false, image);
+				ConvertBufferedImage.convertFromInterleaved(origImg, imgF32, false);
+				BoofTesting.checkEquals(origImg, imgF32, false, 1);
 			}
 		}
 	}
 
-	public void convertTo_single_ms(ImageBase srcImg) {
-		BufferedImage dstImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
-		ConvertBufferedImage.convertTo(srcImg, dstImg,false);
+	/**
+	 * Create an image and convert it into a buffered image
+	 */
+	@Test
+	public void convertTo_SB() {
+		Class[] types = new Class[]{ImageUInt8.class, ImageUInt16.class, ImageFloat32.class};
 
-		BoofTesting.checkEquals(dstImg, srcImg,false,  1);
+		for (Class t : types) {
+			ImageBase image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
+
+			GImageMiscOps.fillUniform(image, rand, 0, 100);
+			BoofTesting.checkSubImage(this, "convertTo", false, image);
+		}
+	}
+
+	@Test
+	public void convertTo_MS() {
+		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
+
+		for (Class t : types) {
+			ImageBase image = new MultiSpectral(t, imgWidth, imgHeight, 3);
+			GImageMiscOps.fillUniform(image, rand, 0, 100);
+
+			BoofTesting.checkSubImage(this, "convertTo", false, image);
+		}
+	}
+
+	@Test
+	public void convertTo_IL() {
+		Class[] types = new Class[]{InterleavedU8.class, InterleavedF32.class};
+
+		for (Class t : types) {
+			ImageBase image = GeneralizedImageOps.createInterleaved(t, imgWidth, imgHeight, 3);
+			GImageMiscOps.fillUniform(image, rand, 0, 100);
+
+			BoofTesting.checkSubImage(this, "convertTo", false, image);
+		}
+	}
+
+	public void convertTo(ImageBase input ) {
+		convertTo(input, BufferedImage.TYPE_3BYTE_BGR);
+//		convertTo(input, BufferedImage.TYPE_4BYTE_ABGR); // commented out 4 band images just to make things easier
+//		convertTo(input, BufferedImage.TYPE_INT_ARGB);
+		convertTo(input, BufferedImage.TYPE_INT_RGB);
+		convertTo(input, BufferedImage.TYPE_INT_BGR);
+	}
+
+	public void convertTo( ImageBase input , int buffType  ) {
+		BufferedImage output = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
+
+		ConvertBufferedImage.convertTo(input, output,false);
+
+		BoofTesting.checkEquals(output, input,false,  1);
 	}
 
 	/**
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
 	@Test
-	public void convertTo_single_ms_orderRgb() {
+	public void convertTo_ms_orderRgb() {
 		Class []bandTypes = new Class[]{ImageUInt8.class,ImageFloat32.class};
 		for( Class b : bandTypes ) {
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
-			convertTo_single_ms_orderRgb(BufferedImage.TYPE_INT_BGR,b,false);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
 	}
 
-	public void convertTo_single_ms_orderRgb( int buffType , Class bandType , boolean reorder ) {
-		BufferedImage output = TestConvertRaster.createByteBuffByType(imgWidth, imgHeight, buffType, rand);
+	public void convertTo_ms_orderRgb(int buffType, Class bandType, boolean reorder) {
+		BufferedImage output = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
 
 		int numBands = output.getRaster().getNumBands();
 
 		MultiSpectral input = new MultiSpectral(bandType,imgWidth,imgHeight,numBands);
+
+		double pixel[] = new double[numBands];
+		for (int i = 0; i < numBands; i++) {
+			pixel[i] = (i+1)*10;
+		}
+		GeneralizedImageOps.setM(input, 5, 6, pixel);
 
 		ConvertBufferedImage.convertTo(input, output, reorder);
 
 		checkBandOrder(buffType, reorder, output, numBands, input);
 	}
 
-	private void checkBandOrder(int buffType, boolean reorder, BufferedImage imageA, int numBands, MultiSpectral imageB) {
+	@Test
+	public void convertTo_interleaved_orderRgb() {
+		Class []bandTypes = new Class[]{InterleavedI8.class,InterleavedF32.class};
+		for( Class b : bandTypes ) {
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
+
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
+		}
+	}
+
+	public void convertTo_interleaved_orderRgb( int buffType , Class bandType , boolean reorder ) {
+		BufferedImage output = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
+
+		int numBands = output.getRaster().getNumBands();
+
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(bandType, imgWidth, imgHeight, numBands);
+
+		double pixel[] = new double[numBands];
+		for (int i = 0; i < numBands; i++) {
+			pixel[i] = (i+1)*10;
+		}
+		GeneralizedImageOps.setM(input, 5, 6, pixel);
+
+		ConvertBufferedImage.convertTo(input, output, reorder);
+
+		checkBandOrder(buffType, reorder, output, numBands, input);
+	}
+
+	private void checkBandOrder(int buffType, boolean reorder, BufferedImage imageA, int numBands,
+								ImageMultiBand imageB) {
 		// this always returns it in ARGB order
 		int found = imageA.getRGB(5,6);
 
+		assertTrue(found != 0 );
+
 		if( reorder ) {
 			if( numBands == 4 ) {
-				assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB.getBand(3), 5, 6)) < 1e-8 );
-				assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
-				assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
-				assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
+				assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB,5,6,3)) < 1e-8 );
+				assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
+				assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
+				assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
 			} else {
-				assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
-				assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
-				assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
+				assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
+				assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
+				assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
 			}
 		} else {
 			if( numBands == 4 ){
 				if( buffType == BufferedImage.TYPE_4BYTE_ABGR ) {
-					assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(3),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
-					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
+					assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
+					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,3)) < 1e-8 );
+					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
+					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
 				} else if( buffType == BufferedImage.TYPE_INT_ARGB ) {
-					assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
-					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(3),5,6)) < 1e-8 );
+					assertTrue(Math.abs(((found>>24)&0xFF) - GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
+					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
+					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
+					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,3)) < 1e-8 );
 				} else {
 					throw new RuntimeException("Unknown type");
 				}
 			} else {
 				if( buffType == BufferedImage.TYPE_INT_BGR || buffType == BufferedImage.TYPE_3BYTE_BGR  ) {
-					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
-					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
+					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
+					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
+					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
 				} else {
-					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB.getBand(0),5,6)) < 1e-8 );
-					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB.getBand(1),5,6)) < 1e-8 );
-					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB.getBand(2),5,6)) < 1e-8 );
+					assertTrue(Math.abs(((found>>16)&0xFF) - GeneralizedImageOps.get(imageB,5,6,0)) < 1e-8 );
+					assertTrue(Math.abs(((found>>8)&0xFF) -  GeneralizedImageOps.get(imageB,5,6,1)) < 1e-8 );
+					assertTrue(Math.abs((found&0xFF) -       GeneralizedImageOps.get(imageB,5,6,2)) < 1e-8 );
 				}
 			}
 		}

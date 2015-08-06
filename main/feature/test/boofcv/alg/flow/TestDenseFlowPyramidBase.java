@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.flow;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.pyramid.ImagePyramid;
@@ -77,7 +78,7 @@ public class TestDenseFlowPyramidBase {
 	public static class Dummy extends DenseFlowPyramidBase {
 
 		public Dummy(double scale, double sigma, int maxLayers) {
-			super(scale, sigma, maxLayers, FactoryInterpolation.bilinearPixelS(ImageFloat32.class));
+			super(scale, sigma, maxLayers, FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED));
 		}
 
 		@Override

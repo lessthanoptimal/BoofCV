@@ -115,7 +115,7 @@ public class CompareDerivativeToConvolution {
 		}
 		if( param.length == numImageOutputs + 2 ) {
 			if( processBorder ) {
-				testInputs[param.length-1] = FactoryImageBorder.general(inputImage.getClass(),BorderType.EXTENDED);
+				testInputs[param.length-1] = FactoryImageBorder.single(inputImage.getClass(), BorderType.EXTENDED);
 			} else {
 				testInputs[param.length-1] = null;
 			}

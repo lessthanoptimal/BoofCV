@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.flow;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.alg.transform.pyramid.PyramidFloatScale;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -90,7 +91,7 @@ public class UtilDenseOpticalFlow {
 			numScales++;
 		}
 
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		if( sigma > 0 ) {
 			double layerSigma = sigma*Math.sqrt(Math.pow(scale,-2)-1);

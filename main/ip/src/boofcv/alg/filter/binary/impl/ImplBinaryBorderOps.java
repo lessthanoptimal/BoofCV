@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.core.image.border.ImageBorderValue;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageUInt8;
 public class ImplBinaryBorderOps {
 	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -66,7 +66,7 @@ public class ImplBinaryBorderOps {
 
 	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -102,7 +102,7 @@ public class ImplBinaryBorderOps {
 
 	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -140,7 +140,7 @@ public class ImplBinaryBorderOps {
 
 	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -180,7 +180,7 @@ public class ImplBinaryBorderOps {
 
 	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -220,7 +220,7 @@ public class ImplBinaryBorderOps {
 
 	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
 		final int h = input.height - 1;
 		final int w = input.width - 1;
@@ -260,7 +260,7 @@ public class ImplBinaryBorderOps {
 
 	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_I32 in = ImageBorderValue.wrap(input,0);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 
 		final int h = input.height - 1;
 		final int w = input.width - 1;

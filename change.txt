@@ -49,8 +49,8 @@ Version : Alpha 0.19
 - Calibration
   * A single class fully specifies the calibration target now
   * Intrinsic parameters can now use a flow style assignment of parameters
-- Interpolation actually can interpolate along the image border now
-  * Can specify a border and is automatically used if a pixel outside the image is requested
+- Interpolation
+  * Can specify a border handling algorithm now
 - PixelMath
   * Added minus(image,scalar)
   * Added minus(scalar,image)
@@ -82,7 +82,9 @@ Version : Alpha 0.19
   * Requested by Rafael Maus and others
 - ConvertBufferedImage
   * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
-  * Thanks thhart for pointing this out
+    - Thanks thhart for pointing this out
+  * Added partial support for images encoded with SunWritableRaster
+  * Much improved support of BoofCV Interleaved images
 - ThresholdImageOps
   * Changed threshold up from >= to >.
   * Turns out the original choice was bad.  Images were not inverses of each other
@@ -100,6 +102,10 @@ Version : Alpha 0.19
   * General cleaning up the API
   * Fewer functions, but uses enum for specific type
   * Function for AnyImageDerivative is clearly named and more useful
+- ImageMiscOps
+  * fill band
+  * fill bands
+  * insert band
 
 TODO
   * Distortion Model + Calibration

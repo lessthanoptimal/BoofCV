@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -62,7 +63,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 	public CreateSyntheticOverheadViewMS( TypeInterpolate type , int numBands , Class<T> imageType ) {
 		this.interp = new InterpolatePixelS[numBands];
 		for( int i = 0; i < numBands; i++ ) {
-			interp[i] = FactoryInterpolation.createPixelS(0, 255, type, imageType);
+			interp[i] = FactoryInterpolation.createPixelS(0, 255, type, BorderType.EXTENDED, imageType);
 		}
 		output = new GImageSingleBand[interp.length];
 	}

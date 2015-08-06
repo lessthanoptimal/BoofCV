@@ -26,12 +26,12 @@ import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -46,7 +46,7 @@ public class TestImageMiscOps {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 14*6 + 8*2;
+		int numExpected = 19*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -60,6 +60,10 @@ public class TestImageMiscOps {
 					testCopy(m);
 				} else if( m.getName().compareTo("fill") == 0 ) {
 					testFill(m);
+				} else if( m.getName().compareTo("fillBand") == 0 ) {
+					testFillBand(m);
+				} else if( m.getName().compareTo("insertBand") == 0 ) {
+					testInsertBand(m);
 				} else if( m.getName().compareTo("fillBorder") == 0 ) {
 					testFillBorder(m);
 				} else if( m.getName().compareTo("fillRectangle") == 0 ) {
@@ -138,14 +142,17 @@ public class TestImageMiscOps {
 		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
 			testFill_Single(m);
 		} else {
-			testFill_Interleaved(m);
+			if( paramTypes[1].isArray())
+				testFill_Interleaved_array(m);
+			else
+				testFill_Interleaved(m);
 		}
 	}
 
 	private void testFill_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		GImageMiscOps.fillUniform(orig, rand, 0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
 		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
@@ -164,7 +171,7 @@ public class TestImageMiscOps {
 	private void testFill_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
-		GImageMiscOps.fillUniform(orig, rand, 0,20);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
 		if( orig.getDataType().isInteger()) {
 			m.invoke(null,orig,10);
@@ -179,6 +186,89 @@ public class TestImageMiscOps {
 					assertEquals(10.0,value,1e-4);
 				}
 			}
+		}
+	}
+
+	private void testFill_Interleaved_array(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+		GImageMiscOps.fillUniform(orig, rand, 0,20);
+
+		Object array = Array.newInstance(paramTypes[1].getComponentType(), numBands);
+		for (int i = 0; i < numBands; i++) {
+			Array.set(array, i, 2 * i + 1);
+		}
+		m.invoke(null, orig, array);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for( int band = 0; band < numBands; band++ ) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					assertEquals(2*band+1,value,1e-4);
+				}
+			}
+		}
+	}
+
+	private void testFillBand(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
+
+		for (int band = 0; band < numBands; band++) {
+			GImageMiscOps.fillUniform(orig, rand, 0, 20);
+			if( orig.getDataType().isInteger()) {
+				m.invoke(null,orig,band,10);
+			} else {
+				m.invoke(null,orig,band,10.0f);
+			}
+
+			int numMatch = 0;
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					for (int k = 0; k < numBands; k++) {
+						double value = GeneralizedImageOps.get(orig,j,i,k);
+						if( k == band ) {
+							assertEquals(10.0,value,1e-4);
+						} else {
+							if( 10.0 == value ) numMatch++;
+						}
+					}
+				}
+			}
+
+			assertFalse(numMatch > width * height * (numBands - 1) / 5);
+		}
+	}
+
+	private void testInsertBand(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(paramTypes[2], width, height, numBands);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		for (int band = 0; band < numBands; band++) {
+			GImageMiscOps.fillUniform(output, rand, 0, 20);
+
+			m.invoke(null, input, band, output);
+
+			int numMatch = 0;
+			for( int i = 0; i < height; i++ ) {
+				for( int j = 0; j < width; j++ ) {
+					double valueIn = GeneralizedImageOps.get(input,j,i);
+
+					for (int k = 0; k < numBands; k++) {
+						double valueOut = GeneralizedImageOps.get(output,j,i,k);
+						if( k == band ) {
+							assertEquals(valueIn,valueOut,1e-4);
+						} else {
+							if( valueIn == valueOut ) numMatch++;
+						}
+					}
+				}
+			}
+
+			assertFalse(numMatch > width * height * (numBands - 1) / 5);
 		}
 	}
 
@@ -207,6 +297,15 @@ public class TestImageMiscOps {
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testFillRectangle_Single(m);
+		} else {
+			testFillRectangle_Interleaved(m);
+		}
+	}
+
+	private void testFillRectangle_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		int x0 = 2;
@@ -227,6 +326,42 @@ public class TestImageMiscOps {
 					assertEquals(j+" "+i,0.0,a.get(j,i).doubleValue(),1e-4);
 				else
 					assertEquals(10.0,a.get(j,i).doubleValue(),1e-4);
+			}
+		}
+	}
+
+	private void testFillRectangle_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
+
+		int x0 = 2;
+		int y0 = 3;
+		int width = 5;
+		int height = 6;
+
+		Class numParam = paramTypes[1];
+		if( numParam == byte.class ) {
+			m.invoke(null, orig, (byte) 10, x0, y0, width, height);
+		} else if( numParam == short.class ) {
+			m.invoke(null,orig,(short)10,x0,y0,width,height);
+		} else if( numParam == int.class ) {
+			m.invoke(null,orig,10,x0,y0,width,height);
+		} else if( numParam == long.class ) {
+			m.invoke(null,orig,(long)10,x0,y0,width,height);
+		} else {
+			m.invoke(null,orig,10.0f,x0,y0,width,height);
+		}
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int band = 0; band < orig.numBands; band++) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+
+					if( j < x0 || i < y0 || i >= (x0+width) || j >= (y0+height ))
+						assertEquals(j+" "+i,0.0,value,1e-4);
+					else
+						assertEquals(10.0,value,1e-4);
+				}
 			}
 		}
 	}
@@ -299,7 +434,16 @@ public class TestImageMiscOps {
 		assertTrue( numZero < width*height*numBands );
 	}
 
-	private void testFillGaussian(Method m) throws InvocationTargetException, IllegalAccessException {
+	private void testFillGaussian( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testFillGaussian_Single(m);
+		} else {
+			testFillGaussian_Interleaved(m);
+		}
+	}
+
+	private void testFillGaussian_Single(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
@@ -330,7 +474,48 @@ public class TestImageMiscOps {
 		assertTrue( numZero < width*height );
 	}
 
+	private void testFillGaussian_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
+
+		if( orig.getDataType().isSigned() )
+			m.invoke(null,orig,rand,0,5,-2,2);
+		else {
+			m.invoke(null,orig,rand,5,7,0,12);
+		}
+
+		int numZero = 0;
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int band = 0; band < orig.numBands; band++) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+
+					if( orig.getDataType().isSigned() ) {
+						assertTrue("value = "+value,value>=-2 && value <= 2);
+					} else {
+						assertTrue("value = "+value,value>=0 && value <= 12);
+					}
+
+					if( value == 0 )
+						numZero++;
+				}
+			}
+		}
+
+		assertTrue( numZero < width*height*2 );
+	}
+
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testAddUniform_Single(m);
+		} else {
+			testAddUniform_Interleaved(m);
+		}
+	}
+
+	private void testAddUniform_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageSingleBand orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fill(orig, 1);
@@ -350,7 +535,37 @@ public class TestImageMiscOps {
 		}
 	}
 
+	private void testAddUniform_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
+		GImageMiscOps.fill(orig, 1);
+
+		if( orig.getDataType().isInteger() ) {
+			m.invoke(null,orig,rand,1,10);
+		} else {
+			m.invoke(null,orig,rand,1,10);
+		}
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int band = 0; band < orig.numBands; band++) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					assertTrue(value>=-2 && value <= 11);
+				}
+			}
+		}
+	}
+
 	private void testAddGaussian( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		if( ImageSingleBand.class.isAssignableFrom(paramTypes[0])) {
+			testAddGaussian_Single(m);
+		} else {
+			testAddGaussian_Interleaved(m);
+		}
+	}
+
+	private void testAddGaussian_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
 
 		double mean = 10;
 
@@ -377,6 +592,43 @@ public class TestImageMiscOps {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
 				stdev10 += (value-mean)*(value-mean);
+			}
+		}
+
+		// see if the gaussian with the larger variance creates a noisier image
+		assertTrue(stdev2<stdev10);
+	}
+
+	private void testAddGaussian_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+
+		double mean = 10;
+
+		Class paramTypes[] = m.getParameterTypes();
+		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
+
+		GImageMiscOps.fill(orig,mean);
+		m.invoke(null,orig,rand,2.0,0,255);
+
+		double stdev2 = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int band = 0; band < orig.numBands; band++) {
+					double value = GeneralizedImageOps.get(orig,j,i,band);
+					stdev2 += (value-mean)*(value-mean);
+				}
+			}
+		}
+
+		GImageMiscOps.fill(orig,mean);
+		m.invoke(null, orig, rand, 10.0, 0, 255);
+
+		double stdev10 = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int band = 0; band < orig.numBands; band++) {
+					double value = GeneralizedImageOps.get(orig, j, i, band);
+					stdev10 += (value - mean) * (value - mean);
+				}
 			}
 		}
 

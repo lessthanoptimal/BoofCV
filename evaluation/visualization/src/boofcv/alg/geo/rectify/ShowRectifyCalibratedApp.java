@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
@@ -118,9 +119,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
 		// Will rectify the image
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.VALUE, ImageFloat32.class);
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2,ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.VALUE, ImageFloat32.class);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);
@@ -181,7 +182,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		while( !app.getHasProcessedImage() ) {
 			Thread.yield();
 		}
-		ShowImages.showWindow(app, "Calibrated Camera Rectification");
+		ShowImages.showWindow(app, "Calibrated Camera Rectification", true);
 
 		System.out.println("Done");
 	}

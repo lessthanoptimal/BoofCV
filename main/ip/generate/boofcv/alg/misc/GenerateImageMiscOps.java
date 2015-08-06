@@ -72,11 +72,16 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printCopy();
 			printFill();
 			printFillInterleaved();
+			printFillInterleaved_bands();
+			printFillBand_Interleaved();
+			printInsertBandInterleaved();
 			printFillBorder();
 			printFillRectangle();
+			printFillRectangleInterleaved();
 			printFillUniform();
 			printFillUniformInterleaved();
 			printFillGaussian();
+			printFillGaussianInterleaved();
 			printFlipVertical();
 			printFlipHorizontal();
 			printRotateCW_one();
@@ -94,8 +99,10 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			imageName = t.getSingleBandName();
 			dataType = t.getDataType();
 			bitWise = t.getBitWise();
-			printAddUniform();
-			printAddGaussian();
+			printAddUniformSB();
+			printAddUniformIL();
+			printAddGaussianSB();
+			printAddGaussianIL();
 		}
 	}
 
@@ -174,6 +181,84 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	public void printFillInterleaved_bands()
+	{
+		String imageName = imageType.getInterleavedName();
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print(
+				"\t/**\n" +
+				"\t * Fills each band in the image with the specified values\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param values Array which contains the values each band is to be filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+"[] values) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = input.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tfor( int band = 0; band < numBands; band++ ) {\n" +
+				"\t\t\t\tint index = input.getStartIndex() + y * input.getStride() + band;\n" +
+				"\t\t\t\tint end = index + input.width*numBands - band;\n" +
+				"\t\t\t\t"+imageType.getSumType()+" value = values[band];\n" +
+				"\t\t\t\tfor (; index < end; index += numBands ) {\n" +
+				"\t\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printFillBand_Interleaved()
+	{
+		String imageName = imageType.getInterleavedName();
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print(
+				"\t/**\n" +
+				"\t * Fills one band in the image with the specified value\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param band Which band is to be filled with the specified value   \n" +
+				"\t * @param value The value that the image is being filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void fillBand("+imageName+" input, int band , "+imageType.getSumType()+" value) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = input.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride() + band;\n" +
+				"\t\t\tint end = index + input.width*numBands - band;\n" +
+				"\t\t\tfor (; index < end; index += numBands ) {\n" +
+				"\t\t\t\tinput.data[index] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printInsertBandInterleaved()
+	{
+		String singleName = imageType.getSingleBandName();
+		String interleavedName = imageType.getInterleavedName();
+		out.print(
+				"\t/**\n" +
+				"\t * Inserts a single band into into one of the bands in a multi-band image\n" +
+				"\t *\n" +
+				"\t * @param input Single band image\n" +
+				"\t * @param band Which band the image is to be inserted into\n" +
+				"\t * @param output The multi-band image which the input image is to be inserted into\n" +
+				"\t */\n" +
+				"\tpublic static void insertBand( "+singleName+" input, int band , "+interleavedName+" output) {\n" +
+				"\n" +
+				"\t\tfinal int numBands = output.numBands;\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint indexIn = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride() + band;\n" +
+				"\t\t\tint end = indexOut + output.width*numBands - band;\n" +
+				"\t\t\tfor (; indexOut < end; indexOut += numBands , indexIn++ ) {\n" +
+				"\t\t\t\toutput.data[indexOut] = input.data[indexIn];\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 	public void printFillBorder()
 	{
 		String typeCast = imageType.getTypeCastFromSum();
@@ -230,13 +315,49 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\tint x1 = x0 + width;\n" +
 				"\t\tint y1 = y0 + height;\n" +
 				"\n" +
+				"\t\tif( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;\n" +
+				"\t\tif( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;\n" +
+				"\n" +
 				"\t\tfor (int y = y0; y < y1; y++) {\n" +
 				"\t\t\tfor (int x = x0; x < x1; x++) {\n" +
-				"\t\t\t\tif( img.isInBounds(x,y ))\n" +
-				"\t\t\t\t\timg.set(x, y, value);\n" +
+				"\t\t\t\timg.set(x, y, value);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+
+	public void printFillRectangleInterleaved()
+	{
+		String imageName = imageType.getInterleavedName();
+		String dataType = imageType.getDataType();
+
+		out.print("\t/**\n" +
+				"\t * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands\n" +
+				"\t * are filled with the same value.\n" +
+				"\t *\n" +
+				"\t * @param img Image the rectangle is drawn in.  Modified\n" +
+				"\t * @param value Value of the rectangle\n" +
+				"\t * @param x0 Top left x-coordinate\n" +
+				"\t * @param y0 Top left y-coordinate\n" +
+				"\t * @param width Rectangle width\n" +
+				"\t * @param height Rectangle height\n" +
+				"\t */\n" +
+				"\tpublic static void fillRectangle("+imageName+" img, "+dataType+" value, int x0, int y0, int width, int height) {\n" +
+				"\t\tint x1 = x0 + width;\n" +
+				"\t\tint y1 = y0 + height;\n" +
+				"\n" +
+				"\t\tif( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;\n" +
+				"\t\tif( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;\n" +
+				"\n" +
+				"\t\tint length = (x1-x0)*img.numBands;\n" +
+				"\t\tfor (int y = y0; y < y1; y++) {\n" +
+				"\t\t\tint index = img.startIndex + y*img.stride + x0*img.numBands;\n" +
+				"\t\t\tint indexEnd = index + length;\n" +
+				"\t\t\twhile( index < indexEnd ) {\n" +
+				"\t\t\t\timg.data[index++] = value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}");
 	}
 
 	public void printFillUniform() {
@@ -345,7 +466,45 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printAddUniform() {
+	public void printFillGaussianInterleaved() {
+
+		String imageName = imageType.getInterleavedName();
+		String sumType = imageType.getSumType();
+		String castToSum = sumType.compareTo("double") == 0 ? "" : "("+sumType+")";
+		String typeCast = imageType.getTypeCastFromSum();
+
+		out.print("\t/**\n" +
+				"\t * Sets each value in the image to a value drawn from a Gaussian distribution.  A user\n" +
+				"\t * specified lower and upper bound is provided to ensure that the values are within a legal\n" +
+				"\t * range.  A drawn value outside the allowed range will be set to the closest bound.\n" +
+				"\t * \n" +
+				"\t * @param input Input image.  Modified.\n" +
+				"\t * @param rand Random number generator\n" +
+				"\t * @param mean Distribution's mean.\n" +
+				"\t * @param sigma Distribution's standard deviation.\n" +
+				"\t * @param lowerBound Lower bound of value clip\n" +
+				"\t * @param upperBound Upper bound of value clip\n" +
+				"\t */\n" +
+				"\tpublic static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
+				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\t\t"+dataType+"[] data = input.data;\n" +
+				"\t\tint length = input.width*input.numBands;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint indexEnd = index+length;\n" +
+				"\n" +
+				"\t\t\twhile( index < indexEnd ) {\n" +
+				"\t\t\t\t"+sumType+" value = "+castToSum+"(rand.nextGaussian()*sigma+mean);\n" +
+				"\t\t\t\tif( value < lowerBound ) value = lowerBound;\n" +
+				"\t\t\t\tif( value > upperBound ) value = upperBound;\n" +
+				"\t\t\t\tdata[index++] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printAddUniformSB() {
 
 		String sumType = imageType.getSumType();
 		int min = imageType.getMin().intValue();
@@ -382,7 +541,48 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printAddGaussian() {
+	public void printAddUniformIL() {
+
+		String imageName = imageType.getInterleavedName();
+		String sumType = imageType.getSumType();
+		int min = imageType.getMin().intValue();
+		int max = imageType.getMax().intValue();
+		String typeCast = imageType.getTypeCastFromSum();
+
+		out.print("\t/**\n" +
+				"\t * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.\n" +
+				"\t */\n" +
+				"\tpublic static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\t\t"+sumType+" range = max-min;\n" +
+				"\n" +
+				"\t\t"+dataType+"[] data = input.data;\n" +
+				"\t\tint length = input.width*input.numBands;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\n" +
+				"\t\t\t\tint indexEnd = index+length;\n" +
+				"\t\t\t\twhile( index < indexEnd ) {\n");
+		if( imageType.isInteger() && imageType.getNumBits() != 64) {
+			out.print("\t\t\t\t"+sumType+" value = (data[index] "+bitWise+") + rand.nextInt(range)+min;\n");
+			if( imageType.getNumBits() < 32 ) {
+				out.print("\t\t\t\tif( value < "+min+" ) value = "+min+";\n" +
+						"\t\t\t\tif( value > "+max+" ) value = "+max+";\n" +
+						"\n");
+			}
+		} else if( imageType.isInteger() ) {
+			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.nextInt((int)range)+min;\n");
+		} else {
+			String randType = imageType.getRandType();
+			out.print("\t\t\t\t"+sumType+" value = data[index] + rand.next"+randType+"()*range+min;\n");
+		}
+		out.print("\t\t\t\tdata[index++] = "+typeCast+" value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printAddGaussianSB() {
 		String sumType = imageType.getSumType();
 		String typeCast = imageType.getTypeCastFromSum();
 		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
@@ -406,6 +606,39 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\t\tif( value < lowerBound ) value = lowerBound;\n" +
 				"\t\t\t\tif( value > upperBound ) value = upperBound;\n" +
 				"\t\t\t\tinput.data[index++] = "+typeCast+" value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printAddGaussianIL() {
+		String imageName = imageType.getInterleavedName();
+		String sumType = imageType.getSumType();
+		String typeCast = imageType.getTypeCastFromSum();
+		String sumCast = sumType.equals("double") ? "" : "("+sumType+")";
+
+		out.print("\t/**\n" +
+				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified\n"+
+				"\t * it will be set to the closest bound.\n" +
+				"\t * @param input Input image.  Modified.\n" +
+				"\t * @param rand Random number generator.\n" +
+				"\t * @param sigma Distributions standard deviation.\n" +
+				"\t * @param lowerBound Allowed lower bound\n" +
+				"\t * @param upperBound Allowed upper bound\n" +
+				"\t */\n" +
+				"\tpublic static void addGaussian("+imageName+" input, Random rand , double sigma , "
+				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
+				"\n" +
+				"\t\tint length = input.width*input.numBands;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
+				"\t\t\tint indexEnd = index+length;\n" +
+				"\t\t\twhile( index < indexEnd ) {\n" +
+				"\t\t\t\t"+sumType+" value = (input.data[index]"+bitWise+") + "+sumCast+"(rand.nextGaussian()*sigma);\n" +
+				"\t\t\t\tif( value < lowerBound ) value = lowerBound;\n" +
+				"\t\t\t\tif( value > upperBound ) value = upperBound;\n" +
+				"\t\t\t\tinput.data[index++] = "+typeCast+"value;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

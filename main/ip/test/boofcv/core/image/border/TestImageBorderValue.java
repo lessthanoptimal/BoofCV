@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,37 +18,59 @@
 
 package boofcv.core.image.border;
 
-import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestImageBorderValue extends GenericImageBorderTests {
 
-	float value = 43;
+	int value = 43;
 
-	@Override
-	public ImageBorder_I32 wrap(ImageUInt8 image) {
-		return ImageBorderValue.wrap(image,(int)value);
+	public TestImageBorderValue() {
+		super(ImageType.single(ImageUInt8.class),
+				ImageType.single(ImageUInt16.class),
+				ImageType.single(ImageSInt32.class),
+				ImageType.single(ImageSInt64.class),
+				ImageType.single(ImageFloat32.class),
+				ImageType.single(ImageFloat64.class),
+				ImageType.il(2,InterleavedU8.class),
+				ImageType.il(2,InterleavedU16.class),
+				ImageType.il(2,InterleavedS32.class),
+				ImageType.il(2,InterleavedS64.class),
+				ImageType.il(2,InterleavedF32.class),
+				ImageType.il(2,InterleavedF64.class)
+				);
+
 	}
 
 	@Override
-	public ImageBorder_F32 wrap(ImageFloat32 image) {
-		return ImageBorderValue.wrap(image,value);
+	public ImageBorder<ImageBase> wrap(ImageBase image) {
+		if( image instanceof ImageSingleBand)
+			return ImageBorderValue.wrap((ImageSingleBand)image,value);
+		else if( image instanceof ImageInterleaved )
+			return ImageBorderValue.wrap((ImageInterleaved)image,value);
+		else
+			throw new RuntimeException("asdfasdf");
 	}
 
 	@Override
-	public Number get(GImageSingleBand img, int x, int y) {
-		if( img.getImage().isInBounds(x,y))
-			return img.get(x,y);
-		return value;
+	public void checkBorderSet(int x, int y, double[] pixel, ImageBase image) {
 	}
 
 	@Override
-	public void checkBorderSet(int x, int y, Number val,
-							GImageSingleBand border, GImageSingleBand orig) {
-		// the original image should not be modified
+	public void checkBorderGet(int x, int y, ImageBase image, double[] pixel) {
+		if( image.isInBounds(x,y)) {
+			for (int i = 0; i < pixel.length; i++) {
+				assertEquals(pixel[i], GeneralizedImageOps.get(image,x,y,i), 1e-5);
+			}
+		} else {
+			for (int i = 0; i < pixel.length; i++) {
+				assertEquals(value, (int) pixel[i]);
+			}
+		}
 	}
 }

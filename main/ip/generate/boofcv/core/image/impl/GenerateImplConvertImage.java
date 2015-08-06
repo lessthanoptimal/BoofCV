@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,8 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				if( in == out )
 					continue;
 
-				printConvert(in,out);
+				printConvertSingle(in, out);
+				printConvertInterleaved(in, out);
 			}
 		}
 
@@ -69,7 +70,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printConvert( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
+	private void printConvertSingle(AutoTypeImage imageIn, AutoTypeImage imageOut) {
 
 		String typeCast = "( "+imageOut.getDataType()+" )";
 		String bitWise = imageIn.getBitWise();
@@ -98,6 +99,49 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\n" +
 				"\t\t} else {\n" +
 				"\t\t\tfinal int N = from.width * from.height;\n" +
+				"\n");
+
+		if( sameTypes ) {
+			out.print("\t\t\tSystem.arraycopy(from.data, 0, to.data, 0, N);\n");
+		} else {
+			out.print("\t\t\tfor (int i = 0; i < N; i++) {\n" +
+					"\t\t\t\tto.data[i] = "+typeCast+"( from.data[i] "+bitWise+");\n" +
+					"\t\t\t}\n");
+		}
+		out.print("\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printConvertInterleaved( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
+
+		String typeCast = "( "+imageOut.getDataType()+" )";
+		String bitWise = imageIn.getBitWise();
+
+		boolean sameTypes = imageIn.getDataType().compareTo(imageOut.getDataType()) == 0;
+
+		if( imageIn.isInteger() && imageOut.isInteger() &&
+				((imageOut.getNumBits() == 32 && imageIn.getNumBits() != 64) ||
+						(imageOut.getNumBits() == 64)) )
+			typeCast = "";
+		else if( sameTypes && imageIn.isSigned() )
+			typeCast = "";
+
+		out.print("\tpublic static void convert( "+imageIn.getInterleavedName()+" from, "+imageOut.getInterleavedName()+" to ) {\n" +
+				"\n" +
+				"\t\tif (from.isSubimage() || to.isSubimage()) {\n" +
+				"\t\t\tfinal int N = from.width * from.getNumBands();\n" +
+				"\n" +
+				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
+				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
+				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +
+				"\n" +
+				"\t\t\t\tfor (int x = 0; x < N; x++) {\n" +
+				"\t\t\t\t\tto.data[indexTo++] = "+typeCast+"( from.data[indexFrom++] "+bitWise+");\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t} else {\n" +
+				"\t\t\tfinal int N = from.width * from.height * from.getNumBands();\n" +
 				"\n");
 
 		if( sameTypes ) {

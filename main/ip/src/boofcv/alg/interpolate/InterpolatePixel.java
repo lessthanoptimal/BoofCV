@@ -39,6 +39,11 @@ public interface InterpolatePixel<T extends ImageBase> {
 	void setBorder( ImageBorder<T> border );
 
 	/**
+	 * Returns the class which handles the image border
+	 */
+	ImageBorder<T> getBorder();
+
+	/**
 	 * Change the image that is being interpolated.
 	 *
 	 * @param image An image.

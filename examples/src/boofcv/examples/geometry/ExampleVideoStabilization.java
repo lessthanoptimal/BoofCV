@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class ExampleVideoStabilization {
 		gui.setImage(0,1,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
 		gui.autoSetPreferredSize();
 
-		ShowImages.showWindow(gui,"Example Stabilization");
+		ShowImages.showWindow(gui,"Example Stabilization", true);
 
 		// process the video sequence one frame at a time
 		while( video.hasNext() ) {

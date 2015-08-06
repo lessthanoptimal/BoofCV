@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,5 +63,15 @@ public class ImplImageDistort_MS <Input extends ImageSingleBand,Output extends I
 		for( int i = 0; i < N; i++ ) {
 			layerDistort.apply(srcImg.getBand(i),dstImg.getBand(i),dstX0, dstY0, dstX1, dstY1);
 		}
+	}
+
+	@Override
+	public void setRenderAll(boolean renderAll) {
+		layerDistort.setRenderAll(renderAll);
+	}
+
+	@Override
+	public boolean getRenderAll() {
+		return layerDistort.getRenderAll();
 	}
 }

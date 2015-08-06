@@ -21,6 +21,7 @@ package boofcv.abst.distort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -49,9 +50,8 @@ public class TestFDistort {
 
 		new FDistort(input,output).scaleExt().apply();
 
-		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input);
+		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
-		interp.setBorder(FactoryImageBorderAlgs.extend(input));
 
 		float scaleX = (float)input.width/(float)output.width;
 		float scaleY = (float)input.height/(float)output.height;
@@ -105,9 +105,9 @@ public class TestFDistort {
 		PixelTransform_F32 transform = new PixelTransformAffine_F32(affine.invert(null));
 		new FDistort(input,output).affine(2,0.1f,-0.2f,1.1f,3,4.5f).borderExt().apply();
 
-		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input);
-		interp.setImage(input);
+		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input,null);
 		interp.setBorder(FactoryImageBorderAlgs.extend(input));
+		interp.setImage(input);
 
 		if( input.getDataType().isInteger() ) {
 			for( int y = 0; y < output.height; y++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.segmentation.slic.*;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageBase;
@@ -91,12 +92,12 @@ public class FactorySegmentationAlg {
 		SegmentMeanShiftSearch<T> search;
 
 		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
-			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass());
+			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass(), BorderType.EXTENDED);
 			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,
 					spacialRadius,spacialRadius,colorRadius,config.fast);
 		} else {
 			InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(0,255,
-					TypeInterpolate.BILINEAR,(ImageType)imageType);
+					TypeInterpolate.BILINEAR, BorderType.EXTENDED,(ImageType)imageType);
 			search = new SegmentMeanShiftSearchColor(maxIterations,convergenceTol,interp,
 					spacialRadius,spacialRadius,colorRadius,config.fast,imageType);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageUInt8;
 public class DerivativeHelperFunctions {
 
 	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , ImageBorder_I32 borderType )
+												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
@@ -52,7 +52,7 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderHorizontal( ImageSInt16 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , ImageBorder_I32 borderType )
+												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
@@ -69,7 +69,7 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderVertical( ImageUInt8 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , ImageBorder_I32 borderType)
+											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel,borderType,deriv);
@@ -86,7 +86,7 @@ public class DerivativeHelperFunctions {
 	}
 
 	public static void processBorderVertical( ImageSInt16 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , ImageBorder_I32 borderType)
+											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv);

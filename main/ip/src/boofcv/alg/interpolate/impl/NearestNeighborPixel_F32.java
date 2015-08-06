@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.NearestNeighborPixel;
+import boofcv.alg.interpolate.NearestNeighborPixelS;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -34,7 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_F32 extends NearestNeighborPixel<ImageFloat32> {
+public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<ImageFloat32> {
 
 	private float data[];
 	public NearestNeighborPixel_F32() {

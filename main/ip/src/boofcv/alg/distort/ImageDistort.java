@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,10 @@ import boofcv.struct.image.ImageBase;
 
 
 /**
- * Copies an image onto another image while applying a transform to the pixel coordinates. Pixels
- * which have no corresponding mapping can either be skipped or set to a default value.
+ * Copies an image onto another image while applying a transform to the pixel coordinates.
+ * Pixels outside the source image can be handled using the interpolations border or by simply skipping them.  This
+ * behavior is set by calling the {@link #setRenderAll(boolean)} flag.  By Default it will render the entire image,
+ * even if pixel is outside the source image.
  *
  * @author Peter Abeles
  */
@@ -57,4 +59,18 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * @param dstY1 Bottom most crop boundary. Exclusive.
 	 */
 	public void apply( Input srcImg , Output dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
+
+	/**
+	 * Specifies if the entire output image should be rendered, even if mapping to the source image is outside
+	 * the source image.
+	 *
+	 * @param renderAll true to render all pixels or false only ones inside the source image
+	 */
+	public void setRenderAll( boolean renderAll );
+
+	/**
+	 * Returns the render all flag
+	 * @return render all flag
+	 */
+	public boolean getRenderAll();
 }

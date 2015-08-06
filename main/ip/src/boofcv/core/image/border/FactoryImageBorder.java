@@ -29,8 +29,14 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-	public static <T extends ImageSingleBand> ImageBorder<T> general( T image , BorderType borderType ) {
-		ImageBorder<T> ret = general((Class)image.getClass(),borderType);
+	public static <T extends ImageSingleBand> ImageBorder<T> single(T image, BorderType borderType) {
+		ImageBorder<T> ret = single((Class) image.getClass(), borderType);
+		ret.setImage(image);
+		return ret;
+	}
+
+	public static <T extends ImageInterleaved> ImageBorder<T> interleaved(T image, BorderType borderType) {
+		ImageBorder<T> ret = interleaved((Class) image.getClass(), borderType);
 		ret.setImage(image);
 		return ret;
 	}
@@ -47,29 +53,67 @@ public class FactoryImageBorder {
 		if( (Class)imageType == ImageFloat64.class )
 			return (Class)ImageBorder1D_F64.class;
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return (Class)ImageBorder1D_I32.class;
+			return (Class)ImageBorder1D_S32.class;
 		else if( (Class)imageType == ImageSInt64.class )
-			return (Class)ImageBorder1D_I64.class;
+			return (Class)ImageBorder1D_S64.class;
 		else
 			throw new IllegalArgumentException("Unknown image type");
 	}
 
+	public static <T extends ImageBase> ImageBorder<T>
+	generic( BorderType borderType, ImageType<T> imageType ) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				return single(imageType.getImageClass(),borderType);
+
+			case MULTI_SPECTRAL:
+				return single(imageType.getImageClass(),borderType);
+
+			case INTERLEAVED:
+				return interleaved(imageType.getImageClass(),borderType);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
+	}
+
+	public static <T extends ImageBase> ImageBorder<T>
+	genericValue( double value, ImageType<T> imageType ) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+				return singleValue(imageType.getImageClass(), value);
+
+			case MULTI_SPECTRAL:
+				return singleValue(imageType.getImageClass(),value);
+
+			case INTERLEAVED:
+				return interleavedValue(imageType.getImageClass(),value);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
+	}
+
 	/**
-	 * Creates an instance of the requested algorithms for handling borders pixels.  For
-	 * borders that return the same pixel value always use {@link #value(Class, double)} instead.
+	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageSingleBand}.  If type
+	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
+	 * use {@link #singleValue(Class, double)} instead.
 	 *
 	 * @param imageType Type of image being processed.
 	 * @param borderType Which border algorithm should it use.
 	 * @return The requested {@link ImageBorder).
 	 */
 	public static <T extends ImageSingleBand> ImageBorder<T>
-	general( Class<T> imageType , BorderType borderType )
+	single(Class<T> imageType, BorderType borderType)
 	{
 		Class<?> borderClass;
 		switch(borderType) {
 			case SKIP:
-				borderClass = BorderIndex1D_Exception.class;
-				break;
+				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
+						"externally.  Call this might be a bug. Instead pass in EXTENDED and manually skip over the " +
+						"pixel in a loop some place.");
+//				borderClass = BorderIndex1D_Exception.class;
+//				break;
 
 			case NORMALIZED:
 				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
@@ -86,6 +130,9 @@ public class FactoryImageBorder {
 				borderClass = BorderIndex1D_Wrap.class;
 				break;
 
+			case VALUE:
+				return FactoryImageBorder.singleValue(imageType, 0);
+
 			default:
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
@@ -95,9 +142,64 @@ public class FactoryImageBorder {
 		if( imageType == ImageFloat64.class )
 			return (ImageBorder<T>)new ImageBorder1D_F64(borderClass);
 		else if( ImageInteger.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_I32((Class)borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_S32((Class)borderClass);
 		else if( imageType == ImageSInt64.class )
-			return (ImageBorder<T>)new ImageBorder1D_I64(borderClass);
+			return (ImageBorder<T>)new ImageBorder1D_S64(borderClass);
+		else
+			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+	}
+
+	/**
+	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageInterleaved}.  If type
+	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
+	 * use {@link #singleValue(Class, double)} instead.
+	 *
+	 * @param imageType Type of image being processed.
+	 * @param borderType Which border algorithm should it use.
+	 * @return The requested {@link ImageBorder).
+	 */
+	public static <T extends ImageInterleaved> ImageBorder<T>
+	interleaved(Class<T> imageType, BorderType borderType)
+	{
+		Class<?> borderClass;
+		switch(borderType) {
+			case SKIP:
+				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
+						"externally.  Call this might be a bug. Instead pass in EXTENDED and manually skip over the " +
+						"pixel in a loop some place.");
+//				borderClass = BorderIndex1D_Exception.class;
+//				break;
+
+			case NORMALIZED:
+				throw new IllegalArgumentException("Normalized can't be supported by this border interface");
+
+			case REFLECT:
+				borderClass = BorderIndex1D_Reflect.class;
+				break;
+
+			case EXTENDED:
+				borderClass = BorderIndex1D_Extend.class;
+				break;
+
+			case WRAP:
+				borderClass = BorderIndex1D_Wrap.class;
+				break;
+
+			case VALUE:
+				return FactoryImageBorder.interleavedValue(imageType, 0);
+
+			default:
+				throw new IllegalArgumentException("Border type not supported: "+borderType);
+		}
+
+		if( imageType == InterleavedF32.class )
+			return (ImageBorder<T>)new ImageBorder1D_IL_F32(borderClass);
+		else if( imageType == InterleavedF64.class )
+			return (ImageBorder<T>)new ImageBorder1D_IL_F64(borderClass);
+		else if( InterleavedInteger.class.isAssignableFrom(imageType) )
+			return (ImageBorder<T>)new ImageBorder1D_IL_S32(borderClass);
+		else if( imageType == InterleavedS64.class )
+			return (ImageBorder<T>)new ImageBorder1D_IL_S64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}
@@ -111,8 +213,8 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageSingleBand> ImageBorder<T> value( T image , double value ) {
-		ImageBorder border = value(image.getClass(),value);
+	public static <T extends ImageSingleBand> ImageBorder<T> singleValue(T image, double value) {
+		ImageBorder border = singleValue(image.getClass(), value);
 		border.setImage(image);
 		return border;
 	}
@@ -126,13 +228,51 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageSingleBand> ImageBorder<T> value( Class<T> imageType , double value ) {
+	public static <T extends ImageSingleBand> ImageBorder<T> singleValue(Class<T> imageType, double value) {
 		if( imageType == ImageFloat32.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
 		} else if( imageType == ImageFloat64.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
 		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+		}
+	}
+
+	/**
+	 * Creates an {@link ImageBorder} that returns the specified value always.
+	 *
+	 * @see ImageBorderValue
+	 *
+	 * @param image The image the border is being created for.
+	 * @param value The value which will be returned.
+	 * @return An {@link ImageBorder}
+	 */
+	public static <T extends ImageInterleaved> ImageBorder<T> interleavedValue(T image, double value) {
+		ImageBorder border = interleavedValue(image.getClass(), value);
+		border.setImage(image);
+		return border;
+	}
+
+	/**
+	 * Creates an {@link ImageBorder} that returns the specified value always.
+	 *
+	 * @see ImageBorderValue
+	 *
+	 * @param imageType The image type the border is being created for.
+	 * @param value The value which will be returned.
+	 * @return An {@link ImageBorder}
+	 */
+	public static <T extends ImageInterleaved> ImageBorder<T> interleavedValue(Class<T> imageType, double value) {
+		if( imageType == InterleavedF32.class ) {
+			return (ImageBorder<T>) new ImageBorderValue.Value_IL_F32((float) value);
+		} else if( imageType == InterleavedF64.class ) {
+				return (ImageBorder<T>)new ImageBorderValue.Value_IL_F64(value);
+		} else if( InterleavedInteger.class.isAssignableFrom(imageType) ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_IL_S32((int)value);
+		} else if( imageType == InterleavedS64.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_IL_S64((long)value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}

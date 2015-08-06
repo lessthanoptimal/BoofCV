@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative.impl;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -39,7 +39,7 @@ public class TestGradientSparseTwo0_U8 extends GeneralGradientSparse {
 
 	@Override
 	public SparseImageGradient createAlg(ImageBorder border) {
-		return new GradientSparseTwo0_U8((ImageBorder_I32)border);
+		return new GradientSparseTwo0_U8((ImageBorder_S32)border);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,19 +21,18 @@ package boofcv.factory.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.alg.tracker.meanshift.LocalWeightedHistogramRotRect;
 import boofcv.alg.tracker.meanshift.PixelLikelihood;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftComaniciu2003;
 import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.alg.tracker.tld.TldTracker;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -61,7 +60,7 @@ public class FactoryTrackerObjectQuad {
 
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
 		TldTracker<T,D> tracker = new TldTracker<T,D>(config.parameters,interpolate,gradient,imageType,derivType);
@@ -106,7 +105,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
 	 */
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageBase>
 	TrackerObjectQuad<T> meanShiftLikelihood(int maxIterations,
 											 int numBins,
 											 double maxPixelValue,
@@ -120,11 +119,16 @@ public class FactoryTrackerObjectQuad {
 				break;
 
 			case HISTOGRAM_INDEPENDENT_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue,numBins,imageType);
+				if( imageType.getNumBands() != 3 )
+					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
+				likelihood = FactoryTrackerObjectAlgs.
+						likelihoodHueSatHistIndependent(maxPixelValue, numBins, (ImageType) imageType);
 				break;
 
 			case HISTOGRAM_RGB_to_HSV:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,imageType);
+				if( imageType.getNumBands() != 3 )
+					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
+				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,(ImageType)imageType);
 				break;
 
 			default:
@@ -148,21 +152,10 @@ public class FactoryTrackerObjectQuad {
 	 * @param <T> Image type
 	 * @return TrackerObjectQuad based on Comaniciu2003
 	 */
-	public static <T extends ImageMultiBand>
+	public static <T extends ImageBase>
 	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
-		if( config == null )
-			config = new ConfigComaniciu2003();
-
-		InterpolatePixelMB<T> interp = FactoryInterpolation.createPixelMB(0,config.maxPixelValue,
-				config.interpolation,imageType);
-
-		LocalWeightedHistogramRotRect<T> hist =
-				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
-						imageType.getNumBands(),config.maxPixelValue,interp);
-		TrackerMeanShiftComaniciu2003<T> alg = new TrackerMeanShiftComaniciu2003<T>(
-				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
-				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
+		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config,imageType);
 
 		return new Comaniciu2003_to_TrackerObjectQuad<T>(alg,imageType);
 	}

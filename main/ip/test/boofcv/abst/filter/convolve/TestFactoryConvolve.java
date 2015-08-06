@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder1D_F32;
-import boofcv.core.image.border.ImageBorder1D_I32;
+import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -105,7 +105,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class, ImageInt16.class,BorderType.EXTENDED,true);
 		conv.process(input,found);
-		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+		ConvolveWithBorder.horizontal(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED
@@ -170,7 +170,7 @@ public class TestFactoryConvolve {
 		// CHECK EXTENDED
 		conv = FactoryConvolve.convolve( kernel,ImageUInt8.class,ImageInt16.class,BorderType.EXTENDED);
 		conv.process(input,found);
-		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+		ConvolveWithBorder.convolve(kernel,input,expected,new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		BoofTesting.assertEquals(expected,found,0);
 
 		// CHECK NORMALIZED

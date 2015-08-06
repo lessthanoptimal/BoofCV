@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.struct.RectangleRotate_F32;
-import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F32;
 
 import java.util.List;
@@ -51,7 +51,7 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-public class TrackerMeanShiftComaniciu2003<T extends ImageMultiBand> {
+public class TrackerMeanShiftComaniciu2003<T extends ImageBase> {
 
 	// computes the histogram inside a rotated rectangle
 	private LocalWeightedHistogramRotRect<T> calcHistogram;

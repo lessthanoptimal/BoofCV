@@ -22,6 +22,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.impl.DistortSupport;
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
@@ -32,7 +34,6 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 
@@ -47,9 +48,8 @@ public class FDistort
 	// input and output images
 	ImageBase input,output;
 	// specifies how the borders are handled
-	ImageBorder border;
 	ImageDistort distorter;
-	InterpolatePixelS interp;
+	InterpolatePixel interp;
 	PixelTransform_F32 outputToInput;
 
 	// if the transform should be cached or not.
@@ -66,21 +66,9 @@ public class FDistort
 		this.input = input;
 		this.output = output;
 
-		ImageType inputType = input.getImageType();
-		interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, inputType.getImageClass());
+		interp(TypeInterpolate.BILINEAR);
+		border(0);
 
-		switch( inputType.getFamily() ) {
-			case SINGLE_BAND:
-				border = FactoryImageBorder.value(inputType.getImageClass(), 0);
-				break;
-
-			case MULTI_SPECTRAL:
-				border = FactoryImageBorder.value(inputType.getImageClass(), 0);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unsupported image type");
-		}
 		cached = false;
 		distorter = null;
 		outputToInput = null;
@@ -115,11 +103,11 @@ public class FDistort
 	}
 
 	/**
-	 * Sets the border.  null means those pixels are skipped
+	 * Sets how the interpolation handles borders.
 	 */
 	public FDistort border( ImageBorder border ) {
 		distorter = null;
-		this.border = border;
+		interp.setBorder(border);
 		return this;
 	}
 
@@ -127,14 +115,14 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
-		return border(FactoryImageBorder.general(input.getImageType().getImageClass(), type));
+		return border(FactoryImageBorder.generic(type, input.getImageType()));
 	}
 
 	/**
 	 * Sets the border to a fixed gray-scale value
 	 */
 	public FDistort border( double value ) {
-		return border(FactoryImageBorder.value(input.getImageType().getImageClass(), value));
+		return border(FactoryImageBorder.genericValue(value, input.getImageType()));
 	}
 
 	/**
@@ -159,8 +147,7 @@ public class FDistort
 	 */
 	public FDistort interp(TypeInterpolate type) {
 		distorter = null;
-		this.interp = FactoryInterpolation.createPixelS(0, 255, type,
-				input.getImageType().getImageClass());
+		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, input.getImageType());
 		;
 		return this;
 	}
@@ -257,11 +244,15 @@ public class FDistort
 			Class typeOut = output.getImageType().getImageClass();
 			switch( input.getImageType().getFamily() ) {
 				case SINGLE_BAND:
-					distorter = FactoryDistort.distort(cached, interp, border, typeOut);
+					distorter = FactoryDistort.distortSB(cached, (InterpolatePixelS)interp, typeOut);
 					break;
 
 				case MULTI_SPECTRAL:
-					distorter = FactoryDistort.distortMS(cached, interp, border, typeOut);
+					distorter = FactoryDistort.distortMS(cached, (InterpolatePixelS)interp, typeOut);
+					break;
+
+				case INTERLEAVED:
+					distorter = FactoryDistort.distortIL(cached, (InterpolatePixelMB) interp, output.getImageType());
 					break;
 
 				default:

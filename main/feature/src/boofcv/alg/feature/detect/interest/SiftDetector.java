@@ -140,7 +140,7 @@ public class SiftDetector {
 		derivYY = FactoryConvolveSparse.create(ImageFloat32.class,kerYY);
 
 		// treat pixels outside the image border as having a value of zero
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.singleValue(ImageFloat32.class, 0);
 
 		derivXX.setImageBorder(border);
 		derivXY.setImageBorder(border);

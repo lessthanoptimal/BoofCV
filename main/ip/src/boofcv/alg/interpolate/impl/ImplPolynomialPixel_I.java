@@ -15,10 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageType;
 
@@ -118,7 +119,7 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 		int x0 = xt - M/2 + offM;
 		int y0 = yt - M/2 + offM;
 
-		ImageBorder_I32 border = (ImageBorder_I32)this.border;
+		ImageBorder_S32 border = (ImageBorder_S32)this.border;
 
 		interp1D.setInput(horiz,horiz.length);
 		for( int i = 0; i < M; i++ ) {

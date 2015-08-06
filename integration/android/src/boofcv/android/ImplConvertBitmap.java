@@ -19,9 +19,7 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 
 /**
  * Low level implementations of Bitmap conversion routines. Contains functions
@@ -100,6 +98,23 @@ public class ImplConvertBitmap {
 			}
 		}
 	}
+
+	public static void bitmapToInterleaved(Bitmap input, InterleavedU8 output) {
+		final int h = output.height;
+		final int w = output.width;
+
+		for (int y = 0; y < h; y++) {
+			int index = output.startIndex + y * output.stride;
+			for (int x = 0; x < w; x++) {
+				int rgb = input.getPixel(x, y);
+
+				output.data[index++] = (byte)(rgb >> 24);
+				output.data[index++] = (byte)((rgb >> 16) & 0xFF);
+				output.data[index++] = (byte)((rgb >> 8) & 0xFF);
+				output.data[index++] = (byte)(rgb & 0xFF);
+			}
+		}
+	}
 	
 	public static void bitmapToMultiRGB_F32(Bitmap input, MultiSpectral<ImageFloat32> output) {
 		final int h = output.height;
@@ -119,6 +134,23 @@ public class ImplConvertBitmap {
 				R.data[index] = (rgb >> 16) & 0xFF;
 				G.data[index] = (rgb >> 8) & 0xFF;
 				B.data[index] = rgb & 0xFF;
+			}
+		}
+	}
+
+	public static void bitmapToInterleaved(Bitmap input, InterleavedF32 output) {
+		final int h = output.height;
+		final int w = output.width;
+
+		for (int y = 0; y < h; y++) {
+			int index = output.startIndex + y * output.stride;
+			for (int x = 0; x < w; x++ ) {
+				int rgb = input.getPixel(x, y);
+
+				output.data[index++] = (rgb >> 24) & 0xFF;
+				output.data[index++] = (rgb >> 16) & 0xFF;
+				output.data[index++] = (rgb >> 8) & 0xFF;
+				output.data[index++] = rgb & 0xFF;
 			}
 		}
 	}
@@ -279,6 +311,34 @@ public class ImplConvertBitmap {
 			throw new RuntimeException("Image type not yet supported: "+config);
 		}
 	}
+
+	public static void arrayToInterleaved(int input[], Bitmap.Config config , InterleavedU8 output ) {
+		final int h = output.height;
+		final int w = output.width;
+
+		int indexSrc = 0;
+
+		switch (config) {
+			case ARGB_8888:
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w*output.numBands;
+					// for (int x = 0; x < w; x++) {
+					while (indexDst < end) {
+						int rgb = input[indexSrc++];
+
+						output.data[indexDst++] = (byte)(rgb >> 24);
+						output.data[indexDst++] = (byte)(rgb >> 16);
+						output.data[indexDst++] = (byte)(rgb >> 8);
+						output.data[indexDst++] = (byte)rgb;
+					}
+				}
+				break;
+
+			default:
+				throw new RuntimeException("Image type not yet supported: "+config);
+		}
+	}
 	
 	public static void arrayToMulti_F32(int input[], Bitmap.Config config , MultiSpectral<ImageFloat32> output ) {
 		final int h = output.height;
@@ -311,6 +371,34 @@ public class ImplConvertBitmap {
 
 		default:
 			throw new RuntimeException("Image type not yet supported: "+config);
+		}
+	}
+
+	public static void arrayToInterleaved(int input[], Bitmap.Config config , InterleavedF32 output ) {
+		final int h = output.height;
+		final int w = output.width;
+
+		int indexSrc = 0;
+
+		switch (config) {
+			case ARGB_8888:
+				for (int y = 0; y < h; y++) {
+					int indexDst = output.startIndex + y * output.stride;
+					int end = indexDst + w*output.numBands;
+					// for (int x = 0; x < w; x++) {
+					while (indexDst < end) {
+						int rgb = input[indexSrc++];
+
+						output.data[indexDst++] = (rgb >> 24) & 0xFF;
+						output.data[indexDst++] = (rgb >> 16) & 0xFF;
+						output.data[indexDst++] = (rgb >> 8) & 0xFF;
+						output.data[indexDst++] = rgb & 0xFF;
+					}
+				}
+				break;
+
+			default:
+				throw new RuntimeException("Image type not yet supported: "+config);
 		}
 	}
 	

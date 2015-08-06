@@ -22,8 +22,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -68,17 +66,13 @@ public class LensDistortionOps {
 											ImageType<T> imageType)
 	{
 		Class bandType = imageType.getImageClass();
+		boolean skip = borderType == BorderType.SKIP;
 
-		InterpolatePixelS interp =
-				FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, bandType);
+		// it has to process the border at some point, so if skip is requested just skip stuff truly outside the image
+		if( skip )
+			borderType = BorderType.EXTENDED;
 
-		ImageBorder border;
-		if( borderType == null ) {
-			border = null;
-		} else if( borderType == BorderType.VALUE )
-			border = FactoryImageBorder.value(bandType, 0);
-		else
-			border = FactoryImageBorder.general(bandType,borderType);
+		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR,borderType, bandType);
 
 		PointTransform_F32 undistToDist = null;
 		switch( type ) {
@@ -96,11 +90,11 @@ public class LensDistortionOps {
 
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
-				distort = FactoryDistort.distort(true,interp, border, bandType);
+				distort = FactoryDistort.distortSB(true, interp, bandType);
 				break;
 
 			case MULTI_SPECTRAL:
-				distort = FactoryDistort.distortMS(true,interp, border, bandType);
+				distort = FactoryDistort.distortMS(true,interp, bandType);
 				break;
 
 			default:
@@ -108,6 +102,7 @@ public class LensDistortionOps {
 		}
 
 		distort.setModel(new PointToPixelTransform_F32(undistToDist));
+		distort.setRenderAll(!skip );
 
 		return distort;
 	}

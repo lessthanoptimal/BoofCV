@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.core.image.border;
 
 import boofcv.struct.image.*;
+
+import java.util.Arrays;
 
 /**
  * All points outside of the image will return the specified value
@@ -40,7 +42,21 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static ImageBorder_I64 wrap( ImageSInt64 image , long value ) {
+	public static ImageBorder wrap( ImageInterleaved image , double value ) {
+		if (image instanceof InterleavedF32) {
+			return new Value_IL_F32((InterleavedF32) image, (float) value);
+		} else if (image instanceof InterleavedF64) {
+			return new Value_IL_F64((InterleavedF64) image, value);
+		} else if (InterleavedInteger.class.isAssignableFrom(image.getClass())) {
+			return new Value_IL_S32((InterleavedInteger)image,(int)value );
+		} else if( image instanceof InterleavedS64 ) {
+			return new Value_IL_S64((InterleavedS64)image,(long)value );
+		} else {
+			throw new RuntimeException("Add support for more types");
+		}
+	}
+
+	public static ImageBorder_S64 wrap( ImageSInt64 image , long value ) {
 		return new Value_I64(image,value);
 	}
 
@@ -52,11 +68,11 @@ public class ImageBorderValue {
 		return new Value_F32(image,value);
 	}
 
-	public static ImageBorder_I32 wrap( ImageInteger image , int value ) {
+	public static ImageBorder_S32 wrap( ImageInteger image , int value ) {
 		return new Value_I(image,value);
 	}
 
-	public static class Value_I64 extends ImageBorder_I64 {
+	public static class Value_I64 extends ImageBorder_S64 {
 		long value;
 
 		public Value_I64( ImageSInt64 image , long value ) {
@@ -125,7 +141,7 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static class Value_I extends ImageBorder_I32 {
+	public static class Value_I extends ImageBorder_S32 {
 		int value;
 
 		public Value_I( ImageInteger image , int value ) {
@@ -146,5 +162,69 @@ public class ImageBorderValue {
 		public void setOutside(int x, int y, int value) {
 			// do nothing since it is a constant
 		}
+	}
+
+	public static class Value_IL_F32 extends ImageBorder_IL_F32 {
+		float value;
+
+		public Value_IL_F32(InterleavedF32 image, float value) {super(image); this.value = value; }
+
+		public Value_IL_F32(float value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, float[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, float[] pixel) {}
+	}
+
+	public static class Value_IL_F64 extends ImageBorder_IL_F64 {
+		double value;
+
+		public Value_IL_F64(InterleavedF64 image, double value) {super(image); this.value = value; }
+
+		public Value_IL_F64(double value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, double[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, double[] pixel) {}
+	}
+
+	public static class Value_IL_S32 extends ImageBorder_IL_S32 {
+		int value;
+
+		public Value_IL_S32(InterleavedInteger image, int value) {super(image); this.value = value; }
+
+		public Value_IL_S32(int value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, int[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, int[] pixel) {}
+	}
+
+	public static class Value_IL_S64 extends ImageBorder_IL_S64 {
+		long value;
+
+		public Value_IL_S64(InterleavedS64 image, long value) {super(image); this.value = value; }
+
+		public Value_IL_S64(long value) { this.value = value; }
+
+		@Override
+		public void getOutside(int x, int y, long[] pixel) {
+			Arrays.fill(pixel,value);
+		}
+
+		@Override
+		public void setOutside(int x, int y, long[] pixel) {}
 	}
 }

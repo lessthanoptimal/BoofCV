@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class InterleavedI16 extends ImageInterleaved<InterleavedI16> {
+public abstract class InterleavedI16<T extends InterleavedI16> extends InterleavedInteger<T> {
 
 	public short data[];
 
@@ -89,15 +89,6 @@ public abstract class InterleavedI16 extends ImageInterleaved<InterleavedI16> {
 		}
 	}
 
-	/**
-	 * Returns the value of the specified band in the specified pixel.
-	 *
-	 * @param x	pixel coordinate.
-	 * @param y	pixel coordinate.
-	 * @param band which color band in the pixel
-	 * @return an intensity value.
-	 */
-	public abstract int getBand(int x, int y, int band);
 
 	/**
 	 * Returns the value of the specified band in the specified pixel.
@@ -114,6 +105,24 @@ public abstract class InterleavedI16 extends ImageInterleaved<InterleavedI16> {
 			throw new ImageAccessException("Invalid band requested.");
 
 		data[getIndex(x, y, band)] = value;
+	}
+
+	@Override
+	public void set_unsafe(int x, int y, int... value) {
+		int index = getIndex(x, y, 0);
+		for (int i = 0; i < numBands; i++, index++) {
+			data[index] = (short)value[i];
+		}
+	}
+
+	@Override
+	public void setBand(int x, int y, int band, int value) {
+		if (!isInBounds(x, y))
+			throw new ImageAccessException("Requested pixel is out of bounds.");
+		if (band < 0 || band >= numBands)
+			throw new ImageAccessException("Invalid band requested.");
+
+		data[getIndex(x, y, band)] = (short)value;
 	}
 
 	@Override

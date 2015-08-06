@@ -1,7 +1,26 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.tracker.tld;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageUInt8;
@@ -28,7 +47,8 @@ public class TestTldFernClassifier {
 
 	ImageUInt8 input = new ImageUInt8(width,height);
 
-	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
+	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(
+			ImageUInt8.class, BorderType.EXTENDED);
 
 	public TestTldFernClassifier() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
@@ -186,7 +206,8 @@ public class TestTldFernClassifier {
 	}
 
 	private TldFernClassifier<ImageUInt8> createAlg() {
-		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
+		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(
+				ImageUInt8.class, BorderType.EXTENDED);
 		return new TldFernClassifier<ImageUInt8>(rand,numFerns,8,numLearnRandom,10,interpolate);
 	}
 

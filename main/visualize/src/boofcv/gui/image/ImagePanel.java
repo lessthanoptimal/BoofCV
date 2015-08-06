@@ -58,6 +58,7 @@ public class ImagePanel extends JPanel {
 		Graphics2D g2 = (Graphics2D)g;
 
 		//draw the image
+		BufferedImage img = this.img;
 		if (img != null) {
 			if( scaling != ScaleOptions.NONE ) {
 				double ratioW = (double)getWidth()/(double)img.getWidth();
@@ -90,6 +91,7 @@ public class ImagePanel extends JPanel {
 	 */
 	public void setBufferedImage(BufferedImage image) {
 		this.img = image;
+		this.repaint();
 	}
 
    /**
@@ -101,8 +103,7 @@ public class ImagePanel extends JPanel {
       SwingUtilities.invokeLater(new Runnable() {
          @Override
          public void run() {
-            img = image;
-            repaint();
+			 setBufferedImage(image);
          }
       });
    }

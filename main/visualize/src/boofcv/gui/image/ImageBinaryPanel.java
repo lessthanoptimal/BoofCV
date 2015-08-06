@@ -51,13 +51,13 @@ public class ImageBinaryPanel extends JPanel {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public synchronized void paintComponent(Graphics g) {
 		//draw the image
 		if (img != null)
 			g.drawImage(img, 0, 0, this);
 	}
 
-	public void setBinaryImage(ImageUInt8 binaryImage) {
+	public synchronized void setBinaryImage(ImageUInt8 binaryImage) {
 		this.binaryImage = binaryImage;
 		VisualizeBinaryData.renderBinary(binaryImage,false,img);
 	}

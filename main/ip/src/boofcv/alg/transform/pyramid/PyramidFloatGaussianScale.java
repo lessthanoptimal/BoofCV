@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,7 +112,7 @@ public class PyramidFloatGaussianScale< T extends ImageSingleBand> extends Pyram
 				layer.setTo(tempImage);
 			} else {
 				PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage);
-				DistortImageOps.distortSingle(tempImage,layer,model,null,interpolate);
+				DistortImageOps.distortSingle(tempImage,layer, true, model,interpolate);
 			}
 		}
 	}

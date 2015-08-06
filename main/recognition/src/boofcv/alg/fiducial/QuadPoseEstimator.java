@@ -82,6 +82,9 @@ public class QuadPoseEstimator {
 	private Se3_F64 outputFiducialToCamera = new Se3_F64();
 	private Se3_F64 foundEPNP = new Se3_F64();
 
+	// error for outputFiducialToCamera
+	private double outputError;
+
 	private Point3D_F64 cameraP3 = new Point3D_F64();
 	private Point2D_F64 predicted = new Point2D_F64();
 
@@ -170,11 +173,17 @@ public class QuadPoseEstimator {
 		// this is mainly an optimization thing.  The handling of the pathological cause is only
 		// used if it doesn't add a bunch of error.  But this technique is only needed when certain conditions
 		// are meet.
+		boolean success;
 		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
-			return estimatePathological();
+			success = estimatePathological(outputFiducialToCamera);
 		} else {
-			return estimate(undistortedCorners, outputFiducialToCamera);
+			success = estimate(undistortedCorners, outputFiducialToCamera);
 		}
+
+		if( success ) {
+			outputError = computeErrors(outputFiducialToCamera);
+		}
+		return success;
 	}
 
 	/**
@@ -193,7 +202,7 @@ public class QuadPoseEstimator {
 	 *
 	 * @return true if successful false if not
 	 */
-	private boolean estimatePathological() {
+	private boolean estimatePathological( Se3_F64 outputFiducialToCamera ) {
 		enlargedCorners.set(undistortedCorners);
 		enlarge(enlargedCorners, 4);
 
@@ -210,6 +219,7 @@ public class QuadPoseEstimator {
 
 		double errorModified = computeErrors(outputFiducialToCamera);
 
+		// todo do a weighted average of the two estimates so the transition is smooth
 		// if the solutions are very similar go with the enlarged version
 		if (errorModified > errorRegular + FUDGE_FACTOR ) {
 			outputFiducialToCamera.set(foundRegular);
@@ -357,5 +367,12 @@ public class QuadPoseEstimator {
 
 	public Se3_F64 getWorldToCamera() {
 		return outputFiducialToCamera;
+	}
+
+	/**
+	 * Reprojection error of fiducial
+	 */
+	public double getError() {
+		return outputError;
 	}
 }

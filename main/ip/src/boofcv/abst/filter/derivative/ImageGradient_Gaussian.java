@@ -70,7 +70,7 @@ public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSi
 
 		kernelBlur = FactoryKernelGaussian.gaussian1D(inputType,sigma,radius);
 		kernelDeriv = FactoryKernelGaussian.derivativeI(inputType,1,sigma,radius);
-		border = FactoryImageBorder.general(derivType,borderType);
+		border = FactoryImageBorder.single(derivType, borderType);
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -92,7 +92,7 @@ public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSi
 	@Override
 	public void setBorderType(BorderType type) {
 		this.borderType = type;
-		border = FactoryImageBorder.general(derivType,borderType);
+		border = FactoryImageBorder.single(derivType, borderType);
 	}
 
 	@Override

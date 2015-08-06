@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Random;
 
@@ -41,7 +42,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(14);
+		performTests(17);
 	}
 
 	@Override
@@ -83,9 +84,32 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][6] = inputA;
 			ret[0][7] = inputB;
 
-		} else if( name.equals("fill")) {
+		} else if( name.equals("fillBand")) {
 			ret[0][0] = inputA;
-			ret[0][1] = 3;
+			ret[0][1] = 1;
+			ret[0][2] = 3;
+		} else if( name.equals("fill")) {
+			if( param[1].isArray() ) {
+				Object array = Array.newInstance(param[1].getComponentType(), numBands);
+				for (int i = 0; i < numBands; i++) {
+					Array.set(array, i, 2 * i + 1);
+				}
+				ret[0][0] = inputA;
+				ret[0][1] = array;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+			}
+		} else if( name.equals("insertBand")) {
+			ImageBase input = GeneralizedImageOps.createSingleBand((Class) param[0], width, height);
+			ImageBase output = GeneralizedImageOps.createInterleaved((Class) param[2], width, height,numBands);
+
+			GImageMiscOps.fillUniform(input,rand,0,10);
+			GImageMiscOps.fillUniform(output,rand,0,10);
+
+			ret[0][0] = input;
+			ret[0][1] = 1;
+			ret[0][2] = output;
 		} else if( name.equals("fillBorder")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;

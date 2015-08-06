@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.filter.FilterSequence;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder1D_F32;
-import boofcv.core.image.border.ImageBorder1D_I32;
+import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
@@ -125,7 +125,7 @@ public class CompareHessianToConvolution {
 		}
 		if( processBorder ) {
 			if( images[0].getDataType().isInteger())
-				testInputs[5] = new ImageBorder1D_I32(BorderIndex1D_Extend.class);
+				testInputs[5] = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 			else
 				testInputs[5] = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 		} else {

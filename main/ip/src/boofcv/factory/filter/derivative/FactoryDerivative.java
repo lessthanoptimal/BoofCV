@@ -22,7 +22,7 @@ import boofcv.abst.filter.derivative.*;
 import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
@@ -189,7 +189,7 @@ public class FactoryDerivative {
 										 Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_S32.class;
 			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible",e);
@@ -201,7 +201,7 @@ public class FactoryDerivative {
 										Class<?> inputType , Class<?> derivType ) {
 		Method m;
 		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_S32.class;
 			m = derivativeClass.getDeclaredMethod("process", inputType,derivType,derivType,derivType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible",e);
@@ -213,7 +213,7 @@ public class FactoryDerivative {
 		String name = derivativeClass.getSimpleName().substring(8);
 		Method m;
 		try {
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_I32.class;
+			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(imageType) ? ImageBorder_F32.class : ImageBorder_S32.class;
 			m = HessianFromGradient.class.getDeclaredMethod("hessian"+name, imageType,imageType,imageType,imageType,imageType,borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible",e);

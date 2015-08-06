@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,12 @@
 
 package boofcv.io.image;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.IntegerInterleavedRaster;
-import sun.awt.image.ShortInterleavedRaster;
+import boofcv.struct.image.*;
+import sun.awt.image.*;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 
 /**
@@ -50,53 +47,15 @@ public class ConvertRaster {
 		int size = dst.getWidth() * dst.getHeight();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					int ave = (r + g + b) / 3;
-
-					data[indexDst] = (byte) ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
-				System.arraycopy(srcData, 0, data, 0, size);
-			else {
-				for (int y = 0; y < dst.height; y++) {
-					int indexDst = dst.startIndex + dst.stride * y;
-					int indexSrc = srcOffset + srcStride * y;
-
-					System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
-				}
-			}
+			from_1BU8_to_U8(dst, srcData, data, size, srcStride, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					indexSrc++;
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					int ave = (r + g + b) / 3;
-
-					data[indexDst] = (byte) ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_U8(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
 		}
@@ -113,7 +72,7 @@ public class ConvertRaster {
 		int size = dst.getWidth() * dst.getHeight();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 1) {
@@ -143,54 +102,177 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					float ave = (r + g + b) / 3.0f;
-
-					data[indexDst] = ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				int indexSrc = srcOffset + srcStride * y;
-
-				for (; indexDst < indexDstEnd; indexDst++) {
-					data[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-			}
+			from_1BU8_to_F32(dst, srcData, data, srcStride, srcOffset);
 		} else if (numBands == 4) {
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					indexSrc++;
-					int r = srcData[indexSrc++] & 0xFF;
-					int g = srcData[indexSrc++] & 0xFF;
-					int b = srcData[indexSrc++] & 0xFF;
-
-					float ave = (r + g + b) / 3.0f;
-
-					data[indexDst] = ave;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_F32(dst, srcData, data, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(SunWritableRaster src, ImageUInt8 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		byte[] dstData = dst.data;
+
+		int numBands = src.getNumBands();
+
+		int srcStride = src.getWidth()*numBands;
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		int size = dst.getWidth() * dst.getHeight();
+
+		if (numBands == 3) {
+			from_3BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_U8(dst, srcData, dstData, size, srcStride, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_U8(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToGray(SunWritableRaster src, ImageFloat32 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		float[] dstData = dst.data;
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_F32(dst, srcData, dstData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Unexpected number of bands found. Bands = "+numBands);
+		}
+	}
+
+	private static void from_4BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				indexSrc++;
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				int ave = (r + g + b) / 3;
+
+				data[indexDst] = (byte) ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
+			System.arraycopy(srcData, 0, data, 0, size);
+		else {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + dst.stride * y;
+				int indexSrc = srcOffset + srcStride * y;
+
+				System.arraycopy(srcData, indexSrc, dst.data, indexDst, dst.width);
+			}
+		}
+	}
+
+	private static void from_3BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] dstData, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				int ave = (r + g + b) / 3;
+
+				dstData[indexDst] = (byte) ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_4BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				indexSrc++;
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				float ave = (r + g + b) / 3.0f;
+
+				data[indexDst] = ave;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcStride, int srcOffset) {
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			int indexSrc = srcOffset + srcStride * y;
+
+			for (; indexDst < indexDstEnd; indexDst++) {
+				data[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+		}
+	}
+
+	private static void from_3BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				int r = srcData[indexSrc++] & 0xFF;
+				int g = srcData[indexSrc++] & 0xFF;
+				int b = srcData[indexSrc++] & 0xFF;
+
+				float ave = (r + g + b) / 3.0f;
+
+				data[indexDst] = ave;
+			}
+			indexSrc += srcStrideDiff;
 		}
 	}
 
@@ -203,52 +285,15 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-numBands+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			byte[] band1 = dst.getBand(0).data;
-			byte[] band2 = dst.getBand(1).data;
-			byte[] band3 = dst.getBand(2).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
-					band3[indexDst] = srcData[indexSrc++];
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			byte dstData[] = dst.getBand(0).data;
-
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexSrc = srcOffset + srcStride * y;
-
-				System.arraycopy(srcData, indexSrc, dstData, indexDst, dst.width);
-			}
+			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			byte[] band1 = dst.getBand(0).data;
-			byte[] band2 = dst.getBand(1).data;
-			byte[] band3 = dst.getBand(2).data;
-			byte[] band4 = dst.getBand(3).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++];
-					band2[indexDst] = srcData[indexSrc++];
-					band3[indexDst] = srcData[indexSrc++];
-					band4[indexDst] = srcData[indexSrc++];
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -263,58 +308,280 @@ public class ConvertRaster {
 		int numBands = src.getNumBands();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			float[] band1 = dst.getBand(0).data;
-			float[] band2 = dst.getBand(1).data;
-			float[] band3 = dst.getBand(2).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
-					band3[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-				indexSrc += srcStrideDiff;
-			}
+			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			float[] data = dst.getBand(0).data;
-
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				int indexSrc = srcOffset + srcStride * y;
-
-				for (; indexDst < indexDstEnd; indexDst++) {
-					data[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-			}
+			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			float[] band1 = dst.getBand(0).data;
-			float[] band2 = dst.getBand(1).data;
-			float[] band3 = dst.getBand(2).data;
-			float[] band4 = dst.getBand(3).data;
-
-			int indexSrc = srcOffset;
-			for (int y = 0; y < dst.height; y++) {
-				int indexDst = dst.startIndex + dst.stride * y;
-				int indexDstEnd = indexDst + dst.width;
-				for (; indexDst < indexDstEnd; indexDst++) {
-					band1[indexDst] = srcData[indexSrc++] & 0xFF;
-					band2[indexDst] = srcData[indexSrc++] & 0xFF;
-					band3[indexDst] = srcData[indexSrc++] & 0xFF;
-					band4[indexDst] = srcData[indexSrc++] & 0xFF;
-				}
-
-				indexSrc += srcStrideDiff;
-			}
+			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToInterleaved(ByteInterleavedRaster src, InterleavedF32 dst) {
+		byte[] srcData = src.getDataStorage();
+
+		int srcStride = src.getScanlineStride();
+		int srcOffset = getOffset(src);
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		int indexSrc = srcOffset;
+		int length = dst.width*dst.numBands;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + length;
+			while( indexDst < indexDstEnd) {
+				dst.data[indexDst++] = srcData[indexSrc++] & 0xFF;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	public static void bufferedToInterleaved(ByteInterleavedRaster src, InterleavedU8 dst) {
+		byte[] srcData = src.getDataStorage();
+
+		int numBands = src.getNumBands();
+
+		int srcStride = src.getScanlineStride();
+		int srcOffset = getOffset(src);
+
+		int length = dst.width*dst.numBands;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + y*dst.stride;
+			int indexSrc = srcOffset + y*srcStride;
+
+			System.arraycopy(srcData,indexSrc,dst.data,indexDst,length);
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToMulti_U8(SunWritableRaster src, MultiSpectral<ImageUInt8> dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToMulti_F32(SunWritableRaster src, MultiSpectral<ImageFloat32> dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int numBands = src.getNumBands();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		if (numBands == 3) {
+			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 1) {
+			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else if (numBands == 4) {
+			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+		} else {
+			throw new RuntimeException("Write more code here.");
+		}
+	}
+
+	private static void from_4BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] band1 = dst.getBand(0).data;
+		float[] band2 = dst.getBand(1).data;
+		float[] band3 = dst.getBand(2).data;
+		float[] band4 = dst.getBand(3).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++] & 0xFF;
+				band2[indexDst] = srcData[indexSrc++] & 0xFF;
+				band3[indexDst] = srcData[indexSrc++] & 0xFF;
+				band4[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] data = dst.getBand(0).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+
+			for (; indexDst < indexDstEnd; indexDst++) {
+				data[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_3BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		float[] band1 = dst.getBand(0).data;
+		float[] band2 = dst.getBand(1).data;
+		float[] band3 = dst.getBand(2).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++] & 0xFF;
+				band2[indexDst] = srcData[indexSrc++] & 0xFF;
+				band3[indexDst] = srcData[indexSrc++] & 0xFF;
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_4BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte[] band1 = dst.getBand(0).data;
+		byte[] band2 = dst.getBand(1).data;
+		byte[] band3 = dst.getBand(2).data;
+		byte[] band4 = dst.getBand(3).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++];
+				band2[indexDst] = srcData[indexSrc++];
+				band3[indexDst] = srcData[indexSrc++];
+				band4[indexDst] = srcData[indexSrc++];
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	private static void from_1BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte dstData[] = dst.getBand(0).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+
+			System.arraycopy(srcData, indexSrc, dstData, indexDst, dst.width);
+			indexSrc += dst.width + srcStrideDiff;
+		}
+	}
+
+	private static void from_3BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		byte[] band1 = dst.getBand(0).data;
+		byte[] band2 = dst.getBand(1).data;
+		byte[] band3 = dst.getBand(2).data;
+
+		int indexSrc = srcOffset;
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexDstEnd = indexDst + dst.width;
+			for (; indexDst < indexDstEnd; indexDst++) {
+				band1[indexDst] = srcData[indexSrc++];
+				band2[indexDst] = srcData[indexSrc++];
+				band3[indexDst] = srcData[indexSrc++];
+			}
+			indexSrc += srcStrideDiff;
+		}
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToInterleaved(SunWritableRaster src, InterleavedU8 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		from_NBU8_to_IU8(dst, srcData, srcOffset, srcStrideDiff);
+	}
+
+	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToInterleaved(SunWritableRaster src, InterleavedF32 dst) {
+		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
+			throw new RuntimeException("Unsupported type");
+
+		DataBufferByte byteBuffer = (DataBufferByte)src.getDataBuffer();
+
+		byte[] srcData = byteBuffer.getData();
+
+		int srcOffset = 0;
+		int srcStrideDiff = 0;
+
+		from_NBU8_to_IF32(dst, srcData, srcOffset, srcStrideDiff);
+	}
+
+	private static void from_NBU8_to_IU8(InterleavedU8 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		int length = dst.width*dst.numBands;
+
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexSrc = srcOffset + y*(length + srcStrideDiff);
+
+			try {
+				System.arraycopy(srcData, indexSrc, dst.data, indexDst, length);
+			} catch( ArrayIndexOutOfBoundsException e ) {
+				System.out.println();
+			}
+		}
+	}
+
+	private static void from_NBU8_to_IF32(InterleavedF32 dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+		int length = dst.width*dst.numBands;
+
+		for (int y = 0; y < dst.height; y++) {
+			int indexDst = dst.startIndex + dst.stride * y;
+			int indexSrc = srcOffset + y*(length + srcStrideDiff);
+
+			int indexDstEnd = indexDst+length;
+			while( indexDst < indexDstEnd ) {
+				dst.data[indexDst] = srcData[indexSrc] & 0xFF;
+				indexDst++;
+				indexSrc++;
+			}
 		}
 	}
 
@@ -327,7 +594,7 @@ public class ConvertRaster {
 		byte[] data = dst.data;
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -358,7 +625,7 @@ public class ConvertRaster {
 		float[] data = dst.data;
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int indexSrc = srcOffset;
@@ -387,7 +654,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		int numBands = src.getNumBands();
@@ -438,7 +705,7 @@ public class ConvertRaster {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
-		int srcOffset = src.getDataOffset(0)-src.getPixelStride()+1;
+		int srcOffset = getOffset(src);
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		float[] data1 = dst.getBand(0).data;
@@ -484,6 +751,94 @@ public class ConvertRaster {
 	}
 
 	/**
+	 * A faster convert that works directly with a specific raster
+	 */
+	public static void bufferedToInterleaved(IntegerInterleavedRaster src, InterleavedU8 dst) {
+		int[] srcData = src.getDataStorage();
+
+		int srcStride = src.getScanlineStride();
+		int srcOffset = getOffset(src);
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		int numBands = src.getNumBands();
+		if( numBands == 3 ) {
+			int indexSrc = srcOffset;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++) {
+
+					int rgb = srcData[indexSrc++];
+
+					dst.data[indexDst++] = (byte) (rgb >>> 16);
+					dst.data[indexDst++] = (byte) (rgb >>> 8);
+					dst.data[indexDst++] = (byte) rgb;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
+		} else if( numBands == 4 ) {
+
+			int indexSrc = srcOffset;
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++) {
+
+					int rgb = srcData[indexSrc++];
+
+					dst.data[indexDst++] = (byte) (rgb >>> 24);
+					dst.data[indexDst++] = (byte) (rgb >>> 16);
+					dst.data[indexDst++] = (byte) (rgb >>> 8);
+					dst.data[indexDst++] = (byte) rgb;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
+		}
+	}
+
+	public static void bufferedToInterleaved(IntegerInterleavedRaster src, InterleavedF32 dst ) {
+		int[] srcData = src.getDataStorage();
+
+		int srcStride = src.getScanlineStride();
+		int srcOffset = getOffset(src);
+		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
+
+		int indexSrc = srcOffset;
+		int numBands = src.getNumBands();
+
+		if( numBands == 3 ) {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++) {
+
+					int rgb = srcData[indexSrc++];
+
+					dst.data[indexDst++] = (rgb >>> 16) & 0xFF;
+					dst.data[indexDst++] = (rgb >>> 8) & 0xFF;
+					dst.data[indexDst++] = rgb & 0xFF;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
+		} else if( numBands == 4 ) {
+			for (int y = 0; y < dst.height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < dst.width; x++) {
+
+					int rgb = srcData[indexSrc++];
+
+					dst.data[indexDst++] = (rgb >>> 24) & 0xFF;
+					dst.data[indexDst++] = (rgb >>> 16) & 0xFF;
+					dst.data[indexDst++] = (rgb >>> 8) & 0xFF;
+					dst.data[indexDst++] = rgb & 0xFF;
+				}
+
+				indexSrc += srcStrideDiff;
+			}
+		}
+	}
+
+	/**
 	 * <p>
 	 * Converts a buffered image into an 8bit intensity image using the
 	 * BufferedImage's RGB interface.
@@ -498,10 +853,17 @@ public class ConvertRaster {
 	 * @param dst Output image.
 	 */
 	public static void bufferedToGray(BufferedImage src, ImageUInt8 dst) {
-		final int width = src.getWidth();
-		final int height = src.getHeight();
+		bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
+	}
 
-		byte[] data = dst.data;
+	public static void bufferedToGray(BufferedImage src, InterleavedU8 dst) {
+		bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
+	}
+
+	private static void bufferedToGray(BufferedImage src, byte[] dstData, int dstStartIndex , int dstStride ) {
+
+		int width = src.getWidth();
+		int height = src.getHeight();
 
 		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
@@ -510,20 +872,20 @@ public class ConvertRaster {
 			int hack[] = new int[1];
 
 			for (int y = 0; y < height; y++) {
-				int index = dst.startIndex + y * dst.stride;
+				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
 
-					data[index++] = (byte) hack[0];
+					dstData[index++] = (byte) hack[0];
 				}
 			}
 		} else {
 			for (int y = 0; y < height; y++) {
-				int index = dst.startIndex + y * dst.stride;
+				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
 
-					data[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
+					dstData[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
 				}
 			}
 		}
@@ -591,10 +953,16 @@ public class ConvertRaster {
 	 * @param dst Output image.
 	 */
 	public static void bufferedToGray(BufferedImage src, ImageFloat32 dst) {
+		bufferedToGray(src,dst.data,dst.startIndex,dst.stride);
+	}
+
+	public static void bufferedToGray(BufferedImage src, InterleavedF32 dst) {
+		bufferedToGray(src,dst.data,dst.startIndex,dst.stride);
+	}
+
+	public static void bufferedToGray(BufferedImage src, float[] data, int dstStartIndex , int dstStride ) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-
-		float[] data = dst.data;
 
 		if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
@@ -603,7 +971,7 @@ public class ConvertRaster {
 			float hack[] = new float[1];
 
 			for (int y = 0; y < height; y++) {
-				int index = dst.startIndex + y * dst.stride;
+				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
 
@@ -612,7 +980,7 @@ public class ConvertRaster {
 			}
 		} else {
 			for (int y = 0; y < height; y++) {
-				int index = dst.startIndex + y * dst.stride;
+				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
 
@@ -717,12 +1085,80 @@ public class ConvertRaster {
 					band4[index] = argb & 0xFF;
 				}
 			}
-		} else {
+		} else if( dst.getNumBands() == 1 ){
 			ConvertRaster.bufferedToGray(src, dst.getBand(0));
-			ImageFloat32 band1 = dst.getBand(0);
-			for (int i = 1; i < dst.getNumBands(); i++) {
-				dst.getBand(i).setTo(band1);
+		} else {
+			throw new IllegalArgumentException("Unsupported number of input bands");
+		}
+	}
+
+	public static void bufferedToInterleaved(BufferedImage src, InterleavedF32 dst) {
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		if (dst.getNumBands() == 3) {
+			for (int y = 0; y < height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					dst.data[indexDst++] = (argb >>> 16) & 0xFF;
+					dst.data[indexDst++] = (argb >>> 8) & 0xFF;
+					dst.data[indexDst++] = argb & 0xFF;
+				}
 			}
+		} else if (dst.getNumBands() == 4) {
+			for (int y = 0; y < height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					dst.data[indexDst++] = (argb >>> 24) & 0xFF;
+					dst.data[indexDst++] = (argb >>> 16) & 0xFF;
+					dst.data[indexDst++] = (argb >>> 8) & 0xFF;
+					dst.data[indexDst++] = argb & 0xFF;
+				}
+			}
+		} else if( dst.getNumBands() == 1 ){
+			ConvertRaster.bufferedToGray(src, dst);
+		} else {
+			throw new IllegalArgumentException("Unsupported number of input bands");
+		}
+	}
+
+	/**
+	 * <p>
+	 * Converts a buffered image into an multi-spectral image using the BufferedImage's RGB interface.
+	 * </p>
+	 * <p>
+	 * This is much slower than working directly with the BufferedImage's internal raster and should be
+	 * avoided if possible.
+	 * </p>
+	 *
+	 * @param src Input image.
+	 * @param dst Output image.
+	 */
+	public static void bufferedToInterleaved(BufferedImage src, InterleavedU8 dst) {
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+
+		if (dst.getNumBands() == 3) {
+
+			for (int y = 0; y < height; y++) {
+				int indexDst = dst.startIndex + y * dst.stride;
+				for (int x = 0; x < width; x++) {
+					int argb = src.getRGB(x, y);
+
+					dst.data[indexDst++] = (byte) (argb >>> 16);
+					dst.data[indexDst++] = (byte) (argb >>> 8);
+					dst.data[indexDst++] = (byte) argb;
+				}
+			}
+		} else if( dst.getNumBands() == 1 ){
+			ConvertRaster.bufferedToGray(src, dst);
+		} else {
+			throw new IllegalArgumentException("Unsupported number of input bands");
 		}
 	}
 
@@ -1360,5 +1796,210 @@ public class ConvertRaster {
 				dst.setRGB(x, y, argb);
 			}
 		}
+	}
+
+	public static void interleavedToBuffered(InterleavedU8 src, IntegerInterleavedRaster dst) {
+
+		if (src.getNumBands() != dst.getNumBands())
+			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
+
+		final int[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+		int dstStride = dst.getScanlineStride();
+		int dstOffset = getOffset(dst);
+
+		if (numBands == 3) {
+
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+				int indexDst = dstOffset + y*dstStride;
+
+				for (int x = 0; x < src.width; x++) {
+					int c1 = src.data[indexSrc++] & 0xFF;
+					int c2 = src.data[indexSrc++] & 0xFF;
+					int c3 = src.data[indexSrc++] & 0xFF;
+
+					dstData[indexDst++] = c1 << 16 | c2 << 8 | c3;
+				}
+			}
+		} else if (numBands == 4) {
+
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+				int indexDst = dstOffset + y*dstStride;
+
+				for (int x = 0; x < src.width; x++) {
+					int c1 = src.data[indexSrc++] & 0xFF;
+					int c2 = src.data[indexSrc++] & 0xFF;
+					int c3 = src.data[indexSrc++] & 0xFF;
+					int c4 = src.data[indexSrc++] & 0xFF;
+
+					dstData[indexDst++] = c1 << 24 | c2 << 16 | c3 << 8 | c4;
+				}
+			}
+		} else {
+			throw new RuntimeException("Code more here");
+		}
+	}
+
+	public static void interleavedToBuffered(InterleavedU8 src, ByteInterleavedRaster dst) {
+
+		if (src.getNumBands() != dst.getNumBands())
+			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
+
+		final byte[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+		final int length = src.width*numBands;
+
+		int dstStride = dst.getScanlineStride();
+		int dstOffset = getOffset(dst);
+
+		for (int y = 0; y < src.height; y++) {
+			int indexSrc = src.startIndex + src.stride * y;
+			int indexDst = dstOffset + dstStride*y;
+
+			System.arraycopy(src.data,indexSrc,dstData,indexDst,length);
+		}
+	}
+
+	public static void interleavedToBuffered( InterleavedU8 src, BufferedImage dst) {
+
+		if (src.getNumBands() != 3)
+			throw new IllegalArgumentException("src must have three bands");
+
+		final int width = dst.getWidth();
+		final int height = dst.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = src.startIndex + src.stride * y;
+
+			for (int x = 0; x < width; x++ ) {
+				int c1 = src.data[indexSrc++] & 0xFF;
+				int c2 = src.data[indexSrc++] & 0xFF;
+				int c3 = src.data[indexSrc++] & 0xFF;
+
+				int argb = c1 << 16 | c2 << 8 | c3;
+
+				dst.setRGB(x, y, argb);
+			}
+		}
+	}
+
+	public static void interleavedToBuffered(InterleavedF32 src, IntegerInterleavedRaster dst) {
+
+		if (src.getNumBands() != dst.getNumBands())
+			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
+
+		final int[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+		int dstStride = dst.getScanlineStride();
+		int dstOffset = getOffset(dst);
+
+		if (numBands == 3) {
+
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+				int indexDst = dstOffset + y*dstStride;
+
+				for (int x = 0; x < src.width; x++) {
+					int c1 = (int)src.data[indexSrc++];
+					int c2 = (int)src.data[indexSrc++];
+					int c3 = (int)src.data[indexSrc++];
+
+					dstData[indexDst++] = c1 << 16 | c2 << 8 | c3;
+				}
+			}
+		} else if (numBands == 4) {
+
+			for (int y = 0; y < src.height; y++) {
+				int indexSrc = src.startIndex + y * src.stride;
+				int indexDst = dstOffset + y*dstStride;
+
+				for (int x = 0; x < src.width; x++) {
+					int c1 = (int)src.data[indexSrc++];
+					int c2 = (int)src.data[indexSrc++];
+					int c3 = (int)src.data[indexSrc++];
+					int c4 = (int)src.data[indexSrc++];
+
+					dstData[indexDst++] = c1 << 24 | c2 << 16 | c3 << 8 | c4;
+				}
+			}
+		} else {
+			throw new RuntimeException("Code more here");
+		}
+	}
+
+	public static void interleavedToBuffered(InterleavedF32 src, ByteInterleavedRaster dst) {
+
+		if (src.getNumBands() != dst.getNumBands())
+			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
+
+		final byte[] dstData = dst.getDataStorage();
+
+		final int numBands = dst.getNumBands();
+		final int length = src.width*numBands;
+
+		int dstStride = dst.getScanlineStride();
+		int dstOffset = getOffset(dst);
+
+		for (int y = 0; y < src.height; y++) {
+			int indexSrc = src.startIndex + src.stride * y;
+			int indexDst = dstOffset + dstStride*y;
+			int indexSrcEnd = indexSrc+length;
+
+			while( indexSrc < indexSrcEnd ) {
+				dstData[indexDst++] = (byte)src.data[indexSrc++];
+			}
+		}
+	}
+
+	public static void interleavedToBuffered( InterleavedF32 src, BufferedImage dst) {
+
+		if (src.getNumBands() != 3)
+			throw new IllegalArgumentException("src must have three bands");
+
+		final int width = dst.getWidth();
+		final int height = dst.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			int indexSrc = src.startIndex + src.stride * y;
+
+			for (int x = 0; x < width; x++ ) {
+				int c1 = (int)src.data[indexSrc++];
+				int c2 = (int)src.data[indexSrc++];
+				int c3 = (int)src.data[indexSrc++];
+
+				int argb = c1 << 16 | c2 << 8 | c3;
+
+				dst.setRGB(x, y, argb);
+			}
+		}
+	}
+
+	private static int getOffset( ByteComponentRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
+	}
+
+	private static int getOffset( IntegerInterleavedRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
+	}
+
+	private static int getOffset( ShortInterleavedRaster raster ) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < raster.getNumDataElements(); i++) {
+			min = Math.min(raster.getDataOffset(i),min);
+		}
+		return min;
 	}
 }

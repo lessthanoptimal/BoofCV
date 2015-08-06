@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General;
 import boofcv.alg.filter.derivative.impl.HessianSobel_Shared;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.ImageFloat32;
@@ -113,7 +113,7 @@ public class HessianSobel {
 	 */
 	public static void process( ImageUInt8 orig,
 								ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-								ImageBorder_I32 border ) {
+								ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianSobel_Shared.process(orig, derivXX, derivYY, derivXY);
 

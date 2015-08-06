@@ -377,4 +377,70 @@ public class BoofMiscOps {
 			}
 		});
 	}
+
+	public static int[] convertArray( double input[] , int output[] ) {
+		if( output == null )
+			output = new int[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = (int)input[i];
+		}
+
+		return output;
+	}
+
+	public static long[] convertArray( double input[] , long output[] ) {
+		if( output == null )
+			output = new long[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = (long)input[i];
+		}
+
+		return output;
+	}
+
+	public static float[] convertArray( double input[] , float output[] ) {
+		if( output == null )
+			output = new float[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = (float)input[i];
+		}
+
+		return output;
+	}
+
+	public static double[] convertArray( float input[] , double output[] ) {
+		if( output == null )
+			output = new double[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = input[i];
+		}
+
+		return output;
+	}
+
+	public static int[] convertArray( float input[] , int output[] ) {
+		if( output == null )
+			output = new int[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = (int)input[i];
+		}
+
+		return output;
+	}
+
+	public static float[] convertArray( int input[] , float output[] ) {
+		if( output == null )
+			output = new float[input.length];
+
+		for (int i = 0; i < input.length; i++) {
+			output[i] = input[i];
+		}
+
+		return output;
+	}
 }

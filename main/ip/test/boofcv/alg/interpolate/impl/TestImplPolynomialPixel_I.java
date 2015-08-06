@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageUInt8;
@@ -60,15 +60,15 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		InterpolatePixelS<ImageUInt8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
+		alg.setBorder( FactoryImageBorder.singleValue(ImageUInt8.class, 0));
 
-		ImageBorder<ImageUInt8> border = FactoryImageBorder.value(ImageUInt8.class, 0);
-		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distort(false,alg, border, ImageUInt8.class);
+		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distortSB(false, alg, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixelS<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
+		InterpolatePixelS<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixelS(ImageUInt8.class, BorderType.VALUE);
 
-		distorter = FactoryDistort.distort(false,bilinear, border,ImageUInt8.class);
+		distorter = FactoryDistort.distortSB(false, bilinear, ImageUInt8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 

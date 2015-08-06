@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class ExampleVideoMosaic {
 		gui.setImage(0,1,new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB));
 		gui.setPreferredSize(new Dimension(3*frame.width,frame.height*2));
 
-		ShowImages.showWindow(gui,"Example Mosaic");
+		ShowImages.showWindow(gui,"Example Mosaic", true);
 
 		boolean enlarged = false;
 

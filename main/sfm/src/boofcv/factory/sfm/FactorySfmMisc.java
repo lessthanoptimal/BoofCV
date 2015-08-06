@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -41,7 +42,7 @@ public class FactorySfmMisc {
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
 			{
-				InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(classType);
+				InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(classType, BorderType.EXTENDED);
 				return new CreateSyntheticOverheadViewS(interp);
 			}
 

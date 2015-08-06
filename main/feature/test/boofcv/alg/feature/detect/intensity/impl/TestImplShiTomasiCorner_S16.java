@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
-import boofcv.core.image.border.ImageBorder1D_I32;
+import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -67,7 +67,7 @@ public class TestImplShiTomasiCorner_S16 {
 		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
 		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
 
-		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 
 		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}

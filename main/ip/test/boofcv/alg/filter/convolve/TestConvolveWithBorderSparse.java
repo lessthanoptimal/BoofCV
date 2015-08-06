@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,13 +124,13 @@ public class TestConvolveWithBorderSparse {
 	protected static ImageBorder createBorder(Class<?> borderType ) {
 		ImageBorder ret;
 		if (ImageBorder_F32.class == borderType) {
-			ret = FactoryImageBorder.general(ImageFloat32.class,BorderType.REFLECT);
+			ret = FactoryImageBorder.single(ImageFloat32.class, BorderType.REFLECT);
 		} else if (ImageBorder_F64.class == borderType) {
-			ret = FactoryImageBorder.general(ImageFloat64.class,BorderType.REFLECT);
-		} else if (ImageBorder_I32.class == borderType) {
-			ret =FactoryImageBorder.general(ImageSInt32.class,BorderType.REFLECT);
-		} else if (ImageBorder_I64.class == borderType) {
-			ret = FactoryImageBorder.general(ImageSInt64.class,BorderType.REFLECT);
+			ret = FactoryImageBorder.single(ImageFloat64.class, BorderType.REFLECT);
+		} else if (ImageBorder_S32.class == borderType) {
+			ret =FactoryImageBorder.single(ImageSInt32.class, BorderType.REFLECT);
+		} else if (ImageBorder_S64.class == borderType) {
+			ret = FactoryImageBorder.single(ImageSInt64.class, BorderType.REFLECT);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
@@ -142,9 +142,9 @@ public class TestConvolveWithBorderSparse {
 			return ImageFloat32.class;
 		} else if (ImageBorder_F64.class == borderType) {
 			return ImageFloat64.class;
-		} else if (ImageBorder_I32.class == borderType) {
+		} else if (ImageBorder_S32.class == borderType) {
 			return ImageUInt8.class;
-		} else if (ImageBorder_I64.class == borderType) {
+		} else if (ImageBorder_S64.class == borderType) {
 			return ImageSInt64.class;
 		} else {
 			throw new RuntimeException("Unknown border type");
@@ -156,9 +156,9 @@ public class TestConvolveWithBorderSparse {
 			return ImageFloat32.class;
 		} else if (ImageBorder_F64.class == borderType) {
 			return ImageFloat64.class;
-		} else if (ImageBorder_I32.class == borderType) {
+		} else if (ImageBorder_S32.class == borderType) {
 			return ImageSInt16.class;
-		} else if (ImageBorder_I64.class == borderType) {
+		} else if (ImageBorder_S64.class == borderType) {
 			return ImageSInt64.class;
 		} else {
 			throw new RuntimeException("Unknown border type");

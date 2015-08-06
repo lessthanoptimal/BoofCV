@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,14 @@
 
 package boofcv.core.image.border;
 
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -35,126 +33,117 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class GenericImageBorderTests {
+public abstract class GenericImageBorderTests<T extends ImageBase> {
 
 	Random rand = new Random(234);
+	List<ImageType<T>> imageTypes = new ArrayList<ImageType<T>>();
 
 	int width = 20;
 	int height = 25;
 
-	public abstract ImageBorder_I32 wrap( ImageUInt8 image );
+	double tmp0[];
+	double tmp1[];
 
-	public abstract ImageBorder_F32 wrap( ImageFloat32 image );
+	public GenericImageBorderTests(ImageType<T> ...imageTypes) {
+		for( int i = 0; i < imageTypes.length; i++ ) {
+			this.imageTypes.add( imageTypes[i]);
+		}
+	}
 
-	public abstract Number get( GImageSingleBand img , int x , int y );
+
+	public abstract ImageBorder<T> wrap( T image );
 
 	/**
-	 * The border was set to the specified value.  See if it had the expected affect
+	 * Checks to see if the image at the specified coordinate has the specified pixel value.
 	 */
-	public abstract void checkBorderSet( int x , int y , Number val ,
-										 GImageSingleBand border,
-										 GImageSingleBand orig );
+	public abstract void checkBorderSet( int x , int y , double[] pixel , T image );
 
-	@Test
-	public void get_I8() {
-		ImageUInt8 imgA = new ImageUInt8(width,height);
-		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
+	/**
+	 * Check to see if the provided pixel is the value it should be at the specified coordinate
+	 */
+	public abstract void checkBorderGet(int x, int y, T image, double[] pixel);
 
-		ImageBorder_I32 fooA = wrap(imgA);
-
-		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
-
-		checkGet(orig, border);
+	protected void init( ImageType<T> imageType ) {
+		tmp0 = new double[imageType.getNumBands()];
+		tmp1 = new double[imageType.getNumBands()];
 	}
 
 	@Test
-	public void get_F32() {
-		ImageFloat32 imgA = new ImageFloat32(width,height);
-		ImageMiscOps.fillUniform(imgA,rand,0,5);
+	public void get() {
+		for( ImageType<T> imageType : imageTypes ) {
+			init(imageType);
 
-		ImageBorder_F32 fooA = wrap(imgA);
+			T img = imageType.createImage(width, height);
+			GImageMiscOps.fillUniform(img, rand, 0, 100);
 
-		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
+			ImageBorder<T> border = wrap(img);
 
-		checkGet(orig, border);
+			checkGet(img, border);
+		}
 	}
 
-	private void checkGet(GImageSingleBand orig, GImageSingleBand border) {
+	private void checkGet(T image, ImageBorder<T> border) {
 		// test the image's inside where there is no border condition
-		assertEquals(orig.get(1,1),border.get(1,1));
-		assertEquals(orig.get(0,0),border.get(0,0));
-		assertEquals(orig.get(width-1,height-1),border.get(width-1,height-1));
+
+		checkEquals(1, 1, image, border);
+		checkEquals(0, 0, image, border);
+		checkEquals(width - 1, height - 1, image, border);
+
+		checkEquals(-1,0,image,border);
+		checkEquals(-2,0,image,border);
+		checkEquals(0,-1,image,border);
+		checkEquals(0,-2,image,border);
+
+		checkEquals(width, height - 1, image, border);
+		checkEquals(width + 1, height - 1, image, border);
+		checkEquals(width - 1, height, image, border);
+		checkEquals(width - 1, height + 1, image, border);
+	}
+
+	private void checkEquals( int x , int y , T orig, ImageBorder<T> border ) {
+		border.getGeneral(x, y, tmp0);
+		checkBorderGet(x,y,orig,tmp0);
+	}
+
+	@Test
+	public void set() {
+		for( ImageType<T> imageType : imageTypes ) {
+			init(imageType);
+			T img = imageType.createImage(width, height);
+			GImageMiscOps.fillUniform(img, rand, 0, 100);
+
+			ImageBorder<T> border = wrap(img);
+
+			checkSet(img, border);
+		}
+	}
+
+
+	private void checkSet(T image, ImageBorder<T> border) {
+		// test the image's inside where there is no border condition
+		checkSet(0, 0, 1, image, border);
+		checkSet(width - 1, height - 1, 2, image, border);
 
 		// test border conditions
-		checkBorder(-1,0,border,orig);
-		checkBorder(-2,0,border,orig);
-		checkBorder(0,-1,border,orig);
-		checkBorder(0,-2,border,orig);
+		checkSet(-1,0,2,image,border);
+		checkSet(-2,0,3,image,border);
+		checkSet(0,-1,4,image,border);
+		checkSet(0,-2,5,image,border);
 
-		checkBorder(width,height-1,border,orig);
-		checkBorder(width+1,height-1,border,orig);
-		checkBorder(width-1,height,border,orig);
-		checkBorder(width-1,height+1,border,orig);
+		checkSet(width, height - 1, 6, image, border);
+		checkSet(width + 1, height - 1, 7, image, border);
+
+		checkSet(width - 1, height, 8, image, border);
+		checkSet(width - 1, height + 1, 9, image, border);
 	}
 
-	private void checkBorder( int x , int y , GImageSingleBand border , GImageSingleBand orig ) {
-		assertEquals(get(orig,x,y).floatValue(),border.get(x,y).floatValue(),1e-4f);
+	private void checkSet( int x , int y , double value, T orig, ImageBorder<T> border ) {
+		for (int i = 0; i < tmp0.length; i++) {
+			tmp0[i] = value;
+		}
+
+		border.setGeneral(x, y, tmp0);
+		checkBorderSet(x,y, tmp0,orig);
 	}
 
-	@Test
-	public void set_I8() {
-		ImageUInt8 imgA = new ImageUInt8(width,height);
-		ImageMiscOps.fillUniform(imgA,rand, 0, 100);
-
-		ImageBorder_I32 fooA = wrap(imgA);
-
-		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
-
-		checkSet(orig, border);
-	}
-
-	@Test
-	public void set_F32() {
-		ImageFloat32 imgA = new ImageFloat32(width,height);
-		ImageMiscOps.fillUniform(imgA,rand,0,5);
-
-		ImageBorder_F32 fooA = wrap(imgA);
-
-		GImageSingleBand orig = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand border = FactoryGImageSingleBand.wrap(fooA);
-
-		checkSet(orig, border);
-	}
-
-	private void checkSet(GImageSingleBand orig, GImageSingleBand border) {
-		// test the image's inside where there is no border condition
-		border.set(0,0,1);
-		border.set(width-1,height-1,2);
-		assertEquals(1.0f,orig.get(0,0).floatValue(),1e-4f);
-		assertEquals(2.0f,orig.get(width-1,height-1).floatValue(),1e-4f);
-
-		// test border conditions
-		border.set(-1,0,2);
-		checkBorderSet(-1,0,2,border,orig);
-		border.set(-2,0,3);
-		checkBorderSet(-2,0,3,border,orig);
-
-		border.set(0,-1,4);
-		checkBorderSet(0,-1,4,border,orig);
-		border.set(0,-2,5);
-		checkBorderSet(0,-2,5,border,orig);
-
-		border.set(width,height-1,2);
-		checkBorderSet(width,height-1,2,border,orig);
-		border.set(width+1,height-1,3);
-		checkBorderSet(width+1,height-1,3,border,orig);
-
-		border.set(width-1,height,4);
-		checkBorderSet(width-1,height,4,border,orig);
-		border.set(width-1,height+1,5);
-		checkBorderSet(width-1,height+1,5,border,orig);
-	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,8 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.alg.distort.ImageDistortCache;
+import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageSInt32;
 
 /**
@@ -33,9 +32,8 @@ public class TestImplImageDistortCache_S32 extends CommonImageDistortCacheTests<
 	}
 
 	@Override
-	public ImageDistortCache<ImageSInt32,ImageSInt32> create(InterpolatePixelS<ImageSInt32> interp,
-															 ImageBorder<ImageSInt32> border,
+	public ImageDistortCache_SB<ImageSInt32,ImageSInt32> create(InterpolatePixelS<ImageSInt32> interp,
 															 Class<ImageSInt32> imageType) {
-		return new ImplImageDistortCache_S32(interp,border);
+		return new ImplImageDistortCache_S32(interp);
 	}
 }

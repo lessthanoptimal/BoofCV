@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
@@ -60,15 +59,16 @@ public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixel
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
+		alg.setBorder(FactoryImageBorder.singleValue(ImageFloat32.class, 0));
 
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.value(ImageFloat32.class, 0);
-		ImageDistort<ImageFloat32,ImageFloat32> distorter = FactoryDistort.distort(false,alg, border, ImageFloat32.class);
+		ImageDistort<ImageFloat32,ImageFloat32> distorter = FactoryDistort.distortSB(false, alg, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> bilinear = FactoryInterpolation.bilinearPixelS(ImageFloat32.class,null);
+		bilinear.setBorder(FactoryImageBorder.singleValue(ImageFloat32.class, 0));
 
-		distorter = FactoryDistort.distort(false,bilinear, border, ImageFloat32.class);
+		distorter = FactoryDistort.distortSB(false, bilinear, ImageFloat32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 

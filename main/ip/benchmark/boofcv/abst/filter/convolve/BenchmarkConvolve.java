@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
-import boofcv.core.image.border.ImageBorder1D_I32;
+import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -166,7 +166,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Extend_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveWithBorder.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+			ConvolveWithBorder.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		return 0;
 	}
 

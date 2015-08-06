@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -48,7 +48,7 @@ public class TestGradientTwo0 {
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientTwo0.class.getMethod("process",
-				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
+				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_S32.class ));
 
 		validator.setKernel(0, GradientTwo0.kernelDeriv_I32,true);
 		validator.setKernel(1, GradientTwo0.kernelDeriv_I32,false);
@@ -65,7 +65,7 @@ public class TestGradientTwo0 {
 	public void compareToConvolve_I16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientTwo0.class.getMethod("process",
-				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_I32.class ));
+				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_S32.class ));
 
 		validator.setKernel(0, GradientTwo0.kernelDeriv_I32,true);
 		validator.setKernel(1, GradientTwo0.kernelDeriv_I32,false);

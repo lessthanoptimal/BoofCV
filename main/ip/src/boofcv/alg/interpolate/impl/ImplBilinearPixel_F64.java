@@ -15,9 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.interpolate.impl;
 
-import boofcv.alg.interpolate.BilinearPixel;
+import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.core.image.border.ImageBorder_F64;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageType;
@@ -25,7 +26,7 @@ import boofcv.struct.image.ImageType;
 
 /**
  * <p>
- * Implementation of {@link BilinearPixel} for a specific image type.
+ * Implementation of {@link BilinearPixelS} for a specific image type.
  * </p>
  *
  * <p>
@@ -34,7 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_F64 extends BilinearPixel<ImageFloat64> {
+public class ImplBilinearPixel_F64 extends BilinearPixelS<ImageFloat64> {
 
 	public ImplBilinearPixel_F64() {
 	}
@@ -82,29 +83,10 @@ public class ImplBilinearPixel_F64 extends BilinearPixel<ImageFloat64> {
 
 	@Override
 	public float get(float x, float y) {
-		if (x < 0 || y < 0 || x > width-1 || y > height-1)
+		if (x < 0 || y < 0 || x > width-2 || y > height-2)
 			return get_border(x,y);
 
-		int xt = (int) x;
-		int yt = (int) y;
-
-		double ax = x - xt;
-		double ay = y - yt;
-
-		int index = orig.startIndex + yt * stride + xt;
-
-		// allows borders to be interpolated gracefully by double counting appropriate pixels
-		int dx = xt == width - 1 ? 0 : 1;
-		int dy = yt == height - 1 ? 0 : stride;
-
-		double[] data = orig.data;
-
-		double val = (1.0 - ax) * (1.0 - ay) * (data[index] ); // (x,y)
-		val += ax * (1.0 - ay) * (data[index + dx] ); // (x+1,y)
-		val += ax * ay * (data[index + dx + dy] ); // (x+1,y+1)
-		val += (1.0 - ax) * ay * (data[index + dy] ); // (x,y+1)
-
-		return (float)val;
+		return get_fast(x,y);
 	}
 
 	@Override

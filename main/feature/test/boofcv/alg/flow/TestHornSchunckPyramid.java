@@ -59,7 +59,8 @@ public class TestHornSchunckPyramid {
 		pyr1.process(original1);
 		pyr2.process(original2);
 
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(
+				ImageFloat32.class, BorderType.EXTENDED);
 		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(20f,100),interpolate);
 		alg.process(pyr1,pyr2);
 
@@ -85,7 +86,8 @@ public class TestHornSchunckPyramid {
 		GImageDerivativeOps.gradient(DerivativeType.TWO_0,image2, deriv2X, deriv2Y, BorderType.EXTENDED);
 
 		// have the smoothness constraint be weak
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class);
+		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(
+				ImageFloat32.class, BorderType.EXTENDED);
 		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(100,200),interpolate);
 
 		alg.initFlowX.reshape(width,height);

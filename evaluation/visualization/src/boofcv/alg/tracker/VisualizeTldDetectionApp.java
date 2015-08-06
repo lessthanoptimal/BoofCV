@@ -27,6 +27,7 @@ import boofcv.alg.tracker.tld.TldRegion;
 import boofcv.alg.tracker.tld.TldTemplateMatching;
 import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
@@ -71,7 +72,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType);
+		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
 		tracker = new TldTracker<T,D>(new TldParameters(),interpolate,gradient,imageType,derivType);

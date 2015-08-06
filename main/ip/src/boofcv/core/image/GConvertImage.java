@@ -49,43 +49,72 @@ public class GConvertImage {
 	 * @return Converted image.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
-		if( input.getClass() == output.getClass() ) {
-			output.setTo(input);
-			return;
-		} else {
-			if( input instanceof ImageSingleBand && output instanceof ImageSingleBand )  {
+		if( input instanceof ImageSingleBand && output instanceof ImageSingleBand ) {
+			if (input.getClass() == output.getClass()) {
+				output.setTo(input);
+			} else {
 				try {
-					Method m = ConvertImage.class.getMethod("convert",input.getClass(),output.getClass());
-					m.invoke(null,input,output);
-					return;
+					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+					m.invoke(null, input, output);
 				} catch (Exception e) {
 					throw new IllegalArgumentException("Unknown conversion");
 				}
-			} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
-				MultiSpectral mi = (MultiSpectral)input;
-				ImageSingleBand so = (ImageSingleBand)output;
-
-				if( mi.getImageType().getDataType() != so.getDataType() ) {
-					int w = output.width;
-					int h = output.height;
-					ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
-					average(mi,tmp);
-					convert(tmp,so);
-				} else {
-					average(mi,so);
-				}
-
-				return;
-			} else if( input instanceof MultiSpectral && output instanceof MultiSpectral )  {
-				MultiSpectral mi = (MultiSpectral)input;
-				MultiSpectral mo = (MultiSpectral)output;
-
-				for( int i = 0; i < mi.getNumBands(); i++ ) {
-					convert(mi.getBand(i),mo.getBand(i));
+			}
+		} else if( input instanceof ImageInterleaved && output instanceof ImageInterleaved )  {
+			if( input.getClass() == output.getClass() ) {
+				output.setTo(input);
+			} else {
+				try {
+					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+					m.invoke(null, input, output);
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Unknown conversion");
 				}
 			}
+		} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
+			MultiSpectral mi = (MultiSpectral)input;
+			ImageSingleBand so = (ImageSingleBand)output;
+
+			if( mi.getImageType().getDataType() != so.getDataType() ) {
+				int w = output.width;
+				int h = output.height;
+				ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
+				average(mi,tmp);
+				convert(tmp,so);
+			} else {
+				average(mi,so);
+			}
+		} else if( input instanceof MultiSpectral && output instanceof ImageInterleaved )  {
+			throw new RuntimeException("Now would be a good time to code this conversion");
+		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral ) {
+			MultiSpectral mi = (MultiSpectral) input;
+			MultiSpectral mo = (MultiSpectral) output;
+
+			if (mi.getBandType() == mo.getBandType()) {
+				mo.setTo(mi);
+			} else {
+				for (int i = 0; i < mi.getNumBands(); i++) {
+					convert(mi.getBand(i), mo.getBand(i));
+				}
+			}
+		} else if( input instanceof ImageInterleaved && output instanceof MultiSpectral )  {
+			throw new RuntimeException("Now would be a good time to code this conversion");
+		} else if( input instanceof ImageInterleaved && output instanceof ImageSingleBand )  {
+			ImageInterleaved mb = (ImageInterleaved)input;
+			ImageSingleBand so = (ImageSingleBand)output;
+
+			if( mb.getImageType().getDataType() != so.getDataType() ) {
+				int w = output.width;
+				int h = output.height;
+				ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mb.getImageType().getDataType(),w,h);
+				average(mb,tmp);
+				convert(tmp,so);
+			} else {
+				average(mb,so);
+			}
+		} else {
+			throw new IllegalArgumentException("Don't know how to convert between input types");
 		}
-		throw new IllegalArgumentException("Don't know how to convert between input types");
 	}
 
 	/**
@@ -116,6 +145,37 @@ public class GConvertImage {
 			return (T)ConvertImage.average((MultiSpectral<ImageFloat64>)input,(ImageFloat64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+type.getSimpleName());
+		}
+	}
+
+	/**
+	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * across all the bands.
+	 *
+	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageSingleBand>T average( ImageInterleaved input , T output ) {
+		ImageDataType type = input.getImageType().getDataType();
+		if( type == ImageDataType.U8) {
+			return (T)ConvertImage.average((InterleavedU8)input,(ImageUInt8)output);
+		} else if( type == ImageDataType.S8) {
+			return (T)ConvertImage.average((InterleavedS8)input,(ImageSInt8)output);
+		} else if( type == ImageDataType.U16 ) {
+			return (T)ConvertImage.average((InterleavedU16)input,(ImageUInt16)output);
+		} else if( type == ImageDataType.S16 ) {
+			return (T)ConvertImage.average((InterleavedS16)input,(ImageSInt16)output);
+		} else if( type == ImageDataType.S32 ) {
+			return (T)ConvertImage.average((InterleavedS32)input,(ImageSInt32)output);
+		} else if( type == ImageDataType.S64 ) {
+			return (T)ConvertImage.average((InterleavedS64)input,(ImageSInt64)output);
+		} else if( type == ImageDataType.F32 ) {
+			return (T)ConvertImage.average((InterleavedF32)input,(ImageFloat32)output);
+		} else if( type == ImageDataType.F64 ) {
+			return (T)ConvertImage.average((InterleavedF64)input,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + type);
 		}
 	}
 }

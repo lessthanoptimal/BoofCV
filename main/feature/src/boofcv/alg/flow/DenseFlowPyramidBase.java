@@ -58,7 +58,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 		this.sigma = sigma;
 		this.maxLayers = maxLayers;
 		this.interp = interp;
-		interp.setBorder(FactoryImageBorder.general(ImageFloat32.class, BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED));
 	}
 
 	/**
@@ -120,7 +120,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
 	protected void warpImageTaylor(ImageFloat32 before, ImageFloat32 flowX , ImageFloat32 flowY , ImageFloat32 after) {
-		interp.setBorder(FactoryImageBorder.general(before.getImageType().getImageClass(), BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(before.getImageType().getImageClass(), BorderType.EXTENDED));
 		interp.setImage(before);
 
 		for( int y = 0; y < before.height; y++ ) {
@@ -179,7 +179,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 			}
 		} else {
 			GConvertImage.convert(image1, normalized1);
-			GConvertImage.convert(image2,normalized2);
+			GConvertImage.convert(image2, normalized2);
 		}
 	}
 }

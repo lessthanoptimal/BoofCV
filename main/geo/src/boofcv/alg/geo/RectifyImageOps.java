@@ -22,6 +22,7 @@ import boofcv.alg.distort.*;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -395,16 +396,21 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageSingleBand> ImageDistort<T,T>
-	rectifyImage( DenseMatrix64F rectify , Class<T> imageType)
+	rectifyImage( DenseMatrix64F rectify , BorderType borderType, Class<T> imageType)
 	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		boolean skip = borderType == BorderType.SKIP;
+		if( skip ) {
+			borderType = BorderType.EXTENDED;
+		}
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 rectifyTran = new PointTransformHomography_F32(rectifyInv);
 
 		// don't bother caching the results since it is likely to only be applied once and is cheap to compute
-		ImageDistort<T,T> ret = FactoryDistort.distort(false,interp, null, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortSB(false, interp, imageType);
+		ret.setRenderAll(!skip);
 
 		ret.setModel(new PointToPixelTransform_F32(rectifyTran));
 
@@ -421,12 +427,17 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageSingleBand> ImageDistort<T,T>
-	rectifyImage(IntrinsicParameters param, DenseMatrix64F rectify , Class<T> imageType)
+	rectifyImage(IntrinsicParameters param, DenseMatrix64F rectify , BorderType borderType, Class<T> imageType)
 	{
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType);
+		boolean skip = borderType == BorderType.SKIP;
+		if( skip ) {
+			borderType = BorderType.EXTENDED;
+		}
+		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 
 		// only compute the transform once
-		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, null, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distortSB(true, interp, imageType);
+		ret.setRenderAll(!skip);
 
 		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);
 

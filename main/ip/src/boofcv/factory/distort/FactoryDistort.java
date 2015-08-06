@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.factory.distort;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.*;
 
 /**
@@ -35,33 +35,32 @@ public class FactoryDistort {
 	 *
 	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
-	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
 	 * @param outputType Type of output image.
 	 */
 	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
-	ImageDistort<Input, Output> distort( boolean cached , InterpolatePixelS<Input> interp, ImageBorder border, Class<Output> outputType)
+	ImageDistort<Input, Output> distortSB(boolean cached, InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		if( cached ) {
 			if( outputType == ImageFloat32.class ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_F32(interp,border);
+				return (ImageDistort<Input,Output>)new ImplImageDistortCache_F32(interp);
 			} else if( ImageSInt32.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_S32(interp,border);
+				return (ImageDistort<Input,Output>)new ImplImageDistortCache_S32(interp);
 			} else if( ImageInt16.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I16(interp,border);
+				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I16(interp);
 			} else if( ImageInt8.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I8(interp,border);
+				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I8(interp);
 			} else {
 				throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
 			}
 		} else {
 			if (outputType == ImageFloat32.class) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_F32(interp, border);
+				return (ImageDistort<Input, Output>) new ImplImageDistort_F32(interp);
 			} else if (ImageSInt32.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_S32(interp, border);
+				return (ImageDistort<Input, Output>) new ImplImageDistort_S32(interp);
 			} else if (ImageInt16.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_I16(interp, border);
+				return (ImageDistort<Input, Output>) new ImplImageDistort_I16(interp);
 			} else if (ImageInt8.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_I8(interp, border);
+				return (ImageDistort<Input, Output>) new ImplImageDistort_I8(interp);
 			} else {
 				throw new IllegalArgumentException("Output type not supported: " + outputType.getSimpleName());
 			}
@@ -74,14 +73,30 @@ public class FactoryDistort {
 	 *
 	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
 	 * @param interp Which interpolation algorithm should be used.
-	 * @param border Specifies how requests to pixels outside the image should be handled.  If null then no change
 	 * @param outputType Type of output image.
 	 */
 	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
 	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
-	distortMS( boolean cached , InterpolatePixelS<Input> interp, ImageBorder border, Class<Output> outputType)
+	distortMS( boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
-		ImageDistort<Input, Output> distortSingle = distort(cached,interp,border,outputType);
+		ImageDistort<Input, Output> distortSingle = distortSB(cached, interp, outputType);
 		return new ImplImageDistort_MS<Input, Output>(distortSingle);
+	}
+
+	public static <Input extends ImageInterleaved, Output extends ImageInterleaved>
+	ImageDistort<Input, Output>
+	distortIL(boolean cached, InterpolatePixelMB<Input> interp, ImageType<Output> outputType)
+	{
+		if( cached ) {
+			throw new IllegalArgumentException("Cached not supported yet");
+		} else {
+			switch( outputType.getDataType() ) {
+				case F32:
+					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
+
+				default:
+					throw new IllegalArgumentException("Not supported yet");
+			}
+		}
 	}
 }

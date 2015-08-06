@@ -19,26 +19,10 @@
 
 package org.boofcv.example.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.hardware.Camera;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.SurfaceView;
-import android.view.Window;
-import android.widget.FrameLayout;
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.ConvertNV21;
-import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoDisplayActivity;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -56,7 +57,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 	protected abstract T createImage( int width , int height );
 
 	public InterpolatePixelS<T> createPixelInterpolate() {
-		return FactoryInterpolation.bilinearPixelS(imageType);
+		return FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 	}
 
 	public InterpolateRectangle<T> createRectangleInterpolate() {

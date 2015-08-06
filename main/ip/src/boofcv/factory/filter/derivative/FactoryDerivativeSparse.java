@@ -53,7 +53,7 @@ public class FactoryDerivativeSparse {
 	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
-			border = FactoryImageBorder.general(imageType,BorderType.EXTENDED);
+			border = FactoryImageBorder.single(imageType, BorderType.EXTENDED);
 		}
 
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
@@ -65,7 +65,7 @@ public class FactoryDerivativeSparse {
 		} else {
 			ImageConvolveSparse<ImageInteger, Kernel2D_I32> r = FactoryConvolveSparse.create(ImageInteger.class,LaplacianEdge.kernel_I32);
 
-			r.setImageBorder((ImageBorder_I32)border);
+			r.setImageBorder((ImageBorder_S32)border);
 
 			return (ImageFunctionSparse<T>)r;
 		}
@@ -84,7 +84,7 @@ public class FactoryDerivativeSparse {
 		if( imageType == ImageFloat32.class) {
 			return (SparseImageGradient)new GradientSparseSobel_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
-			return (SparseImageGradient)new GradientSparseSobel_U8((ImageBorder_I32)border);
+			return (SparseImageGradient)new GradientSparseSobel_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
@@ -103,7 +103,7 @@ public class FactoryDerivativeSparse {
 		if( imageType == ImageFloat32.class) {
 			return (SparseImageGradient)new GradientSparsePrewitt_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
-			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_I32)border);
+			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
@@ -122,7 +122,7 @@ public class FactoryDerivativeSparse {
 		if( imageType == ImageFloat32.class) {
 			return (SparseImageGradient)new GradientSparseThree_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
-			return (SparseImageGradient)new GradientSparseThree_U8((ImageBorder_I32)border);
+			return (SparseImageGradient)new GradientSparseThree_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
@@ -141,7 +141,7 @@ public class FactoryDerivativeSparse {
 		if( imageType == ImageFloat32.class) {
 			return (SparseImageGradient)new GradientSparseTwo0_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
-			return (SparseImageGradient)new GradientSparseTwo0_U8((ImageBorder_I32)border);
+			return (SparseImageGradient)new GradientSparseTwo0_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
@@ -160,7 +160,7 @@ public class FactoryDerivativeSparse {
 		if( imageType == ImageFloat32.class) {
 			return (SparseImageGradient)new GradientSparseTwo1_F32((ImageBorder_F32)border);
 		} else if( imageType == ImageUInt8.class ){
-			return (SparseImageGradient)new GradientSparseTwo1_U8((ImageBorder_I32)border);
+			return (SparseImageGradient)new GradientSparseTwo1_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}

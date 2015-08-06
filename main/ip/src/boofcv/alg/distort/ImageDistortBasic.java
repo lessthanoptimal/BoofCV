@@ -18,10 +18,9 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 
 /**
  * Most basic implementation of {@link ImageDistort}. Computes the distortion from the dst to src image
@@ -29,19 +28,19 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output extends ImageSingleBand>
+public abstract class ImageDistortBasic<Input extends ImageBase,Output extends ImageBase,Interpolate extends InterpolatePixel<Input>>
 		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image
 	protected PixelTransform_F32 dstToSrc;
 	// sub pixel interpolation
-	protected InterpolatePixelS<Input> interp;
-	// handle the image border
-	protected ImageBorder<Input> border;
+	protected Interpolate interp;
 
 	// crop boundary
 	protected int x0,y0,x1,y1;
 
+	// should it render all pixels in the destination, even ones outside the input image
+	protected boolean renderAll = true;
 	protected Input srcImg;
 	protected Output dstImg;
 
@@ -49,12 +48,9 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 	 * Specifies configuration parameters
 	 *
 	 * @param interp Interpolation algorithm
-	 * @param border How borders are handled
 	 */
-	public ImageDistortBasic(InterpolatePixelS<Input> interp,
-							 ImageBorder<Input> border) {
+	public ImageDistortBasic( Interpolate interp ) {
 		this.interp = interp;
-		this.border = border;
 	}
 
 	@Override
@@ -68,10 +64,10 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
-		if( border != null )
-			applyBorder();
+		if(renderAll)
+			applyAll();
 		else
-			applyNoBorder();
+			applyOnlyInside();
 	}
 
 	@Override
@@ -80,57 +76,29 @@ public abstract class ImageDistortBasic<Input extends ImageSingleBand,Output ext
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
 
-		if( border != null )
-			applyBorder();
+		if(renderAll)
+			applyAll();
 		else
-			applyNoBorder();
+			applyOnlyInside();
 	}
 
-	private void init(Input srcImg, Output dstImg) {
+	protected void init(Input srcImg, Output dstImg) {
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
-		interp.setBorder(border);
 		interp.setImage(srcImg);
 	}
 
-	public void applyBorder() {
+	protected abstract void applyAll();
 
-		// todo TO make this faster first apply inside the region which can process the fast border
-		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
+	protected abstract void applyOnlyInside();
 
-				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-			}
-		}
+	@Override
+	public void setRenderAll(boolean renderAll) {
+		this.renderAll = renderAll;
 	}
 
-	public void applyNoBorder() {
-		final float minInterpX = interp.getFastBorderX();
-		final float minInterpY = interp.getFastBorderY();
-		final float maxInterpX = srcImg.getWidth()-interp.getFastBorderX()-1;
-		final float maxInterpY = srcImg.getHeight()-interp.getFastBorderY()-1;
-
-		final float widthF = srcImg.getWidth()-1;
-		final float heightF = srcImg.getHeight()-1;
-
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
-			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				if( dstToSrc.distX < minInterpX || dstToSrc.distX > maxInterpX ||
-						dstToSrc.distY < minInterpY || dstToSrc.distY > maxInterpY ) {
-					if( dstToSrc.distX >= 0f && dstToSrc.distX <= widthF && dstToSrc.distY >= 0f && dstToSrc.distY <= heightF )
-						assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-				} else {
-					assign(indexDst,interp.get_fast(dstToSrc.distX, dstToSrc.distY));
-				}
-			}
-		}
+	@Override
+	public boolean getRenderAll() {
+		return renderAll;
 	}
-
-	protected abstract void assign( int indexDst , float value );
 }

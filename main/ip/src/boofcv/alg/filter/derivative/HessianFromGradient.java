@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class HessianFromGradient {
 	 */
 	public static void hessianPrewitt( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									   ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									   ImageBorder_I32 border ) {
+									   ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientPrewitt.process(inputDerivX,derivXX,derivXY,border);
@@ -101,14 +101,14 @@ public class HessianFromGradient {
 	 */
 	public static void hessianSobel( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									 ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									 ImageBorder_I32 border ) {
+									 ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientSobel.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
 			ConvolveWithBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY,
-					new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+					new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelDerivY_I32,inputDerivY,derivYY);
 	}
@@ -149,14 +149,14 @@ public class HessianFromGradient {
 	 */
 	public static void hessianThree( ImageSInt16 inputDerivX , ImageSInt16 inputDerivY ,
 									 ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-									 ImageBorder_I32 border ) {
+									 ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(inputDerivX, inputDerivY, derivXX, derivYY, derivXY);
 
 		GradientThree.process(inputDerivX,derivXX,derivXY,border);
 
 		if( border != null )
 			ConvolveWithBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY,
-					new ImageBorder1D_I32(BorderIndex1D_Extend.class));
+					new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernelDeriv_I32,inputDerivY,derivYY);
 	}

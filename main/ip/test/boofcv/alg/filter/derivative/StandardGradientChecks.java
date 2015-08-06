@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.ImageBorder1D_F32;
-import boofcv.core.image.border.ImageBorder1D_I32;
+import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
@@ -90,7 +90,7 @@ public class StandardGradientChecks {
 		if( params[3] == ImageBorder_F32.class ) {
 			border = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
 		} else {
-			border = new ImageBorder1D_I32(BorderIndex1D_Wrap.class);
+			border = new ImageBorder1D_S32(BorderIndex1D_Wrap.class);
 		}
 
 		try {

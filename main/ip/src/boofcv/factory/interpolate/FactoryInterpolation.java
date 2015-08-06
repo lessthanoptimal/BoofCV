@@ -18,13 +18,12 @@
 
 package boofcv.factory.interpolate;
 
-import boofcv.abst.filter.interpolate.InterpolatePixel_S_to_MB_MultiSpectral;
-import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.abst.filter.interpolate.InterpolatePixel_MS_using_SB;
+import boofcv.alg.interpolate.*;
 import boofcv.alg.interpolate.impl.*;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
+import boofcv.core.image.border.BorderType;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.image.*;
 
 /**
@@ -45,12 +44,27 @@ public class FactoryInterpolation {
 	 * @return Interpolation for single band image
 	 */
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
-	createPixelS(double min, double max, TypeInterpolate type, ImageDataType dataType )
+	createPixelS(double min, double max, TypeInterpolate type, BorderType borderType , ImageDataType dataType )
 	{
 
 		Class t = ImageDataType.typeToSingleClass(dataType);
 
-		return createPixelS(min,max,type,t);
+		return createPixelS(min,max,type,borderType,t);
+	}
+
+	public static <T extends ImageBase> InterpolatePixel<T>
+	createPixel(double min, double max, TypeInterpolate type, BorderType borderType, ImageType<T> imageType) {
+		switch( imageType.getFamily() ) {
+			case SINGLE_BAND:
+			case MULTI_SPECTRAL:
+				return createPixelS(min, max, type, borderType, imageType.getImageClass());
+
+			case INTERLEAVED:
+				return createPixelMB(min,max,type,borderType,(ImageType)imageType);
+
+			default:
+				throw new IllegalArgumentException("Unknown family");
+		}
 	}
 
 	/**
@@ -59,26 +73,38 @@ public class FactoryInterpolation {
 	 * @param min Minimum possible pixel value.  Inclusive.
 	 * @param max Maximum possible pixel value.  Inclusive.
 	 * @param type Interpolation type
+	 * @param borderType Border type. If null then it will not be set here.
 	 * @param imageType Type of input image
 	 * @return Interpolation
 	 */
 	public static <T extends ImageSingleBand> InterpolatePixelS<T>
-	createPixelS(double min, double max, TypeInterpolate type, Class<T> imageType)
+	createPixelS(double min, double max, TypeInterpolate type, BorderType borderType, Class<T> imageType)
 	{
+		InterpolatePixelS<T> alg;
+
 		switch( type ) {
 			case NEAREST_NEIGHBOR:
-				return nearestNeighborPixelS(imageType);
+				alg = nearestNeighborPixelS(imageType);
+				break;
 
 			case BILINEAR:
-				return bilinearPixelS(imageType);
+				return bilinearPixelS(imageType, borderType);
 
 			case BICUBIC:
-				return bicubicS(0.5f, (float) min, (float) max, imageType);
+				alg = bicubicS(-0.5f, (float) min, (float) max, imageType);
+				break;
 
 			case POLYNOMIAL4:
-				return polynomialS(4, min, max, imageType);
+				alg = polynomialS(4, min, max, imageType);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Add type: "+type);
 		}
-		throw new IllegalArgumentException("Add type: "+type);
+
+		if( borderType != null )
+			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
+		return alg;
 	}
 
 	/**
@@ -89,20 +115,30 @@ public class FactoryInterpolation {
 	 * @param type Interpolation type
 	 * @param imageType Type of input image
 	 */
-	public static <T extends ImageMultiBand> InterpolatePixelMB<T>
-	createPixelMB(double min, double max, TypeInterpolate type, ImageType<T> imageType )
+	public static <T extends ImageBase> InterpolatePixelMB<T>
+	createPixelMB(double min, double max, TypeInterpolate type, BorderType borderType, ImageType<T> imageType )
 	{
 		switch (imageType.getFamily()) {
 
 			case MULTI_SPECTRAL:
-				return (InterpolatePixelMB)createPixelMB(createPixelS(min,max,type,imageType.getDataType()));
+				return (InterpolatePixelMB) createPixelMS(createPixelS(min, max, type, borderType, imageType.getDataType()));
 
-			case SINGLE_BAND:
-				throw new IllegalArgumentException("Need to specify a multi-band image type");
+			case SINGLE_BAND:{
+				InterpolatePixelS interpS = createPixelS(min,max,type,borderType,imageType.getImageClass());
+				return new InterpolatePixel_S_to_MB(interpS);
+			}
 
 			case INTERLEAVED:
-				throw new IllegalArgumentException("Not yet supported.  Post a message letting us know you need this." +
-						"  Use MultiSpectral instead for now.");
+				switch( type ) {
+					case NEAREST_NEIGHBOR:
+						return nearestNeighborPixelMB((ImageType) imageType, borderType);
+
+					case BILINEAR:
+						return bilinearPixelMB((ImageType)imageType,borderType);
+
+					default:
+						throw new IllegalArgumentException("Interpolate type not yet support for ImageInterleaved");
+				}
 
 			default:
 				throw new IllegalArgumentException("Add type: "+type);
@@ -119,31 +155,108 @@ public class FactoryInterpolation {
 	 * @return Interpolation for MultiSpectral images
 	 */
 	public static <T extends ImageSingleBand> InterpolatePixelMB<MultiSpectral<T>>
-	createPixelMB( InterpolatePixelS<T> singleBand ) {
-		return new InterpolatePixel_S_to_MB_MultiSpectral<T>(singleBand);
+	createPixelMS(InterpolatePixelS<T> singleBand) {
+		return new InterpolatePixel_MS_using_SB<T>(singleBand);
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image) {
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {
 
-		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass());
+		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass(), borderType);
 		ret.setImage(image);
 
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(Class<T> type) {
-		if( type == ImageFloat32.class )
-			return (InterpolatePixelS<T>)new ImplBilinearPixel_F32();
-		if( type == ImageFloat64.class )
-			return (InterpolatePixelS<T>)new ImplBilinearPixel_F64();
-		else if( type == ImageUInt8.class )
-			return (InterpolatePixelS<T>)new ImplBilinearPixel_U8();
-		else if( type == ImageSInt16.class )
-			return (InterpolatePixelS<T>)new ImplBilinearPixel_S16();
-		else if( type == ImageSInt32.class )
-			return (InterpolatePixelS<T>)new ImplBilinearPixel_S32();
+	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(Class<T> imageType, BorderType borderType ) {
+		InterpolatePixelS<T> alg;
+
+		if( imageType == ImageFloat32.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_F32();
+		else if( imageType == ImageFloat64.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_F64();
+		else if( imageType == ImageUInt8.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_U8();
+		else if( imageType == ImageSInt16.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_S16();
+		else if( imageType == ImageSInt32.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_S32();
 		else
-			throw new RuntimeException("Unknown image type: "+ typeName(type));
+			throw new RuntimeException("Unknown image type: "+ typeName(imageType));
+
+		if( borderType != null )
+			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
+
+		return alg;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> bilinearPixelMB(T image, BorderType borderType) {
+
+		InterpolatePixelMB<T> ret = bilinearPixelMB(image.getImageType(), borderType);
+		ret.setImage(image);
+
+		return ret;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> bilinearPixelMB(ImageType<T> imageType, BorderType borderType ) {
+		InterpolatePixelMB<T> alg;
+
+		int numBands = imageType.getNumBands();
+		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
+			switch( imageType.getDataType()) {
+				case U8:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_U8(numBands);
+					break;
+
+				case S16:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_S16(numBands);
+					break;
+
+				case S32:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_S32(numBands);
+					break;
+
+				case F32:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_F32(numBands);
+					break;
+
+				case F64:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_F64(numBands);
+					break;
+
+				default:
+					throw new IllegalArgumentException("Add support");
+			}
+
+			if( borderType != null )
+				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+		} else {
+			throw new IllegalArgumentException("Only interleaved current supported here");
+		}
+
+		return alg;
+	}
+
+	public static <T extends ImageMultiBand> InterpolatePixelMB<T> nearestNeighborPixelMB(ImageType<T> imageType, BorderType borderType ) {
+		InterpolatePixelMB<T> alg;
+
+		int numBands = imageType.getNumBands();
+		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
+			switch( imageType.getDataType()) {
+				case F32:
+					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_F32();
+					break;
+
+				default:
+					throw new IllegalArgumentException("Add support");
+			}
+
+			if( borderType != null )
+				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+		} else {
+			throw new IllegalArgumentException("Only interleaved current supported here");
+		}
+
+		return alg;
 	}
 
 	private static String typeName(Class type) {

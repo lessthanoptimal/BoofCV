@@ -145,13 +145,13 @@ public class TestHistogramFeatureOps {
 	public void histogram_MS_U8() {
 		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,2);
 
-		GeneralizedImageOps.set(image, 2, 3, 20, 30);
-		GeneralizedImageOps.set(image, 2, 4, 20, 30);
-		GeneralizedImageOps.set(image, 2, 5, 20, 30);
-		GeneralizedImageOps.set(image, 2, 6, 20, 30);
-		GeneralizedImageOps.set(image, 2, 7, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 5, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 6, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 7, 20, 30);
 
-		GeneralizedImageOps.set(image, 3, 7, 45, 2);
+		GeneralizedImageOps.setM(image, 3, 7, 45, 2);
 
 		Histogram_F64 histogram = new Histogram_F64(256,256);
 		histogram.setRange(0, 0, 255);
@@ -192,13 +192,13 @@ public class TestHistogramFeatureOps {
 	public void histogram_MS_F32() {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,2);
 
-		GeneralizedImageOps.set(image, 2, 3, 20, 30);
-		GeneralizedImageOps.set(image, 2, 4, 20, 30);
-		GeneralizedImageOps.set(image, 2, 5, 20, 30);
-		GeneralizedImageOps.set(image, 2, 6, 20, 30);
-		GeneralizedImageOps.set(image, 2, 7, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 5, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 6, 20, 30);
+		GeneralizedImageOps.setM(image, 2, 7, 20, 30);
 
-		GeneralizedImageOps.set(image, 3, 7, 45, 2);
+		GeneralizedImageOps.setM(image, 3, 7, 45, 2);
 
 		Histogram_F64 histogram = new Histogram_F64(256,256);
 		histogram.setRange(0, 0, 256);

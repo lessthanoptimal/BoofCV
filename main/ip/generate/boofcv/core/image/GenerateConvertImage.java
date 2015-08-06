@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,9 +44,11 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				if( in == out )
 					continue;
 
-				printConvert(in,out);
+				printConvertSingle(in, out);
+				printConvertInterleaved(in, out);
 			}
-			printAverage(in);
+			printMultiAverage(in);
+			printInterleaveAverage(in);
 		}
 
 		out.print("\n" +
@@ -57,6 +59,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.core.image.impl.ImplConvertImage;\n" +
 				"import boofcv.core.image.impl.ImplConvertMsToSingle;\n" +
+				"import boofcv.core.image.impl.ConvertInterleavedToSingle;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
@@ -74,7 +77,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	private void printConvert( AutoTypeImage imageIn , AutoTypeImage imageOut ) {
+	private void printConvertSingle(AutoTypeImage imageIn, AutoTypeImage imageOut) {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
@@ -98,7 +101,31 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printAverage( AutoTypeImage imageIn ) {
+	private void printConvertInterleaved(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Converts an {@link boofcv.struct.image."+imageIn.getInterleavedName()+"} into a {@link boofcv.struct.image."+imageOut.getInterleavedName()+"}.\n" +
+				"\t * </p>\n" +
+				"\t *\n" +
+				"\t * @param input Input image which is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static "+imageOut.getInterleavedName()+" convert("+imageIn.getInterleavedName()+" input, "+imageOut.getInterleavedName()+" output) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new "+imageOut.getInterleavedName()+"(input.width, input.height, input.numBands);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tImplConvertImage.convert(input, output);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void printMultiAverage(AutoTypeImage imageIn) {
 
 		String imageName = imageIn.getSingleBandName();
 
@@ -118,6 +145,32 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\n" +
 				"\t\tImplConvertMsToSingle.average(input, output);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n");
+	}
+
+	private void printInterleaveAverage(AutoTypeImage imageIn) {
+
+		String inputName = imageIn.getInterleavedName();
+		String outputName = imageIn.getSingleBandName();
+
+		out.print("\t/**\n" +
+				"\t * Converts a {@link "+inputName+"} into a {@link "+outputName+"} by computing the average value of each pixel\n" +
+				"\t * across all the bands.\n" +
+				"\t * \n" +
+				"\t * @param input (Input) The ImageInterleaved that is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The single band output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static "+outputName+" average( "+inputName+" input , "+outputName+" output ) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new "+outputName+"(input.width, input.height);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tConvertInterleavedToSingle.average(input, output);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n");

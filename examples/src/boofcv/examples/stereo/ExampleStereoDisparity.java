@@ -23,8 +23,10 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -129,9 +131,9 @@ public class ExampleStereoDisparity {
 
 		// undistorted and rectify images
 		ImageDistort<ImageUInt8,ImageUInt8> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, ImageUInt8.class);
 		ImageDistort<ImageUInt8,ImageUInt8> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, ImageUInt8.class);
 
 		imageDistortLeft.apply(origLeft, rectLeft);
 		imageDistortRight.apply(origRight, rectRight);
@@ -165,7 +167,10 @@ public class ExampleStereoDisparity {
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,10,60,0);
 
-		ShowImages.showWindow(rectLeft,"Rectified");
-		ShowImages.showWindow(visualized,"Disparity");
+		ListDisplayPanel gui = new ListDisplayPanel();
+		gui.addImage(rectLeft, "Rectified");
+		gui.addImage(visualized, "Disparity");
+
+		ShowImages.showWindow(gui,"Stereo Disparity", true);
 	}
 }

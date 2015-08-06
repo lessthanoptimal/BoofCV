@@ -20,6 +20,7 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
@@ -81,7 +82,8 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogram() {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(ImageFloat32.class));
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
+				ImageFloat32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
 
@@ -116,7 +118,8 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogramBorder_compare() {
 		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMB(FactoryInterpolation.bilinearPixelS(ImageFloat32.class));
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
+				ImageFloat32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
 
@@ -265,6 +268,9 @@ public class TestLocalWeightedHistogramRotRect {
 
 		@Override
 		public void setBorder(ImageBorder border) {}
+
+		@Override
+		public ImageBorder getBorder() {return null;}
 
 		@Override
 		public void setImage(ImageBase image) {}

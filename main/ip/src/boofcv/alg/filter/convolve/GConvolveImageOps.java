@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_I32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
@@ -44,11 +44,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.horizontal((Kernel1D_F32)kernel,(ImageFloat32)input,(ImageFloat32)output,(ImageBorder_F32)border);
 		} else if( input instanceof ImageUInt8 ) {
 			if( ImageInt16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageInt16)output,(ImageBorder_I32)border);
+				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageInt16)output,(ImageBorder_S32)border);
 			else
-				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageSInt32)output,(ImageBorder_I32)border);
+				ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageUInt8)input,(ImageSInt32)output,(ImageBorder_S32)border);
 		} else if( input instanceof ImageSInt16 ) {
-			ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageSInt16)input,(ImageInt16)output,(ImageBorder_I32)border);
+			ConvolveWithBorder.horizontal((Kernel1D_I32)kernel,(ImageSInt16)input,(ImageInt16)output,(ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -69,11 +69,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.vertical((Kernel1D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output, (ImageBorder_F32) border);
 		} else if( input instanceof ImageUInt8 ) {
 			if( ImageInt16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageInt16) output, (ImageBorder_I32) border);
+				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageInt16) output, (ImageBorder_S32) border);
 			else
-				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output, (ImageBorder_I32) border);
+				ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output, (ImageBorder_S32) border);
 		} else if( input instanceof ImageSInt16 ) {
-			ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageSInt16) input, (ImageInt16) output, (ImageBorder_I32) border);
+			ConvolveWithBorder.vertical((Kernel1D_I32) kernel, (ImageSInt16) input, (ImageInt16) output, (ImageBorder_S32) border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}
@@ -94,11 +94,11 @@ public class GConvolveImageOps {
 			ConvolveWithBorder.convolve((Kernel2D_F32) kernel, (ImageFloat32) input, (ImageFloat32) output, (ImageBorder_F32) border);
 		} else if( input instanceof ImageUInt8 ) {
 			if( ImageInt16.class.isAssignableFrom(output.getClass()) )
-				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageUInt8) input, (ImageInt16) output, (ImageBorder_I32) border);
+				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageUInt8) input, (ImageInt16) output, (ImageBorder_S32) border);
 			else
-				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output, (ImageBorder_I32) border);
+				ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageUInt8) input, (ImageSInt32) output, (ImageBorder_S32) border);
 		} else if( input instanceof ImageSInt16 ) {
-			ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageSInt16) input, (ImageInt16) output, (ImageBorder_I32) border);
+			ConvolveWithBorder.convolve((Kernel2D_I32) kernel, (ImageSInt16) input, (ImageInt16) output, (ImageBorder_S32) border);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getName());
 		}

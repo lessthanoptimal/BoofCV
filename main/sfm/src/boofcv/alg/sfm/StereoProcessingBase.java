@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
@@ -114,8 +115,8 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		rectR = rectifyAlg.getRectifiedRotation();
 
 		Class<T> imageType = (Class<T>)imageLeftRect.getClass();
-		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, imageType);
-		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, imageType);
+		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, BorderType.SKIP, imageType);
+		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, BorderType.SKIP, imageType);
 
 		// Compute parameters that are needed when converting to 3D
 		baseline = stereoParam.getBaseline();

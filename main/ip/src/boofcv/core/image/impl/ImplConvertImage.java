@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.core.image.impl;
 
 import boofcv.struct.image.*;
@@ -54,6 +53,27 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU8 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			System.arraycopy(from.data, 0, to.data, 0, N);
+		}
+	}
+
 	public static void convert( ImageUInt8 from, ImageInt16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -69,6 +89,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] & 0xFF);
+			}
+		}
+	}
+
+	public static void convert( InterleavedU8 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( short )( from.data[i] & 0xFF);
@@ -98,6 +141,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU8 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFF);
+			}
+		}
+	}
+
 	public static void convert( ImageUInt8 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -113,6 +179,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFF);
+			}
+		}
+	}
+
+	public static void convert( InterleavedU8 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( from.data[i] & 0xFF);
@@ -142,6 +231,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU8 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] & 0xFF);
+			}
+		}
+	}
+
 	public static void convert( ImageUInt8 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -157,6 +269,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] & 0xFF);
+			}
+		}
+	}
+
+	public static void convert( InterleavedU8 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] & 0xFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( double )( from.data[i] & 0xFF);
@@ -184,6 +319,27 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS8 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			System.arraycopy(from.data, 0, to.data, 0, N);
+		}
+	}
+
 	public static void convert( ImageSInt8 from, ImageInt16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -199,6 +355,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS8 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( short )( from.data[i] );
@@ -228,6 +407,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS8 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt8 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -243,6 +445,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS8 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( from.data[i] );
@@ -272,6 +497,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS8 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt8 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -287,6 +535,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS8 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( double )( from.data[i] );
@@ -316,6 +587,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU16 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
 	public static void convert( ImageUInt16 from, ImageInt16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -336,6 +630,27 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU16 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			System.arraycopy(from.data, 0, to.data, 0, N);
+		}
+	}
+
 	public static void convert( ImageUInt16 from, ImageSInt32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -351,6 +666,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
+	public static void convert( InterleavedU16 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( from.data[i] & 0xFFFF);
@@ -380,6 +718,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU16 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
 	public static void convert( ImageUInt16 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -395,6 +756,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
+	public static void convert( InterleavedU16 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( float )( from.data[i] & 0xFFFF);
@@ -424,6 +808,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedU16 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] & 0xFFFF);
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] & 0xFFFF);
+			}
+		}
+	}
+
 	public static void convert( ImageSInt16 from, ImageInt8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -439,6 +846,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS16 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( byte )( from.data[i] );
@@ -466,6 +896,27 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS16 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			System.arraycopy(from.data, 0, to.data, 0, N);
+		}
+	}
+
 	public static void convert( ImageSInt16 from, ImageSInt32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -481,6 +932,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS16 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( from.data[i] );
@@ -510,6 +984,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS16 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt16 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -525,6 +1022,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS16 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( float )( from.data[i] );
@@ -554,6 +1074,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS16 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt32 from, ImageInt8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -569,6 +1112,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS32 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( byte )( from.data[i] );
@@ -598,6 +1164,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS32 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt32 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -613,6 +1202,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS32 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( from.data[i] );
@@ -642,6 +1254,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS32 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt32 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -657,6 +1292,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS32 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( double )( from.data[i] );
@@ -686,6 +1344,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS64 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt64 from, ImageInt16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -701,6 +1382,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS64 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( short )( from.data[i] );
@@ -730,6 +1434,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS64 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( int )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( int )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageSInt64 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -745,6 +1472,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedS64 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( float )( from.data[i] );
@@ -774,6 +1524,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedS64 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat32 from, ImageInt8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -789,6 +1562,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedF32 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( byte )( from.data[i] );
@@ -818,6 +1614,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedF32 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat32 from, ImageSInt32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -833,6 +1652,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( int )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedF32 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( int )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( int )( from.data[i] );
@@ -862,6 +1704,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedF32 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( long )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( long )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat32 from, ImageFloat64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -877,6 +1742,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( double )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedF32 from, InterleavedF64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( double )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( double )( from.data[i] );
@@ -906,6 +1794,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedF64 from, InterleavedI8 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( byte )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( byte )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat64 from, ImageInt16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -921,6 +1832,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( short )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedF64 from, InterleavedI16 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( short )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( short )( from.data[i] );
@@ -950,6 +1884,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedF64 from, InterleavedS32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( int )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( int )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat64 from, ImageSInt64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -972,6 +1929,29 @@ public class ImplConvertImage {
 		}
 	}
 
+	public static void convert( InterleavedF64 from, InterleavedS64 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( long )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( long )( from.data[i] );
+			}
+		}
+	}
+
 	public static void convert( ImageFloat64 from, ImageFloat32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
@@ -987,6 +1967,29 @@ public class ImplConvertImage {
 
 		} else {
 			final int N = from.width * from.height;
+
+			for (int i = 0; i < N; i++) {
+				to.data[i] = ( float )( from.data[i] );
+			}
+		}
+	}
+
+	public static void convert( InterleavedF64 from, InterleavedF32 to ) {
+
+		if (from.isSubimage() || to.isSubimage()) {
+			final int N = from.width * from.getNumBands();
+
+			for (int y = 0; y < from.height; y++) {
+				int indexFrom = from.getIndex(0, y);
+				int indexTo = to.getIndex(0, y);
+
+				for (int x = 0; x < N; x++) {
+					to.data[indexTo++] = ( float )( from.data[indexFrom++] );
+				}
+			}
+
+		} else {
+			final int N = from.width * from.height * from.getNumBands();
 
 			for (int i = 0; i < N; i++) {
 				to.data[i] = ( float )( from.data[i] );

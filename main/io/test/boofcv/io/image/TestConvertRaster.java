@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.junit.Test;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 import sun.awt.image.ShortInterleavedRaster;
+import sun.awt.image.SunWritableRaster;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -46,7 +47,7 @@ public class TestConvertRaster {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 30;
+	int numMethods = 50;
 
 	/**
 	 * Use reflections to test all the functions.
@@ -61,7 +62,7 @@ public class TestConvertRaster {
 			if (!isTestMethod(m))
 				continue;
 
-			System.out.println("Examining: " + m.getName());
+//			System.out.println("Examining: " + m.getName()+" "+m.getParameterTypes()[0].getSimpleName()+" "+m.getParameterTypes()[1].getSimpleName());
 			if (m.getName().contains("bufferedTo"))
 				testBufferedTo(m);
 			else if (m.getName().contains("ToBuffered"))
@@ -141,15 +142,22 @@ public class TestConvertRaster {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
+		boolean canSubImage = true;
+		if( paramTypes[0] == SunWritableRaster.class ) {
+			canSubImage = false;
+		}
+
 		for (int i = 0; i < input.length; i++) {
 			// regular image
 			ImageBase output = createImage(m, paramTypes[1], input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
-			// subimage input
-			BufferedImage subimage = input[i].getSubimage(1,2,imgWidth-1,imgHeight-2);
-			output = createImage(m, paramTypes[1], subimage);
-			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
+			if( canSubImage ) {
+				// subimage input
+				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
+				output = createImage(m, paramTypes[1], subimage);
+				BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
+			}
 		}
 	}
 
@@ -160,6 +168,12 @@ public class TestConvertRaster {
 		ImageBase output;
 		if (ImageSingleBand.class.isAssignableFrom(imageType)) {
 			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
+		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
+			if( m.getName().contains("Gray")) {
+				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), 1);
+			} else {
+				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
+			}
 		} else {
 			Class type;
 			if (m.getName().contains("U8")) {
@@ -183,19 +197,24 @@ public class TestConvertRaster {
 		if (paramType == ByteInterleavedRaster.class) {
 			// the code is handled different when a different number of channels is used
 			input = new BufferedImage[]{
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_4BYTE_ABGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_BYTE_GRAY, rand)};
 		} else if (paramType == IntegerInterleavedRaster.class) {
 			input = new BufferedImage[]{
-					createByteBuffByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
-					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_BGR, rand),
-					createByteBuffByType(imgWidth, imgHeight,BufferedImage.TYPE_INT_RGB, rand)};
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB, rand)};
 		} else if( paramType == ShortInterleavedRaster.class ) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
 			input = new BufferedImage[]{createIntBuff(imgWidth, imgHeight, rand)};
+		} else if( paramType == SunWritableRaster.class ) {
+			// ByteInterleavedRaster extends SunWritableRaster
+			input = new BufferedImage[]{
+					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_3BYTE_BGR, rand)};
+
 		} else {
 			throw new RuntimeException("Unknown raster type: " + paramType.getSimpleName());
 		}
@@ -208,8 +227,8 @@ public class TestConvertRaster {
 				m.invoke(null, input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
-				if( MultiSpectral.class.isAssignableFrom(output.getClass()) )
-					BoofTesting.checkEquals(input.getRaster(),(MultiSpectral)output,1);
+				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
+					BoofTesting.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
 				else
 					BoofTesting.checkEquals(input, output, false, 1f);
 			} else {
@@ -278,7 +297,7 @@ public class TestConvertRaster {
 		return ret;
 	}
 
-	public static BufferedImage createByteBuffByType(int width, int height, int type, Random rand) {
+	public static BufferedImage createBufferedByType(int width, int height, int type, Random rand) {
 		BufferedImage ret = new BufferedImage(width, height, type);
 
 		randomize(ret, rand);

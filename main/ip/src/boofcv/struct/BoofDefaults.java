@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ public class BoofDefaults {
 	/**
 	 * Creates a new instance of the default border for derivatives of integer images
 	 */
-	public static ImageBorder_I32 borderDerivative_I32() {
-		return new ImageBorder1D_I32((Class)BorderIndex1D_Extend.class);
+	public static ImageBorder_S32 borderDerivative_I32() {
+		return new ImageBorder1D_S32((Class)BorderIndex1D_Extend.class);
 	}
 
 	/**

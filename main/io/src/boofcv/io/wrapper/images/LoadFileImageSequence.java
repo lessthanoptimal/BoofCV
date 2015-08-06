@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.io.wrapper.images;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ import java.util.Collections;
  *
  * @author Peter Abeles
  */
-public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleImageSequence<T> {
+public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
 
 	String directoryName;
 	String suffix;
@@ -196,6 +196,14 @@ public class LoadFileImageSequence<T extends ImageSingleBand> implements SimpleI
 	public void reset() {
 		index = 0;
 		forwards = true;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 	private class Filter implements FilenameFilter {
