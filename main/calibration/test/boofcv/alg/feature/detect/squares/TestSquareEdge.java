@@ -18,33 +18,21 @@
 
 package boofcv.alg.feature.detect.squares;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
-public class SquareEdge {
-	SquareNode a;
-	SquareNode b;
-
-	int sideA;
-	int sideB;
-
-	double distance;
-
-	/**
-	 * Returns the destination node.
-	 */
-	public SquareNode destination(SquareNode src) {
-		if( a == src )
-			return b;
-		else if( b == src )
-			return b;
-		else
-			throw new IllegalArgumentException("BUG! src is not a or b");
+public class TestSquareEdge {
+	@Test
+	public void destination() {
+		fail("implement");
 	}
 
+	@Test
 	public void reset() {
-		a = b = null;
-		sideA = sideB = -1;
-		distance = -1;
+		fail("implement");
 	}
 }

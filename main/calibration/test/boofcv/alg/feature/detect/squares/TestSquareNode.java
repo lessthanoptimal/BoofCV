@@ -18,46 +18,21 @@
 
 package boofcv.alg.feature.detect.squares;
 
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Polygon2D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class SquareNode {
-	Polygon2D_F64 corners;
-
-	// intersection of line 0 and 2  with 1 and 3.
-	Point2D_F64 center = new Point2D_F64();
-	// length of sides. side = i and i+1
-	double sideLengths[] = new double[4];
-	// the largest length
-	double largestSide;
-
-	int graph;
-
-	boolean inGraph;
-
-	SquareEdge edges[] = new SquareEdge[4];
-
+public class TestSquareNode {
+	@Test
 	public void reset() {
-		corners = null;
-		inGraph = false;
-		graph = -2;
-		largestSide = 0;
-		for (int i = 0; i < 4; i++) {
-			if ( edges[i] != null )
-				throw new RuntimeException("BUG!");
-			sideLengths[i] = 0;
-		}
+		fail("implement");
 	}
 
-	public int getNumberOfConnections() {
-		int ret = 0;
-		for (int i = 0; i < 4; i++) {
-			if( edges[i] != null )
-				ret++;
-		}
-		return ret;
+	@Test
+	public void getNumberOfConnections() {
+		fail("implement");
 	}
 }

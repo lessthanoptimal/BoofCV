@@ -25,6 +25,6 @@ import java.util.List;
  */
 public class SquareGrid {
 	List<SquareNode> nodes;
-	int width;
-	int height;
+	int columns;
+	int rows;
 }
