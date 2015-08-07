@@ -106,6 +106,10 @@ Version : Alpha 0.19
   * fill band
   * fill bands
   * insert band
+- Background Model / Motion Detection
+  * For stationary cameras and moving cameras
+  * Basic: pixels modeled with a fading average
+  * Gaussian: pixels modeled with a fading Normal distribution
 
 TODO
   * Distortion Model + Calibration

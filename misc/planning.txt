@@ -19,3 +19,8 @@ Alpha 0.20
 - Sparse Bundle Adjustment?
 
 - Look at Sandreas's NewWarp?
+
+- Background Model
+  * Gaussian Mixture Model for individual pixels
+  * Shadow removal
+  * remove support for MultiSpectral once Interleaved is supported enough
