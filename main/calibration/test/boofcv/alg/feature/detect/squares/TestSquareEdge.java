@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.squares;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -28,11 +29,38 @@ import static org.junit.Assert.fail;
 public class TestSquareEdge {
 	@Test
 	public void destination() {
-		fail("implement");
+		SquareNode a = new SquareNode();
+		SquareNode b = new SquareNode();
+		SquareNode c = new SquareNode();
+
+		SquareEdge edge = new SquareEdge();
+		edge.a = a;
+		edge.b = b;
+
+		assertTrue(edge.b == edge.destination(edge.a));
+		assertTrue(edge.a == edge.destination(edge.b));
+
+		try {
+			edge.destination(c);
+			fail("Should have thrown exception");
+		} catch( RuntimeException ignore){}
 	}
 
 	@Test
 	public void reset() {
-		fail("implement");
+		SquareEdge edge = new SquareEdge();
+		edge.a = new SquareNode();
+		edge.b = new SquareNode();
+		edge.sideA = 1;
+		edge.sideB = 2;
+		edge.distance = 3;
+
+		edge.reset();
+
+		assertTrue(null == edge.a);
+		assertTrue(null == edge.b);
+		assertTrue(-1 == edge.sideA);
+		assertTrue(-1 == edge.sideA);
+		assertTrue(-1 == edge.distance);
 	}
 }

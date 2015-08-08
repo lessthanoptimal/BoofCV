@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.squares;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,11 +28,26 @@ import static org.junit.Assert.fail;
 public class TestSquareNode {
 	@Test
 	public void reset() {
-		fail("implement");
+		SquareNode a = new SquareNode();
+
+
+
+
+		a.reset();
 	}
 
 	@Test
 	public void getNumberOfConnections() {
-		fail("implement");
+		SquareNode a = new SquareNode();
+
+		assertEquals(0,a.getNumberOfConnections());
+		a.edges[2] = new SquareEdge();
+		assertEquals(1,a.getNumberOfConnections());
+		a.edges[0] = new SquareEdge();
+		assertEquals(2,a.getNumberOfConnections());
+		a.edges[3] = new SquareEdge();
+		assertEquals(3,a.getNumberOfConnections());
+		a.edges[1] = new SquareEdge();
+		assertEquals(4,a.getNumberOfConnections());
 	}
 }

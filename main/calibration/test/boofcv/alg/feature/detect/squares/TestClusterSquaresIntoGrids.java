@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSquareSquearesIntoGrids {
+public class TestClusterSquaresIntoGrids {
 
 
 	@Test
@@ -65,51 +65,6 @@ public class TestSquareSquearesIntoGrids {
 
 	@Test
 	public void pickNot_2() {
-		fail("implement");
-	}
-
-	@Test
-	public void computeNodeInfo() {
-		fail("implement");
-	}
-
-	@Test
-	public void connectNodes() {
-		fail("implement");
-	}
-
-	@Test
-	public void considerAttach() {
-		fail("implement");
-	}
-
-	@Test
-	public void findSideIntersect() {
-		fail("implement");
-	}
-
-	@Test
-	public void areLinesParallel() {
-		fail("implement");
-	}
-
-	@Test
-	public void areMiddlePointsClose() {
-		fail("implement");
-	}
-
-	@Test
-	public void checkConnect() {
-		fail("implement");
-	}
-
-	@Test
-	public void removeEdge() {
-		fail("implement");
-	}
-
-	@Test
-	public void connect() {
 		fail("implement");
 	}
 

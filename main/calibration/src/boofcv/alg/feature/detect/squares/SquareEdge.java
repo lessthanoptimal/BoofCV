@@ -19,16 +19,21 @@
 package boofcv.alg.feature.detect.squares;
 
 /**
+ * Edge in the graph which connects square shapes
+ *
  * @author Peter Abeles
  */
 public class SquareEdge {
-	SquareNode a;
-	SquareNode b;
+	// destinations
+	public SquareNode a;
+	public SquareNode b;
 
-	int sideA;
-	int sideB;
+	// which index in the shape this edge belongs to
+	public int sideA;
+	public int sideB;
 
-	double distance;
+	// the distance between the square's centers
+	public double distance;
 
 	/**
 	 * Returns the destination node.
@@ -42,6 +47,9 @@ public class SquareEdge {
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}
 
+	/**
+	 * Discards previous settings.
+	 */
 	public void reset() {
 		a = b = null;
 		sideA = sideB = -1;

@@ -22,27 +22,34 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
+ * Graph representation of square blobs.  Each blob can be connected to at most 4 other shapes which are directly
+ * adjacent of one of the sides.
+ *
  * @author Peter Abeles
  */
 public class SquareNode {
-	Polygon2D_F64 corners;
+	// polygon which this node represents.
+	// cw or ccw ordering of edges doesn't matter
+	public Polygon2D_F64 corners;
 
 	// intersection of line 0 and 2  with 1 and 3.
-	Point2D_F64 center = new Point2D_F64();
+	public Point2D_F64 center = new Point2D_F64();
 	// length of sides. side = i and i+1
-	double sideLengths[] = new double[4];
+	public double sideLengths[] = new double[4];
 	// the largest length
-	double largestSide;
+	public double largestSide;
 
-	int graph;
+	// marker used to indicate that this has been traversed by different algorithms
+	public int graph;
 
-	boolean inGraph;
+	// edges in the graph.  One for each side in the shape
+	public SquareEdge edges[] = new SquareEdge[4];
 
-	SquareEdge edges[] = new SquareEdge[4];
-
+	/**
+	 * Discards previous information
+	 */
 	public void reset() {
 		corners = null;
-		inGraph = false;
 		graph = -2;
 		largestSide = 0;
 		for (int i = 0; i < 4; i++) {
@@ -52,6 +59,9 @@ public class SquareNode {
 		}
 	}
 
+	/**
+	 * Computes the number of edges attached to this node
+	 */
 	public int getNumberOfConnections() {
 		int ret = 0;
 		for (int i = 0; i < 4; i++) {
