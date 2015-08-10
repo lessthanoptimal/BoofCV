@@ -36,8 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Processes the detected squares in the image and connects them into clusters.  Two squares can only be connected
- * if their sides are approximately adjacent.  Otherwise the clusters are no
+ * Processes the detected squares in the image and connects them into clusters.  Squares can be connected to each
+ * other if two equivalent sides are parallel and their distance apart is "reasonable".  The parallel requirement
+ * take advantage of line under perspective distortion remaining parallel.
  *
  * @author Peter Abeles
  */
@@ -177,6 +178,9 @@ public class SquaresIntoClusters {
 		}
 	}
 
+	/**
+	 * Attaches the candidate node to n if they meet several criteria.  See code for details.
+	 */
 	void considerAttach( SquareNode n , SquareNode candidate ) {
 
 		// Find the side on each line which intersects the line connecting the two centers
@@ -190,8 +194,6 @@ public class SquaresIntoClusters {
 			return;
 
 		double distanceApart = lineA.getLength();
-
-		// TODO make sure it's not too far away
 
 		// see if they are approximately parallel
 		if( !areSidesParallel(n,intersectionN,candidate,intersectionC)) {
@@ -259,6 +261,10 @@ public class SquaresIntoClusters {
 		}
 	}
 
+	/**
+	 * Finds the side which intersects the line on the shape.  The line is assumed to pass through the shape
+	 * so if there is no intersection it is considered a bug
+	 */
 	int findSideIntersect( SquareNode n , LineSegment2D_F64 line , LineSegment2D_F64 storage ) {
 		for (int i = 0; i < 4; i++) {
 			int j = (i+1)%4;
@@ -271,11 +277,12 @@ public class SquaresIntoClusters {
 			}
 		}
 
+		// bug but I won't throw an exception to stop it from blowing up a bunch
 		return -1;
 	}
 
 	/**
-	 * Returns true if line segment (a0,b0) is parallel to line segment (a1,b1)
+	 * Returns true if the specified side on each square are parallel to each other.
 	 */
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();

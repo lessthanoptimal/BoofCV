@@ -18,7 +18,10 @@
 
 package boofcv.alg.feature.detect.squares;
 
+import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -43,19 +46,83 @@ public class TestSquaresIntoClusters {
 		fail("implement");
 	}
 
+	/**
+	 * The usual case.  They should attach
+	 */
 	@Test
-	public void considerAttach() {
+	public void considerAttach_nominal() {
+		fail("implement");
+	}
+
+	/**
+	 * Everything's good, but they are offset from each other by too much
+	 */
+	@Test
+	public void considerAttach_shape_offset() {
+		fail("implement");
+	}
+
+	/**
+	 * Every thing's good, but the size difference of the squares is too much
+	 */
+	@Test
+	public void considerAttach_shape_size() {
 		fail("implement");
 	}
 
 	@Test
 	public void findSideIntersect() {
-		fail("implement");
+		LineSegment2D_F64 line = new LineSegment2D_F64();
+		LineSegment2D_F64 storage = new LineSegment2D_F64();
+		SquareNode a = new SquareNode();
+		a.corners = new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1);
+
+		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+
+		line.b.set(0,2);
+		assertEquals(0,alg.findSideIntersect(a,line,storage));
+		line.b.set(0,-2);
+		assertEquals(2,alg.findSideIntersect(a,line,storage));
+		line.b.set(2,0);
+		assertEquals(1,alg.findSideIntersect(a,line,storage));
+		line.b.set(-2,0);
+		assertEquals(3,alg.findSideIntersect(a,line,storage));
 	}
 
 	@Test
 	public void areSidesParallel() {
-		fail("implement");
+		areSidesParallel(true);
+		areSidesParallel(false);
+	}
+
+	private void areSidesParallel(boolean changeClock) {
+		SquareNode a = new SquareNode();
+		a.corners = new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1);
+		SquareNode b = new SquareNode();
+		b.corners = new Polygon2D_F64( 1,1,  3,1,  3,-1,   1,-1);
+
+		if( changeClock ) {
+			UtilPolygons2D_F64.flip(a.corners);
+			UtilPolygons2D_F64.flip(a.corners);
+		}
+
+		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		for (int i = 0; i < 4; i++) {
+			assertTrue(alg.areSidesParallel(a,i,b,i));
+			assertFalse(alg.areSidesParallel(a, i, b, (i + 1) % 4));
+		}
+
+		// test jsut above and below the threshold
+		double cos0 = Math.cos(alg.acuteAngleTol * 0.99);
+		double sin0 = Math.sin(alg.acuteAngleTol * 0.99);
+		double cos1 = Math.cos(alg.acuteAngleTol * 1.01);
+		double sin1 = Math.sin(alg.acuteAngleTol * 1.01);
+
+		a.corners.get(1).set(-1+2*cos0,1+2*sin0);
+		assertTrue(alg.areSidesParallel(a, 0, b, 0));
+
+		a.corners.get(1).set(-1 + 2 * cos1, 1 + 2 * sin1);
+		assertFalse(alg.areSidesParallel(a, 0, b, 0));
 	}
 
 	@Test

@@ -117,6 +117,7 @@ TODO
     - Regression with hand selected points
     - try convex
     - try detect multiple number of sides
+    - specify no inner contour or not
 
   * Update filter example
 
