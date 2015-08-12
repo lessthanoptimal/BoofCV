@@ -23,6 +23,7 @@ import boofcv.struct.image.*;
 /**
  * Used to convert NV21 image format used in Android into BoofCV standard image types. NV21 is an encoding of a
  * YUV image [1] (more specifically YUV 4:2:0) where Y is encoded in the first block and UV are interlaced together.
+ * The UV planes are at 1/2 resolution.
  *
  * @author Peter Abeles
  */

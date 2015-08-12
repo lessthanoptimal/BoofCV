@@ -108,8 +108,8 @@ public class TestConvertNV21 {
 
 				for (int i = 0; i < 2; i++) {
 					for (int j = 0; j < 2; j++) {
-						yuv.getBand(1).set(2*x+j,2*y+i,value0);
-						yuv.getBand(2).set(2*x+j,2*y+i,value1);
+						yuv.getBand(2).set(2*x+j,2*y+i,value0);
+						yuv.getBand(1).set(2*x+j,2*y+i,value1);
 					}
 				}
 			}
