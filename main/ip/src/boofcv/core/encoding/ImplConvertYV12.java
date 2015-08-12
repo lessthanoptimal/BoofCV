@@ -46,7 +46,7 @@ public class ImplConvertYV12 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(dataYV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataYV[indexY++] & 0xFF) - 16);
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
@@ -83,7 +83,7 @@ public class ImplConvertYV12 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ ) {
-				int y = 1191*(dataYV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataYV[indexY++] & 0xFF) - 16);
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
@@ -124,7 +124,7 @@ public class ImplConvertYV12 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(dataYV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataYV[indexY++] & 0xFF) - 16);
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 
@@ -161,7 +161,7 @@ public class ImplConvertYV12 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ ) {
-				int y = 1191*(dataYV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataYV[indexY++] & 0xFF) - 16);
 				int cb = (dataYV[ indexU ] & 0xFF) - 128;
 				int cr = (dataYV[ indexU+offsetV] & 0xFF) - 128;
 

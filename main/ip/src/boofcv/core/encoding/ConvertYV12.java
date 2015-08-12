@@ -29,7 +29,6 @@ import boofcv.struct.image.*;
  */
 public class ConvertYV12 {
 
-
     /**
      * Converts a YU12 encoded byte array into a BoofCV formatted image.
      *
