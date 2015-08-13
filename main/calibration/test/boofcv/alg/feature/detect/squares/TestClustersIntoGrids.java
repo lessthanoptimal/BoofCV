@@ -51,10 +51,42 @@ public class TestClustersIntoGrids {
 	}
 
 	@Test
+	public void orderInfoLine() {
+		for( int length = 1; length < 4; length++ ) {
+			for (int i = 0; i < 2; i++) {
+				int numRows,numCols;
+
+				if (i == 0) {
+					numRows = 1;
+					numCols = length;
+				} else {
+					numRows = length;
+					numCols = 1;
+				}
+
+				List<SquareNode> nodes = createGrid(numRows, numCols);
+
+				Collections.shuffle(nodes, rand);
+
+				ClustersIntoGrids alg = new ClustersIntoGrids(1);
+				SquareGrid found = alg.orderIntoLine(nodes);
+
+				assertEquals(length, found.nodes.size());
+				if (found.columns == numCols) {
+					assertEquals(numRows, found.rows);
+				} else {
+					assertEquals(numRows, found.columns);
+					assertEquals(numCols, found.rows);
+				}
+			}
+		}
+	}
+
+	@Test
 	public void orderIntoGrid() {
 
-		for (int numRows = 1; numRows <= 4; numRows++) {
-			for (int numCols = 1; numCols <= 4; numCols++) {
+		for (int numRows = 2; numRows <= 4; numRows++) {
+			for (int numCols = 2; numCols <= 4; numCols++) {
 				List<SquareNode> nodes = createGrid(numRows, numCols);
 
 				Collections.shuffle(nodes,rand);

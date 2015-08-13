@@ -54,10 +54,12 @@ public class ClustersIntoGrids {
 			if( graph.size() < minimumElements )
 				continue;
 
-			if( !checkNumberOfConnections(graph))
-				continue;
+			SquareGrid grid = null;
+			switch( checkNumberOfConnections(graph) ) {
+				case 1: grid = orderIntoLine(graph); break;
+				case 2: grid = orderIntoGrid(graph); break;
+			}
 
-			SquareGrid grid = orderIntoGrid(graph);
 			if( grid != null )
 				valid.add( grid );
 		}
@@ -66,25 +68,96 @@ public class ClustersIntoGrids {
 	/**
 	 * Does a weak check on the number of edges in the graph.  Since the structure isn't known it can't make
 	 * harder checks
+	 *
+	 * @return 0 = not a grid.  1 = line, 2 = grud
 	 */
-	private boolean checkNumberOfConnections( List<SquareNode> graph ) {
+	private int checkNumberOfConnections( List<SquareNode> graph ) {
 		int histogram[] = new int[5];
 
 		for (int i = 0; i < graph.size(); i++) {
 			histogram[ graph.get(i).getNumberOfConnections() ]++;
 		}
 
-		if( histogram[0] != 0 )
-			return false;
-		if( histogram[1] != 0 )
-			return false;
-		if( histogram[2] != 4 )
-			return false;
-		return true;
+		if( graph.size() == 1 ) {
+			if( histogram[1] != 1 )
+				return 0;
+
+			return 1;
+		} else if( histogram[1] == 2 ) {
+			// line
+			if( histogram[0] != 0 )
+				return 0;
+			if( histogram[2] != graph.size()-2 )
+				return 0;
+			if( histogram[3] != 0 )
+				return 0;
+			if( histogram[4] != 0 )
+				return 0;
+
+			return 1;
+		} else {
+			// grid
+			if (histogram[0] != 0)
+				return 0;
+			if (histogram[1] != 0)
+				return 0;
+			if (histogram[2] != 4)
+				return 0;
+			return 2;
+		}
 	}
 
 	/**
-	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.
+	 * Puts the un-ordered graph into a ordered grid which is a line.
+	 */
+	SquareGrid orderIntoLine(List<SquareNode> graph) {
+
+		// discard previous label information since its now being used to avoid cycles
+		for (int i = 0; i < graph.size(); i++) {
+			graph.get(i).graph = -1;
+		}
+
+		List<SquareNode> line = new ArrayList<SquareNode>();
+
+		if( graph.size() > 1 ) {
+			escape:
+			for (int i = 0; i < graph.size(); i++) {
+				// Find a side with 2 connections and use that as the seed
+				SquareNode seed = graph.get(i);
+				if (seed.getNumberOfConnections() != 1)
+					continue;
+
+				seed.graph = SEARCHED;
+				line.add(seed);
+
+				// Find the one connecting node
+				for (int edge = 0; edge < 4; edge++) {
+					if (seed.edges[edge] == null)
+						continue;
+
+					SquareNode b = seed.edges[edge].destination(seed);
+					b.graph = 1;
+
+					line.add(b);
+					addLineToGrid(seed, b, line);
+					break escape;
+				}
+			}
+		} else {
+			line.add(graph.get(0));
+		}
+
+		SquareGrid grid = new SquareGrid();
+		grid.nodes = line;
+		grid.columns = line.size();
+		grid.rows = 1;
+
+		return grid;
+	}
+
+	/**
+	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.  This assumes
+	 * the grid is 2 by 2 or larger.
 	 * @param graph unordered nodes in a connected graph
 	 * @return grid
 	 */
@@ -104,28 +177,24 @@ public class ClustersIntoGrids {
 			if( seed.getNumberOfConnections() != 2 )
 				continue;
 
-			seed.graph = 1;
+			seed.graph = SEARCHED;
 			column.add(seed);
 
 			// find all the nodes along one side, just pick an edge arbitrarily.  This will be the first column
-			for (int j = 0; j < 4; j++) {
-				if( seed.edges[i] == null )
+			for (int edge = 0; edge < 4; edge++) {
+				if( seed.edges[edge] == null )
 					continue;
 
-				SquareNode b = seed.edges[i].destination(seed);
-				b.graph = 1;
+				SquareNode b = seed.edges[edge].destination(seed);
+				b.graph = SEARCHED;
 
 				column.add(b);
 				addLineToGrid(seed, b, column);
 				break;
 			}
 
-			// handle special case where there is only one element
-			if( column.size() <= 1 ) {
-				ordered.addAll(column);
-				break;
-			}
-			if (addRowsToGrid(column, ordered)) return null;
+			if (addRowsToGrid(column, ordered))
+				return null;
 
 			break;
 		}
@@ -142,6 +211,10 @@ public class ClustersIntoGrids {
 	 * Competes the graph by traversing down the first column and adding the rows one at a time
 	 */
 	boolean addRowsToGrid(List<SquareNode> column, List<SquareNode> ordered) {
+		for (int i = 0; i < column.size(); i++) {
+			column.get(i).graph = 0;
+		}
+
 		// now add the rows by traversing down the column
 		int numFirsRow = 0;
 		for (int j = 0; j < column.size(); j++) {
@@ -244,6 +317,8 @@ public class ClustersIntoGrids {
 	static SquareNode pickNot( SquareNode target , SquareNode child ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
+			if( e == null )
+				continue;
 			SquareNode c = e.destination(target);
 			if( c != child )
 				return c;
@@ -257,6 +332,7 @@ public class ClustersIntoGrids {
 	static SquareNode pickNot( SquareNode target , SquareNode child0 , SquareNode child1 ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
+			if( e == null ) continue;
 			SquareNode c = e.destination(target);
 			if( c != child0 && c != child1 )
 				return c;
