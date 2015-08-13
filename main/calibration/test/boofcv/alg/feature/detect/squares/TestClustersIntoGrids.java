@@ -1,0 +1,184 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.feature.detect.squares;
+
+import georegression.struct.shapes.Polygon2D_F64;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author Peter Abeles
+ */
+public class TestClustersIntoGrids {
+
+
+	@Test
+	public void highLevelCheck() {
+		fail("implement");
+	}
+
+	@Test
+	public void findClusters() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkNumberOfConnections() {
+		fail("implement");
+	}
+
+	@Test
+	public void orderIntoGrid() {
+		fail("implement");
+	}
+
+	@Test
+	public void addRows() {
+		fail("implement");
+	}
+
+	@Test
+	public void addLineToGrid() {
+		int numRows = 3;
+		int numCols = 4;
+		List<SquareNode> nodes = createGrid(numRows, numCols);
+
+		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+
+		List<SquareNode> row = new ArrayList<SquareNode>();
+		List<SquareNode> col = new ArrayList<SquareNode>();
+
+		checkAddLineToGrid(alg, nodes.get(0), nodes.get(1), row);
+		checkAddLineToGrid(alg, nodes.get(0), nodes.get(numCols), col);
+
+		assertEquals(numCols - 2, row.size());
+		assertEquals(numRows - 2, col.size());
+		assertTrue(row.get(1) == nodes.get(3));
+		assertTrue(col.get(0) == nodes.get(2 * numCols));
+
+		// try it the other direction
+		nodes = createGrid(numRows, numCols);
+		checkAddLineToGrid(alg,nodes.get(numCols - 1), nodes.get(numCols - 2), row);
+		nodes = createGrid(numRows, numCols);
+		checkAddLineToGrid(alg, nodes.get(2 * numCols), nodes.get(1 * numCols), col);
+		assertEquals(numCols - 2, row.size());
+		assertEquals(numRows - 2, col.size());
+
+	}
+
+	void checkAddLineToGrid(ClustersIntoGrids alg,SquareNode a, SquareNode b, List<SquareNode> list) {
+		list.clear();
+		a.graph = ClustersIntoGrids.SEARCHED;
+		b.graph = ClustersIntoGrids.SEARCHED;
+		alg.addLineToGrid(a,b,list);
+	}
+
+	@Test
+	public void pickNot_1() {
+		SquareNode a = new SquareNode();
+		SquareNode b = new SquareNode();
+		SquareNode c = new SquareNode();
+
+		connect(a, 0, b, 0);
+		connect(a, 1, c, 0);
+
+		assertTrue(c == ClustersIntoGrids.pickNot(a, b));
+		assertTrue(b == ClustersIntoGrids.pickNot(a, c));
+	}
+
+	@Test
+	public void pickNot_2() {
+		SquareNode a = new SquareNode();
+		SquareNode b = new SquareNode();
+		SquareNode c = new SquareNode();
+		SquareNode d = new SquareNode();
+
+		connect(a,0,b,0);
+		connect(a,1,c,0);
+		connect(a,2,d,0);
+
+		assertTrue(d == ClustersIntoGrids.pickNot(a, b, c));
+		assertTrue(b == ClustersIntoGrids.pickNot(a, c, d));
+		assertTrue(c == ClustersIntoGrids.pickNot(a, d, b));
+	}
+
+	private List<SquareNode> createGrid(int numRows, int numCols) {
+		List<SquareNode> nodes = new ArrayList<SquareNode>();
+		double w = 1.2;
+		for (int y = 0; y < numRows; y++) {
+			for (int x = 0; x < numCols; x++) {
+				nodes.add( createSquare(x*w*2,y*w*2,w) );
+			}
+		}
+		int index = 0;
+		for (int y = 0; y < numRows; y++) {
+			for (int x = 0; x < numCols; x++, index++ ) {
+				SquareNode a = nodes.get(index);
+				if( x < numCols-1) {
+					SquareNode b = nodes.get(index + 1);
+					connect(a,0,b,2);
+				}
+				if( y < numRows-1) {
+					SquareNode c = nodes.get(index + numCols);
+					connect(a, 1, c, 3);
+				}
+			}
+		}
+		return nodes;
+	}
+
+
+	private void connect( SquareNode a , int sideA , SquareNode b , int sideB ) {
+		SquareEdge e = new SquareEdge();
+		e.a = a;
+		e.sideA = sideA;
+		e.b = b;
+		e.sideB = sideB;
+		a.edges[sideA] = e;
+		b.edges[sideB] = e;
+	}
+
+	private SquareNode createSquare( double x , double y , double width ) {
+
+		double r = width/2;
+		Polygon2D_F64 poly = new Polygon2D_F64(4);
+		poly.get(0).set(-r, r);
+		poly.get(1).set( r, r);
+		poly.get(2).set( r,-r);
+		poly.get(3).set(-r, -r);
+
+		SquareNode square = new SquareNode();
+		for (int i = 0; i < 4; i++) {
+			poly.get(i).x += x;
+			poly.get(i).y += y;
+			square.sideLengths[i] = width;
+		}
+
+		square.corners = poly;
+		square.center.set(x,y);
+		square.largestSide = width;
+
+		return square;
+	}
+
+}

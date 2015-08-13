@@ -45,17 +45,15 @@ import java.util.List;
 public class SquaresIntoClusters {
 
 	// maximum neighbors on nearest-neighbor search
-	public static int MAX_NEIGHBORS = 7;
+	public static int MAX_NEIGHBORS = 6;
 
 	// tolerance for fractional distance away a point can be from a line to be considered on the line
 	double distanceTol = 0.05;
-	// number of radians the acute angle can be for a line to be consdiered parallel
-	double acuteAngleTol = UtilAngle.degreeToRadian(10);
 
 	// ratio of the length of a square to the distance separating the square
 	private double spaceToSquareRatio;
 
-	private FastQueue<SquareNode> nodes = new FastQueue<SquareNode>(SquareNode.class,true);
+	FastQueue<SquareNode> nodes = new FastQueue<SquareNode>(SquareNode.class,true);
 	protected RecycleManager<SquareEdge> edges = new RecycleManager<SquareEdge>(SquareEdge.class);
 
 	// Storage for line segments used to calculate center
@@ -71,6 +69,14 @@ public class SquaresIntoClusters {
 	// storage for found clusters
 	private FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList.class,true);
 
+	// storage for open list when clustering points
+	List<SquareNode> open = new ArrayList<SquareNode>();
+
+	/**
+	 * Declares data structures and configures algorithm
+	 *
+	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
+	 */
 	public SquaresIntoClusters(double spaceToSquareRatio ) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
 
@@ -84,6 +90,12 @@ public class SquaresIntoClusters {
 		search.init(2);
 	}
 
+	/**
+	 * Processes the unordered set of squares and creates a graph out of them using prior knowledge and geometric
+	 * constraints.
+	 * @param squares Set of squares
+	 * @return List of graphs.  All data structures are recycled on the next call to process().
+	 */
 	public List<List<SquareNode>> process( List<Polygon2D_F64> squares ) {
 		recycleData();
 
@@ -91,7 +103,6 @@ public class SquaresIntoClusters {
 		computeNodeInfo(squares);
 
 		// Connect nodes to each other
-		setupSearch();
 		connectNodes();
 
 		// Find all valid graphs
@@ -119,7 +130,7 @@ public class SquaresIntoClusters {
 		clusters.reset();
 	}
 
-	private void computeNodeInfo( List<Polygon2D_F64> squares ) {
+	void computeNodeInfo( List<Polygon2D_F64> squares ) {
 
 		for (int i = 0; i < squares.size(); i++) {
 			SquareNode n = nodes.grow();
@@ -143,6 +154,38 @@ public class SquaresIntoClusters {
 		}
 	}
 
+	/**
+	 * Goes through each node and uses a nearest-neighbor search to find the closest nodes in its local neighborhood.
+	 * It then checks those to see if it should connect
+	 */
+	void connectNodes() {
+		setupSearch();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			SquareNode n = nodes.get(i);
+			double[] point = searchPoints.get(i);
+
+			// distance between center when viewed head on will be space + 0.5*2*width.
+			// when you factor in foreshortening this search will not be symmetric
+			// the smaller will miss its larger neighbor but the larger one will find the smaller one.
+			double neighborDistance = n.largestSide*(1.0+spaceToSquareRatio)*1.2;
+
+			// find it's neighbors
+			searchResults.reset();
+			search.findNearest(point, neighborDistance*neighborDistance, MAX_NEIGHBORS + 1, searchResults);
+
+			// try to attach it's closest neighbors
+			for (int j = 0; j < searchResults.size(); j++) {
+				NnData<SquareNode> neighbor = searchResults.get(j);
+				if( neighbor.data != n )
+					considerConnect(n, neighbor.data);
+			}
+		}
+	}
+
+	/**
+	 * Sets up data structures for nearest-neighbor search used in {@link #connectNodes()}
+	 */
 	private void setupSearch() {
 		searchPoints.reset();
 		for (int i = 0; i < nodes.size(); i++) {
@@ -155,65 +198,48 @@ public class SquaresIntoClusters {
 		search.setPoints(searchPoints.toList(), nodes.toList());
 	}
 
-	private void connectNodes() {
-		for (int i = 0; i < nodes.size(); i++) {
-			SquareNode n = nodes.get(i);
-			double[] point = searchPoints.get(i);
-
-			// distance between center when viewed head on will be space + 0.5*2*width.
-			// when you factor in foreshortening this search will not be symmetric
-			// the smaller will miss its larger neighbor but the larger one will find the smaller one.
-			double neighborDistance = n.largestSide*(1.0+spaceToSquareRatio)*1.2;
-
-			// find it's neighbors
-			searchResults.reset();
-			search.findNearest(point,neighborDistance,MAX_NEIGHBORS,searchResults);
-
-			// try to attach it's closest neighbors
-			for (int j = 0; j < searchResults.size(); j++) {
-				NnData<SquareNode> neighbor = searchResults.get(j);
-				if( neighbor.data != n )
-					considerAttach(n,neighbor.data);
-			}
-		}
-	}
-
 	/**
-	 * Attaches the candidate node to n if they meet several criteria.  See code for details.
+	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
-	void considerAttach( SquareNode n , SquareNode candidate ) {
+	void considerConnect(SquareNode node0, SquareNode node1) {
 
 		// Find the side on each line which intersects the line connecting the two centers
-		lineA.a = n.center;
-		lineA.b = candidate.center;
+		lineA.a = node0.center;
+		lineA.b = node1.center;
 
-		int intersectionN = findSideIntersect(n,lineA,lineB);
-		int intersectionC = findSideIntersect(candidate,lineA,lineB);
+		int intersection0 = findSideIntersect(node0,lineA,lineB);
+		int intersection1 = findSideIntersect(node1,lineA,lineB);
 
-		if( intersectionC < 0 || intersectionN < 0 )
+		if( intersection1 < 0 || intersection0 < 0 )
 			return;
 
 		double distanceApart = lineA.getLength();
 
-		// see if they are approximately parallel
-		if( !areSidesParallel(n,intersectionN,candidate,intersectionC)) {
+		// see if these two sides are the closest to being parallel to each other.
+		// perspective distortion will make the lines not parallel, bit will still have a smaller
+		// acute angle than the adjacent sides
+		if( !mostParallel(node0, intersection0, node1, intersection1)) {
 			return;
 		}
 
-		// See if the connecting sides end points lie along the line defined by the adjacent sides on
-		// each shape
-		if( !areMiddlePointsClose(n.corners.get(add(intersectionN, -1)),n.corners.get(intersectionN),
-				candidate.corners.get(add(intersectionC,1)),candidate.corners.get(add(intersectionC,2)))) {
+		// See if the two end points of the selected sides lie close to the line defined by adjacent sides.
+		// Another way of saying this, for the "top" corner on the side, is it close to the line defined
+		// by the side "top" sides on both squares.
+		if( !areMiddlePointsClose(node0.corners.get(add(intersection0, -1)), node0.corners.get(intersection0),
+				node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)))) {
 			return;
 		}
 
-		if( areMiddlePointsClose(n.corners.get(add(intersectionN,2)),n.corners.get(add(intersectionN,1)),
-				candidate.corners.get(intersectionC),candidate.corners.get(add(intersectionC,-1)))) {
+		if( areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
+				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
 
-			checkConnect(n,intersectionN,candidate,intersectionC,distanceApart);
+			checkConnect(node0,intersection0,node1,intersection1,distanceApart);
 		}
 	}
 
+	/**
+	 * Put sets of nodes into the same list if they are some how connected
+	 */
 	private void findClusters() {
 
 		for (int i = 0; i < nodes.size(); i++) {
@@ -232,7 +258,7 @@ public class SquaresIntoClusters {
 	 * Finds all neighbors and adds them to the graph.  Repeated until there are no more nodes to add to the graph
 	 */
 	void addToCluster(SquareNode seed, List<SquareNode> graph) {
-		List<SquareNode> open = new ArrayList<SquareNode>();
+		open.clear();
 		open.add(seed);
 		while( !open.isEmpty() ) {
 			SquareNode n = open.remove( open.size() -1 );
@@ -250,12 +276,12 @@ public class SquaresIntoClusters {
 				else
 					throw new RuntimeException("BUG!");
 
-				if( other.graph == -1) {
+				if( other.graph == SquareNode.RESET_GRAPH) {
 					other.graph = n.graph;
 					graph.add(other);
 					open.add(other);
 				} else if( other.graph != n.graph ) {
-					throw new RuntimeException("BUG!");
+					throw new RuntimeException("BUG! "+other.graph+" "+n.graph);
 				}
 			}
 		}
@@ -282,12 +308,28 @@ public class SquaresIntoClusters {
 	}
 
 	/**
-	 * Returns true if the specified side on each square are parallel to each other.
+	 * Returns true if the two sides are the two sides on each shape which are closest to being parallel
+	 * to each other.  Only the two sides which are adjacent are considered
+	 */
+	boolean mostParallel( SquareNode a , int sideA , SquareNode b , int sideB ) {
+		double selected = acuteAngle(a,sideA,b,sideB);
+
+		if( selected >  acuteAngle(a,sideA,b,add(sideB,1)) || selected >  acuteAngle(a,sideA,b,add(sideB,-1)) )
+			return false;
+
+		if( selected >  acuteAngle(a,add(sideA,1),b,sideB) || selected >  acuteAngle(a,add(sideA,-1),b,sideB) )
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Returns an angle between 0 and PI/4 which describes the difference in slope
+	 * between the two sides
 	 */
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();
-	boolean areSidesParallel( SquareNode a , int sideA , SquareNode b , int sideB ) {
-
+	double acuteAngle(  SquareNode a , int sideA , SquareNode b , int sideB ) {
 		Point2D_F64 a0 = a.corners.get(sideA);
 		Point2D_F64 a1 = a.corners.get(add(sideA, 1));
 
@@ -297,7 +339,8 @@ public class SquaresIntoClusters {
 		vector0.set(a1.x - a0.x, a1.y - a0.y);
 		vector1.set(b1.x - b0.x, b1.y - b0.y);
 
-		return vector0.acute(vector1) <= acuteAngleTol;
+		double acute = vector0.acute(vector1);
+		return Math.min(UtilAngle.dist(Math.PI, acute), acute);
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class SquareEdge {
 		if( a == src )
 			return b;
 		else if( b == src )
-			return b;
+			return a;
 		else
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}

@@ -28,6 +28,8 @@ import georegression.struct.shapes.Polygon2D_F64;
  * @author Peter Abeles
  */
 public class SquareNode {
+	public static final int RESET_GRAPH = -2;
+
 	// polygon which this node represents.
 	// cw or ccw ordering of edges doesn't matter
 	public Polygon2D_F64 corners;
@@ -50,7 +52,7 @@ public class SquareNode {
 	 */
 	public void reset() {
 		corners = null;
-		graph = -2;
+		graph = RESET_GRAPH;
 		largestSide = 0;
 		for (int i = 0; i < 4; i++) {
 			if ( edges[i] != null )

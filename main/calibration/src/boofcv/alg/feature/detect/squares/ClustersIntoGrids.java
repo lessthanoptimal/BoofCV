@@ -33,6 +33,7 @@ import java.util.List;
 	// TODO tell the polygon detector that there should be no inner contour
 public class ClustersIntoGrids {
 
+	static final int SEARCHED = 1;
 	boolean verbose = false;
 
 	// minimum number of squares in a grid
@@ -142,6 +143,7 @@ public class ClustersIntoGrids {
 		for (int j = 0; j < column.size(); j++) {
 			SquareNode n = column.get(j);
 
+			n.graph = SEARCHED;
 			ordered.add(n);
 
 			SquareNode nextRow;
@@ -170,6 +172,8 @@ public class ClustersIntoGrids {
 				nextRow = pickNot(n,column.get(j-1));
 			}
 
+			nextRow.graph = SEARCHED;
+			ordered.add(nextRow);
 			int numberLine = addLineToGrid(n, nextRow, ordered);
 
 			if( j == 0 ) {
@@ -186,15 +190,16 @@ public class ClustersIntoGrids {
 	 * Add all the nodes into the list which lie along the line defined by a and b.  a is assumed to be
 	 * an end point.  Care is taken to not cycle.
 	 */
-	private int addLineToGrid(SquareNode a, SquareNode b, List<SquareNode> list) {
-
-		LineParametric2D_F64 line = new LineParametric2D_F64();
+	LineParametric2D_F64 line = new LineParametric2D_F64();
+	int addLineToGrid(SquareNode a, SquareNode b, List<SquareNode> list) {
 
 		int total = 2;
 
 		while( true ) {
 			// maximum distance off of line
-			double bestDistance = Math.max(3, b.largestSide / 4.0);
+			double bestDistance = b.largestSide / 4.0;
+			bestDistance *= bestDistance;
+
 			SquareNode best = null;
 
 			line.setP(a.center);
@@ -207,21 +212,23 @@ public class ClustersIntoGrids {
 
 				SquareNode c = b.edges[i].destination(b);
 
-				if (c.graph == 1 )
+				if (c.graph == SEARCHED )
 					continue;
 
-				double distance = Distance2D_F64.distance(line, c.center);
+				double distance = Distance2D_F64.distanceSq(line, c.center);
 				if (distance < bestDistance) {
 					bestDistance = distance;
 					best = c;
 				}
 			}
 
+			System.out.println(line);
+			System.out.println("  b.numConnections "+b.getNumberOfConnections());
 			if( best == null )
 				return total;
 			else {
 				total++;
-				best.graph = 1;
+				best.graph = SEARCHED;
 				list.add(best);
 				a = b;
 				b = best;
@@ -232,7 +239,7 @@ public class ClustersIntoGrids {
 	/**
 	 * There are only two edges on target.  Pick the edge which does not go to the provided child
 	 */
-	private SquareNode pickNot( SquareNode target , SquareNode child ) {
+	static SquareNode pickNot( SquareNode target , SquareNode child ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
 			SquareNode c = e.destination(target);
@@ -245,7 +252,7 @@ public class ClustersIntoGrids {
 	/**
 	 * There are only three edges on target and two of them are known.  Pick the one which isn't an inptu child
 	 */
-	private SquareNode pickNot( SquareNode target , SquareNode child0 , SquareNode child1 ) {
+	static SquareNode pickNot( SquareNode target , SquareNode child0 , SquareNode child1 ) {
 		for (int i = 0; i < 4; i++) {
 			SquareEdge e = target.edges[i];
 			SquareNode c = e.destination(target);
