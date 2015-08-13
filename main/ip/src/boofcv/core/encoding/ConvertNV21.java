@@ -23,10 +23,52 @@ import boofcv.struct.image.*;
 /**
  * Used to convert NV21 image format used in Android into BoofCV standard image types. NV21 is an encoding of a
  * YUV image [1] (more specifically YUV 4:2:0) where Y is encoded in the first block and UV are interlaced together.
+ * The UV planes are at 1/2 resolution.
  *
  * @author Peter Abeles
  */
 public class ConvertNV21 {
+
+	/**
+	 * Converts a NV21 encoded byte array into a BoofCV formatted image.
+	 *
+	 * @param data (input) NV21 byte array
+	 * @param width (input) image width
+	 * @param height (input) image height
+	 * @param output (output) BoofCV image
+	 */
+	public static void nv21ToBoof(byte[] data, int width, int height, ImageBase output) {
+
+		if( output instanceof MultiSpectral) {
+			MultiSpectral ms = (MultiSpectral) output;
+
+			if (ms.getBandType() == ImageUInt8.class) {
+				ConvertNV21.nv21ToMsRgb_U8(data, width, height, ms);
+			} else if (ms.getBandType() == ImageFloat32.class) {
+				ConvertNV21.nv21ToMsRgb_F32(data, width, height , ms);
+			} else {
+				throw new IllegalArgumentException("Unsupported output band format");
+			}
+		} else if( output instanceof ImageSingleBand) {
+			if (output.getClass() == ImageUInt8.class) {
+				nv21ToGray(data, width, height, (ImageUInt8) output);
+			} else if (output.getClass() == ImageFloat32.class) {
+				nv21ToGray(data, width, height, (ImageFloat32) output);
+			} else {
+				throw new IllegalArgumentException("Unsupported output type");
+			}
+		} else if( output instanceof ImageInterleaved ) {
+			if( output.getClass() == InterleavedU8.class ) {
+				ConvertNV21.nv21ToInterleaved(data, width, height, (InterleavedU8) output);
+			} else if( output.getClass() == InterleavedF32.class ) {
+				ConvertNV21.nv21ToInterleaved(data, width, height, (InterleavedF32) output);
+			} else {
+				throw new IllegalArgumentException("Unsupported output type");
+			}
+		} else {
+			throw new IllegalArgumentException("Boofcv image type not yet supported");
+		}
+	}
 
 	/**
 	 * Converts an NV21 image into a gray scale image.  Image type is determined at runtime.
