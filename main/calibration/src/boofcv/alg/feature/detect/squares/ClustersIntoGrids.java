@@ -83,7 +83,12 @@ public class ClustersIntoGrids {
 		return true;
 	}
 
-	private SquareGrid orderIntoGrid(List<SquareNode> graph) {
+	/**
+	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.
+	 * @param graph unordered nodes in a connected graph
+	 * @return grid
+	 */
+	SquareGrid orderIntoGrid(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles
 		for (int i = 0; i < graph.size(); i++) {
@@ -100,6 +105,7 @@ public class ClustersIntoGrids {
 				continue;
 
 			seed.graph = 1;
+			column.add(seed);
 
 			// find all the nodes along one side, just pick an edge arbitrarily.  This will be the first column
 			for (int j = 0; j < 4; j++) {
@@ -109,7 +115,6 @@ public class ClustersIntoGrids {
 				SquareNode b = seed.edges[i].destination(seed);
 				b.graph = 1;
 
-				column.add(seed);
 				column.add(b);
 				addLineToGrid(seed, b, column);
 				break;
@@ -121,7 +126,6 @@ public class ClustersIntoGrids {
 				break;
 			}
 			if (addRowsToGrid(column, ordered)) return null;
-
 
 			break;
 		}
@@ -135,9 +139,9 @@ public class ClustersIntoGrids {
 	}
 
 	/**
-	 * Compete the graph by traversing down the first column and adding the rows one at a time
+	 * Competes the graph by traversing down the first column and adding the rows one at a time
 	 */
-	private boolean addRowsToGrid(List<SquareNode> column, List<SquareNode> ordered) {
+	boolean addRowsToGrid(List<SquareNode> column, List<SquareNode> ordered) {
 		// now add the rows by traversing down the column
 		int numFirsRow = 0;
 		for (int j = 0; j < column.size(); j++) {
@@ -157,19 +161,19 @@ public class ClustersIntoGrids {
 				nextRow = pickNot(n, column.get(j + 1));
 
 			} else if( j == column.size()-1 ) {
-				if( n.getNumberOfConnections() != 3 ) {
-					if (verbose) System.err.println(
-							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
-					return true;
-				}
-				nextRow = pickNot(n, column.get(j-1),column.get(j+1));
-			} else {
 				if( n.getNumberOfConnections() != 2 ) {
 					if (verbose) System.err.println(
 							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
 					return true;
 				}
 				nextRow = pickNot(n,column.get(j-1));
+			} else {
+				if( n.getNumberOfConnections() != 3 ) {
+					if (verbose) System.err.println(
+							"Unexpected number of connections. want 2 found " + n.getNumberOfConnections());
+					return true;
+				}
+				nextRow = pickNot(n, column.get(j-1),column.get(j+1));
 			}
 
 			nextRow.graph = SEARCHED;
@@ -222,8 +226,6 @@ public class ClustersIntoGrids {
 				}
 			}
 
-			System.out.println(line);
-			System.out.println("  b.numConnections "+b.getNumberOfConnections());
 			if( best == null )
 				return total;
 			else {

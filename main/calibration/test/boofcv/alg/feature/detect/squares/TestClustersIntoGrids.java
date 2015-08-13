@@ -22,7 +22,9 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -31,6 +33,7 @@ import static org.junit.Assert.*;
  */
 public class TestClustersIntoGrids {
 
+	Random rand = new Random(23423);
 
 	@Test
 	public void highLevelCheck() {
@@ -49,12 +52,47 @@ public class TestClustersIntoGrids {
 
 	@Test
 	public void orderIntoGrid() {
-		fail("implement");
+
+		for (int numRows = 1; numRows <= 4; numRows++) {
+			for (int numCols = 1; numCols <= 4; numCols++) {
+				List<SquareNode> nodes = createGrid(numRows, numCols);
+
+				Collections.shuffle(nodes,rand);
+
+				ClustersIntoGrids alg = new ClustersIntoGrids(1);
+				SquareGrid found = alg.orderIntoGrid(nodes);
+
+				assertEquals(found.nodes.size(),numRows*numCols);
+				if( found.columns == numCols ) {
+					assertEquals(numRows,found.rows);
+				} else {
+					assertEquals(numRows,found.columns);
+					assertEquals(numCols,found.rows);
+				}
+			}
+		}
 	}
 
 	@Test
 	public void addRows() {
-		fail("implement");
+		int numRows = 3;
+		int numCols = 4;
+		List<SquareNode> nodes = createGrid(numRows, numCols);
+
+		List<SquareNode> column = new ArrayList<SquareNode>();
+		for (int i = 0; i < numRows; i++) {
+			column.add( nodes.get(i*numCols));
+		}
+
+		List<SquareNode> found = new ArrayList<SquareNode>();
+		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+
+		assertFalse(alg.addRowsToGrid(column, found));
+
+		assertEquals(nodes.size(), found.size());
+		for (int i = 0; i < found.size(); i++) {
+			assertTrue(nodes.get(i) == found.get(i));
+		}
 	}
 
 	@Test
