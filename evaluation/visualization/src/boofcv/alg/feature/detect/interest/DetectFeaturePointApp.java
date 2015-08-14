@@ -94,6 +94,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, derivType);
 		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		configExtract.detectMinimums = true;
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, derivType);
 		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
 
