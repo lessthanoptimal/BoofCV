@@ -37,17 +37,46 @@ public class TestClustersIntoGrids {
 
 	@Test
 	public void highLevelCheck() {
-		fail("implement");
+		List<List<SquareNode>> clusters = new ArrayList<List<SquareNode>>();
+
+		for (int length = 1; length <= 4; length++) {
+			clusters.add(createGrid(length, length));
+		}
+
+		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+
+		alg.process(clusters);
+		assertEquals(4,alg.getGrids().size());
+
+		// see if running it twice messes things up
+		alg.process(clusters);
+		assertEquals(4,alg.getGrids().size());
 	}
 
 	@Test
-	public void findClusters() {
-		fail("implement");
+	public void checkNumberOfConnections_positive() {
+		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+
+		for (int numRows = 1; numRows <= 4; numRows++) {
+			for (int numCols = 1; numCols <= 4; numCols++) {
+				List<SquareNode> nodes = createGrid(numRows, numCols);
+				Collections.shuffle(nodes, rand);
+
+				if( numRows == 1 || numCols == 1 )
+					assertEquals(1,alg.checkNumberOfConnections(nodes));
+				else
+					assertEquals(2,alg.checkNumberOfConnections(nodes));
+			}
+		}
 	}
 
 	@Test
-	public void checkNumberOfConnections() {
-		fail("implement");
+	public void checkNumberOfConnections_negative() {
+		List<SquareNode> nodes = createGrid(1, 2);
+		nodes.addAll( createGrid(2,3));
+
+		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		assertEquals(0, alg.checkNumberOfConnections(nodes));
 	}
 
 	@Test
@@ -69,7 +98,8 @@ public class TestClustersIntoGrids {
 				Collections.shuffle(nodes, rand);
 
 				ClustersIntoGrids alg = new ClustersIntoGrids(1);
-				SquareGrid found = alg.orderIntoLine(nodes);
+				alg.orderIntoLine(nodes);
+				SquareGrid found = alg.valid.getTail();
 
 				assertEquals(length, found.nodes.size());
 				if (found.columns == numCols) {
@@ -92,9 +122,10 @@ public class TestClustersIntoGrids {
 				Collections.shuffle(nodes,rand);
 
 				ClustersIntoGrids alg = new ClustersIntoGrids(1);
-				SquareGrid found = alg.orderIntoGrid(nodes);
+				alg.orderIntoGrid(nodes);
+				SquareGrid found = alg.valid.getTail();
 
-				assertEquals(found.nodes.size(),numRows*numCols);
+				assertEquals(numRows*numCols,found.nodes.size());
 				if( found.columns == numCols ) {
 					assertEquals(numRows,found.rows);
 				} else {

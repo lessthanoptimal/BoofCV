@@ -20,48 +20,56 @@ package boofcv.alg.feature.detect.squares;
 
 import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detector for square grid calibration pattern.
+ * Takes as input a set of unordered clusters and converts them into ordered grids with known numbers
+ * of rows and columns.
  *
  * @author Peter Abeles
  */
-// TODO support partial observations of grid
-	// TODO tell the polygon detector that there should be no inner contour
 public class ClustersIntoGrids {
 
+	// Value of a node which has been searched already
 	static final int SEARCHED = 1;
-	boolean verbose = false;
+	// verbose debug output
+	private boolean verbose = false;
 
 	// minimum number of squares in a grid
-	int minimumElements;
+	private int minimumElements;
 
 	// All valid graphics
-	List<SquareGrid> valid = new ArrayList<SquareGrid>();
+	FastQueue<SquareGrid> valid = new FastQueue<SquareGrid>(SquareGrid.class,true);
 
+	/**
+	 * Configures class
+	 * @param minimumElements The minimum number of elements which must be in a cluster for it to be accepted
+	 */
 	public ClustersIntoGrids( int minimumElements) {
 		this.minimumElements = minimumElements;
 	}
 
+	/**
+	 * Converts the set of provided clusters into ordered grids.
+	 *
+	 * @param clusters List of clustered nodes
+	 */
 	public void process( List<List<SquareNode>> clusters ) {
 
+		valid.reset();
 		for( int i = 0; i < clusters.size(); i++ ) {
 			List<SquareNode> graph = clusters.get(i);
 
 			if( graph.size() < minimumElements )
 				continue;
 
-			SquareGrid grid = null;
 			switch( checkNumberOfConnections(graph) ) {
-				case 1: grid = orderIntoLine(graph); break;
-				case 2: grid = orderIntoGrid(graph); break;
+				case 1:orderIntoLine(graph); break;
+				case 2:orderIntoGrid(graph); break;
 			}
-
-			if( grid != null )
-				valid.add( grid );
 		}
 	}
 
@@ -71,7 +79,7 @@ public class ClustersIntoGrids {
 	 *
 	 * @return 0 = not a grid.  1 = line, 2 = grud
 	 */
-	private int checkNumberOfConnections( List<SquareNode> graph ) {
+	int checkNumberOfConnections( List<SquareNode> graph ) {
 		int histogram[] = new int[5];
 
 		for (int i = 0; i < graph.size(); i++) {
@@ -79,7 +87,7 @@ public class ClustersIntoGrids {
 		}
 
 		if( graph.size() == 1 ) {
-			if( histogram[1] != 1 )
+			if( histogram[0] != 1 )
 				return 0;
 
 			return 1;
@@ -110,14 +118,15 @@ public class ClustersIntoGrids {
 	/**
 	 * Puts the un-ordered graph into a ordered grid which is a line.
 	 */
-	SquareGrid orderIntoLine(List<SquareNode> graph) {
+	List<SquareNode> nodesLine = new ArrayList<SquareNode>();
+	void orderIntoLine(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles
 		for (int i = 0; i < graph.size(); i++) {
 			graph.get(i).graph = -1;
 		}
 
-		List<SquareNode> line = new ArrayList<SquareNode>();
+		nodesLine.clear();
 
 		if( graph.size() > 1 ) {
 			escape:
@@ -128,7 +137,7 @@ public class ClustersIntoGrids {
 					continue;
 
 				seed.graph = SEARCHED;
-				line.add(seed);
+				nodesLine.add(seed);
 
 				// Find the one connecting node
 				for (int edge = 0; edge < 4; edge++) {
@@ -138,38 +147,37 @@ public class ClustersIntoGrids {
 					SquareNode b = seed.edges[edge].destination(seed);
 					b.graph = 1;
 
-					line.add(b);
-					addLineToGrid(seed, b, line);
+					nodesLine.add(b);
+					addLineToGrid(seed, b, nodesLine);
 					break escape;
 				}
 			}
 		} else {
-			line.add(graph.get(0));
+			nodesLine.add(graph.get(0));
 		}
 
-		SquareGrid grid = new SquareGrid();
-		grid.nodes = line;
-		grid.columns = line.size();
+		SquareGrid grid = valid.grow();
+		grid.nodes = nodesLine;
+		grid.columns = nodesLine.size();
 		grid.rows = 1;
-
-		return grid;
 	}
 
 	/**
 	 * Given an unordered set of nodes, it will order them into a grid with row-major indexes.  This assumes
 	 * the grid is 2 by 2 or larger.
 	 * @param graph unordered nodes in a connected graph
-	 * @return grid
 	 */
-	SquareGrid orderIntoGrid(List<SquareNode> graph) {
+	List<SquareNode> column = new ArrayList<SquareNode>();
+	List<SquareNode> ordered = new ArrayList<SquareNode>();
+	void orderIntoGrid(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles
 		for (int i = 0; i < graph.size(); i++) {
 			graph.get(i).graph = -1;
 		}
 
-		List<SquareNode> column = new ArrayList<SquareNode>();
-		List<SquareNode> ordered = new ArrayList<SquareNode>();
+		column.clear();
+		ordered.clear();
 
 		for (int i = 0; i < graph.size(); i++) {
 			// Find a side with 2 connections and use that as the seed
@@ -194,17 +202,15 @@ public class ClustersIntoGrids {
 			}
 
 			if (addRowsToGrid(column, ordered))
-				return null;
+				return;
 
 			break;
 		}
 
-		SquareGrid grid = new SquareGrid();
+		SquareGrid grid = valid.grow();
 		grid.nodes = ordered;
 		grid.columns = column.size();
 		grid.rows = ordered.size() / column.size();
-
-		return grid;
 	}
 
 	/**
@@ -344,6 +350,14 @@ public class ClustersIntoGrids {
 	 * Returns a list of all the square grids it found
 	 */
 	public List<SquareGrid> getGrids() {
-		return valid;
+		return valid.toList();
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 }

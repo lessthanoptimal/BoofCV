@@ -16,22 +16,53 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.squares;
+package boofcv.alg.feature.detect.grid;
 
-import java.util.List;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Data structure which describes a set of {@link SquareNode} as a grid.  Must be a complete grid with no
- * missing elements.  CW or CCW orientation is not specified.
- *
  * @author Peter Abeles
  */
-public class SquareGrid {
-	public List<SquareNode> nodes;
-	public int columns;
-	public int rows;
+public class TestDetectSquareGridCalibration {
+	@Test
+	public void process() {
+		fail("implement");
+	}
 
-	public SquareNode get( int row , int col ) {
-		return nodes.get( row*columns + col );
+	@Test
+	public void computeSize() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkFlip() {
+		fail("implement");
+	}
+
+	@Test
+	public void transpose() {
+		fail("implement");
+	}
+
+	@Test
+	public void flipRows() {
+		fail("implement");
+	}
+
+	@Test
+	public void extractCalibrationPoints() {
+		fail("implement");
+	}
+
+	@Test
+	public void sortCorners() {
+		fail("implement");
+	}
+
+	@Test
+	public void selectAxis() {
+		fail("implement");
 	}
 }
