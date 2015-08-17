@@ -39,6 +39,12 @@ public class FactoryPlanarCalibrationTarget {
 		return new PlanarDetectorSquareGrid(config);
 	}
 
+	public static PlanarCalibrationDetector detectorSquareGrid2( ConfigSquareGrid2 config) {
+		config.checkValidity();
+
+		return new PlanarDetectorSquareGrid2(config);
+	}
+
 	/**
 	 * Creates a calibration target detector for chessboard targets.  Adjust the feature radius
 	 * for best performance.

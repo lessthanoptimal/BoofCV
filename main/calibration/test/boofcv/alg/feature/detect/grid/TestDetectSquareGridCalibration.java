@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -39,22 +39,51 @@ import static org.junit.Assert.fail;
 public class TestDetectSquareGridCalibration {
 	@Test
 	public void process() {
-		fail("implement");
+		// intentionally blank.  tested in the wrapper class
 	}
 
 	@Test
 	public void computeSize() {
-		fail("implement");
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+
+		SquareGrid grid = createGrid(2,3);
+
+		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double expected = (2*w*(3-1))*(2*w*(2-1)); // see how the grid is constructed
+
+		assertEquals(expected,alg.computeSize(grid),1e-8);
 	}
 
 	@Test
 	public void checkFlip() {
-		fail("implement");
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+
+		SquareGrid grid = createGrid(2,3);
+		assertFalse(alg.checkFlip(grid));
+
+		flipColumns(grid);
+		assertTrue(alg.checkFlip(grid));
+
+		alg.flipRows(grid);
+		assertFalse(alg.checkFlip(grid));
+	}
+
+	void flipColumns( SquareGrid grid ) {
+		List<SquareNode> tmp = new ArrayList<SquareNode>();
+
+		for (int row = 0; row < grid.rows; row++) {
+			for (int col = 0; col < grid.columns; col++) {
+				tmp.add( grid.nodes.get( row*grid.columns + (grid.columns - col - 1)));
+			}
+		}
+
+		grid.nodes.clear();
+		grid.nodes.addAll(tmp);
 	}
 
 	@Test
 	public void transpose() {
-		DetectSquareGridCalibration alg = new DetectSquareGridCalibration(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
 
 		SquareGrid grid = createGrid(2,3);
 		SquareGrid orig = copy(grid);
@@ -73,7 +102,7 @@ public class TestDetectSquareGridCalibration {
 
 	@Test
 	public void flipRows() {
-		DetectSquareGridCalibration alg = new DetectSquareGridCalibration(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
 
 		SquareGrid grid = createGrid(2,3);
 		SquareGrid orig = copy(grid);
@@ -89,7 +118,7 @@ public class TestDetectSquareGridCalibration {
 
 	@Test
 	public void extractCalibrationPoints() {
-		DetectSquareGridCalibration alg = new DetectSquareGridCalibration(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
 
 		SquareGrid grid = createGrid(2,3);
 
@@ -123,7 +152,7 @@ public class TestDetectSquareGridCalibration {
 	public void sortCorners() {
 		Polygon2D_F64 poly = new Polygon2D_F64(-1,-1,1,-1,1,1,-1,1);
 
-		DetectSquareGridCalibration alg = new DetectSquareGridCalibration(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
 		alg.axisX.slope.set(1, 0);
 		alg.axisY.slope.set(0, 1);
 
@@ -142,7 +171,7 @@ public class TestDetectSquareGridCalibration {
 
 	}
 
-	private void checkOrder( DetectSquareGridCalibration alg , Polygon2D_F64 poly , int ...order) {
+	private void checkOrder( DetectSquareGridFiducial alg , Polygon2D_F64 poly , int ...order) {
 		for (int i = 0; i < 4; i++) {
 			assertTrue(""+i,alg.sorted[i] == poly.get(order[i]));
 		}
@@ -150,7 +179,7 @@ public class TestDetectSquareGridCalibration {
 
 	@Test
 	public void selectAxis() {
-		DetectSquareGridCalibration alg = new DetectSquareGridCalibration(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
 
 		for (int numRows = 1; numRows <= 3; numRows++) {
 			for (int numCols = 1; numCols <= 3; numCols++) {
@@ -166,7 +195,7 @@ public class TestDetectSquareGridCalibration {
 	}
 
 	// select and axis and check its properties
-	protected void selectAxis( DetectSquareGridCalibration alg,
+	protected void selectAxis( DetectSquareGridFiducial alg,
 							   SquareGrid grid , int row , int col ) {
 		alg.selectAxis(grid, row, col);
 
@@ -183,7 +212,7 @@ public class TestDetectSquareGridCalibration {
 		alg.selectAxis(grid, 0, 0);
 		double angleX0 = Math.atan2(alg.axisX.slope.y,alg.axisX.slope.x);
 
-		assertEquals(angleX0,angleX,1e-6);
+		assertEquals(angleX0, angleX, 1e-6);
 	}
 
 	public static SquareGrid createGrid( int numRows , int numCols ) {

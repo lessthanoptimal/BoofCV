@@ -44,7 +44,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO tell the polygon detector that there should be no inner contour
-public class DetectSquareGridCalibration<T extends ImageSingleBand> {
+public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 
 	// dimension of square grid.  This only refers to black squares and not the white space
 	int numCols;
@@ -63,15 +63,15 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	int calibCols;
 
 	/**
-	 * Confiogures detector
+	 * COnfigures the detector
 	 *
 	 * @param numCols Number of black squares in the grid columns
 	 * @param numRows Number of black squares in the grid rows
 	 * @param spaceToSquareRatio Ratio of spacing between the squares and the squares width
 	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
 	 */
-	public DetectSquareGridCalibration(int numCols, int numRows, double spaceToSquareRatio,
-									   BinaryPolygonConvexDetector<T> detectorSquare ) {
+	public DetectSquareGridFiducial(int numCols, int numRows, double spaceToSquareRatio,
+									BinaryPolygonConvexDetector<T> detectorSquare) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.detectorSquare = detectorSquare;
@@ -98,7 +98,6 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		SquareGrid match = null;
 		double matchSize = 0;
 		for( SquareGrid g : grids ) {
-			SquareGrid candidate = null;
 			if (g.columns != numCols || g.rows != numRows) {
 				if( g.columns == numRows && g.rows == numCols ) {
 					transpose(g);
@@ -180,7 +179,7 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	 * Flips the order of rows
 	 */
 	void flipRows( SquareGrid grid ) {
-		List<SquareNode> tmp = new ArrayList<SquareNode>();
+		tmp.clear();
 
 		for (int row = 0; row < grid.rows; row++) {
 			for (int col = 0; col < grid.columns; col++) {
@@ -191,7 +190,6 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		grid.nodes.clear();
 		grid.nodes.addAll(tmp);
 	}
-
 
 	// local storage for extractCalibrationPoints
 	LineParametric2D_F64 axisX = new LineParametric2D_F64();

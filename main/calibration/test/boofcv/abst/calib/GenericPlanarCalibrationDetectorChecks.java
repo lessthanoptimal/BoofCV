@@ -139,7 +139,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	private void display( ImageFloat32 image ) {
 		BufferedImage visualized = ConvertBufferedImage.convertTo(image, null, true);
-		ShowImages.showWindow(visualized, "Distorted");
+		ShowImages.showWindow(visualized, "Input");
 
 		try {
 			Thread.sleep(3000);
