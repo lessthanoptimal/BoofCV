@@ -33,6 +33,7 @@ import static org.junit.Assert.*;
  */
 public class TestClustersIntoGrids {
 
+	public static double DEFAULT_WIDTH = 1.2;
 	Random rand = new Random(23423);
 
 	@Test
@@ -223,9 +224,9 @@ public class TestClustersIntoGrids {
 		assertTrue(c == ClustersIntoGrids.pickNot(a, d, b));
 	}
 
-	private List<SquareNode> createGrid(int numRows, int numCols) {
+	public static List<SquareNode> createGrid(int numRows, int numCols) {
 		List<SquareNode> nodes = new ArrayList<SquareNode>();
-		double w = 1.2;
+		double w = DEFAULT_WIDTH;
 		for (int y = 0; y < numRows; y++) {
 			for (int x = 0; x < numCols; x++) {
 				nodes.add( createSquare(x*w*2,y*w*2,w) );
@@ -249,7 +250,7 @@ public class TestClustersIntoGrids {
 	}
 
 
-	private void connect( SquareNode a , int sideA , SquareNode b , int sideB ) {
+	public static void connect( SquareNode a , int sideA , SquareNode b , int sideB ) {
 		SquareEdge e = new SquareEdge();
 		e.a = a;
 		e.sideA = sideA;
@@ -259,14 +260,14 @@ public class TestClustersIntoGrids {
 		b.edges[sideB] = e;
 	}
 
-	private SquareNode createSquare( double x , double y , double width ) {
+	public static SquareNode createSquare( double x , double y , double width ) {
 
 		double r = width/2;
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		poly.get(0).set(-r, r);
 		poly.get(1).set( r, r);
 		poly.get(2).set( r,-r);
-		poly.get(3).set(-r, -r);
+		poly.get(3).set(-r,-r);
 
 		SquareNode square = new SquareNode();
 		for (int i = 0; i < 4; i++) {

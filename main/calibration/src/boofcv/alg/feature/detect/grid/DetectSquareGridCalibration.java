@@ -39,7 +39,7 @@ import java.util.List;
  * Detect a square grid calibration target and returns the corner points of each square.  This calibration grid is
  * specified by a set of squares which are organized in a grid pattern.  All squares are the same size.  The entire
  * grid must be visible.  Space between the squares is specified as a ratio of the square size. The grid will be
- * oriented so that returned points are in clock-wise order.
+ * oriented so that returned points are in counter clockwise (CCW) ordering, which appears to be CW in the image.
  *
  * @author Peter Abeles
  */
@@ -50,12 +50,14 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	int numCols;
 	int numRows;
 
+	// detector for squares
+	BinaryPolygonConvexDetector<T> detectorSquare;
+
+	// Converts detected squares into a graph and into grids
 	SquaresIntoClusters s2c;
 	ClustersIntoGrids c2g;
 
-	BinaryPolygonConvexDetector<T> detectorSquare;
-
-	// output results
+	// output results.  Grid of calibration points in row-major order
 	List<Point2D_F64> calibrationPoints = new ArrayList<Point2D_F64>();
 	int calibRows;
 	int calibCols;
@@ -66,6 +68,7 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	 * @param numCols Number of black squares in the grid columns
 	 * @param numRows Number of black squares in the grid rows
 	 * @param spaceToSquareRatio Ratio of spacing between the squares and the squares width
+	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
 	 */
 	public DetectSquareGridCalibration(int numCols, int numRows, double spaceToSquareRatio,
 									   BinaryPolygonConvexDetector<T> detectorSquare ) {
@@ -77,6 +80,12 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		c2g = new ClustersIntoGrids(numCols*numRows);
 	}
 
+	/**
+	 * Process the image and detect the calibration target
+	 *
+	 * @param image Input image
+	 * @return true if a calibration target was found and false if not
+	 */
 	public boolean process( T image ) {
 		detectorSquare.process(image);
 
@@ -115,6 +124,9 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		}
 	}
 
+	/**
+	 * Compute the visual size of a polygon
+	 */
 	Polygon2D_F64 poly = new Polygon2D_F64(4);
 	double computeSize( SquareGrid grid ) {
 		poly.vertexes.data[0] = grid.get(0,0).center;
@@ -125,7 +137,14 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		return Area2D_F64.polygonConvex(poly);
 	}
 
+	/**
+	 * Checks to see if it needs to be flipped.  Flipping is required if X and Y axis in 2D grid
+	 * are not CCW.
+	 */
 	boolean checkFlip( SquareGrid grid ) {
+		if( grid.columns == 1 || grid.rows == 1 )
+			return false;
+
 		Point2D_F64 a = grid.get(0,0).center;
 		Point2D_F64 b = grid.get(0,grid.columns-1).center;
 		Point2D_F64 c = grid.get(grid.rows-1,0).center;
@@ -133,23 +152,28 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 		double angleAB = Math.atan2( b.y-a.y, b.x-a.x);
 		double angleAC = Math.atan2( c.y-a.y, c.x-a.x);
 
-		return UtilAngle.distanceCW(angleAB, angleAC) > Math.PI * 0.7;
+		return UtilAngle.distanceCCW(angleAB, angleAC) > Math.PI * 0.75;
 	}
 
+	List<SquareNode> tmp = new ArrayList<SquareNode>();
 	/**
 	 * Transposes the grid
 	 */
 	void transpose( SquareGrid grid ) {
-		List<SquareNode> tmp = new ArrayList<SquareNode>();
+		tmp.clear();
 
-		for (int row = 0; row < grid.rows; row++) {
-			for (int col = 0; col < grid.columns; col++) {
-				tmp.add( grid.nodes.get( col*grid.rows + row));
+		for (int col = 0; col < grid.columns; col++) {
+			for (int row = 0; row < grid.rows; row++) {
+				tmp.add(grid.get(row, col));
 			}
 		}
 
 		grid.nodes.clear();
 		grid.nodes.addAll(tmp);
+
+		int a = grid.columns;
+		grid.columns = grid.rows;
+		grid.rows = a;
 	}
 
 	/**
@@ -196,21 +220,19 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 				Polygon2D_F64 square = grid.get(row,col).corners;
 				sortCorners(square);
 
-				for (int i = 0; i < 4; i++) {
-					if( sorted[i] == null) {
-						return false;
-					} else {
-						if( i < 2 )
-							row0.add(sorted[i]);
-						else
-							row1.add(sorted[i]);
-					}
-				}
+				for (int i = 0; i < 4; i++) {if( sorted[i] == null) {return false;}}
+				row0.add(sorted[0]);
+				row0.add(sorted[1]);
+				row1.add(sorted[3]);
+				row1.add(sorted[2]);
+
 			}
 			calibrationPoints.addAll(row0);
 			calibrationPoints.addAll(row1);
 		}
 
+		calibCols = grid.columns*2;
+		calibRows = grid.rows*2;
 		return true;
 	}
 
@@ -218,7 +240,7 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	 * Puts the corners into a specified order so that it can be placed into the grid.
 	 * Uses local coordiant systems defined buy axisX and axisY.
 	 */
-	private void sortCorners(Polygon2D_F64 square) {
+	void sortCorners(Polygon2D_F64 square) {
 		for (int i = 0; i < 4; i++) {
 			sorted[i] = null;
 		}
@@ -231,13 +253,13 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 				if( coorY < 0 ) {
 					sorted[0] = p;
 				} else {
-					sorted[2] = p;
+					sorted[3] = p;
 				}
 			} else {
 				if( coorY < 0 ) {
 					sorted[1] = p;
 				} else {
-					sorted[3] = p;
+					sorted[2] = p;
 				}
 			}
 		}
@@ -247,45 +269,61 @@ public class DetectSquareGridCalibration<T extends ImageSingleBand> {
 	 * Select the local X and Y axis around the specified grid element.
 	 */
 	void selectAxis( SquareGrid grid, int row , int col ) {
-		int r0,r1;
-		int c0,c1;
 
-		if( row == grid.rows-1 ) {
-			r0 = row-1;
-			r1 = row;
+		Point2D_F64 a = grid.get(row,col).center;
+		axisX.p.set(a);
+		axisY.p.set(a);
+
+		double dx,dy;
+
+		if( grid.columns == 1 && grid.rows == 1 ) {
+			// just pick an axis arbitrarily from the corner points
+			Polygon2D_F64 square = grid.nodes.get(0).corners;
+			double px = (square.get(0).x+square.get(1).x)/2.0;
+			double py = (square.get(0).y+square.get(1).y)/2.0;
+
+			dx = px-a.x;
+			dy = py-a.y;
+		} else if( grid.columns == 1 ) {
+			// find slope of y-axis
+			double fx,fy;
+			if( row == grid.rows-1 ) {
+				Point2D_F64 b = grid.get(row-1,col).center;
+				fx = a.x-b.x;
+				fy = a.y-b.y;
+			} else {
+				Point2D_F64 b = grid.get(row+1,col).center;
+				fx = b.x-a.x;
+				fy = b.y-a.y;
+			}
+			// convert into x-axis slope
+			dx = -fy;
+			dy = fx;
 		} else {
-			r0 = row;
-			r1 = row+1;
+			if( col == grid.columns-1 ) {
+				Point2D_F64 b = grid.get(row,col-1).center;
+				dx = a.x-b.x;
+				dy = a.y-b.y;
+			} else {
+				Point2D_F64 b = grid.get(row,col+1).center;
+				dx = b.x-a.x;
+				dy = b.y-a.y;
+			}
 		}
-
-		if( col == grid.columns-1 ) {
-			c0 = col-1;
-			c1 = col;
-		} else {
-			c0 = col;
-			c1 = col+1;
-		}
-
-		Point2D_F64 c = grid.get(r0,c0).center;
-		Point2D_F64 a = grid.get(r0,c1).center;
-		Point2D_F64 b = grid.get(r1,c0).center;
-
-
-		axisX.p.set(c);
-		axisX.slope.set(a.x-c.x,a.y-c.y);
-		axisY.p.set(c);
-		axisY.slope.set(b.y-c.y,b.y-c.y);
+		// Y axis will be CCW of x-axis.  Which appears to be CW on the screen
+		axisX.slope.set(dx,dy);
+		axisY.slope.set(-dy,dx);
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {
 		return calibrationPoints;
 	}
 
-	public int getCalibRows() {
+	public int getCalibrationRows() {
 		return calibRows;
 	}
 
-	public int getCalibCols() {
+	public int getCalibrationCols() {
 		return calibCols;
 	}
 }

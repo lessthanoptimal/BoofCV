@@ -346,6 +346,19 @@ public class BoofMiscOps {
 		return ret;
 	}
 
+	/**
+	 * <p>
+	 * Looks for file names which match the regex in the directory.
+	 * </p>
+	 * <p>
+	 * Example:<br>
+	 * BoofMiscOps.findMatches(new File("/path/to/directory"), ".+jpg");
+	 * </p>
+	 *
+	 * @param directory directory
+	 * @param regex file name regex
+	 * @return array of matching files
+	 */
 	public static File[] findMatches( File directory , String regex ) {
 		final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
 		return directory.listFiles(new FileFilter(){
@@ -357,7 +370,7 @@ public class BoofMiscOps {
 	}
 
 	/**
-	 * Looks up all files which are in the specified directory and match the regex.<b>
+	 * Looks up all files which are in the specified directory and match the regex.<br>
 	 * Example: path/to/input/image\d*.jpg
 	 *
 	 * @param pathRegex regex
