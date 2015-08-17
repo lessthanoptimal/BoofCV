@@ -30,13 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestDetectSquareGridCalibration {
+public class TestDetectSquareGridFiducial {
 	@Test
 	public void process() {
 		// intentionally blank.  tested in the wrapper class
@@ -51,7 +50,17 @@ public class TestDetectSquareGridCalibration {
 		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 		double expected = (2*w*(3-1))*(2*w*(2-1)); // see how the grid is constructed
 
-		assertEquals(expected,alg.computeSize(grid),1e-8);
+		assertEquals(expected, alg.computeSize(grid), 1e-8);
+	}
+
+	@Test
+	public void resolveAmbiguity_square() {
+		fail("implement");
+	}
+
+	@Test
+	public void resolveAmbiguity_rectangle() {
+		fail("implement");
 	}
 
 	@Test

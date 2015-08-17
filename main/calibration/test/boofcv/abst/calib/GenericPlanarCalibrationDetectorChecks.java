@@ -43,8 +43,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -55,18 +54,18 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	ImageFloat32 original = new ImageFloat32(width,height);
 	ImageFloat32 distorted = new ImageFloat32(width, height);
-	List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+	List<List<Point2D_F64>> solutions = new ArrayList<List<Point2D_F64>>();
 
 	PointTransform_F32 d2o;
 	PointTransform_F64 o2d;
 
 
-	public abstract void renderTarget( ImageFloat32 original , List<Point2D_F64> points );
+	public abstract void renderTarget( ImageFloat32 original , List<List<Point2D_F64>> solutions );
 
 	public abstract PlanarCalibrationDetector createDetector();
 
 	public GenericPlanarCalibrationDetectorChecks() {
-		renderTarget(original,points);
+		renderTarget(original, solutions);
 	}
 
 	/**
@@ -94,8 +93,16 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 				maxY = p.y;
 		}
 
-		assertEquals(Math.abs(minX),Math.abs(maxX),1e-8);
-		assertEquals(Math.abs(minY),Math.abs(maxY),1e-8);
+		assertEquals(Math.abs(minX), Math.abs(maxX), 1e-8);
+		assertEquals(Math.abs(minY), Math.abs(maxY), 1e-8);
+	}
+
+	/**
+	 * Make sure new instances of calibration points are returned each time
+	 */
+	@Test
+	public void dataNotRecycled() {
+		fail("implements");
 	}
 
 	/**
@@ -149,28 +156,45 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	}
 
 	public void checkList( List<Point2D_F64> found , boolean applyTransform ) {
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<List<Point2D_F64>> expectedList = new ArrayList<List<Point2D_F64>>();
 
 		if( !applyTransform ) {
-			expected.addAll(this.points);
+			expectedList.addAll(this.solutions);
 		} else {
-			for (int i = 0; i < points.size(); i++) {
-				Point2D_F64 p = points.get(i).copy();
+			for (int i = 0; i < solutions.size(); i++) {
+				List<Point2D_F64> orig = solutions.get(i);
+				List<Point2D_F64> mod = new ArrayList<Point2D_F64>();
+				for (int j = 0; j < orig.size(); j++) {
+					Point2D_F64 p = orig.get(i).copy();
 
-				o2d.compute(p.x, p.y, p);
-				expected.add(p);
+					o2d.compute(p.x, p.y, p);
+					mod.add(p);
+				}
+				expectedList.add(mod);
 			}
 		}
 
-		assertEquals(expected.size(),found.size());
+		assertEquals(expectedList.get(0).size(),found.size());
 
 		// the order is important.  check to see that they are close and in the correct order
-		for (int i = 0; i < found.size(); i++) {
-			Point2D_F64 f = found.get(i);
-			Point2D_F64 e = expected.get(i);
-
-			assertTrue(f.distance(e) < 3 );
+		boolean anyMatched = false;
+		for (int i = 0; i < expectedList.size(); i++) {
+			List<Point2D_F64> expected = expectedList.get(i);
+			boolean matched = true;
+			for (int j = 0; j < expected.size(); j++) {
+				Point2D_F64 f = found.get(i);
+				Point2D_F64 e = expected.get(i);
+				if( f.distance(e) >= 3 ) {
+					matched = false;
+					break;
+				}
+			}
+			if( matched ) {
+				anyMatched = true;
+				break;
+			}
 		}
+		assertTrue(anyMatched);
 	}
 
 	public void createTransform( double x0 , double y0 , double x1 , double y1 ,

@@ -41,6 +41,9 @@ import java.util.List;
  * grid must be visible.  Space between the squares is specified as a ratio of the square size. The grid will be
  * oriented so that returned points are in counter clockwise (CCW) ordering, which appears to be CW in the image.
  *
+ * There is also always at least two solutions to the ordering.  For sake of consistency it will select
+ * the orientation where index 0 is the closest to the origin.
+ *
  * @author Peter Abeles
  */
 // TODO tell the polygon detector that there should be no inner contour
@@ -65,12 +68,12 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	/**
 	 * COnfigures the detector
 	 *
-	 * @param numCols Number of black squares in the grid columns
 	 * @param numRows Number of black squares in the grid rows
+	 * @param numCols Number of black squares in the grid columns
 	 * @param spaceToSquareRatio Ratio of spacing between the squares and the squares width
 	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
 	 */
-	public DetectSquareGridFiducial(int numCols, int numRows, double spaceToSquareRatio,
+	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
 									BinaryPolygonConvexDetector<T> detectorSquare) {
 		this.numCols = numCols;
 		this.numRows = numRows;
@@ -117,11 +120,77 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 			if( checkFlip(match) ) {
 				flipRows(match);
 			}
-			return extractCalibrationPoints(match);
+			if( extractCalibrationPoints(match) ) {
+				resolveAmbiguity();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * There can be 2 or 4 possible orientations which are equally valid solutions.  For
+	 * sake of consistency it will make the (0,0) coordinate be closest to the origin
+	 * of the image coordinate system.
+	 */
+	private void resolveAmbiguity() {
+		if( calibCols == calibRows ) {
+			int best = -1;
+			double bestDistance = Double.MAX_VALUE;
+			if( getCalib(0,0).normSq() < bestDistance ) {
+				best = 0;
+				bestDistance = getCalib(0,0).normSq();
+			}
+			if( getCalib(0,calibCols-1).normSq() < bestDistance ) {
+				best = 1;
+				bestDistance = getCalib(0,calibCols-1).normSq();
+			}
+			if( getCalib(calibRows-1,calibCols-1).normSq() < bestDistance ) {
+				best = 2;
+				bestDistance = getCalib(calibRows-1,calibCols-1).normSq();
+			}
+			if( getCalib(calibRows-1,0).normSq() < bestDistance ) {
+				best = 3;
+			}
+			for (int i = 0; i < best; i++) {
+				rotateCalibSquareCCW();
+			}
 		} else {
-			return false;
+			int N = calibrationPoints.size();
+			double first = calibrationPoints.get(0).normSq();
+			double last = calibrationPoints.get(N-1).normSq();
+
+			if( last < first ) {
+				reverseCalib();
+			}
 		}
 	}
+
+	private Point2D_F64 getCalib( int row , int col ) {
+		return calibrationPoints.get( row*calibCols + col );
+	}
+
+	private void rotateCalibSquareCCW() {
+		tmpPts.clear();
+		for (int row = 0; row < calibRows; row++) {
+			for (int col = 0; col < calibCols; col++) {
+				tmpPts.add(getCalib(col,calibCols-row-1));
+			}
+		}
+		calibrationPoints.clear();
+		calibrationPoints.addAll(tmpPts);
+	}
+
+	private void reverseCalib() {
+		tmpPts.clear();
+		int N = calibCols*calibRows;
+		for (int i = 0; i < N; i++) {
+			tmpPts.add( calibrationPoints.get(N-i-1));
+		}
+		calibrationPoints.clear();
+		calibrationPoints.addAll(tmpPts);
+	}
+
 
 	/**
 	 * Compute the visual size of a polygon
@@ -155,6 +224,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	}
 
 	List<SquareNode> tmp = new ArrayList<SquareNode>();
+	List<Point2D_F64> tmpPts = new ArrayList<Point2D_F64>();
 	/**
 	 * Transposes the grid
 	 */
@@ -207,6 +277,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	 */
 	boolean extractCalibrationPoints( SquareGrid grid ) {
 
+		calibrationPoints.clear();
 		// the first pass interleaves every other row
 		for (int row = 0; row < grid.rows; row++) {
 

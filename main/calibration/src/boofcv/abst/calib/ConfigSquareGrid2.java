@@ -62,6 +62,11 @@ public class ConfigSquareGrid2 implements Configuration {
 	 */
 	public double spaceWidth;
 
+	{
+		square.refineWithCorners = true;
+		square.refineWithLines = false;
+	}
+
 	public ConfigSquareGrid2(int numCols, int numRows, double squareWidth, double spaceWidth) {
 		this.numCols = numCols;
 		this.numRows = numRows;

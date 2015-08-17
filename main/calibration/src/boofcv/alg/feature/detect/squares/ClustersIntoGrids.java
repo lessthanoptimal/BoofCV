@@ -209,8 +209,8 @@ public class ClustersIntoGrids {
 
 		SquareGrid grid = valid.grow();
 		grid.nodes = ordered;
-		grid.columns = column.size();
-		grid.rows = ordered.size() / column.size();
+		grid.columns = ordered.size() / column.size();
+		grid.rows = column.size();
 	}
 
 	/**

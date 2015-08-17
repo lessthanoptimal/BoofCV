@@ -40,6 +40,7 @@ public class PlanarDetectorSquareGrid2 implements PlanarCalibrationDetector {
 	DetectSquareGridFiducial<ImageFloat32> detect;
 
 	List<Point2D_F64> layoutPoints;
+	List<Point2D_F64> detected;
 
 	public PlanarDetectorSquareGrid2(ConfigSquareGrid2 config) {
 		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
@@ -64,7 +65,16 @@ public class PlanarDetectorSquareGrid2 implements PlanarCalibrationDetector {
 	@Override
 	public boolean process(ImageFloat32 input) {
 
-		return detect.process(input);
+		if( detect.process(input) )  {
+			detected = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> found = detect.getCalibrationPoints();
+			for (int i = 0; i < found.size(); i++) {
+				detected.add( found.get(i).copy() );
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -116,7 +126,7 @@ public class PlanarDetectorSquareGrid2 implements PlanarCalibrationDetector {
 
 	@Override
 	public List<Point2D_F64> getDetectedPoints() {
-		return detect.getCalibrationPoints();
+		return detected;
 	}
 
 	@Override
