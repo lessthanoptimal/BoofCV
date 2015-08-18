@@ -102,7 +102,19 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void dataNotRecycled() {
-		fail("implements");
+		PlanarCalibrationDetector detector = createDetector();
+
+		assertTrue(detector.process(original));
+		List<Point2D_F64> found0 = detector.getDetectedPoints();
+
+		assertTrue(detector.process(original));
+		List<Point2D_F64> found1 = detector.getDetectedPoints();
+
+		assertEquals(found0.size(),found1.size());
+		assertTrue(found0 != found1);
+		for (Point2D_F64 a : found0) {
+			assertFalse(found1.contains(a));
+		}
 	}
 
 	/**

@@ -133,7 +133,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	 * sake of consistency it will make the (0,0) coordinate be closest to the origin
 	 * of the image coordinate system.
 	 */
-	private void resolveAmbiguity() {
+	void resolveAmbiguity() {
 		if( calibCols == calibRows ) {
 			int best = -1;
 			double bestDistance = Double.MAX_VALUE;
@@ -170,7 +170,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		return calibrationPoints.get( row*calibCols + col );
 	}
 
-	private void rotateCalibSquareCCW() {
+	void rotateCalibSquareCCW() {
 		tmpPts.clear();
 		for (int row = 0; row < calibRows; row++) {
 			for (int col = 0; col < calibCols; col++) {
@@ -181,7 +181,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		calibrationPoints.addAll(tmpPts);
 	}
 
-	private void reverseCalib() {
+	void reverseCalib() {
 		tmpPts.clear();
 		int N = calibCols*calibRows;
 		for (int i = 0; i < N; i++) {

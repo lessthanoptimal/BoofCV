@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.grid;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.alg.feature.detect.squares.TestClustersIntoGrids;
+import boofcv.struct.image.ImageFloat32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -30,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -55,12 +57,53 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void resolveAmbiguity_square() {
-		fail("implement");
+		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null);
+
+		// grids of different sizes.  smallest is 4x4 since that's one square
+		for (int i = 4; i <= 8; i++) {
+			alg.calibCols = i;
+			alg.calibRows = i;
+
+			// try different initial orientations
+			for (int j = 0; j < 4; j++) {
+				alg.calibrationPoints = createPoints(i,i);
+				for (int k = 0; k < j; k++) {
+					alg.rotateCalibSquareCCW();
+				}
+				alg.resolveAmbiguity();
+				assertTrue(alg.calibrationPoints.get(0).distance(new Point2D_F64(10, 20)) < 1e-8);
+			}
+		}
 	}
 
 	@Test
 	public void resolveAmbiguity_rectangle() {
-		fail("implement");
+		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null);
+
+		alg.calibCols = 5;
+		alg.calibRows = 2;
+		alg.calibrationPoints = createPoints(alg.calibRows,alg.calibCols);
+		alg.resolveAmbiguity();
+		assertTrue(alg.calibrationPoints.get(0).distance(new Point2D_F64(10, 20)) < 1e-8);
+
+		alg.reverseCalib();
+		alg.resolveAmbiguity();
+		assertTrue(alg.calibrationPoints.get(0).distance(new Point2D_F64(10, 20)) < 1e-8);
+	}
+
+	private List<Point2D_F64> createPoints( int rows , int cols ) {
+		double x0 = 10;
+		double y0 = 20;
+
+		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				list.add( new Point2D_F64(x0+i,y0+j));
+			}
+		}
+
+		return list;
 	}
 
 	@Test
