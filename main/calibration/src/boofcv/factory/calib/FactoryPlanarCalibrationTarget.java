@@ -33,16 +33,10 @@ public class FactoryPlanarCalibrationTarget {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorSquareGrid( ConfigSquareGrid config) {
+	public static PlanarCalibrationDetector detectorSquareGrid(ConfigSquareGrid config) {
 		config.checkValidity();
 
 		return new PlanarDetectorSquareGrid(config);
-	}
-
-	public static PlanarCalibrationDetector detectorSquareGrid2( ConfigSquareGrid2 config) {
-		config.checkValidity();
-
-		return new PlanarDetectorSquareGrid2(config);
 	}
 
 	/**

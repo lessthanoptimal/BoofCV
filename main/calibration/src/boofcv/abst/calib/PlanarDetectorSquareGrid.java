@@ -18,16 +18,12 @@
 
 package boofcv.abst.calib;
 
-import boofcv.alg.feature.detect.InvalidCalibrationTarget;
-import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
-import boofcv.alg.feature.detect.grid.RefineCalibrationGridCorner;
-import boofcv.alg.feature.detect.grid.UtilCalibrationGrid;
-import boofcv.alg.feature.detect.grid.refine.WrapRefineCornerSegmentFit;
-import boofcv.alg.feature.detect.quadblob.OrderPointsIntoGrid;
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -40,42 +36,28 @@ import java.util.List;
  */
 public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 
-	// number of squares in the grid's column
-	int squareColumns;
 
-	// shape of grid in calibration points
-	int pointColumns;
-	int pointRows;
+	DetectSquareGridFiducial<ImageFloat32> detect;
 
-	RefineCalibrationGridCorner refine;
-	DetectSquareCalibrationPoints detect;
-
-	// binary image computed from the threshold
-	private ImageUInt8 binary = new ImageUInt8(1,1);
-
-	// set of found points
-	List<Point2D_F64> ret;
-
-	ImageFloat32 work1 = new ImageFloat32(1,1);
-	ImageFloat32 work2 = new ImageFloat32(1,1);
-
-	ConfigSquareGrid config;
 	List<Point2D_F64> layoutPoints;
+	List<Point2D_F64> detected;
 
 	public PlanarDetectorSquareGrid(ConfigSquareGrid config) {
-		this.config = config;
-		refine = new WrapRefineCornerSegmentFit();
-//		refine = new WrapRefineCornerCanny();
-
-		this.squareColumns = config.numCols;
-
-		pointColumns = (squareColumns/2+1)*2;
-		pointRows = (config.numRows/2+1)*2;
-
 		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
 
-		detect = new DetectSquareCalibrationPoints(config.relativeSizeThreshold,spaceToSquareRatio ,
-				squareColumns,config.numRows);
+		InputToBinary<ImageFloat32> inputToBinary;
+
+		if( config.binaryGlobalThreshold <= 0 ) {
+			inputToBinary = FactoryThresholdBinary.adaptiveSquare(config.binaryAdaptiveRadius,0,true,ImageFloat32.class);
+		} else {
+			inputToBinary = FactoryThresholdBinary.globalFixed(config.binaryGlobalThreshold,true,ImageFloat32.class);
+		}
+
+		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
+				FactoryShapeDetector.polygon(inputToBinary,config.square,ImageFloat32.class);
+
+		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows/2+1,config.numCols/2+1,
+				spaceToSquareRatio,detectorSquare);
 
 		layoutPoints = createLayout(config.numCols,config.numRows,config.squareWidth,config.spaceWidth);
 	}
@@ -83,49 +65,16 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	@Override
 	public boolean process(ImageFloat32 input) {
 
-		work1.reshape(input.width,input.height);
-		work2.reshape(input.width,input.height);
-
-		binary.reshape(input.width,input.height);
-
-		if( config.binaryGlobalThreshold <= 0 ) {
-			work1.reshape(input.width,input.height);
-			work2.reshape(input.width,input.height);
-			GThresholdImageOps.adaptiveSquare(input, binary, config.binaryAdaptiveRadius, config.binaryAdaptiveBias, true, work1, work2);
-		} else
-			GThresholdImageOps.threshold(input, binary, config.binaryGlobalThreshold, true);
-
-
-		// detect the target at pixel level accuracy
-		if( !detect.process(binary) )
-			return false;
-		try {
-			List<QuadBlob> squares = detect.getInterestSquares();
-
-			// refine the corner accuracy estimate to sub-pixel
-			refine.refine(squares,input);
-
-			List<Point2D_F64> subpixel = new ArrayList<Point2D_F64>();
-			for( QuadBlob b : squares ) {
-				for( Point2D_F64 p : b.subpixel )
-					subpixel.add(p);
+		if( detect.process(input) )  {
+			detected = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> found = detect.getCalibrationPoints();
+			for (int i = 0; i < found.size(); i++) {
+				detected.add( found.get(i).copy() );
 			}
-
-			//TODO it was already ordered before subpixel.  can that be used again?
-			OrderPointsIntoGrid orderAlg = new OrderPointsIntoGrid();
-			List<Point2D_F64> ordered = orderAlg.process(subpixel);
-
-			ret = UtilCalibrationGrid.rotatePoints(ordered,
-					orderAlg.getNumRows(),orderAlg.getNumCols(),
-					pointRows,pointColumns);
-		} catch( InvalidCalibrationTarget e ) {
-			System.err.println("Target lost during subpixel estimation.  This algorithm needs to be improved");
-//			e.printStackTrace();
+			return true;
+		} else {
 			return false;
 		}
-
-		return ret != null;
-
 	}
 
 	/**
@@ -177,24 +126,12 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 
 	@Override
 	public List<Point2D_F64> getDetectedPoints() {
-		return ret;
+		return detected;
 	}
 
 	@Override
 	public List<Point2D_F64> getLayout() {
 		return layoutPoints;
-	}
-
-	public ImageUInt8 getBinary() {
-		return binary;
-	}
-
-	public RefineCalibrationGridCorner getRefine() {
-		return refine;
-	}
-
-	public DetectSquareCalibrationPoints getDetect() {
-		return detect;
 	}
 
 }

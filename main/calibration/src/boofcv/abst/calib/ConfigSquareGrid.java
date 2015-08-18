@@ -18,6 +18,7 @@
 
 package boofcv.abst.calib;
 
+import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
@@ -38,10 +39,6 @@ public class ConfigSquareGrid implements Configuration {
 	public int numRows = -1;
 
 	/**
-	 * Increases or decreases the minimum allowed blob size. Try 1.0
-	 */
-	public double relativeSizeThreshold = 1;
-	/**
 	 * Global threshold used on the image.  If <= 0 then a local adaptive threshold is used instead
 	 */
 	public double binaryGlobalThreshold = -1;
@@ -49,10 +46,11 @@ public class ConfigSquareGrid implements Configuration {
 	 * Size of local region used by adaptive threshold
 	 */
 	public int binaryAdaptiveRadius = 20;
+
 	/**
-	 * Bias used by local adaptive threshold
+	 * Configuration for square detector
 	 */
-	public double binaryAdaptiveBias = -10;
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(4,true);
 
 	/**
 	 * Physical width of the square.
@@ -64,20 +62,18 @@ public class ConfigSquareGrid implements Configuration {
 	 */
 	public double spaceWidth;
 
-	public ConfigSquareGrid(int numCols, int numRows , double squareWidth , double spaceWidth  ) {
-		this.numCols = numCols;
-		this.numRows = numRows;
-		this.squareWidth = squareWidth;
-		this.spaceWidth = spaceWidth;
+	{
+		square.contour2Poly_splitDistanceFraction = 0.1;
+
+		square.refineWithCorners = true;
+		square.refineWithLines = false;
 	}
 
-	public ConfigSquareGrid(int numCols, int numRows, double squareWidth , double spaceWidth  ,
-							double relativeSizeThreshold) {
+	public ConfigSquareGrid(int numCols, int numRows, double squareWidth, double spaceWidth) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.squareWidth = squareWidth;
 		this.spaceWidth = spaceWidth;
-		this.relativeSizeThreshold = relativeSizeThreshold;
 	}
 
 	public double getSpacetoSquareRatio() {

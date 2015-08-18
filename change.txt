@@ -46,6 +46,7 @@ Version : Alpha 0.19
 - Square grid calibration target
   * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
     lack of regression tests
+  * Change underlying algorithm.  Now uses polygon detector for corners.
 - Calibration
   * A single class fully specifies the calibration target now
   * Intrinsic parameters can now use a flow style assignment of parameters

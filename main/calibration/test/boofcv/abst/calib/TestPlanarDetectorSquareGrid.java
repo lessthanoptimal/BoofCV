@@ -36,9 +36,6 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 
 	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 5, 30,30);
 
-	{
-		config.relativeSizeThreshold = 0.6;
-	}
 
 	@Test
 	public void createLayout() {
@@ -90,7 +87,6 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 			}
 		}
 		solutions.add(points);
-
 	}
 
 	@Override

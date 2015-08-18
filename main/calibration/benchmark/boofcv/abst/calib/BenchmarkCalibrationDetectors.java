@@ -52,7 +52,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Square extends PerformerBase {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorSquareGrid(new ConfigSquareGrid(5, 7,30,30));
+				detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 		@Override
 		public void process() {

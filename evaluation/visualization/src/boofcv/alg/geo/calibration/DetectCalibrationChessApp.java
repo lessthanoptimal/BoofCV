@@ -218,7 +218,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
 			if( graph != null )
-				DetectCalibrationSquaresApp.drawGraph(g2,graph);
+				drawGraph(g2,graph);
 		}
 
 		gui.setBufferedImage(workImage);
@@ -226,6 +226,41 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		gui.repaint();
 
 		processed = true;
+	}
+
+	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
+
+		if( squares.size() == 0)
+			return;
+
+		g2.setStroke(new BasicStroke(2.0f));
+		for( int i = 0; i < squares.size(); i++ ) {
+			QuadBlob p = squares.get(i);
+			Point2D_I32 c = p.center;
+
+			int red = 255;
+			int green = 255*i/squares.size();
+			int blue = 255*(i%(squares.size()/2))/(squares.size()/2);
+
+			g2.setColor(new Color(red,green,blue));
+			for( QuadBlob w : p.conn ) {
+				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
+			}
+		}
+		g2.setColor(Color.RED);
+		for( int i = 0; i < squares.size(); i++ ) {
+			QuadBlob p = squares.get(i);
+			Point2D_I32 c = p.center;
+			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
+		}
+
+//		for( int i = 0; i < squares.size(); i++ ) {
+//			QuadBlob p = squares.get(i);
+//			for( int j = 0; j < p.corners.size(); j++ ) {
+//				Point2D_I32 c = p.corners.get(j);
+//				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+//			}
+//		}
 	}
 
 	public static void drawBounds( Graphics2D g2 , Polygon2D_I32 bounds) {
