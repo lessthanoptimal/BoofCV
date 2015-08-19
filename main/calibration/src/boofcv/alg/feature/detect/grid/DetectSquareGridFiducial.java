@@ -18,12 +18,14 @@
 
 package boofcv.alg.feature.detect.grid;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.squares.ClustersIntoGrids;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.alg.feature.detect.squares.SquaresIntoClusters;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import georegression.metric.Area2D_F64;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.metric.UtilAngle;
@@ -53,6 +55,9 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	int numCols;
 	int numRows;
 
+	// converts input image into a binary image
+	InputToBinary<T> inputToBinary;
+
 	// detector for squares
 	BinaryPolygonConvexDetector<T> detectorSquare;
 
@@ -65,18 +70,24 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	int calibRows;
 	int calibCols;
 
+	// storage for binary image
+	ImageUInt8 binary = new ImageUInt8(1,1);
+
 	/**
 	 * COnfigures the detector
 	 *
 	 * @param numRows Number of black squares in the grid rows
 	 * @param numCols Number of black squares in the grid columns
 	 * @param spaceToSquareRatio Ratio of spacing between the squares and the squares width
+	 * @param inputToBinary Converts input image into a binary image
 	 * @param detectorSquare Detects the squares in the image.  Must be configured to detect squares
 	 */
 	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
+									InputToBinary<T> inputToBinary ,
 									BinaryPolygonConvexDetector<T> detectorSquare) {
 		this.numCols = numCols;
 		this.numRows = numRows;
+		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
 		s2c = new SquaresIntoClusters(spaceToSquareRatio);
@@ -90,7 +101,10 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	 * @return true if a calibration target was found and false if not
 	 */
 	public boolean process( T image ) {
-		detectorSquare.process(image);
+		binary.reshape(image.width,image.height);
+
+		inputToBinary.process(image,binary);
+		detectorSquare.process(image, binary);
 
 		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
 

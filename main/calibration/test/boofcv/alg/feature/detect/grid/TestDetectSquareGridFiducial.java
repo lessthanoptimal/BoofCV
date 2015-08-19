@@ -45,7 +45,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void computeSize() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		SquareGrid grid = createGrid(2,3);
 
@@ -57,7 +57,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void resolveAmbiguity_square() {
-		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null);
+		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null,null);
 
 		// grids of different sizes.  smallest is 4x4 since that's one square
 		for (int i = 4; i <= 8; i++) {
@@ -78,7 +78,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void resolveAmbiguity_rectangle() {
-		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null);
+		DetectSquareGridFiducial<ImageFloat32> alg = new DetectSquareGridFiducial<ImageFloat32>(1,1,1,null,null);
 
 		alg.calibCols = 5;
 		alg.calibRows = 2;
@@ -108,7 +108,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void checkFlip() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		SquareGrid grid = createGrid(2,3);
 		assertFalse(alg.checkFlip(grid));
@@ -135,7 +135,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void transpose() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		SquareGrid grid = createGrid(2,3);
 		SquareGrid orig = copy(grid);
@@ -154,7 +154,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void flipRows() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		SquareGrid grid = createGrid(2,3);
 		SquareGrid orig = copy(grid);
@@ -170,7 +170,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void extractCalibrationPoints() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		SquareGrid grid = createGrid(2,3);
 
@@ -204,7 +204,7 @@ public class TestDetectSquareGridFiducial {
 	public void sortCorners() {
 		Polygon2D_F64 poly = new Polygon2D_F64(-1,-1,1,-1,1,1,-1,1);
 
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 		alg.axisX.slope.set(1, 0);
 		alg.axisY.slope.set(0, 1);
 
@@ -231,7 +231,7 @@ public class TestDetectSquareGridFiducial {
 
 	@Test
 	public void selectAxis() {
-		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null);
+		DetectSquareGridFiducial alg = new DetectSquareGridFiducial(1,1,1,null,null);
 
 		for (int numRows = 1; numRows <= 3; numRows++) {
 			for (int numCols = 1; numCols <= 3; numCols++) {

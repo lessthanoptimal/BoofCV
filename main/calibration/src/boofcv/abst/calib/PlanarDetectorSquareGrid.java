@@ -54,10 +54,10 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		}
 
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(inputToBinary,config.square,ImageFloat32.class);
+				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
 
 		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows/2+1,config.numCols/2+1,
-				spaceToSquareRatio,detectorSquare);
+				spaceToSquareRatio,inputToBinary,detectorSquare);
 
 		layoutPoints = createLayout(config.numCols,config.numRows,config.squareWidth,config.spaceWidth);
 	}

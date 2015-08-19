@@ -28,6 +28,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import com.github.sarxos.webcam.Webcam;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -77,14 +78,15 @@ public class DetectPolygonWebcam {
 		config.configRefineLines.maxIterations = 30;
 
 		InputToBinary<ImageFloat32> inputToBinary =
-				FactoryThresholdBinary.globalOtsu(0, 255, true, ImageFloat32.class);
+				FactoryThresholdBinary.globalOtsu(0, 256, true, ImageFloat32.class);
 //				FactoryThresholdBinary.globalEntropy(0,255,true,ImageFloat32.class);
 //				FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageFloat32.class);
 		BinaryPolygonConvexDetector<ImageFloat32> detector = FactoryShapeDetector.
-				polygon(inputToBinary, new ConfigPolygonDetector(4), ImageFloat32.class);
+				polygon(new ConfigPolygonDetector(4), ImageFloat32.class);
 
 
 		ImageFloat32 gray = new ImageFloat32(imageWidth,imageHeight);
+		ImageUInt8 binary = new ImageUInt8(imageWidth,imageHeight);
 		ImagePanel gui = new ImagePanel(imageWidth,imageHeight);
 		ShowImages.showWindow(gui,"Fiducials",true);
 
@@ -92,8 +94,8 @@ public class DetectPolygonWebcam {
 			BufferedImage frame = webcam.getImage();
 
 			ConvertBufferedImage.convertFrom(frame,gray);
-
-			detector.process(gray);
+			inputToBinary.process(gray,binary);
+			detector.process(gray,binary);
 
 			// display the results
 			Graphics2D g2 = frame.createGraphics();

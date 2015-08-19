@@ -18,7 +18,6 @@
 
 package boofcv.factory.shape;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
@@ -37,14 +36,12 @@ public class FactoryShapeDetector {
 	 * Creates a polygon detector.  The polygon is assumed to be a black shape with a much lighter background.
 	 * The polygon can be found to sub-pixel accuracy, if configured to do so.
 	 *
-	 * @param inputToBinary Class which is used to convert the gray scale image into a binary one
 	 * @param config Configuration for polygon detector
 	 * @param imageType Input image type
 	 * @return Detector
 	 */
 	public static <T extends ImageSingleBand>
-	BinaryPolygonConvexDetector<T> polygon( InputToBinary<T> inputToBinary,
-											ConfigPolygonDetector config,
+	BinaryPolygonConvexDetector<T> polygon( ConfigPolygonDetector config,
 											Class<T> imageType)
 	{
 		config.checkValidity();
@@ -67,7 +64,7 @@ public class FactoryShapeDetector {
 					config.configRefineCorners.sampleRadius,config.configRefineCorners.maxIterations,
 					config.configRefineCorners.convergeTolPixels,imageType);
 
-		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,inputToBinary,contourToPolygon,
+		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,contourToPolygon,
 				refineLine,refineCorner,config.minContourImageWidthFraction,
 				config.contour2Poly_splitDistanceFraction,config.clockwise,imageType);
 	}

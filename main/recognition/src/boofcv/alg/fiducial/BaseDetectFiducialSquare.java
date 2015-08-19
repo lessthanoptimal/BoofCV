@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.h.HomographyLinear4;
@@ -34,6 +35,7 @@ import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.homography.UtilHomography;
@@ -71,11 +73,16 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// Storage for the found fiducials
 	private FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
 
+	// converts input image into a binary image
+	InputToBinary<T> inputToBinary;
 	// Detects the squares
 	private BinaryPolygonConvexDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
 	private ImageFloat32 square;
+
+	// storage for binary image
+	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// Used to compute/remove distortion from perspective
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
@@ -103,11 +110,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	/**
 	 * Configures the detector.
 	 *
+	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param squarePixels  Number of pixels wide the image that stores the target's detector interior is.
 	 * @param inputType Type of input image it's processing
 	 */
-	protected BaseDetectFiducialSquare(BinaryPolygonConvexDetector<T> squareDetector,
+	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
+									   BinaryPolygonConvexDetector<T> squareDetector,
 									   int squarePixels,
 									   Class<T> inputType) {
 
@@ -116,6 +125,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		if( squareDetector.isOutputClockwise() )
 			throw new IllegalArgumentException("output polygons needs to be counter-clockwise");
 
+		this.inputToBinary = inputToBinary;
 		this.squareDetector = squareDetector;
 		this.inputType = inputType;
 		this.square = new ImageFloat32(squarePixels,squarePixels);
@@ -182,6 +192,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// provide intrinsic camera parameters
 		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
 		removePerspective.setModel(squareToInput);
+
+		binary.reshape(intrinsic.width,intrinsic.height);
 	}
 
 	/**
@@ -191,7 +203,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	public void process( T gray ) {
 
-		squareDetector.process(gray);
+		inputToBinary.process(gray,binary);
+		squareDetector.process(gray,binary);
 		FastQueue<Polygon2D_F64> candidates = squareDetector.getFound();
 
 		found.reset();
@@ -322,6 +335,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	public BinaryPolygonConvexDetector getSquareDetector() {
 		return squareDetector;
+	}
+
+	public ImageUInt8 getBinary() {
+		return binary;
 	}
 
 	public Class<T> getInputType() {

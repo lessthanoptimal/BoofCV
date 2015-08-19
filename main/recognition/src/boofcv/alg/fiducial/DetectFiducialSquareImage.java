@@ -91,8 +91,8 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 *
 	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
-	public DetectFiducialSquareImage(BinaryPolygonConvexDetector<T> quadDetector, double matchThreshold, Class<T> inputType) {
-		super(quadDetector, squareLength+squareLength, inputType);
+	public DetectFiducialSquareImage(InputToBinary<T> inputToBinary,BinaryPolygonConvexDetector<T> quadDetector, double matchThreshold, Class<T> inputType) {
+		super(inputToBinary,quadDetector, squareLength+squareLength, inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 

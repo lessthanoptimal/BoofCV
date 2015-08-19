@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
@@ -45,8 +46,9 @@ import static org.junit.Assert.*;
 public class TestDetectFiducialSquareBinary {
 
 	Random rand = new Random(234);
-	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class)
-			,new ConfigPolygonDetector(4,false),ImageUInt8.class);
+	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.polygon(
+			new ConfigPolygonDetector(4,false),ImageUInt8.class);
+	InputToBinary<ImageUInt8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class);
 
 	/**
 	 * Makes sure the found rotation matrix is correct
@@ -71,7 +73,7 @@ public class TestDetectFiducialSquareBinary {
 			ImageMiscOps.fill(input, 255);
 			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
-			DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(squareDetector, ImageUInt8.class);
+			DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(inputToBinary,squareDetector, ImageUInt8.class);
 			alg.setLengthSide(2);
 			alg.configure(intrinsic, false);
 			alg.process(input);
@@ -106,7 +108,7 @@ public class TestDetectFiducialSquareBinary {
 			for (int j = 0; j < i - 1; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
-			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(squareDetector,ImageUInt8.class);
+			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result));
@@ -124,7 +126,7 @@ public class TestDetectFiducialSquareBinary {
 		ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
-		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(squareDetector,ImageUInt8.class);
+		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertFalse(alg.processSquare(input, result));
