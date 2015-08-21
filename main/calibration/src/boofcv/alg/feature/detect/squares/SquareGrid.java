@@ -38,4 +38,33 @@ public class SquareGrid {
 			col = columns + col;
 		return nodes.get( row*columns + col );
 	}
+
+	public SquareNode getCornerByIndex( int index ) {
+		switch( index ) {
+			case 0: return get(0,0);
+			case 1: return get(0,-1);
+			case 2: return get(-1,-1);
+			case 3: return get(-1,0);
+			default: throw new RuntimeException("BUG!");
+		}
+	}
+
+	public int getCornerIndex( SquareNode node ) {
+		int index = nodes.indexOf(node);
+
+		int x = index%columns;
+		int y = index/columns;
+
+		if( x == 0 && y == 0 ) {
+			return 0;
+		} else if( x == columns-1 && y == 0 ) {
+			return 1;
+		} else if( x == columns-1 && y == rows-1 ) {
+			return 2;
+		} else if( x == 0 && y == rows-1 ) {
+			return 3;
+		} else {
+			throw new RuntimeException("Not corner!");
+		}
+	}
 }

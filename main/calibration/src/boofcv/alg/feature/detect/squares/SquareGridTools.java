@@ -44,27 +44,21 @@ public class SquareGridTools {
 		if( grid.rows == grid.columns ) {
 			int best = -1;
 			double bestDistance = Double.MAX_VALUE;
-			if( grid.get(0,0).center.normSq() < bestDistance ) {
-				best = 0;
-				bestDistance = grid.get(0,0).center.normSq();
+			for (int i = 0; i < 4; i++) {
+				SquareNode n = grid.getCornerByIndex(i);
+				double d = n.center.normSq();
+				if( d < bestDistance ) {
+					best = 0;
+					bestDistance = d;
+				}
 			}
-			if( grid.get(0, grid.columns  - 1).center.normSq() < bestDistance ) {
-				best = 1;
-				bestDistance = grid.get(0, grid.columns - 1).center.normSq();
-			}
-			if( grid.get(grid.rows - 1, grid.columns  - 1).center.normSq() < bestDistance ) {
-				best = 2;
-				bestDistance = grid.get(grid.rows - 1, grid.columns -1).center.normSq();
-			}
-			if( grid.get(grid.rows - 1,0).center.normSq() < bestDistance ) {
-				best = 3;
-			}
+
 			for (int i = 0; i < best; i++) {
 				rotateCCW(grid);
 			}
 		} else {
 			double first = grid.get(0,0).center.normSq();
-			double last = grid.get(grid.rows - 1, grid.columns -1).center.normSq();
+			double last = grid.getCornerByIndex(2).center.normSq();
 
 			if( last < first ) {
 				reverse(grid);
