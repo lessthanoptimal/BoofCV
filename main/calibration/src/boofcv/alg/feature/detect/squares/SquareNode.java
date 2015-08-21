@@ -48,6 +48,20 @@ public class SquareNode {
 	public SquareEdge edges[] = new SquareEdge[4];
 
 	/**
+	 * Finds the Euclidean distance squared of the closest corner to point p
+	 */
+	public double distanceSqCorner( Point2D_F64 p ) {
+		double best = Double.MAX_VALUE;
+		for (int i = 0; i < 4; i++) {
+			double d = corners.get(i).distance2(p);
+			if( d < best ) {
+				best = d;
+			}
+		}
+		return best;
+	}
+
+	/**
 	 * Discards previous information
 	 */
 	public void reset() {

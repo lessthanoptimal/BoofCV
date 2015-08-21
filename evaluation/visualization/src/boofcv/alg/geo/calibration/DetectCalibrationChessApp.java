@@ -20,7 +20,6 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
@@ -190,8 +189,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
 			if( calibGUI.isShowBound() ) {
-				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
-				drawBounds(g2, bounds);
+//				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+//				drawBounds(g2, bounds);
 			}
 
 			if( calibGUI.isShowNumbers() ) {
@@ -200,8 +199,8 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
 			if( calibGUI.isShowBound() ) {
-				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
-				drawBounds(g2, bounds);
+//				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
+//				drawBounds(g2, bounds);
 			}
 
 			calibGUI.setSuccessMessage("FAILED",false);
@@ -216,9 +215,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 		if( calibGUI.doShowGraph ) {
 
-			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
-			if( graph != null )
-				drawGraph(g2,graph);
+//			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
+//			if( graph != null )
+//				drawGraph(g2,graph);
 		}
 
 		gui.setBufferedImage(workImage);
@@ -282,21 +281,21 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	private void renderClusters() {
-		DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
-
-		int numLabels = detectBlobs.getNumLabels();
-		VisualizeBinaryData.renderLabeledBG(detectBlobs.getLabeledImage(), numLabels, workImage);
-
-		// put a mark in the center of blobs that were declared as being valid
-		Graphics2D g2 = workImage.createGraphics();
-		if( detectBlobs.getDetected() != null ) {
-			for( QuadBlob b : detectBlobs.getDetected() ) {
-				for( int i = 0; i < b.corners.size(); i++ ) {
-					Point2D_I32 c = b.corners.get(i);
-					VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.GREEN);
-				}
-			}
-		}
+//		DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
+//
+//		int numLabels = detectBlobs.getNumLabels();
+//		VisualizeBinaryData.renderLabeledBG(detectBlobs.getLabeledImage(), numLabels, workImage);
+//
+//		// put a mark in the center of blobs that were declared as being valid
+//		Graphics2D g2 = workImage.createGraphics();
+//		if( detectBlobs.getDetected() != null ) {
+//			for( QuadBlob b : detectBlobs.getDetected() ) {
+//				for( int i = 0; i < b.corners.size(); i++ ) {
+//					Point2D_I32 c = b.corners.get(i);
+//					VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.GREEN);
+//				}
+//			}
+//		}
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,

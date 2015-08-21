@@ -137,7 +137,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 //		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
 
 		// minContourSize is specified later after the image's size is known
-		findBound = new DetectChessSquaresBinary(numCols, numRows, 10);
+		findBound = new DetectChessSquaresBinary(numCols, numRows, null);
 
 		localPeak.setSearchRadius(2);
 
@@ -165,7 +165,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			return false;
 
 		// rectangle that contains the area of interest
-		targetRect = findBound.getBoundRect();
+//		targetRect = findBound.getBoundRect();
 
 		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
 		derivX.reshape(subGray.width, subGray.height);
@@ -177,7 +177,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// detect interest points
 		intensityAlg.process(subGray, derivX, derivY, null, null, null);
 
-		List<QuadBlob> unorderedBlobs = findBound.getGraphBlobs();
+		List<QuadBlob> unorderedBlobs = null;//findBound.getGraphBlobs();
 
 		if( !orderAlg.order(unorderedBlobs) ) {
 			return false;
@@ -232,7 +232,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, 1, eroded);
 
-		return findBound.process(eroded);
+		return true;//findBound.process(eroded);
 	}
 
 	/**

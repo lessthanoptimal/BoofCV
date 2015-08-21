@@ -32,6 +32,10 @@ public class SquareGrid {
 	public int rows;
 
 	public SquareNode get( int row , int col ) {
+		if( row < 0 )
+			row = rows + row;
+		if( col < 0 )
+			col = columns + col;
 		return nodes.get( row*columns + col );
 	}
 }

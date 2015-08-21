@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.squares;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -34,6 +35,12 @@ public class TestSquareNode {
 
 
 		a.reset();
+		fail("implement");
+	}
+
+	@Test
+	public void distanceSqCorner() {
+		fail("implement");
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,15 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.alg.feature.detect.grid.ConnectGridSquares;
-import boofcv.alg.feature.detect.quadblob.DetectQuadBlobsBinary;
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
-import boofcv.struct.ImageRectangle;
+import boofcv.alg.feature.detect.squares.*;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.UtilPoint2D_I32;
-import georegression.geometry.UtilPolygons2D_I32;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
-import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,380 +36,172 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquaresBinary {
+public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 
-	// square blob detector
-	private DetectQuadBlobsBinary detectBlobs;
+	// detector for squares
+	BinaryPolygonConvexDetector<T> detectorSquare;
 
-	// how many blobs it expects to find
-	private int expectedBlobs;
+	// Converts detected squares into a graph and into grids
+	SquaresIntoClusters s2c;
+	ClustersIntoGrids c2g;
 
-	// number of rows and columns in blob grid
-	private int numRows;
-	private int numCols;
 
-	// Find a rectangle which contains the whole target
-	private ImageRectangle boundRect = new ImageRectangle();
+	// size of square grids
+	private int outerRows,outerCols;
+	private int innerRows,innerCols;
+
 	// bounding quadrilateral
 	private Polygon2D_I32 boundPolygon = new Polygon2D_I32();
-	// graph of connected bobs
-	private List<QuadBlob> graphBlobs;
 
-	// corners on detected squares
-	FastQueue<Point2D_I32> corners = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	SquareGridTools tools = new SquareGridTools();
 
-	QuickSort_F64 sort = new QuickSort_F64();
+	// bounding polygon of inner grid
+	private Polygon2D_F64 innerPolygon = new Polygon2D_F64();
+
+	// nodes in the outer which could be the zero node
+	private List<SquareNode> outerOrigins = new ArrayList<SquareNode>();
 
 	/**
 	 * Configures chess board detector.
 	 *
 	 * @param numCols Number of columns in square grid
 	 * @param numRows Number of rows in square grid
-	 * @param minContourSize Prune blobs which have a contour with few than this number of pixels.
 	 */
-	public DetectChessSquaresBinary(int numCols, int numRows, int minContourSize)
+	public DetectChessSquaresBinary(int numCols, int numRows,
+									BinaryPolygonConvexDetector<T> detectorSquare )
 	{
-		this.numRows = numRows;
-		this.numCols = numCols;
 
 		// number of black squares in rows/columns
-		int blackCols = numCols/2 + numCols%2;
-		int blackRows = numRows/2 + numRows%2;
+		outerCols = numCols/2 + numCols%2;
+		outerRows = numRows/2 + numRows%2;
 
-		int innerCols = numCols/2;
-		int innerRows = numRows/2;
+		innerCols = numCols/2;
+		innerRows = numRows/2;
 
-		expectedBlobs = blackCols*blackRows + innerCols*innerRows;
+		this.detectorSquare = detectorSquare;
 
-		setMinimumContourSize(minContourSize);
+		s2c = new SquaresIntoClusters(1.0);
+		c2g = new ClustersIntoGrids(innerCols*innerRows);
 	}
 
 	/**
 	 * Detects chessboard in the binary image.  Square corners must be disconnected.
 	 * Returns true if a chessboard was found, false otherwise.
 	 *
+	 * @param input Original input image.
 	 * @param binary Binary image of chessboard
 	 * @return True if successful.
 	 */
-	public boolean process( ImageUInt8 binary ) {
+	public boolean process( T input , ImageUInt8 binary ) {
 		boundPolygon.vertexes.reset();
-		graphBlobs = null;
 
-		// detect blobs
-		if( !detectBlobs.process(binary) )
-			return false;
+		detectorSquare.process(input, binary);
 
-		// connect blobs
-		graphBlobs = detectBlobs.getDetected();
+		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
 
-		connect(graphBlobs);
+		List<List<SquareNode>> clusters = s2c.process(found.toList());
+		c2g.process(clusters);
+		List<SquareGrid> grids = c2g.getGrids();
 
-		// Remove all but the largest islands in the graph to reduce the number of combinations
-		graphBlobs = ConnectGridSquares.pruneSmallIslands(graphBlobs);
-		if( graphBlobs.size() != expectedBlobs ) {
-//			System.out.println("Unexpected graph size: found = "+graphBlobs.size()+" expected "+expectedBlobs);
-			return false;
+		// find inner and outer grids of squares
+		SquareGrid inner = null;
+		SquareGrid outer = null;
+
+		for (int i = 0; i < grids.size(); i++) {
+			SquareGrid g = grids.get(i);
+
+			if( (g.columns == innerCols && g.rows == innerRows) ||
+					(g.columns == innerRows && g.rows == innerCols)) {
+				if( inner != null )
+					return false;
+				inner = g;
+			} else if( (g.columns == outerCols && g.rows == outerRows) ||
+					(g.columns == outerRows && g.rows == outerCols)) {
+				if( outer != null )
+					return false;
+				outer = g;
+			}
 		}
 
-		// Examine connections
-		if( !checkGraphStructure(graphBlobs)) {
-//			System.out.println("Bad graph structure");
+		if( inner == null || outer == null )
 			return false;
+
+		// make sure the rows/columns are correctly aligned
+		if( inner.columns != innerCols ) {
+			tools.transpose(inner);
 		}
 
-		findBoundingPolygon(graphBlobs);
+		if( outer.columns != outerCols ) {
+			tools.transpose(outer);
+		}
+
+		tools.boundingPolygon(inner,innerPolygon);
+		selectSeedZero(inner,outer,innerPolygon);
+
+		// TODO align inner with outer now that a matching pair is known
+
+		// TODO create list of possible zeros again
+
+		// TODO select canonical
+
 
 		return true;
 	}
 
-
-	/**
-	 * Connect blobs together based on corner distance. If two corners are uniquely close
-	 * then connect them together.
-	 */
-	public static void connect( List<QuadBlob> blobs  )
-	{
-		for( int i = 0; i < blobs.size(); i++ ) {
-			QuadBlob a = blobs.get(i);
-
-			// A constant threshold for max distance was used before with a requirement that only one point
-			// match that criteria.  While a constant threshold is reasonable across
-			// images of different resolutions, blurred images caused problems.  They would silently fail
-			// confusing users.
-			double tol = Math.max( a.largestSide/2.0 , 10 );
-
-			if( a.corners.size() != 4 )
-				throw new RuntimeException("WTF is this doing here?");
-
-			for( int indexA = 0; indexA < 4; indexA++ ) {
-				Point2D_I32 ac = a.corners.get(indexA);
-
-//				int count = 0;
-				QuadBlob match = null;
-				double bestScore = Double.MAX_VALUE;
-
-				// find the blobs which has a corner that is the closest match to corner 'indexA'
-				for( int j = 0; j < blobs.size(); j++ ) {
-					if( j == i )
-						continue;
-
-					QuadBlob b = blobs.get(j);
-
-					// they should be about the same size
-					double sizeRatio = Math.min(a.contour.size(),b.contour.size())/(double)Math.max(a.contour.size(),b.contour.size());
-					if( sizeRatio < 0.25 )
-						continue;
-
-					for( int indexB = 0; indexB < 4; indexB++ ) {
-						Point2D_I32 bc = b.corners.get(indexB);
-
-						double d = UtilPoint2D_I32.distance(ac,bc);
-						if( d < bestScore ) {
-//							System.out.println("  Match distance = "+d+" count = "+count);
-							match = b;
-							bestScore = d;
-						}
-					}
-				}
-
-				if( match != null && bestScore < tol) {
-					// it is possible to try connecting to the same shape more than once
-					int index = a.conn.indexOf(match);
-					if( index != -1  ) {
-						// save the match with the closest distance
-						if( a.connDist.get(index) > bestScore ) {
-							a.conn.set(index,match);
-							a.connDist.data[index] = bestScore;
-							a.connIndex.data[index] = indexA;
-						}
-					} else {
-						a.conn.add(match);
-						a.connDist.add( bestScore );
-						a.connIndex.add(indexA);
-					}
-				}
-			}
-		}
-
-		// remove connections that are not mutual
-		for( int i = 0; i < blobs.size(); i++ ) {
-			QuadBlob a = blobs.get(i);
-
-			for( int j = 0; j < a.conn.size(); ) {
-				QuadBlob b = a.conn.get(j);
-				if( !b.conn.contains(a) ) {
-					a.conn.remove(j);
-					a.connDist.remove(j);
-					a.connIndex.remove(j);
-				} else {
-					j++;
-				}
-			}
-		}
-	}
-
-	/**
-	 * For targets with even sides this isn't the best.  Corners can be chopped too close.  a rectangle
-	 * should be returned instead
-	 */
-	boolean connected[] = new boolean[4];
-	List<QuadBlob> outside = new ArrayList<QuadBlob>();
-	List<Point2D_I32> points = new ArrayList<Point2D_I32>();
-	private void findBoundingPolygon(List<QuadBlob> blobs) {
-
-		outside.clear();
-		points.clear();
-
-		int x = 0,y = 0;
-		for( int i = 0; i < blobs.size(); i++ ) {
-			QuadBlob b = blobs.get(i);
-			if( b.conn.size() != 4 ) {
-				outside.add( b );
-				x += b.center.x;
-				y += b.center.y;
-			}
-		}
-
-		// center
-		x /= outside.size();
-		y /= outside.size();
-
-
-		for( int i = 0; i < outside.size(); i++ ) {
-			QuadBlob b = outside.get(i);
-
-			Arrays.fill(connected,false);
-
-			for( int j = 0; j < b.conn.size(); j++ ) {
-				connected[ b.connIndex.data[j]] = true;
-			}
-
-//			if( b.conn.size() == 2 ) {
-//				// this strategy fills out the corners in the rectangle
-//				int num = 0;
-//				Point2D_I32 p0=null,p1=null;
-//				for( int j = 0; j < 4; j++ ) {
-//					if( !connected[j] )  {
-//						if( num == 0 ) {
-//							p0 = b.corners.get(j);
-//						} else {
-//							p1 = b.corners.get(j);
-//						}
-//						num++;
-//					}
-//				}
-//
-//				int dx = p1.x - p0.x;
-//				int dy = p1.y - p0.y;
-//
-//				points.add(new Point2D_I32(p0.x - dx , p0.y - dy));
-//				points.add(new Point2D_I32(p1.x + dx , p1.y + dy));
-//			} else {
-			for( int j = 0; j < 4; j++ ) {
-				if( !connected[j] ) {
-					points.add(b.corners.get(j));
-				}
-			}
-//			}
-
-		}
-
-		int indexes[] = new int[points.size()];
-		double angles[] = new double[points.size()];
-
-		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
-			angles[i] = Math.atan2( p.y - y , p.x - x );
-		}
-
-		sort.sort(angles,points.size(),indexes);
-
-		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 b = points.get(indexes[i]);
-			boundPolygon.vertexes.grow().set(b.x,b.y);
-		}
-
-		UtilPolygons2D_I32.bounding(boundPolygon,boundRect);
-	}
-
-	/**
-	 * Counts the number of connections each node has.  If it is a legit grid
-	 * then it should have a known number of nodes with a specific number
-	 * of connections.
-	 */
-	public boolean checkGraphStructure( List<QuadBlob> blobs )
-	{
-		// make a histogram of connection counts
-		int conn[] = new int[5];
-
-		for( QuadBlob b : blobs ) {
-			conn[b.conn.size()]++;
-		}
-
-
-		if( conn[3] != 0 )
-			return false;
-
-		if( numCols == 1 && numRows == 1 ) {
-			if( conn[0] != 1 )
-				return false;
-			if( conn[1] != 0 )
-				return false;
-			if( conn[2] != 0 )
-				return false;
+	SquareNode seedOuter;
+	SquareNode seedInner;
+	private void selectSeedZero( SquareGrid gridOuter , SquareGrid gridInner , Polygon2D_F64 bounding  ) {
+		outerOrigins.clear();
+		if( gridOuter.columns == gridOuter.rows ) {
+			outerOrigins.add(gridOuter.get(0, 0));
+			checkAdd(gridOuter.get( 0,-1),outerOrigins);
+			checkAdd(gridOuter.get(-1,-1),outerOrigins);
+			checkAdd(gridOuter.get(-1, 0),outerOrigins);
 		} else {
-			if( conn[0] != 0 )
-				return false;
+			outerOrigins.add(gridOuter.get(0, 0));
+			checkAdd(gridOuter.get(-1,-1),outerOrigins);
+		}
 
-			if( numCols%2 == 1 && numRows%2 == 1 ) {
-				if( conn[1] != 4 )
-					return false;
+		SquareNode best = null;
+		int bestCorner = 0;
+		double bestDistance = Double.MAX_VALUE;
+		for (int i = 0; i < outerOrigins.size(); i++) {
+			SquareNode n = outerOrigins.get(i);
 
-				if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
-					return false;
-			} else if( numCols%2 == 1 || numRows%2 == 1 ) {
-				// can handle both cases here due to symmetry
-				if( numRows%2 == 0 ) {
-					int tmp = numRows;
-					numRows = numCols;
-					numCols = tmp;
+			double d = Double.MAX_VALUE;
+			int corner = -1;
+			for (int j = 0; j < 4; j++) {
+				double a = n.distanceSqCorner(bounding.get(j));
+				if( a < d ) {
+					corner = j;
+					d = a;
 				}
-
-				if( conn[1] != 2 )
-					return false;
-
-				if( conn[2] != (numRows-2) + 2*(numCols/2-1) )
-					return false;
-			} else if( numRows%2 == 1 ) {
-				if( conn[1] != 1 + (numCols%2) + (numRows%2) + ((numCols+numRows+1)%2) )
-					return false;
-
-				if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
-					return false;
-			} else {
-				if( conn[1] != 2 )
-					return false;
-				if( numCols == 2 || numRows == 2 ) {
-					if( conn[2] != Math.max(numCols,numRows)-2 )
-						return false;
-				} else {
-					if( conn[2] != 2*(numCols/2-1) + 2*(numRows/2-1) )
-						return false;
-				}
+			}
+			if( d < bestDistance ) {
+				best = n;
+				bestCorner = corner;
+				bestDistance = d;
 			}
 		}
 
-		if( conn[4] != expectedBlobs-conn[0]-conn[1]-conn[2] )
-			return false;
-
-		return true;
-	}
-
-	/**
-	 * Adjusts the minimum contour for a square blob
-	 *
-	 * @param minContourSize The minimum contour size. Try 10
-	 */
-	public void setMinimumContourSize( int minContourSize ) {
-		detectBlobs = new DetectQuadBlobsBinary(minContourSize,0.25,expectedBlobs);
-	}
-
-	public DetectQuadBlobsBinary getDetectBlobs() {
-		return detectBlobs;
-	}
-
-	public List<QuadBlob> getGraphBlobs() {
-		return graphBlobs;
-	}
-
-	public ImageRectangle getBoundRect() {
-		return boundRect;
-	}
-
-	public Polygon2D_I32 getBoundPolygon() {
-		return boundPolygon;
-	}
-
-	/**
-	 * Returns corners that are near a another square
-	 */
-	public List<Point2D_I32> getCandidatePoints() {
-		corners.reset();
-		for( QuadBlob b : graphBlobs ) {
-			// find point closest to each connection
-			for( QuadBlob c : b.conn ) {
-				Point2D_I32 best = null;
-				double bestDistance = Double.MAX_VALUE;
-				for( Point2D_I32 p : b.corners ) {
-					int d = p.distance2(c.center);
-					if( d < bestDistance ) {
-						bestDistance = d;
-						best = p;
-					}
-				}
-				corners.grow().set(best);
-			}
+		seedOuter = best;
+		switch( bestCorner ) {
+			case 0:seedInner = gridInner.get(0,0); break;
+			case 1:seedInner = gridInner.get(0,-1); break;
+			case 2:seedInner = gridInner.get(-1,-1); break;
+			case 3:seedInner = gridInner.get(-1,0); break;
+			default: throw new RuntimeException("Bug!");
 		}
-		return corners.toList();
 	}
+
+	private void checkAdd( SquareNode node , List<SquareNode> list ) {
+		if( !list.contains(node)) {
+			list.add(node);
+		}
+	}
+
+	boolean isAsymmetric() {
+		return innerCols == outerCols || innerRows == outerRows;
+	}
+
 }
