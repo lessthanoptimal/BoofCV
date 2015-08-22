@@ -76,6 +76,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 	 *
 	 * @param numCols Number of columns in square grid
 	 * @param numRows Number of rows in square grid
+	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
 	public DetectChessSquaresBinary(int numCols, int numRows, double maxCornerDistance ,
 									BinaryPolygonConvexDetector<T> detectorSquare )
@@ -148,7 +149,9 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 
 		// find a corner to align the two grids by
 		tools.boundingPolygon(inner, innerPolygon);
-		selectSeedZero(inner, outer, innerPolygon);
+		outerOrigins.clear();
+		listPossibleZeroNodes(outer, outerOrigins);
+		selectSeedZero(outerOrigins,inner, innerPolygon);
 		// now align the grids
 		forceToZero(seedInner, inner);
 		forceToZero(seedOuter, outer);
@@ -165,51 +168,56 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		return getCalibrationPoints(uberGrid);
 	}
 
-	private void selectSeedZero( SquareGrid gridOuter , SquareGrid gridInner , Polygon2D_F64 bounding  ) {
-		listPossibleZeroNodes(gridOuter);
+	/**
+	 * Select a node in the outer grid from the list of nodes which could be a valid origin which has corner
+	 * node in the inner grid which is the closest to one of its corners.  This pair will then be used
+	 * to align the two grids.
+	 */
+	private void selectSeedZero( List<SquareNode> listOuter, SquareGrid gridInner , Polygon2D_F64 bounding  ) {
 
+		// Find the node in the outer list with the closest corner node in the inner grid
 		SquareNode best = null;
 		int bestCorner = 0;
 		double bestDistance = Double.MAX_VALUE;
-		for (int i = 0; i < outerOrigins.size(); i++) {
-			SquareNode n = outerOrigins.get(i);
+		for (int i = 0; i < listOuter.size(); i++) {
+			SquareNode n = listOuter.get(i);
 
-			double d = Double.MAX_VALUE;
+			// go through the 4 corners in the bounding rectangle and see which one is the closest to the node
+			double closestCorner = Double.MAX_VALUE;
 			int corner = -1;
 			for (int j = 0; j < 4; j++) {
-				double a = n.distanceSqCorner(bounding.get(j));
-				if( a < d ) {
+				double distanceFromN = n.distanceSqCorner(bounding.get(j));
+				if( distanceFromN < closestCorner ) {
 					corner = j;
-					d = a;
+					closestCorner = distanceFromN;
 				}
 			}
-			if( d < bestDistance ) {
+			if( closestCorner < bestDistance ) {
 				best = n;
 				bestCorner = corner;
-				bestDistance = d;
+				bestDistance = closestCorner;
 			}
 		}
+		if( best == null )
+			throw new RuntimeException("BUG!");
 
 		seedOuter = best;
-		switch( bestCorner ) {
-			case 0:seedInner = gridInner.get( 0, 0); break;
-			case 1:seedInner = gridInner.get( 0,-1); break;
-			case 2:seedInner = gridInner.get(-1,-1); break;
-			case 3:seedInner = gridInner.get(-1, 0); break;
-			default: throw new RuntimeException("Bug!");
-		}
+		seedInner = gridInner.getCornerByIndex(bestCorner);
 	}
 
-	private void listPossibleZeroNodes(SquareGrid grid) {
-		outerOrigins.clear();
+	/**
+	 * Find all the corners which could be a valid 0 corner in the grid.  4 for square and 2 for rectanglar grid
+	 */
+	private void listPossibleZeroNodes(SquareGrid grid, List<SquareNode> list) {
+		list.clear();
 		if( grid.columns == grid.rows ) {
-			outerOrigins.add(grid.get(0, 0));
-			checkAdd(grid.get( 0,-1),outerOrigins);
-			checkAdd(grid.get(-1,-1),outerOrigins);
-			checkAdd(grid.get(-1, 0),outerOrigins);
+			list.add(grid.get(0, 0));
+			checkAdd(grid.get( 0,-1),list);
+			checkAdd(grid.get(-1,-1),list);
+			checkAdd(grid.get(-1, 0),list);
 		} else {
-			outerOrigins.add(grid.get(0, 0));
-			checkAdd(grid.get(-1,-1),outerOrigins);
+			list.add(grid.get(0, 0));
+			checkAdd(grid.get(-1,-1),list);
 		}
 	}
 
@@ -331,14 +339,13 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		return true;
 	}
 
+	/**
+	 * Adds square into the list.  Makes sure it already isn't there to avoid duplicates
+	 */
 	private void checkAdd( SquareNode node , List<SquareNode> list ) {
 		if( !list.contains(node)) {
 			list.add(node);
 		}
-	}
-
-	boolean isAsymmetric() {
-		return innerCols == outerCols || innerRows == outerRows;
 	}
 
 }

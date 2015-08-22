@@ -28,7 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -59,7 +60,7 @@ public class TestSquareGridTools {
 					alg.rotateCCW(grid);
 				}
 				alg.putIntoCanonical(grid);
-				assertTrue(grid.get(0,0).center.norm() < 1e-8);
+				assertTrue(i+" "+j,grid.get(0,0).center.norm() < 1e-8);
 			}
 		}
 	}
@@ -156,7 +157,19 @@ public class TestSquareGridTools {
 
 	@Test
 	public void boundingPolygon() {
-		fail("Implement");
+		SquareGridTools alg = new SquareGridTools();
+
+		SquareGrid grid = createGrid(2,3);
+		alg.orderSquareCorners(grid);
+
+		Polygon2D_F64 poly = new Polygon2D_F64();
+		alg.boundingPolygon(grid, poly);
+
+		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		assertTrue(poly.get(0).distance(- w / 2, -w / 2) <= 1e-8);
+		assertTrue(poly.get(1).distance( w*4 + w / 2 , - w / 2) <= 1e-8);
+		assertTrue(poly.get(2).distance( w*4 + w / 2 , w*2 + w / 2) <= 1e-8);
+		assertTrue(poly.get(3).distance( - w / 2 , w*2 + w / 2) <= 1e-8);
 	}
 
 	@Test

@@ -31,6 +31,9 @@ public class SquareGrid {
 	public int columns;
 	public int rows;
 
+	/**
+	 * Looks up the node based on its coordinate.  negative values wrap
+	 */
 	public SquareNode get( int row , int col ) {
 		if( row < 0 )
 			row = rows + row;
@@ -39,6 +42,10 @@ public class SquareGrid {
 		return nodes.get( row*columns + col );
 	}
 
+	/**
+	 * Returns the corner specified by its index.
+	 * @param index 0 to 3, inclusive
+	 */
 	public SquareNode getCornerByIndex( int index ) {
 		switch( index ) {
 			case 0: return get(0,0);
@@ -49,19 +56,22 @@ public class SquareGrid {
 		}
 	}
 
+	/**
+	 * Returns the index of the corner.  0 = (0,0), 1 = (0,w-1), 2 = (h-1,w-1), 3 = (h-1,0)
+	 */
 	public int getCornerIndex( SquareNode node ) {
 		int index = nodes.indexOf(node);
 
 		int x = index%columns;
 		int y = index/columns;
 
-		if( x == 0 && y == 0 ) {
+		if( x <= 0 && y <= 0 ) {
 			return 0;
-		} else if( x == columns-1 && y == 0 ) {
+		} else if( x > 0 && y <= 0 ) {
 			return 1;
-		} else if( x == columns-1 && y == rows-1 ) {
+		} else if( x > 0 && y > 0 ) {
 			return 2;
-		} else if( x == 0 && y == rows-1 ) {
+		} else if( x <= 0 && y > 0 ) {
 			return 3;
 		} else {
 			throw new RuntimeException("Not corner!");

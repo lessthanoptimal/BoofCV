@@ -18,29 +18,30 @@
 
 package boofcv.alg.feature.detect.squares;
 
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestSquareNode {
-	@Test
-	public void reset() {
-		SquareNode a = new SquareNode();
-
-
-
-
-		a.reset();
-		fail("implement");
-	}
 
 	@Test
 	public void distanceSqCorner() {
-		fail("implement");
+		SquareNode a = new SquareNode();
+		a.corners = new Polygon2D_F64(4);
+		a.corners.get(0).set(-2,-2);
+		a.corners.get(1).set( 2,-2);
+		a.corners.get(2).set( 2, 2);
+		a.corners.get(3).set(-2, 2);
+
+		assertEquals(0, a.distanceSqCorner(new Point2D_F64(-2, -2)), 1e-8);
+		assertEquals(0, a.distanceSqCorner(new Point2D_F64( 2, 2)),1e-8);
+		assertEquals(1, a.distanceSqCorner(new Point2D_F64(-3, 2)),1e-8);
+		assertEquals(4, a.distanceSqCorner(new Point2D_F64(-4, 2)),1e-8);
 	}
 
 	@Test

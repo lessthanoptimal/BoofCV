@@ -23,6 +23,8 @@ import boofcv.struct.image.ImageUInt8;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -114,5 +116,40 @@ public class TestDetectChessSquaresBinary {
 		}
 
 		return binary;
+	}
+
+	@Test
+	public void selectSeedZero() {
+		fail("implement");
+	}
+
+	@Test
+	public void listPossibleZeroNodes() {
+		fail("implement");
+	}
+
+	@Test
+	public void forceToZero() {
+		fail("implement");
+	}
+
+	@Test
+	public void createUber() {
+		fail("implement");
+	}
+
+	@Test
+	public void putIntoCanonical() {
+		fail("implement");
+	}
+
+	@Test
+	public void getCalibrationPoints() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkAdd() {
+		fail("implement");
 	}
 }

@@ -48,7 +48,7 @@ public class SquareGridTools {
 				SquareNode n = grid.getCornerByIndex(i);
 				double d = n.center.normSq();
 				if( d < bestDistance ) {
-					best = 0;
+					best = i;
 					bestDistance = d;
 				}
 			}
