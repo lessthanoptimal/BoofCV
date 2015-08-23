@@ -155,21 +155,68 @@ public class TestSquareGridTools {
 		}
 	}
 
-	@Test
-	public void boundingPolygon() {
+		@Test
+	public void flipColumns() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(2,3);
-		alg.orderSquareCorners(grid);
+		SquareGrid orig = copy(grid);
 
-		Polygon2D_F64 poly = new Polygon2D_F64();
+		alg.flipColumns(grid);
+
+		for (int row = 0; row < orig.rows; row++) {
+			for (int col = 0; col < orig.columns; col++) {
+				assertTrue(orig.get(row, col) == grid.get(row, orig.columns - col - 1));
+			}
+		}
+	}
+
+	@Test
+	public void boundingPolygon_rect() {
+		SquareGridTools alg = new SquareGridTools();
+
+		SquareGrid grid = createGrid(2,3);
+
+		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		alg.boundingPolygon(grid, poly);
 
 		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 		assertTrue(poly.get(0).distance(- w / 2, -w / 2) <= 1e-8);
 		assertTrue(poly.get(1).distance( w*4 + w / 2 , - w / 2) <= 1e-8);
 		assertTrue(poly.get(2).distance( w*4 + w / 2 , w*2 + w / 2) <= 1e-8);
-		assertTrue(poly.get(3).distance( - w / 2 , w*2 + w / 2) <= 1e-8);
+		assertTrue(poly.get(3).distance(-w/2, w*2 + w/2) <= 1e-8);
+	}
+
+	@Test
+	public void boundingPolygon_column() {
+		SquareGridTools alg = new SquareGridTools();
+
+		SquareGrid grid = createGrid(3,1);
+
+		Polygon2D_F64 poly = new Polygon2D_F64(4);
+		alg.boundingPolygon(grid, poly);
+
+		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		assertTrue(poly.get(0).distance(- w/2,  - w/2) <= 1e-8);
+		assertTrue(poly.get(1).distance(  w/2 , - w/2) <= 1e-8);
+		assertTrue(poly.get(2).distance(  w/2 , w*4 + w / 2) <= 1e-8);
+		assertTrue(poly.get(3).distance(- w/2 , w*4 + w / 2) <= 1e-8);
+	}
+
+		@Test
+	public void boundingPolygon_row() {
+		SquareGridTools alg = new SquareGridTools();
+
+		SquareGrid grid = createGrid(1,3);
+
+		Polygon2D_F64 poly = new Polygon2D_F64(4);
+		alg.boundingPolygon(grid, poly);
+
+		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		assertTrue(poly.get(0).distance( -w/2      , -w/2) <= 1e-8);
+		assertTrue(poly.get(1).distance( w*4 + w/2 , -w/2) <= 1e-8);
+		assertTrue(poly.get(2).distance( w*4 + w/2 ,  w/2) <= 1e-8);
+		assertTrue(poly.get(3).distance( -w/2      ,  w/2) <= 1e-8);
 	}
 
 	@Test
@@ -285,7 +332,6 @@ public class TestSquareGridTools {
 
 	public static SquareGrid copy( SquareGrid orig ) {
 		SquareGrid ret = new SquareGrid();
-		ret.nodes = new ArrayList<SquareNode>();
 		ret.nodes.addAll(orig.nodes);
 		ret.rows = orig.rows;
 		ret.columns = orig.columns;

@@ -156,7 +156,23 @@ public class SquareGridTools {
 	}
 
 	/**
-	 * Get outside corner polygon around the grid
+	 * Flips the order of columns
+	 */
+	public void flipColumns( SquareGrid grid ) {
+		tmp.clear();
+
+		for (int row = 0; row < grid.rows; row++) {
+			for (int col = 0; col < grid.columns; col++) {
+				tmp.add( grid.get(row,grid.columns-col-1));
+			}
+		}
+
+		grid.nodes.clear();
+		grid.nodes.addAll(tmp);
+	}
+
+	/**
+	 * Get outside corner polygon around the grid.  Corners
 	 */
 	public void boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
 		int w = grid.columns;
@@ -209,7 +225,6 @@ public class SquareGridTools {
 						square.vertexes.data[i] = sorted[i];
 					}
 				}
-
 			}
 		}
 
@@ -277,8 +292,8 @@ public class SquareGridTools {
 				fy = b.y-a.y;
 			}
 			// convert into x-axis slope
-			dx = -fy;
-			dy = fx;
+			dx = fy;
+			dy = -fx;
 		} else {
 			if( col == grid.columns-1 ) {
 				Point2D_F64 b = grid.get(row,col-1).center;

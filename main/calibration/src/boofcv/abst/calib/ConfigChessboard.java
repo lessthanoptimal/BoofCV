@@ -18,6 +18,7 @@
 
 package boofcv.abst.calib;
 
+import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
@@ -61,9 +62,21 @@ public class ConfigChessboard implements Configuration {
 	public double binaryAdaptiveBias = -10;
 
 	/**
+	 * Configuration for square detector
+	 */
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(4,true);
+
+	/**
 	 * Physical width of each square on the calibration target
 	 */
 	public  double squareWidth;
+
+	{
+		square.contour2Poly_splitDistanceFraction = 0.1;
+
+		square.refineWithCorners = true;
+		square.refineWithLines = false;
+	}
 
 	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {
 		this.numCols = numCols;

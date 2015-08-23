@@ -18,7 +18,10 @@
 
 package boofcv.factory.calib;
 
-import boofcv.abst.calib.*;
+import boofcv.abst.calib.ConfigChessboard;
+import boofcv.abst.calib.ConfigSquareGrid;
+import boofcv.abst.calib.PlanarDetectorChessboard;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
 
 /**
  * Creates descriptions of commonly used calibration targets
@@ -33,7 +36,7 @@ public class FactoryPlanarCalibrationTarget {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorSquareGrid(ConfigSquareGrid config) {
+	public static PlanarDetectorSquareGrid detectorSquareGrid(ConfigSquareGrid config) {
 		config.checkValidity();
 
 		return new PlanarDetectorSquareGrid(config);
@@ -47,7 +50,7 @@ public class FactoryPlanarCalibrationTarget {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarCalibrationDetector detectorChessboard( ConfigChessboard config ) {
+	public static PlanarDetectorChessboard detectorChessboard( ConfigChessboard config ) {
 		config.checkValidity();
 
 		return new PlanarDetectorChessboard(config);

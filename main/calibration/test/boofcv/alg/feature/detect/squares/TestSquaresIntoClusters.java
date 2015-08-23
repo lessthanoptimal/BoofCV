@@ -51,7 +51,7 @@ public class TestSquaresIntoClusters {
 			}
 		}
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(1.0);
+		SquaresIntoClusters alg = new SquaresIntoClusters(1.0,6);
 		List<List<SquareNode>> clusters = alg.process(squares);
 		assertEquals(2,clusters.size());
 
@@ -66,7 +66,7 @@ public class TestSquaresIntoClusters {
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		alg.computeNodeInfo(squares);
 
 		assertEquals(2, alg.nodes.size());
@@ -104,7 +104,7 @@ public class TestSquaresIntoClusters {
 			}
 		}
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(1.0);
+		SquaresIntoClusters alg = new SquaresIntoClusters(1.0,6);
 		alg.computeNodeInfo(squares);
 		alg.connectNodes();
 
@@ -125,7 +125,7 @@ public class TestSquaresIntoClusters {
 			}
 		}
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(1.0);
+		SquaresIntoClusters alg = new SquaresIntoClusters(1.0,6);
 		alg.computeNodeInfo(squares);
 		alg.connectNodes();
 
@@ -167,7 +167,7 @@ public class TestSquaresIntoClusters {
 		squares.add(new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		alg.computeNodeInfo(squares);
 		SquareNode a = alg.nodes.get(0);
 		SquareNode b = alg.nodes.get(1);
@@ -185,7 +185,7 @@ public class TestSquaresIntoClusters {
 		squares.add(new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1));
 		squares.add(new Polygon2D_F64( 2, 2, 4, 2, 4, -2, 2, -2));
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		alg.computeNodeInfo(squares);
 		SquareNode a = alg.nodes.get(0);
 		SquareNode b = alg.nodes.get(1);
@@ -203,7 +203,7 @@ public class TestSquaresIntoClusters {
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 4, 10, 4, 10, -4, 2, -4));
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		alg.computeNodeInfo(squares);
 		SquareNode a = alg.nodes.get(0);
 		SquareNode b = alg.nodes.get(1);
@@ -219,7 +219,7 @@ public class TestSquaresIntoClusters {
 		SquareNode a = new SquareNode();
 		a.corners = new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1);
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 
 		line.b.set(0,2);
 		assertEquals(0,alg.findSideIntersect(a,line,storage));
@@ -250,7 +250,7 @@ public class TestSquaresIntoClusters {
 			adj = 3;
 		}
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		for (int i = 0; i < 4; i++) {
 			assertTrue(alg.mostParallel(a, i, b, i));
 			assertTrue(alg.mostParallel(a, i, b, (i + 2) % 4));
@@ -290,7 +290,7 @@ public class TestSquaresIntoClusters {
 			UtilPolygons2D_F64.flip(b.corners);
 		}
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 
 		assertEquals(0,alg.acuteAngle(a,0,b,0),1e-8);
 		assertEquals(0,alg.acuteAngle(a,0,b,2),1e-8);
@@ -321,7 +321,7 @@ public class TestSquaresIntoClusters {
 		Point2D_F64 p2 = new Point2D_F64( 1,3);
 		Point2D_F64 p3 = new Point2D_F64( 2,3);
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(2);
+		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		double maxDistance = 1.0*alg.distanceTol;
 
 		assertTrue(alg.areMiddlePointsClose(p0,p1,p2,p3));
@@ -343,7 +343,7 @@ public class TestSquaresIntoClusters {
 		SquareNode b = new SquareNode();
 		SquareNode c = new SquareNode();
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(0.1);
+		SquaresIntoClusters alg = new SquaresIntoClusters(0.1,6);
 
 		// check case where there are no prior connection
 		alg.checkConnect(a,2,b,0,2);
@@ -395,7 +395,7 @@ public class TestSquaresIntoClusters {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(0.1);
+		SquaresIntoClusters alg = new SquaresIntoClusters(0.1,6);
 
 		alg.connect(a, 1, b, 2, 2.5);
 		SquareEdge e = a.edges[1];
@@ -413,7 +413,7 @@ public class TestSquaresIntoClusters {
 		SquareNode a = new SquareNode();
 		SquareNode b = new SquareNode();
 
-		SquaresIntoClusters alg = new SquaresIntoClusters(0.1);
+		SquaresIntoClusters alg = new SquaresIntoClusters(0.1,6);
 
 		alg.connect(a,1,b,2,2.5);
 

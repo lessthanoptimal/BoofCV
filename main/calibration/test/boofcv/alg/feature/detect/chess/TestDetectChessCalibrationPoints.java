@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,9 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -69,11 +72,14 @@ public class TestDetectChessCalibrationPoints {
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
-		DetectChessCalibrationPoints alg = new DetectChessCalibrationPoints(numCols,numRows,5,1.0,ImageFloat32.class);
+		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
+				FactoryShapeDetector.polygon(new ConfigPolygonDetector(4), ImageFloat32.class);
+		DetectChessCalibrationPoints alg =
+				new DetectChessCalibrationPoints(numCols,numRows,5,1.0,detectorSquare,ImageFloat32.class);
 
 		assertTrue(alg.process(gray));
 
-		List<Point2D_F64> found = alg.getPoints();
+		List<Point2D_F64> found = alg.getCalibrationPoints();
 		List<Point2D_F64> expected = calibrationPoints(numCols,numRows);
 
 		assertEquals(expected.size(), found.size());

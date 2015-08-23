@@ -20,9 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -35,7 +34,6 @@ import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -53,12 +51,11 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectCalibrationChessApp
 		extends SelectInputPanel implements VisualizeApp, GridCalibPanel.Listener
 
 {
-	Class<T> imageType;
-	DetectChessCalibrationPoints<T,D> alg;
+	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
 	GridCalibPanel calibGUI;
 	ImageZoomPanel gui = new ImageZoomPanel();
@@ -68,7 +65,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	// original untainted image
 	BufferedImage input;
 	// gray scale image that targets are detected inside of
-	T gray;
+	ImageFloat32 gray;
 	// feature intensity image
 	ImageFloat32 intensity = new ImageFloat32(1,1);
 
@@ -77,10 +74,9 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 	boolean processed = false;
 
-	public DetectCalibrationChessApp(Class<T> imageType) {
-		this.imageType = imageType;
+	public DetectCalibrationChessApp() {
 
-		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		gray = new ImageFloat32(1,1);
 
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
@@ -99,7 +95,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 	public void configure( int numCols , int numRows ) {
 		ConfigChessboard config = new ConfigChessboard(numCols,numRows,30);
 
-		alg = new DetectChessCalibrationPoints<T,D>(numCols,numRows,5,2,imageType);
+		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlg();
 
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
@@ -194,7 +190,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 			}
 
 			if( calibGUI.isShowNumbers() ) {
-				drawNumbers(g2, alg.getPoints(),null,1);
+				drawNumbers(g2, alg.getCalibrationPoints(),null,1);
 			}
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
@@ -207,7 +203,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		}
 
 		if( calibGUI.isShowPoints() ) {
-			List<Point2D_F64> candidates =  alg.getPoints();
+			List<Point2D_F64> candidates =  alg.getCalibrationPoints();
 			for( Point2D_F64 c : candidates ) {
 				VisualizeFeatures.drawPoint(g2, (int)(c.x+0.5), (int)(c.y+0.5), 1, Color.RED);
 			}
@@ -227,40 +223,40 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 		processed = true;
 	}
 
-	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
-
-		if( squares.size() == 0)
-			return;
-
-		g2.setStroke(new BasicStroke(2.0f));
-		for( int i = 0; i < squares.size(); i++ ) {
-			QuadBlob p = squares.get(i);
-			Point2D_I32 c = p.center;
-
-			int red = 255;
-			int green = 255*i/squares.size();
-			int blue = 255*(i%(squares.size()/2))/(squares.size()/2);
-
-			g2.setColor(new Color(red,green,blue));
-			for( QuadBlob w : p.conn ) {
-				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
-			}
-		}
-		g2.setColor(Color.RED);
-		for( int i = 0; i < squares.size(); i++ ) {
-			QuadBlob p = squares.get(i);
-			Point2D_I32 c = p.center;
-			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
-		}
-
+//	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
+//
+//		if( squares.size() == 0)
+//			return;
+//
+//		g2.setStroke(new BasicStroke(2.0f));
 //		for( int i = 0; i < squares.size(); i++ ) {
 //			QuadBlob p = squares.get(i);
-//			for( int j = 0; j < p.corners.size(); j++ ) {
-//				Point2D_I32 c = p.corners.get(j);
-//				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+//			Point2D_I32 c = p.center;
+//
+//			int red = 255;
+//			int green = 255*i/squares.size();
+//			int blue = 255*(i%(squares.size()/2))/(squares.size()/2);
+//
+//			g2.setColor(new Color(red,green,blue));
+//			for( QuadBlob w : p.conn ) {
+//				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
 //			}
 //		}
-	}
+//		g2.setColor(Color.RED);
+//		for( int i = 0; i < squares.size(); i++ ) {
+//			QuadBlob p = squares.get(i);
+//			Point2D_I32 c = p.center;
+//			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
+//		}
+//
+////		for( int i = 0; i < squares.size(); i++ ) {
+////			QuadBlob p = squares.get(i);
+////			for( int j = 0; j < p.corners.size(); j++ ) {
+////				Point2D_I32 c = p.corners.get(j);
+////				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
+////			}
+////		}
+//	}
 
 	public static void drawBounds( Graphics2D g2 , Polygon2D_I32 bounds) {
 		if( bounds.size() <= 0 )
@@ -370,7 +366,7 @@ public class DetectCalibrationChessApp<T extends ImageSingleBand, D extends Imag
 
 	public static void main(String args[]) throws FileNotFoundException {
 
-		DetectCalibrationChessApp app = new DetectCalibrationChessApp(ImageFloat32.class);
+		DetectCalibrationChessApp app = new DetectCalibrationChessApp();
 
 		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
 

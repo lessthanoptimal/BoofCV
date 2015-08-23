@@ -45,7 +45,7 @@ import java.util.List;
 public class SquaresIntoClusters {
 
 	// maximum neighbors on nearest-neighbor search
-	public static int MAX_NEIGHBORS = 6;
+	public int maxNeighbors = 6;
 
 	// tolerance for fractional distance away a point can be from a line to be considered on the line
 	double distanceTol = 0.05;
@@ -76,9 +76,11 @@ public class SquaresIntoClusters {
 	 * Declares data structures and configures algorithm
 	 *
 	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
+	 * @param maxNeighbors The maximum number of neighbors it will look at when connecting a node
 	 */
-	public SquaresIntoClusters(double spaceToSquareRatio ) {
+	public SquaresIntoClusters(double spaceToSquareRatio , int maxNeighbors ) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
+		this.maxNeighbors = maxNeighbors;
 
 		searchPoints = new FastQueue<double[]>(double[].class,true) {
 			@Override
@@ -163,6 +165,7 @@ public class SquaresIntoClusters {
 
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
+
 			double[] point = searchPoints.get(i);
 
 			// distance between center when viewed head on will be space + 0.5*2*width.
@@ -172,7 +175,7 @@ public class SquaresIntoClusters {
 
 			// find it's neighbors
 			searchResults.reset();
-			search.findNearest(point, neighborDistance*neighborDistance, MAX_NEIGHBORS + 1, searchResults);
+			search.findNearest(point, neighborDistance*neighborDistance, maxNeighbors + 1, searchResults);
 
 			// try to attach it's closest neighbors
 			for (int j = 0; j < searchResults.size(); j++) {

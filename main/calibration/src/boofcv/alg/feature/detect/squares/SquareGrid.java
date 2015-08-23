@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.squares;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SquareGrid {
-	public List<SquareNode> nodes;
+	public List<SquareNode> nodes = new ArrayList<SquareNode>();
 	public int columns;
 	public int rows;
 

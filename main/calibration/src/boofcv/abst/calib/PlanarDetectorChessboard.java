@@ -19,6 +19,8 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -35,11 +37,16 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
+	List<Point2D_F64> detected;
 
 	public PlanarDetectorChessboard(ConfigChessboard config) {
+
+		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
+				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
+
 		alg = new DetectChessCalibrationPoints<ImageFloat32, ImageFloat32>(
 				config.numCols,config.numRows,config.nonmaxRadius,
-				config.relativeSizeThreshold,ImageFloat32.class);
+				config.relativeSizeThreshold,detectorSquare,ImageFloat32.class);
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
 		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
@@ -49,13 +56,21 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
 	@Override
 	public boolean process(ImageFloat32 input) {
-		return alg.process(input);
+		if( alg.process(input) )  {
+			detected = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> found = alg.getCalibrationPoints();
+			for (int i = 0; i < found.size(); i++) {
+				detected.add( found.get(i).copy() );
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public List<Point2D_F64> getDetectedPoints() {
-		// points should be at sub-pixel accuracy and in the correct orientation
-		return alg.getPoints();
+		return detected;
 	}
 
 	@Override

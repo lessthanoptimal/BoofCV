@@ -22,18 +22,19 @@ import boofcv.alg.feature.detect.squares.*;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.UtilPolygons2D_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Given a binary image it detects the presence of chess board calibration grids. 1) Detect blobs
- * in binary image and select square like ones. 2) Connect blobs based distance of corners. 3)
- * prune graph. 4) sanity check graph structure. 5) Find bounding quadrilateral.
+ * in binary image and select square like ones. 2) Create two grids, inner and outer, 3) Put the
+ * grids together, 4) extract initial estimate for corners
  *
  * @author Peter Abeles
  */
@@ -56,11 +57,9 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 	SquareGridTools tools = new SquareGridTools();
 
 	// bounding polygon of inner grid
-	private Polygon2D_F64 innerPolygon = new Polygon2D_F64();
+	private Polygon2D_F64 innerPolygon = new Polygon2D_F64(4);
 
-	// nodes in the outer which could be the zero node
-	private List<SquareNode> outerOrigins = new ArrayList<SquareNode>();
-
+	// The chessboard grid.  Combination of inner and outer grids
 	SquareGrid uberGrid = new SquareGrid();
 
 	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
@@ -70,6 +69,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 
 	// storage for the nodes which are used to align the two grids
 	SquareNode seedInner,seedOuter;
+	double seedScore;
 
 	/**
 	 * Configures chess board detector.
@@ -92,7 +92,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(1.0);
+		s2c = new SquaresIntoClusters(1.0,20);
 		c2g = new ClustersIntoGrids(innerCols*innerRows);
 	}
 
@@ -112,6 +112,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
 
 		List<List<SquareNode>> clusters = s2c.process(found.toList());
+
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids();
 
@@ -122,15 +123,11 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
 
-			if( (g.columns == innerCols && g.rows == innerRows) ||
-					(g.columns == innerRows && g.rows == innerCols)) {
-				if( inner != null )
-					return false;
+			if( inner == null && ((g.columns == innerCols && g.rows == innerRows) ||
+					(g.columns == innerRows && g.rows == innerCols))) {
 				inner = g;
-			} else if( (g.columns == outerCols && g.rows == outerRows) ||
-					(g.columns == outerRows && g.rows == outerCols)) {
-				if( outer != null )
-					return false;
+			} else if( outer == null && ((g.columns == outerCols && g.rows == outerRows) ||
+					(g.columns == outerRows && g.rows == outerCols))) {
 				outer = g;
 			}
 		}
@@ -147,99 +144,136 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 			tools.transpose(outer);
 		}
 
+		// make sure the grids are in counter clockwise order
+		if( tools.checkFlip(inner)) {
+			tools.flipRows(inner);
+		}
+		if( tools.checkFlip(outer)) {
+			tools.flipRows(outer);
+		}
+
 		// find a corner to align the two grids by
 		tools.boundingPolygon(inner, innerPolygon);
-		outerOrigins.clear();
-		listPossibleZeroNodes(outer, outerOrigins);
-		selectSeedZero(outerOrigins,inner, innerPolygon);
-		// now align the grids
+		selectZeroSeed(inner, outer, innerPolygon);
+		// now align the two grids with adjacent zeros
 		forceToZero(seedInner, inner);
 		forceToZero(seedOuter, outer);
 
 		// create one big grid for easier processing
-		createUber(outer, inner, uberGrid);
+		createUber(inner, outer, uberGrid);
 
 		// put it into canonical order
-		putIntoCanonical(uberGrid,inner,outer);
-		tools.orderSquareCorners(inner);
-		tools.orderSquareCorners(outer);
+		putIntoCanonical(uberGrid);
+		orderUberCorners(uberGrid);
 
 		// now extract the calibration points
-		return getCalibrationPoints(uberGrid);
+		return computeCalibrationPoints(uberGrid);
 	}
 
 	/**
-	 * Select a node in the outer grid from the list of nodes which could be a valid origin which has corner
-	 * node in the inner grid which is the closest to one of its corners.  This pair will then be used
-	 * to align the two grids.
+	 * Find all the corners which could be a valid 0 corner in the grid.  4 for square and 2 for rectangular grid
+	 *
+	 * grids must be in CCW order
 	 */
-	private void selectSeedZero( List<SquareNode> listOuter, SquareGrid gridInner , Polygon2D_F64 bounding  ) {
-
-		// Find the node in the outer list with the closest corner node in the inner grid
-		SquareNode best = null;
-		int bestCorner = 0;
-		double bestDistance = Double.MAX_VALUE;
-		for (int i = 0; i < listOuter.size(); i++) {
-			SquareNode n = listOuter.get(i);
-
-			// go through the 4 corners in the bounding rectangle and see which one is the closest to the node
-			double closestCorner = Double.MAX_VALUE;
-			int corner = -1;
-			for (int j = 0; j < 4; j++) {
-				double distanceFromN = n.distanceSqCorner(bounding.get(j));
-				if( distanceFromN < closestCorner ) {
-					corner = j;
-					closestCorner = distanceFromN;
-				}
-			}
-			if( closestCorner < bestDistance ) {
-				best = n;
-				bestCorner = corner;
-				bestDistance = closestCorner;
+	void selectZeroSeed(SquareGrid inner, SquareGrid outer, Polygon2D_F64 innerBounding) {
+		if( outer.nodes.size() == 1 ) {
+			seedInner = inner.get(0,0);
+			seedOuter = outer.get(0, 0);
+		} else {
+			seedScore = Double.MAX_VALUE;
+			seedInner = seedOuter = null;
+			if (outer.columns == outer.rows) {
+				checkZeroSeed(0, outer, inner, innerBounding);
+				checkZeroSeed(1, outer, inner, innerBounding);
+				checkZeroSeed(2, outer, inner, innerBounding);
+				checkZeroSeed(3, outer, inner, innerBounding);
+			} else {
+				checkZeroSeed(0, outer, inner, innerBounding);
+				checkZeroSeed(2, outer, inner, innerBounding);
 			}
 		}
-		if( best == null )
+		if( seedInner == null )
 			throw new RuntimeException("BUG!");
-
-		seedOuter = best;
-		seedInner = gridInner.getCornerByIndex(bestCorner);
 	}
 
 	/**
-	 * Find all the corners which could be a valid 0 corner in the grid.  4 for square and 2 for rectanglar grid
+	 * Looks to see if there is a good match to the specified corner in the inner grid.  If so it then
+	 * sees if it beats the previously best zero seed pair
 	 */
-	private void listPossibleZeroNodes(SquareGrid grid, List<SquareNode> list) {
-		list.clear();
-		if( grid.columns == grid.rows ) {
-			list.add(grid.get(0, 0));
-			checkAdd(grid.get( 0,-1),list);
-			checkAdd(grid.get(-1,-1),list);
-			checkAdd(grid.get(-1, 0),list);
+	void checkZeroSeed( int outerCorner ,
+						SquareGrid outer ,
+						SquareGrid inner , Polygon2D_F64 innerBounding ) {
+		SquareNode outerN = outer.getCornerByIndex(outerCorner);
+		Point2D_F64 c = outerN.center;
+
+		double bestDistance = Double.MAX_VALUE;
+		SquareNode best = null;
+
+		// find the closest valid inner corner
+		for (int i = 0; i < 4; i++) {
+			// if inner is rectangular the only two can be seeds
+			if( inner.columns != inner.rows ) {
+				if( i == 1 || i ==3 )
+					continue;
+			}
+			double d = innerBounding.get(i).distance2(c);
+
+			if( d < bestDistance ) {
+				best = inner.getCornerByIndex(i);
+				bestDistance = d;
+			}
+		}
+
+		Point2D_F64 nextCorner = outer.getCornerByIndex((outerCorner + 1)%4).center;
+		boolean ccw;
+		// special case with only two "corners" and the next corner isn't in the expected location
+		if( nextCorner == c ) {
+			nextCorner = outer.getCornerByIndex((outerCorner + 2)%4).center;
+			ccw = isVectorsCCW(c,best.center,nextCorner);
 		} else {
-			list.add(grid.get(0, 0));
-			checkAdd(grid.get(-1,-1),list);
+			ccw = isVectorsCCW(c,nextCorner,best.center);
+		}
+
+		if( ccw ) {
+			if( seedScore > bestDistance ) {
+				seedScore = bestDistance;
+				seedInner = best;
+				seedOuter = outerN;
+			}
 		}
 	}
 
 	/**
 	 * Rotates or flips the grid until the specified node is the zero index node
 	 */
-	private void forceToZero( SquareNode zero , SquareGrid grid) {
+	void forceToZero( SquareNode zero , SquareGrid grid) {
 
 		int cornerIndex = grid.getCornerIndex(zero);
 
 		if( cornerIndex != 0 ) {
-			if( grid.rows == grid.columns ) {
-				tools.reverse(grid);
+			if( grid.rows != grid.columns ) {
+				int corner = grid.getCornerIndex(zero);
+				switch( corner ) {
+					case 1:tools.flipColumns(grid);break;
+					case 2:tools.reverse(grid);break;
+					case 3:tools.flipRows(grid);break;
+				}
 			} else {
 				for (int i = 0; i < cornerIndex; i++) {
 					tools.rotateCCW(grid);
 				}
 			}
 		}
+		if( grid.get(0,0) != zero )
+			throw new RuntimeException("BUG!");
 	}
 
-	private void createUber( SquareGrid outer , SquareGrid inner , SquareGrid uber ) {
+	/**
+	 * Given the inner and outer grids create the "uber" grid.  Its a full chessboard pattern with null
+	 * where there are no squares
+	 *
+	 */
+	static void createUber(SquareGrid inner, SquareGrid outer, SquareGrid uber) {
 		uber.columns = outer.columns + inner.columns;
 		uber.rows = outer.rows + inner.rows;
 		uber.nodes.clear();
@@ -253,24 +287,43 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 						uber.nodes.add(null);
 				}
 			} else {
-				if( row % 2 == 0 ) {
-					for (int col = 0; col < uber.columns; col++) {
-						if( col % 2 == 1 )
-							uber.nodes.add(inner.get(row/2,col/2));
-						else
-							uber.nodes.add(null);
-					}
+				for (int col = 0; col < uber.columns; col++) {
+					if( col % 2 == 1 )
+						uber.nodes.add(inner.get(row/2,col/2));
+					else
+						uber.nodes.add(null);
 				}
 			}
 		}
 	}
 
-	private void putIntoCanonical( SquareGrid uber , SquareGrid inner , SquareGrid outer ) {
+	/**
+	 * Checks to see if a->b and a->c is CCW
+	 */
+	public boolean isVectorsCCW(Point2D_F64 a, Point2D_F64 b, Point2D_F64 c ) {
+
+		double angleAB = Math.atan2( b.y-a.y, b.x-a.x);
+		double angleAC = Math.atan2( c.y-a.y, c.x-a.x);
+
+		return UtilAngle.distanceCCW(angleAB, angleAC) < Math.PI/2;
+	}
+
+
+
+	/**
+	 * Examines the uber grid and makes sure the 0 square is the closest one ot the top left corner.
+	 * The current 0 node in uber is assumed to be a legit zero node and possible solution.  Any
+	 * modification it makes to uber is also done to the inner and outer grids, which uber
+	 * was derived from
+	 */
+	void putIntoCanonical( SquareGrid uber ) {
 
 		boolean rowOdd = uber.rows%2 == 1;
 		boolean colOdd = uber.columns%2 == 1;
 
 		if( rowOdd == colOdd ) {
+			// if odd and square then 4 solutions.  Otherwise just two solution that are on
+			// opposite sides on the grid
 			if( rowOdd && uber.rows == uber.columns ) {
 				int best = -1;
 				double bestDistance = Double.MAX_VALUE;
@@ -278,15 +331,13 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 					SquareNode n = uber.getCornerByIndex(i);
 					double d = n.center.normSq();
 					if( d < bestDistance ) {
-						best = 0;
+						best = i;
 						bestDistance = d;
 					}
 				}
 
 				for (int i = 0; i < best; i++) {
 					tools.rotateCCW(uber);
-					tools.rotateCCW(inner);
-					tools.rotateCCW(outer);
 				}
 			} else {
 				double first = uber.get(0,0).center.normSq();
@@ -294,20 +345,113 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 
 				if( last < first ) {
 					tools.reverse(uber);
-					tools.reverse(inner);
-					tools.reverse(outer);
 				}
 			}
 		}
+		// if only one is odd then there is a unique solution.  Since uber is already in a legit
+		// configuration nothing needs ot be done
 	}
 
-	private boolean getCalibrationPoints( SquareGrid uber ) {
+	/**
+	 * Adjust the corners in the square's polygon so that they are aligned along the grids overall
+	 * length
+	 *
+	 * @return true if valid grid or false if not
+	 */
+	static boolean orderUberCorners(SquareGrid grid) {
+
+		// the first pass interleaves every other row
+		for (int row = 0; row < grid.rows; row++) {
+
+			for (int col = row%2; col < grid.columns; col += 2) {
+				SquareNode n = grid.get(row,col);
+
+				boolean ordered = false;
+				for (int diag = 0; diag < 4; diag++) {
+					SquareNode d = getDiag(grid,row,col,diag);
+					if( d != null ) {
+						orderCorner(n,d.center,diag);
+						ordered = true;
+					}
+				}
+
+				if( !ordered )
+					throw new IllegalArgumentException("BUG!");
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Ensures that the nodes in square are in CCW order and that the closest one to 'target' has
+	 * the index 'diag'
+	 */
+	static void orderCorner( SquareNode node , Point2D_F64 target , int diag ) {
+
+		// make sure it goes CCW
+		if( !node.corners.isCCW() )
+			node.corners.flip();
+
+		// see which corner is the closest
+		double closestDistance = Double.MAX_VALUE;
+		int closest = -1;
+		for (int i = 0; i < 4; i++) {
+			double d = target.distance2(node.corners.get(i));
+			if( d < closestDistance ) {
+				closestDistance = d;
+				closest = i;
+			}
+		}
+		// rotate it until its at the specified diagonal
+		int numRotate = diag-closest;
+		if( numRotate < 0 )
+			numRotate = 4 + numRotate;
+
+		for (int i = 0; i < numRotate; i++) {
+			UtilPolygons2D_F64.shiftDown(node.corners);
+		}
+
+	}
+
+	/**
+	 * Returns the node diagonal to the specified coordinate.  If it goes outside the grid then nul
+	 * is returned
+	 */
+	static SquareNode getDiag( SquareGrid grid , int row , int col , int diag ) {
+		int dx=0,dy=0;
+		switch( diag ) {
+			case 0: dx = -1; dy = -1; break;
+			case 1: dx =  1; dy = -1; break;
+			case 2: dx =  1; dy =  1; break;
+			case 3: dx = -1; dy =  1; break;
+		}
+
+		int y = row + dy;
+		int x = col + dx;
+
+		if( y < 0 || y >= grid.rows )
+			return null;
+		if( x < 0 || x >= grid.columns )
+			return null;
+		return grid.get(y,x);
+	}
+
+
+	/**
+	 * Extracts calibration points from the uber grid.  Calibration points are created from
+	 * the inner corners in the chessboard.  Each point is computed from equivalent corners from
+	 * two squares by averaging.
+	 *
+	 * Also checks to see if the two equivalent corners are close to each other.  If one is too far
+	 * away false is returned.
+	 */
+	boolean computeCalibrationPoints(SquareGrid uber) {
 		calibrationPoints.reset();
 
 		for (int row = 1; row < uber.rows; row++) {
 			for (int col = row%2; col < uber.columns; col += 2) {
-				SquareNode n = uber.get(row,col);
-				Point2D_F64 p = calibrationPoints.grow();
+				SquareNode n = uber.get(row, col);
 				int left = col-1;
 				int right = col+1;
 
@@ -319,10 +463,11 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 						return false;
 					}
 
+					Point2D_F64 p = calibrationPoints.grow();
 					p.x = (a.x+b.x)/2.0;
 					p.y = (a.y+b.y)/2.0;
 				}
-				if( right >= 0 ) {
+				if( right < uber.columns ) {
 					Point2D_F64 a = uber.get(row-1,right).corners.get(3);
 					Point2D_F64 b = n.corners.get(1);
 
@@ -330,6 +475,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 						return false;
 					}
 
+					Point2D_F64 p = calibrationPoints.grow();
 					p.x = (a.x+b.x)/2.0;
 					p.y = (a.y+b.y)/2.0;
 				}
@@ -339,13 +485,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		return true;
 	}
 
-	/**
-	 * Adds square into the list.  Makes sure it already isn't there to avoid duplicates
-	 */
-	private void checkAdd( SquareNode node , List<SquareNode> list ) {
-		if( !list.contains(node)) {
-			list.add(node);
-		}
+	public FastQueue<Point2D_F64> getCalibrationPoints() {
+		return calibrationPoints;
 	}
-
 }

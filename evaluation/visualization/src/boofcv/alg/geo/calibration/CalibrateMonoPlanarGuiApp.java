@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.CalibrateMonoPlanar;
-import boofcv.abst.calib.ConfigSquareGrid;
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
@@ -197,20 +197,20 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		PlanarCalibrationDetector detector =
-				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
-//				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
+				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
 
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
 //		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
-		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
 //		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 //		app.configure(detector,BoofMiscOps.directoryList(directory, "frame" ),2,false);
-//		app.configure(detector,BoofMiscOps.directoryList(directory, "left" ),2,false);
-		app.configure(detector,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
+		app.configure(detector,BoofMiscOps.directoryList(directory, "left" ),2,false);
+//		app.configure(detector,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);
