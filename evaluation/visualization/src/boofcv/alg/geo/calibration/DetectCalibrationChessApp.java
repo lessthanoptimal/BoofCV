@@ -22,7 +22,6 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
@@ -31,7 +30,6 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.image.ConvertBufferedImage;
@@ -69,8 +67,6 @@ public class DetectCalibrationChessApp
 	BufferedImage input;
 	// gray scale image that targets are detected inside of
 	ImageFloat32 gray;
-	// feature intensity image
-	ImageFloat32 intensity = new ImageFloat32(1,1);
 
 	// if a target was found or not
 	boolean foundTarget;
@@ -85,12 +81,11 @@ public class DetectCalibrationChessApp
 		panel.setLayout( new BorderLayout());
 
 		calibGUI = new GridCalibPanel(true);
-		calibGUI.addView("Feature");
 		calibGUI.setListener( this );
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 
-		panel.add(gui,BorderLayout.CENTER);
-		panel.add(calibGUI,BorderLayout.WEST);
+		panel.add(gui, BorderLayout.CENTER);
+		panel.add(calibGUI, BorderLayout.WEST);
 
 		setMainGUI(panel);
 	}
@@ -131,17 +126,15 @@ public class DetectCalibrationChessApp
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 
-		configure(numCols,numRows);
+		configure(numCols, numRows);
 	}
 
 	public synchronized void process( final BufferedImage input ) {
 		this.input = input;
 		workImage = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
 
-		gray.reshape(input.getWidth(),input.getHeight());
+		gray.reshape(input.getWidth(), input.getHeight());
 		ConvertBufferedImage.convertFrom(input, gray, true);
-
-		intensity.reshape(gray.width,gray.height);
 
 		detectTarget();
 
@@ -165,7 +158,7 @@ public class DetectCalibrationChessApp
 	private synchronized void renderOutput() {
 		switch( calibGUI.getSelectedView() ) {
 			case 0:
-				workImage.createGraphics().drawImage(input,null,null);
+				workImage.createGraphics().drawImage(input, null, null);
 				break;
 
 			case 1:
@@ -174,12 +167,6 @@ public class DetectCalibrationChessApp
 
 			case 2:
 				renderClusters();
-				break;
-
-			case 3:
-				alg.renderIntensity(intensity);
-				float max = ImageStatistics.maxAbs(intensity);
-				VisualizeImageData.colorizeSign(intensity,workImage,max);
 				break;
 
 			default:

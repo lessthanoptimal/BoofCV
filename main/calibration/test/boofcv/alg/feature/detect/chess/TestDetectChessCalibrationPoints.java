@@ -78,7 +78,7 @@ public class TestDetectChessCalibrationPoints {
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
 		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numCols,numRows,5,1.0,detectorSquare,ImageFloat32.class);
+				new DetectChessboardFiducial(numCols,numRows,detectorSquare,ImageFloat32.class);
 
 		assertTrue(alg.process(gray));
 
@@ -92,7 +92,7 @@ public class TestDetectChessCalibrationPoints {
 			Point2D_F64 e = expected.get(i);
 			Point2D_F64 f = found.get(i);
 
-			assertEquals("i = " + i, e.x, f.x, 2);
+			assertEquals("i = " + i,e.x,f.x,2);
 			assertEquals("i = " + i,e.y,f.y,2);
 		}
 	}

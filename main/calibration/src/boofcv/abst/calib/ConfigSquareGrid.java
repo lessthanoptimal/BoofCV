@@ -63,10 +63,16 @@ public class ConfigSquareGrid implements Configuration {
 	public double spaceWidth;
 
 	{
-		square.contour2Poly_splitDistanceFraction = 0.1;
+		square.contour2Poly_splitDistanceFraction = 0.05;
 
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
+
+		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
+		// very crude corners
+		square.configRefineCorners.lineSamples = 10;
+		square.configRefineCorners.convergeTolPixels = 0.2;
+		square.configRefineCorners.maxIterations = 5;
 	}
 
 	public ConfigSquareGrid(int numCols, int numRows, double squareWidth, double spaceWidth) {

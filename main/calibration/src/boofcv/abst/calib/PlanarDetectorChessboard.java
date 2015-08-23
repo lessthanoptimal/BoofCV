@@ -45,8 +45,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
 
 		alg = new DetectChessboardFiducial<ImageFloat32, ImageFloat32>(
-				config.numCols,config.numRows,config.nonmaxRadius,
-				config.relativeSizeThreshold,detectorSquare,ImageFloat32.class);
+				config.numCols,config.numRows,detectorSquare,ImageFloat32.class);
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
 		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);

@@ -18,35 +18,22 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.filter.derivative.DerivativeType;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
-import boofcv.misc.BoofMiscOps;
-import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Rectangle2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
 /**
  * <p>
- * Detects calibration points inside a chessboard calibration target.  The first processing step is to find the
- * calibration points quickly using a binary image square detector.  The those initial points are used to seed
- * a mean-shift sub-pixel algorithm.
+ * Detects calibration points inside a chessboard calibration target.  The image is first the image
+ * is thresholded to create a binary image for square detection, then the binary image is eroded to make sure
+ * the squares don't touch.  After that {@link DetectChessSquarePoints} is called and it detects and sorts
+ * the squares.
  * </p>
  * <p>
  * The found control points are ensured to be returned in a row-major format with the correct number of rows and columns,
@@ -58,12 +45,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectChessboardFiducial<T extends ImageSingleBand, D extends ImageSingleBand> {
-	// stores image derivative
-	private D derivX;
-	private D derivY;
-
-	// radius of the feature being detected
-	private int radius;
 
 	// detects the chess board 
 	private DetectChessSquarePoints<T> findSeeds;
@@ -76,21 +57,8 @@ public class DetectChessboardFiducial<T extends ImageSingleBand, D extends Image
 	private int userAdaptiveRadius = 20;
 	private double userAdaptiveBias = -10;
 
-	// point detection algorithms
-	private GeneralFeatureIntensity<T, D> intensityAlg;
 
-	// rectangle the target is contained inside of
-	private ImageRectangle targetRect = new ImageRectangle();
-	private Rectangle2D_F64 rect_F64 = new Rectangle2D_F64();
-
-	// true if it found the rectangular bound
-	private boolean foundBound;
-
-	// local search algorithm for peaks in corner intensity image
-	private SearchLocalPeak<ImageFloat32> localPeak =
-			FactorySearchLocalPeak.meanShiftUniform(10, 1e-4f,ImageFloat32.class);
-
-	// work space for thresholding
+	// work space for binary images
 	private T work1;
 	private T work2;
 
@@ -99,32 +67,18 @@ public class DetectChessboardFiducial<T extends ImageSingleBand, D extends Image
 	 *
 	 * @param numCols       Number of columns in the grid.  Target dependent.
 	 * @param numRows       Number of rows in the grid.  Target dependent.
-	 * @param radius        Side of interest point detection region.  Typically 5
-	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @param imageType     Type of image being processed
 	 */
-	public DetectChessboardFiducial(int numCols, int numRows, int radius,
-									double relativeSizeThreshold, // TODo remove or re-active this threshold?
+	public DetectChessboardFiducial(int numCols, int numRows,
 									BinaryPolygonConvexDetector<T> detectorSquare,
 									Class<T> imageType) {
-		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		this.radius = radius;
 
 		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		work2 = GeneralizedImageOps.createSingleBand(imageType,1,1);
-
-		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-
-		intensityAlg = FactoryIntensityPoint.shiTomasi(radius, true, derivType);
-//		intensityAlg = FactoryIntensityPoint.harris(radius,0.04f,true,derivType);
+		work2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		// minContourSize is specified later after the image's size is known
 		// TODO make separation configurable?
 		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,4, detectorSquare);
-
-		localPeak.setSearchRadius(2);
 
 		reset();
 	}
@@ -139,42 +93,6 @@ public class DetectChessboardFiducial<T extends ImageSingleBand, D extends Image
 		binary.reshape(gray.width, gray.height);
 		eroded.reshape(gray.width, gray.height);
 
-
-		// detect the chess board
-		if (!(foundBound = detectChessBoard(gray)))
-			return false;
-
-		FastQueue<Point2D_F64> seeds = findSeeds.getCalibrationPoints();
-		UtilPoint2D_F64.bounding(seeds.toList(),rect_F64);
-
-		int buffer = radius*3;
-		targetRect.x0 = (int)(rect_F64.p0.x-buffer);
-		targetRect.y0 = (int)(rect_F64.p0.y-buffer);
-		targetRect.x1 = (int)(rect_F64.p1.x+buffer);
-		targetRect.y1 = (int)(rect_F64.p1.y+buffer);
-		BoofMiscOps.boundRectangleInside(gray,targetRect);
-
-		T subGray = (T) gray.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
-		derivX.reshape(subGray.width, subGray.height);
-		derivY.reshape(subGray.width, subGray.height);
-
-		// extended border to avoid false positives
-		GImageDerivativeOps.gradient(DerivativeType.SOBEL,subGray, derivX, derivY, BorderType.EXTENDED);
-
-		// Compute interest point intensity
-		intensityAlg.process(subGray, derivX, derivY, null, null, null);
-
-		// use mean-shift to get a more accurate estimate using corner intensity image
-		meanShiftBlobCorners(seeds.toList(),intensityAlg.getIntensity(),targetRect);
-
-		return true;
-	}
-
-	/**
-	 * Threshold the image and find squares
-	 */
-	private boolean detectChessBoard(T gray ) {
-
 		if( userBinaryThreshold <= 0 ) {
 			work1.reshape(gray.width,gray.height);
 			work2.reshape(gray.width,gray.height);
@@ -186,34 +104,9 @@ public class DetectChessboardFiducial<T extends ImageSingleBand, D extends Image
 		// erode to make the squares separated
 		BinaryImageOps.erode8(binary, 1, eroded);
 
-		return findSeeds.process(gray,eroded);
+		return findSeeds.process(gray, eroded);
 	}
 
-	private void meanShiftBlobCorners( List<Point2D_F64> seeds , ImageFloat32 intensity , ImageRectangle rect ) {
-		localPeak.setImage(intensity);
-		for( int i = 0; i < seeds.size(); i++ ) {
-			Point2D_F64 c = seeds.get(i);
-			localPeak.search((float)c.x - rect.x0, (float)c.y - rect.y0);
-			c.x = localPeak.getPeakX() + rect.x0;
-			c.y = localPeak.getPeakY() + rect.y0;
-		}
-	}
-
-	/**
-	 * Only part of the image is processed when detecting features.  This copies the detected part into
-	 * the provided image
-	 *
-	 * @param wholeImage Image being written to
-	 */
-	public void renderIntensity(ImageFloat32 wholeImage) {
-		if( targetRect == null ) {
-			ImageMiscOps.fill(wholeImage,0);
-		} else {
-			ImageFloat32 found = intensityAlg.getIntensity();
-			ImageFloat32 out = wholeImage.subimage(targetRect.x0, targetRect.y0, targetRect.x1, targetRect.y1);
-			out.setTo(found);
-		}
-	}
 	public DetectChessSquarePoints getFindSeeds() {
 		return findSeeds;
 	}
@@ -248,9 +141,5 @@ public class DetectChessboardFiducial<T extends ImageSingleBand, D extends Image
 
 	public void setUserAdaptiveBias(double userAdaptiveBias) {
 		this.userAdaptiveBias = userAdaptiveBias;
-	}
-
-	public boolean isFoundBound() {
-		return foundBound;
 	}
 }
