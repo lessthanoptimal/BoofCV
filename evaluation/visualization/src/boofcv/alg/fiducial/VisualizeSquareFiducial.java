@@ -83,7 +83,7 @@ public class VisualizeSquareFiducial {
 		}
 
 		BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderBinary(detector.getSquareDetector().getBinary(), false, output);
+		VisualizeBinaryData.renderBinary(detector.getBinary(), false, output);
 		Graphics2D g2 = output.createGraphics();
 		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setColor(Color.RED);
@@ -134,7 +134,7 @@ public class VisualizeSquareFiducial {
 		public List<ImageFloat32> squares = new ArrayList<ImageFloat32>();
 
 		protected Detector() {
-			super(FactoryShapeDetector.polygon(inputToBinary, new ConfigPolygonDetector(4,false), ImageFloat32.class),
+			super(VisualizeSquareFiducial.inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4), ImageFloat32.class),
 					200,ImageFloat32.class);
 		}
 

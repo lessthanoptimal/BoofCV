@@ -364,8 +364,8 @@ public class TestBaseDetectFiducialSquare {
 		public List<ImageFloat32> detected = new ArrayList<ImageFloat32>();
 
 		protected Dummy() {
-			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					new ConfigPolygonDetector(4,false),ImageUInt8.class),100, ImageUInt8.class);
+			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4),ImageUInt8.class),100, ImageUInt8.class);
 		}
 
 		@Override
@@ -380,8 +380,8 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	public static class DetectCorner extends BaseDetectFiducialSquare<ImageUInt8> {
 		protected DetectCorner() {
-			super(FactoryShapeDetector.polygon(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
-					new ConfigPolygonDetector(4,false),ImageUInt8.class),100, ImageUInt8.class);
+			super(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4),ImageUInt8.class),100, ImageUInt8.class);
 		}
 
 		@Override

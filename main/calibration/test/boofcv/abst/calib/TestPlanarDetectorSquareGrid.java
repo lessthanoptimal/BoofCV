@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -35,9 +36,6 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 
 	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 5, 30,30);
 
-	{
-		config.relativeSizeThreshold = 0.6;
-	}
 
 	@Test
 	public void createLayout() {
@@ -57,7 +55,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 	}
 
 	@Override
-	public void renderTarget(ImageFloat32 original, List<Point2D_F64> points) {
+	public void renderTarget(ImageFloat32 original, List<List<Point2D_F64>> solutions) {
 		ImageMiscOps.fill(original, 255);
 
 		int square = original.getWidth() / (Math.max(config.numCols, config.numRows) + 4);
@@ -80,6 +78,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 		int pointsRow = config.numRows+1;
 		int pointsCol = config.numCols+1;
 
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
 		for (int i = 0; i < pointsRow; i++) {
 			for (int j = 0; j < pointsCol; j++) {
 				double y = y0 + i*square;
@@ -87,7 +86,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 				points.add(new Point2D_F64(x, y));
 			}
 		}
-
+		solutions.add(points);
 	}
 
 	@Override

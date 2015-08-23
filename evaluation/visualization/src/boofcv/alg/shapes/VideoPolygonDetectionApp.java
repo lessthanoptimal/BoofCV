@@ -67,8 +67,10 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 	ImagePanel panel = new ImagePanel();
 
 	I gray;
+	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	BinaryPolygonConvexDetector<I> detector;
+	InputToBinary<I> inputToBinary;
 
 	IntrinsicParameters intrinsic;
 
@@ -112,10 +114,10 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		config.refineWithLines = true;
 		config.refineWithCorners = false;
 
-//		InputToBinary<I> inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
-		InputToBinary<I> inputToBinary = FactoryThresholdBinary.globalOtsu(0, 256, true, imageType);
+//		inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
+		inputToBinary = FactoryThresholdBinary.globalOtsu(0, 256, true, imageType);
 
-		detector = FactoryShapeDetector.polygon(inputToBinary,config,imageType);
+		detector = FactoryShapeDetector.polygon(config,imageType);
 	}
 
 	@Override
@@ -157,7 +159,8 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 	protected void updateAlg(MultiSpectral<I> frame, BufferedImage buffImage) {
 
 		GConvertImage.average(frame,gray);
-		detector.process(gray);
+		inputToBinary.process(gray,binary);
+		detector.process(gray,binary);
 
 		// frame 212 it isn't detecting a square
 		System.out.println(count+"  detected "+detector.getFound().size);
@@ -210,6 +213,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
 
 		gray.reshape(intrinsic.width,intrinsic.height);
+		binary.reshape(intrinsic.width,intrinsic.height);
 
 		this.pointUndistToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);
 

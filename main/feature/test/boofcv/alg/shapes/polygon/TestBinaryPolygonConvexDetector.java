@@ -60,15 +60,19 @@ public class TestBinaryPolygonConvexDetector {
 	int width = 400,height=450;
 	boolean showRendered = false;
 
+	ImageUInt8 binary = new ImageUInt8(1,1);
 	ImageSingleBand orig;
 	ImageSingleBand dist;
 
 	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
 
 	List<Rectangle2D_I32> rectangles = new ArrayList<Rectangle2D_I32>();
+	List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
 	List<Polygon2D_F64> distorted = new ArrayList<Polygon2D_F64>();
 
 	Affine2D_F64 transform = new Affine2D_F64();
+
+	InputToBinary<ImageUInt8> inputToBinary_U8 = FactoryThresholdBinary.globalFixed(100, true, ImageUInt8.class);
 
 	@Before
 	public void before() {
@@ -88,7 +92,7 @@ public class TestBinaryPolygonConvexDetector {
 		rectangles.add(new Rectangle2D_I32(30,90,60,120));
 		rectangles.add(new Rectangle2D_I32(90,90,120,120));
 
-		transform.set(0.8,0,0,0.8,1,2);
+		transform.set(0.8, 0, 0, 0.8, 1, 2);
 		transform = transform.invert(null);
 
 		for( Class imageType : imageTypes ) {
@@ -106,9 +110,9 @@ public class TestBinaryPolygonConvexDetector {
 		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		int numberOfSides = 4;
-		BinaryPolygonConvexDetector alg = createDetector(imageType, numberOfSides, useLines);
-		alg.setLensDistortion(dist.width,dist.height,tranTo,tranFrom);
-		alg.process(dist);
+		BinaryPolygonConvexDetector alg = createDetector(imageType, useLines, numberOfSides);
+		alg.setLensDistortion(dist.width, dist.height, tranTo, tranFrom);
+		alg.process(dist, binary);
 
 		FastQueue<Polygon2D_F64> found = alg.getFound();
 
@@ -139,7 +143,7 @@ public class TestBinaryPolygonConvexDetector {
 		rectangles.add(new Rectangle2D_I32(30,90,60,120));
 		rectangles.add(new Rectangle2D_I32(90,90,120,120));
 
-		transform.set(1.1,0.2,0.12,1.3,10.2,20.3);
+		transform.set(1.1, 0.2, 0.12, 1.3, 10.2, 20.3);
 
 		for( Class imageType : imageTypes ) {
 			checkDetected(imageType,true,0.3);
@@ -151,26 +155,52 @@ public class TestBinaryPolygonConvexDetector {
 		renderDistortedRectangle(imageType);
 
 		int numberOfSides = 4;
-		BinaryPolygonConvexDetector alg = createDetector(imageType, numberOfSides, useLines);
-		alg.process(dist);
+		BinaryPolygonConvexDetector alg = createDetector(imageType, useLines, numberOfSides);
+		alg.process(dist, binary);
 
 		FastQueue<Polygon2D_F64> found = alg.getFound();
 
-		assertEquals(rectangles.size(),found.size);
+		assertEquals(rectangles.size(), found.size);
 
 		for (int i = 0; i < found.size; i++) {
 			assertEquals(1,findMatches(found.get(i),tol));
 		}
 	}
 
-	private BinaryPolygonConvexDetector createDetector(Class imageType, int numberOfSides, boolean useLines) {
-		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
+	@Test
+	public void easyTestMultipleShapes() {
+		polygons.add(new Polygon2D_F64(20, 20, 40, 50, 80, 20));
+		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90,40, 60));
+
+
+		for( Class imageType : imageTypes ) {
+			checkDetectedMulti(imageType, true,1.5);
+			checkDetectedMulti(imageType, false,1.5);
+		}
+	}
+
+	private void checkDetectedMulti(Class imageType, boolean useLines,  double tol ) {
+		renderPolygons(imageType);
+
+		BinaryPolygonConvexDetector alg = createDetector(imageType, useLines, 3,4);
+		alg.process(dist, binary);
+
+		FastQueue<Polygon2D_F64> found = alg.getFound();
+
+		assertEquals(polygons.size(), found.size);
+
+		for (int i = 0; i < found.size; i++) {
+			assertEquals(1,findMatches(found.get(i),tol));
+		}
+	}
+
+	private BinaryPolygonConvexDetector createDetector(Class imageType, boolean useLines, int ...numberOfSides) {
 		ConfigPolygonDetector config = new ConfigPolygonDetector(numberOfSides);
 
 		config.refineWithLines = useLines;
 		config.refineWithCorners = !useLines;
 
-		return FactoryShapeDetector.polygon(inputToBinary,config,imageType);
+		return FactoryShapeDetector.polygon(config,imageType);
 	}
 
 	/**
@@ -201,9 +231,58 @@ public class TestBinaryPolygonConvexDetector {
 		return match;
 	}
 
+
+	public void renderPolygons( Class imageType ) {
+		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
+
+		BufferedImage work = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+		Graphics2D g2 = work.createGraphics();
+
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0, 0, width, height);
+		g2.setColor(Color.BLACK);
+
+		distorted.clear();
+		for (int i = 0; i < polygons.size(); i++) {
+			Polygon2D_F64 orig = polygons.get(i);
+
+			int x[] = new int[ orig.size() ];
+			int y[] = new int[ orig.size() ];
+
+			for (int j = 0; j < orig.size(); j++) {
+				x[j] = (int)orig.get(j).x;
+				y[j] = (int)orig.get(j).y;
+			}
+
+			g2.fillPolygon(x,y,orig.size());
+
+			distorted.add( orig );
+		}
+
+		dist = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		binary = new ImageUInt8(width,height);
+
+		ConvertBufferedImage.convertFrom(work,dist,true);
+
+		inputToBinary.process(dist,binary);
+
+		if( showRendered ) {
+			ShowImages.showWindow(work, "Rendered");
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	public void renderDistortedRectangle( Class imageType ) {
+		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
+
 		orig = GeneralizedImageOps.createSingleBand(imageType,width,height);
 		dist = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		binary.reshape(width,height);
 
 		GImageMiscOps.fill(orig, 200);
 		GImageMiscOps.fill(dist, 200);
@@ -224,6 +303,8 @@ public class TestBinaryPolygonConvexDetector {
 		}
 
 		new FDistort(orig,dist).border(200).affine(transform).apply();
+
+		inputToBinary.process(dist,binary);
 
 		if( showRendered ) {
 			BufferedImage out = ConvertBufferedImage.convertTo(dist, null, true);
@@ -246,11 +327,13 @@ public class TestBinaryPolygonConvexDetector {
 		g2.fillOval(30, 30, 40, 50);
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+		binary.reshape(gray.width,gray.height);
+		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, i, true);
+			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, i);
 
-			alg.process(gray);
+			alg.process(gray,binary);
 			assertEquals("num sides = "+i,0,alg.getFound().size());
 		}
 	}
@@ -265,11 +348,13 @@ public class TestBinaryPolygonConvexDetector {
 		g2.fillPolygon(new int[]{10, 50, 30}, new int[]{10, 10, 40}, 3);
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+		binary.reshape(gray.width,gray.height);
+		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, i, true);
+			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, i);
 
-			alg.process(gray);
+			alg.process(gray,binary);
 			if( i == 3 ) {
 				double tol = 0.5;
 				assertEquals(1, alg.getFound().size());
@@ -290,8 +375,8 @@ public class TestBinaryPolygonConvexDetector {
 	public void touchesBorder_false() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 
-		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4, true);
-		alg.getBinary().reshape(20,30);
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, 4);
+		alg.getLabeled().reshape(20,30);
 		assertFalse(alg.touchesBorder(contour));
 
 		contour.add(new Point2D_I32(10,1));
@@ -308,8 +393,8 @@ public class TestBinaryPolygonConvexDetector {
 	public void touchesBorder_true() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 
-		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4, true);
-		alg.getBinary().reshape(20,30);
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, 4);
+		alg.getLabeled().reshape(20,30);
 
 		contour.add(new Point2D_I32(10,0));
 		assertTrue(alg.touchesBorder(contour));
@@ -333,7 +418,7 @@ public class TestBinaryPolygonConvexDetector {
 		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
 		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
-		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, 4, true);
+		BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, 4);
 		alg.setLensDistortion(width, height, tranTo, tranFrom);
 		try {
 			// this should cause it to go outside the image

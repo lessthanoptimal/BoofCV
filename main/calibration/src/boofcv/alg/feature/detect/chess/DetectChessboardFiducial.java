@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.feature.detect.chess;
+
+import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_F64;
+
+import java.util.List;
+
+/**
+ * <p>
+ * Detects calibration points inside a chessboard calibration target.  The image is first the image
+ * is thresholded to create a binary image for square detection, then the binary image is eroded to make sure
+ * the squares don't touch.  After that {@link DetectChessSquarePoints} is called and it detects and sorts
+ * the squares.
+ * </p>
+ * <p>
+ * The found control points are ensured to be returned in a row-major format with the correct number of rows and columns,
+ * with a counter clockwise ordering.  Note that when viewed on the monitor this will appear to be clockwise because
+ * the y-axis points down.  If there are multiple valid solution then the solution with the (0,0) grid point closest
+ * top the origin is selected.
+ * </p>
+ *
+ * @author Peter Abeles
+ */
+public class DetectChessboardFiducial<T extends ImageSingleBand, D extends ImageSingleBand> {
+
+	// detects the chess board 
+	private DetectChessSquarePoints<T> findSeeds;
+	// binary images used to detect chess board
+	private ImageUInt8 binary = new ImageUInt8(1, 1);
+	private ImageUInt8 eroded = new ImageUInt8(1, 1);
+	// Threshold used to create binary image.  if < 0 then a threshold a local adaptive threshold is used
+	private double userBinaryThreshold = -1;
+	// parameters for local adaptive threshold
+	private int userAdaptiveRadius = 20;
+	private double userAdaptiveBias = -10;
+
+
+	// work space for binary images
+	private T work1;
+	private T work2;
+
+	/**
+	 * Configures detection parameters
+	 *
+	 * @param numCols       Number of columns in the grid.  Target dependent.
+	 * @param numRows       Number of rows in the grid.  Target dependent.
+	 * @param imageType     Type of image being processed
+	 */
+	public DetectChessboardFiducial(int numCols, int numRows,
+									BinaryPolygonConvexDetector<T> detectorSquare,
+									Class<T> imageType) {
+
+		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		work2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+
+		// minContourSize is specified later after the image's size is known
+		// TODO make separation configurable?
+		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,4, detectorSquare);
+
+		reset();
+	}
+
+	/**
+	 * Forgets any past history and resets the detector
+	 */
+	public void reset() {
+	}
+
+	public boolean process(T gray) {
+		binary.reshape(gray.width, gray.height);
+		eroded.reshape(gray.width, gray.height);
+
+		if( userBinaryThreshold <= 0 ) {
+			work1.reshape(gray.width,gray.height);
+			work2.reshape(gray.width,gray.height);
+			GThresholdImageOps.adaptiveSquare(gray, binary, userAdaptiveRadius, userAdaptiveBias, true, work1, work2);
+		} else {
+			GThresholdImageOps.threshold(gray, binary, userBinaryThreshold, true);
+		}
+
+		// erode to make the squares separated
+		BinaryImageOps.erode8(binary, 1, eroded);
+
+		return findSeeds.process(gray, eroded);
+	}
+
+	public DetectChessSquarePoints getFindSeeds() {
+		return findSeeds;
+	}
+
+	public List<Point2D_F64> getCalibrationPoints() {
+		return findSeeds.getCalibrationPoints().toList();
+	}
+
+	public ImageUInt8 getBinary() {
+			return eroded;
+	}
+
+	public void setUserBinaryThreshold(double userBinaryThreshold) {
+		this.userBinaryThreshold = userBinaryThreshold;
+	}
+
+	public double getUserBinaryThreshold() {
+		return userBinaryThreshold;
+	}
+
+	public int getUserAdaptiveRadius() {
+		return userAdaptiveRadius;
+	}
+
+	public void setUserAdaptiveRadius(int userAdaptiveRadius) {
+		this.userAdaptiveRadius = userAdaptiveRadius;
+	}
+
+	public double getUserAdaptiveBias() {
+		return userAdaptiveBias;
+	}
+
+	public void setUserAdaptiveBias(double userAdaptiveBias) {
+		this.userAdaptiveBias = userAdaptiveBias;
+	}
+}

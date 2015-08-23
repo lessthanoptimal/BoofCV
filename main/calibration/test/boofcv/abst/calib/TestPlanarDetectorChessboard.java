@@ -24,6 +24,7 @@ import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -48,7 +49,7 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 	}
 
 	@Override
-	public void renderTarget(ImageFloat32 original, List<Point2D_F64> points) {
+	public void renderTarget(ImageFloat32 original, List<List<Point2D_F64>> solutions) {
 
 		ImageMiscOps.fill(original, 255);
 
@@ -73,6 +74,7 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 		int pointsRow = 2*(config.numRows/2) - (1 - config.numRows % 2);
 		int pointsCol = 2*(config.numCols/2) - (1 - config.numCols % 2);
 
+		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
 		for (int i = 0; i < pointsRow; i++) {
 			for (int j = 0; j < pointsCol; j++) {
 				double y = y0+(i+1)*square;
@@ -80,6 +82,7 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 				points.add( new Point2D_F64(x,y));
 			}
 		}
+		solutions.add(points);
 	}
 
 	@Override

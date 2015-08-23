@@ -58,10 +58,9 @@ public class FactoryFiducial {
 		config.squareDetector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold,true,imageType);
-		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(config.squareDetector,imageType);
 
-		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				squareDetector,imageType);
+		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
@@ -85,10 +84,9 @@ public class FactoryFiducial {
 		config.squareDetector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
-		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(config.squareDetector,imageType);
 
-		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(
-				squareDetector,imageType);
+		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(config.ambiguousThreshold);
 
 		return new SquareBinary_to_FiducialDetector<T>(alg,config.targetWidth);
@@ -117,8 +115,8 @@ public class FactoryFiducial {
 
 		InputToBinary<T> binary = FactoryThresholdBinary.globalFixed(binaryThreshold, true, imageType);
 		BinaryPolygonConvexDetector<T> squareDetector = 
-				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
-		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
+				FactoryShapeDetector.polygon(config.squareDetector,imageType);
+		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
 				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
@@ -146,9 +144,9 @@ public class FactoryFiducial {
 
 		InputToBinary<T> binary = FactoryThresholdBinary.adaptiveSquare(thresholdRadius, 0, true, imageType);
 		BinaryPolygonConvexDetector<T> squareDetector =
-				FactoryShapeDetector.polygon(binary,config.squareDetector,imageType);
+				FactoryShapeDetector.polygon(config.squareDetector,imageType);
 		
-		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(
+		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
 				squareDetector,config.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);

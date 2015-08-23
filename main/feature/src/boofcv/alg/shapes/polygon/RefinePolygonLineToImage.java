@@ -74,14 +74,11 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
 	 *
-	 * @param numSides Number of sides on the polygon
 	 */
-	public RefinePolygonLineToImage(int numSides,
-									double cornerOffset, int lineSamples, int sampleRadius,
+	public RefinePolygonLineToImage(double cornerOffset, int lineSamples, int sampleRadius,
 									int maxIterations, double convergeTolPixels, boolean fitBlack,
 									Class<T> imageType ) {
-		if( sampleRadius < 1 )
-			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
+
 
 		this.cornerOffset = cornerOffset;
 		this.maxIterations = maxIterations;
@@ -89,7 +86,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		this.snapToEdge = new SnapToEdge<T>(lineSamples,sampleRadius,imageType);
 		this.imageType = imageType;
 
-		previous = new Polygon2D_F64(numSides);
+		previous = new Polygon2D_F64(1);
 
 		setup(fitBlack);
 	}
@@ -135,10 +132,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	public boolean refine(Polygon2D_F64 input, Polygon2D_F64 output)
 	{
-		if( input.size() != previous.size() )
-			throw new IllegalArgumentException("Unexpected number of sides in the input polygon");
-		if( output.size() != previous.size() )
-			throw new IllegalArgumentException("Unexpected number of sides in the output polygon");
+		if( input.size() != output.size())
+			throw new IllegalArgumentException("Input and output sides do not match. "+input.size()+" "+output.size());
 
 		if( input.isCCW() )
 			throw new IllegalArgumentException("Polygon must be in clockwise order");
@@ -248,13 +243,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	public SnapToEdge<T> getSnapToEdge() {
 		return snapToEdge;
-	}
-
-	/**
-	 * Returns the expected number of sides of the input polygon
-	 */
-	public int getNumberOfSides() {
-		return previous.size();
 	}
 
 	/**

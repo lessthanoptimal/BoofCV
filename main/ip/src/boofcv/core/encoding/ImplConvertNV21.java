@@ -130,7 +130,7 @@ public class ImplConvertNV21 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataNV[indexY++] & 0xFF) - 16);
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
@@ -166,7 +166,7 @@ public class ImplConvertNV21 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ ) {
-				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataNV[indexY++] & 0xFF) - 16);
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
@@ -206,7 +206,7 @@ public class ImplConvertNV21 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ , indexOut++ ) {
-				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataNV[indexY++] & 0xFF) - 16);
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 
@@ -242,7 +242,7 @@ public class ImplConvertNV21 {
 			int indexOut = output.startIndex + row*output.stride;
 
 			for( int col = 0; col < output.width; col++ ) {
-				int y = 1191*(dataNV[indexY++] & 0xFF) - 16;
+				int y = 1191*((dataNV[indexY++] & 0xFF) - 16);
 				int cr = (dataNV[ indexUV ] & 0xFF) - 128;
 				int cb = (dataNV[ indexUV+1] & 0xFF) - 128;
 

@@ -45,6 +45,10 @@ public class ConfigFiducialBinary implements Configuration {
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
 
+	{
+		squareDetector.configRefineLines.cornerOffset = 2;
+	}
+
 	public ConfigFiducialBinary() {
 	}
 

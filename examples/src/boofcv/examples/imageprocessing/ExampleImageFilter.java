@@ -48,7 +48,6 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-// TODO show how to convolve instead of image derivative
 @SuppressWarnings({"unchecked"})
 public class ExampleImageFilter {
 
@@ -145,7 +144,7 @@ public class ExampleImageFilter {
 		filter(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
 		nogenerics(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
 
-		// try another image input type
+		// try another image data type
 		generalized(ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class));
 	}
 }

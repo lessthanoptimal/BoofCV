@@ -1,7 +1,7 @@
 Alpha 0.20
 
 - BinaryPolygonConvexDetector
-  * Can detect shapes with various number of edges in the same detector
+  * See if it will work with concave shapes too
 
 - SnapToEdge
   * Does it really need to know if left/right is darker/lighter?
@@ -13,6 +13,7 @@ Alpha 0.20
 
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
+  * Or some how estimate both at same time.  using center seems to introduce translation error
 
 - Multi camera calibration using square binary patterns.
 

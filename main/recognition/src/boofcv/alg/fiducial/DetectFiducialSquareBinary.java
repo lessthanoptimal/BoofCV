@@ -77,8 +77,8 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 *
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareBinary(BinaryPolygonConvexDetector<T> quadDetector,  Class<T> inputType) {
-		super(quadDetector, w*8, inputType);
+	public DetectFiducialSquareBinary(InputToBinary<T> inputToBinary, BinaryPolygonConvexDetector<T> quadDetector,  Class<T> inputType) {
+		super(inputToBinary,quadDetector, w*8, inputType);
 
 		int widthNoBorder = w*4;
 

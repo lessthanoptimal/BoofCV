@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -48,7 +48,7 @@ import java.util.List;
  *
  * Processing Steps:
  * <ol>
- * <li>First the input gray scale image is converted into a binary image.</li>
+ * <li>First the input a gray scale image and a binarized version of it.</li>
  * <li>The contours of black blobs are found.</li>
  * <li>From the contours polygons are fitted and refined to pixel accuracy.</li>
  * <li>(Optional) Sub-pixel refinement of the polygon's edges and/or corners.</li>
@@ -77,9 +77,6 @@ import java.util.List;
  */
 public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
-	// Converts the input image into a binary one
-	private InputToBinary<T> thresholder;
-
 	// private maximum distance a point can deviate from the edge of the contour and not
 	// cause a new line to formed as a fraction of the contour's size
 	private double splitDistanceFraction;
@@ -88,9 +85,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	private double minContourFraction;
 	private int minimumContour; // this is image.width*minContourFraction
 	private double minimumArea; // computed from minimumContour
-
-	// Storage for the binary image
-	private ImageUInt8 binary = new ImageUInt8(1,1);
 
 	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	private ImageSInt32 labeled = new ImageSInt32(1,1);
@@ -112,8 +106,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// type of input image
 	private Class<T> inputType;
 
-	// number of lines in the polygon
-	private int polyNumberOfLines;
+	// number of lines allowed in the polygon
+	private int numberOfSides[];
 
 	// work space for initial polygon
 	private Polygon2D_F64 workPoly = new Polygon2D_F64();
@@ -133,7 +127,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * Configures the detector.
 	 *
 	 * @param polygonSides Number of lines in the polygon
-	 * @param thresholder Converts the input image into a binary one
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
@@ -143,8 +136,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
-	public BinaryPolygonConvexDetector(final int polygonSides,
-									   InputToBinary<T> thresholder,
+	public BinaryPolygonConvexDetector(int polygonSides[],
 									   SplitMergeLineFitLoop contourToPolygon,
 									   RefinePolygonLineToImage<T> refineLine,
 									   RefinePolygonCornersToImage<T> refineCorner,
@@ -153,30 +145,19 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 									   boolean outputClockwise,
 									   Class<T> inputType) {
 
-		if( refineLine != null ) {
-			if (polygonSides != refineLine.getNumberOfSides())
-				throw new IllegalArgumentException("Miss matched number of lines with refineLine");
-			this.refineLine = refineLine;
-		}
-		if( refineCorner != null ) {
-			this.refineCorner = refineCorner;
-		}
 
-		this.polyNumberOfLines = polygonSides;
-		this.thresholder = thresholder;
+		this.refineLine = refineLine;
+		this.refineCorner = refineCorner;
+
+		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
 		this.splitDistanceFraction = splitDistanceFraction;
 		this.outputClockwise = outputClockwise;
 
-		workPoly = new Polygon2D_F64(polygonSides);
-		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
-			@Override
-			protected Polygon2D_F64 createInstance() {
-				return new Polygon2D_F64(polygonSides);
-			}
-		};
+		workPoly = new Polygon2D_F64(1);
+		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
 	}
 
 	/**
@@ -224,17 +205,17 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 *
 	 * @param gray Input image
 	 */
-	public void process( T gray ) {
-		if( binary.width != gray.width || binary.height == gray.width )
+	public void process(T gray, ImageUInt8 binary) {
+		InputSanityCheck.checkSameShape(binary, gray);
+
+		if( labeled.width != gray.width || labeled.height == gray.width )
 			configure(gray.width,gray.height);
 
 		found.reset();
 		foundContours.clear();
 
-		thresholder.process(gray, binary);
-
 		// Find quadrilaterals that could be fiducials
-		findCandidateShapes(gray);
+		findCandidateShapes(gray, binary);
 	}
 
 	/**
@@ -246,7 +227,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	private void configure( int width , int height ) {
 
 		// resize storage images
-		binary.reshape(width, height);
 		labeled.reshape(width, height);
 
 		// adjust size based parameters based on image size
@@ -258,7 +238,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
 	 * below for the requirements.  Those that remain are considered to be target candidates.
 	 */
-	private void findCandidateShapes( T gray ) {
+	private void findCandidateShapes( T gray , ImageUInt8 binary ) {
 		// find binary blobs
 		contourFinder.process(binary, labeled);
 
@@ -285,7 +265,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
 				// only accept polygons with the expected number of sides
-				if( splits.size() != polyNumberOfLines )
+				if (!expectedNumberOfSides(splits))
 					continue;
 
 				// further improve the selection of corner points
@@ -295,7 +275,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				// convert the format of the initial crude polygon
-				for (int j = 0; j < polyNumberOfLines; j++) {
+				workPoly.vertexes.resize(splits.size());
+				for (int j = 0; j < splits.size(); j++) {
 					Point2D_I32 p = c.external.get( splits.get(j));
 					workPoly.get(j).set(p.x,p.y);
 				}
@@ -319,6 +300,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				Polygon2D_F64 refined = found.grow();
+				refined.vertexes.resize(splits.size);
 
 				boolean success;
 				if( refineCorner != null ) {
@@ -351,6 +333,18 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	}
 
 	/**
+	 * True if the number of sides found matches what it is looking for
+	 */
+	private boolean expectedNumberOfSides(GrowQueue_I32 splits) {
+		for (int j = 0; j < numberOfSides.length; j++) {
+			if( numberOfSides[j] == splits.size() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Removes lens distortion from the found contour
 	 */
 	private void removeDistortionFromContour(List<Point2D_I32> contour) {
@@ -368,8 +362,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * Checks to see if some part of the contour touches the image border.  Most likely cropped
 	 */
 	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
-		int endX = binary.width-1;
-		int endY = binary.height-1;
+		int endX = labeled.width-1;
+		int endY = labeled.height-1;
 
 		for (int j = 0; j < contour.size(); j++) {
 			Point2D_I32 p = contour.get(j);
@@ -382,6 +376,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		return false;
 	}
 
+	public ImageSInt32 getLabeled() {
+		return labeled;
+	}
+
 	public boolean isOutputClockwise() {
 		return outputClockwise;
 	}
@@ -392,15 +390,11 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	public List<Contour> getFoundContours(){return foundContours;}
 
-	public ImageUInt8 getBinary() {
-		return binary;
-	}
-
 	public Class<T> getInputType() {
 		return inputType;
 	}
 
-	public int getPolyNumberOfLines() {
-		return polyNumberOfLines;
+	public int[] getNumberOfSides() {
+		return numberOfSides;
 	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -50,8 +51,8 @@ public class TestDetectFiducialSquareImage {
 
 	Random rand = new Random(234);
 	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.
-			polygon(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
-					new ConfigPolygonDetector(4,false), ImageUInt8.class);
+			polygon(new ConfigPolygonDetector(false, 4), ImageUInt8.class);
+	InputToBinary<ImageUInt8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class);
 
 	/**
 	 * Makes sure the found rotation matrix is correct
@@ -68,7 +69,7 @@ public class TestDetectFiducialSquareImage {
 
 		ImageUInt8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
 
-		DetectFiducialSquareImage<ImageUInt8> alg = new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
+		DetectFiducialSquareImage<ImageUInt8> alg = new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.1,ImageUInt8.class);
 		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
 
@@ -122,7 +123,7 @@ public class TestDetectFiducialSquareImage {
 
 		// process it in different orientations
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.1,ImageUInt8.class);
 
 		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -163,7 +164,7 @@ public class TestDetectFiducialSquareImage {
 		}
 
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(squareDetector,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.1,ImageUInt8.class);
 
 		alg.addPattern(threshold(image, 100), 1.0);
 
@@ -231,7 +232,7 @@ public class TestDetectFiducialSquareImage {
 			expected += valA != valB ? 1 : 0;
 		}
 
-		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(squareDetector,0.1,ImageFloat32.class);
+		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,0.1,ImageFloat32.class);
 		int found = alg.hamming(a, b);
 
 		assertEquals(expected,found);

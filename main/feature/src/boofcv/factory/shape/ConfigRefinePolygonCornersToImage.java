@@ -35,14 +35,15 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 
 	/**
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
-	 * with ambiguous borders.
+	 * with ambiguous borders.  Sides with smaller acute angles will be aliased to a greater distance and you
+	 * might need to increase this number.
 	 */
 	public double cornerOffset = 2;
 
 	/**
 	 * Number of times along the line it will be sampled
 	 */
-	public int lineSamples = 15;
+	public int lineSamples = 10;
 	/**
 	 * Number of points tangent to the line in each direction it samples.  In total the number of
 	 * samples along a line will be lineSamples*(2*sampleRadius+1)
@@ -51,11 +52,11 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 	/**
 	 * Maximum number of iterations
 	 */
-	public int maxIterations = 15;
+	public int maxIterations = 10;
 	/**
 	 * Convergence tolerance in pixels
 	 */
-	public double convergeTolPixels = 1e-8;
+	public double convergeTolPixels = 0.05;
 	/**
 	 * If true it is fitting to a black shape, false means a white shape.
 	 */
