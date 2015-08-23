@@ -66,6 +66,8 @@ public class ConfigChessboard implements Configuration {
 	{
 		square.contour2Poly_splitDistanceFraction = 0.05;
 
+		square.minContourImageWidthFraction = 0.05;
+
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
 

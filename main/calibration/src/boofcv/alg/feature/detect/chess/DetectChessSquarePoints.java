@@ -132,8 +132,9 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 			}
 		}
 
-		if( inner == null || outer == null )
+		if( inner == null || outer == null ) {
 			return false;
+		}
 
 		// make sure the rows/columns are correctly aligned
 		if( inner.columns != innerCols ) {

@@ -40,7 +40,6 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.se.Se3_F64;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -247,7 +246,6 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Tracking Rectangle").
-				setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		ShowImages.showWindow(app, "Detecting Fiducials", true);
 	}
 }
