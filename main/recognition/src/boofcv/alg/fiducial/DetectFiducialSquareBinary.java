@@ -48,7 +48,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
 	// converts the input image into a binary one
-	InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
+	InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,ImageFloat32.class);
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	// helper data structures for computing the value of each grid point

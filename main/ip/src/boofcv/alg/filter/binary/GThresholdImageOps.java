@@ -39,12 +39,12 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input gray-scale image
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static int computeOtsu( ImageSingleBand input , int minValue , int maxValue ) {
 
-		int range = maxValue - minValue;
+		int range = 1+maxValue - minValue;
 		int histogram[] = new int[ range ];
 
 		GImageStatistics.histogram(input,minValue,histogram);
@@ -116,12 +116,12 @@ public class GThresholdImageOps {
 	 *
 	 * @param input Input gray-scale image
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
 	public static int computeEntropy( ImageSingleBand input , int minValue , int maxValue ) {
 
-		int range = maxValue - minValue;
+		int range = 1 + maxValue - minValue;
 		int histogram[] = new int[ range ];
 
 		GImageStatistics.histogram(input,minValue,histogram);

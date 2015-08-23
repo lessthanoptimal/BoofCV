@@ -214,7 +214,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		found.reset();
 		foundContours.clear();
 
-		// Find quadrilaterals that could be fiducials
 		findCandidateShapes(gray, binary);
 	}
 
@@ -265,8 +264,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
 				// only accept polygons with the expected number of sides
-				if (!expectedNumberOfSides(splits))
+				if (!expectedNumberOfSides(splits)) {
+					if( verbose ) System.out.println("rejected number of sides. "+splits.size());
 					continue;
+				}
 
 				// further improve the selection of corner points
 				if( !improveContour.fit(c.external,splits) ) {
@@ -281,8 +282,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					workPoly.get(j).set(p.x,p.y);
 				}
 
-				boolean workOrigCWW = workPoly.isCCW();
-				if( workOrigCWW ) {
+				boolean workOrigCCW = workPoly.isCCW();
+				if( workOrigCCW ) {
 					workPoly.flip();
 				}
 				// this only supports convex polygons
@@ -306,7 +307,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( refineCorner != null ) {
 					refineCorner.setImage(gray);
 					success = refineCorner.refine(c.external,splits,refined)>=3;
-					if( workOrigCWW ) {
+					if( workOrigCCW ) {
 						refined.flip();
 					}
 				} else if( refineLine != null ){
@@ -396,5 +397,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	public int[] getNumberOfSides() {
 		return numberOfSides;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 }

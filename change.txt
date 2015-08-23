@@ -116,23 +116,16 @@ Version : Alpha 0.19
   * Gaussian: pixels modeled with a fading Normal distribution
 
 TODO
-  * Distortion Model + Calibration
-    - calibration regression
-       * Same data set include different terms in estimation
-    - square pattern needs to pass unit tests
-
   * Polygon Detector
-    - Regression with hand selected points
+    - *Regression with hand selected points
     - try convex
-    - * Add example
-
-  * Update filter example
 
   * BOW Scene classification
     - regression test
     - examples
 
   * Android Demo:   Automatic Threshold.  Dim slider for global
+  * Background model example
   * Documentation on how to build a single jar
 
 ---------------------------------------------

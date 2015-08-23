@@ -116,7 +116,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 
 		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
-		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,256);
+		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,255);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				selectThresh.setThreshold((int) threshold);

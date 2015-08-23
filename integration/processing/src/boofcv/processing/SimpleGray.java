@@ -225,7 +225,7 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 	 * @see GThresholdImageOps#computeOtsu
 	 */
 	public SimpleBinary thresholdOtsu(boolean down ) {
-		double threshold = GThresholdImageOps.computeOtsu(image,0,256);
+		double threshold = GThresholdImageOps.computeOtsu(image,0,255);
 		return new SimpleBinary(GThresholdImageOps.threshold(image, null, threshold, down));
 	}
 
@@ -233,7 +233,7 @@ public class SimpleGray extends SimpleImage<ImageSingleBand>{
 	 * @see GThresholdImageOps#computeEntropy
 	 */
 	public SimpleBinary thresholdEntropy(boolean down ) {
-		double threshold = GThresholdImageOps.computeEntropy(image,0,256);
+		double threshold = GThresholdImageOps.computeEntropy(image,0,255);
 		return new SimpleBinary(GThresholdImageOps.threshold(image, null, threshold, down));
 	}
 

@@ -68,7 +68,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	private final static int DESC_LENGTH = squareLength*squareLength/16;
 
 	// converts the input image into a binary one
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,false,ImageFloat32.class);
+	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,false,ImageFloat32.class);
 	private ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
 
 	// list of all known targets

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,10 +48,10 @@ public class TestGlobalOtsuBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			GlobalOtsuBinaryFilter alg = new GlobalOtsuBinaryFilter(0,256,true, ImageType.single(type));
+			GlobalOtsuBinaryFilter alg = new GlobalOtsuBinaryFilter(0,255,true, ImageType.single(type));
 
 			alg.process(input,found);
-			double threshold = GThresholdImageOps.computeOtsu(input, 0, 256);
+			double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
 			GThresholdImageOps.threshold(input,expected,threshold,true);
 
 			BoofTesting.assertEquals(found, expected, 0);

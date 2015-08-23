@@ -78,7 +78,7 @@ public class DetectPolygonWebcam {
 		config.configRefineLines.maxIterations = 30;
 
 		InputToBinary<ImageFloat32> inputToBinary =
-				FactoryThresholdBinary.globalOtsu(0, 256, true, ImageFloat32.class);
+				FactoryThresholdBinary.globalOtsu(0, 255, true, ImageFloat32.class);
 //				FactoryThresholdBinary.globalEntropy(0,255,true,ImageFloat32.class);
 //				FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageFloat32.class);
 		BinaryPolygonConvexDetector<ImageFloat32> detector = FactoryShapeDetector.

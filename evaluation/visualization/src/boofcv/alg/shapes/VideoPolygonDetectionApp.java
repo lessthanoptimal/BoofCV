@@ -115,7 +115,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		config.refineWithCorners = false;
 
 //		inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
-		inputToBinary = FactoryThresholdBinary.globalOtsu(0, 256, true, imageType);
+		inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, imageType);
 
 		detector = FactoryShapeDetector.polygon(config,imageType);
 	}

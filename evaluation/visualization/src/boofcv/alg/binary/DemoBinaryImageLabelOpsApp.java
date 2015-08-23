@@ -141,7 +141,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 		ConvertBufferedImage.convertFromSingle(image, imageInput, imageType);
 
-		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,256);
+		final double threshold = GThresholdImageOps.computeOtsu(imageInput,0,255);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				selectThresh.setThreshold((int) threshold);

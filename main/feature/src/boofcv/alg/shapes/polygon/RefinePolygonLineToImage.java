@@ -60,7 +60,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	private SnapToEdge<T> snapToEdge;
 
 	//---------- storage for local work space
-	private LineGeneral2D_F64 general[]; // estimated line for each side
+	private LineGeneral2D_F64 general[] = new LineGeneral2D_F64[0]; // estimated line for each side
 	private Polygon2D_F64 previous;
 	// adjusted corner points which have been offset from the true corners
 	private Point2D_F64 adjA = new Point2D_F64();
@@ -85,10 +85,9 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		this.convergeTolPixels = convergeTolPixels;
 		this.snapToEdge = new SnapToEdge<T>(lineSamples,sampleRadius,imageType);
 		this.imageType = imageType;
+		this.fitBlack = fitBlack;
 
 		previous = new Polygon2D_F64(1);
-
-		setup(fitBlack);
 	}
 
 	/**
@@ -101,18 +100,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
 		this.snapToEdge = new SnapToEdge<T>(20,1,imageType);
-		setup(fitBlack);
-	}
-
-	/**
-	 * Declares data structures
-	 */
-	private void setup(boolean fitBlack) {
 		this.fitBlack = fitBlack;
-		general = new LineGeneral2D_F64[4];
-		for (int i = 0; i < general.length; i++) {
-			general[i] = new LineGeneral2D_F64();
-		}
 	}
 
 	/**
@@ -141,6 +129,14 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		// sanity check input.  If it's too small this algorithm won't work
 		if( checkShapeTooSmall(input) )
 			return false;
+
+		// see if this work space needs to be resized
+		if( general.length < input.size() ) {
+			general = new LineGeneral2D_F64[input.size() ];
+			for (int i = 0; i < general.length; i++) {
+				general[i] = new LineGeneral2D_F64();
+			}
+		}
 
 		// estimate line equations
 		return optimize(input,output);

@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
@@ -55,7 +56,7 @@ public class ExampleBinaryOps {
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
 		// Select a global threshold using Otsu's method.
-		double threshold = GThresholdImageOps.computeOtsu(input, 0, 256);
+		double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
 
 		// Apply the threshold to create a binary image
 		ThresholdImageOps.threshold(input,binary,(float)threshold,true);
@@ -77,13 +78,15 @@ public class ExampleBinaryOps {
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, false, null);
 		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, false, null);
 		BufferedImage visualLabel = VisualizeBinaryData.renderLabeledBG(label, contours.size(), null);
-		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
-				input.width,input.height,null);
+		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours, colorExternal, colorInternal,
+				input.width, input.height, null);
 
-		ShowImages.showWindow(visualBinary,"Binary Original");
-		ShowImages.showWindow(visualFiltered,"Binary Filtered");
-		ShowImages.showWindow(visualLabel,"Labeled Blobs");
-		ShowImages.showWindow(visualContour,"Contours");
+		ListDisplayPanel panel = new ListDisplayPanel();
+		panel.addImage(visualBinary, "Binary Original");
+		panel.addImage(visualFiltered, "Binary Filtered");
+		panel.addImage(visualLabel, "Labeled Blobs");
+		panel.addImage(visualContour, "Contours");
+		ShowImages.showWindow(panel,"Binary Operations",true);
 	}
 
 }
