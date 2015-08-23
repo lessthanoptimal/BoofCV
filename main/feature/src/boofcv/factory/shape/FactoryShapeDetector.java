@@ -51,7 +51,7 @@ public class FactoryShapeDetector {
 
 		RefinePolygonLineToImage<T> refineLine = null;
 		if( config.refineWithLines )
-			refineLine = new RefinePolygonLineToImage<T>(config.numberOfSides,
+			refineLine = new RefinePolygonLineToImage<T>(
 					config.configRefineLines.cornerOffset,config.configRefineLines.lineSamples,
 					config.configRefineLines.sampleRadius,config.configRefineLines.maxIterations,
 					config.configRefineLines.convergeTolPixels,

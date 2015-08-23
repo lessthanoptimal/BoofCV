@@ -1,7 +1,7 @@
 Alpha 0.20
 
 - BinaryPolygonConvexDetector
-  * Can detect shapes with various number of edges in the same detector
+  * See if it will work with concave shapes too
 
 - SnapToEdge
   * Does it really need to know if left/right is darker/lighter?

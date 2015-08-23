@@ -120,7 +120,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 									   int squarePixels,
 									   Class<T> inputType) {
 
-		if( squareDetector.getPolyNumberOfLines() != 4 )
+		if( squareDetector.getNumberOfSides()[0] != 4 )
 			throw new IllegalArgumentException("quadDetector not configured to detect quadrilaterals");
 		if( squareDetector.isOutputClockwise() )
 			throw new IllegalArgumentException("output polygons needs to be counter-clockwise");

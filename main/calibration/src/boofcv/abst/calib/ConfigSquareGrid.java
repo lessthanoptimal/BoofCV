@@ -50,7 +50,7 @@ public class ConfigSquareGrid implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(4,true);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4);
 
 	/**
 	 * Physical width of the square.
@@ -67,6 +67,9 @@ public class ConfigSquareGrid implements Configuration {
 
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
+
+		// good value for squares.  Set it here to make it not coupled to default values
+		square.configRefineCorners.cornerOffset = 2;
 
 		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
 		// very crude corners

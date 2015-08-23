@@ -35,7 +35,8 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 
 	/**
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
-	 * with ambiguous borders.
+	 * with ambiguous borders.  Sides with smaller acute angles will be aliased to a greater distance and you
+	 * might need to increase this number.
 	 */
 	public double cornerOffset = 2;
 

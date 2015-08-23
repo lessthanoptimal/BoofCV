@@ -30,7 +30,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Number of sides in the polygon it's trying to detect
 	 */
-	public int numberOfSides = -1;
+	public int[] numberOfSides = null;
 
 	/**
 	 * Two lines are merged together if their angle is <= to this number.
@@ -82,11 +82,11 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
-	public ConfigPolygonDetector(int numberOfSides) {
+	public ConfigPolygonDetector(int ...numberOfSides) {
 		this.numberOfSides = numberOfSides;
 	}
 
-	public ConfigPolygonDetector(int numberOfSides, boolean clockwise) {
+	public ConfigPolygonDetector(boolean clockwise, int ...numberOfSides) {
 		this.numberOfSides = numberOfSides;
 		this.clockwise = clockwise;
 	}
@@ -105,7 +105,13 @@ public class ConfigPolygonDetector implements Configuration {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{ numberOfSides="+numberOfSides+
+		String sides = "[";
+		for (int i = 0; i < numberOfSides.length; i++) {
+			sides += " "+numberOfSides[i];
+		}
+		sides += " ]";
+
+		return getClass().getSimpleName()+"{ numberOfSides="+sides+
 				" , contour2Poly_mergeTolerance="+contour2Poly_mergeTolerance+
 				" , contour2Poly_iterations="+contour2Poly_iterations+
 				" , contour2Poly_splitDistanceFraction="+contour2Poly_splitDistanceFraction+

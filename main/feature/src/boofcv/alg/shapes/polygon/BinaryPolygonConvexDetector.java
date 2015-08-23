@@ -106,8 +106,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	// type of input image
 	private Class<T> inputType;
 
-	// number of lines in the polygon
-	private int polyNumberOfLines;
+	// number of lines allowed in the polygon
+	private int numberOfSides[];
 
 	// work space for initial polygon
 	private Polygon2D_F64 workPoly = new Polygon2D_F64();
@@ -136,7 +136,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
-	public BinaryPolygonConvexDetector(final int polygonSides,
+	public BinaryPolygonConvexDetector(int polygonSides[],
 									   SplitMergeLineFitLoop contourToPolygon,
 									   RefinePolygonLineToImage<T> refineLine,
 									   RefinePolygonCornersToImage<T> refineCorner,
@@ -145,29 +145,19 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 									   boolean outputClockwise,
 									   Class<T> inputType) {
 
-		if( refineLine != null ) {
-			if (polygonSides != refineLine.getNumberOfSides())
-				throw new IllegalArgumentException("Miss matched number of lines with refineLine");
-			this.refineLine = refineLine;
-		}
-		if( refineCorner != null ) {
-			this.refineCorner = refineCorner;
-		}
 
-		this.polyNumberOfLines = polygonSides;
+		this.refineLine = refineLine;
+		this.refineCorner = refineCorner;
+
+		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
 		this.splitDistanceFraction = splitDistanceFraction;
 		this.outputClockwise = outputClockwise;
 
-		workPoly = new Polygon2D_F64(polygonSides);
-		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
-			@Override
-			protected Polygon2D_F64 createInstance() {
-				return new Polygon2D_F64(polygonSides);
-			}
-		};
+		workPoly = new Polygon2D_F64(1);
+		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
 	}
 
 	/**
@@ -275,7 +265,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
 				// only accept polygons with the expected number of sides
-				if( splits.size() != polyNumberOfLines )
+				if (!expectedNumberOfSides(splits))
 					continue;
 
 				// further improve the selection of corner points
@@ -285,7 +275,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				// convert the format of the initial crude polygon
-				for (int j = 0; j < polyNumberOfLines; j++) {
+				workPoly.vertexes.resize(splits.size());
+				for (int j = 0; j < splits.size(); j++) {
 					Point2D_I32 p = c.external.get( splits.get(j));
 					workPoly.get(j).set(p.x,p.y);
 				}
@@ -309,6 +300,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				Polygon2D_F64 refined = found.grow();
+				refined.vertexes.resize(splits.size);
 
 				boolean success;
 				if( refineCorner != null ) {
@@ -338,6 +330,18 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * True if the number of sides found matches what it is looking for
+	 */
+	private boolean expectedNumberOfSides(GrowQueue_I32 splits) {
+		for (int j = 0; j < numberOfSides.length; j++) {
+			if( numberOfSides[j] == splits.size() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -390,7 +394,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		return inputType;
 	}
 
-	public int getPolyNumberOfLines() {
-		return polyNumberOfLines;
+	public int[] getNumberOfSides() {
+		return numberOfSides;
 	}
 }

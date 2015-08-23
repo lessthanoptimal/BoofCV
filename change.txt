@@ -47,6 +47,9 @@ Version : Alpha 0.19
   * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
     lack of regression tests
   * Change underlying algorithm.  Now uses polygon detector for corners.
+- Chessboard calibration target
+   * Complete re-write.  Now uses polygon detector
+   * Corner precision appears to have improved and runs faster
 - Calibration
   * A single class fully specifies the calibration target now
   * Intrinsic parameters can now use a flow style assignment of parameters
@@ -117,8 +120,7 @@ TODO
   * Polygon Detector
     - Regression with hand selected points
     - try convex
-    - try detect multiple number of sides
-    - specify no inner contour or not
+    - * Add example
 
   * Update filter example
 

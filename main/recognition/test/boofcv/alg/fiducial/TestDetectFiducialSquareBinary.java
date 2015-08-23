@@ -47,7 +47,7 @@ public class TestDetectFiducialSquareBinary {
 
 	Random rand = new Random(234);
 	BinaryPolygonConvexDetector squareDetector = FactoryShapeDetector.polygon(
-			new ConfigPolygonDetector(4,false),ImageUInt8.class);
+			new ConfigPolygonDetector(false, 4),ImageUInt8.class);
 	InputToBinary<ImageUInt8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class);
 
 	/**
