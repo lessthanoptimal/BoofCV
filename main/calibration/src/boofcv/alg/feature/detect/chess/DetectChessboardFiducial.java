@@ -44,21 +44,20 @@ import java.util.List;
 
 /**
  * <p>
- * Detects calibration points inside a chessboard calibration target.  A crude approximation of the chess
- * board is found by thresholding the image dynamically.  Once found corner points are detected and pruned.
- * The remaining points are computed to sub-pixel accuracy by fitting a 2D quadratic to feature intensity
- * in a 3x3 region.
+ * Detects calibration points inside a chessboard calibration target.  The first processing step is to find the
+ * calibration points quickly using a binary image square detector.  The those initial points are used to seed
+ * a mean-shift sub-pixel algorithm.
  * </p>
- * <p/>
  * <p>
  * The found control points are ensured to be returned in a row-major format with the correct number of rows and columns,
  * with a counter clockwise ordering.  Note that when viewed on the monitor this will appear to be clockwise because
- * the y-axis points down.
+ * the y-axis points down.  If there are multiple valid solution then the solution with the (0,0) grid point closest
+ * top the origin is selected.
  * </p>
  *
  * @author Peter Abeles
  */
-public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends ImageSingleBand> {
+public class DetectChessboardFiducial<T extends ImageSingleBand, D extends ImageSingleBand> {
 	// stores image derivative
 	private D derivX;
 	private D derivY;
@@ -67,7 +66,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	private int radius;
 
 	// detects the chess board 
-	private DetectChessSquaresBinary<T> findSeeds;
+	private DetectChessSquarePoints<T> findSeeds;
 	// binary images used to detect chess board
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
@@ -104,10 +103,10 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 	 * @param relativeSizeThreshold Increases or decreases the minimum allowed blob size. Try 1.0
 	 * @param imageType     Type of image being processed
 	 */
-	public DetectChessCalibrationPoints(int numCols, int numRows, int radius,
-										double relativeSizeThreshold , // TODo remove or re-active this threshold?
-										BinaryPolygonConvexDetector<T> detectorSquare ,
-										Class<T> imageType) {
+	public DetectChessboardFiducial(int numCols, int numRows, int radius,
+									double relativeSizeThreshold, // TODo remove or re-active this threshold?
+									BinaryPolygonConvexDetector<T> detectorSquare,
+									Class<T> imageType) {
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		this.radius = radius;
@@ -123,7 +122,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 
 		// minContourSize is specified later after the image's size is known
 		// TODO make separation configurable?
-		findSeeds = new DetectChessSquaresBinary<T>(numCols, numRows,4, detectorSquare);
+		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,4, detectorSquare);
 
 		localPeak.setSearchRadius(2);
 
@@ -215,7 +214,7 @@ public class DetectChessCalibrationPoints<T extends ImageSingleBand, D extends I
 			out.setTo(found);
 		}
 	}
-	public DetectChessSquaresBinary getFindSeeds() {
+	public DetectChessSquarePoints getFindSeeds() {
 		return findSeeds;
 	}
 

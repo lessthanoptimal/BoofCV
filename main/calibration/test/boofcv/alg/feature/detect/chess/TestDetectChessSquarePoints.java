@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestDetectChessSquaresBinary {
+public class TestDetectChessSquarePoints {
 
 	int offsetX = 15;
 	int offsetY = 10;
@@ -97,8 +97,8 @@ public class TestDetectChessSquaresBinary {
 
 		BinaryPolygonConvexDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4),ImageUInt8.class);
-		DetectChessSquaresBinary<ImageUInt8> alg =
-				new DetectChessSquaresBinary<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
+		DetectChessSquarePoints<ImageUInt8> alg =
+				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
 
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
@@ -151,14 +151,9 @@ public class TestDetectChessSquaresBinary {
 	}
 
 	@Test
-	public void selectZeroSeed() {
-		fail("implement");
-	}
-
-	@Test
 	public void forceToZero() {
 
-		DetectChessSquaresBinary alg = new DetectChessSquaresBinary(2,2,10,null);
+		DetectChessSquarePoints alg = new DetectChessSquarePoints(2,2,10,null);
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
@@ -191,7 +186,7 @@ public class TestDetectChessSquaresBinary {
 				SquareGrid outer = TestSquareGridTools.createGrid(rows/2 + rows%2, cols/2 + cols%2);
 				SquareGrid inner = TestSquareGridTools.createGrid(rows / 2 , cols / 2 );
 
-				DetectChessSquaresBinary.createUber(inner, outer, uber);
+				DetectChessSquarePoints.createUber(inner, outer, uber);
 
 				assertEquals(rows, uber.rows);
 				assertEquals(cols, uber.columns);
@@ -217,16 +212,12 @@ public class TestDetectChessSquaresBinary {
 
 	}
 
-	@Test
-	public void checkFlipUber() {
-		fail("Implement");
-	}
 
 	@Test
 	public void putIntoCanonical() {
 		SquareGridTools tools = new SquareGridTools();
 
-		DetectChessSquaresBinary alg = new DetectChessSquaresBinary(2,2,10,null);
+		DetectChessSquarePoints alg = new DetectChessSquarePoints(2,2,10,null);
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
 				SquareGrid uber = createUber(rows, cols);
@@ -280,7 +271,7 @@ public class TestDetectChessSquaresBinary {
 				}
 
 				// let's fix it
-				DetectChessSquaresBinary.orderUberCorners(uber);
+				DetectChessSquarePoints.orderUberCorners(uber);
 
 				checkCornerOrder(uber);
 			}
@@ -319,8 +310,8 @@ public class TestDetectChessSquaresBinary {
 		for (int diag = 0; diag < 4; diag++) {
 			UtilPolygons2D_F64.shiftUp(n.corners);
 
-			SquareNode target = DetectChessSquaresBinary.getDiag(uber,1,1,diag);
-			DetectChessSquaresBinary.orderCorner(n, target.center, diag);
+			SquareNode target = DetectChessSquarePoints.getDiag(uber, 1, 1, diag);
+			DetectChessSquarePoints.orderCorner(n, target.center, diag);
 
 			assertEquals(n.corners.get(0).distance(w - w/2, w - w/2), 0, 1e-8);
 			assertEquals(n.corners.get(1).distance(w + w/2, w - w/2) ,0, 1e-8);
@@ -333,26 +324,26 @@ public class TestDetectChessSquaresBinary {
 	public void getDiag() {
 		SquareGrid uber = createUber(5, 5);
 
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 0, 0, 0));
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 0, 0, 1));
-		assertTrue(uber.get(1,1) == DetectChessSquaresBinary.getDiag(uber, 0, 0, 2));
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 0, 0, 3));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 0, 0, 0));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 0, 0, 1));
+		assertTrue(uber.get(1,1) == DetectChessSquarePoints.getDiag(uber, 0, 0, 2));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 0, 0, 3));
 
-		assertTrue(uber.get(3,3) == DetectChessSquaresBinary.getDiag(uber, 4, 4, 0));
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 4, 4, 1));
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 4, 4, 2));
-		assertTrue(null == DetectChessSquaresBinary.getDiag(uber, 4, 4, 3));
+		assertTrue(uber.get(3,3) == DetectChessSquarePoints.getDiag(uber, 4, 4, 0));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 4, 4, 1));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 4, 4, 2));
+		assertTrue(null == DetectChessSquarePoints.getDiag(uber, 4, 4, 3));
 
-		assertTrue(uber.get(0,0) == DetectChessSquaresBinary.getDiag(uber, 1, 1, 0));
-		assertTrue(uber.get(0,2) == DetectChessSquaresBinary.getDiag(uber, 1, 1, 1));
-		assertTrue(uber.get(2,2) == DetectChessSquaresBinary.getDiag(uber, 1, 1, 2));
-		assertTrue(uber.get(2,0) == DetectChessSquaresBinary.getDiag(uber, 1, 1, 3));
+		assertTrue(uber.get(0,0) == DetectChessSquarePoints.getDiag(uber, 1, 1, 0));
+		assertTrue(uber.get(0,2) == DetectChessSquarePoints.getDiag(uber, 1, 1, 1));
+		assertTrue(uber.get(2,2) == DetectChessSquarePoints.getDiag(uber, 1, 1, 2));
+		assertTrue(uber.get(2,0) == DetectChessSquarePoints.getDiag(uber, 1, 1, 3));
 	}
 
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessSquaresBinary<ImageUInt8> alg = new DetectChessSquaresBinary<ImageUInt8>(2,2,0.01,null);
+		DetectChessSquarePoints<ImageUInt8> alg = new DetectChessSquarePoints<ImageUInt8>(2,2,0.01,null);
 
 		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 

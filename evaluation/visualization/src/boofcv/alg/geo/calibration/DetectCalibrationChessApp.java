@@ -19,13 +19,16 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
-import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
+import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
+import boofcv.alg.feature.detect.squares.SquareGrid;
+import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -36,8 +39,8 @@ import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.Polygon2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,7 +58,7 @@ public class DetectCalibrationChessApp
 		extends SelectInputPanel implements VisualizeApp, GridCalibPanel.Listener
 
 {
-	DetectChessCalibrationPoints<ImageFloat32,ImageFloat32> alg;
+	DetectChessboardFiducial<ImageFloat32,ImageFloat32> alg;
 
 	GridCalibPanel calibGUI;
 	ImageZoomPanel gui = new ImageZoomPanel();
@@ -210,10 +213,7 @@ public class DetectCalibrationChessApp
 		}
 
 		if( calibGUI.doShowGraph ) {
-
-//			List<QuadBlob> graph = alg.getFindBound().getGraphBlobs();
-//			if( graph != null )
-//				drawGraph(g2,graph);
+			System.out.println("Maybe I should add this back in with the new detector some how");
 		}
 
 		gui.setBufferedImage(workImage);
@@ -223,75 +223,37 @@ public class DetectCalibrationChessApp
 		processed = true;
 	}
 
-//	public static void drawGraph(Graphics2D g2, List<QuadBlob> squares) {
-//
-//		if( squares.size() == 0)
-//			return;
-//
-//		g2.setStroke(new BasicStroke(2.0f));
-//		for( int i = 0; i < squares.size(); i++ ) {
-//			QuadBlob p = squares.get(i);
-//			Point2D_I32 c = p.center;
-//
-//			int red = 255;
-//			int green = 255*i/squares.size();
-//			int blue = 255*(i%(squares.size()/2))/(squares.size()/2);
-//
-//			g2.setColor(new Color(red,green,blue));
-//			for( QuadBlob w : p.conn ) {
-//				g2.drawLine(c.x,c.y,w.center.x,w.center.y);
-//			}
-//		}
-//		g2.setColor(Color.RED);
-//		for( int i = 0; i < squares.size(); i++ ) {
-//			QuadBlob p = squares.get(i);
-//			Point2D_I32 c = p.center;
-//			g2.drawString(String.format("%d", p.conn.size()), c.x, c.y);
-//		}
-//
-////		for( int i = 0; i < squares.size(); i++ ) {
-////			QuadBlob p = squares.get(i);
-////			for( int j = 0; j < p.corners.size(); j++ ) {
-////				Point2D_I32 c = p.corners.get(j);
-////				VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.BLUE );
-////			}
-////		}
-//	}
-
-	public static void drawBounds( Graphics2D g2 , Polygon2D_I32 bounds) {
-		if( bounds.size() <= 0 )
-			return;
-
-		g2.setColor(Color.BLUE);
-		g2.setStroke(new BasicStroke(2.0f));
-		for( int i = 1; i < bounds.vertexes.size(); i++ ) {
-			Point2D_I32 p0 = bounds.vertexes.get(i-1);
-			Point2D_I32 p1 = bounds.vertexes.get(i);
-
-			g2.drawLine(p0.x,p0.y,p1.x,p1.y);
-		}
-		Point2D_I32 p0 = bounds.vertexes.get(bounds.size()-1);
-		Point2D_I32 p1 = bounds.vertexes.get(0);
-		g2.drawLine(p0.x,p0.y,p1.x,p1.y);
-
-	}
-
 	private void renderClusters() {
-//		DetectQuadBlobsBinary detectBlobs = alg.getFindBound().getDetectBlobs();
-//
-//		int numLabels = detectBlobs.getNumLabels();
-//		VisualizeBinaryData.renderLabeledBG(detectBlobs.getLabeledImage(), numLabels, workImage);
-//
-//		// put a mark in the center of blobs that were declared as being valid
-//		Graphics2D g2 = workImage.createGraphics();
-//		if( detectBlobs.getDetected() != null ) {
-//			for( QuadBlob b : detectBlobs.getDetected() ) {
-//				for( int i = 0; i < b.corners.size(); i++ ) {
-//					Point2D_I32 c = b.corners.get(i);
-//					VisualizeFeatures.drawPoint(g2, c.x, c.y, 1, Color.GREEN);
-//				}
-//			}
-//		}
+
+		Graphics2D g2 = workImage.createGraphics();
+
+		FastQueue<Polygon2D_F64> squares =  alg.getFindSeeds().getDetectorSquare().getFound();
+
+		for (int i = 0; i < squares.size(); i++) {
+			Polygon2D_F64 p = squares.get(i);
+			g2.setColor(Color.black);
+			g2.setStroke(new BasicStroke(4));
+			VisualizeShapes.drawPolygon(p, true, g2, true);
+			g2.setColor(Color.white);
+			g2.setStroke(new BasicStroke(2));
+			VisualizeShapes.drawPolygon(p, true, g2, true);
+		}
+
+		List<SquareGrid> grids = alg.getFindSeeds().getGrids().getGrids();
+
+		for( int i = 0; i < grids.size(); i++ ) {
+			SquareGrid g = grids.get(i);
+			int a = grids.size()==1 ? 0 : 255*i/(grids.size()-1);
+
+			int rgb = a << 16 | (255-a) << 8;
+			g2.setColor(new Color(rgb));
+			g2.setStroke(new BasicStroke(3));
+
+			for (int j = 0; j < g.nodes.size(); j++) {
+				SquareNode n = g.nodes.get(j);
+				VisualizeShapes.drawPolygon(n.corners, true, g2, true);
+			}
+		}
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
@@ -368,25 +330,20 @@ public class DetectCalibrationChessApp
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp();
 
-		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
+//		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
+		String prefix = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
 
-//		app.setBaseDirectory(prefix);
+		app.setBaseDirectory(prefix);
 //		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("View 01",prefix+"frame01.jpg"));
-		inputs.add(new PathLabel("View 02",prefix+"frame02.jpg"));
-		inputs.add(new PathLabel("View 03",prefix+"frame03.jpg"));
-		inputs.add(new PathLabel("View 04",prefix+"frame04.jpg"));
-		inputs.add(new PathLabel("View 05",prefix+"frame05.jpg"));
-		inputs.add(new PathLabel("View 06",prefix+"frame06.jpg"));
-		inputs.add(new PathLabel("View 07",prefix+"frame07.jpg"));
-		inputs.add(new PathLabel("View 08",prefix+"frame08.jpg"));
-		inputs.add(new PathLabel("View 11",prefix+"frame11.jpg"));
-		inputs.add(new PathLabel("View 12",prefix+"frame12.jpg"));
+		for (int i = 1; i <= 12; i++) {
+//			inputs.add(new PathLabel(String.format("View %02d",i),String.format("%sframe%02d.jpg",prefix,i)));
+			inputs.add(new PathLabel(String.format("View %02d",i),String.format("%sleft%02d.jpg",prefix,i)));
+		}
 
 		app.setInputList(inputs);
 

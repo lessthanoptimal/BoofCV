@@ -18,13 +18,14 @@
 
 package boofcv.abst.calib;
 
+import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
- * @see boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints
+ * @see DetectChessboardFiducial
  *
  * @author Peter Abeles
  */
@@ -72,10 +73,17 @@ public class ConfigChessboard implements Configuration {
 	public  double squareWidth;
 
 	{
-		square.contour2Poly_splitDistanceFraction = 0.1;
+		square.contour2Poly_splitDistanceFraction = 0.05;
 
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
+
+
+		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
+		// very crude corners
+		square.configRefineCorners.lineSamples = 10;
+		square.configRefineCorners.convergeTolPixels = 0.5;
+		square.configRefineCorners.maxIterations = 3;
 	}
 
 	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {

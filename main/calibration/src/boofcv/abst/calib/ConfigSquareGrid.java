@@ -24,7 +24,7 @@ import boofcv.struct.Configuration;
 /**
  * Calibration parameters for square-grid style calibration grid.
  *
- * @see boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints
+ * @see boofcv.alg.feature.detect.grid.DetectSquareGridFiducial
  *
  * @author Peter Abeles
  */

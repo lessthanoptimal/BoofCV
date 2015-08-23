@@ -72,10 +72,13 @@ public class TestDetectChessCalibrationPoints {
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
+		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(4);
+		configPoly.refineWithCorners = true;
+		configPoly.refineWithLines = false;
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(new ConfigPolygonDetector(4), ImageFloat32.class);
-		DetectChessCalibrationPoints alg =
-				new DetectChessCalibrationPoints(numCols,numRows,5,1.0,detectorSquare,ImageFloat32.class);
+				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
+		DetectChessboardFiducial alg =
+				new DetectChessboardFiducial(numCols,numRows,5,1.0,detectorSquare,ImageFloat32.class);
 
 		assertTrue(alg.process(gray));
 

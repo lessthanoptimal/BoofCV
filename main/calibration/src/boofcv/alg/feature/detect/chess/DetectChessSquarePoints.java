@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquaresBinary<T extends ImageSingleBand> {
+public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 	// detector for squares
 	BinaryPolygonConvexDetector<T> detectorSquare;
@@ -78,8 +78,8 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 	 * @param numRows Number of rows in square grid
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
-	public DetectChessSquaresBinary(int numCols, int numRows, double maxCornerDistance ,
-									BinaryPolygonConvexDetector<T> detectorSquare )
+	public DetectChessSquarePoints(int numCols, int numRows, double maxCornerDistance,
+								   BinaryPolygonConvexDetector<T> detectorSquare)
 	{
 		this.maxCornerDistanceSq = maxCornerDistance*maxCornerDistance;
 
@@ -178,7 +178,7 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 	void selectZeroSeed(SquareGrid inner, SquareGrid outer, Polygon2D_F64 innerBounding) {
 		if( outer.nodes.size() == 1 ) {
 			seedInner = inner.get(0,0);
-			seedOuter = outer.get(0, 0);
+			seedOuter = outer.get(0,0);
 		} else {
 			seedScore = Double.MAX_VALUE;
 			seedInner = seedOuter = null;
@@ -483,6 +483,18 @@ public class DetectChessSquaresBinary<T extends ImageSingleBand> {
 		}
 
 		return true;
+	}
+
+	public SquaresIntoClusters getClusters() {
+		return s2c;
+	}
+
+	public ClustersIntoGrids getGrids() {
+		return c2g;
+	}
+
+	public BinaryPolygonConvexDetector<T> getDetectorSquare() {
+		return detectorSquare;
 	}
 
 	public FastQueue<Point2D_F64> getCalibrationPoints() {
