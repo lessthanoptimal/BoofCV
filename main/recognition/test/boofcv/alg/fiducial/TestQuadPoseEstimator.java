@@ -74,7 +74,7 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void estimateP3P() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600).fsetRadial(0.04,0.02);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
@@ -111,11 +111,11 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void computeErrors() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
-		RotationMatrixGenerator.eulerXYZ(0.05,0.015,0.001,fiducialToCamera.R);
+		RotationMatrixGenerator.eulerXYZ(0.05, 0.015, 0.001, fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
 		alg.setIntrinsic(intrinsic);
@@ -124,21 +124,21 @@ public class TestQuadPoseEstimator {
 
 		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, fiducialToCamera);
 
-		alg.listObs.add(worldToPixel.transform(alg.points[0].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[1].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[2].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[3].location));
+		for (int i = 0; i < 4; i++) {
+			Point3D_F64 X = alg.points[i].location;
+			alg.listObs.add(worldToPixel.transform(X));
+		}
 
 		// perfect
 		assertEquals(0,alg.computeErrors(fiducialToCamera),1e-8);
 
 		// now with known errors
 		for (int i = 0; i < 4; i++) {
-			alg.listObs.get(0).x += 1.5;
+			alg.listObs.get(i).x += 1.5;
 
-			assertEquals(1.5*1.5,alg.computeErrors(fiducialToCamera),1e-8);
+			assertEquals(1.5,alg.computeErrors(fiducialToCamera),1e-8);
 
-			alg.listObs.get(0).x -= 1.5;
+			alg.listObs.get(i).x -= 1.5;
 		}
 
 	}

@@ -73,8 +73,10 @@ public class QuadPoseEstimator {
 	private PointTransform_F64 normToPixel;
 
 	// storage for inputs to estimation algorithms
+	// observations in normalized image coordinates
 	protected Point2D3D[] points = new Point2D3D[4];
 
+	// observation in undistorted pixels
 	protected List<Point2D_F64> listObs = new ArrayList<Point2D_F64>();
 
 	private List<Point2D3D> inputP3P = new ArrayList<Point2D3D>();
