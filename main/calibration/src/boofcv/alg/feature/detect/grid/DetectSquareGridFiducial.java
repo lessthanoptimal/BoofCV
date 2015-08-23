@@ -36,12 +36,18 @@ import java.util.List;
  * grid must be visible.  Space between the squares is specified as a ratio of the square size. The grid will be
  * oriented so that returned points are in counter clockwise (CCW) ordering, which appears to be CW in the image.
  *
- * There is also always at least two solutions to the ordering.  For sake of consistency it will select
- * the orientation where index 0 is the closest to the origin.
+ * <p>There is also always at least two solutions to the ordering.  For sake of consistency it will select
+ * the orientation where index 0 is the closest to the origin.</p>
+ *
+ * </p>
+ * <center>
+ * <img src="doc-files/square_grid.jpg"/>
+ * </center>
+ * Example of a 4 by 3 grid.  Note:  In other parts of the code this might be a 5 column by 7 row.
+ * <p>
  *
  * @author Peter Abeles
  */
-// TODO tell the polygon detector that there should be no inner contour
 public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 
 	// dimension of square grid.  This only refers to black squares and not the white space

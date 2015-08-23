@@ -22,6 +22,7 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarDetectorChessboard;
 import boofcv.abst.calib.PlanarDetectorSquareGrid;
+import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 
 /**
  * Creates descriptions of commonly used calibration targets
@@ -32,6 +33,8 @@ public class FactoryPlanarCalibrationTarget {
 
 	/**
 	 * Creates a calibration target detector for square grid targets.
+	 *
+	 * @see boofcv.alg.feature.detect.grid.DetectSquareGridFiducial
 	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
@@ -46,6 +49,7 @@ public class FactoryPlanarCalibrationTarget {
 	 * Creates a calibration target detector for chessboard targets.  Adjust the feature radius
 	 * for best performance.
 	 *
+	 * @see DetectChessboardFiducial
 	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.

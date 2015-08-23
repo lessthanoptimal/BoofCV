@@ -42,6 +42,13 @@ import java.util.List;
  * top the origin is selected.
  * </p>
  *
+ * </p>
+ * <center>
+ * <img src="doc-files/chessboard.jpg"/>
+ * </center>
+ * Example of a 5 by 7 grid; column, row.
+ * <p>
+ *
  * @author Peter Abeles
  */
 public class DetectChessboardFiducial<T extends ImageSingleBand, D extends ImageSingleBand> {

@@ -60,9 +60,10 @@ public class ConfigPolygonDetector implements Configuration {
 	public boolean refineWithCorners = false;
 
 	/**
-	 * Size of minimum shape contour as a fraction of the input image's width.
+	 * Specifies the minimum allowed contour length as a fraction of the input image's width.  Smaller numbers
+	 * mean smaller objects are allowed.
 	 */
-	public double minContourImageWidthFraction = 0.1;
+	public double minContourImageWidthFraction = 0.05;
 
 	/**
 	 * Will the found polygons be in clockwise order?

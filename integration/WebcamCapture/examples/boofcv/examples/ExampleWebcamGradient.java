@@ -53,7 +53,7 @@ public class ExampleWebcamGradient {
 		ImageFloat32 derivX = new ImageFloat32((int)viewSize.getWidth(),(int)viewSize.getHeight());
 		ImageFloat32 derivY = new ImageFloat32((int)viewSize.getWidth(),(int)viewSize.getHeight());
 
-		ShowImages.showWindow(gui,"Gradient");
+		ShowImages.showWindow(gui,"Gradient",true);
 
 		for(;;) {
 			BufferedImage image = webcam.getImage();

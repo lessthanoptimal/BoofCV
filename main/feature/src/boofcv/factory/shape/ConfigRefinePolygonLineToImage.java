@@ -49,7 +49,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration{
 	/**
 	 * Convergence tolerance in pixels
 	 */
-	public double convergeTolPixels = 1e-8;
+	public double convergeTolPixels = 0.2;
 	/**
 	 * If true it is fitting to a black shape, false means a white shape.
 	 */
