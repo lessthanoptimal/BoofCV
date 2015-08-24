@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardFiducial<T extends ImageSingleBand, D extends ImageSingleBand> {
+public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 	// detects the chess board 
 	private DetectChessSquarePoints<T> findSeeds;

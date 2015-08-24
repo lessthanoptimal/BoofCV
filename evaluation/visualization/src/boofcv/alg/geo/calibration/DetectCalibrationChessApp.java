@@ -56,7 +56,7 @@ public class DetectCalibrationChessApp
 		extends SelectInputPanel implements VisualizeApp, GridCalibPanel.Listener
 
 {
-	DetectChessboardFiducial<ImageFloat32,ImageFloat32> alg;
+	DetectChessboardFiducial<ImageFloat32> alg;
 
 	GridCalibPanel calibGUI;
 	ImageZoomPanel gui = new ImageZoomPanel();

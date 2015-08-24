@@ -134,4 +134,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		return layoutPoints;
 	}
 
+	public DetectSquareGridFiducial<ImageFloat32> getDetect() {
+		return detect;
+	}
 }

@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
-	DetectChessboardFiducial<ImageFloat32,ImageFloat32> alg;
+	DetectChessboardFiducial<ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	List<Point2D_F64> detected;
@@ -44,7 +44,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
 
-		alg = new DetectChessboardFiducial<ImageFloat32, ImageFloat32>(
+		alg = new DetectChessboardFiducial<ImageFloat32>(
 				config.numCols,config.numRows,detectorSquare,ImageFloat32.class);
 		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
 		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
@@ -77,7 +77,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 		return layoutPoints;
 	}
 
-	public DetectChessboardFiducial<ImageFloat32, ImageFloat32> getAlg() {
+	public DetectChessboardFiducial<ImageFloat32> getAlg() {
 		return alg;
 	}
 

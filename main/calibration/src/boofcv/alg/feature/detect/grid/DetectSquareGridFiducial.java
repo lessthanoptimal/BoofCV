@@ -184,4 +184,20 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	public int getCalibrationCols() {
 		return calibCols;
 	}
+
+	public BinaryPolygonConvexDetector<T> getDetectorSquare() {
+		return detectorSquare;
+	}
+
+	public SquaresIntoClusters getClusters() {
+		return s2c;
+	}
+
+	public ClustersIntoGrids getGrids() {
+		return c2g;
+	}
+
+	public ImageUInt8 getBinary() {
+		return binary;
+	}
 }
