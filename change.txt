@@ -80,7 +80,8 @@ Version : Alpha 0.19
 - Android
   * Can convert from 8888 to 3 channel multi-spectral images
 - BinaryImageOps
-  * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicity declare a boolean array
+  * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicitly declare a boolean array
+  * Added thin() operator for thinning/skeletonization
 - Template Matching
   * Can provide a mask for a template and effectively make pixels transparent or translucent
   * Requested by Rafael Maus and others

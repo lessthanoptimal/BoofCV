@@ -24,14 +24,17 @@ import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
- * Applies binary thinning operators.  There are 8 masks and each is run in sequence.
+ * Applies binary thinning operators to the input image.  Thinning discards most of objects foreground
+ * (value one) pixels are leaves behind a "skinny" object which still mostly describes the original object's shape.
  *
- * TODO CITE SORUCE
- * TODO SAY WHAT ITS GUARANTEES ARE
+ * This implementation is known as the morphological thinning.  It works by applying 8 masks to the image.  If a pixel
+ * matches a mask it is removed.  This cycle is repeated until the image no longer changes.
  *
  * @author Peter Abeles
  */
 public class BinaryThinning {
+
+	// -1 means any pixel value is ok
 
 	public static byte mask0[]=new byte[]{ 0, 0, 0,
 										  -1, 1,-1,
@@ -58,7 +61,7 @@ public class BinaryThinning {
 										   0, 1, 1,
 										  -1, 1, 1};
 
-	private Mask masks[] = new Mask[]{
+	Mask masks[] = new Mask[]{
 			new Mask0(), new Mask1(), new Mask2(), new Mask3(),
 			new Mask4(), new Mask5(), new Mask6(), new Mask7() };
 
@@ -66,12 +69,12 @@ public class BinaryThinning {
 	ImageUInt8 binary;
 	// all pixels outside the image are set to 0
 	ImageBorder_S32<ImageUInt8> inputBorder = ImageBorderValue.wrap(binary, 0);
-	// list of black pixels, input
-	GrowQueue_I32 black0 = new GrowQueue_I32();
-	// list of black pixels, output
-	GrowQueue_I32 black1 = new GrowQueue_I32();
-	// list of pixels which need to be set to white
-	GrowQueue_I32 whiteOut = new GrowQueue_I32();
+	// list of one valued pixels, input
+	GrowQueue_I32 ones0 = new GrowQueue_I32();
+	GrowQueue_I32 ones1 = new GrowQueue_I32();
+
+	// list of pixels which need to be set to zero
+	GrowQueue_I32 zerosOut = new GrowQueue_I32();
 
 	/**
 	 * Applies the thinning algorithm.  Runs for the specified number of loops or until no change is detected.
@@ -83,49 +86,53 @@ public class BinaryThinning {
 		this.binary = binary;
 		inputBorder.setImage(binary);
 
-		black0.reset();
-		black1.reset();
-		whiteOut.reset();
+		ones0.reset();
+		zerosOut.reset();
 
-		findBlackPixels(black0);
+		findOnePixels(ones0);
 
-		escape:
-		for (int loop = 0; loop < maxLoops || maxLoops == -1; loop++) {
+		for (int loop = 0; (loop < maxLoops || maxLoops == -1) && ones0.size > 0; loop++) {
 			// do one cycle through all the masks
+			zerosOut.reset();
 			for (int i = 0; i < masks.length; i++) {
 				Mask mask = masks[i];
-				mask.apply(black0,whiteOut,black1);
-
-				if( black0.size() == black1.size() )
-					break escape;
-
-				// modify the input image and turn the pixels which changes white
-				for (int j = 0; j < whiteOut.size(); j++) {
-					binary.data[whiteOut.get(j)] = 0;
-				}
-
-				// swap the lists
-				GrowQueue_I32 tmp = black0;
-				black0 = black1;
-				black1 = tmp;
-
-				// reset data structures
-				whiteOut.reset();
-				black1.reset();
+				mask.apply(ones0, zerosOut);
 			}
+
+			if( zerosOut.size() == 0 )
+				break;
+
+			// mark all the pixels that need to be set to 0 as 0
+			for (int i = 0; i < zerosOut.size(); i++) {
+				int index = zerosOut.get(i);
+				binary.data[index] = 0;
+			}
+
+			// update the ones list
+			ones1.reset();
+			for (int i = 0; i < ones0.size(); i++) {
+				if( binary.data[ones0.get(i)] == 1 ) {
+					ones1.add(ones0.get(i));
+				}
+			}
+
+			// swap the lists
+			GrowQueue_I32 tmp = ones0;
+			ones0 = ones1;
+			ones1 = tmp;
 		}
 
 	}
 
 	/**
-	 * Scans through the image and record the array index of all black pixels
+	 * Scans through the image and record the array index of all marked pixels
 	 */
-	protected void findBlackPixels( GrowQueue_I32 black ) {
+	protected void findOnePixels(GrowQueue_I32 ones) {
 		for (int y = 0; y < binary.height; y++) {
 			int index = binary.startIndex + y* binary.stride;
-			for (int x = 0; x < binary.width; x++) {
-				if( binary.data[index++] != 0 ) {
-					black.add(index);
+			for (int x = 0; x < binary.width; x++, index++) {
+				if( binary.data[index] != 0 ) {
+					ones.add(index);
 				}
 			}
 		}
@@ -143,29 +150,41 @@ public class BinaryThinning {
 			this.mask = mask;
 		}
 
-		public void apply( GrowQueue_I32 blackIn , GrowQueue_I32 whiteOut, GrowQueue_I32 blackOut ) {
+		/**
+		 *
+		 * @param onesIn (input) Indexes of pixels with a value of 1
+		 * @param zerosOut (output) Indexes of pixels whose values have changed form 1 to 0
+		 */
+		public void apply( GrowQueue_I32 onesIn , GrowQueue_I32 zerosOut ) {
 			int w = binary.width-1;
 			int h = binary.height-1;
 
-			for (int i = 0; i < blackIn.size; i++) {
-				int indexIn = blackIn.get(i);
-				int x = (indexIn- binary.startIndex)% binary.stride;
-				int y = (indexIn- binary.startIndex)/ binary.stride;
+			for (int i = 0; i < onesIn.size; i++) {
+				int indexIn = onesIn.get(i);
+				int x = (indexIn - binary.startIndex)% binary.stride;
+				int y = (indexIn - binary.startIndex)/ binary.stride;
 
-				boolean remainsBlack;
+				boolean staysAsOne;
 				if( x == 0 || x == w || y == 0 || y == h ) {
-					remainsBlack = borderMask( x, y);
+					staysAsOne = borderMask( x, y);
 				} else {
-					remainsBlack = innerMask(indexIn);
+					staysAsOne = innerMask(indexIn);
 				}
-				if( remainsBlack ) {
-					blackOut.add(indexIn);
-				} else {
-					whiteOut.add(indexIn);
+				if( !staysAsOne ) {
+					// yes some pixels will be marked more than once.  less memory and maybe faster than
+					// having  second binary image to keep track of what was already marked
+					zerosOut.add(indexIn);
 				}
 			}
 		}
 
+		/**
+		 * Slower code which uses a generic mask to handle image border
+		 *
+		 * @param cx x-coordinate of center pixels, always 1
+		 * @param cy y-coordinate of center pixels, always 1
+		 * @return true means the pixels keeps the value of one, otherwise it is set to zero
+		 */
 		protected boolean borderMask( int cx , int cy ) {
 
 			int maskIndex = 0;
@@ -185,6 +204,12 @@ public class BinaryThinning {
 			return false;
 		}
 
+		/**
+		 * Specialized code optimized for the inner image
+		 *
+		 * @param indexIn Index of center pixels, always 1
+		 * @return true means the pixels keeps the value of one, otherwise it is set to zero
+		 */
 		protected abstract boolean innerMask( int indexIn );
 
 	}

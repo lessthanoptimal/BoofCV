@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.filter.binary.impl.BinaryThinning;
 import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -376,6 +377,28 @@ public class BinaryImageOps {
 
 		ImplBinaryInnerOps.removePointNoise(input, output);
 		ImplBinaryBorderOps.removePointNoise(input, output);
+
+		return output;
+	}
+
+	/**
+	 * Applies a thinning operation to the image.  Also known as skeletonization.
+	 *
+	 * @see BinaryThinning
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param maxIterations Maximum number of cycles it will thin for.  -1 for the maximum required
+	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @return Output image.
+	 */
+	public static ImageUInt8 thin( ImageUInt8 input , int maxIterations, ImageUInt8 output ) {
+
+		output = InputSanityCheck.checkDeclare(input, output);
+
+		output.setTo(input);
+		BinaryThinning thinning = new BinaryThinning();
+
+		thinning.apply(output,maxIterations);
 
 		return output;
 	}
