@@ -382,7 +382,7 @@ public class BinaryImageOps {
 	}
 
 	/**
-	 * Applies a thinning operation to the image.  Also known as skeletonization.
+	 * Applies a morphological thinning operation to the image.  Also known as skeletonization.
 	 *
 	 * @see BinaryThinning
 	 *
