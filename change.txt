@@ -119,7 +119,6 @@ Version : Alpha 0.19
 TODO
   * Polygon Detector
     - *Regression with hand selected points
-    - try convex
 
   * BOW Scene classification
     - regression test

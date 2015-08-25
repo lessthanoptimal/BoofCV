@@ -108,6 +108,16 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 		Collections.sort(fileNames);
 	}
 
+	@Override
+	public int getNextWidth() {
+		return image.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return image.getHeight();
+	}
+
 	/**
 	 * True if there is another image to read and false if there are no more.
 	 */

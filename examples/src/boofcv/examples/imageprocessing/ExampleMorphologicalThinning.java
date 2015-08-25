@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExampleBinaryThinning {
+public class ExampleMorphologicalThinning {
 	public static void main(String[] args) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage("../data/applet/standard/fingerprint.jpg");

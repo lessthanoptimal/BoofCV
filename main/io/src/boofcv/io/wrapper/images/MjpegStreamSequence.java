@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.io.*;
  * @author Peter Abeles
  */
 public class MjpegStreamSequence<T extends ImageBase>
-implements SimpleImageSequence<T>
+		implements SimpleImageSequence<T>
 {
 	VideoMjpegCodec codec = new VideoMjpegCodec();
 	DataInputStream in;
@@ -68,6 +68,16 @@ implements SimpleImageSequence<T>
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	@Override
+	public int getNextWidth() {
+		return next.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return next.getHeight();
 	}
 
 	@Override

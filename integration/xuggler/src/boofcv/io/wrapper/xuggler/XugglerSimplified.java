@@ -155,6 +155,16 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	}
 
 	@Override
+	public int getNextWidth() {
+		return image.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return image.getHeight();
+	}
+
+	@Override
 	public boolean hasNext() {
 		if( hasNextBeenCalled ) {
 			hasNext = readNextFrame();

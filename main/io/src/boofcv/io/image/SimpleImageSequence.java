@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,16 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface SimpleImageSequence<T extends ImageBase> {
+
+	/**
+	 * Returns the width of the next image
+	 */
+	int getNextWidth();
+
+	/**
+	 * Returns the height of the next image
+	 */
+	int getNextHeight();
 
 	/**
 	 * If a new image is available.

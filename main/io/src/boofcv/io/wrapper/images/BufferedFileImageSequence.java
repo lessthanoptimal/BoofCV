@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,6 +98,16 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 
 	public void setLoop(boolean loop) {
 		this.loop = loop;
+	}
+
+	@Override
+	public int getNextWidth() {
+		return imageGUI.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return imageGUI.getHeight();
 	}
 
 	/**

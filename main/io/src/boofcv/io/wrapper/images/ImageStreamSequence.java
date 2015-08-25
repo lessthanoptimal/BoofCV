@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import java.io.*;
  * @author Peter Abeles
  */
 public class ImageStreamSequence<T extends ImageBase>
-implements SimpleImageSequence<T>
+		implements SimpleImageSequence<T>
 {
 	// If the data set was read from a file it can then be restarted
 	String fileName;
@@ -84,6 +84,16 @@ implements SimpleImageSequence<T>
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+	}
+
+	@Override
+	public int getNextWidth() {
+		return image.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return image.getWidth();
 	}
 
 	@Override

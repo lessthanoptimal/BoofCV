@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class ImageGridPanel extends JPanel {
 		autoSetPreferredSize();
 	}
 
-	public void autoSetPreferredSize() {
+	public synchronized void autoSetPreferredSize() {
 		int width = 0;
 		int height = 0;
 
@@ -74,7 +74,7 @@ public class ImageGridPanel extends JPanel {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 
@@ -98,17 +98,18 @@ public class ImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setImage( int row , int col , BufferedImage image ) {
+	public synchronized void setImage( int row , int col , BufferedImage image ) {
 		this.images[row*numCols+col] = image;
 	}
 
-	public BufferedImage getImage( int row , int col ) {
+	public synchronized BufferedImage getImage( int row , int col ) {
 		return images[row*numCols+col];
 	}
 
-	public void setImages( BufferedImage ...images ) {
+	public synchronized void setImages( BufferedImage ...images ) {
 		for( int i = 0; i < images.length; i++ ) {
 			this.images[i] = images[i];
 		}
+		autoSetPreferredSize();
 	}
 }

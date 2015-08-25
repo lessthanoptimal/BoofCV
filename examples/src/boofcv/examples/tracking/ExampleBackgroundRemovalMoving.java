@@ -29,7 +29,8 @@ import boofcv.factory.background.ConfigBackgroundGaussian;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
-import boofcv.gui.image.ImageBinaryPanel;
+import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
@@ -42,19 +43,26 @@ import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography;
 
+import java.awt.image.BufferedImage;
+
 /**
+ * Example showing how to perform background modeling with a moving camera.  Here the camera's motion is explicitly
+ * estimated using a motion model.  That motion model is then used to distort the image and generate background.
+ * The net affect is a significant reduction in false positives around the objects of images in oscillating cameras
+ * and the ability to detect motion in moving scenes.
+ *
  * @author Peter Abeles
  */
-// TODO simplify the creation image motion estimation
-// TODO Visualization.  Show input image in a window,  Difference + color in another
 public class ExampleBackgroundRemovalMoving {
 	public static void main(String[] args) {
 
-		String fileName = "../data/applet/background/horse_jitter.mjpg";
-//		String fileName = "../data/applet/shake.mjpeg";
+		// Example with a moving camera.  Highlights why motion estimation is sometimes required
+		String fileName = "../data/applet/tracking/chipmunk.mjpeg";
+		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
+//		String fileName = "../data/applet/background/horse_jitter.mp4";
 
+		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(ImageFloat32.class);
-//		ImageType imageType = ImageType.ms(3, ImageFloat32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
@@ -69,30 +77,47 @@ public class ExampleBackgroundRemovalMoving {
 				ImageFloat32.class, null);
 
 		// This estimates the 2D image motion
-		// An Affine2D_F64 model also works quite well.
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(500, 0.5, 3, 100, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
-		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.05f);
+		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.005f);
 
-		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(40,0.001f);
+		// Configuration for Gaussian model.  Note that the threshold changes depending on the number of image bands
+		// 12 = gray scale and 40 = color
+		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.001f);
 		configGaussian.initialVariance = 64;
 		configGaussian.minimumDifference = 5;
 
+		// Comment/Uncomment to switch background mode
 		BackgroundModelMoving background =
-//				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
-				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
+				FactoryBackgroundModel.movingBasic(configBasic, new PointTransformHomography_F32(), imageType);
+//				FactoryBackgroundModel.movingGaussian(configGaussian, new PointTransformHomography_F32(), imageType);
 
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
 
-		ImageUInt8 segmented = new ImageUInt8(1,1);
-		ImageFloat32 grey = new ImageFloat32(1,1);
+		//====== Initialize Images
 
+		// storage for segmented image.  Background = 0, Foreground = 1
+		ImageUInt8 segmented = new ImageUInt8(video.getNextWidth(),video.getNextHeight());
+		// Grey scale image that's the input for motion estimation
+		ImageFloat32 grey = new ImageFloat32(segmented.width,segmented.height);
+
+		// coordinate frames
 		Homography2D_F32 firstToCurrent32 = new Homography2D_F32();
+		Homography2D_F32 homeToWorld = new Homography2D_F32();
+		homeToWorld.a13 = grey.width/2;
+		homeToWorld.a23 = grey.height/2;
 
-		ImageBinaryPanel gui = null;
+		// Create a background image twice the size of the input image.  Tell it that the home is in the center
+		background.initialize(grey.width * 2, grey.height * 2, homeToWorld);
+
+		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);
+		ImageGridPanel gui = new ImageGridPanel(1,2);
+		gui.setImages(visualized, visualized);
+
+		ShowImages.showWindow(gui, "Detections", true);
 
 		double fps = 0;
 		double alpha = 0.01; // smoothing factor for FPS
@@ -100,35 +125,27 @@ public class ExampleBackgroundRemovalMoving {
 		while( video.hasNext() ) {
 			ImageBase input = video.next();
 
-			if( segmented.width != input.width ) {
-				segmented.reshape(input.width,input.height);
-				grey.reshape(input.width,input.height);
-				Homography2D_F32 homeToWorld = new Homography2D_F32();
-				homeToWorld.a13 = input.width/2;
-				homeToWorld.a23 = input.height/2;
-				background.initialize(input.width*2,input.height*2,homeToWorld);
-
-				gui = new ImageBinaryPanel(segmented);
-				ShowImages.showWindow(gui,"Detections",true);
-			}
-
 			long before = System.nanoTime();
 			GConvertImage.convert(input, grey);
 
-			if( !motion2D.process(grey) )
-				throw new RuntimeException("Failed!");
+			if( !motion2D.process(grey) ) {
+				throw new RuntimeException("Should handle this scenario");
+			}
 
 			Homography2D_F64 firstToCurrent64 = motion2D.getFirstToCurrent();
-			UtilHomography.convert(firstToCurrent64,firstToCurrent32);
+			UtilHomography.convert(firstToCurrent64, firstToCurrent32);
 
-			background.segment(firstToCurrent32,input,segmented);
+			background.segment(firstToCurrent32, input, segmented);
 			background.updateBackground(firstToCurrent32,input);
 			long after = System.nanoTime();
 
 			fps = (1.0-alpha)*fps + alpha*(1.0/((after-before)/1e9));
 
-			gui.setBinaryImage(segmented);
+			VisualizeBinaryData.renderBinary(segmented,false,visualized);
+			gui.setImage(0, 0, (BufferedImage)video.getGuiImage());
+			gui.setImage(0, 1, visualized);
 			gui.repaint();
+
 			System.out.println("FPS = "+fps);
 
 			try {Thread.sleep(5);} catch (InterruptedException e) {}

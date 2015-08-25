@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,6 +68,16 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 		this.loop = loop;
 
 		output = this.imageType.createImage(1,1);
+	}
+
+	@Override
+	public int getNextWidth() {
+		return output.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return output.getHeight();
 	}
 
 	@Override
