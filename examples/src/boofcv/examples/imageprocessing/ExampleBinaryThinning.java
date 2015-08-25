@@ -20,7 +20,6 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
@@ -41,17 +40,14 @@ import java.awt.image.BufferedImage;
 public class ExampleBinaryThinning {
 	public static void main(String[] args) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/finger_print.jpg");
+		BufferedImage image = UtilImageIO.loadImage("../data/applet/standard/fingerprint.jpg");
 
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 
-		// Select a global threshold using Otsu's method.
-		double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
-
-		// Apply the threshold to create a binary image
-		ThresholdImageOps.threshold(input, binary, (float) threshold, true);
+		// Adaptive threshold to better handle changes in local image intensity
+		GThresholdImageOps.adaptiveGaussian(input,binary,10,0,true,null,null);
 
 		// Tell it to thin the image until there are no more changes
 		ImageUInt8 thinned = BinaryImageOps.thin(binary, -1, null);
@@ -65,6 +61,6 @@ public class ExampleBinaryThinning {
 		panel.addImage(visualBinary, "Binary");
 		panel.addImage(image, "Original");
 
-		ShowImages.showWindow(panel,"Thinned/Skeletonalized Image");
+		ShowImages.showWindow(panel,"Thinned/Skeletonalized Image", true);
 	}
 }
