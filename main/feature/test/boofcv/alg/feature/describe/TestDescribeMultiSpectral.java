@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,5 +151,10 @@ public class TestDescribeMultiSpectral {
 
 		@Override
 		public ImageType getImageType() {return null;}
+
+		@Override
+		public double getScaleAtRadius(double radius) {
+			throw new RuntimeException("Fooo");
+		}
 	}
 }

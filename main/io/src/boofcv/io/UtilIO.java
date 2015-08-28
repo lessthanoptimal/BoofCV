@@ -136,7 +136,7 @@ public class UtilIO {
 		XStream xstream = createXStream();
 
 		try {
-			xstream.toXML(o,new FileOutputStream(fileName));
+			xstream.toXML(o, new FileOutputStream(fileName));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -165,6 +165,33 @@ public class UtilIO {
 				new ClassLoaderReference(Thread.currentThread().getContextClassLoader()));
 		xstream.registerConverter(new JavaBeanConverter(xstream.getMapper()));
 		return xstream;
+	}
+
+	public static void save( Object o , String fileName ) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(o);
+			out.close();
+			fileOut.close();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static <T> T load( String fileName ) {
+		try {
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			T obj = (T)in.readObject();
+			in.close();
+			fileIn.close();
+			return obj;
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

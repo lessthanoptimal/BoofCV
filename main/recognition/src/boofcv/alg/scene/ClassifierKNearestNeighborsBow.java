@@ -66,7 +66,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 	private int numNeighbors;
 
 	// used what the most frequent neighbor is
-	private int scenes[];
+	private double scenes[];
 
 	/**
 	 * Configures internal algorithms.
@@ -81,8 +81,6 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 		this.nn = nn;
 		this.describe = describe;
 		this.featureToHistogram = featureToHistogram;
-
-		scenes = new int[ featureToHistogram.getTotalWords() ];
 
 		imageFeatures = new FastQueue<Desc>(describe.getDescriptionType(),true) {
 			@Override
@@ -103,7 +101,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 	 * Provides a set of labeled word histograms to use to classify a new image
 	 * @param memory labeled histograms
 	 */
-	public void setClassificationData(List<HistogramScene> memory) {
+	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
 		List<double[]> points = new ArrayList<double[]>(memory.size());
 		for (int i = 0; i < memory.size(); i++) {
@@ -113,7 +111,9 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 		int numWords = featureToHistogram.getTotalWords();
 
 		nn.init(numWords);
-		nn.setPoints(points,memory);
+		nn.setPoints(points, memory);
+
+		scenes = new double[ numScenes ];
 	}
 
 	/**
@@ -122,6 +122,8 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 	 * @return The index of the scene it most resembles
 	 */
 	public int classify(T image) {
+		if( numNeighbors == 0 )
+			throw new IllegalArgumentException("Must specify number of neighbors!");
 
 		// compute all the features inside the image
 		imageFeatures.reset();
@@ -146,12 +148,14 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 			NnData<HistogramScene> data = resultsNN.get(i);
 			HistogramScene n = data.data;
 
-			scenes[n.type]++;
+//			scenes[n.type]++;
+			scenes[n.type] += 1.0/(data.distance+0.005); // todo
+//			scenes[n.type] += 1.0/(Math.sqrt(data.distance)+0.005); // todo
 		}
 
 		// pick the scene with the highest frequency
 		int bestIndex = 0;
-		int bestCount = 0;
+		double bestCount = 0;
 
 		for (int i = 0; i < scenes.length; i++) {
 			if( scenes[i] > bestCount ) {

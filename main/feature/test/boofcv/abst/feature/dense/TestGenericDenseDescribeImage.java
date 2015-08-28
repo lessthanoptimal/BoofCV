@@ -119,6 +119,11 @@ public class TestGenericDenseDescribeImage {
 		}
 
 		@Override
+		public double getScaleAtRadius(double radius) {
+			throw new RuntimeException("Foo");
+		}
+
+		@Override
 		public TupleDesc createDescription() {
 			return new TupleDesc_F64(10);
 		}

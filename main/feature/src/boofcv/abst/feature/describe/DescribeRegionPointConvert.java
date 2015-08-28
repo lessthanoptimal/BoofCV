@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,6 +80,11 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	@Override
 	public ImageType<T> getImageType() {
 		return original.getImageType();
+	}
+
+	@Override
+	public double getScaleAtRadius(double radius) {
+		return original.getScaleAtRadius(radius);
 	}
 
 	@Override

@@ -24,13 +24,21 @@ import boofcv.alg.bow.LearnSceneFromFiles;
 import boofcv.alg.scene.ClassifierKNearestNeighborsBow;
 import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
+import boofcv.factory.feature.dense.ConfigDenseSample;
+import boofcv.factory.feature.dense.FactoryDescribeImageDense;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.learning.Confusion;
 import org.ddogleg.clustering.AssignCluster;
+import org.ddogleg.clustering.ComputeClusters;
+import org.ddogleg.clustering.FactoryClustering;
+import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.struct.FastQueue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,90 +47,141 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleLearnSceneKnn {
+public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 
-	public static int NUMBER_OF_WORDS = 200;
+	public static int NUMBER_OF_WORDS = 50;
 	public static boolean HISTOGRAM_HARD = true;
-
-	public static class Learning extends LearnSceneFromFiles {
-
-		ClusterVisualWords cluster;
-		DescribeImageDense<ImageUInt8,TupleDesc_F64> describeImage;
-		NearestNeighbor<HistogramScene> nn;
+	public static int NUM_NEIGHBORS = 10;
+	public static int MAX_KNN_ITERATIONS = 100;
+	public static double DESC_RADIUS = 16;
+	public static int DESC_SKIP = 8;
 
 
-		ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64> classifier;
+	ClusterVisualWords cluster;
+	DescribeImageDense<ImageUInt8,TupleDesc_F64> describeImage;
+	NearestNeighbor<HistogramScene> nn;
 
-		// Storage for detected features
-		FastQueue<TupleDesc_F64> features;
+	ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64> classifier;
 
-		public Learning(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
-						ClusterVisualWords cluster,
-						NearestNeighbor<HistogramScene> nn ) {
-			this.describeImage = describeImage;
-			this.cluster = cluster;
-			this.nn = nn;
+	// Storage for detected features
+	FastQueue<TupleDesc_F64> features;
 
+	public ExampleLearnSceneKnn(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
+								ComputeClusters<double[]> clusterer,
+								NearestNeighbor<HistogramScene> nn ) {
+		this.describeImage = describeImage;
+		this.cluster = new ClusterVisualWords(clusterer,
+				describeImage.createDescription().size(),0xFEEDBEEF);
+		this.nn = nn;
 
-			// This list can be dynamically grown.  However TupleDesc doesn't have a no argument constructor so
-			// you must to it how to cosntruct the data
-			features = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-				@Override
-				protected TupleDesc_F64 createInstance() {
-					return describeImage.createDescription();
-				}
-			};
-		}
+		// This list can be dynamically grown.  However TupleDesc doesn't have a no argument constructor so
+		// you must to it how to cosntruct the data
+		features = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
+			@Override
+			protected TupleDesc_F64 createInstance() {
+				return describeImage.createDescription();
+			}
+		};
+	}
 
-		public void learn() {
-			// load all features in the training set
-			for( String scene : train.keySet() ) {
-				List<String> imagePaths = train.get(scene);
+	private String getClusterName() {
+		return "clusters.xml";
+	}
 
-				for( String path : imagePaths ) {
-					ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+	private String getHistogramsName() {
+		return "histograms.xml";
+	}
 
-					features.reset();
-					describeImage.process(image,features,null);
+	private AssignCluster<double[]> computeClusters() {
+		// load all features in the training set
+		for( String scene : train.keySet() ) {
+			System.out.println("   " + scene);
+			List<String> imagePaths = train.get(scene);
 
-					// add the features to the overall list which the clusters will be found inside of
-					for (int i = 0; i < features.size; i++) {
-						cluster.add(features.get(i));
-					}
+			for( String path : imagePaths ) {
+				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+
+				features.reset();
+				describeImage.process(image,features,null);
+
+				// add the features to the overall list which the clusters will be found inside of
+				for (int i = 0; i < features.size; i++) {
+					cluster.add(features.get(i));
 				}
 			}
+		}
 
-			// Find the clusters.  This can take a bit
-			cluster.process(NUMBER_OF_WORDS);
+		System.out.println("Clustering");
+		// Find the clusters.  This can take a bit
+		cluster.process(NUMBER_OF_WORDS);
 
-			// Use these clusters to assign features to words
-			AssignCluster<double[]> assignment =  cluster.getAssignment();
-			FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
+		UtilIO.save(cluster.getAssignment(), getClusterName());
 
-			// Must use this list of the scenes.  Otherwise the index will be different
-			List<String> scenes = getScenes();
+		return cluster.getAssignment();
+	}
 
-			// Processed results which will be passed into the k-NN algorithm
-			List<HistogramScene> memory = new ArrayList<HistogramScene>();
+	public void learn() {
+		System.out.println("======== Learning Classifier");
 
-			for( int sceneIndex = 0; sceneIndex < scenes.size(); sceneIndex++ ) {
-				String scene = scenes.get(sceneIndex);
-				List<String> imagePaths = train.get(scene);
+		File clusterFile = new File(getClusterName());
+		File histogramFile = new File(getHistogramsName());
+
+		AssignCluster<double[]> assignment;
+		if( clusterFile.exists() ) {
+			System.out.println(" Loading "+clusterFile.getName());
+			assignment = UtilIO.load(clusterFile.getName());
+		} else {
+			System.out.println(" Computing clusters");
+			assignment = computeClusters();
+		}
+
+		// Use these clusters to assign features to words
+		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
+
+		// Storage for the work histogram in each image in the training set and their label
+		List<HistogramScene> memory;
+
+		if( histogramFile.exists() ) {
+			System.out.println(" Loading "+histogramFile.getName());
+			memory = UtilIO.load(histogramFile.getName());
+		} else {
+			System.out.println(" computing histograms");
+			memory = computeHistograms(featuresToHistogram);
+			UtilIO.save(memory,histogramFile.getName());
+		}
+
+
+		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
+		classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
+		classifier.setClassificationData(memory,getScenes().size());
+		classifier.setNumNeighbors(NUM_NEIGHBORS);
+	}
+
+	private List<HistogramScene> computeHistograms(FeatureToWordHistogram_F64 featuresToHistogram ) {
+
+		List<String> scenes = getScenes();
+
+		List<HistogramScene> memory;// Processed results which will be passed into the k-NN algorithm
+		memory = new ArrayList<HistogramScene>();
+
+		for( int sceneIndex = 0; sceneIndex < scenes.size(); sceneIndex++ ) {
+			String scene = scenes.get(sceneIndex);
+			System.out.println("   " + scene);
+			List<String> imagePaths = train.get(scene);
+
+			for (String path : imagePaths) {
+				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
 
 				// reset before processing a new image
 				featuresToHistogram.reset();
-
-				for (String path : imagePaths) {
-					ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
-
-					features.reset();
-					describeImage.process(image, features,null);
-					for (int i = 0; i < features.size; i++) {
-						featuresToHistogram.addFeature(features.get(i));
-					}
+				features.reset();
+				describeImage.process(image, features,null);
+				for (int i = 0; i < features.size; i++) {
+					featuresToHistogram.addFeature(features.get(i));
 				}
+				featuresToHistogram.process();
 
-				// The histogram is already normalized so that it sums up to 1.  This provides same invariance
+				// The histogram is already normalized so that it sums up to 1.  This provides invariance
 				// against the overall number of features changing.
 				double[] histogram = featuresToHistogram.getHistogram();
 
@@ -133,30 +192,40 @@ public class ExampleLearnSceneKnn {
 
 				memory.add(imageHist);
 			}
-
-			// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
-			classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
-			classifier.setClassificationData(memory);
 		}
+		return memory;
+	}
 
-		@Override
-		protected int classify(String path) {
-			ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+	@Override
+	protected int classify(String path) {
+		ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
 
-			return classifier.classify(image);
-		}
-
-
+		return classifier.classify(image);
 	}
 
 	public static void main(String[] args) {
 
+		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
+				FactoryDescribeImageDense.surfStable(null,
+						new ConfigDenseSample(DESC_RADIUS,DESC_SKIP,DESC_SKIP),ImageUInt8.class);
+
+		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null,MAX_KNN_ITERATIONS,20,1e-6);
+		clusterer.setVerbose(true);
+
+		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive();
+		ExampleLearnSceneKnn example = new ExampleLearnSceneKnn(desc,clusterer,nn);
+
+		example.loadSets(new File("/home/pja/projects/bow/brown/data/train"),null,
+				new File("/home/pja/projects/bow/brown/data/test"));
 		// train
+		example.learn();
 
 		// test
+		Confusion confusion = example.evaluateTest();
+		confusion.getMatrix().print();
+		System.out.println("Accuracy = " + confusion.computeAccuracy());
 
-		// save results
-		// TODO save cluster assignment
-		// TODO save memory
+		// current settings 0.4576592819873412
+		// best so far 0.4712136547498593 - not sure how I got that, changed how scale is specified after
 	}
 }

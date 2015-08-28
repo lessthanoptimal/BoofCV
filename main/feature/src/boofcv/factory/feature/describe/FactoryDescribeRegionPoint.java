@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,18 +54,18 @@ public class FactoryDescribeRegionPoint {
 	 * @see DescribePointSurf
 	 *
 	 * @param config SURF configuration. Pass in null for default options.
-	 * @param bandType Type of input image.
+	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> bandType) {
+	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
-		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
+		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
 
-		return new WrapDescribeSurf( alg , bandType );
+		return new WrapDescribeSurf( alg , imageType );
 	}
 
 	/**

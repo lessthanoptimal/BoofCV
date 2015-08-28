@@ -51,6 +51,10 @@ public abstract class LearnSceneFromFiles {
 	protected Map<String,List<String>> cross;
 	protected Map<String,List<String>> test;
 
+	public Confusion evaluateTest() {
+		return evaluate(test);
+	}
+
 	/**
 	 * Given a set of images with known classification, predict which scene each one belongs in and compute
 	 * a confusion matrix for the results.
@@ -61,10 +65,17 @@ public abstract class LearnSceneFromFiles {
 	protected Confusion evaluate( Map<String,List<String>> set ) {
 		ClassificationHistogram histogram = new ClassificationHistogram(scenes.size());
 
+		int total = 0;
+		for (int i = 0; i < scenes.size(); i++) {
+			total += set.get(scenes.get(i)).size();
+		}
+		System.out.println("total images "+total);
+
 		for (int i = 0; i < scenes.size(); i++) {
 			String scene = scenes.get(i);
 
 			List<String> images = set.get(scene);
+			System.out.println("  "+scene+" "+images.size());
 			for (String image : images) {
 				int predicted = classify(image);
 				histogram.increment(i, predicted);
@@ -83,12 +94,23 @@ public abstract class LearnSceneFromFiles {
 
 
 	public void loadSets( File dirTraining, File dirCross , File dirTest ) {
-		train = findImages(dirTest);
+		train = findImages(dirTraining);
 		if( dirCross != null )
-			cross = findImages(dirTest);
+			cross = findImages(dirCross);
 		test = findImages(dirTest);
 
-		// TODO make sure the same scenes are included in all sets
+		extractKeys(train);
+		extractKeys(test);
+	}
+
+	private void extractKeys( Map<String,List<String>> images ) {
+		Set<String> keys = images.keySet();
+
+		for( String key : keys ) {
+			if( !scenes.contains(key)) {
+				scenes.add(key);
+			}
+		}
 	}
 
 	public void loadThenSplit( File directory ) {

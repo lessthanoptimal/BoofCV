@@ -18,13 +18,15 @@
 
 package boofcv.alg.scene;
 
+import java.io.Serializable;
+
 /**
  * Histogram which represents the frequency of different types of words in a single image.
  * Typically used during scene classification.
  *
  * @author Peter Abeles
  */
-public class HistogramScene {
+public class HistogramScene implements Serializable {
 	/**
 	 * Normalized word frequency histogram.  Normalized so that it sums up to 1.
 	 */
@@ -38,6 +40,9 @@ public class HistogramScene {
 		histogram = new double[numWords];
 	}
 
+	public HistogramScene() {
+	}
+
 	public void setHistogram( double original[] ) {
 		System.arraycopy(original,0,histogram,0,histogram.length);
 	}
@@ -48,5 +53,9 @@ public class HistogramScene {
 
 	public int getType() {
 		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 }

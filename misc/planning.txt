@@ -25,3 +25,9 @@ Alpha 0.20
   * Gaussian Mixture Model for individual pixels
   * Shadow removal
   * remove support for MultiSpectral once Interleaved is supported enough
+
+- Dense SIFT
+  * Fix SIFT
+
+- Unit test for getScaleAtRadius
+  * Implement universally

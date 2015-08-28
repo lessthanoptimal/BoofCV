@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,6 +92,11 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	@Override
 	public ImageType<MultiSpectral<T>> getImageType() {
 		return imageType;
+	}
+
+	@Override
+	public double getScaleAtRadius(double radius) {
+		return alg.getDescribe().getRadius()*radius;
 	}
 
 	@Override

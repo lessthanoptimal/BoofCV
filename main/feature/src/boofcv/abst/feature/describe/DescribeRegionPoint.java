@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,4 +80,11 @@ public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc
 	 * @return ImageDataType
 	 */
 	public ImageType<T> getImageType();
+
+	/**
+	 * Returns the scale at which the descriptor has the specified radius
+	 * @param radius Radius of the descriptor.  Width is 2*radius
+	 * @return The scale that it has that radius
+	 */
+	public double getScaleAtRadius( double radius );
 }

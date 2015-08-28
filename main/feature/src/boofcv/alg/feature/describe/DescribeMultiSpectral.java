@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,5 +111,10 @@ public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc exte
 	@Override
 	public Class<Desc> getDescriptionType() {
 		return descType;
+	}
+
+	@Override
+	public double getScaleAtRadius( double radius ) {
+		return describers[0].getScaleAtRadius(radius);
 	}
 }

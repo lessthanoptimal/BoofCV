@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 		if( !alg.isInBounds((int)x,(int)y) )
 			return false;
 
-		alg.process((int)x,(int)y,storage);
+		alg.process((int) x, (int) y, storage);
 
 		return true;
 	}
@@ -82,5 +82,10 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	@Override
 	public Class<NccFeature> getDescriptionType() {
 		return NccFeature.class;
+	}
+
+	@Override
+	public double getScaleAtRadius(double radius) {
+		throw new RuntimeException("Not yet implemented");
 	}
 }

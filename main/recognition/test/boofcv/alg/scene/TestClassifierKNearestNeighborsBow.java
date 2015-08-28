@@ -56,7 +56,7 @@ public class TestClassifierKNearestNeighborsBow {
 
 		ClassifierKNearestNeighborsBow bow = new ClassifierKNearestNeighborsBow(nn,features,toWords);
 		bow.setNumNeighbors(6);
-		bow.setClassificationData(memory);
+		bow.setClassificationData(memory, 3);
 
 		assertEquals(2, bow.classify(new ImageUInt8(2, 3)));
 

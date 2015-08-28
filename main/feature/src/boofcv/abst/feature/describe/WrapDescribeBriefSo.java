@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	@Override
 	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
 	{
-		alg.process((float)x,(float)y,(float)orientation,(float)scale,storage);
+		alg.process((float) x, (float) y, (float) orientation, (float) scale, storage);
 		return true;
 	}
 
@@ -73,5 +73,10 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	@Override
 	public Class<TupleDesc_B> getDescriptionType() {
 		return TupleDesc_B.class;
+	}
+
+	@Override
+	public double getScaleAtRadius(double radius) {
+		throw new RuntimeException("Not yet implemented");
 	}
 }

@@ -30,8 +30,8 @@ import java.util.Arrays;
  * best fit to the feature.  In soft the relative similarity between the words is used to assign values to the histogram.
  * </p>
  * <p>
- * With hard assignment a single word is selected.  With soft a fraction is assigned to each word based on some
- * implementation specific distance metric.  See {@link AssignCluster} for the details.
+ * With hard assignment a single word is selected.  With soft a fraction is assigned to each word based on
+ * a distance metric.  See {@link AssignCluster} for the details.
  * </p>
  * @author Peter Abeles
  */
@@ -50,6 +50,9 @@ public class FeatureToWordHistogram_F64
 
 	// internal work space
 	private double temp[];
+
+	// used to catch a common bug
+	private boolean processed;
 
 	/**
 	 * Assigns and configures internal algorithms.
@@ -70,6 +73,7 @@ public class FeatureToWordHistogram_F64
 	@Override
 	public void reset() {
 		total = 0;
+		processed = false;
 		Arrays.fill(histogram,0);
 	}
 
@@ -92,6 +96,7 @@ public class FeatureToWordHistogram_F64
 	 */
 	@Override
 	public void process() {
+		processed = true;
 		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] /= total;
 		}
@@ -103,6 +108,8 @@ public class FeatureToWordHistogram_F64
 	 */
 	@Override
 	public double[] getHistogram() {
+		if( !processed )
+			throw new RuntimeException("Must call process first before histogram is valid");
 		return histogram;
 	}
 

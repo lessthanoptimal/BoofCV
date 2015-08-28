@@ -60,6 +60,16 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 	}
 
 	@Override
+	public int getNextWidth() {
+		return frameNext.getWidth();
+	}
+
+	@Override
+	public int getNextHeight() {
+		return frameNext.getHeight();
+	}
+
+	@Override
 	public boolean hasNext() {
 		return frameNext != null;
 	}

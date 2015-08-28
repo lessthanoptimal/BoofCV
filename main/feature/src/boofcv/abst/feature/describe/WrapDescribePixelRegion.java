@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	@Override
 	public boolean process(double x, double y, double orientation, double scale, D storage)
 	{
-		alg.process((int)x,(int)y,storage);
+		alg.process((int) x, (int) y, storage);
 
 		return true;
 	}
@@ -81,5 +81,10 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	@Override
 	public Class<D> getDescriptionType() {
 		return alg.getDescriptorType();
+	}
+
+	@Override
+	public double getScaleAtRadius(double radius) {
+		throw new RuntimeException("Not yet implemented");
 	}
 }
