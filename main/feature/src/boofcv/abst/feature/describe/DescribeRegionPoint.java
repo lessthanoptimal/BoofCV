@@ -82,7 +82,9 @@ public interface DescribeRegionPoint<T extends ImageBase, Desc extends TupleDesc
 	public ImageType<T> getImageType();
 
 	/**
-	 * Returns the scale at which the descriptor has the specified radius
+	 * Returns the scale at which the descriptor has the specified radius.  The radius of the descriptor
+	 * defines a square region (width = 2*radius) in which all the image pixels which are sampled is
+	 * contained.
 	 * @param radius Radius of the descriptor.  Width is 2*radius
 	 * @return The scale that it has that radius
 	 */

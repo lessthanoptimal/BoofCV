@@ -1,10 +1,4 @@
 
-repositories {
-    maven {
-        url "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
-    }
-}
-
 dependencies {
     compile project(':main:ip')
     compile project(':main:io')

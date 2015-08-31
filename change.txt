@@ -125,7 +125,6 @@ TODO
     - examples
 
   * Android Demo:   Automatic Threshold.  Dim slider for global
-  * Background model example
   * Documentation on how to build a single jar
 
 ---------------------------------------------

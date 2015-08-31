@@ -227,5 +227,8 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 
 		// current settings 0.4576592819873412
 		// best so far 0.4712136547498593 - not sure how I got that, changed how scale is specified after
+
+		// skip 6 = Accuracy = 0.44168243495940473
+
 	}
 }

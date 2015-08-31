@@ -87,5 +87,8 @@ public class TestClusterVisualWords {
 		public double getDistanceMeasure() {
 			return DISTANCE;
 		}
+
+		@Override
+		public void setVerbose(boolean verbose) {}
 	}
 }

@@ -2,6 +2,7 @@ Alpha 0.20
 
 - BinaryPolygonConvexDetector
   * See if it will work with concave shapes too
+  * Filter out
 
 - SnapToEdge
   * Does it really need to know if left/right is darker/lighter?
@@ -10,6 +11,8 @@ Alpha 0.20
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
+  * Regression tests that can determine if orientation is correct
+    - If multiple squares on same surface see if their orientation is the same
 
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
@@ -31,3 +34,4 @@ Alpha 0.20
 
 - Unit test for getScaleAtRadius
   * Implement universally
+  * Create unit test for it

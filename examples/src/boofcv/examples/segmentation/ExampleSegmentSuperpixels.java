@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
@@ -94,13 +95,15 @@ public class ExampleSegmentSuperpixels {
 
 		// Make region edges appear red
 		BufferedImage outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(color,outBorder,true);
+		ConvertBufferedImage.convertTo(color, outBorder, true);
 		VisualizeRegions.regionBorders(pixelToRegion,0xFF0000,outBorder);
 
 		// Show the visualization results
-		ShowImages.showWindow(outSegments, "Regions");
-		ShowImages.showWindow(outBorder,"Region Borders");
-		ShowImages.showWindow(outColor,"Color of Segments");
+		ListDisplayPanel gui = new ListDisplayPanel();
+		gui.addImage(outColor,"Color of Segments");
+		gui.addImage(outBorder, "Region Borders");
+		gui.addImage(outSegments, "Regions");
+		ShowImages.showWindow(gui,"Superpixels", true);
 	}
 
 	public static void main(String[] args) {
