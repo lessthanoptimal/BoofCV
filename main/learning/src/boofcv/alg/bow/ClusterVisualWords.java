@@ -55,10 +55,11 @@ public class ClusterVisualWords {
 	}
 
 	/**
-	 * Add a feature to the list
-	 * @param feature image feature
+	 * Add a feature to the list.
+	 *
+	 * @param feature image feature. Reference to inner array is saved.
 	 */
-	public void add(TupleDesc_F64 feature ) {
+	public void addReference(TupleDesc_F64 feature) {
 		tuples.add(feature.getValue());
 	}
 

@@ -84,7 +84,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
+	public double getCanonicalWidth() {
 		throw new RuntimeException("Not yet implemented");
 	}
 }

@@ -43,9 +43,9 @@ public class TestClusterVisualWords {
 		DummyClusters clusters = new DummyClusters();
 		ClusterVisualWords alg = new ClusterVisualWords(clusters,DOF,SEED);
 
-		alg.add(new TupleDesc_F64(2));
-		alg.add(new TupleDesc_F64(2));
-		alg.add(new TupleDesc_F64(2));
+		alg.addReference(new TupleDesc_F64(2));
+		alg.addReference(new TupleDesc_F64(2));
+		alg.addReference(new TupleDesc_F64(2));
 		alg.process(NUM_CLUSTERS);
 
 		assertEquals(1,clusters.numInit);

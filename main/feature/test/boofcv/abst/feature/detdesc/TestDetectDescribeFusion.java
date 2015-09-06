@@ -167,7 +167,7 @@ public class TestDetectDescribeFusion {
 		public ImageType getImageType() {return null;}
 
 		@Override
-		public double getScaleAtRadius(double radius) {
+		public double getCanonicalWidth() {
 			throw new RuntimeException("Foo");
 		}
 	}

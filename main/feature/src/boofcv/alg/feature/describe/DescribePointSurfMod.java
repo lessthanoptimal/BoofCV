@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,7 +185,7 @@ public class DescribePointSurfMod<II extends ImageSingleBand> extends DescribePo
 	}
 
 	@Override
-	public int getRadius() {
-		return (widthLargeGrid*widthSubRegion+widthSample)/2 + overLap;
+	public int getCanonicalWidth() {
+		return super.getCanonicalWidth() + 2*overLap;
 	}
 }

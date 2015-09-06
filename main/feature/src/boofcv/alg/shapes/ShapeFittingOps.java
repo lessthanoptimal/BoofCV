@@ -49,11 +49,11 @@ import java.util.List;
 public class ShapeFittingOps {
 
 	/**
-	 * Fits a polygon to the provided sequence of connected points.  The found polygon is returned as a list of
-	 * vertices.  Each point in the original sequence is guaranteed to be within "toleranceDist' of a line segment.
+	 * <p>Fits a polygon to the provided sequence of connected points.  The found polygon is returned as a list of
+	 * vertices.  Each point in the original sequence is guaranteed to be within "toleranceDist' of a line segment.</p>
 	 *
-	 * Internally a split-and-merge algorithm is used.  See referenced classes for more information. Consider
-	 * using internal algorithms directly if this function is a performance bottleneck.
+	 * <p>Internally a split-and-merge algorithm is used.  See referenced classes for more information. Consider
+	 * using internal algorithms directly if this function is a performance bottleneck.</p>
 	 *
 	 * @see SplitMergeLineFitLoop
 	 * @see SplitMergeLineFitSegment
@@ -97,7 +97,7 @@ public class ShapeFittingOps {
 	 * optimization can be controlled using 'iterations' parameter.  Will work with partial and complete contours
 	 * of objects.
 	 *
-	 * NOTE: To improve speed, directly call classes from Georegression.  Look at the code for details.
+	 * <p>NOTE: To improve speed, make calls directly to classes in Georegression.  Look at the code for details.</p>
 	 *
 	 * @param points (Input) Set of unordered points. Not modified.
 	 * @param iterations Number of iterations used to refine the fit. If set to zero then an algebraic solution

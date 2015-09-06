@@ -84,8 +84,8 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
-		return radius/surf.getRadius();
+	public double getCanonicalWidth() {
+		return surf.getCanonicalWidth();
 	}
 
 	@Override

@@ -37,26 +37,51 @@ import org.ddogleg.clustering.FactoryClustering;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.ops.MatrixVisualization;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Example of how to train a K-NN bow-of-word classifier for scene recognition.  TODO flush out more
+ * <p>
+ * Example of how to train a K-NN bow-of-word classifier for scene recognition.  The resulting classifier
+ * produces results which are correct 46% of the time.  To provide a point of comparison, a
+ * SVM One vs One RBF classifier can produce accuracy of around 74% and other people using different techniques
+ * claim to have achieved around 85% accurate.
+ * </p>
+ *
+ * Training Steps:
+ * <ol>
+ * <li>Compute dense SURF features across the training data set.</li>
+ * <li>Cluster using k-means to create works.</li>
+ * <li>For each image compute the histogram of words found in the image<li>
+ * <li>Save word histograms and image scene labels in a classifier</li>
+ * </ol>
+ *
+ * Testing Steps:
+ * <ol>
+ * <li>For each image in the testing data set compute its histogram</li>
+ * <li>Look up the k-nearest-neighbors for that histogram</li>
+ * <li>Classify an image by by selecting the scene type with the most neighbors</li>
+ * </ol>
+ *
+ * <p>NOTE: Scene recognition is still very much a work in progress and the code is likely to be significantly
+ * modified in the future.</p>
  *
  * @author Peter Abeles
  */
 public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 
+	// Tuning parameters
 	public static int NUMBER_OF_WORDS = 50;
 	public static boolean HISTOGRAM_HARD = true;
 	public static int NUM_NEIGHBORS = 10;
 	public static int MAX_KNN_ITERATIONS = 100;
-	public static double DESC_RADIUS = 16;
+	public static double DESC_SCALE = 1.0;
 	public static int DESC_SKIP = 8;
 
-
+	// Algorithms
 	ClusterVisualWords cluster;
 	DescribeImageDense<ImageUInt8,TupleDesc_F64> describeImage;
 	NearestNeighbor<HistogramScene> nn;
@@ -70,8 +95,7 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 								ComputeClusters<double[]> clusterer,
 								NearestNeighbor<HistogramScene> nn ) {
 		this.describeImage = describeImage;
-		this.cluster = new ClusterVisualWords(clusterer,
-				describeImage.createDescription().size(),0xFEEDBEEF);
+		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(),0xFEEDBEEF);
 		this.nn = nn;
 
 		// This list can be dynamically grown.  However TupleDesc doesn't have a no argument constructor so
@@ -85,30 +109,31 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 	}
 
 	private String getClusterName() {
-		return "clusters.xml";
+		return "clusters.obj";
 	}
 
 	private String getHistogramsName() {
-		return "histograms.xml";
+		return "histograms.obj";
 	}
 
+	/**
+	 * Extract dense features across the training set.  Then clusters are found within those features.
+	 */
 	private AssignCluster<double[]> computeClusters() {
 		// load all features in the training set
+		features.reset();
 		for( String scene : train.keySet() ) {
-			System.out.println("   " + scene);
 			List<String> imagePaths = train.get(scene);
+			System.out.println("   " + scene);
 
 			for( String path : imagePaths ) {
 				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
-
-				features.reset();
 				describeImage.process(image,features,null);
-
-				// add the features to the overall list which the clusters will be found inside of
-				for (int i = 0; i < features.size; i++) {
-					cluster.add(features.get(i));
-				}
 			}
+		}
+		// add the features to the overall list which the clusters will be found inside of
+		for (int i = 0; i < features.size; i++) {
+			cluster.addReference(features.get(i));
 		}
 
 		System.out.println("Clustering");
@@ -120,12 +145,16 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 		return cluster.getAssignment();
 	}
 
+	/**
+	 * Process all the data in the training data set to learn the classifications.  See code for details.
+	 */
 	public void learn() {
 		System.out.println("======== Learning Classifier");
 
 		File clusterFile = new File(getClusterName());
 		File histogramFile = new File(getHistogramsName());
 
+		// Either load pre-computed words or compute the words from the training images
 		AssignCluster<double[]> assignment;
 		if( clusterFile.exists() ) {
 			System.out.println(" Loading "+clusterFile.getName());
@@ -153,10 +182,14 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
 		classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
-		classifier.setClassificationData(memory,getScenes().size());
+		classifier.setClassificationData(memory, getScenes().size());
 		classifier.setNumNeighbors(NUM_NEIGHBORS);
 	}
 
+	/**
+	 * For all the images in the training data set it computes a {@link HistogramScene}.  That data structure
+	 * contains the word histogram and the scene that the histogram belongs to.
+	 */
 	private List<HistogramScene> computeHistograms(FeatureToWordHistogram_F64 featuresToHistogram ) {
 
 		List<String> scenes = getScenes();
@@ -207,28 +240,37 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 
 		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
 				FactoryDescribeImageDense.surfStable(null,
-						new ConfigDenseSample(DESC_RADIUS,DESC_SKIP,DESC_SKIP),ImageUInt8.class);
+						new ConfigDenseSample(DESC_SCALE,DESC_SKIP,DESC_SKIP),ImageUInt8.class);
 
-		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null,MAX_KNN_ITERATIONS,20,1e-6);
+		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
 
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive();
 		ExampleLearnSceneKnn example = new ExampleLearnSceneKnn(desc,clusterer,nn);
 
-		example.loadSets(new File("/home/pja/projects/bow/brown/data/train"),null,
-				new File("/home/pja/projects/bow/brown/data/test"));
-		// train
+		File trainingDir = new File("../data/applet/learning/scene/train");
+		File testingDir = new File("../data/applet/learning/scene/test");
+
+		if( !trainingDir.exists() || !testingDir.exists() ) {
+			System.err.println("Please follow instructions in data/applet/learning/scene and download the");
+			System.err.println("required files");
+			System.exit(1);
+		}
+
+		example.loadSets(trainingDir,null,testingDir);
+		// train the classifier
 		example.learn();
 
-		// test
+		// test the classifier
 		Confusion confusion = example.evaluateTest();
 		confusion.getMatrix().print();
 		System.out.println("Accuracy = " + confusion.computeAccuracy());
 
-		// current settings 0.4576592819873412
-		// best so far 0.4712136547498593 - not sure how I got that, changed how scale is specified after
+		// Show confusion matrix
+		// Not the best coloration scheme...  perfect = red diagonal and black elsewhere.
+		MatrixVisualization.show(confusion.getMatrix(),"Confusion Matrix");
 
-		// skip 6 = Accuracy = 0.44168243495940473
-
+		// Using the default settings you should get an accuracy of 0.4643560924582769
+		// 0.4938983163196912
 	}
 }

@@ -119,7 +119,7 @@ public class TestGenericDenseDescribeImage {
 		}
 
 		@Override
-		public double getScaleAtRadius(double radius) {
+		public double getCanonicalWidth() {
 			throw new RuntimeException("Foo");
 		}
 

@@ -62,7 +62,7 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 
 		if( !original.process(x,y,orientation,scale, this.storage) )
 			return false;
-		converter.convert(this.storage,storage);
+		converter.convert(this.storage, storage);
 
 		return true;
 	}
@@ -83,8 +83,8 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
-		return original.getScaleAtRadius(radius);
+	public double getCanonicalWidth() {
+		return original.getCanonicalWidth();
 	}
 
 	@Override

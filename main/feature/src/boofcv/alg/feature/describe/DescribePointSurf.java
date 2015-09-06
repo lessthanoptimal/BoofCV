@@ -309,8 +309,12 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		return featureDOF;
 	}
 
-	public int getRadius() {
-		int ret = widthLargeGrid*widthSubRegion+widthSample;
-		return ret/2 + ret%2;
+	/**
+	 * Width of sampled region when sampling is aligned with image pixels
+	 * @return width of descriptor sample
+	 */
+	public int getCanonicalWidth() {
+		//
+		return widthLargeGrid*widthSubRegion+widthSample-(widthSample%2);
 	}
 }

@@ -153,8 +153,8 @@ public class TestDescribeMultiSpectral {
 		public ImageType getImageType() {return null;}
 
 		@Override
-		public double getScaleAtRadius(double radius) {
-			throw new RuntimeException("Fooo");
+		public double getCanonicalWidth() {
+			throw new RuntimeException("Foo");
 		}
 	}
 }

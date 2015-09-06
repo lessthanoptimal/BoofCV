@@ -55,10 +55,9 @@ public class FactoryDescribeImageDense {
 		configSample.checkValidity();
 		DescribeRegionPoint<T,SurfFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
 
-		double scale = surf.getScaleAtRadius(configSample.radius);
-		int width = (int)(2*configSample.radius+0.5);
+		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
 
-		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , scale , width ,
+		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , configSample.scale , width ,
 				configSample.periodX, configSample.periodY );
 	}
 
@@ -84,10 +83,9 @@ public class FactoryDescribeImageDense {
 		configSample.checkValidity();
 		DescribeRegionPoint<T,SurfFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
 
-		double scale = surf.getScaleAtRadius(configSample.radius);
-		int width = (int)(2*configSample.radius+0.5);
+		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
 
-		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , scale , width ,
+		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , configSample.scale , width ,
 				configSample.periodX, configSample.periodY );
 	}
 }

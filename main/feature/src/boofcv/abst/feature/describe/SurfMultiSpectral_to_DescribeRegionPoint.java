@@ -95,8 +95,8 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
-		return alg.getDescribe().getRadius()*radius;
+	public double getCanonicalWidth() {
+		return alg.getDescribe().getCanonicalWidth();
 	}
 
 	@Override

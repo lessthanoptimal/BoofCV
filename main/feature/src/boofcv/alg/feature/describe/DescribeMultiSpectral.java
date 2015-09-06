@@ -114,7 +114,7 @@ public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc exte
 	}
 
 	@Override
-	public double getScaleAtRadius( double radius ) {
-		return describers[0].getScaleAtRadius(radius);
+	public double getCanonicalWidth() {
+		return describers[0].getCanonicalWidth();
 	}
 }

@@ -75,7 +75,7 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
+	public double getCanonicalWidth() {
 		throw new RuntimeException("Not yet implemented");
 	}
 }

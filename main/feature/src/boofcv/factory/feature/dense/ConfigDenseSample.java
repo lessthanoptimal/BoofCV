@@ -28,9 +28,9 @@ import boofcv.struct.Configuration;
 public class ConfigDenseSample implements Configuration {
 
 	/**
-	 * Radius in pixels that the descriptor sample region is
+	 * Scale factor that the descriptor is computed at
 	 */
-	public double radius;
+	public double scale;
 	/**
 	 * Period in pixels that it will be sampled across the image. x-axis
 	 */
@@ -40,8 +40,8 @@ public class ConfigDenseSample implements Configuration {
 	 */
 	public int periodY;
 
-	public ConfigDenseSample(double radius, int periodX, int periodY) {
-		this.radius = radius;
+	public ConfigDenseSample(double scale, int periodX, int periodY) {
+		this.scale = scale;
 		this.periodX = periodX;
 		this.periodY = periodY;
 	}
@@ -51,7 +51,7 @@ public class ConfigDenseSample implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( radius <= 0 )
+		if( scale <= 0 )
 			throw new IllegalArgumentException("Width must be more than zero");
 		if( periodX <= 0 )
 			throw new IllegalArgumentException("periodX must be more than zero");

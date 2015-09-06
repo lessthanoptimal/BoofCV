@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,22 +27,43 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
+ * Factory for {@link ImageSuperpixels} algorithms, which are used to segment the image into super pixels.
+ *
  * @author Peter Abeles
  */
 public class FactoryImageSegmentation {
 
+	/**
+	 * Creates a new instance of {@link SegmentMeanShift} which is in a wrapper for {@link ImageSuperpixels}.
+	 *
+	 * @see SegmentMeanShift
+	 *
+	 * @param config Configuration.  If null then defaults are used.
+	 * @param imageType Type of input image.
+	 * @param <T> Image type
+	 * @return new instance of {@link ImageSuperpixels}
+	 */
 	public static <T extends ImageBase>ImageSuperpixels<T>
 	meanShift( ConfigSegmentMeanShift config ,  ImageType<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigSegmentMeanShift();
 
-
 		SegmentMeanShift<T> ms = FactorySegmentationAlg.meanShift(config,imageType);
 
 		return new MeanShift_to_ImageSuperpixels<T>(ms,config.connectRule);
 	}
 
+	/**
+	 * Creates a new instance of {@link SegmentSlic} which is in a wrapper for {@link ImageSuperpixels}.
+	 *
+	 * @see SegmentSlic
+	 *
+	 * @param config Configuration.
+	 * @param imageType Type of input image.
+	 * @param <T> Image type
+	 * @return new instance of {@link ImageSuperpixels}
+	 */
 	public static <T extends ImageBase>ImageSuperpixels<T>
 	slic( ConfigSlic config , ImageType<T> imageType )
 	{
@@ -51,6 +72,16 @@ public class FactoryImageSegmentation {
 		return new Slic_to_ImageSuperpixels<T>(ms);
 	}
 
+	/**
+	 * Creates a new instance of {@link SegmentFelzenszwalbHuttenlocher04} which is in a wrapper for {@link ImageSuperpixels}.
+	 *
+	 * @see SegmentFelzenszwalbHuttenlocher04
+	 *
+	 * @param config Configuration.  If null defaults are used.
+	 * @param imageType Type of input image.
+	 * @param <T> Image type
+	 * @return new instance of {@link ImageSuperpixels}
+	 */
 	public static <T extends ImageBase>ImageSuperpixels<T>
 	fh04( ConfigFh04 config , ImageType<T> imageType )
 	{
@@ -71,8 +102,8 @@ public class FactoryImageSegmentation {
 	 * @see WatershedVincentSoille1991
 	 *
 	 * @param config Configuration.  If null default is used.
-	 * @param <T>
-	 * @return
+	 * @param <T> Image type
+	 * @return new instance of {@link ImageSuperpixels}
 	 */
 	public static <T extends ImageBase>ImageSuperpixels<T>
 	watershed( ConfigWatershed config , ImageType<T> imageType )

@@ -80,10 +80,9 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public double getScaleAtRadius(double radius) {
+	public double getCanonicalWidth() {
 		throw new RuntimeException("Not yet implemented");
 	}
-
 	@Override
 	public Class<SurfFeature> getDescriptionType() {
 		return SurfFeature.class;
