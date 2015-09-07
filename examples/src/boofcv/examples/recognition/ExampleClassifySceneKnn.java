@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.examples.learning;
+package boofcv.examples.recognition;
 
 import boofcv.abst.feature.dense.DescribeImageDense;
 import boofcv.alg.bow.ClusterVisualWords;
@@ -56,7 +56,7 @@ import java.util.List;
  * <ol>
  * <li>Compute dense SURF features across the training data set.</li>
  * <li>Cluster using k-means to create works.</li>
- * <li>For each image compute the histogram of words found in the image<li>
+ * <li>For each image compute the histogram of words found in the image</li>
  * <li>Save word histograms and image scene labels in a classifier</li>
  * </ol>
  *
@@ -67,12 +67,12 @@ import java.util.List;
  * <li>Classify an image by by selecting the scene type with the most neighbors</li>
  * </ol>
  *
- * <p>NOTE: Scene recognition is still very much a work in progress and the code is likely to be significantly
- * modified in the future.</p>
+ * <p>NOTE: Scene recognition is still very much a work in progress in BoofCV and the code is likely to be
+ * significantly modified in the future.</p>
  *
  * @author Peter Abeles
  */
-public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
+public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	// Tuning parameters
 	public static int NUMBER_OF_WORDS = 100;
@@ -81,6 +81,10 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 	public static int MAX_KNN_ITERATIONS = 100;
 	public static double DESC_SCALE = 1.0;
 	public static int DESC_SKIP = 8;
+
+	// Files intermediate results are stored in
+	public static final String CLUSTER_FILE_NAME = "clusters.obj";
+	public static final String HISTOGRAM_FILE_NAME = "histograms.obj";
 
 	// Algorithms
 	ClusterVisualWords cluster;
@@ -92,9 +96,9 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 	// Storage for detected features
 	FastQueue<TupleDesc_F64> features;
 
-	public ExampleLearnSceneKnn(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
-								ComputeClusters<double[]> clusterer,
-								NearestNeighbor<HistogramScene> nn ) {
+	public ExampleClassifySceneKnn(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
+								   ComputeClusters<double[]> clusterer,
+								   NearestNeighbor<HistogramScene> nn) {
 		this.describeImage = describeImage;
 		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(),0xFEEDBEEF);
 		this.nn = nn;
@@ -109,12 +113,32 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 		};
 	}
 
-	private String getClusterName() {
-		return "clusters.obj";
-	}
+	/**
+	 * Process all the data in the training data set to learn the classifications.  See code for details.
+	 */
+	public void learnAndSave() {
+		System.out.println("======== Learning Classifier");
 
-	private String getHistogramsName() {
-		return "histograms.obj";
+		// Either load pre-computed words or compute the words from the training images
+		AssignCluster<double[]> assignment;
+		if( !new File(CLUSTER_FILE_NAME).exists() ) {
+			assignment = UtilIO.load(CLUSTER_FILE_NAME);
+		} else {
+			System.out.println(" Computing clusters");
+			assignment = computeClusters();
+		}
+
+		// Use these clusters to assign features to words
+		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
+
+		// Storage for the work histogram in each image in the training set and their label
+		List<HistogramScene> memory;
+
+		if( !new File(HISTOGRAM_FILE_NAME).exists() ) {
+			System.out.println(" computing histograms");
+			memory = computeHistograms(featuresToHistogram);
+			UtilIO.save(memory,HISTOGRAM_FILE_NAME);
+		}
 	}
 
 	/**
@@ -143,47 +167,22 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 		// Find the clusters.  This can take a bit
 		cluster.process(NUMBER_OF_WORDS);
 
-		UtilIO.save(cluster.getAssignment(), getClusterName());
+		UtilIO.save(cluster.getAssignment(), CLUSTER_FILE_NAME);
 
 		return cluster.getAssignment();
 	}
 
-	/**
-	 * Process all the data in the training data set to learn the classifications.  See code for details.
-	 */
-	public void learn() {
-		System.out.println("======== Learning Classifier");
+	public void loadAndCreateClassifier() {
+		// load results from a file
+		List<HistogramScene> memory = UtilIO.load(HISTOGRAM_FILE_NAME);
+		AssignCluster<double[]> assignment = UtilIO.load(CLUSTER_FILE_NAME);
 
-		File clusterFile = new File(getClusterName());
-		File histogramFile = new File(getHistogramsName());
-
-		// Either load pre-computed words or compute the words from the training images
-		AssignCluster<double[]> assignment;
-		if( clusterFile.exists() ) {
-			System.out.println(" Loading "+clusterFile.getName());
-			assignment = UtilIO.load(clusterFile.getName());
-		} else {
-			System.out.println(" Computing clusters");
-			assignment = computeClusters();
-		}
-
-		// Use these clusters to assign features to words
 		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment,HISTOGRAM_HARD);
-
-		// Storage for the work histogram in each image in the training set and their label
-		List<HistogramScene> memory;
-
-		if( histogramFile.exists() ) {
-			System.out.println(" Loading "+histogramFile.getName());
-			memory = UtilIO.load(histogramFile.getName());
-		} else {
-			System.out.println(" computing histograms");
-			memory = computeHistograms(featuresToHistogram);
-			UtilIO.save(memory,histogramFile.getName());
-		}
 
 
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
+		// Can use this classifier with saved results and avoid the
+
 		classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
 		classifier.setClassificationData(memory, getScenes().size());
 		classifier.setNumNeighbors(NUM_NEIGHBORS);
@@ -249,7 +248,7 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 		clusterer.setVerbose(true);
 
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive();
-		ExampleLearnSceneKnn example = new ExampleLearnSceneKnn(desc,clusterer,nn);
+		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc,clusterer,nn);
 
 		File trainingDir = new File("../data/applet/learning/scene/train");
 		File testingDir = new File("../data/applet/learning/scene/test");
@@ -260,11 +259,13 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 			System.exit(1);
 		}
 
-		example.loadSets(trainingDir,null,testingDir);
+		example.loadSets(trainingDir, null, testingDir);
 		// train the classifier
-		example.learn();
+		example.learnAndSave();
+		// now load it for evaluation purposes from the files
+		example.loadAndCreateClassifier();
 
-		// test the classifier
+		// test the classifier on the test set
 		Confusion confusion = example.evaluateTest();
 		confusion.getMatrix().print();
 		System.out.println("Accuracy = " + confusion.computeAccuracy());
@@ -279,7 +280,7 @@ public class ExampleLearnSceneKnn extends LearnSceneFromFiles {
 		// This is interesting for matching images "stable" is significantly better than "fast"
 		// One explanation is that the descriptor for "fast" is samples a smaller region than "stable", by a
 		// couple of pixels at scale of 1.  Thus there is less overlap between the features.
-		//
+
 		// Reducing the size of "stable" to 0.95 does slightly improve performance to 50.5%, but really isn't
 		// designed to scale down, just designed to scale up
 	}

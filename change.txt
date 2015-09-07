@@ -118,11 +118,7 @@ Version : Alpha 0.19
 
 TODO
   * Polygon Detector
-    - *Regression with hand selected points
-
-  * BOW Scene classification
-    - regression test
-    - examples
+    - Regression with hand selected points
 
   * Android Demo:   Automatic Threshold.  Dim slider for global
   * Documentation on how to build a single jar
