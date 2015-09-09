@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	/**
 	 * Constructor which specifies the input image type.
 	 *
-	 * @param imageType  Either ImageUInt8 or ImageFloat32
+	 * @param imageType  Either {@link ImageUInt8} or {@link ImageFloat32}
 	 */
 	public TldVarianceFilter( Class<T> imageType ) {
 

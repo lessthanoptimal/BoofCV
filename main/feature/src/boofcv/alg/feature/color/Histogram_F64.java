@@ -255,7 +255,21 @@ public class Histogram_F64 extends TupleDesc_F64 {
 		return  value[getIndex(coordinate)];
 	}
 
+	/**
+	 * Creates an exact copy of "this" histogram
+	 */
 	public Histogram_F64 copy() {
+		Histogram_F64 out = newInstance();
+
+		System.arraycopy(value,0,out.value,0,length.length);
+
+		return out;
+	}
+
+	/**
+	 * Creates a new instance of this histogram which has the same "shape" and min / max values.
+	 */
+	public Histogram_F64 newInstance() {
 		Histogram_F64 out = new Histogram_F64(length);
 
 		for (int i = 0; i < length.length; i++) {

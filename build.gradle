@@ -155,6 +155,10 @@ def mainProjects = [
 ]
 
 def integrationProjects = [
+        ':integration:android',
+        ':integration:jcodec',
+        ':integration:openkinect',
+        ':integration:processing',
         ':integration:WebcamCapture',
         ':integration:xuggler',
 ]
@@ -199,6 +203,13 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
             "BoofCV-" + fileName
         }
     }
+}
+
+// Creates a single jar which contains all the subprojects in main and integration
+task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJava" }) {
+    baseName = 'BoofCV'
+
+    from files(javadocProjects.collect { project(it).sourceSets.main.output })
 }
 
 task alljavadoc(type: Javadoc) {

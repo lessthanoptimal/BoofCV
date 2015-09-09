@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2014
+Date    : 2015
 Version : Alpha 0.19
 
 - Removed -1 from CachedSineCosine_F32
@@ -108,8 +108,7 @@ Version : Alpha 0.19
   * Fewer functions, but uses enum for specific type
   * Function for AnyImageDerivative is clearly named and more useful
 - ImageMiscOps
-  * fill band
-  * fill bands
+  * fill band and bands
   * insert band
 - Background Model / Motion Detection
   * For stationary cameras and moving cameras
@@ -119,9 +118,6 @@ Version : Alpha 0.19
 TODO
   * Polygon Detector
     - Regression with hand selected points
-
-  * Android Demo:   Automatic Threshold.  Dim slider for global
-  * Documentation on how to build a single jar
 
 ---------------------------------------------
 Date    : 2014/9/22

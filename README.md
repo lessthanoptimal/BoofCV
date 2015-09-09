@@ -88,7 +88,8 @@ BoofCV is very easy to build on just about any system with Gradle and Java suppo
 
 Below are a few useful custom Gradle scripts that can be invoked:
 
-* _createLibraryDirectory_ : Will gather all the BoofCV jars (main and integration) and jars which boofcv/main depend on and place them in the boofcv/library directory.
+* _oneJarBin_ : Creates a single jar that contains all of BoofCV main and integration
+* _createLibraryDirectory_ : Will gather all the BoofCV jars (main and integration) and jars that BoofCV depends on and place them in the "boofcv/library" directory.
 * _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
 
 _createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
