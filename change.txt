@@ -115,10 +115,6 @@ Version : Alpha 0.19
   * Basic: pixels modeled with a fading average
   * Gaussian: pixels modeled with a fading Normal distribution
 
-TODO
-  * Polygon Detector
-    - Regression with hand selected points
-
 ---------------------------------------------
 Date    : 2014/9/22
 Version : Alpha 0.18

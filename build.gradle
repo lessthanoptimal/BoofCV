@@ -155,10 +155,7 @@ def mainProjects = [
 ]
 
 def integrationProjects = [
-        ':integration:android',
         ':integration:jcodec',
-        ':integration:openkinect',
-        ':integration:processing',
         ':integration:WebcamCapture',
         ':integration:xuggler',
 ]
@@ -169,6 +166,10 @@ try {
 try {
     project(':integration:openkinect')
     integrationProjects.add(':integration:openkinect')
+} catch( UnknownProjectException ignore ) {}
+try {
+    project(':integration:processing')
+    integrationProjects.add(':integration:processing')
 } catch( UnknownProjectException ignore ) {}
 
 def javadocProjects = mainProjects + integrationProjects
