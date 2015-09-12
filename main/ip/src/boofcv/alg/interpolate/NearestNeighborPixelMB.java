@@ -20,6 +20,7 @@ package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageMultiBand;
+import boofcv.struct.image.ImageType;
 
 /**
  *  Performs nearest neighbor interpolation to extract values between pixels in an image.
@@ -71,5 +72,10 @@ public abstract class NearestNeighborPixelMB<T extends ImageMultiBand> implement
 	@Override
 	public ImageBorder<T> getBorder() {
 		return border;
+	}
+
+	@Override
+	public ImageType<T> getImageType() {
+		return orig.getImageType();
 	}
 }

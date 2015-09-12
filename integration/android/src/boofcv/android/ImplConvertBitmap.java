@@ -772,22 +772,26 @@ public class ImplConvertBitmap {
 			break;
 
 		case RGB_565:
-			for (int y = 0; y < h; y++) {
-				int indexSrc = input.startIndex + y * input.stride;
-				for (int x = 0; x < w; x++,indexSrc++) {
-					int r = R.data[indexSrc] & 0xFF;
-					int g = G.data[indexSrc] & 0xFF;
-					int b = B.data[indexSrc] & 0xFF;
-					
-					int valueR = table5[r];
-					int valueG = table6[g];
-					int valueB = table5[b];
+			if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++, indexSrc++) {
+						int r = R.data[indexSrc] & 0xFF;
+						int g = G.data[indexSrc] & 0xFF;
+						int b = B.data[indexSrc] & 0xFF;
 
-					int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
-					
-					output[indexDst++] = (byte) rgb565;
-					output[indexDst++] = (byte) (rgb565 >> 8);
+						int valueR = table5[r];
+						int valueG = table6[g];
+						int valueB = table5[b];
+
+						int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
+
+						output[indexDst++] = (byte) rgb565;
+						output[indexDst++] = (byte) (rgb565 >> 8);
+					}
 				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 bands");
 			}
 			break;
 
@@ -838,22 +842,156 @@ public class ImplConvertBitmap {
 			break;
 
 		case RGB_565:
-			for (int y = 0; y < h; y++) {
-				int indexSrc = input.startIndex + y * input.stride;
-				for (int x = 0; x < w; x++,indexSrc++) {
-					int r = (int)R.data[indexSrc];
-					int g = (int)G.data[indexSrc];
-					int b = (int)B.data[indexSrc];
-					
-					int valueR = table5[r];
-					int valueG = table6[g];
-					int valueB = table5[b];
+			if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++, indexSrc++) {
+						int r = (int) R.data[indexSrc];
+						int g = (int) G.data[indexSrc];
+						int b = (int) B.data[indexSrc];
 
-					int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
-					
-					output[indexDst++] = (byte) rgb565;
-					output[indexDst++] = (byte) (rgb565 >> 8);
+						int valueR = table5[r];
+						int valueG = table6[g];
+						int valueB = table5[b];
+
+						int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
+
+						output[indexDst++] = (byte) rgb565;
+						output[indexDst++] = (byte) (rgb565 >> 8);
+					}
 				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 bands");
+			}
+			break;
+
+		case ALPHA_8:
+			throw new RuntimeException("ALPHA_8 seems to have some weired internal format and is not currently supported");
+
+		case ARGB_4444:
+			throw new RuntimeException("Isn't 4444 deprecated?");
+		}
+	}
+
+	public static void interleavedToArray(InterleavedU8 input, byte[] output , Bitmap.Config config ) {
+		final int h = input.height;
+		final int w = input.width;
+
+		int indexDst = 0;
+
+		switch (config) {
+			case ARGB_8888:
+			if( input.getNumBands() == 4 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = input.data[indexSrc++];
+					}
+				}
+			} else if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = input.data[indexSrc++];
+						output[indexDst++] = (byte)0xFF;
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 or 4 bands");
+			}
+			break;
+
+		case RGB_565:
+			if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						int r = input.data[indexSrc++] & 0xFF;
+						int g = input.data[indexSrc++] & 0xFF;
+						int b = input.data[indexSrc++] & 0xFF;
+
+						int valueR = table5[r];
+						int valueG = table6[g];
+						int valueB = table5[b];
+
+						int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
+
+						output[indexDst++] = (byte) rgb565;
+						output[indexDst++] = (byte) (rgb565 >> 8);
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 bands");
+			}
+			break;
+
+		case ALPHA_8:
+			throw new RuntimeException("ALPHA_8 seems to have some weired internal format and is not currently supported");
+
+		case ARGB_4444:
+			throw new RuntimeException("Isn't 4444 deprecated?");
+		}
+	}
+
+	public static void interleavedToArray(InterleavedF32 input, byte[] output , Bitmap.Config config ) {
+		final int h = input.height;
+		final int w = input.width;
+
+		int indexDst = 0;
+
+		switch (config) {
+			case ARGB_8888:
+			if( input.getNumBands() == 4 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)input.data[indexSrc++];
+					}
+				}
+			} else if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)input.data[indexSrc++];
+						output[indexDst++] = (byte)0xFF;
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 or 4 bands");
+			}
+			break;
+
+		case RGB_565:
+			if( input.getNumBands() == 3 ) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = input.startIndex + y * input.stride;
+					for (int x = 0; x < w; x++) {
+						int r = (int)input.data[indexSrc++];
+						int g = (int)input.data[indexSrc++];
+						int b = (int)input.data[indexSrc++];
+
+						int valueR = table5[r];
+						int valueG = table6[g];
+						int valueB = table5[b];
+
+						int rgb565 = (valueR << 11) | (valueG << 5) | valueB;
+
+						output[indexDst++] = (byte) rgb565;
+						output[indexDst++] = (byte) (rgb565 >> 8);
+					}
+				}
+			} else {
+				throw new IllegalArgumentException("Expected input to have 3 bands");
 			}
 			break;
 

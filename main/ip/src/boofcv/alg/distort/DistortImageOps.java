@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -61,6 +62,8 @@ public class DistortImageOps {
 	 * @param output The image in which the output is written to.
 	 * @param borderType Describes how pixels outside the image border should be handled.
 	 * @param interpType Which type of interpolation will be used.
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 */
 	@Deprecated
 	public static <T extends ImageBase>
@@ -89,6 +92,9 @@ public class DistortImageOps {
 
 	/**
 	 * Applies a pixel transform to a single band image.  Easier to use function.
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
+	 *
 	 * @param input Input (source) image.
 	 * @param output Where the result of transforming the image image is written to.
 	 * @param transform The transform that is being applied to the image
@@ -116,7 +122,10 @@ public class DistortImageOps {
 
 	/**
 	 * Applies a pixel transform to a single band image.  More flexible but order to use function.
-	 *  @param input Input (source) image.
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
+	 *
+	 * @param input Input (source) image.
 	 * @param output Where the result of transforming the image image is written to.
 	 * @param renderAll true it renders all pixels, even ones outside the input image.
 	 * @param transform The transform that is being applied to the image
@@ -136,6 +145,8 @@ public class DistortImageOps {
 
 	/**
 	 * Applies a pixel transform to a {@link MultiSpectral} image.
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 *
 	 * @param input Input (source) image.
 	 * @param output Where the result of transforming the image image is written to.
@@ -165,6 +176,8 @@ public class DistortImageOps {
 	 *
 	 * @see FactoryDistort
 	 * @see FactoryInterpolation
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 *
 	 * @param transform Image transform.
 	 * @param interpType Which interpolation. Try bilinear.
@@ -216,6 +229,9 @@ public class DistortImageOps {
 	 * x' = x_c + c*(x-x_c) - s(y - y_c)<br>
 	 * y' = y_c + s*(x-x_c) + c(y - y_c)
 	 * </p>
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
+	 *
 	 * @param input Which which is being rotated.
 	 * @param output The image in which the output is written to.
 	 * @param borderType Describes how pixels outside the image border should be handled.
@@ -241,6 +257,8 @@ public class DistortImageOps {
 
 	/**
 	 * Applies a distortion to a {@link MultiSpectral} image.
+	 *
+	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 *
 	 * @param input Image being distorted. Not modified.
 	 * @param output Output image. modified.

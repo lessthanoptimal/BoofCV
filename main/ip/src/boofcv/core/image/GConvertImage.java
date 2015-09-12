@@ -18,6 +18,7 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.*;
 
 import java.lang.reflect.Method;
@@ -36,7 +37,8 @@ public class GConvertImage {
 	 * <p>
 	 * Converts one type of between two types of images using a default method.  Both are the same image type
 	 * then a simple type cast if performed at the pixel level.  If the input is multi-band and the output
-	 * is single band then it will average te bands.
+	 * is single band then it will average the bands.  If input is single band and output is multi-band
+	 * then the single band is copied into each of the other bands.
 	 * </p>
 	 *
 	 * <p>
@@ -49,15 +51,29 @@ public class GConvertImage {
 	 * @return Converted image.
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
-		if( input instanceof ImageSingleBand && output instanceof ImageSingleBand ) {
-			if (input.getClass() == output.getClass()) {
-				output.setTo(input);
-			} else {
-				try {
-					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
-					m.invoke(null, input, output);
-				} catch (Exception e) {
-					throw new IllegalArgumentException("Unknown conversion");
+
+		if( input instanceof ImageSingleBand ) {
+			ImageSingleBand sb = (ImageSingleBand)input;
+			if( output instanceof ImageSingleBand ) {
+				if (input.getClass() == output.getClass()) {
+					output.setTo(input);
+				} else {
+					try {
+						Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+						m.invoke(null, input, output);
+					} catch (Exception e) {
+						throw new IllegalArgumentException("Unknown conversion");
+					}
+				}
+			} else if( output instanceof MultiSpectral ) {
+				MultiSpectral ms = (MultiSpectral)output;
+				for (int i = 0; i < ms.getNumBands(); i++) {
+					convert(input,ms.getBand(i));
+				}
+			} else if( output instanceof ImageInterleaved ) {
+				ImageInterleaved il = (ImageInterleaved)output;
+				for (int i = 0; i < il.getNumBands(); i++) {
+					GImageMiscOps.insertBand(sb, i, il);
 				}
 			}
 		} else if( input instanceof ImageInterleaved && output instanceof ImageInterleaved )  {
@@ -113,7 +129,9 @@ public class GConvertImage {
 				average(mb,so);
 			}
 		} else {
-			throw new IllegalArgumentException("Don't know how to convert between input types");
+			String nameInput = input.getClass().getSimpleName();
+			String nameOutput = output.getClass().getSimpleName();
+			throw new IllegalArgumentException("Don't know how to convert between input types. "+nameInput+" "+nameOutput);
 		}
 	}
 

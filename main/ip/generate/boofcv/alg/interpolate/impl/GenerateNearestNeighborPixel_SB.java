@@ -27,7 +27,7 @@ import java.io.FileNotFoundException;
 /**
  * @author Peter Abeles
  */
-public class GenerateNearestNeighborPixel extends CodeGeneratorBase {
+public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	AutoTypeImage image;
 
 	String floatType;
@@ -129,7 +129,7 @@ public class GenerateNearestNeighborPixel extends CodeGeneratorBase {
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		GenerateNearestNeighborPixel gen = new GenerateNearestNeighborPixel();
+		GenerateNearestNeighborPixel_SB gen = new GenerateNearestNeighborPixel_SB();
 		gen.generate();
 	}
 }

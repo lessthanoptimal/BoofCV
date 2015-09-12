@@ -239,9 +239,20 @@ public class FactoryInterpolation {
 	public static <T extends ImageMultiBand> InterpolatePixelMB<T> nearestNeighborPixelMB(ImageType<T> imageType, BorderType borderType ) {
 		InterpolatePixelMB<T> alg;
 
-		int numBands = imageType.getNumBands();
 		if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType()) {
+				case U8:
+					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_U8();
+					break;
+
+				case S16:
+					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_S16();
+					break;
+
+				case S32:
+					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_S32();
+					break;
+
 				case F32:
 					alg = (InterpolatePixelMB<T>)new NearestNeighborPixel_IL_F32();
 					break;

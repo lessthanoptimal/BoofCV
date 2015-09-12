@@ -55,6 +55,13 @@ public class FDistort
 	// if the transform should be cached or not.
 	boolean cached;
 
+	/**
+	 * Constructor in which input and output images are specified.  Equivalent to calling
+	 * {@link #init(ImageBase, ImageBase)}
+	 *
+	 * @param input Input image
+	 * @param output output image
+	 */
 	public FDistort(ImageBase input, ImageBase output) {
 		init(input, output);
 	}
@@ -62,6 +69,9 @@ public class FDistort
 	public FDistort() {
 	}
 
+	/**
+	 * Specifies the input and output image.
+	 */
 	public FDistort init(ImageBase input, ImageBase output) {
 		this.input = input;
 		this.output = output;

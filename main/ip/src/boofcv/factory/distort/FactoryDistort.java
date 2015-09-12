@@ -94,6 +94,9 @@ public class FactoryDistort {
 				case F32:
 					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
 
+				case U8:
+					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_U8((InterpolatePixelMB)interp);
+
 				default:
 					throw new IllegalArgumentException("Not supported yet");
 			}

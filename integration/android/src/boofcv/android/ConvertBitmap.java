@@ -198,6 +198,8 @@ public class ConvertBitmap {
 			multiToBitmap((MultiSpectral)input,output,storage);
 		} else if( input instanceof ImageSingleBand ) {
 			grayToBitmap((ImageSingleBand)input,output,storage);
+		} else if( input instanceof ImageInterleaved ) {
+			interleavedToBitmap((ImageInterleaved) input, output, storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
@@ -285,6 +287,33 @@ public class ConvertBitmap {
 			ImplConvertBitmap.multiToArray_U8((MultiSpectral)input, storage,output.getConfig());
 		else if( input.getBandType() == ImageFloat32.class )
 			ImplConvertBitmap.multiToArray_F32((MultiSpectral)input, storage,output.getConfig());
+		else
+			throw new IllegalArgumentException("Unsupported BoofCV Type");
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+	}
+
+	/**
+	 * Converts {@link ImageInterleaved} image into Bitmap.
+	 *
+	 * @see #declareStorage(android.graphics.Bitmap, byte[])
+	 *
+	 * @param input Input MultiSpectral image.
+	 * @param output Output Bitmap image.
+	 * @param storage Byte array used for internal storage. If null it will be declared internally.
+	 */
+	public static <T extends ImageInterleaved>
+	void interleavedToBitmap(T input, Bitmap output, byte[] storage) {
+		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
+			throw new IllegalArgumentException("Image shapes are not the same");
+		}
+
+		if( storage == null )
+			storage = declareStorage(output,null);
+
+		if( input.getImageType().getDataType() == ImageDataType.U8 )
+			ImplConvertBitmap.interleavedToArray((InterleavedU8) input, storage, output.getConfig());
+		else if( input.getImageType().getDataType() == ImageDataType.F32 )
+			ImplConvertBitmap.interleavedToArray((InterleavedF32) input, storage, output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
