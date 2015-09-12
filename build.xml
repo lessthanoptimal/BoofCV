@@ -7,11 +7,12 @@
         <pathelement path="main/geo/src"/>
         <pathelement path="main/io/src"/>
         <pathelement path="main/ip/src"/>
+        <pathelement path="main/learning/src"/>
         <pathelement path="main/recognition/src"/>
         <pathelement path="main/sfm/src"/>
         <pathelement path="main/visualize/src"/>
         <pathelement path="integration/android/src"/>
-        <pathelement path="integration/applet/src"/>
+        <pathelement path="integration/jcodec/src"/>
         <pathelement path="integration/openkinect/src"/>
         <pathelement path="integration/WebcamCapture/src"/>
         <pathelement path="integration/xuggler/src"/>
