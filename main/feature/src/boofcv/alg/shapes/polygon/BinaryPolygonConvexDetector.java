@@ -282,10 +282,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					workPoly.get(j).set(p.x,p.y);
 				}
 
-				boolean workOrigCCW = workPoly.isCCW();
-				if( workOrigCCW ) {
-					workPoly.flip();
-				}
 				// this only supports convex polygons
 				if( !UtilPolygons2D_F64.isConvex(workPoly)) {
 					if( verbose ) System.out.println("Rejected not convex");
@@ -298,6 +294,14 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( area < minimumArea ) {
 					if( verbose ) System.out.println("Rejected area");
 					continue;
+				}
+
+				boolean workOrigCCW = workPoly.isCCW();
+				if( workOrigCCW ) {
+					workPoly.flip();
+					if( workPoly.isCCW() ) {
+						throw new RuntimeException("BUG!!!!");
+					}
 				}
 
 				Polygon2D_F64 refined = found.grow();
@@ -393,6 +397,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	public Class<T> getInputType() {
 		return inputType;
+	}
+
+	public void setNumberOfSides(int[] numberOfSides) {
+		this.numberOfSides = numberOfSides;
 	}
 
 	public int[] getNumberOfSides() {
