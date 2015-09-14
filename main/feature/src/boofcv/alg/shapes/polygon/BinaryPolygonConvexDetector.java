@@ -126,6 +126,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	// used to remove false positives
 	PolygonEdgeScore differenceScore;
+	// should it check the edge score before?  With a chessboard pattern the initial guess is known to be very poor
+	// so it should only check the edge after.  Otherwise its good to filter before optimization.
+	boolean checkEdgeBefore = true;
 
 	/**
 	 * Configures the detector.
@@ -133,6 +136,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param polygonSides Number of lines in the polygon
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges.
+	 *                        If null then this test is skipped.
 	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
@@ -318,17 +322,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					}
 				}
 
-				// use a lower threshold of the edge the first time since the edge might not be perfect
-				// this especially true for chessboard patterns where the edge is intentionally off
-				if( differenceScore != null ) {
-					double edgeThreshold = differenceScore.getThresholdScore();
-					differenceScore.setThresholdScore(edgeThreshold/3.0);
-					boolean valid = differenceScore.validate(workPoly);
-					differenceScore.setThresholdScore(edgeThreshold);
-					if( !valid ) {
-						if( verbose ) System.out.println("Rejected edge score, before: "+differenceScore.getAverageEdgeIntensity());
-						continue;
-					}
+				// test it again with the full threshold
+				if( checkEdgeBefore && differenceScore != null && !differenceScore.validate(workPoly)) {
+					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
+					continue;
 				}
 
 				Polygon2D_F64 refined = found.grow();
@@ -350,7 +347,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				// test it again with the full threshold
-				if( differenceScore != null && !differenceScore.validate(refined)) {
+				if( !checkEdgeBefore && differenceScore != null && !differenceScore.validate(refined)) {
 					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
 					continue;
 				}
@@ -442,5 +439,18 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
+	}
+
+	public boolean isCheckEdgeBefore() {
+		return checkEdgeBefore;
+	}
+
+	/**
+	 * If set to true it will prune using polygons using their edge intensity before sub-pixel optimization.
+	 * This should only be set to false if the initial edge is known to be off by a bit, like with a chessboard.
+	 * @param checkEdgeBefore true for checking before and false for after.
+	 */
+	public void setCheckEdgeBefore(boolean checkEdgeBefore) {
+		this.checkEdgeBefore = checkEdgeBefore;
 	}
 }

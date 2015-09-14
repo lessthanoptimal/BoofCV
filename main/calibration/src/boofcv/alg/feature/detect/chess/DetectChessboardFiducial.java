@@ -87,6 +87,9 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 		// TODO make separation configurable?
 		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,4, detectorSquare);
 
+		// tell it not to check the edge intensity before it optimizes
+		detectorSquare.setCheckEdgeBefore(false);
+
 		reset();
 	}
 

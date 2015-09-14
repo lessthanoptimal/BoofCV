@@ -103,6 +103,7 @@ public class TestFeatureToWordHistogram_F64 {
 		alg.reset();
 
 		alg.addFeature(new TupleDesc_F64(5));
+		alg.process();
 
 		double histogram[] = alg.getHistogram();
 

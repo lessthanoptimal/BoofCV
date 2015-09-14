@@ -324,7 +324,7 @@ public class TestBinaryPolygonConvexDetector {
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0,0,200,220);
 		g2.setColor(Color.BLACK);
-		g2.fillOval(30, 30, 40, 50);
+		g2.fillOval(30, 30, 90, 100);
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
 		binary.reshape(gray.width,gray.height);

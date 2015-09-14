@@ -77,6 +77,7 @@ public class TestDetectChessCalibrationPoints {
 		configPoly.refineWithLines = false;
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
+		detectorSquare.setVerbose(true);
 		DetectChessboardFiducial alg =
 				new DetectChessboardFiducial(numCols,numRows,detectorSquare,ImageFloat32.class);
 
