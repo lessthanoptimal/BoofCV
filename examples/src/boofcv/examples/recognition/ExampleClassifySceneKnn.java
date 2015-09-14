@@ -121,7 +121,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		// Either load pre-computed words or compute the words from the training images
 		AssignCluster<double[]> assignment;
-		if( !new File(CLUSTER_FILE_NAME).exists() ) {
+		if( new File(CLUSTER_FILE_NAME).exists() ) {
 			assignment = UtilIO.load(CLUSTER_FILE_NAME);
 		} else {
 			System.out.println(" Computing clusters");
@@ -277,11 +277,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// For  "fast"  SURF descriptor the accuracy is 52.2%
 		// For "stable" SURF descriptor the accuracy is 49.4%
 
-		// This is interesting for matching images "stable" is significantly better than "fast"
-		// One explanation is that the descriptor for "fast" is samples a smaller region than "stable", by a
+		// This is interesting. When matching images "stable" is significantly better than "fast"
+		// One explanation is that the descriptor for "fast" samples a smaller region than "stable", by a
 		// couple of pixels at scale of 1.  Thus there is less overlap between the features.
 
-		// Reducing the size of "stable" to 0.95 does slightly improve performance to 50.5%, but really isn't
-		// designed to scale down, just designed to scale up
+		// Reducing the size of "stable" to 0.95 does slightly improve performance to 50.5%, can't scale it down
+		// much more without performance going down
 	}
 }

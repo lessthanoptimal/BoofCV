@@ -18,6 +18,7 @@
 
 package boofcv.factory.shape;
 
+import boofcv.alg.shapes.edge.PolygonEdgeScore;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
@@ -64,8 +65,25 @@ public class FactoryShapeDetector {
 					config.configRefineCorners.sampleRadius,config.configRefineCorners.maxIterations,
 					config.configRefineCorners.convergeTolPixels,imageType);
 
+		PolygonEdgeScore<T> scorer = null;
+		if( config.minimumEdgeIntensity > 0 ) {
+			if (config.refineWithLines) {
+				scorer = new PolygonEdgeScore<T>(
+						config.configRefineLines.cornerOffset,
+						config.configRefineLines.sampleRadius,
+						config.configRefineLines.lineSamples,
+						config.minimumEdgeIntensity, imageType);
+			} else if( config.refineWithCorners ) {
+				scorer = new PolygonEdgeScore<T>(
+						config.configRefineCorners.cornerOffset,
+						config.configRefineCorners.sampleRadius,
+						config.configRefineCorners.lineSamples*2,
+						config.minimumEdgeIntensity, imageType);
+			}
+		}
+
 		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,contourToPolygon,
-				refineLine,refineCorner,config.minContourImageWidthFraction,
+				scorer, refineLine,refineCorner,config.minContourImageWidthFraction,
 				config.contour2Poly_splitDistanceFraction,config.clockwise,imageType);
 	}
 }

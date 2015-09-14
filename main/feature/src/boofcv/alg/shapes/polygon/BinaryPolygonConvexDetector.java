@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.alg.shapes.edge.PolygonEdgeScore;
 import boofcv.alg.shapes.polyline.RefinePolyLine;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
@@ -123,21 +124,26 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 	boolean verbose = false;
 
+	// used to remove false positives
+	PolygonEdgeScore differenceScore;
+
 	/**
 	 * Configures the detector.
 	 *
 	 * @param polygonSides Number of lines in the polygon
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
+	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges.
 	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param splitDistanceFraction Number of pixels as a fraction of contour length to split a new line in
-	 *                             SplitMergeLineFitLoop.  Try 0.03
+*                             SplitMergeLineFitLoop.  Try 0.03
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
 	public BinaryPolygonConvexDetector(int polygonSides[],
 									   SplitMergeLineFitLoop contourToPolygon,
+									   PolygonEdgeScore differenceScore,
 									   RefinePolygonLineToImage<T> refineLine,
 									   RefinePolygonCornersToImage<T> refineCorner,
 									   double minContourFraction,
@@ -148,7 +154,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 		this.refineLine = refineLine;
 		this.refineCorner = refineCorner;
-
+		this.differenceScore = differenceScore;
 		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
@@ -198,6 +204,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		if( refineCorner != null ) {
 			refineCorner.getSnapToEdge().setTransform(toDistorted);
 		}
+
+		if( differenceScore != null ) {
+			differenceScore.setTransform(toDistorted);
+		}
 	}
 
 	/**
@@ -213,6 +223,10 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
 		found.reset();
 		foundContours.clear();
+
+		if( differenceScore != null ) {
+			differenceScore.setImage(gray);
+		}
 
 		findCandidateShapes(gray, binary);
 	}
@@ -282,7 +296,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					workPoly.get(j).set(p.x,p.y);
 				}
 
-				// this only supports convex polygons
+				// Functions below only supports convex polygons
 				if( !UtilPolygons2D_F64.isConvex(workPoly)) {
 					if( verbose ) System.out.println("Rejected not convex");
 					continue;
@@ -302,6 +316,11 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					if( workPoly.isCCW() ) {
 						throw new RuntimeException("BUG!!!!");
 					}
+				}
+
+				if( !differenceScore.validate(workPoly) ) {
+					if( verbose ) System.out.println("Failed due to weak edge");
+					continue;
 				}
 
 				Polygon2D_F64 refined = found.grow();

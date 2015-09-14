@@ -44,7 +44,7 @@ import java.io.File;
  *
  * @author Peter Abeles
  */
-public class ExampleDetectPolygon {
+public class ExampleDetectBlackPolygon {
 	public static void main(String[] args) {
 		String files[] = new String[]{
 				"../data/applet/polygons01.jpg",

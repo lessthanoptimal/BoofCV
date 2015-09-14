@@ -18,14 +18,6 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.alg.interpolate.ImageLineIntegral;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GImageSingleBandDistorted;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
@@ -60,7 +52,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  * @author Peter Abeles
  */
 // TODO specify weight function.  close to A, close to B, even
-public class SnapToEdge<T extends ImageSingleBand> {
+public class SnapToEdge<T extends ImageSingleBand>extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
 	protected int lineSamples;
@@ -77,16 +69,10 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	// storage for where the points that are sampled along the line
 	protected FastQueue<Point2D_F64> samplePts = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-	// used when computing the fit for a line at specific points
-	protected ImageLineIntegral integral;
-	protected GImageSingleBand integralImage;
 
 	// storage for the line's center.  used to reduce numerical problems.
 	protected Point2D_F64 center = new Point2D_F64();
 	protected double localScale;
-
-	// type of image it can process
-	Class<T> imageType;
 
 	/**
 	 * Configures the algorithm.
@@ -96,35 +82,13 @@ public class SnapToEdge<T extends ImageSingleBand> {
 	 * @param imageType Type of image it's going to process
 	 */
 	public SnapToEdge(int lineSamples, int tangentialSamples,  Class<T> imageType) {
+		super(imageType);
+
 		if( tangentialSamples < 1 )
 			throw new IllegalArgumentException("Tangential samples must be >= 1 or else it won't work");
 
 		this.lineSamples = lineSamples;
 		this.radialSamples = tangentialSamples;
-		this.imageType = imageType;
-		this.integral = new ImageLineIntegral();
-		this.integralImage = FactoryGImageSingleBand.create(imageType);
-	}
-
-	/**
-	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
-	 * image coordinates.  For example if the input image has lens distortion but the edge were found
-	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
-	 * image coordinates in order to read the pixel's value.
-	 *
-	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
-	 */
-	public void setTransform( PixelTransform_F32 undistToDist ) {
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
-	}
-
-	/**
-	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
-	 */
-	public void setImage(T image) {
-		integralImage.wrap(image);
-		integral.setImage(integralImage);
 	}
 
 	/**
