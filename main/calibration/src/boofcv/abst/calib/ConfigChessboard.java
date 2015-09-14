@@ -64,6 +64,7 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
+		square.minimumEdgeIntensity = 0.1;
 		square.contour2Poly_splitDistanceFraction = 0.05;
 
 		square.minContourImageWidthFraction = 0.05;
@@ -74,11 +75,9 @@ public class ConfigChessboard implements Configuration {
 		// good value for squares.  Set it here to make it not coupled to default values
 		square.configRefineCorners.cornerOffset = 2;
 
-		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
-		// very crude corners
 		square.configRefineCorners.lineSamples = 10;
-		square.configRefineCorners.convergeTolPixels = 0.2;
-		square.configRefineCorners.maxIterations = 5;
+		square.configRefineCorners.convergeTolPixels = 0.05;
+		square.configRefineCorners.maxIterations = 10;
 	}
 
 	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {

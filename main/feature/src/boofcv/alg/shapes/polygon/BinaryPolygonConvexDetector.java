@@ -318,9 +318,17 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					}
 				}
 
-				if( !differenceScore.validate(workPoly) ) {
-					if( verbose ) System.out.println("Failed due to weak edge");
-					continue;
+				// use a lower threshold of the edge the first time since the edge might not be perfect
+				// this especially true for chessboard patterns where the edge is intentionally off
+				if( differenceScore != null ) {
+					double edgeThreshold = differenceScore.getThresholdScore();
+					differenceScore.setThresholdScore(edgeThreshold/3.0);
+					boolean valid = differenceScore.validate(workPoly);
+					differenceScore.setThresholdScore(edgeThreshold);
+					if( !valid ) {
+						if( verbose ) System.out.println("Rejected edge score, before: "+differenceScore.getAverageEdgeIntensity());
+						continue;
+					}
 				}
 
 				Polygon2D_F64 refined = found.grow();
@@ -339,6 +347,12 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				} else {
 					refined.set(workPoly);
 					success = true;
+				}
+
+				// test it again with the full threshold
+				if( differenceScore != null && !differenceScore.validate(refined)) {
+					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
+					continue;
 				}
 
 				if( !outputClockwise )
