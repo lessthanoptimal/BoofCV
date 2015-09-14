@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ExampleOverheadView {
 		// 2D coordinate system having +y pointing up, while images have +y pointing down.
 		BufferedImage output = ConvertBufferedImage.convertTo(overheadRGB,null,true);
 
-		ShowImages.showWindow(input,"Input Image");
-		ShowImages.showWindow(output,"Overhead Image");
+		ShowImages.showWindow(input,"Input Image",true);
+		ShowImages.showWindow(output,"Overhead Image",true);
 	}
 }

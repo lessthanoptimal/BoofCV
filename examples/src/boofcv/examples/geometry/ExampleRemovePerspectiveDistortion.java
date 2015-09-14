@@ -76,7 +76,7 @@ public class ExampleRemovePerspectiveDistortion {
 		DistortImageOps.distortMS(input,output,pixelTransform, null, TypeInterpolate.BILINEAR);
 
 		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
-		ShowImages.showWindow(buffered,"Original Image");
-		ShowImages.showWindow(flat,"Without Perspective Distortion");
+		ShowImages.showWindow(buffered,"Original Image",true);
+		ShowImages.showWindow(flat,"Without Perspective Distortion",true);
 	}
 }

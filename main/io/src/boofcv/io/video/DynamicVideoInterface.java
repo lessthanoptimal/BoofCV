@@ -53,13 +53,20 @@ public class DynamicVideoInterface implements VideoInterface {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T> load(String fileName, ImageType<T> imageType) {
 
-		if( xuggler != null ) {
-			return xuggler.load(fileName,imageType);
-		} else if( jcodec != null ) {
-			if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
-				return jcodec.load(fileName,imageType);
+		try {
+			if( xuggler != null ) {
+				return xuggler.load(fileName, imageType);
 			}
-		}
+		} catch( RuntimeException ignore ){}
+
+		try {
+			if( jcodec != null ) {
+				if( fileName.endsWith(".mp4") || fileName.endsWith(".MP4")) {
+					return jcodec.load(fileName,imageType);
+				}
+			}
+		} catch( RuntimeException ignore ){}
+
 		if( fileName.endsWith("mjpeg") || fileName.endsWith("MJPEG") ||
 				fileName.endsWith("mjpg") || fileName.endsWith("MJPG") ) {
 			try {

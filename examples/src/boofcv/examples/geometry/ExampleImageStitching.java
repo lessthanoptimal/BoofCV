@@ -27,11 +27,13 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
-import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -170,7 +172,7 @@ public class ExampleImageStitching {
 
 		// Convert into a BoofCV color format
 		MultiSpectral<ImageFloat32> colorA =
-				ConvertBufferedImage.convertFromMulti(imageA, null,true, ImageFloat32.class);
+				ConvertBufferedImage.convertFromMulti(imageA, null, true, ImageFloat32.class);
 		MultiSpectral<ImageFloat32> colorB =
 				ConvertBufferedImage.convertFromMulti(imageB, null,true, ImageFloat32.class);
 
@@ -183,8 +185,10 @@ public class ExampleImageStitching {
 
 		// Used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.VALUE);
 		ImageDistort<MultiSpectral<ImageFloat32>,MultiSpectral<ImageFloat32>> distort =
-				DistortSupport.createDistortMS(ImageFloat32.class, model, new ImplBilinearPixel_F32(),false);
+				DistortSupport.createDistortMS(ImageFloat32.class, model, interp, false);
+		distort.setRenderAll(false);
 
 		// Render first image
 		model.set(fromWorkToA);
@@ -211,12 +215,13 @@ public class ExampleImageStitching {
 
 		g2.setColor(Color.ORANGE);
 		g2.setStroke(new BasicStroke(4));
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.drawLine(corners[0].x,corners[0].y,corners[1].x,corners[1].y);
 		g2.drawLine(corners[1].x,corners[1].y,corners[2].x,corners[2].y);
 		g2.drawLine(corners[2].x,corners[2].y,corners[3].x,corners[3].y);
 		g2.drawLine(corners[3].x,corners[3].y,corners[0].x,corners[0].y);
 
-		ShowImages.showWindow(output,"Stitched Images");
+		ShowImages.showWindow(output,"Stitched Images", true);
 	}
 
 	private static Point2D_I32 renderPoint( int x0 , int y0 , Homography2D_F64 fromBtoWork )

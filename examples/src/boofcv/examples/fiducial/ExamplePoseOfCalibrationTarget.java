@@ -104,7 +104,7 @@ public class ExamplePoseOfCalibrationTarget {
 			detector.detect(video.next());
 
 			if( detector.totalFound() == 0 )
-				throw new RuntimeException("Failed to detect target");
+				continue;
 
 			detector.getFiducialToCamera(0, targetToCamera);
 

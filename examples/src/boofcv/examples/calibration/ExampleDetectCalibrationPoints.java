@@ -70,6 +70,6 @@ public class ExampleDetectCalibrationPoints {
 		for( Point2D_F64 p : points )
 			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.RED);
 
-		ShowImages.showWindow(orig,"Calibration Points");
+		ShowImages.showWindow(orig,"Calibration Points", true);
 	}
 }
