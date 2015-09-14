@@ -38,7 +38,7 @@ public class ConfigFiducialBinary implements Configuration {
 	 * Value from 0 to 1.  0 is very strict and 1 is very relaxed.  Used when classifying a require block
 	 * as black or white.  If it can't be classified then the shape is discarded
 	 */
-	public double ambiguousThreshold = 0.5;
+	public double ambiguousThreshold = 0.75;
 
 	/**
 	 * Configuration for square detector
