@@ -66,7 +66,7 @@ public class ExampleVideoMosaic {
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.
 		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
-				FactoryMotion2D.createMotion2D(200,3,2,30,0.6,0.5,false,tracker,new Homography2D_F64());
+				FactoryMotion2D.createMotion2D(220,3,2,30,0.6,0.5,false,tracker,new Homography2D_F64());
 
 		// wrap it so it output color images while estimating motion from gray
 		ImageMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64> motion2DColor =
