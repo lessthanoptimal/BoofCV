@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.kernel;
+package boofcv.alg.filter;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.filter.kernel.GKernelMath;
+import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.ListDisplayPanel;

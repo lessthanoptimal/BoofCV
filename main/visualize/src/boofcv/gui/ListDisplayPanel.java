@@ -28,7 +28,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ import java.util.List;
  */
 public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
-	List<JPanel> panels = new ArrayList<JPanel>();
+	final List<JPanel> panels = new ArrayList<JPanel>();
 	private JPanel bodyPanel;
 	private JList listPanel;
 
@@ -70,20 +69,16 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	}
 
 	public synchronized void reset() {
+		panels.clear();
+
 		if( SwingUtilities.isEventDispatchThread() ) {
-			panels.clear();
 			listModel.removeAllElements();
 		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						panels.clear();
-						listModel.removeAllElements();
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					listModel.removeAllElements();
+				}
+			});
 		}
 //		bodyPanel.requestFocus();
 	}
@@ -103,12 +98,12 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 	 * @param image The image being displayed
 	 * @param name Name of the image.  Shown in the list.
 	 */
-	public void addImage( BufferedImage image , String name ) {
+	public void addImage( BufferedImage image , String name) {
 		addImage(image, name, ScaleOptions.DOWN);
 	}
 
-	public void addImage( BufferedImage image , String name , ScaleOptions scaling ) {
-		addItem(new ImagePanel(image, scaling), name );
+	public void addImage( BufferedImage image , String name , ScaleOptions scaling) {
+		addItem(new ImagePanel(image, scaling), name);
 	}
 
 	/**
@@ -122,14 +117,14 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 		Dimension panelD = panel.getPreferredSize();
 
 		// make the preferred size large enough to hold all the images
-		bodyWidth = (int)Math.max(bodyWidth,panelD.getWidth());
+		bodyWidth = (int)Math.max(bodyWidth, panelD.getWidth());
 		bodyHeight = (int)Math.max(bodyHeight,panelD.getHeight());
 
 		panels.add(panel);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				listModel.addElement(name);
-				if( listModel.size() == 1 ) {
+				if (listModel.size() == 1) {
 					listPanel.setSelectedIndex(0);
 				}
 				// update the list's size
@@ -137,9 +132,9 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 				listPanel.setPreferredSize(new Dimension(d.width + scroll.getVerticalScrollBar().getWidth(), d.height));
 
 				// make sure it's preferred size is up to date
-				Component old = ((BorderLayout)bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
-				if( old != null )
-					old.setPreferredSize(new Dimension(bodyWidth,bodyHeight));
+				Component old = ((BorderLayout) bodyPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+				if (old != null)
+					old.setPreferredSize(new Dimension(bodyWidth, bodyHeight));
 
 				validate();
 			}

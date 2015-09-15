@@ -87,14 +87,29 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 				GThresholdImageOps.threshold(imageInput,imageBinary,threshValue,thresholdDown);
 				break;
 
-			case 1:
+			case 1: {
+				threshValue = GThresholdImageOps.computeOtsu(imageInput,0,255);
+				GThresholdImageOps.threshold(imageInput, imageBinary, threshValue, thresholdDown);
+			} break;
+
+			case 2: {
+				threshValue = GThresholdImageOps.computeEntropy(imageInput, 0, 255);
+				GThresholdImageOps.threshold(imageInput, imageBinary, threshValue, thresholdDown);
+			} break;
+
+			case 3:
 				GThresholdImageOps.adaptiveSquare(imageInput, imageBinary,
 						threshRadius, threshBias, thresholdDown,null,null);
 				break;
 
-			case 2:
+			case 4:
 				GThresholdImageOps.adaptiveGaussian(imageInput, imageBinary,
-						threshRadius, threshBias, thresholdDown,null,null);
+						threshRadius, threshBias, thresholdDown, null, null);
+				break;
+
+			case 5:
+				GThresholdImageOps.adaptiveSauvola(imageInput, imageBinary,
+						threshRadius, 0.3f, thresholdDown);
 				break;
 		}
 
@@ -140,6 +155,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles","../data/evaluation/particles01.jpg"));
 		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("stained","../data/applet/segment/stained_handwriting.jpg"));
 
 		app.setInputList(inputs);
 
@@ -148,7 +164,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Noise Removal");
+		ShowImages.showWindow(app, "Thresholding Demo", true);
 
 		System.out.println("Done");
 	}

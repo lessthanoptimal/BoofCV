@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.filter;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -107,7 +107,6 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 
 		panel.reset();
-
 		Helper h = (Helper)cookie;
 
 		D derivXX = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);

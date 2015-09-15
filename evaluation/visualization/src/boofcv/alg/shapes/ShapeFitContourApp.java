@@ -268,7 +268,7 @@ public class ShapeFitContourApp
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Shape Fitting");
+		ShowImages.showWindow(app,"Shape Fitting", true);
 	}
 
 	@Override

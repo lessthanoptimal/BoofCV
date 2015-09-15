@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.kernel;
+package boofcv.alg.filter;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.filter.kernel.GKernelMath;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -83,7 +84,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 
 			Kernel1D kerX =  FactoryKernelGaussian.derivativeK(typeKer1,type.orderX,sigma,radius);
 			Kernel1D kerY = FactoryKernelGaussian.derivativeK(typeKer1,type.orderY,sigma,radius);
-			Kernel2D kernel = GKernelMath.convolve(kerY,kerX);
+			Kernel2D kernel = GKernelMath.convolve(kerY, kerX);
 
 			T smallImg = GKernelMath.convertToImage(kernel);
 			new FDistort(smallImg,largeImg).interpNN().scaleExt().apply();

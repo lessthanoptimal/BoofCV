@@ -113,7 +113,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Video Image Stabilize");
+		ShowImages.showWindow(app, "Video Image Stabilize", true);
 	}
 
 	@Override

@@ -200,7 +200,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		}
 
 		System.out.println("Calling show window");
-		ShowImages.showWindow(app, "Feature Orientation");
+		ShowImages.showWindow(app, "Feature Orientation", true);
 		System.out.println("Done");
 	}
 }

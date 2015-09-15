@@ -110,6 +110,6 @@ public class VisualizePyramidFloatApp <T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Image Float Pyramid");
+		ShowImages.showWindow(app,"Image Float Pyramid", true);
 	}
 }

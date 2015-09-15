@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.kernel;
+package boofcv.alg.filter;
 
+import boofcv.alg.filter.kernel.SteerableKernel;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.gui.image.ShowImages;

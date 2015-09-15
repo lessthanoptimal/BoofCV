@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -195,6 +195,6 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Region Descriptor Visualization");
+		ShowImages.showWindow(app,"Region Descriptor Visualization", true);
 	}
 }

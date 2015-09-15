@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -44,7 +45,7 @@ public class VisualizeAverageDownSample {
 		MultiSpectral<ImageFloat32> output2 = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				original.getWidth()/3,original.getHeight()/3,3);
 
-		AverageDownSampleOps.down(input,output);
+		AverageDownSampleOps.down(input, output);
 		new FDistort(input,output2).scaleExt().apply();
 
 		BufferedImage outputFull = ConvertBufferedImage.convertTo_F32(output, null, true);

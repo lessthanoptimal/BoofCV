@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -167,6 +167,6 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Feature Tracker");
+		ShowImages.showWindow(app, "Feature Tracker", true);
 	}
 }

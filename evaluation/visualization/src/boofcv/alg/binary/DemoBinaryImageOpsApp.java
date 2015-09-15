@@ -212,7 +212,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Noise Removal");
+		ShowImages.showWindow(app, "Image Noise Removal", true);
 
 		System.out.println("Done");
 	}

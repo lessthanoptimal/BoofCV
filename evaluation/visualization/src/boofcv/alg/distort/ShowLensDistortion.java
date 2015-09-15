@@ -276,6 +276,6 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Lens Distortion");
+		ShowImages.showWindow(app, "Lens Distortion", true);
 	}
 }

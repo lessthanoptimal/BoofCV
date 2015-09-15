@@ -322,6 +322,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Associated Features");
+		ShowImages.showWindow(app, "Associated Features", true);
 	}
 }

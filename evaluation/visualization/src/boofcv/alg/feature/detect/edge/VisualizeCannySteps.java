@@ -22,6 +22,7 @@ import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.edge.VisualizeEdgeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -70,12 +71,11 @@ public class VisualizeCannySteps {
 		float threshLow = 5;
 		float threshHigh = 40;
 
-		GradientToEdgeFeatures.intensityE(derivX,derivY,intensity);
-		GradientToEdgeFeatures.direction(derivX,derivY,orientation);
-		GradientToEdgeFeatures.discretizeDirection4(orientation,direction);
-		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction,suppressed);
+		GradientToEdgeFeatures.intensityE(derivX, derivY, intensity);
+		GradientToEdgeFeatures.direction(derivX, derivY, orientation);
+		GradientToEdgeFeatures.discretizeDirection4(orientation, direction);
+		GradientToEdgeFeatures.nonMaxSuppression4(intensity, direction, suppressed);
 
-		ShowImages.showWindow(suppressed,"Suppressed Intensity",true);
 		BufferedImage renderedOrientation = VisualizeEdgeFeatures.renderOrientation4(direction,suppressed,threshLow,null);
 
 		HysteresisEdgeTraceMark hysteresis = new HysteresisEdgeTraceMark();
@@ -83,8 +83,12 @@ public class VisualizeCannySteps {
 
 		BufferedImage renderedLabel = VisualizeBinaryData.renderBinary(output, false, null);
 
-		ShowImages.showWindow(intensity,"Raw Intensity",true);
-		ShowImages.showWindow(renderedOrientation,"Orientation");
-		ShowImages.showWindow(renderedLabel,"Labeled Contours");
+		ListDisplayPanel gui =  new ListDisplayPanel();
+		gui.addImage(suppressed,"Suppressed Intensity");
+		gui.addImage(intensity,"Raw Intensity");
+		gui.addImage(renderedOrientation,"Orientation");
+		gui.addImage(renderedLabel, "Labeled Contours");
+
+		ShowImages.showWindow(gui,"Visualized Canny Steps", true);
 	}
 }

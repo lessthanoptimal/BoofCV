@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -332,7 +332,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app,"Image Noise Removal");
+		ShowImages.showWindow(app,"Image Noise Removal", true);
 
 		System.out.println("Done");
 	}

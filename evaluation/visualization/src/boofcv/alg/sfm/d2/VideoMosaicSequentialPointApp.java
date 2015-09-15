@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,7 +148,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Video Image Mosaic");
+		ShowImages.showWindow(app, "Video Image Mosaic", true);
 	}
 
 	@Override

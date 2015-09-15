@@ -87,8 +87,8 @@ public class VisualizeSquareBinaryFiducial {
 			VisualizeShapes.draw(fiducials.get(i).location,g2);
 		}
 
-		ShowImages.showWindow(output,"Binary");
-		ShowImages.showWindow(squares,"Candidates");
+		ShowImages.showWindow(output,"Binary",true);
+		ShowImages.showWindow(squares,"Candidates",true);
 	}
 
 	public static class Detector extends DetectFiducialSquareBinary<ImageFloat32> {

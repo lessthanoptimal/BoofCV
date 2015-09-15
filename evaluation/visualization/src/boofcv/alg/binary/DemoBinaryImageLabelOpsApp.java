@@ -267,7 +267,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Label Binary Blobs");
+		ShowImages.showWindow(app, "Label Binary Blobs", true);
 
 		System.out.println("Done");
 	}

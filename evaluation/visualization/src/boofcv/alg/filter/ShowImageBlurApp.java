@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.blur;
+package boofcv.alg.filter;
 
+import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
 import javax.swing.*;
@@ -226,10 +227,8 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 
 	public static void main(String args[]) {
 
-		ShowImageBlurApp<ImageFloat32> app
-				= new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
-//		ShowImageBlurApp<ImageUInt8> app
-//				= new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
+//		ShowImageBlurApp<ImageFloat32> app = new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
+		ShowImageBlurApp<ImageUInt8> app = new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
