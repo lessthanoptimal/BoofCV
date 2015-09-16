@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class ExampleJCodecDisplayFrames {
 	public static void main(String[] args) {
 
-		String fileName = "/home/pja/tempvideo.mp4";
+		String fileName = "../data/applet/background/highway_bridge_jitter.mp4";
 		ImageType type = ImageType.ms(3, ImageUInt8.class);
 //		ImageType type = ImageType.single(ImageUInt8.class);
 //		ImageType type = ImageType.ms(3, ImageFloat32.class);
@@ -55,7 +55,7 @@ public class ExampleJCodecDisplayFrames {
 		}
 
 		ImagePanel gui = new ImagePanel(out);
-		ShowImages.showWindow(gui,"Video!");
+		ShowImages.showWindow(gui,"Video!", true);
 
 		long totalNano = 0;
 		while(sequence.hasNext()) {

@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.19-SNAPSHOT'
+    version = '0.19'
 }
 
 subprojects {
@@ -166,10 +166,6 @@ try {
 try {
     project(':integration:openkinect')
     integrationProjects.add(':integration:openkinect')
-} catch( UnknownProjectException ignore ) {}
-try {
-    project(':integration:processing')
-    integrationProjects.add(':integration:processing')
 } catch( UnknownProjectException ignore ) {}
 
 def javadocProjects = mainProjects + integrationProjects

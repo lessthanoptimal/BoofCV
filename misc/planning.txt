@@ -13,6 +13,9 @@ Alpha 0.20
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
   * Regression tests that can determine if orientation is correct
     - If multiple squares on same surface see if their orientation is the same
+  * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
+                     Put all patterns which meet the correctness fraction then use the weighted sum to
+                     select the winner.
 
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
