@@ -93,7 +93,7 @@ public class ExampleTemplateMatching {
 
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		VisualizeImageData.grayMagnitude(intensity, output, -1);
-		ShowImages.showWindow(output, "Match Intensity");
+		ShowImages.showWindow(output, "Match Intensity", true);
 	}
 
 	public static void main(String args[]) {

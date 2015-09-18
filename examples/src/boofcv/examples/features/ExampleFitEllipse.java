@@ -74,7 +74,7 @@ public class ExampleFitEllipse {
 			VisualizeShapes.drawEllipse(ellipse.shape, g2);
 		}
 
-//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(filtered,null),"Binary");
+//		ShowImages.showWindow(VisualizeBinaryData.renderBinary(filtered, false, null),"Binary",true);
 		ShowImages.showWindow(image,"Ellipses",true);
 	}
 }

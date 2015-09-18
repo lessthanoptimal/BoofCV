@@ -1,7 +1,7 @@
 dependencies {
     compile project(':main:all')
 
-    compile 'net.sf.py4j:py4j:0.8.2.1'
+    compile 'net.sf.py4j:py4j:0.9'
 }
 
 sourceSets {

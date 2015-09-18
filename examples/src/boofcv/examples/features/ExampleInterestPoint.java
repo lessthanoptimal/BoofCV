@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,8 @@ public class ExampleInterestPoint {
 		displayResults(image, detector);
 	}
 
-	private static <T extends ImageSingleBand> void displayResults(BufferedImage image,
-															 InterestPointDetector<T> detector)
+	private static <T extends ImageSingleBand>
+	void displayResults(BufferedImage image, InterestPointDetector<T> detector)
 	{
 		Graphics2D g2 = image.createGraphics();
 		FancyInterestPointRender render = new FancyInterestPointRender();
@@ -87,7 +87,7 @@ public class ExampleInterestPoint {
 
 		// just draw the features onto the input image
 		render.draw(g2);
-		ShowImages.showWindow(image, "Detected Features");
+		ShowImages.showWindow(image, "Detected Features", true);
 	}
 
 	public static void main( String args[] ) {

@@ -79,8 +79,8 @@ public class ExampleCalibrateMonocularPlanar {
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
 
 		// load image list
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-		images = BoofMiscOps.directoryList(directory,"left");
+		String directory = "/home/pja/romotive/Systems/common/vision/blur/calib";
+		images = BoofMiscOps.directoryList(directory,"png");
 	}
 
 	/**

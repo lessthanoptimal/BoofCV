@@ -22,7 +22,7 @@ Gradle
 To post a SNAPSHOT or full release:
 gradle uploadArchives
 
-SNAPSHOT is it has that in its name.
+A SNAPSHOT is created if SNAPSHOT is in its name.
 
 log onto http://oss.sonatype.org
 

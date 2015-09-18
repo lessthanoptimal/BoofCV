@@ -89,7 +89,7 @@ public class ExampleFiducialImage {
 			System.out.println("Location:");
 			System.out.println(targetToSensor);
 
-			VisualizeFiducial.drawNumbers(targetToSensor,param,detector.getId(i), g2);
+			VisualizeFiducial.drawLabelCenter(targetToSensor, param, ""+detector.getId(i), g2);
 			VisualizeFiducial.drawCube(targetToSensor,param,detector.getWidth(i), 3, g2);
 		}
 
