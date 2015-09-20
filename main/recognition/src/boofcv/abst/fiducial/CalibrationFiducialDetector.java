@@ -97,6 +97,14 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);
 
+		int squareCols = config.numCols/2+1;
+		int squareRows = config.numRows/2+1;
+
+		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
+		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+
+		width = (sideWidth+sideHeight)/2.0;
+
 		computeH = new Zhang99ComputeTargetHomography(detector.getLayout());
 	}
 

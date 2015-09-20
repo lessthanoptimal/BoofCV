@@ -42,6 +42,8 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -81,11 +83,18 @@ public class DetectCalibrationChessApp
 		panel.setLayout( new BorderLayout());
 
 		calibGUI = new GridCalibPanel(true);
-		calibGUI.setListener( this );
+		calibGUI.setListener(this);
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 
 		panel.add(gui, BorderLayout.CENTER);
 		panel.add(calibGUI, BorderLayout.WEST);
+
+		gui.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				System.out.println("clicked at " + e.getX() + " " + e.getY());
+			}
+		});
 
 		setMainGUI(panel);
 	}
@@ -233,9 +242,22 @@ public class DetectCalibrationChessApp
 			int a = grids.size()==1 ? 0 : 255*i/(grids.size()-1);
 
 			int rgb = a << 16 | (255-a) << 8;
-			g2.setColor(new Color(rgb));
+
 			g2.setStroke(new BasicStroke(3));
 
+			for (int j = 0; j < g.nodes.size()-1; j++) {
+				double fraction = j/((double)g.nodes.size()-1);
+				fraction = fraction*0.6 + 0.4;
+
+				int lineRGB = (int)(fraction*a) << 16 | (int)(fraction*(255-a)) << 8;
+
+				g2.setColor(new Color(lineRGB));
+				SquareNode p0 = g.nodes.get(j);
+				SquareNode p1 = g.nodes.get(j+1);
+				g2.drawLine((int) p0.center.x, (int) p0.center.y, (int) p1.center.x, (int) p1.center.y);
+			}
+
+			g2.setColor(new Color(rgb));
 			for (int j = 0; j < g.nodes.size(); j++) {
 				SquareNode n = g.nodes.get(j);
 				VisualizeShapes.drawPolygon(n.corners, true, g2, true);

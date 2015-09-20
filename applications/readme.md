@@ -1,4 +1,4 @@
-Applications for common, such as resizing images, removing lens distortion in batch, ...etc.
+Applications for common or useful tasks, such as resizing images, removing lens distortion in batch, ...etc.
 
 Usage:
 

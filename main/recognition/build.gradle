@@ -13,26 +13,3 @@ idea {
         name = "BoofCV Recognition"
     }
 }
-
-// gradle fidicualBinary -Pnumber=643
-// gradle fidicualBinary -Pnumber=643 -Plength=20
-// length is in centimeters
-task fidicualBinary(dependsOn: 'classes' )<< {
-
-    if ( !project.hasProperty('number')) {
-        print 'Must specify the encoded number. 0 to 4095. e.g. -Pnumber=427'
-        return;
-    }
-
-    if ( project.hasProperty('length')) {
-        ext.length = "$length"
-    } else {
-        ext.length="10.0"
-    }
-
-    javaexec {
-        main = "boofcv.alg.fiducial.CreateSquareBinaryPatternEPS"
-        classpath = sourceSets.main.runtimeClasspath
-        args = [ext.length,"$number"]
-    }
-}

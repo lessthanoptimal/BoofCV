@@ -19,7 +19,6 @@
 package boofcv.alg.feature.detect.squares;
 
 import georegression.geometry.UtilPolygons2D_F64;
-import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
@@ -28,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -257,69 +255,13 @@ public class TestSquareGridTools {
 
 	@Test
 	public void sortCorners() {
-		Polygon2D_F64 poly = new Polygon2D_F64(-1,-1,1,-1,1,1,-1,1);
+		fail("implement");
 
-		SquareGridTools alg = new SquareGridTools();
-		alg.axisX.slope.set(1, 0);
-		alg.axisY.slope.set(0, 1);
-
-		alg.sortCorners(poly);
-		checkOrder(alg,poly, 0,1,2,3);
-
-		alg.axisX.slope.set( 0,1);
-		alg.axisY.slope.set(-1,0);
-		alg.sortCorners(poly);
-		checkOrder(alg, poly, 1, 2, 3, 0);
-
-		alg.axisX.slope.set( -1, 0);
-		alg.axisY.slope.set(  0,-1);
-		alg.sortCorners(poly);
-		checkOrder(alg,poly, 2,3,0,1);
-
-	}
-
-	private void checkOrder( SquareGridTools alg , Polygon2D_F64 poly , int ...order) {
-		for (int i = 0; i < 4; i++) {
-			assertTrue("" + i, alg.sorted[i] == poly.get(order[i]));
-		}
 	}
 
 	@Test
 	public void selectAxis() {
-		SquareGridTools alg = new SquareGridTools();
-
-		for (int numRows = 1; numRows <= 3; numRows++) {
-			for (int numCols = 1; numCols <= 3; numCols++) {
-				SquareGrid grid = createGrid(numRows,numCols);
-
-				for (int i = 0; i < numRows; i++) {
-					for (int j = 0; j < numCols; j++) {
-						selectAxis(alg, grid, i, j);
-					}
-				}
-			}
-		}
-	}
-
-	// select and axis and check its properties
-	protected void selectAxis( SquareGridTools alg,
-							   SquareGrid grid , int row , int col ) {
-		alg.selectAxis(grid, row, col);
-
-		SquareNode n = grid.get(row,col);
-		assertEquals(0,alg.axisX.p.distance2(n.center),1e-8);
-		assertEquals(0,alg.axisY.p.distance2(n.center),1e-8);
-
-		double angleX = Math.atan2(alg.axisX.slope.y,alg.axisX.slope.x);
-		double angleY = Math.atan2(alg.axisY.slope.y,alg.axisY.slope.x);
-
-		assertEquals(Math.PI/2, UtilAngle.distanceCCW(angleX, angleY));
-
-		// compare to the first square, should be very similar
-		alg.selectAxis(grid, 0, 0);
-		double angleX0 = Math.atan2(alg.axisX.slope.y,alg.axisX.slope.x);
-
-		assertEquals(angleX0, angleX, 1e-6);
+		fail("implement");
 	}
 
 	public static SquareGrid createGrid( int numRows , int numCols ) {

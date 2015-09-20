@@ -18,10 +18,12 @@
 
 package boofcv.alg.feature.detect.squares;
 
+import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Area2D_F64;
-import georegression.metric.ClosestPoint2D_F64;
+import georegression.metric.Intersection2D_F64;
 import georegression.metric.UtilAngle;
-import georegression.struct.line.LineParametric2D_F64;
+import georegression.struct.line.LineGeneral2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -174,31 +176,140 @@ public class SquareGridTools {
 	/**
 	 * Get outside corner polygon around the grid.  Corners
 	 */
-	public void boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
+	public boolean boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
 		int w = grid.columns;
 		int h = grid.rows;
 
-		selectAxis(grid, 0,0);
-		sortCorners(grid.get(0, 0).corners);
-		bounding.get(0).set(sorted[0]);
+		if( w == 1 && h == 1 ) {
 
-		selectAxis(grid, 0,w-1);
-		sortCorners(grid.get(0, w-1).corners);
-		bounding.get(1).set(sorted[1]);
+		} else if( w == 1 ) {
 
-		selectAxis(grid, h-1,w-1);
-		sortCorners(grid.get(h-1, w-1).corners);
-		bounding.get(2).set(sorted[2]);
+		} else if( h == 1 ) {
 
-		selectAxis(grid, h-1,0);
-		sortCorners(grid.get(h-1, 0).corners);
-		bounding.get(3).set(sorted[3]);
+		} else {
+			orderNode(grid.get(0, 0), grid.get(h - 1, 0), true);
+			bounding.get(0).set(ordered[0]);
+			orderNode(grid.get(h - 1, 0), grid.get(h - 1, w - 1), true);
+			bounding.get(1).set(ordered[0]);
+			orderNode(grid.get(h - 1, w - 1), grid.get(0, w - 1), true);
+			bounding.get(2).set(ordered[0]);
+			orderNode(grid.get(0, w - 1), grid.get(0, 0), true);
+			bounding.get(3).set(ordered[0]);
+
+			return true;
+		}
+
+		return false;
 	}
 
-	// local storage for extractCalibrationPoints
-	LineParametric2D_F64 axisX = new LineParametric2D_F64();
-	LineParametric2D_F64 axisY = new LineParametric2D_F64();
-	Point2D_F64 sorted[] = new Point2D_F64[4];
+	private void orderNode( SquareGrid grid , int row , int col ) {
+		SquareNode node = grid.get(row,col);
+
+		if(grid.rows==1 && grid.columns==1 ) {
+			for (int i = 0; i < 4; i++) {
+				ordered[i] = node.corners.get(i);
+			}
+		} else if( grid.columns==1 || col == grid.columns-1 ) {
+			if( row == grid.rows-1 ) {
+				orderNode(node, grid.get(row - 1, col), false);
+				rotateTwiceOrdered();
+			} else {
+				orderNode(node, grid.get(row + 1, col), false);
+			}
+		} else {
+			if( col == grid.columns-1 ) {
+				orderNode(node, grid.get(row, col - 1), true);
+				rotateTwiceOrdered();
+			} else {
+				orderNode(node, grid.get(row, col + 1), true);
+			}
+		}
+	}
+
+	private void rotateTwiceOrdered() {
+		Point2D_F64 a = ordered[0];
+		Point2D_F64 b = ordered[1];
+		Point2D_F64 c = ordered[2];
+		Point2D_F64 d = ordered[3];
+
+		ordered[0] = c;
+		ordered[1] = d;
+		ordered[2] = a;
+		ordered[3] = b;
+	}
+
+	LineSegment2D_F64 lineCenters = new LineSegment2D_F64();
+	LineSegment2D_F64 lineSide = new LineSegment2D_F64();
+	Point2D_F64 dummy = new Point2D_F64();
+
+	LineGeneral2D_F64 general = new LineGeneral2D_F64();
+	Point2D_F64 ordered[] = new Point2D_F64[4];
+	private void orderNode(SquareNode target, SquareNode node, boolean pointingX) {
+
+		int index0 = findIntersection(target,node);
+		int index1 = (index0+1)%4;
+
+		int index2 = (index0+2)%4;
+		int index3 = (index0+3)%4;
+
+		if( index0 < 0 )
+			throw new RuntimeException("Couldn't find intersection.  Probable bug");
+
+		lineCenters.a = target.center;
+		lineCenters.b = node.center;
+		UtilLine2D_F64.convert(lineCenters,general);
+
+		Polygon2D_F64 poly = target.corners;
+		if( pointingX ) {
+			if (sign(general, poly.get(index0)) > 0) {
+				ordered[1] = poly.get(index0);
+				ordered[2] = poly.get(index1);
+			} else {
+				ordered[1] = poly.get(index1);
+				ordered[2] = poly.get(index0);
+			}
+			if (sign(general, poly.get(index2)) > 0) {
+				ordered[3] = poly.get(index2);
+				ordered[0] = poly.get(index3);
+			} else {
+				ordered[3] = poly.get(index2);
+				ordered[0] = poly.get(index3);
+			}
+		} else {
+			if (sign(general, poly.get(index0)) > 0) {
+				ordered[2] = poly.get(index0);
+				ordered[3] = poly.get(index1);
+			} else {
+				ordered[3] = poly.get(index1);
+				ordered[2] = poly.get(index0);
+			}
+			if (sign(general, poly.get(index2)) > 0) {
+				ordered[0] = poly.get(index2);
+				ordered[1] = poly.get(index3);
+			} else {
+				ordered[0] = poly.get(index2);
+				ordered[1] = poly.get(index3);
+			}
+		}
+	}
+
+	private int findIntersection( SquareNode target , SquareNode node ) {
+		lineCenters.a = target.center;
+		lineCenters.b = node.center;
+
+		for (int i = 0; i < 4; i++) {
+			int j = (i+1)%4;
+
+			lineSide.a = target.corners.get(i);
+			lineSide.b = target.corners.get(j);
+
+			if(Intersection2D_F64.intersection(lineCenters,lineSide,dummy) != null ) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 
 	/**
 	 * Adjust the corners in the square's polygon so that they are aligned along the grids overall
@@ -212,101 +323,27 @@ public class SquareGridTools {
 		for (int row = 0; row < grid.rows; row++) {
 
 			for (int col = 0; col < grid.columns; col++) {
-				selectAxis(grid, row, col);
-
+				orderNode(grid, row, col);
 				Polygon2D_F64 square = grid.get(row,col).corners;
-				sortCorners(square);
 
 				for (int i = 0; i < 4; i++) {
-					if( sorted[i] == null)
-					{
-						return false;
-					} else {
-						square.vertexes.data[i] = sorted[i];
-					}
+					square.vertexes.data[i] = ordered[i];
 				}
 			}
 		}
+
+
 
 		return true;
 	}
 
-	/**
-	 * Puts the corners into a specified order so that it can be placed into the grid.
-	 * Uses local coordiant systems defined buy axisX and axisY.
-	 */
-	void sortCorners(Polygon2D_F64 square) {
-		for (int i = 0; i < 4; i++) {
-			sorted[i] = null;
-		}
-		for (int i = 0; i < 4; i++) {
-			Point2D_F64 p = square.get(i);
-			double coorX = ClosestPoint2D_F64.closestPointT(axisX, p);
-			double coorY = ClosestPoint2D_F64.closestPointT(axisY, p);
-
-			if( coorX < 0 ) {
-				if( coorY < 0 ) {
-					sorted[0] = p;
-				} else {
-					sorted[3] = p;
-				}
-			} else {
-				if( coorY < 0 ) {
-					sorted[1] = p;
-				} else {
-					sorted[2] = p;
-				}
-			}
-		}
+	public static int sign( LineGeneral2D_F64 line , Point2D_F64 p ) {
+		double val = line.A*p.x + line.B*p.y + line.C;
+		if( val > 0 )
+			return 1;
+		if( val < 0 )
+			return -1;
+		return 0;
 	}
 
-	/**
-	 * Select the local X and Y axis around the specified grid element.
-	 */
-	void selectAxis( SquareGrid grid, int row , int col ) {
-
-		Point2D_F64 a = grid.get(row,col).center;
-		axisX.p.set(a);
-		axisY.p.set(a);
-
-		double dx,dy;
-
-		if( grid.columns == 1 && grid.rows == 1 ) {
-			// just pick an axis arbitrarily from the corner points
-			Polygon2D_F64 square = grid.nodes.get(0).corners;
-			double px = (square.get(0).x+square.get(1).x)/2.0;
-			double py = (square.get(0).y+square.get(1).y)/2.0;
-
-			dx = px-a.x;
-			dy = py-a.y;
-		} else if( grid.columns == 1 ) {
-			// find slope of y-axis
-			double fx,fy;
-			if( row == grid.rows-1 ) {
-				Point2D_F64 b = grid.get(row-1,col).center;
-				fx = a.x-b.x;
-				fy = a.y-b.y;
-			} else {
-				Point2D_F64 b = grid.get(row+1,col).center;
-				fx = b.x-a.x;
-				fy = b.y-a.y;
-			}
-			// convert into x-axis slope
-			dx = fy;
-			dy = -fx;
-		} else {
-			if( col == grid.columns-1 ) {
-				Point2D_F64 b = grid.get(row,col-1).center;
-				dx = a.x-b.x;
-				dy = a.y-b.y;
-			} else {
-				Point2D_F64 b = grid.get(row,col+1).center;
-				dx = b.x-a.x;
-				dy = b.y-a.y;
-			}
-		}
-		// Y axis will be CCW of x-axis.  Which appears to be CW on the screen
-		axisX.slope.set(dx, dy);
-		axisY.slope.set(-dy, dx);
-	}
 }

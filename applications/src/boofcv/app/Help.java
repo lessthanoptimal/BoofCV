@@ -29,7 +29,8 @@ public class Help {
 				CreateFiducialSquareImageEPS.class,
 				CreateFiducialSquareBinaryEPS.class,
 				BatchRemoveLensDistortion.class,
-				BatchDownSizeImage.class};
+				BatchDownSizeImage.class,
+				WebcamTrackFiducial.class};
 
 		System.out.println("Trying to run a command-line application?  Here are your options!");
 		System.out.println();

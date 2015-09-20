@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2015
+Date    : 2015/09/20
 Version : Alpha 0.19
 
 - Removed -1 from CachedSineCosine_F32
