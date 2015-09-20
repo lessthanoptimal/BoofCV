@@ -26,6 +26,8 @@ import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
 import boofcv.factory.feature.dense.ConfigDenseSample;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
+import boofcv.gui.image.ShowImages;
+import boofcv.gui.learning.ConfusionMatrixPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -37,7 +39,6 @@ import org.ddogleg.clustering.FactoryClustering;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.ops.MatrixVisualization;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -271,8 +272,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		System.out.println("Accuracy = " + confusion.computeAccuracy());
 
 		// Show confusion matrix
-		// Not the best coloration scheme...  perfect = red diagonal and black elsewhere.
-		MatrixVisualization.show(confusion.getMatrix(),"Confusion Matrix");
+		// Not the best coloration scheme...  perfect = red diagonal and blue elsewhere.
+		ShowImages.showWindow(new ConfusionMatrixPanel(confusion.getMatrix(), 400, true), "Confusion Matrix", true);
 
 		// For  "fast"  SURF descriptor the accuracy is 52.2%
 		// For "stable" SURF descriptor the accuracy is 49.4%

@@ -57,7 +57,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-public class ExampleColorHistogramFeature {
+public class ExampleColorHistogramLookup {
 
 	/**
 	 * HSV stores color information in Hue and Saturation while intensity is in Value.  This computes a 2D histogram
