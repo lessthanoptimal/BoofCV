@@ -5,13 +5,14 @@ configurations {
 
 
 dependencies {
-    compile project(':main:ip')
-    compile project(':main:io')
+    compile project(':main:all')
     compile project(':main:feature')
-    compile project(':main:calibration')
     compile project(':main:geo')
-    compile project(':main:sfm')
+    compile project(':main:io')
+    compile project(':main:ip')
+    compile project(':main:learning')
     compile project(':main:recognition')
+    compile project(':main:sfm')
     compile project(':main:visualize')
 
     processing files("core.jar")
@@ -46,6 +47,7 @@ task processingJavaDoc(type: Javadoc) {
 
     // provide references to external javadoc
     configure(options) {
+        failOnError = false
         links = ['http://docs.oracle.com/javase/7/docs/api/',
                  'http://ejml.org/javadoc/',
                  'http://georegression.org/javadoc/',
