@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		// Figure out how large the GUI window should be
 		T frame = sequence.next();
 		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
-		ShowImages.showWindow(gui,"KTL Tracker");
+		ShowImages.showWindow(gui,"KTL Tracker", true);
 
 		// process each frame in the image sequence
 		while( sequence.hasNext() ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
@@ -77,9 +78,11 @@ public class ExampleWatershedWithSeeds {
 		numRegions -= 1;
 		BufferedImage outRegions = VisualizeRegions.regions(output,numRegions,null);
 
-		ShowImages.showWindow(outLabeled,"Seeds");
-		ShowImages.showWindow(outRegions,"Regions");
-		ShowImages.showWindow(image,"Watersheds");
+		ListDisplayPanel gui = new ListDisplayPanel();
+		gui.addImage(image, "Watersheds");
+		gui.addImage(outRegions, "Regions");
+		gui.addImage(outLabeled, "Seeds");
+		ShowImages.showWindow(gui, "Waterhsed", true);
 
 		// Additional processing would be needed for this example to be really useful.
 		// The watersheds can be used to characterize the background while the seed binary image the particles

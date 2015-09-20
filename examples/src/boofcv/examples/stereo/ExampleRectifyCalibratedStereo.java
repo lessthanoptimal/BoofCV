@@ -40,7 +40,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * <p>
- * Show how to rectify a pair of stereo images with known intrinsic parameters and stereo baseline.
+ * Shows how to rectify a pair of stereo images with known intrinsic parameters and stereo baseline.
  * The example code does the following:<br>
  * 1) Load stereo parameters from XML file with a pair of images.<br>
  * 2) Undistort and rectify images..  This provides one rectification matrix

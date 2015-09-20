@@ -137,7 +137,7 @@ public class ExamplePnP {
 	}
 
 	/**
-	 * Generates synthetic observatiosn randomly in front of the camera
+	 * Generates synthetic observations randomly in front of the camera
 	 */
 	public List<Point2D3D> createObservations( Se3_F64 worldToCamera , int total ) {
 

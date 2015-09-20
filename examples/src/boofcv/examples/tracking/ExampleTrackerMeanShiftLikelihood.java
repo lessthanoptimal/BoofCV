@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,7 +120,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		gui.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
 		gui.setBackGround((BufferedImage)video.getGuiImage());
 		gui.setTarget(location,true);
-		ShowImages.showWindow(gui, "Tracking Results");
+		ShowImages.showWindow(gui, "Tracking Results", true);
 
 		// Track the object across each video frame and display the results
 		while( video.hasNext() ) {
