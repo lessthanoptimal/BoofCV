@@ -19,6 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.calib.CalibrateMonoPlanar;
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -75,11 +76,11 @@ public class ExampleCalibrateMonocularPlanar {
 	 */
 	private void setupBumbleBee() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30,30));
+		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
 
 		// load image list
-		String directory = "/home/pja/projects/boofcv/evaluation/a";
-		images = BoofMiscOps.directoryList(directory,"png");
+		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		images = BoofMiscOps.directoryList(directory,"left");
 	}
 
 	/**
