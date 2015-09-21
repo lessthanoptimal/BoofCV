@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -182,7 +183,7 @@ public class TestSquareGridTools {
 		assertTrue(poly.get(0).distance(- w / 2, -w / 2) <= 1e-8);
 		assertTrue(poly.get(1).distance( w*4 + w / 2 , - w / 2) <= 1e-8);
 		assertTrue(poly.get(2).distance( w*4 + w / 2 , w*2 + w / 2) <= 1e-8);
-		assertTrue(poly.get(3).distance(-w/2, w*2 + w/2) <= 1e-8);
+		assertTrue(poly.get(3).distance(-w / 2, w * 2 + w / 2) <= 1e-8);
 	}
 
 	@Test
@@ -201,7 +202,7 @@ public class TestSquareGridTools {
 		assertTrue(poly.get(3).distance(- w/2 , w*4 + w / 2) <= 1e-8);
 	}
 
-		@Test
+	@Test
 	public void boundingPolygon_row() {
 		SquareGridTools alg = new SquareGridTools();
 
@@ -253,15 +254,145 @@ public class TestSquareGridTools {
 		}
 	}
 
+	/**
+	 * Exhaustively checks all situations it might encounter
+	 */
 	@Test
-	public void sortCorners() {
-		fail("implement");
+	public void orderNodeGrid() {
+		SquareGridTools alg = new SquareGridTools();
 
+		for( int rows = 1; rows <= 4; rows++ ) {
+			for (int cols = 1; cols <= 4; cols++) {
+				if( rows == 1 && cols == 1 )
+					continue;
+
+				SquareGrid grid = createGrid(rows, cols);
+
+//				System.out.println("grid shape "+rows+" "+cols);
+
+				for (int flip = 0; flip < 2; flip++) {
+					for (int rotate = 0; rotate < 4; rotate++) {
+
+//						System.out.println("  flip "+flip+" rotate "+rotate);
+						for (int i = 0; i < rows; i++) {
+							for (int j = 0; j < cols; j++) {
+//								System.out.println("    element "+i+" "+j);
+								alg.orderNodeGrid(grid, i, j);
+								check_orderNodeGrid(alg.ordered,grid.get(i,j).center);
+							}
+						}
+						for (int i = 0; i < rows; i++) {
+							for (int j = 0; j < cols; j++) {
+								UtilPolygons2D_F64.shiftDown(grid.get(i,j).corners);
+							}
+						}
+					}
+					for (int i = 0; i < rows; i++) {
+						for (int j = 0; j < cols; j++) {
+							UtilPolygons2D_F64.flip(grid.get(i, j).corners);
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	public void check_orderNodeGrid(Point2D_F64 ordered[] , Point2D_F64 center) {
+
+		Point2D_F64 c = center;
+
+		assertTrue(ordered[0].x-c.x < 0 );
+		assertTrue(ordered[0].y - c.y < 0);
+
+		assertTrue(ordered[1].x - c.x > 0);
+		assertTrue(ordered[1].y - c.y < 0);
+
+		assertTrue(ordered[2].x - c.x > 0);
+		assertTrue(ordered[2].y - c.y > 0);
+
+		assertTrue(ordered[3].x-c.x < 0 );
+		assertTrue(ordered[3].y-c.y > 0 );
 	}
 
 	@Test
-	public void selectAxis() {
-		fail("implement");
+	public void orderNode() {
+		SquareNode target = new SquareNode();
+		target.corners = new Polygon2D_F64(4);
+		target.corners.get(0).set(-1,-1);
+		target.corners.get(1).set( 1,-1);
+		target.corners.get(2).set( 1, 1);
+		target.corners.get(3).set(-1, 1);
+
+		SquareNode up = new SquareNode();    up.center.set(0, 5);
+		SquareNode down = new SquareNode();  down.center.set(0,-5);
+		SquareNode left = new SquareNode();  left.center.set(-5, 0);
+		SquareNode right = new SquareNode(); right.center.set( 5,0);
+
+		SquareGridTools alg = new SquareGridTools();
+
+		// try different orders and clockwiseness
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 4; j++) {
+//				System.out.println("i = " + i + " j = " + j);
+				alg.orderNode(target, right,true);
+				checkOrder(alg.ordered, -1,-1,  1,-1,  1,1,  -1,1);
+				alg.orderNode(target, left, true);
+				checkOrder(alg.ordered, 1,1,  -1,1,  -1,-1,  1,-1);
+
+				alg.orderNode(target, up,false);
+				checkOrder(alg.ordered, -1,-1,  1,-1,  1,1,  -1,1);
+				alg.orderNode(target, down,false);
+				checkOrder(alg.ordered, 1,1,  -1,1,  -1,-1,  1,-1);
+
+				UtilPolygons2D_F64.shiftDown(target.corners);
+			}
+			UtilPolygons2D_F64.flip(target.corners);
+		}
+	}
+
+	private void checkOrder( Point2D_F64 ordered[] , double ...expected ) {
+		for (int i = 0; i < 4; i++) {
+			double expectedX = expected[i*2];
+			double expectedY = expected[i*2+1];
+
+			assertEquals(expectedX,ordered[i].x,1e-8);
+			assertEquals(expectedY,ordered[i].y,1e-8);
+		}
+	}
+
+	@Test
+	public void findIntersection() {
+		SquareGrid grid = createGrid(3,3);
+
+		SquareNode center = grid.get(1, 1);
+
+		SquareGridTools alg = new SquareGridTools();
+
+		assertEquals(closestSide(center,grid.get(1,2).center),alg.findIntersection(center,grid.get(1, 2)));
+		assertEquals(closestSide(center,grid.get(1,0).center),alg.findIntersection(center, grid.get(1, 0)));
+		assertEquals(closestSide(center,grid.get(2,1).center),alg.findIntersection(center,grid.get(2, 1)));
+		assertEquals(closestSide(center,grid.get(0,1).center),alg.findIntersection(center,grid.get(0, 1)));
+	}
+
+	private int closestSide( SquareNode node , Point2D_F64 point ) {
+		int best = -1;
+		double bestDistance = Double.MAX_VALUE;
+
+		for (int i = 0; i < 4; i++) {
+			int j = (i+1)%4;
+
+			double distI = node.corners.get(i).distance(point);
+			double distJ = node.corners.get(j).distance(point);
+
+			double distance = distI+distJ;
+			if( distance < bestDistance ) {
+				bestDistance = distance;
+				best = i;
+			}
+		}
+
+		return best;
 	}
 
 	public static SquareGrid createGrid( int numRows , int numCols ) {

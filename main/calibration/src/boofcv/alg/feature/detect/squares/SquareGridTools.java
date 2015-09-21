@@ -176,56 +176,73 @@ public class SquareGridTools {
 	/**
 	 * Get outside corner polygon around the grid.  Corners
 	 */
-	public boolean boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
+	public void boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
 		int w = grid.columns;
 		int h = grid.rows;
 
 		if( w == 1 && h == 1 ) {
-
+			SquareNode n = grid.get(0,0);
+			bounding.get(0).set(n.corners.get(0));
+			bounding.get(1).set(n.corners.get(1));
+			bounding.get(2).set(n.corners.get(2));
+			bounding.get(3).set(n.corners.get(3));
 		} else if( w == 1 ) {
-
-		} else if( h == 1 ) {
-
-		} else {
-			orderNode(grid.get(0, 0), grid.get(h - 1, 0), true);
+			orderNode(grid.get(0, 0), grid.get(h - 1, 0), false);
 			bounding.get(0).set(ordered[0]);
-			orderNode(grid.get(h - 1, 0), grid.get(h - 1, w - 1), true);
-			bounding.get(1).set(ordered[0]);
-			orderNode(grid.get(h - 1, w - 1), grid.get(0, w - 1), true);
+			bounding.get(1).set(ordered[1]);
+			orderNode(grid.get(h - 1, 0), grid.get(0, 0), false);
 			bounding.get(2).set(ordered[0]);
+			bounding.get(3).set(ordered[1]);
+		} else if( h == 1 ) {
+			orderNode(grid.get(0, 0), grid.get(0, w - 1), true);
+			bounding.get(0).set(ordered[0]);
+			bounding.get(3).set(ordered[3]);
 			orderNode(grid.get(0, w - 1), grid.get(0, 0), true);
+			bounding.get(1).set(ordered[3]);
+			bounding.get(2).set(ordered[0]);
+		} else {
+			orderNode(grid.get(0, 0), grid.get(0, w - 1), true);
+			bounding.get(0).set(ordered[0]);
+			orderNode(grid.get(0, w - 1), grid.get(h - 1, w - 1), true);
+			bounding.get(1).set(ordered[0]);
+			orderNode(grid.get(h - 1, w - 1), grid.get(h - 1, 0), true);
+			bounding.get(2).set(ordered[0]);
+			orderNode(grid.get(h - 1, 0), grid.get(0, 0), true);
 			bounding.get(3).set(ordered[0]);
-
-			return true;
 		}
-
-		return false;
 	}
 
-	private void orderNode( SquareGrid grid , int row , int col ) {
+	/**
+	 * Given the grid coordinate, order the corners for the node at that location.  Takes in handles situations
+	 * where there are no neighbors.
+	 */
+	protected void orderNodeGrid(SquareGrid grid, int row, int col) {
 		SquareNode node = grid.get(row,col);
 
 		if(grid.rows==1 && grid.columns==1 ) {
 			for (int i = 0; i < 4; i++) {
 				ordered[i] = node.corners.get(i);
 			}
-		} else if( grid.columns==1 || col == grid.columns-1 ) {
-			if( row == grid.rows-1 ) {
+		} else if( grid.columns==1 ) {
+			if (row == grid.rows - 1) {
 				orderNode(node, grid.get(row - 1, col), false);
 				rotateTwiceOrdered();
 			} else {
 				orderNode(node, grid.get(row + 1, col), false);
 			}
 		} else {
-			if( col == grid.columns-1 ) {
-				orderNode(node, grid.get(row, col - 1), true);
+			if( col == grid.columns-1) {
+				orderNode(node, grid.get(row, col-1), true);
 				rotateTwiceOrdered();
 			} else {
-				orderNode(node, grid.get(row, col + 1), true);
+				orderNode(node, grid.get(row, col+1), true);
 			}
 		}
 	}
 
+	/**
+	 * Reorders the list by the equivalent of two rotations
+	 */
 	private void rotateTwiceOrdered() {
 		Point2D_F64 a = ordered[0];
 		Point2D_F64 b = ordered[1];
@@ -244,7 +261,13 @@ public class SquareGridTools {
 
 	LineGeneral2D_F64 general = new LineGeneral2D_F64();
 	Point2D_F64 ordered[] = new Point2D_F64[4];
-	private void orderNode(SquareNode target, SquareNode node, boolean pointingX) {
+
+	/**
+	 * Fills the ordered list with the corners in target node in canonical order.
+	 *
+	 * @param pointingX true if 'node' is pointing along the x-axis from target.  false for point along y-axis
+	 */
+	protected void orderNode(SquareNode target, SquareNode node, boolean pointingX) {
 
 		int index0 = findIntersection(target,node);
 		int index1 = (index0+1)%4;
@@ -262,38 +285,41 @@ public class SquareGridTools {
 		Polygon2D_F64 poly = target.corners;
 		if( pointingX ) {
 			if (sign(general, poly.get(index0)) > 0) {
-				ordered[1] = poly.get(index0);
-				ordered[2] = poly.get(index1);
-			} else {
 				ordered[1] = poly.get(index1);
 				ordered[2] = poly.get(index0);
+			} else {
+				ordered[1] = poly.get(index0);
+				ordered[2] = poly.get(index1);
 			}
 			if (sign(general, poly.get(index2)) > 0) {
 				ordered[3] = poly.get(index2);
 				ordered[0] = poly.get(index3);
 			} else {
-				ordered[3] = poly.get(index2);
-				ordered[0] = poly.get(index3);
+				ordered[3] = poly.get(index3);
+				ordered[0] = poly.get(index2);
 			}
 		} else {
 			if (sign(general, poly.get(index0)) > 0) {
-				ordered[2] = poly.get(index0);
-				ordered[3] = poly.get(index1);
+				ordered[2] = poly.get(index1);
+				ordered[3] = poly.get(index0);
 			} else {
-				ordered[3] = poly.get(index1);
 				ordered[2] = poly.get(index0);
+				ordered[3] = poly.get(index1);
 			}
 			if (sign(general, poly.get(index2)) > 0) {
 				ordered[0] = poly.get(index2);
 				ordered[1] = poly.get(index3);
 			} else {
-				ordered[0] = poly.get(index2);
-				ordered[1] = poly.get(index3);
+				ordered[0] = poly.get(index3);
+				ordered[1] = poly.get(index2);
 			}
 		}
 	}
 
-	private int findIntersection( SquareNode target , SquareNode node ) {
+	/**
+	 * Finds the side which intersects the line segment from the center of target to center of node
+	 */
+	protected int findIntersection( SquareNode target , SquareNode node ) {
 		lineCenters.a = target.center;
 		lineCenters.b = node.center;
 
@@ -323,7 +349,7 @@ public class SquareGridTools {
 		for (int row = 0; row < grid.rows; row++) {
 
 			for (int col = 0; col < grid.columns; col++) {
-				orderNode(grid, row, col);
+				orderNodeGrid(grid, row, col);
 				Polygon2D_F64 square = grid.get(row,col).corners;
 
 				for (int i = 0; i < 4; i++) {
@@ -331,8 +357,6 @@ public class SquareGridTools {
 				}
 			}
 		}
-
-
 
 		return true;
 	}

@@ -154,8 +154,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		}
 
 		// find a corner to align the two grids by
-		if( !tools.boundingPolygon(inner, innerPolygon) )
-			return false;
+		tools.boundingPolygon(inner, innerPolygon);
 		selectZeroSeed(inner, outer, innerPolygon);
 		// now align the two grids with adjacent zeros
 		forceToZero(seedInner, inner);
