@@ -1,1 +1,0 @@
-This directory is empty when first checked out intentionally.  The preferred build option is using Gradle which will automatically download dependencies to its local repository.  The older ant build requires librairies be placed in this directory and if the latest SNAPSHOT is out of date then placing dependencies here can be useful.

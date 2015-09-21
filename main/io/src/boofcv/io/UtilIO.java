@@ -50,16 +50,19 @@ public class UtilIO {
 			String[] files = f.list();
 
 			boolean foundMain = false;
-			boolean foundLib = false;
+			boolean foundExamples = false;
+			boolean foundIntegration = false;
 
 			for( String s : files ) {
 				if( s.compareToIgnoreCase("main") == 0 )
 					foundMain = true;
-				else if( s.compareToIgnoreCase("lib") == 0 )
-					foundLib = true;
+				else if( s.compareToIgnoreCase("examples") == 0 )
+					foundExamples = true;
+				else if( s.compareToIgnoreCase("integration") == 0 )
+					foundIntegration = true;
 			}
 
-			if( foundMain && foundLib )
+			if( foundMain && foundExamples && foundIntegration)
 				return path;
 
 			if( i > 0 )

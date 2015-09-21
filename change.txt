@@ -79,6 +79,8 @@ Version : Alpha 0.19
   * Will now display any BoofCV image directly.
 - Android
   * Can convert from 8888 to 3 channel multi-spectral images
+  * Moved NV21 out of Android because it's also useful with Webcams
+- Added support for YV12 image format
 - BinaryImageOps
   * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicitly declare a boolean array
   * Added thin() operator for thinning/skeletonization

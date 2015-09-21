@@ -28,6 +28,11 @@ subprojects {
         }
     }
 
+    test {
+        ignoreFailures true
+        reports.html.enabled = false
+    }
+
     sourceSets {
         main {
             java {
@@ -222,6 +227,11 @@ task alljavadoc(type: Javadoc) {
         // TODO still has issues with quotes
         bottom = file('misc/bottom.txt').text
     }
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    reportOn subprojects*.test
 }
 
 idea {

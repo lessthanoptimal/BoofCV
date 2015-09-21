@@ -1,5 +1,9 @@
 Alpha 0.20
 
+- all-integration module
+- merge evaluation into applet and delete evaluation and remove applet directory
+- remove evaluation to demonstrations?
+
 - BinaryPolygonConvexDetector
   * See if it will work with concave shapes too
   * Filter out

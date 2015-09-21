@@ -10,6 +10,7 @@
 - ant javadoc for website
 - create zip files for
   * binary of main + integration + source jars
+    - gradle createLibraryDirectory
   * source code + data
 - Tag git
 - Upload to sourceforge

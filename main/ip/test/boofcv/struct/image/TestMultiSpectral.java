@@ -20,13 +20,9 @@ package boofcv.struct.image;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.testing.BoofTesting;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -161,13 +157,13 @@ public class TestMultiSpectral {
 		MultiSpectral<ImageUInt8> imgB = imgA.clone();
 
 
-		ByteOutputStream streamOut = new ByteOutputStream(1000);
+		ByteArrayOutputStream streamOut = new ByteArrayOutputStream(1000);
 		ObjectOutputStream out = new ObjectOutputStream(streamOut);
 		out.writeObject(imgA);
 		out.close();
 
 
-		ByteInputStream streamIn = new ByteInputStream(streamOut.getBytes(),streamOut.getCount());
+		ByteArrayInputStream streamIn = new ByteArrayInputStream(streamOut.toByteArray());
 		ObjectInputStream in = new ObjectInputStream(streamIn);
 
 		MultiSpectral<ImageUInt8> found = (MultiSpectral)in.readObject();
