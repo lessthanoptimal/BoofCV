@@ -171,29 +171,53 @@ public class TestSquareGridTools {
 	}
 
 	@Test
-	public void boundingPolygon_rect() {
+	public void boundingPolygonCCW_rect() {
 		SquareGridTools alg = new SquareGridTools();
 
-		SquareGrid grid = createGrid(2,3);
+		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		alg.boundingPolygon(grid, poly);
+		for (int rows = 2; rows <= 4; rows++) {
+			for (int cols = 2; cols <= 4; cols++) {
+				SquareGrid grid = createGrid(rows,cols);
 
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
-		assertTrue(poly.get(0).distance(- w / 2, -w / 2) <= 1e-8);
-		assertTrue(poly.get(1).distance( w*4 + w / 2 , - w / 2) <= 1e-8);
-		assertTrue(poly.get(2).distance( w*4 + w / 2 , w*2 + w / 2) <= 1e-8);
-		assertTrue(poly.get(3).distance(-w / 2, w * 2 + w / 2) <= 1e-8);
+				for (int i = 0; i < 2; i++) {
+					if( i == 1 )
+						alg.transpose(grid);
+
+					// ensure preconditions are meet
+					if( alg.checkFlip(grid)) {
+						alg.flipRows(grid);
+					}
+					alg.boundingPolygonCCW(grid, poly);
+
+					double x0 = -w/2;
+					double y0 = -w/2;
+
+					double x1 = w*2*(cols-1) + w/2;
+					double y1 = w*2*(rows-1) + w/2;
+
+					Polygon2D_F64 expected = new Polygon2D_F64(4);
+					expected.get(0).set(x0 ,y0);
+					expected.get(1).set(x1 ,y0);
+					expected.get(2).set(x1 ,y1);
+					expected.get(3).set(x0 ,y1);
+
+					assertTrue(UtilPolygons2D_F64.isEquivalent(expected,poly,1e-8));
+				}
+
+			}
+		}
 	}
 
 	@Test
-	public void boundingPolygon_column() {
+	public void boundingPolygonCCW_column() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(3,1);
 
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		alg.boundingPolygon(grid, poly);
+		alg.boundingPolygonCCW(grid, poly);
 
 		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 		assertTrue(poly.get(0).distance(- w/2,  - w/2) <= 1e-8);
@@ -203,13 +227,13 @@ public class TestSquareGridTools {
 	}
 
 	@Test
-	public void boundingPolygon_row() {
+	public void boundingPolygonCCW_row() {
 		SquareGridTools alg = new SquareGridTools();
 
 		SquareGrid grid = createGrid(1,3);
 
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
-		alg.boundingPolygon(grid, poly);
+		alg.boundingPolygonCCW(grid, poly);
 
 		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
 		assertTrue(poly.get(0).distance( -w/2      , -w/2) <= 1e-8);

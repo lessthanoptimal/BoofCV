@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.squares;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.metric.Intersection2D_F64;
-import georegression.metric.UtilAngle;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -101,10 +100,15 @@ public class SquareGridTools {
 		Point2D_F64 b = grid.get(0,grid.columns-1).center;
 		Point2D_F64 c = grid.get(grid.rows-1,0).center;
 
-		double angleAB = Math.atan2( b.y-a.y, b.x-a.x);
-		double angleAC = Math.atan2( c.y-a.y, c.x-a.x);
+		double x0 = b.x-a.x;
+		double y0 = b.y-a.y;
 
-		return UtilAngle.distanceCCW(angleAB, angleAC) > Math.PI * 0.75;
+		double x1 = c.x-a.x;
+		double y1 = c.y-a.y;
+
+		double z = x0 * y1 - y0 * x1;
+
+		return z < 0;
 	}
 
 	/**
@@ -174,9 +178,9 @@ public class SquareGridTools {
 	}
 
 	/**
-	 * Get outside corner polygon around the grid.  Corners
+	 * Get outside corner polygon around the grid.  The grid is assumed to be in CCW orientation.
 	 */
-	public void boundingPolygon( SquareGrid grid , Polygon2D_F64 bounding ) {
+	public void boundingPolygonCCW(SquareGrid grid, Polygon2D_F64 bounding) {
 		int w = grid.columns;
 		int h = grid.rows;
 
