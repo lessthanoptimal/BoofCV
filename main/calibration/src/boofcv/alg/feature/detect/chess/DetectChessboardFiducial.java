@@ -80,7 +80,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 									BinaryPolygonConvexDetector<T> detectorSquare,
 									Class<T> imageType) {
 
-		work1 = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		work1 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		work2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 		// minContourSize is specified later after the image's size is known

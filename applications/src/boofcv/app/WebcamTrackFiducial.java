@@ -69,8 +69,8 @@ public class WebcamTrackFiducial {
 		System.out.println("  --Camera=<int>                     Opens the specified camera using WebcamCapture ID");
 		System.out.println("                                     DEFAULT: Whatever WebcamCapture opens");
 		System.out.println("  --Resolution=<width>:<height>      Specifies the image resolution.");
-		System.out.println("                                     DEFAULT: Who knows.");
-		System.out.println("  --Intrinsic=<path>                 Specifies where the intrinsic parameters are.");
+		System.out.println("                                     DEFAULT: Who knows or intrinsic, if specified");
+		System.out.println("  --Intrinsic=<path>                 Specifies location of the intrinsic parameters file.");
 		System.out.println("                                     DEFAULT: Make a crude guess.");
 		System.out.println();
 		System.out.println("Fiducial Types:");
@@ -332,14 +332,14 @@ public class WebcamTrackFiducial {
 		parameters = word.substring(indexEquals+1,word.length());
 	}
 
-	private static IntrinsicParameters handleFiducial( String path , int width , int height ) {
-		if( path == null ) {
+	private static IntrinsicParameters handleIntrinsic(IntrinsicParameters intrinsic, int width, int height) {
+		if( intrinsic == null ) {
 			System.out.println();
 			System.out.println("SERIOUSLY YOU NEED TO CALIBRATE THE CAMERA YOURSELF!");
 			System.out.println("There will be a lot more jitter and inaccurate pose");
 			System.out.println();
 
-			IntrinsicParameters intrinsic = new IntrinsicParameters();
+			intrinsic = new IntrinsicParameters();
 			intrinsic.width = width;
 			intrinsic.height = height;
 			intrinsic.cx = width / 2;
@@ -348,7 +348,6 @@ public class WebcamTrackFiducial {
 			intrinsic.fy = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(35));
 			return intrinsic;
 		} else {
-			IntrinsicParameters intrinsic = UtilIO.loadXML(path);
 			if( intrinsic.width != width || intrinsic.height != height ) {
 				double ratioW = width/(double)intrinsic.width;
 				double ratioH = height/(double)intrinsic.height;
@@ -362,9 +361,16 @@ public class WebcamTrackFiducial {
 	}
 
 	private void process() {
+
+		IntrinsicParameters intrinsic = intrinsicPath == null ? null : (IntrinsicParameters)UtilIO.loadXML(intrinsicPath);
+
 		Webcam webcam = Webcam.getWebcams().get(cameraId);
 		if( desiredWidth > 0 && desiredHeight > 0 )
 			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);
+		else if( intrinsic != null ) {
+			System.out.println("Using intrinsic parameters for resolution "+intrinsic.width+" "+intrinsic.height);
+			UtilWebcamCapture.adjustResolution(webcam, intrinsic.width, intrinsic.height);
+		}
 		webcam.open();
 
 		ImagePanel gui = new ImagePanel();
@@ -376,7 +382,7 @@ public class WebcamTrackFiducial {
 
 		ImageUInt8 gray = new ImageUInt8(actualWidth,actualHeight);
 
-		IntrinsicParameters intrinsic = handleFiducial(intrinsicPath,actualWidth,actualHeight);
+		intrinsic = handleIntrinsic(intrinsic, actualWidth, actualHeight);
 		detector.setIntrinsic(intrinsic);
 
 		Font font = new Font("Serif", Font.BOLD, 24);
