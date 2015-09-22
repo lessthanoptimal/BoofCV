@@ -21,14 +21,16 @@ package boofcv.abst.fiducial;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.abst.geo.Estimate1ofPnP;
+import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
-import boofcv.alg.geo.calibration.Zhang99DecomposeHomography;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -36,6 +38,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,23 +52,28 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 {
 	// detects the calibration target
 	PlanarCalibrationDetector detector;
-	// used to compute and decompose the homography
-	Zhang99ComputeTargetHomography computeH;
-	Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 	// intrinsic calibration matrix
 	DenseMatrix64F K = new DenseMatrix64F(3,3);
 	// transform to remove lens distortion
 	PointTransform_F64 distortToUndistorted;
 
+	// non-linear refinement of pose estimate
+	Estimate1ofPnP estimatePnP;
+	RefinePnP refinePnP;
+
 	// indicates if a target was detected and the found transform
 	boolean targetDetected;
-	Se3_F64 targetToCamera;
+	Se3_F64 initialEstimate = new Se3_F64();
+	Se3_F64 targetToCamera = new Se3_F64(); // refined
 
 	// storage for converted input image.  Detector only can process ImageFloat32
 	ImageFloat32 converted;
 
 	// Expected type of input image
 	ImageType<T> type;
+
+	// Known 3D location of points on calibration grid and current obsrevations
+	List<Point2D3D> points2D3D;
 
 	// average of width and height
 	double width;
@@ -75,16 +83,13 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
-		this.detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
-		this.type = ImageType.single(imageType);
-		this.converted = new ImageFloat32(1,1);
-
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
-		width = (sideWidth+sideHeight)/2.0;
+		double width = (sideWidth+sideHeight)/2.0;
 
-		computeH = new Zhang99ComputeTargetHomography(detector.getLayout());
+		init(detector, width, imageType);
 	}
 
 	/**
@@ -92,20 +97,36 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
-		this.detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		int squareCols = config.numCols/2+1;
+		int squareRows = config.numRows/2+1;
+		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
+		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 
+		double width = (sideWidth+sideHeight)/2.0;
+
+		init(detector, width, imageType);
+	}
+
+	protected void init(PlanarCalibrationDetector detector, double width, Class<T> imageType) {
+		this.detector = detector;
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);
 
-		int squareCols = config.numCols/2+1;
-		int squareRows = config.numRows/2+1;
+		this.width = width;
 
-		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
-		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+		List<Point2D_F64> layout = detector.getLayout();
+		points2D3D = new ArrayList<Point2D3D>();
+		for (int i = 0; i < layout.size(); i++) {
+			Point2D_F64 p2 = layout.get(i);
+			Point2D3D p = new Point2D3D();
+			p.location.set(p2.x,p2.y,0);
 
-		width = (sideWidth+sideHeight)/2.0;
+			points2D3D.add(p);
+		}
 
-		computeH = new Zhang99ComputeTargetHomography(detector.getLayout());
+		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+		this.refinePnP = FactoryMultiView.refinePnP(1e-8,100);
 	}
 
 	@Override
@@ -125,27 +146,28 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 			targetDetected = true;
 		}
 
+		// convert points into normalized image coord
 		List<Point2D_F64> points = detector.getDetectedPoints();
-		for( Point2D_F64 p : points ) {
-			distortToUndistorted.compute(p.x,p.y,p);
+		if( points2D3D.size() != points.size() )
+			throw new RuntimeException("BUG! should be same size");
+
+		for (int i = 0; i < points2D3D.size(); i++) {
+			Point2D3D p23 = points2D3D.get(i);
+			Point2D_F64 pixel = points.get(i);
+
+			distortToUndistorted.compute(pixel.x,pixel.y,p23.observation);
 		}
 
-		// Compute the homography
-		if( !computeH.computeHomography(points) ) {
+		// estimate using PNP
+		if( !(estimatePnP.process(points2D3D,initialEstimate) &&
+				refinePnP.fitModel(points2D3D, initialEstimate, targetToCamera)) ) {
 			targetDetected = false;
-			return;
 		}
-
-		DenseMatrix64F H = computeH.getHomography();
-
-		// compute camera pose from the homography matrix
-		decomposeH.setCalibrationMatrix(K);
-		targetToCamera = decomposeH.decompose(H);
 	}
 
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
-		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,true);
+		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 		PerspectiveOps.calibrationMatrix(intrinsic, K);
 	}
 

@@ -3,6 +3,14 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2015
+Version : Alpha 0.20
+
+- Improved pose stability of calibration targets as fiducials
+  * Turns out they were using a linear estimate only
+  * Now uses EPnP followed by a few steps of non-linear refinement
+
+---------------------------------------------
 Date    : 2015/09/20
 Version : Alpha 0.19
 
