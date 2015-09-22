@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.19'
+    version = '0.20-SNAPSHOT'
 }
 
 subprojects {
@@ -223,9 +223,9 @@ task alljavadoc(type: Javadoc) {
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-        header = file('misc/header.txt').text
+//        header = file('misc/header.txt').text
         // TODO still has issues with quotes
-        bottom = file('misc/bottom.txt').text
+//        bottom = file('misc/bottom.txt').text
     }
 }
 

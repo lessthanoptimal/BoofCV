@@ -94,13 +94,13 @@ public class WebcamTrackFiducial {
 		System.out.println("                                     Can be called multiple times for several images");
 		System.out.println("Flags for CHESSBOARD:");
 		System.out.println();
-		System.out.println("  --Shape=<rows int><cols int>       Number of rows/columns it expects to see");
+		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
 		System.out.println("  --SquareWidth=<float>              The width of each square");
 		System.out.println("                                     Can be called multiple times for several images");
 		System.out.println("                                     DEFAULT: 1");
 		System.out.println("Flags for SQUAREGRID:");
 		System.out.println();
-		System.out.println("  --Shape=<rows int><cols int>       Number of rows/columns it expects to see");
+		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
 		System.out.println("  --SquareWidth=<float>              The width of each square");
 		System.out.println("                                     DEFAULT: 1");
 		System.out.println("  --Space=<float>                    The space between each square");
