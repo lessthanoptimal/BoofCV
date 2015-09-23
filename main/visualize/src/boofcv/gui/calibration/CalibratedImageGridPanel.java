@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.gui.calibration;
 
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.distort.AdjustmentType;
@@ -227,9 +227,9 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		if( showNumbers ) {
 			if( showUndistorted )
-				DetectCalibrationChessApp.drawNumbers(g2, points,remove_p_to_p,scale);
+				drawNumbers(g2, points,remove_p_to_p,scale);
 			else
-				DetectCalibrationChessApp.drawNumbers(g2, points,null,scale);
+				drawNumbers(g2, points,null,scale);
 		}
 
 		if( showErrors && results != null && results.size() > selectedImage ) {
@@ -288,5 +288,40 @@ public class CalibratedImageGridPanel extends JPanel {
 
 	public void setLine( int y ) {
 		this.lineY = y;
+	}
+
+	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
+									PointTransform_F32 transform ,
+									double scale ) {
+
+		Font regular = new Font("Serif", Font.PLAIN, 16);
+		g2.setFont(regular);
+
+		Point2D_F32 adj = new Point2D_F32();
+
+		AffineTransform origTran = g2.getTransform();
+		for( int i = 0; i < foundTarget.size(); i++ ) {
+			Point2D_F64 p = foundTarget.get(i);
+
+			if( transform != null ) {
+				transform.compute((float)p.x,(float)p.y,adj);
+			} else {
+				adj.set((float)p.x,(float)p.y);
+			}
+
+			String text = String.format("%2d",i);
+
+			int x = (int)(adj.x*scale);
+			int y = (int)(adj.y*scale);
+
+			g2.setColor(Color.BLACK);
+			g2.drawString(text,x-1,y);
+			g2.drawString(text,x+1,y);
+			g2.drawString(text,x,y-1);
+			g2.drawString(text,x,y+1);
+			g2.setTransform(origTran);
+			g2.setColor(Color.GREEN);
+			g2.drawString(text,x,y);
+		}
 	}
 }

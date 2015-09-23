@@ -48,18 +48,13 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class WebcamTrackFiducial {
+public class WebcamTrackFiducial extends BaseWebcamApp {
 
 	public static final int DEFAULT_THRESHOLD = 100;
 
-	int cameraId=0;
-	int desiredWidth=-1,desiredHeight=-1;
 	String intrinsicPath;
 
 	FiducialDetector<ImageUInt8> detector;
-
-	String flagName;
-	String parameters;
 
 	void printHelp() {
 		System.out.println("./application <Camera Options> <Fiducial Type> <Fiducial Specific Options>");
@@ -113,10 +108,6 @@ public class WebcamTrackFiducial {
 		System.out.println();
 		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1");
 		System.out.println("        Opens the default camera at default resolution looking for binary patterns with a width of 1");
-
-
-
-
 	}
 
 	void parse( String []args ) {
@@ -128,18 +119,12 @@ public class WebcamTrackFiducial {
 			String arg = args[i];
 
 			if( arg.startsWith("--") ) {
-				splitFlag(arg);
-				if( flagName.compareToIgnoreCase("Camera") == 0 ) {
-					cameraId = Integer.parseInt(parameters);
-				} else if( flagName.compareToIgnoreCase("Resolution") == 0 ) {
-					String words[] = parameters.split(":");
-					if( words.length != 2 )throw new RuntimeException("Expected two for width and height");
-					desiredWidth = Integer.parseInt(words[0]);
-					desiredHeight = Integer.parseInt(words[1]);
-				} else if( flagName.compareToIgnoreCase("Intrinsic") == 0 ) {
-					intrinsicPath = parameters;
-				} else {
-					throw new RuntimeException("Unknown camera option "+flagName);
+				if( !checkCameraFlag(arg) ) {
+					if( flagName.compareToIgnoreCase("Intrinsic") == 0 ) {
+						intrinsicPath = parameters;
+					} else {
+						throw new RuntimeException("Unknown camera option "+flagName);
+					}
 				}
 			} else if( arg.compareToIgnoreCase("BINARY") == 0 ) {
 				parseBinary(i+1,args);
@@ -316,20 +301,6 @@ public class WebcamTrackFiducial {
 		ConfigSquareGrid config = new ConfigSquareGrid(cols,rows,width,space);
 
 		detector = FactoryFiducial.calibSquareGrid(config, ImageUInt8.class);
-	}
-
-	private void splitFlag( String word ) {
-		int indexEquals = 2;
-		for(; indexEquals < word.length(); indexEquals++ ) {
-			if( word.charAt(indexEquals)=='=') {
-				break;
-			}
-		}
-		if(indexEquals == word.length() )
-			throw new RuntimeException("Expected = inside of flag");
-
-		flagName = word.substring(2,indexEquals);
-		parameters = word.substring(indexEquals+1,word.length());
 	}
 
 	private static IntrinsicParameters handleIntrinsic(IntrinsicParameters intrinsic, int width, int height) {

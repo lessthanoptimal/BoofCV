@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.calibration;
+package boofcv.gui.calibration;
 
 import boofcv.abst.calib.ImageResults;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * GUI interface for {@link CalibrateMonoPlanarGuiApp}.  Displays results for each calibration
+ * GUI interface for CalibrateMonoPlanarGuiApp.  Displays results for each calibration
  * image in a window.
  * 
  * @author Peter Abeles

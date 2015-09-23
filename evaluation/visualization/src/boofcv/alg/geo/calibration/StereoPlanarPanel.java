@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ImageResults;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;

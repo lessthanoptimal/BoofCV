@@ -23,6 +23,7 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
+import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.io.MediaManager;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
