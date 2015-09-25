@@ -32,27 +32,32 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
+// TODO Determine if the target is stationary enough
+
 // TODO Option to flip image?
 	// TODO Check to see if sufficient area is inside desired rectangle
 	// TODO Check to see if slant is sufficient and in the correct direction
 	// TODO check blur factor
+
 public class AssistedCalibration {
 
 	double shrink = 0.85;
 
 	double SIZE_MATCH_THRESHOLD = 0.85;
 
-	double paddingWidth = 1.0/3.0; // TODO get from CalibrationView
-	double paddingHeight = 1.0/5.0;
+	double paddingWidth;
+	double paddingHeight;
 
 	PlanarCalibrationDetector detector;
 
 	int imageSize;
+	int imageWidth,imageHeight;
 
 	CalibrationView view;
 
@@ -74,29 +79,22 @@ public class AssistedCalibration {
 	Line2D.Double line = new Line2D.Double();
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
-	int targetSide;
+	Side targetSide;
 
 	public AssistedCalibration(PlanarCalibrationDetector detector) {
 		this.detector = detector;
 
-		view = new CalibrationView() {
-			@Override
-			public void getBlurFactor(ImageFloat32 gray) {}
+		view = new CalibrationView.Chessboard(5,7);
 
-			@Override
-			public void getBounds(List<Point2D_F64> detections, Quadrilateral_F64 quad) {
+		paddingWidth = view.getWidthBuffer();
+		paddingHeight = view.getHeightBuffer();
 
-			}
-
-			@Override
-			public double getWidthHeightRatio() {
-				return 3.0/5.0;
-			}
-		};
 	}
 
 	public void process( ImageFloat32 gray , BufferedImage image ) {
 
+		imageWidth = gray.width;
+		imageHeight = gray.height;
 		imageSize = Math.min(gray.width,gray.height);
 
 		g2 = image.createGraphics();
@@ -145,10 +143,68 @@ public class AssistedCalibration {
 				double ratio = Math.sqrt(foundArea/desiredArea);
 				System.out.println("area ratio "+ratio);
 
+				visualizeEdgeGuidance(detected);
+
 				if( ratio >= SIZE_MATCH_THRESHOLD)
 					step++;
 			}
+		}
+	}
 
+	// TODO to buffer edge
+	// TODO colorize based on disance
+	// TODO if within tolerance show a green circle instead
+	private void visualizeEdgeGuidance( List<Point2D_F64> detections ) {
+		List<Point2D_F64> edges = new ArrayList<Point2D_F64>();
+
+		view.getSides(detections,edges);
+
+		int best = -1;
+		double bestScore = Double.MAX_VALUE;
+		for (int i = 0; i < edges.size(); i += 2) {
+			Point2D_F64 a = edges.get(i);
+			Point2D_F64 b = edges.get(i+1);
+
+			double score;
+
+			switch( targetSide ) {
+				case BOTTOM: score = 2*imageHeight-a.y - b.y; break;
+				case RIGHT: score = 2*imageWidth-a.x - b.x; break;
+				case TOP: score = a.y + b.y; break;
+				case LEFT: score = a.x + b.x; break;
+				default: throw new RuntimeException("Egads");
+			}
+
+
+			if( score < bestScore ) {
+				bestScore = score;
+				best = i;
+			}
+		}
+
+		Point2D_F64 a = edges.get(best);
+		Point2D_F64 b = edges.get(best+1);
+
+		switch( targetSide ) {
+			case BOTTOM:
+				drawArrow(a.x,a.y,0,imageHeight-a.y);
+				drawArrow(b.x,b.y,0,imageHeight-b.y);
+				break;
+
+			case RIGHT:
+				drawArrow(a.x,a.y,imageWidth-a.x,0);
+				drawArrow(b.x,b.y,imageWidth-b.x,0);
+				break;
+
+			case TOP:
+				drawArrow(a.x,a.y,0, -a.y);
+				drawArrow(b.x,b.y,0, -b.y);
+				break;
+
+			case LEFT:
+				drawArrow(a.x,a.y,-a.x,0);
+				drawArrow(b.x,b.y,-b.x,0);
+				break;
 		}
 	}
 
@@ -162,8 +218,8 @@ public class AssistedCalibration {
 		g2.draw(line);
 	}
 
-	private void drawGuideArrows( Graphics2D g2 , List<Point2D_F64> detections ) {
-		if( targetSide < 0 )
+	private void drawGuideArrows( List<Point2D_F64> detections ) {
+		if( targetSide == null )
 			return;
 
 		double length = 0.05*imageSize;
@@ -171,10 +227,10 @@ public class AssistedCalibration {
 		double dx,dy;
 
 		switch( targetSide ) {
-			case 0: dx =  0; dy =  1; break;
-			case 1: dx =  1; dy =  0; break;
-			case 2: dx =  0; dy = -1; break;
-			case 3: dx = -1; dy =  0; break;
+			case BOTTOM: dx =  0; dy =  1; break;
+			case RIGHT: dx =  1; dy =  0; break;
+			case TOP: dx =  0; dy = -1; break;
+			case LEFT: dx = -1; dy =  0; break;
 			default: throw new RuntimeException(("BUG!"));
 		}
 
@@ -192,23 +248,23 @@ public class AssistedCalibration {
 		double tanX = -pointY;
 		double tanY =  pointX;
 
-		double w = 0.1;
+		double w = 0.07;
 
 		pointsX[0] = (int)(x0 +   0*pointX - w*tanX   + 0.5);
 		pointsX[1] = (int)(x0 +   0*pointX + w*tanX   + 0.5);
-		pointsX[2] = (int)(x0 +   1*pointX + w*tanX   + 0.5);
-		pointsX[3] = (int)(x0 +   1*pointX + 3*w*tanX + 0.5);
-		pointsX[4] = (int)(x0 + 1.5*pointX + 0*tanX   + 0.5);
-		pointsX[5] = (int)(x0 +   1*pointX - 3*w*tanX + 0.5);
-		pointsX[6] = (int)(x0 +   1*pointX - w*tanX   + 0.5);
+		pointsX[2] = (int)(x0 + 0.7*pointX + w*tanX   + 0.5);
+		pointsX[3] = (int)(x0 + 0.7*pointX + 3*w*tanX + 0.5);
+		pointsX[4] = (int)(x0 + 1.0*pointX + 0*tanX   + 0.5);
+		pointsX[5] = (int)(x0 + 0.7*pointX - 3*w*tanX + 0.5);
+		pointsX[6] = (int)(x0 + 0.7*pointX - w*tanX   + 0.5);
 
 		pointsY[0] = (int)(y0 +   0*pointY - w*tanY   + 0.5);
 		pointsY[1] = (int)(y0 +   0*pointY + w*tanY   + 0.5);
-		pointsY[2] = (int)(y0 +   1*pointY + w*tanY   + 0.5);
-		pointsY[3] = (int)(y0 +   1*pointY + 3*w*tanY + 0.5);
-		pointsY[4] = (int)(y0 + 1.5*pointY + 0*tanY   + 0.5);
-		pointsY[5] = (int)(y0 +   1*pointY - 3*w*tanY + 0.5);
-		pointsY[6] = (int)(y0 +   1*pointY - w*tanY   + 0.5);
+		pointsY[2] = (int)(y0 + 0.7*pointY + w*tanY   + 0.5);
+		pointsY[3] = (int)(y0 + 0.7*pointY + 3*w*tanY + 0.5);
+		pointsY[4] = (int)(y0 + 1.0*pointY + 0*tanY   + 0.5);
+		pointsY[5] = (int)(y0 + 0.7*pointY - 3*w*tanY + 0.5);
+		pointsY[6] = (int)(y0 + 0.7*pointY - w*tanY   + 0.5);
 
 		g2.setColor(Color.BLUE);
 		g2.fill(new Polygon(pointsX,pointsY,pointsX.length));
@@ -280,13 +336,17 @@ public class AssistedCalibration {
 		shiftHorizontal = 0;
 
 		switch( step ) {
-			case 0: ratioBottom *= shrink; shiftVertical=-1; targetSide=0;break; // bottom
-			case 1: ratioRight *= shrink; shiftHorizontal=-1;targetSide=1;break; // right
-			case 2: ratioTop *= shrink; shiftVertical=1;targetSide=2;break; // top
-			case 3: ratioLeft *= shrink;shiftHorizontal=1; targetSide=3;break; // left
-			case 4: ratioBottom *= shrink;targetSide=-1; break; // center
+			case 0: ratioBottom *= shrink; shiftVertical=-1; targetSide=Side.BOTTOM;break; // bottom
+			case 1: ratioRight *= shrink; shiftHorizontal=-1;targetSide=Side.RIGHT;break; // right
+			case 2: ratioTop *= shrink; shiftVertical=1;targetSide=Side.TOP;break; // top
+			case 3: ratioLeft *= shrink;shiftHorizontal=1; targetSide=Side.LEFT;break; // left
+			case 4: ratioBottom *= shrink;targetSide=null; break; // center
 		}
 
+	}
+
+	enum Side {
+		LEFT,RIGHT,TOP,BOTTOM
 	}
 
 }
