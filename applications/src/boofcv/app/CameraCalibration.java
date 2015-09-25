@@ -22,6 +22,7 @@ import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.app.calib.AssistedCalibration;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ImagePanel;
@@ -35,7 +36,6 @@ import boofcv.struct.image.ImageFloat32;
 import com.github.sarxos.webcam.Webcam;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
@@ -250,7 +250,6 @@ public class CameraCalibration extends BaseWebcamApp {
 
 		final MonoPlanarPanel gui = visualize ? new MonoPlanarPanel() : null;
 
-
 		boolean first = true;
 		for( File f : files ){
 			if( f.isDirectory() || f.isHidden())
@@ -311,24 +310,16 @@ public class CameraCalibration extends BaseWebcamApp {
 		gui.setPreferredSize(webcam.getViewSize());
 		ShowImages.showWindow(gui, "Webcam Calibration", true);
 
-		Font font = new Font("Serif", Font.BOLD, 24);
-
 		ImageFloat32 gray = new ImageFloat32(webcam.getViewSize().width,webcam.getViewSize().height);
+
+		AssistedCalibration assisted = new AssistedCalibration(detector);
+
 		BufferedImage image;
 		while( (image = webcam.getImage()) != null ) {
 			ConvertBufferedImage.convertFrom(image, gray);
 
-			Graphics2D g2 = image.createGraphics();
 			try {
-				if( detector.process(gray) ) {
-					// TODO print out detected points on target and show grid order
-
-					// TODO compute blur factor
-
-					// TODO click to save image
-				} else {
-
-				}
+				assisted.process(gray,image);
 			} catch( RuntimeException e ) {
 				System.err.println("BUG!!! saving image to crash_image.png");
 				UtilImageIO.saveImage(image, "crash_image.png");

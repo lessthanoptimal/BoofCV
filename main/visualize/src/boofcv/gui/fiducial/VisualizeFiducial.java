@@ -117,4 +117,66 @@ public class VisualizeFiducial {
 		line.setLine(x0,y0,x1,y1);
 		g2.draw(line);
 	}
+
+
+	/**
+	 * Renders a translucent chessboard pattern
+	 * @param g2 Graphics object it's drawn in
+	 * @param fiducialToPixel Coverts a coordinate from fiducial into pixel
+	 * @param numRows Number of rows in the calibration grid
+	 * @param numCols Number of columns in the calibration grid
+	 * @param squareWidth Width of each square
+	 */
+	public static void drawChessboard( Graphics2D g2 , WorldToCameraToPixel fiducialToPixel ,
+									   int numRows , int numCols , double squareWidth )
+	{
+		Point3D_F64 fidPt = new Point3D_F64();
+		Point2D_F64 pixel0 = new Point2D_F64();
+		Point2D_F64 pixel1 = new Point2D_F64();
+		Point2D_F64 pixel2 = new Point2D_F64();
+		Point2D_F64 pixel3 = new Point2D_F64();
+		Line2D.Double l = new Line2D.Double();
+
+		int polyX[] = new int[4];
+		int polyY[] = new int[4];
+
+		int alpha = 100;
+		Color red = new Color(255,0,0,alpha);
+		Color black = new Color(0,0,0,alpha);
+
+		for( int row = 0; row < numRows; row++ ) {
+			double y0 = -numRows*squareWidth/2 + row*squareWidth;
+			for (int col = row%2; col < numCols; col += 2) {
+				double x0 = -numCols*squareWidth/2 + col*squareWidth;
+
+				fidPt.set(x0,y0, 0);
+				fiducialToPixel.transform(fidPt, pixel0);
+				fidPt.set(x0 + squareWidth, y0, 0);
+				fiducialToPixel.transform(fidPt, pixel1);
+				fidPt.set(x0 + squareWidth, y0 + squareWidth, 0);
+				fiducialToPixel.transform(fidPt, pixel2);
+				fidPt.set(x0, y0 + squareWidth, 0);
+				fiducialToPixel.transform(fidPt, pixel3);
+
+				polyX[0] = (int)(pixel0.x+0.5);
+				polyX[1] = (int)(pixel1.x+0.5);
+				polyX[2] = (int)(pixel2.x+0.5);
+				polyX[3] = (int)(pixel3.x+0.5);
+
+				polyY[0] = (int)(pixel0.y+0.5);
+				polyY[1] = (int)(pixel1.y+0.5);
+				polyY[2] = (int)(pixel2.y+0.5);
+				polyY[3] = (int)(pixel3.y+0.5);
+
+				g2.setColor(black);
+				g2.fillPolygon(polyX,polyY,4);
+
+				g2.setColor(red);
+				drawLine(g2, l, pixel0.x, pixel0.y, pixel1.x, pixel1.y);
+				drawLine(g2, l, pixel1.x, pixel1.y, pixel2.x, pixel2.y);
+				drawLine(g2, l, pixel2.x, pixel2.y, pixel3.x, pixel3.y);
+				drawLine(g2, l, pixel3.x, pixel3.y, pixel0.x, pixel0.y);
+			}
+		}
+	}
 }

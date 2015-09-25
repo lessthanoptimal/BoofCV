@@ -25,6 +25,7 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -42,6 +43,48 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PerspectiveOps {
+
+	/**
+	 * Creates a set of intrinsic parameters, without distortion, for a camera with the specified characteristics
+	 *
+	 * @param width Image width
+	 * @param height Image height
+	 * @param hfov Horizontal FOV in degrees
+	 * @param vfov Vertical FOV in degrees
+	 * @return guess camera parameters
+	 */
+	public static IntrinsicParameters createIntrinsic(int width, int height, double hfov, double vfov) {
+		IntrinsicParameters intrinsic = new IntrinsicParameters();
+		intrinsic.width = width;
+		intrinsic.height = height;
+		intrinsic.cx = width / 2;
+		intrinsic.cy = height / 2;
+		intrinsic.fx = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
+		intrinsic.fy = intrinsic.cy / Math.tan(UtilAngle.degreeToRadian(vfov/2.0));
+
+		return intrinsic;
+	}
+
+	/**
+	 * Creates a set of intrinsic parameters, without distortion, for a camera with the specified characteristics.
+	 * The focal length is assumed to be the same for x and y.
+	 *
+	 * @param width Image width
+	 * @param height Image height
+	 * @param hfov Horizontal FOV in degrees
+	 * @return guess camera parameters
+	 */
+	public static IntrinsicParameters createIntrinsic(int width, int height, double hfov) {
+		IntrinsicParameters intrinsic = new IntrinsicParameters();
+		intrinsic.width = width;
+		intrinsic.height = height;
+		intrinsic.cx = width / 2;
+		intrinsic.cy = height / 2;
+		intrinsic.fx = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
+		intrinsic.fy = intrinsic.fx;
+
+		return intrinsic;
+	}
 
 	/**
 	 * Multiplies each element of the intrinsic parameters by the provided scale factor.  Useful

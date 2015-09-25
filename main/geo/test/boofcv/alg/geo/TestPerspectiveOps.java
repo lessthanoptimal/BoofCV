@@ -24,6 +24,7 @@ import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F32;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -50,6 +51,29 @@ import static org.junit.Assert.assertTrue;
 public class TestPerspectiveOps {
 
 	Random rand = new Random(234);
+
+	@Test
+	public void guessIntrinsic_two() {
+
+		double hfov = 30;
+		double vfov = 35;
+
+		IntrinsicParameters found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
+
+		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
+		assertEquals(UtilAngle.degreeToRadian(vfov),2.0*Math.atan(found.cy/found.fy),1e-6);
+	}
+
+	@Test
+	public void guessIntrinsic_one() {
+
+		double hfov = 30;
+
+		IntrinsicParameters found = PerspectiveOps.createIntrinsic(640, 480, hfov);
+
+		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
+		assertEquals(found.fx,found.fy,1e-6);
+	}
 
 	@Test
 	public void scaleIntrinsic() {

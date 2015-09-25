@@ -36,7 +36,6 @@ import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt8;
 import com.github.sarxos.webcam.Webcam;
-import georegression.metric.UtilAngle;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -310,14 +309,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			System.out.println("There will be a lot more jitter and inaccurate pose");
 			System.out.println();
 
-			intrinsic = new IntrinsicParameters();
-			intrinsic.width = width;
-			intrinsic.height = height;
-			intrinsic.cx = width / 2;
-			intrinsic.cy = height / 2;
-			intrinsic.fx = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(35)); // assume 70 degree FOV
-			intrinsic.fy = intrinsic.cx / Math.tan(UtilAngle.degreeToRadian(35));
-			return intrinsic;
+			return PerspectiveOps.createIntrinsic(width, height, 35);
 		} else {
 			if( intrinsic.width != width || intrinsic.height != height ) {
 				double ratioW = width/(double)intrinsic.width;

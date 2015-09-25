@@ -58,7 +58,7 @@ public class InputSanityCheck {
 		if (output == null) {
 			output = (T) input._createNew(input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
-			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
+			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
 		return output;
 	}
 
@@ -71,7 +71,7 @@ public class InputSanityCheck {
 		if (output == null) {
 			output = (Out) GeneralizedImageOps.createSingleBand(typeOut,input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
-			throw new IllegalArgumentException("Width and/or height of input and output do not match.");
+			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
 		return output;
 	}
 

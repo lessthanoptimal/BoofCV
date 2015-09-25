@@ -39,8 +39,8 @@ public interface PlanarCalibrationDetector {
 	boolean process( ImageFloat32 input );
 
 	/**
-	 * Returns the set of detected points.  Each time this function is invoked a new instance
-	 * of the list and points is returned.  No data reuse here.
+	 * Returns the set of detected points from the most recent call to {@link #process(ImageFloat32)}.  Each
+	 * time this function is invoked a new instance of the list and points is returned.  No data reuse here.
 	 *
 	 * @return List of detected points in row major grid order.
 	 */
