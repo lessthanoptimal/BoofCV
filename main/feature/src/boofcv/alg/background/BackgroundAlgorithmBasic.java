@@ -20,11 +20,8 @@ package boofcv.alg.background;
 
 /**
  * <p>
- * Performs basic background subtraction on an image.
- * </p>
- * <p>
- * One of the most basic ways and easiest to perform background detection.  A simple image is used to represent
- * the background.  each pixel is updated individually using the formula below:<br>
+ * Performs background subtraction on an image using the very simple per-pixel "basic" model, as described in [1].
+ * A simple image is used to represent the background.  Each pixel is updated individually using the formula below:<br>
  * <br>
  * {@code B(i+1) = (1-&alpha;)*B(i) + &alpha;I(i)}<br>
  * Where B is the background image, I is the current observed image, and &alpha; is the learning rate 0 to 1.
@@ -33,6 +30,11 @@ package boofcv.alg.background;
  * <p>
  * If a specific pixel has not been observed before it will be set to the value of the equivalent pixel in the
  * input image.
+ * </p>
+ *
+ * <p>
+ * [1] Benezeth, Y., Jodoin, P. M., Emile, B., Laurent, H., & Rosenberger, C. (2010).
+ * Comparative study of background subtraction algorithms. Journal of Electronic Imaging, 19(3), 033003-033003.
  * </p>
  *
  * @author Peter Abeles

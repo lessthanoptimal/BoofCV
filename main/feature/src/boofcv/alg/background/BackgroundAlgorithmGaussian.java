@@ -18,20 +18,19 @@
 
 package boofcv.alg.background;
 
+import boofcv.struct.image.ImageFloat32;
+
 /**
  * <p>
- * Performs background subtraction on a moving image by modeling each pixel as an independent Guassian
- * distribution.  For computational efficiency each band is modeled as having a diagonal covariance
- * matrix with off diagonal terms set to zero.  This model is susceptible to
+ * Background model in which each pixel is modeled as an independent Guassian distribution.  For computational
+ * efficiency each band is modeled as having a diagonal covariance matrix with off diagonal terms set to zero,
+ * i.e. each band is independent. See [1] for a summary.  This is an approximation but according to several
+ * papers it doesn't hurt performance much but simplifies computations significantly.
  * </p>
  * <p>
- * By assuming that off diagonal terms are zero that's the same as assuming that all bands are
- * independent distribution.  This is an approximation but according to several papers it doesn't hurt
- * performance much but simplifies computations significantly.
- * </p>
- * <p>
- * Internally the mean and variance are stored in ImageFloat32 images.  This allows for the mean and variance
- * of each pixel to be interpolated, reducing artifacts along the border of objects.
+ * Internally background model is represented by two images; mean and variance, which are stored in
+ * {@link ImageFloat32} images.  This allows for the mean and variance of each pixel to be interpolated,
+ * reducing artifacts along the border of objects.
  * </p>
  *
  * <p>Tuning Parameters:</p>
@@ -42,6 +41,11 @@ package boofcv.alg.background;
  * <li><b>initial variance</b> The initial variance assigned to pixels when they are first observed.  By default this is
  * Float.MIN_VALUE.
  * </ul>
+ *
+ * <p>
+ * [1] Benezeth, Y., Jodoin, P. M., Emile, B., Laurent, H., & Rosenberger, C. (2010).
+ * Comparative study of background subtraction algorithms. Journal of Electronic Imaging, 19(3), 033003-033003.
+ * </p>
  *
  * @author Peter Abeles
  */

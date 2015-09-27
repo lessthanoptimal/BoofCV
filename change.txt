@@ -11,6 +11,11 @@ Version : Alpha 0.20
   * Now uses EPnP followed by a few steps of non-linear refinement
 - PerspectiveOps.createIntrinsic() which creates intrinsic parameters from a known FOV and image shape
 
+TODO Polygon shape.  Get it working well on 3,4,5,6 sided shapes
+TODO Easy to use calibration app
+TODO Angular consistency on fiducial tests
+TODO Add calibration grids to fiducial tests
+
 ---------------------------------------------
 Date    : 2015/09/20
 Version : Alpha 0.19
