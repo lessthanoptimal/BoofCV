@@ -19,7 +19,6 @@
 package boofcv.examples.tracking;
 
 import boofcv.alg.background.BackgroundModelStationary;
-import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -56,17 +55,18 @@ public class ExampleBackgroundRemovalStationary {
 
 		// Configuration for Gaussian model.  Note that the threshold changes depending on the number of image bands
 		// 12 = gray scale and 40 = color
-		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.005f);
+		ConfigBackgroundGaussian configGaussian = new ConfigBackgroundGaussian(12,0.0005f);
 		configGaussian.initialVariance = 100;
 		configGaussian.minimumDifference = 10;
 
 		// Comment/Uncomment to switch algorithms
 		BackgroundModelStationary background =
-				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
-//				FactoryBackgroundModel.stationaryGaussian(configGaussian, imageType);
+//				FactoryBackgroundModel.stationaryBasic(new ConfigBackgroundBasic(35, 0.005f), imageType);
+				FactoryBackgroundModel.stationaryGaussian(configGaussian, imageType);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
+//		SimpleImageSequence video = media.openCamera("/dev/video0",640,480,background.getImageType());
 
 		// Declare storage for segmented image.  1 = moving foreground and 0 = background
 		ImageUInt8 segmented = new ImageUInt8(video.getNextWidth(),video.getNextHeight());

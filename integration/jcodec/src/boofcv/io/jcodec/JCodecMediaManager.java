@@ -19,7 +19,6 @@
 package boofcv.io.jcodec;
 
 import boofcv.io.MediaManager;
-import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.VideoMjpegCodec;
@@ -101,7 +100,8 @@ public class JCodecMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
+	public <T extends ImageBase> SimpleImageSequence<T>
+	openCamera(String device, int width, int height, ImageType<T> imageType) {
 		throw new RuntimeException("Not supported");
 	}
 }

@@ -16,30 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.io;
+package boofcv.io.wrapper;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import java.awt.image.BufferedImage;
-import java.io.Reader;
-
 /**
- * Abstract interface for accessing files, images, and videos.  Intended to help
- * handle regular applications and applets
- * 
  * @author Peter Abeles
  */
-public interface MediaManager {
-	
-	public Reader openFile( String fileName );
-	
-	public BufferedImage openImage( String fileName );
-	
-	public <T extends ImageBase>
-	SimpleImageSequence<T> openVideo( String fileName , ImageType<T> imageInfo );
-
-	public <T extends ImageBase>
-	SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType);
+public interface WebcamInterface {
+	<T extends ImageBase> SimpleImageSequence<T> open( String device , int width , int height , ImageType<T> imageType );
 }

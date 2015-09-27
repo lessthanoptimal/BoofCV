@@ -334,7 +334,8 @@ public class ConvertBufferedImage {
 	public static ImageFloat32 convertFrom(BufferedImage src, ImageFloat32 dst) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
+				String difference = "src = "+src.getWidth()+"x"+src.getHeight()+"  dst = "+dst.getWidth()+"x"+dst.getHeight();
+				throw new IllegalArgumentException("image dimension are different. "+difference);
 			}
 		} else {
 			dst = new ImageFloat32(src.getWidth(), src.getHeight());

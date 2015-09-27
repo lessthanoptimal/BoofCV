@@ -19,7 +19,6 @@
 package boofcv.io.wrapper;
 
 import boofcv.io.MediaManager;
-import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.video.DynamicVideoInterface;
@@ -44,7 +43,8 @@ public class DefaultMediaManager implements MediaManager {
 
 	Map<String,BufferedImage> cachedImage = new HashMap<String, BufferedImage>();
 	VideoInterface videoInterface = new DynamicVideoInterface();
-	
+	WebcamInterface webcamInterface = new DynamicWebcamInterface();
+
 	@Override
 	public Reader openFile(String fileName) {
 		try {
@@ -78,11 +78,11 @@ public class DefaultMediaManager implements MediaManager {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
 	openVideo(String fileName, ImageType<T> type) {
-		return videoInterface.load(fileName,type);
+		return videoInterface.load(fileName, type);
 	}
 
 	@Override
-	public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
-		throw new RuntimeException("Not supported");
+	public <T extends ImageBase> SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType) {
+		return webcamInterface.open(device,width,height,imageType);
 	}
 }

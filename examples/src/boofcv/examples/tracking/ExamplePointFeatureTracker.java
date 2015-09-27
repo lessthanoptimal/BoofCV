@@ -28,18 +28,17 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.MediaManager;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.io.video.VideoMjpegCodec;
-import boofcv.io.wrapper.images.JpegByteImageSequence;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 /**
  * <p>
@@ -64,9 +63,12 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	// displays the video sequence and tracked features
 	ImagePanel gui = new ImagePanel();
 
-	public ExamplePointFeatureTracker(Class<T> imageType) {
+	int pause;
+
+	public ExamplePointFeatureTracker(Class<T> imageType , int pause ) {
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		this.pause = pause;
 	}
 
 	/**
@@ -87,14 +89,14 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 			tracker.process(frame);
 
 			// if there are too few tracks spawn more
-			if( tracker.getActiveTracks(null).size() < 100 )
+			if( tracker.getActiveTracks(null).size() < 130 )
 				tracker.spawnTracks();
 
 			// visualize tracking results
 			updateGUI(sequence);
 
 			// wait for a fraction of a second so it doesn't process to fast
-			BoofMiscOps.pause(100);
+			BoofMiscOps.pause(pause);
 		}
 	}
 
@@ -105,9 +107,12 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		BufferedImage orig = sequence.getGuiImage();
 		Graphics2D g2 = orig.createGraphics();
 
-		// draw active tracks as blue dots
+		// draw tracks with semi-unique colors so you can track individual points with your eyes
 		for( PointTrack p : tracker.getActiveTracks(null) ) {
-			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.blue);
+			int red = (int)(2.5*(p.featureId%100));
+			int green = (int)((255.0/150.0)*(p.featureId%150));
+			int blue = (int)(p.featureId%255);
+			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, new Color(red,green,blue));
 		}
 
 		// draw tracks which have just been spawned green
@@ -128,7 +133,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 
-		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1),
+		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(600, 6, 1),
 				imageType, derivType);
 	}
 
@@ -137,7 +142,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 	 */
 	public void createSURF() {
 		ConfigFastHessian configDetector = new ConfigFastHessian();
-		configDetector.maxFeaturesPerScale = 200;
+		configDetector.maxFeaturesPerScale = 250;
 		configDetector.extractRadius = 3;
 		configDetector.initialSampleSize = 2;
 		tracker = FactoryPointTracker.dda_FH_SURF_Fast(configDetector, null, null, imageType);
@@ -147,16 +152,19 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 
 		Class imageType = ImageFloat32.class;
 
-		// loads an MJPEG video sequence
-		VideoMjpegCodec codec = new VideoMjpegCodec();
-		List<byte[]> data = codec.read(new FileInputStream("../data/applet/zoom.mjpeg"));
-		SimpleImageSequence sequence = new JpegByteImageSequence(imageType,data,true);
+		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType);
+		int pause;
+		SimpleImageSequence sequence =
+				media.openVideo("../data/applet/zoom.mjpeg", ImageType.single(imageType)); pause=100;
+//				media.openCamera("/dev/video0",640,480,ImageType.single(imageType)); pause = 5;
+		sequence.setLoop(true);
+
+		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType,pause);
 
 		// Comment or un-comment to change the type of tracker being used
-		app.createKLT();
-//		app.createSURF();
+//		app.createKLT();
+		app.createSURF();
 
 		app.process(sequence);
 	}

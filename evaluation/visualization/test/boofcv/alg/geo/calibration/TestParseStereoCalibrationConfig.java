@@ -19,7 +19,6 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.io.MediaManager;
-import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -93,8 +92,9 @@ public class TestParseStereoCalibrationConfig {
 		}
 
 		@Override
-		public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
-			return false;
+		public <T extends ImageBase> SimpleImageSequence<T>
+		openCamera(String device, int width, int height, ImageType<T> imageType) {
+			throw new RuntimeException("Not supported");
 		}
 	}
 }
