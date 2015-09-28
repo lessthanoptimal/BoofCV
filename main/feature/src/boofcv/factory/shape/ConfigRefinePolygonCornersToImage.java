@@ -57,10 +57,6 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 	 * Convergence tolerance in pixels
 	 */
 	public double convergeTolPixels = 0.05;
-	/**
-	 * If true it is fitting to a black shape, false means a white shape.
-	 */
-	public boolean insideBlack = true;
 
 	@Override
 	public void checkValidity() {
@@ -74,7 +70,6 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 				+" , lineSamples="+lineSamples
 				+" , sampleRadius="+sampleRadius
 				+" , maxIterations="+maxIterations
-				+" , convergeTolPixels="+convergeTolPixels
-				+" , insideBlack="+insideBlack+" }";
+				+" , convergeTolPixels="+convergeTolPixels+" }";
 	}
 }

@@ -109,11 +109,6 @@ public class ConfigPolygonDetector implements Configuration {
 		if( (refineWithCorners && refineWithLines) ) {
 			throw new IllegalArgumentException("Can't refine with both corners and lines");
 		}
-
-		if( refineWithLines && !configRefineLines.insideBlack)
-			throw new IllegalArgumentException("The detector only support black objects so refine lines fitBlack must be true");
-		if( refineWithCorners && !configRefineCorners.insideBlack )
-			throw new IllegalArgumentException("The detector only support black objects so refine corners fitBlack must be true");
 	}
 
 	@Override

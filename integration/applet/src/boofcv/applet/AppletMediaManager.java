@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,11 @@
 package boofcv.applet;
 
 import boofcv.io.MediaManager;
-import boofcv.io.VideoCallBack;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
 
 import javax.imageio.ImageIO;
@@ -140,8 +138,9 @@ public class AppletMediaManager implements MediaManager {
 	}
 
 	@Override
-	public <T extends ImageBase> boolean openCamera(String device, int width, int height, VideoCallBack<T> callback) {
-		return false;
+	public <T extends ImageBase>
+	SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType) {
+		return null;
 	}
 
 	private ByteArrayInputStream readNetworkData(InputStream streamIn , int fileSize ) throws IOException {

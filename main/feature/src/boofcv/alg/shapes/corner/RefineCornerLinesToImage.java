@@ -36,7 +36,7 @@ import georegression.struct.point.Vector2D_F64;
  *
  * <p> The corner is defined using three points.  One corner and two line end points.  One is to the left of the right
  * line.  Left is defined as counter-clockwise.  Optimization is done by fitting a line with that initial seed.  It
- * is then iteratily updated by finding new end points with the new line that are the same distance away.  Pixels
+ * is then iteratively updated by finding new end points with the new line that are the same distance away.  Pixels
  * near the corner are excluded from the optimization because the edge is less clear at that point.
  * </p>
  *
@@ -58,9 +58,6 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 	// convergence tolerance in pixels
 	private double convergeTolPixels;
-
-	// determines if it's fitting to a darker or lighter polygon
-	private boolean fitBlack = true;
 
 	// fits the line to the edge
 	private SnapToEdge<T> snapToEdge;
@@ -97,10 +94,9 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * @param sampleRadius How far away from the line will it sample pixels.  >= 1
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 10
 	 * @param convergeTolPixels When the corner changes less than this amount it will stop iterating. Try 1e-5
-	 * @param fitBlack If true it's fitting a black shape with a white background.  false is the inverse.
 	 */
 	public RefineCornerLinesToImage(double cornerOffset, int maxLineSamples, int sampleRadius,
-									int maxIterations, double convergeTolPixels, boolean fitBlack,
+									int maxIterations, double convergeTolPixels,
 									Class<T> imageType) {
 		if( sampleRadius < 1 )
 			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
@@ -110,17 +106,15 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 		this.convergeTolPixels = convergeTolPixels;
 		this.snapToEdge = new SnapToEdge<T>(maxLineSamples,sampleRadius,imageType);
 		this.maxLineSamples = maxLineSamples;
-		this.fitBlack = fitBlack;
 		this.imageType = imageType;
 	}
 
 	/**
 	 * Simplified constructor which uses reasonable default values for most variables
-	 * @param fitBlack If true it's fitting a black shape with a white background.  false is the inverse.
 	 * @param imageType Type of input image it processes
 	 */
-	public RefineCornerLinesToImage(boolean fitBlack, Class<T> imageType) {
-		this(2.0, 10, 2, 10, 1e-5, fitBlack, imageType);
+	public RefineCornerLinesToImage( Class<T> imageType) {
+		this(2.0, 10, 2, 10, 1e-5, imageType);
 	}
 
 	/**
@@ -172,11 +166,11 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 
 			snapToEdge.setLineSamples(samplesLeft);
-			if( !optimize(refined, _endLeft, lineLeft, fitBlack) )
+			if( !optimize(refined, _endLeft, lineLeft) )
 				return false;
 
 			snapToEdge.setLineSamples(samplesRight);
-			if( !optimize(refined,_endRight, lineRight, !fitBlack) )
+			if( !optimize(refined,_endRight, lineRight) )
 				return false;
 
 			// intersect the two lines to fine the new corner
@@ -229,8 +223,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * @param found (output) Line in image coordinates
 	 * @return true if successful or false if it failed
 	 */
-	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 found,
-								boolean darkRight ) {
+	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 found) {
 
 		double slopeX = (b.x - a.x);
 		double slopeY = (b.y - a.y);
@@ -243,10 +236,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 		adjA.x = a.x + unitX*cornerOffset;
 		adjA.y = a.y + unitY*cornerOffset;
 
-		if( darkRight )
-			return snapToEdge.refine(adjA,b,found);
-		else
-			return snapToEdge.refine(b,adjA,found);
+		return snapToEdge.refine(adjA,b,found);
 	}
 
 	public Point2D_F64 getRefinedCorner() {
@@ -263,12 +253,5 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 	public SnapToEdge<T> getSnapToEdge() {
 		return snapToEdge;
-	}
-
-	/**
-	 * True if it is fitting black to the image
-	 */
-	public boolean isFitBlack() {
-		return fitBlack ;
 	}
 }

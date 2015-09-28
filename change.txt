@@ -13,6 +13,8 @@ Version : Alpha 0.20
 - New WebcamInterface and some examples now can run on your webcam
   * Requires WebcamCapture
 - ExamplePointFeatureTracker has colorized points to make it easier to identify the same point
+- Polygon Detector
+  * Simplified code by removing requirement the CW/CCW must be known by helper classes
 
 TODO Polygon shape.  Get it working well on 3,4,5,6 sided shapes
 TODO Easy to use calibration app

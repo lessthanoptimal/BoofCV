@@ -314,14 +314,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
-				boolean workOrigCCW = workPoly.isCCW();
-				if( workOrigCCW ) {
-					workPoly.flip();
-					if( workPoly.isCCW() ) {
-						throw new RuntimeException("BUG!!!!");
-					}
-				}
-
 				// test it again with the full threshold
 				if( checkEdgeBefore && differenceScore != null && !differenceScore.validate(workPoly)) {
 					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
@@ -335,9 +327,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				if( refineCorner != null ) {
 					refineCorner.setImage(gray);
 					success = refineCorner.refine(c.external,splits,refined)>=3;
-					if( workOrigCCW ) {
-						refined.flip();
-					}
 				} else if( refineLine != null ){
 					refineLine.setImage(gray);
 					success = refineLine.refine(workPoly, refined);
@@ -352,7 +341,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
-				if( !outputClockwise )
+				if( outputClockwise == refined.isCCW() )
 					refined.flip();
 
 				// refine the polygon and add it to the found list

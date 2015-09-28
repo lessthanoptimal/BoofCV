@@ -159,7 +159,7 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 			double up = integral.compute(x,y,x0,y0);
 			double down = integral.compute(x,y,x1,y1);
 
-			// don't take the abs here and requir that a high score involves it being entirely black or white around
+			// don't take the abs here and require that a high score involves it being entirely black or white around
 			// the edge.  Otherwise a random image would score high
 			total += up-down;
 		}

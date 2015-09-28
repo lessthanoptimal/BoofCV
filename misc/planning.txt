@@ -10,11 +10,6 @@ Alpha 0.20
   * See if it will work with concave shapes too
   * Filter out
 
-- SnapToEdge
-  * Does it really need to know if left/right is darker/lighter?
-  * Can't it just maximize the difference
-  * Change RefineCornerLinesToImage and RefinePolygonLineToImage
-
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
   * Regression tests that can determine if orientation is correct
@@ -22,6 +17,9 @@ Alpha 0.20
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
+
+- Fiducial Calibration
+  * Add fiducial style regression tests
 
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation

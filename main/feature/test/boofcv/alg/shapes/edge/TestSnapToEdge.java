@@ -103,12 +103,14 @@ public class TestSnapToEdge {
 		// try
 		for (int i = -1; i <= 1; i++) {
 			LineSegment2D_F64 work = segment.copy();
-			work.a.x += i*v.x;
-			work.a.y += i*v.y;
-			work.b.x += i*v.x;
-			work.b.y += i*v.y;
+			work.a.x += i*v.x; work.a.y += i*v.y;
+			work.b.x += i*v.x; work.b.y += i*v.y;
 
 			assertTrue(alg.refine(work.a, work.b, found));
+			checkIdentical(segment,found);
+
+			// do it in the other direction. shouldn't matter
+			assertTrue(alg.refine(work.b, work.a, found));
 			checkIdentical(segment,found);
 		}
 	}

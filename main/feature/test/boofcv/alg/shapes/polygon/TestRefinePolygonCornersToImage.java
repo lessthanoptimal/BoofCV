@@ -60,16 +60,12 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 				setup(new Affine2D_F64(), black, imageType);
 				findContour(black);
 
-				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black,imageType);
+				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(imageType);
 
 				alg.setImage(image);
 				assertEquals(4, alg.refine(contour, split, found));
 
 				assertTrue(expected.isEquivalent(found, 0.01));
-
-				// give it the wrong information and it should fail
-				alg.setInsideBlack(!black);
-				assertEquals(0, alg.refine(contour, split, found));
 			}
 		}
 	}
@@ -86,16 +82,12 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 				setup(new Affine2D_F64(), black, imageType);
 				findContour(black);
 
-				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black,imageType);
+				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(imageType);
 
 				alg.setImage(BoofTesting.createSubImageOf_S(image));
 				assertEquals(4, alg.refine(contour, split, found));
 
 				assertTrue(expected.isEquivalent(found, 0.01));
-
-				// give it the wrong information and it should fail
-				alg.setInsideBlack(!black);
-				assertEquals(0, alg.refine(contour, split, found));
 			}
 		}
 	}
@@ -119,41 +111,16 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 					setup(affine, black, imageType);
 					findContour(black);
 
-					RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(black, imageType);
+					RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage( imageType);
 
 					alg.setImage(BoofTesting.createSubImageOf_S(image));
 					assertEquals(4, alg.refine(contour, split, found));
 
 					Polygon2D_F64 expected = apply(affine,original);
 					assertTrue(expected.isEquivalent(found, tol));
-
-					// give it the wrong information and it should fail
-					alg.setInsideBlack(!black);
-					assertEquals(0, alg.refine(contour, split, found));
 				}
 			}
 		}
-	}
-
-	@Test
-	public void determineDirection() {
-		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(true, ImageUInt8.class);
-
-		List<Point2D_I32> contour = createContour(10);
-		GrowQueue_I32 split = new GrowQueue_I32(4);
-		split.add(0);  split.add(10);  split.add(20); split.add(30);
-
-		alg.setInsideBlack(true);
-		assertEquals( 1,alg.determineDirection(contour,split));
-		assertEquals(-1,alg.determineDirection(flip(contour),split));
-		assertEquals( 1,alg.determineDirection(flip(contour),flip(split)));
-		assertEquals(-1,alg.determineDirection(contour,flip(split)));
-
-		alg.setInsideBlack(false);
-		assertEquals(-1,alg.determineDirection(contour,split));
-		assertEquals( 1,alg.determineDirection(flip(contour),split));
-		assertEquals(-1,alg.determineDirection(flip(contour),flip(split)));
-		assertEquals( 1,alg.determineDirection(contour,flip(split)));
 	}
 
 	private List<Point2D_I32> createContour(int w ) {
@@ -200,7 +167,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 
 	@Test
 	public void pickEndIndex() {
-		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(true, ImageUInt8.class);
+		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(ImageUInt8.class);
 
 		alg.setPixelsAway(6);
 		alg.contour = new ArrayList();

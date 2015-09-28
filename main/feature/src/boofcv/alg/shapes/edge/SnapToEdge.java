@@ -29,15 +29,15 @@ import org.ddogleg.struct.GrowQueue_F64;
 
 /**
  * <p>
- * Snaps a line to an edge of an object.  The refined line attempts to maximize the difference between
- * the left and right sides of it.  The right side of the edge is assumed to be darker.
+ * Snaps a line to an edge of an object.  The refined line attempts to maximize the absolute value of the
+ * difference between the left and right sides of the line.
  * </p>
  *
  * <p>
  * The algorithm works by sampling along the provided line segment.  For each point along the line it also
- * samples points tangential to
- * it in the left and right direction.  When a point is sampled it is actually the line integral between two points
- * which are one pixel apart.  The weight is found as the difference between the two line integrals on other side.
+ * samples points tangential to it in the left and right direction.  When a point is sampled it is actually
+ * the line integral between two points which are one pixel apart.  The weight is found as the absolute value of
+ * difference the between two adjacent line integrals along the tangent.
  * </p>
  * <p>
  * Internally it will compute the solution in a local coordinate system to reduce numerical errors.
@@ -93,8 +93,7 @@ public class SnapToEdge<T extends ImageSingleBand>extends BaseIntegralEdge<T> {
 
 	/**
 	 * Fits a line defined by the two points. When fitting the line the weight of the edge is used to determine.
-	 * how influential the point is.  Multiple calls might be required to get a perfect fit.  The right side
-	 * of the line must be darker.
+	 * how influential the point is.  Multiple calls might be required to get a perfect fit.
 	 *
 	 * @param a Start of line
 	 * @param b End of line..
@@ -165,11 +164,14 @@ public class SnapToEdge<T extends ImageSingleBand>extends BaseIntegralEdge<T> {
 			for (int j = 0; j < numPts; j++) {
 				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
 
-				double w = Math.max(0, (sample0 - sample1));
+				double w = sample0 - sample1;
+				if( w < 0 ) w = -w;
+
 				if( w > 0 ) {
 					weights.add(w);
-					samplePts.grow().set((x - center.x)/localScale, (y - center.y)/localScale);
+					samplePts.grow().set((x - center.x) / localScale, (y - center.y) / localScale);
 				}
+
 				x += tanX; y += tanY;
 				sample0 = sample1;
 			}

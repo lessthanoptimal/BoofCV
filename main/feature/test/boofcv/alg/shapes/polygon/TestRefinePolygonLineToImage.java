@@ -54,7 +54,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
 
-			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
+			RefinePolygonLineToImage alg = createAlg(input.size(),imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(input.size());
 			alg.setImage(image);
@@ -74,7 +74,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		for (Class imageType : imageTypes) {
 			setup(new Affine2D_F64(), black, imageType);
 
-			RefinePolygonLineToImage alg = createAlg(input.size(),black, imageType);
+			RefinePolygonLineToImage alg = createAlg(input.size(),imageType);
 
 			Polygon2D_F64 output = new Polygon2D_F64(4);
 			alg.setImage(image);
@@ -104,7 +104,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 				setup(new Affine2D_F64(), black, imageType);
 
-				RefinePolygonLineToImage alg = createAlg(original.size(),black, imageType);
+				RefinePolygonLineToImage alg = createAlg(original.size(),imageType);
 
 				for (int j = 0; j < 20; j++) {
 					Polygon2D_F64 input = original.copy();
@@ -143,7 +143,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	public void fit_perfect_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
@@ -191,7 +191,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	public void fit_perfect_transform(boolean black, Affine2D_F64 regToDist, Class imageType) {
 		setup(regToDist, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		input.get(0).set(x0,y0);
@@ -240,7 +240,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
@@ -263,8 +263,17 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 			double before = computeMaxDistance(input,expected);
 			double after = computeMaxDistance(found,expected);
 
+			assertTrue(after < before);
+			assertTrue(expected.isIdentical(found, 0.5));
+
+			//----- Reverse the order and it should still work
+			input.flip();
+			assertTrue(alg.refine(input, found));
+			found.flip();
+			after = computeMaxDistance(found, expected);
+
 			assertTrue(after<before);
-			assertTrue(expected.isIdentical(found,0.5));
+			assertTrue(expected.isIdentical(found, 0.5));
 		}
 	}
 
@@ -276,8 +285,8 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		}
 	}
 
-	private RefinePolygonLineToImage createAlg( int numSides , boolean black, Class imageType) {
-		return new RefinePolygonLineToImage(numSides,black,imageType);
+	private RefinePolygonLineToImage createAlg( int numSides ,  Class imageType) {
+		return new RefinePolygonLineToImage(numSides,imageType);
 	}
 
 	/**
@@ -294,7 +303,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	public void optimize_line_perfect(boolean black, Class imageType) {
 		setup(null, black, imageType);
 
-		RefinePolygonLineToImage alg = createAlg(4,black, imageType);
+		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
 		Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
@@ -315,24 +324,4 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		return a;
 	}
 
-	/**
-	 * Try optimizing an edge which goes in the wrong direction.  should fail
-	 */
-	@Test
-	public void optimize_line_wrongEdge() {
-		final boolean black = true;
-
-		for (Class imageType : imageTypes) {
-			setup(null, black, imageType);
-
-			RefinePolygonLineToImage alg = createAlg(4,black, imageType);
-
-			Quadrilateral_F64 input = new Quadrilateral_F64(x0,y0,x0,y1,x1,y1,x1,y0);
-			LineGeneral2D_F64 found = new LineGeneral2D_F64();
-
-			alg.setImage(image);
-			assertFalse(alg.optimize(input.b, input.a, found));
-			// should be a to b
-		}
-	}
 }

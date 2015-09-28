@@ -75,7 +75,7 @@ public class TestRefineCornerLinesToImage {
 	public void perfectRectangle(boolean black, Class imageType) {
 		setup(null,black,imageType);
 
-		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(black,imageType);
+		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(imageType);
 		alg.setImage(image);
 
 		optimizedCorner(alg,x0,y0,x0,y1,x1,y0);
@@ -131,9 +131,9 @@ public class TestRefineCornerLinesToImage {
 	public void fit_noisy_affine(boolean black, Affine2D_F64 affine, Class imageType) {
 		setup(affine, black, imageType);
 
-		double tol = 0.6;
+		double tol = 0.9;
 
-		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(black,imageType);
+		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(imageType);
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
@@ -142,7 +142,6 @@ public class TestRefineCornerLinesToImage {
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
 
 		Polygon2D_F64 expected = input.copy();
-		Polygon2D_F64 found = new Polygon2D_F64(4);
 
 		for (int i = 0; i < 10; i++) {
 			// add some noise
@@ -190,7 +189,7 @@ public class TestRefineCornerLinesToImage {
 	public void optimize(boolean black , Class imageType) {
 		setup(null, black, imageType);
 
-		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(black,imageType);
+		RefineCornerLinesToImage alg = new RefineCornerLinesToImage(imageType);
 		alg.setImage(image);
 
 		LineGeneral2D_F64 found = new LineGeneral2D_F64();
@@ -198,10 +197,10 @@ public class TestRefineCornerLinesToImage {
 		LineSegment2D_F64 line0 = new LineSegment2D_F64(x0,y0,x1,y0);
 		LineSegment2D_F64 line1 = new LineSegment2D_F64(x0,y0,x0,y1);
 
-		assertTrue(alg.optimize(line0.a,line0.b, found, !black));
+		assertTrue(alg.optimize(line0.a,line0.b, found));
 		checkSolution(line0,found);
 
-		assertTrue(alg.optimize(line1.a,line1.b, found, black));
+		assertTrue(alg.optimize(line1.a,line1.b, found));
 		checkSolution(line1,found);
 
 	}

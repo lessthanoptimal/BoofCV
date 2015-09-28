@@ -56,11 +56,11 @@ public class FactoryShapeDetector {
 					config.configRefineLines.cornerOffset,config.configRefineLines.lineSamples,
 					config.configRefineLines.sampleRadius,config.configRefineLines.maxIterations,
 					config.configRefineLines.convergeTolPixels,
-					true,imageType);
+					imageType);
 		RefinePolygonCornersToImage<T> refineCorner = null;
 		if( config.refineWithCorners )
 			refineCorner = new RefinePolygonCornersToImage<T>(
-					config.configRefineCorners.endPointDistance,true,
+					config.configRefineCorners.endPointDistance,
 					config.configRefineCorners.cornerOffset,config.configRefineCorners.lineSamples,
 					config.configRefineCorners.sampleRadius,config.configRefineCorners.maxIterations,
 					config.configRefineCorners.convergeTolPixels,imageType);
