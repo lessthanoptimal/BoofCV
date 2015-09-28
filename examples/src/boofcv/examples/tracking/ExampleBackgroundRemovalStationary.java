@@ -65,8 +65,9 @@ public class ExampleBackgroundRemovalStationary {
 				FactoryBackgroundModel.stationaryGaussian(configGaussian, imageType);
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
-//		SimpleImageSequence video = media.openCamera("/dev/video0",640,480,background.getImageType());
+		SimpleImageSequence video =
+				media.openVideo(fileName, background.getImageType());
+//				media.openCamera(null,640,480,background.getImageType());
 
 		// Declare storage for segmented image.  1 = moving foreground and 0 = background
 		ImageUInt8 segmented = new ImageUInt8(video.getNextWidth(),video.getNextHeight());

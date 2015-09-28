@@ -95,7 +95,9 @@ public class ExampleBackgroundRemovalMoving {
 
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		SimpleImageSequence video = media.openVideo(fileName, background.getImageType());
+		SimpleImageSequence video =
+				media.openVideo(fileName, background.getImageType());
+//				media.openCamera(null,640,480,background.getImageType());
 
 		//====== Initialize Images
 

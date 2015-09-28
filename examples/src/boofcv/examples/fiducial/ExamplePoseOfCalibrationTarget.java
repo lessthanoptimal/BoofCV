@@ -69,6 +69,7 @@ public class ExamplePoseOfCalibrationTarget {
 		String fileName = "../data/applet/tracking/chessboard_SonyDSC_01.mjpeg";
 		SimpleImageSequence<ImageFloat32> video =
 				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(ImageFloat32.class));
+//				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(ImageFloat32.class));
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
@@ -103,27 +104,26 @@ public class ExamplePoseOfCalibrationTarget {
 			// detect calibration points
 			detector.detect(video.next());
 
-			if( detector.totalFound() == 0 )
-				continue;
+			if( detector.totalFound() == 1 ) {
+				detector.getFiducialToCamera(0, targetToCamera);
 
-			detector.getFiducialToCamera(0, targetToCamera);
+				// Visualization.  Show a path with green points and the calibration points in black
+				viewer.reset();
 
-			// Visualization.  Show a path with green points and the calibration points in black
-			viewer.reset();
+				Point3D_F64 center = new Point3D_F64();
+				SePointOps_F64.transform(targetToCamera, center, center);
+				path.add(center);
 
-			Point3D_F64 center = new Point3D_F64();
-			SePointOps_F64.transform(targetToCamera,center,center);
-			path.add(center);
+				for (Point3D_F64 p : path) {
+					viewer.addPoint(p.x, p.y, p.z, 0x00FF00);
+				}
 
-			for( Point3D_F64 p : path ) {
-				viewer.addPoint(p.x,p.y,p.z,0x00FF00);
-			}
-
-			for( int j = 0; j < calibPts.size(); j++ ) {
-				Point2D_F64 p = calibPts.get(j);
-				Point3D_F64 p3 = new Point3D_F64(p.x,p.y,0);
-				SePointOps_F64.transform(targetToCamera,p3,p3);
-				viewer.addPoint(p3.x,p3.y,p3.z,0);
+				for (int j = 0; j < calibPts.size(); j++) {
+					Point2D_F64 p = calibPts.get(j);
+					Point3D_F64 p3 = new Point3D_F64(p.x, p.y, 0);
+					SePointOps_F64.transform(targetToCamera, p3, p3);
+					viewer.addPoint(p3.x, p3.y, p3.z, 0);
+				}
 			}
 
 			imagePanel.setBufferedImage((BufferedImage) video.getGuiImage());

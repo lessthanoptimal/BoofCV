@@ -134,7 +134,7 @@ public class VisualizeShapes {
 			}
 
 		} else {
-			drawPolygon(polygon,loop,g2);
+			drawPolygon(polygon, loop, g2);
 		}
 	}
 
@@ -182,6 +182,25 @@ public class VisualizeShapes {
 			g2.drawLine((int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5), (int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5));
 			g2.drawLine((int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5), (int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5));
 			g2.drawLine((int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5), (int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5));
+			g2.drawLine((int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5), (int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5));
+		}
+	}
+
+	public static void drawQuad( Quadrilateral_F64 quad , Graphics2D g2 , boolean subpixel , Color color1 , Color color2) {
+		g2.setColor(color1);
+		if( subpixel ) {
+			Line2D.Double line = new Line2D.Double();
+
+			line.setLine(quad.a.x,quad.a.y,quad.b.x,quad.b.y);  g2.draw(line);
+			line.setLine(quad.b.x, quad.b.y, quad.c.x, quad.c.y);  g2.draw(line);
+			line.setLine(quad.c.x, quad.c.y, quad.d.x, quad.d.y);  g2.draw(line);
+			g2.setColor(color2);
+			line.setLine(quad.d.x,quad.d.y,quad.a.x,quad.a.y);  g2.draw(line);
+		} else {
+			g2.drawLine((int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5), (int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5));
+			g2.drawLine((int) (quad.b.x + 0.5), (int) (quad.b.y + 0.5), (int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5));
+			g2.drawLine((int) (quad.c.x + 0.5), (int) (quad.c.y + 0.5), (int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5));
+			g2.setColor(color2);
 			g2.drawLine((int) (quad.d.x + 0.5), (int) (quad.d.y + 0.5), (int) (quad.a.x + 0.5), (int) (quad.a.y + 0.5));
 		}
 	}

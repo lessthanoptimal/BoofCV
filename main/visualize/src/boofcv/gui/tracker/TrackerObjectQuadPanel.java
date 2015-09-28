@@ -111,27 +111,27 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 				drawCorner(g2,quad.b,Color.ORANGE);
 				drawCorner(g2,quad.c,Color.CYAN);
 			} else if( numSelected == 4 ) {
-				VisualizeShapes.drawQuad(quad, g2, false);
+				VisualizeShapes.drawQuad(quad, g2, true, Color.gray , Color.CYAN);
 				drawCorner(g2,quad.a,Color.RED);
 				drawCorner(g2,quad.b,Color.ORANGE);
 				drawCorner(g2,quad.c,Color.CYAN);
 				drawCorner(g2,quad.d,Color.BLUE);
 			}
 		} else if( targetVisible ) {
-			VisualizeShapes.drawQuad(quad, g2, false);
+			VisualizeShapes.drawQuad(quad, g2,true, Color.gray , Color.CYAN);
 			drawCorner(g2,quad.a,Color.RED);
-			drawCorner(g2,quad.b,Color.ORANGE);
-			drawCorner(g2,quad.c,Color.CYAN);
-			drawCorner(g2,quad.d,Color.BLUE);
+			drawCorner(g2,quad.b,Color.RED);
+			drawCorner(g2,quad.c,Color.RED);
+			drawCorner(g2,quad.d,Color.RED);
 		}
 	}
 
 	private void drawLine( Graphics2D g2 , Point2D_F64 a , Point2D_F64 b ) {
-		g2.drawLine((int)a.x,(int)a.y,(int)b.x,(int)b.y);
+		g2.drawLine((int)(a.x+0.5),(int)(a.y+0.5),(int)(b.x+0.5),(int)(b.y+0.5));
 	}
 
 	private void drawCorner( Graphics2D g2 , Point2D_F64 a , Color color ) {
-		VisualizeFeatures.drawPoint(g2,(int)(a.x+0.5),(int)(a.y+0.5),6,color,false);
+		VisualizeFeatures.drawPoint(g2,a.x,a.y,6,color,false);
 	}
 
 	@Override

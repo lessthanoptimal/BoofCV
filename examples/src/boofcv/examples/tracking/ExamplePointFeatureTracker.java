@@ -157,7 +157,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 		int pause;
 		SimpleImageSequence sequence =
 				media.openVideo("../data/applet/zoom.mjpeg", ImageType.single(imageType)); pause=100;
-//				media.openCamera("/dev/video0",640,480,ImageType.single(imageType)); pause = 5;
+//				media.openCamera(null,640,480,ImageType.single(imageType)); pause = 5;
 		sequence.setLoop(true);
 
 		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType,pause);
