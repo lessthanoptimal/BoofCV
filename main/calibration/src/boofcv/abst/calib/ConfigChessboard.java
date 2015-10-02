@@ -65,8 +65,8 @@ public class ConfigChessboard implements Configuration {
 
 	{
 
-		square.contour2Poly_splitFraction = 0.25;
-		square.contour2Poly_minimumSplitFraction = 0.01;
+//		square.contour2Poly_splitFraction = 0.25;
+//		square.contour2Poly_minimumSplitFraction = 0.01;
 
 		square.minimumEdgeIntensity = 0.1;
 
@@ -76,11 +76,18 @@ public class ConfigChessboard implements Configuration {
 		square.refineWithLines = false;
 
 		// good value for squares.  Set it here to make it not coupled to default values
-		square.configRefineCorners.cornerOffset = 2;
+		square.configRefineCorners.cornerOffset = 1;
 
 		square.configRefineCorners.lineSamples = 10;
 		square.configRefineCorners.convergeTolPixels = 0.05;
 		square.configRefineCorners.maxIterations = 10;
+
+		// defaults for if the user toggles it to lines
+		square.configRefineLines.cornerOffset = 1;
+
+		square.configRefineLines.lineSamples = 10;
+		square.configRefineLines.convergeTolPixels = 0.05;
+		square.configRefineLines.maxIterations = 10;
 	}
 
 	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {

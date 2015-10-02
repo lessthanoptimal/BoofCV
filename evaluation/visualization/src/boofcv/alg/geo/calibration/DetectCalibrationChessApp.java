@@ -20,6 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
+import boofcv.alg.feature.detect.squares.SquareEdge;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -99,14 +100,15 @@ public class DetectCalibrationChessApp
 		setMainGUI(panel);
 	}
 
-	public void configure( int numCols , int numRows ) {
+	public void configure( int numCols , int numRows , boolean forCalibration ) {
 		ConfigChessboard config = new ConfigChessboard(numCols,numRows,30);
 
-		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlg();
+		if( !forCalibration ) {
+			config.square.refineWithCorners = false;
+			config.square.refineWithLines = true;
+		}
 
-		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
-		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
-		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
+		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlg();
 	}
 
 	@Override
@@ -135,7 +137,7 @@ public class DetectCalibrationChessApp
 		int numCols = (int)reader.nextDouble();
 		int numRows = (int)reader.nextDouble();
 
-		configure(numCols, numRows);
+		configure(numCols, numRows, true);
 	}
 
 	public synchronized void process( final BufferedImage input ) {
@@ -174,43 +176,36 @@ public class DetectCalibrationChessApp
 				VisualizeBinaryData.renderBinary(alg.getBinary(), false, workImage);
 				break;
 
-			case 2:
-				renderClusters();
-				break;
-
 			default:
 				throw new RuntimeException("Unknown mode");
 		}
 		Graphics2D g2 = workImage.createGraphics();
 		if( foundTarget ) {
-			if( calibGUI.isShowBound() ) {
-//				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
-//				drawBounds(g2, bounds);
-			}
 
 			if( calibGUI.isShowNumbers() ) {
 				drawNumbers(g2, alg.getCalibrationPoints(),null,1);
 			}
+			if( calibGUI.isShowPoints() ) {
+				List<Point2D_F64> candidates =  alg.getCalibrationPoints();
+				for( Point2D_F64 c : candidates ) {
+					VisualizeFeatures.drawPoint(g2, (int)(c.x+0.5), (int)(c.y+0.5), 1, Color.RED);
+				}
+			}
 			calibGUI.setSuccessMessage("FOUND",true);
 		} else {
-			if( calibGUI.isShowBound() ) {
-//				Polygon2D_I32 bounds =  alg.getFindBound().getBoundPolygon();
-//				drawBounds(g2, bounds);
-			}
 
 			calibGUI.setSuccessMessage("FAILED",false);
 		}
 
-		if( calibGUI.isShowPoints() ) {
-			List<Point2D_F64> candidates =  alg.getCalibrationPoints();
-			for( Point2D_F64 c : candidates ) {
-				VisualizeFeatures.drawPoint(g2, (int)(c.x+0.5), (int)(c.y+0.5), 1, Color.RED);
-			}
+		if( calibGUI.isShowGraph() ) {
+			renderGraph(g2);
 		}
 
-		if( calibGUI.doShowGraph ) {
-			System.out.println("Maybe I should add this back in with the new detector some how");
+		if( calibGUI.isShowOrder() ) {
+			renderOrder(g2);
 		}
+
+		renderClusters();
 
 		gui.setBufferedImage(workImage);
 		gui.setScale(calibGUI.getScale());
@@ -219,50 +214,157 @@ public class DetectCalibrationChessApp
 		processed = true;
 	}
 
+	private void renderOrder(Graphics2D g2) {
+		List<SquareGrid> grids = alg.getFindSeeds().getGrids().getGrids();
+		g2.setStroke(new BasicStroke(3));
+
+		for (int i = 0; i < grids.size(); i++) {
+			SquareGrid g = grids.get(i);
+			int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
+
+			for (int j = 0; j < g.nodes.size() - 1; j++) {
+				double fraction = j / ((double) g.nodes.size() - 1);
+				fraction = fraction * 0.6 + 0.4;
+
+				int lineRGB = (int) (fraction * a) << 16 | (int) (fraction * (255 - a)) << 8;
+
+				g2.setColor(new Color(lineRGB));
+				SquareNode p0 = g.nodes.get(j);
+				SquareNode p1 = g.nodes.get(j + 1);
+				g2.drawLine((int) p0.center.x, (int) p0.center.y, (int) p1.center.x, (int) p1.center.y);
+			}
+		}
+	}
+
 	private void renderClusters() {
 
 		Graphics2D g2 = workImage.createGraphics();
 
-		FastQueue<Polygon2D_F64> squares =  alg.getFindSeeds().getDetectorSquare().getFound();
 
-		for (int i = 0; i < squares.size(); i++) {
-			Polygon2D_F64 p = squares.get(i);
-			g2.setColor(Color.black);
-			g2.setStroke(new BasicStroke(4));
-			VisualizeShapes.drawPolygon(p, true, g2, true);
-			g2.setColor(Color.white);
-			g2.setStroke(new BasicStroke(2));
-			VisualizeShapes.drawPolygon(p, true, g2, true);
+		if( calibGUI.doShowSquares ) {
+			FastQueue<Polygon2D_F64> squares =  alg.getFindSeeds().getDetectorSquare().getFound();
+
+			for (int i = 0; i < squares.size(); i++) {
+				Polygon2D_F64 p = squares.get(i);
+				if (isInGrids(p))
+					continue;
+				g2.setColor(Color.cyan);
+				g2.setStroke(new BasicStroke(4));
+				VisualizeShapes.drawPolygon(p, true, g2, true);
+				g2.setColor(Color.blue);
+				g2.setStroke(new BasicStroke(2));
+				VisualizeShapes.drawPolygon(p, true, g2, true);
+
+				drawCornersInside(g2,p);
+			}
 		}
 
+		if( calibGUI.doShowGrids ) {
+			List<SquareGrid> grids = alg.getFindSeeds().getGrids().getGrids();
+
+			for (int i = 0; i < grids.size(); i++) {
+				SquareGrid g = grids.get(i);
+				int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
+
+				int rgb = a << 16 | (255 - a) << 8;
+
+				g2.setStroke(new BasicStroke(3));
+
+				Color color = new Color(rgb);
+				for (int j = 0; j < g.nodes.size(); j++) {
+					SquareNode n = g.nodes.get(j);
+					g2.setColor(color);
+					VisualizeShapes.drawPolygon(n.corners, true, g2, true);
+
+					drawCornersInside(g2,n.corners);
+				}
+			}
+		}
+	}
+
+	private void renderGraph( Graphics2D g2 ) {
+		List<List<SquareNode>> graphs = alg.getFindSeeds().getGraphs();
+
+		g2.setStroke(new BasicStroke(3));
+		for( int i = 0; i < graphs.size(); i++ ) {
+
+			List<SquareNode> graph = graphs.get(i);
+
+			int key = graphs.size() == 1 ? 0 : 255 * i / (graphs.size() - 1);
+
+			int rgb = key << 8 | (255 - key);
+			g2.setColor(new Color(rgb));
+
+			List<SquareEdge> edges = new ArrayList<SquareEdge>();
+
+			for( SquareNode n : graph ) {
+				for (int j = 0; j < 4; j++) {
+					if( n.edges[j] != null && !edges.contains(n.edges[j])) {
+						edges.add( n.edges[j]);
+					}
+				}
+			}
+
+			for( SquareEdge e : edges ) {
+				Point2D_F64 a = e.a.center;
+				Point2D_F64 b = e.b.center;
+
+				g2.drawLine((int)a.x,(int)a.y,(int)b.x,(int)b.y);
+			}
+		}
+	}
+
+	private void drawCornersInside( Graphics2D g2 , Polygon2D_F64 poly ) {
+		double x0 = poly.get(0).x;
+		double y0 = poly.get(0).y;
+
+		double x1 = poly.get(1).x;
+		double y1 = poly.get(1).y;
+
+		double x2 = poly.get(2).x;
+		double y2 = poly.get(2).y;
+
+		double x3 = poly.get(3).x;
+		double y3 = poly.get(3).y;
+
+		double dx02 = x2-x0;
+		double dy02 = y2-y0;
+
+		double dx13 = x3-x1;
+		double dy13 = y3-y1;
+
+		double fraction = 0.2;
+
+		x0 += dx02*fraction;
+		y0 += dy02*fraction;
+
+		x2 -= dx02*fraction;
+		y2 -= dy02*fraction;
+
+		x1 += dx13*fraction;
+		y1 += dy13*fraction;
+
+		x3 -= dx13*fraction;
+		y3 -= dy13*fraction;
+
+		VisualizeFeatures.drawPoint(g2, x0, y0, 3, Color.RED, false);
+		VisualizeFeatures.drawPoint(g2, x1, y1, 3, new Color(190, 0, 0), false);
+		VisualizeFeatures.drawPoint(g2, x2, y2, 3, Color.GREEN, false);
+		VisualizeFeatures.drawPoint(g2, x3, y3, 3, new Color(0, 190, 0), false);
+
+	}
+
+	private boolean isInGrids( Polygon2D_F64 p ) {
 		List<SquareGrid> grids = alg.getFindSeeds().getGrids().getGrids();
 
-		for( int i = 0; i < grids.size(); i++ ) {
+		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
-			int a = grids.size()==1 ? 0 : 255*i/(grids.size()-1);
-
-			int rgb = a << 16 | (255-a) << 8;
-
-			g2.setStroke(new BasicStroke(3));
-
-			for (int j = 0; j < g.nodes.size()-1; j++) {
-				double fraction = j/((double)g.nodes.size()-1);
-				fraction = fraction*0.6 + 0.4;
-
-				int lineRGB = (int)(fraction*a) << 16 | (int)(fraction*(255-a)) << 8;
-
-				g2.setColor(new Color(lineRGB));
-				SquareNode p0 = g.nodes.get(j);
-				SquareNode p1 = g.nodes.get(j+1);
-				g2.drawLine((int) p0.center.x, (int) p0.center.y, (int) p1.center.x, (int) p1.center.y);
-			}
-
-			g2.setColor(new Color(rgb));
 			for (int j = 0; j < g.nodes.size(); j++) {
-				SquareNode n = g.nodes.get(j);
-				VisualizeShapes.drawPolygon(n.corners, true, g2, true);
+				if( g.nodes.get(j).corners == p )
+					return true;
 			}
 		}
+		return false;
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
@@ -343,6 +445,7 @@ public class DetectCalibrationChessApp
 		String prefix = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
 
 		app.loadConfigurationFile(prefix + "info.txt");
+//		app.configure(5,7, true);
 
 		app.setBaseDirectory(prefix);
 //		app.loadInputData(prefix+"images.txt");

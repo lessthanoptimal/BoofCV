@@ -120,7 +120,6 @@ public class VisualizeShapes {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			g2.setColor(Color.red);
 			Line2D.Double l = new Line2D.Double();
 
 			for( int i = 0; i < polygon.size()-1; i++ ) {
@@ -132,12 +131,6 @@ public class VisualizeShapes {
 				Point2D_F64 p0 = polygon.get(0);
 				Point2D_F64 p1 = polygon.get(polygon.size()-1);
 				drawLine(g2, l, p0.x, p0.y, p1.x, p1.y);
-			}
-
-			g2.setColor(Color.cyan);
-			for( int i = 0; i < polygon.size(); i++ ) {
-				Point2D_F64 p0 = polygon.get(i);
-				VisualizeFeatures.drawCircle(g2,p0.x,p0.y,2);
 			}
 
 		} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,10 +42,12 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	JComboBox viewSelector;
 
 	// toggle what is visible or not
-	JCheckBox showBound;
 	JCheckBox showPoints;
 	JCheckBox showNumbers;
 	JCheckBox showGraph;
+	JCheckBox showGrids;
+	JCheckBox showSquares;
+	JCheckBox showOrder;
 
 	// allows the user to change the image zoom
 	JSpinner selectZoom;
@@ -55,10 +57,12 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	// should the threshold be manually selected or automatically
 	JCheckBox manualThreshold;
 
-	boolean doShowBound = true;
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
 	boolean doShowGraph = false;
+	boolean doShowOrder = false;
+	boolean doShowGrids = false;
+	boolean doShowSquares = false;
 
 	double scale = 1;
 	boolean isManual = false;
@@ -72,7 +76,6 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
-		viewSelector.addItem("Cluster");
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
@@ -81,11 +84,6 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 		
 		successIndicator = new JLabel();
-
-		showBound = new JCheckBox("Show Bound");
-		showBound.setSelected(doShowBound);
-		showBound.addItemListener(this);
-		showBound.setMaximumSize(showBound.getPreferredSize());
 		
 		showPoints = new JCheckBox("Show Points");
 		showPoints.setSelected(doShowPoints);
@@ -97,10 +95,25 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		showNumbers.addItemListener(this);
 		showNumbers.setMaximumSize(showNumbers.getPreferredSize());
 
-		showGraph = new JCheckBox("Show Graph");
+		showGraph = new JCheckBox("Show Graphs");
 		showGraph.setSelected(doShowGraph);
 		showGraph.addItemListener(this);
 		showGraph.setMaximumSize(showGraph.getPreferredSize());
+
+		showGrids = new JCheckBox("Show Grids");
+		showGrids.setSelected(doShowGrids);
+		showGrids.addItemListener(this);
+		showGrids.setMaximumSize(showGrids.getPreferredSize());
+
+		showOrder = new JCheckBox("Show Order");
+		showOrder.setSelected(doShowOrder);
+		showOrder.addItemListener(this);
+		showOrder.setMaximumSize(showOrder.getPreferredSize());
+
+		showSquares = new JCheckBox("Show Squares");
+		showSquares.setSelected(doShowSquares);
+		showSquares.addItemListener(this);
+		showSquares.setMaximumSize(showSquares.getPreferredSize());
 
 		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
 		thresholdSpinner.addChangeListener(this);
@@ -117,17 +130,19 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 		addLabeled(successIndicator, "Found:", this);
 		addSeparator(100);
-		addLabeled(viewSelector,"View ",this);
+		addLabeled(viewSelector, "View ", this);
 		addSeparator(100);
 		if( hasManualMode )
 			addAlignLeft(manualThreshold,this);
-		addLabeled(thresholdSpinner,"Threshold",this);
+		addLabeled(thresholdSpinner, "Threshold", this);
 		addSeparator(100);
-		addLabeled(selectZoom,"Zoom ",this);
-		addAlignLeft(showBound, this);
-		addAlignLeft(showPoints,this);
+		addLabeled(selectZoom, "Zoom ", this);
+		addAlignLeft(showPoints, this);
 		addAlignLeft(showNumbers,this);
 		addAlignLeft(showGraph,this);
+		addAlignLeft(showGrids,this);
+		addAlignLeft(showOrder,this);
+		addAlignLeft(showSquares, this);
 	}
 
 	public void addView( String name ) {
@@ -163,8 +178,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		return selectedView;
 	}
 
-	public boolean isShowBound() {
-		return doShowBound;
+	public boolean isShowSquares() {
+		return doShowSquares;
 	}
 
 	public boolean isShowPoints() {
@@ -177,6 +192,14 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 
 	public boolean isShowGraph() {
 		return doShowGraph;
+	}
+
+	public boolean isShowGrids() {
+		return doShowGrids;
+	}
+
+	public boolean isShowOrder() {
+		return doShowOrder;
 	}
 
 	public int getThresholdLevel() {
@@ -207,8 +230,8 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
 			listener.calibEventGUI();
-		} else if( e.getSource() == showBound ) {
-			doShowBound = showBound.isSelected();
+		} else if( e.getSource() == showSquares ) {
+			doShowSquares = showSquares.isSelected();
 			listener.calibEventGUI();
 		} else if( e.getSource() == showNumbers ) {
 			doShowNumbers = showNumbers.isSelected();
@@ -218,6 +241,12 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 			listener.calibEventGUI();
 		} else if( e.getSource() == showGraph ) {
 			doShowGraph = showGraph.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showGrids ) {
+			doShowGrids = showGrids.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showOrder ) {
+			doShowOrder = showOrder.isSelected();
 			listener.calibEventGUI();
 		} else if( e.getSource() == thresholdSpinner) {
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
@@ -237,10 +266,10 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		}
 	}
 
-	public static interface Listener
+	public interface Listener
 	{
-		public void calibEventGUI();
-		
-		public void calibEventProcess();
+		void calibEventGUI();
+
+		void calibEventProcess();
 	}
 }

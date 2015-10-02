@@ -45,10 +45,10 @@ import java.util.List;
 public class SquaresIntoClusters {
 
 	// maximum neighbors on nearest-neighbor search
-	public int maxNeighbors = 6;
+	public int maxNeighbors;
 
 	// tolerance for fractional distance away a point can be from a line to be considered on the line
-	double distanceTol = 0.05;
+	double distanceTol = 0.20;
 
 	// ratio of the length of a square to the distance separating the square
 	private double spaceToSquareRatio;
@@ -205,7 +205,6 @@ public class SquaresIntoClusters {
 	 * Connects the 'candidate' node to node 'n' if they meet several criteria.  See code for details.
 	 */
 	void considerConnect(SquareNode node0, SquareNode node1) {
-
 		// Find the side on each line which intersects the line connecting the two centers
 		lineA.a = node0.center;
 		lineA.b = node1.center;
@@ -213,8 +212,9 @@ public class SquaresIntoClusters {
 		int intersection0 = findSideIntersect(node0,lineA,lineB);
 		int intersection1 = findSideIntersect(node1,lineA,lineB);
 
-		if( intersection1 < 0 || intersection0 < 0 )
+		if( intersection1 < 0 || intersection0 < 0 ) {
 			return;
+		}
 
 		double distanceApart = lineA.getLength();
 
@@ -353,13 +353,16 @@ public class SquaresIntoClusters {
 		lineB.a = p0;
 		lineB.b = p3;
 
-		// tolerance as a fraction the length of a side
-		double tol = lineB.getLength()*distanceTol/(2+spaceToSquareRatio);
+		// (computed expected length of a square) * (fractional tolerance)
+		double tol1 = p0.distance(p1)*distanceTol;
 
-		if(Distance2D_F64.distance(lineB, p1) > tol )
+		// see if inner points are close to the line
+		if(Distance2D_F64.distance(lineB, p1) > tol1 )
 			return false;
 
-		return Distance2D_F64.distance(lineB, p2) <= tol;
+		double tol2 = p2.distance(p3)*distanceTol;
+
+		return Distance2D_F64.distance(lineB, p2) <= tol2;
 	}
 
 
