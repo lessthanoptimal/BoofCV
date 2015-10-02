@@ -20,13 +20,10 @@ package boofcv.app.calib;
 
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.struct.image.ImageFloat32;
-import georegression.geometry.UtilPolygons2D_F64;
-import georegression.metric.Area2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
-import georegression.struct.shapes.Rectangle2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -47,22 +44,26 @@ import java.util.List;
 
 public class AssistedCalibration {
 
+	double CENTER_SKEW = 0.93;
 	double shrink = 0.85;
+	double STILL_THRESHOLD = 3.0;
 
 	double SIZE_MATCH_THRESHOLD = 0.85;
 
-	double paddingWidth;
-	double paddingHeight;
+	int padding;
 
 	PlanarCalibrationDetector detector;
 
 	int imageSize;
 	int imageWidth,imageHeight;
+	double canonicalWidth;
 
 	CalibrationView view;
 
 	Quadrilateral_F64 desired = new Quadrilateral_F64();
 	Polygon2D_F64 foundHull = new Polygon2D_F64();
+
+	List<Point2D_F64> sides = new ArrayList<Point2D_F64>();
 
 	double widthRatio,heightRatio;
 
@@ -81,74 +82,184 @@ public class AssistedCalibration {
 
 	Side targetSide;
 
-	public AssistedCalibration(PlanarCalibrationDetector detector) {
+	DetectUserActions actions = new DetectUserActions();
+	AssistedCalibrationGui gui;
+
+	State state = State.DETERMINE_SIZE;
+
+	public AssistedCalibration(PlanarCalibrationDetector detector, AssistedCalibrationGui gui) {
 		this.detector = detector;
+		this.gui = gui;
 
-		view = new CalibrationView.Chessboard(5,7);
+		view = new CalibrationView.Chessboard();
+		view.initialize(detector);
+	}
 
-		paddingWidth = view.getWidthBuffer();
-		paddingHeight = view.getHeightBuffer();
-
+	public void init( int imageWidth , int imageHeight ) {
+		actions.setImageSize(imageWidth,imageHeight);
 	}
 
 	public void process( ImageFloat32 gray , BufferedImage image ) {
 
 		imageWidth = gray.width;
 		imageHeight = gray.height;
-		imageSize = Math.min(gray.width,gray.height);
+		imageSize = Math.min(gray.width, gray.height);
 
 		g2 = image.createGraphics();
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		boolean success = detector.process(gray);
 
-		configureStep(step);
-		configureDesired(gray.width, gray.height);
+		actions.update(success,detector.getDetectedPoints());
 
-		drawLine(desired.get(0), desired.get(1));
-		drawLine(desired.get(1), desired.get(2));
-		drawLine(desired.get(2), desired.get(3));
-		drawLine(desired.get(3), desired.get(0));
+		switch( state ) {
+			case DETERMINE_SIZE:
+				handleDetermineSize(success);
+				break;
 
-		int w = 11;
-		int r = w/2;
+			default:
+				handleFillScreen(success);
+		}
 
-		if( success ) {
-			List<Point2D_F64> detected = detector.getDetectedPoints();
+		gui.setImage(image);
+	}
 
-			int numInside = 0;
-			for (int i = 0; i < detected.size(); i++) {
-				Point2D_F64 p = detected.get(i);
-				ellipse.setFrame(p.x - r-1, p.y - r-1, w, w);
+	private void handleDetermineSize( boolean detected ) {
+		String message = "Hold target in view and centered.";
 
-				if (Intersection2D_F64.contains(desired, p)) {
-					numInside++;
-					g2.setColor(Color.red);
-					g2.fill(ellipse);
-				} else {
-					g2.setColor(Color.blue);
-					g2.draw(ellipse);
+		if( detected ) {
+			double stationaryTime = actions.getStationaryTime();
+
+			List<Point2D_F64> points = detector.getDetectedPoints();
+			view.getSides(points, sides);
+
+			double top = sides.get(0).distance(sides.get(1));
+			double right = sides.get(1).distance(sides.get(2));
+			double bottom = sides.get(2).distance(sides.get(3));
+			double left = sides.get(3).distance(sides.get(0));
+
+			double ratioHorizontal = Math.min(top,bottom)/Math.max(top,bottom);
+			double ratioVertical = Math.min(left,right)/Math.max(left,right);
+
+			boolean skewed = false;
+			if( ratioHorizontal <= CENTER_SKEW || ratioVertical <= CENTER_SKEW) {
+				actions.resetStationary();
+				skewed = true;
+				ratioHorizontal *= 100.0;
+				ratioVertical *= 100.0;
+
+				message = String.format(
+						"Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
+			} else {
+				if (stationaryTime > 3.0) {
+					actions.resetStationary();
+					state = State.FILL_BOTTOM;
+					canonicalWidth = Math.max(top,bottom);
+					padding = view.getBufferWidth(canonicalWidth);
+				}
+				if (stationaryTime > 0.5) {
+					message = String.format("Hold still:  %6.1f", stationaryTime);
 				}
 			}
 
-			if( numInside == detected.size() ) {
-				UtilPolygons2D_F64.convexHull(detected,foundHull);
-				double foundArea = Area2D_F64.polygonConvex(foundHull);
-				double desiredArea = Area2D_F64.quadrilateral(desired);
+			int r = 6;
+			int w = 2 * r + 1;
+			if( skewed ) {
+				g2.setColor(Color.BLUE);
+				for (int i = 0; i < points.size(); i++) {
+					Point2D_F64 p = points.get(i);
 
-				Polygon2D_F64 hack = new Polygon2D_F64(4);
-				UtilPolygons2D_F64.convert(desired,hack);
-//				System.out.println("areas "+ Area2D_F64.polygonConvex(hack)+"  "+desiredArea);
+					ellipse.setFrame(p.x - r, p.y - r, w, w);
+					g2.draw(ellipse);
+				}
+			} else {
+				int red = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
+				g2.setColor(new Color(red, 0, 0));
 
-				// Use square root since it more closely follows what a person visually sees
-				double ratio = Math.sqrt(foundArea/desiredArea);
-				System.out.println("area ratio "+ratio);
-
-				visualizeEdgeGuidance(detected);
-
-				if( ratio >= SIZE_MATCH_THRESHOLD)
-					step++;
+				for (int i = 0; i < points.size(); i++) {
+					Point2D_F64 p = points.get(i);
+					ellipse.setFrame(p.x - r, p.y - r, w, w);
+					g2.fill(ellipse);
+				}
 			}
 		}
+
+		gui.setMessage(message);
+	}
+
+	boolean pictureTaken = false;
+	FastQueue<Polygon2D_F64> regions = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
+		@Override
+		protected Polygon2D_F64 createInstance() {
+			return new Polygon2D_F64(4);
+		}
+	};
+
+	private void handleFillScreen( boolean detected ) {
+		String message = "Tint the screen!";
+		drawPadding();
+		if( detected ) {
+			double stationaryTime = actions.getStationaryTime();
+			List<Point2D_F64> points = detector.getDetectedPoints();
+			view.getSides(points, sides);
+
+			if( pictureTaken ) {
+				if( stationaryTime >= STILL_THRESHOLD ) {
+					message = "Move somewhere else";
+				} else {
+					pictureTaken = false;
+				}
+
+			} else if( stationaryTime >= STILL_THRESHOLD ) {
+				pictureTaken = true;
+				message = "Move somewhere else";
+				Polygon2D_F64 p = regions.grow();
+				for (int i = 0; i < 4; i++) {
+					p.get(i).set( sides.get(i) );
+				}
+			} else if( stationaryTime > 0.5 ) {
+				message = String.format("Hold still:  %6.1f", stationaryTime);
+			}
+
+			int red = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
+			g2.setColor(new Color(red, 0, 0));
+
+			int r = 6;
+			int w = 2 * r + 1;
+			for (int i = 0; i < points.size(); i++) {
+				Point2D_F64 p = points.get(i);
+				ellipse.setFrame(p.x - r, p.y - r, w, w);
+				g2.fill(ellipse);
+			}
+		}
+		g2.setColor(new Color(0, 255, 255, 50));
+		int polyX[] = new int[4];
+		int polyY[] = new int[4];
+
+		for (int i = 0; i < regions.size(); i++) {
+			Polygon2D_F64 poly = regions.get(i);
+			for (int j = 0; j < 4; j++) {
+				Point2D_F64 p = poly.get(j);
+				polyX[j] = (int)(p.x+0.5);
+				polyY[j] = (int)(p.y+0.5);
+			}
+			g2.fillPolygon(polyX,polyY,4);
+		}
+
+		gui.setMessage(message);
+	}
+
+	private void drawPadding() {
+		if( padding <= 0 )
+			return;
+
+		g2.setColor(Color.BLUE);
+		g2.drawLine(padding,padding,imageWidth-padding,padding);
+		g2.drawLine(imageWidth-padding,padding,imageWidth-padding,imageHeight-padding);
+		g2.drawLine(imageWidth-padding,imageHeight-padding,padding,imageHeight-padding);
+		g2.drawLine(padding,imageHeight-padding,padding,padding);
+
 	}
 
 	// TODO to buffer edge
@@ -159,6 +270,8 @@ public class AssistedCalibration {
 
 		view.getSides(detections,edges);
 
+		g2.setColor(Color.CYAN);
+		g2.setStroke(new BasicStroke(4));
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
 		for (int i = 0; i < edges.size(); i += 2) {
@@ -174,7 +287,6 @@ public class AssistedCalibration {
 				case LEFT: score = a.x + b.x; break;
 				default: throw new RuntimeException("Egads");
 			}
-
 
 			if( score < bestScore ) {
 				bestScore = score;
@@ -272,81 +384,16 @@ public class AssistedCalibration {
 	}
 
 
-	public void configureDesired( int imageWidth , int imageHeight  ) {
-
-		int centerX = imageWidth/2;
-		int centerY = imageHeight/2;
-
-		int maxSide = (int)(Math.min(imageWidth,imageHeight)*0.7);
-
-		desired.a.x = centerX-maxSide*ratioTop/2.0;
-		desired.b.x = centerX+maxSide*ratioTop/2.0;
-		desired.d.x = centerX-maxSide*ratioBottom/2.0;
-		desired.c.x = centerX+maxSide*ratioBottom/2.0;
-
-		desired.a.y = centerY-maxSide*ratioLeft/2.0;
-		desired.d.y = centerY+maxSide*ratioLeft/2.0;
-		desired.b.y = centerY-maxSide*ratioRight/2.0;
-		desired.c.y = centerY+maxSide*ratioRight/2.0;
-
-		Rectangle2D_F64 bounding = new Rectangle2D_F64();
-
-		UtilPolygons2D_F64.bounding(desired,bounding);
-
-		double shiftX=0,shiftY = 0;
-
-		double bufferX = Math.max(maxSide*ratioTop,maxSide*ratioBottom)*paddingWidth;
-		double bufferY = Math.max(maxSide*ratioLeft,maxSide*ratioRight)*paddingHeight;
-
-		if( shiftVertical > 0 ) {
-			shiftY = -Math.max(0,bounding.p0.y-bufferY);
-		} else if( shiftVertical < 0 ) {
-			shiftY = Math.max(0,imageHeight - bounding.p1.y-bufferY);
-		}
-
-		if( shiftHorizontal > 0 ) {
-			shiftX = -Math.max(0,bounding.p0.x-bufferX);
-		} else if( shiftHorizontal < 0 ) {
-			shiftX = Math.max(0,imageWidth - bounding.p1.x-bufferX);
-		}
-
-		for (int i = 0; i < 4; i++) {
-			desired.get(i).x += shiftX;
-			desired.get(i).y += shiftY;
-		}
-	}
-
-	private void configureStep( int step ) {
-		double fiducialRatio = view.getWidthHeightRatio();
-
-		if( fiducialRatio > 1.0 ) {
-			widthRatio = 1.0;
-			heightRatio = 1.0/fiducialRatio;
-		} else {
-			widthRatio = fiducialRatio;
-			heightRatio = 1.0;
-		}
-
-		ratioTop = heightRatio;
-		ratioBottom = heightRatio;
-		ratioLeft = widthRatio;
-		ratioRight = widthRatio;
-
-		shiftVertical = 0;
-		shiftHorizontal = 0;
-
-		switch( step ) {
-			case 0: ratioBottom *= shrink; shiftVertical=-1; targetSide=Side.BOTTOM;break; // bottom
-			case 1: ratioRight *= shrink; shiftHorizontal=-1;targetSide=Side.RIGHT;break; // right
-			case 2: ratioTop *= shrink; shiftVertical=1;targetSide=Side.TOP;break; // top
-			case 3: ratioLeft *= shrink;shiftHorizontal=1; targetSide=Side.LEFT;break; // left
-			case 4: ratioBottom *= shrink;targetSide=null; break; // center
-		}
-
-	}
-
 	enum Side {
 		LEFT,RIGHT,TOP,BOTTOM
+	}
+
+	enum State {
+		DETERMINE_SIZE,
+		FILL_BOTTOM,
+		FILL_LEFT,
+		FILL_TOP,
+		FILL_RIGHT
 	}
 
 }

@@ -33,24 +33,40 @@ public class DetectUserActions {
 	double thresholdDistance;
 	int thresholdConsecutive = 10;
 
-	int consecutive;
+	double stationaryStart;
+	double stationaryTime;
 
 	List<Point2D_F64> previous = new ArrayList<Point2D_F64>();
+
+	List<Point2D_F64> points;
+	boolean stationary;
 
 	public void setImageSize( int width , int height ) {
 		int size = Math.min(width,height);
 
+		thresholdDistance = size*0.005;
 
+		System.out.println("stationary threshold "+thresholdDistance);
 	}
 
-	public boolean isStationary( List<Point2D_F64> points ) {
+	public void update( boolean detected , List<Point2D_F64> points ) {
+		if( detected ) {
+			this.points = points;
+			stationaryTime = checkStationary();
+		} else {
+			previous.clear();
+			stationaryStart = System.currentTimeMillis();
+		}
+	}
+
+	public double checkStationary( ) {
 		if( previous.size() != points.size() ) {
 			previous.clear();
 			for( int i = 0; i < points.size(); i++ ) {
 				previous.add( points.get(i).copy() );
 			}
-			consecutive = 0;
-			return false;
+			stationaryStart = System.currentTimeMillis();
+			return 0;
 		} else {
 			double average = 0;
 			for( int i = 0; i < points.size(); i++ ) {
@@ -61,19 +77,22 @@ public class DetectUserActions {
 			}
 			average /= points.size();
 
-			if( average <= thresholdDistance ) {
-				consecutive++;
-				if( consecutive >= thresholdConsecutive ) {
-					return true;
-				}
-			} else {
-				consecutive = 0;
+			if( average > thresholdDistance ) {
+				stationaryStart = System.currentTimeMillis();
 			}
-			return false;
+			return (System.currentTimeMillis()-stationaryStart)/1000.0;
 		}
 	}
 
-	public boolean isAtLocation( List<Point2D_F64> points , double x , double y ) {
+	public void resetStationary() {
+		stationaryTime = System.currentTimeMillis();
+	}
+
+	public double getStationaryTime() {
+		return stationaryTime;
+	}
+
+	public boolean isAtLocation( double x , double y ) {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {

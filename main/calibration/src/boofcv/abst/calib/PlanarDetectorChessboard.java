@@ -77,6 +77,23 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 		return layoutPoints;
 	}
 
+	/**
+	 * Returns number of rows in the chessboard grid
+	 * @return number of rows
+	 */
+	public int getGridRows() {
+		return alg.getRows();
+	}
+
+	/**
+	 * Returns number of columns in the chessboard grid
+	 * @return number of columns
+	 */
+	public int getGridColumns() {
+		return alg.getColumns();
+	}
+
+
 	public DetectChessboardFiducial<ImageFloat32> getAlg() {
 		return alg;
 	}

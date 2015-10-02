@@ -501,4 +501,20 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 	public FastQueue<Point2D_F64> getCalibrationPoints() {
 		return calibrationPoints;
 	}
+
+	public int getOuterRows() {
+		return outerRows;
+	}
+
+	public int getOuterCols() {
+		return outerCols;
+	}
+
+	public int getInnerRows() {
+		return innerRows;
+	}
+
+	public int getInnerCols() {
+		return innerCols;
+	}
 }

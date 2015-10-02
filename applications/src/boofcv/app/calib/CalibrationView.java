@@ -18,6 +18,8 @@
 
 package boofcv.app.calib;
 
+import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.abst.calib.PlanarDetectorChessboard;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -27,22 +29,21 @@ import java.util.List;
  */
 public interface CalibrationView {
 
+	void initialize( PlanarCalibrationDetector detector );
+
 	void getSides( List<Point2D_F64> detections , List<Point2D_F64> sides );
 
-	double getWidthHeightRatio();
-
-	double getWidthBuffer();
-
-	double getHeightBuffer();
+	int getBufferWidth( double gridPixelsWide );
 
 	class Chessboard implements CalibrationView {
 
 		int numRows,numCols;
 		int pointRows,pointCols;
 
-		public Chessboard(int numRows, int numCols) {
-			this.numRows = numRows;
-			this.numCols = numCols;
+		public void initialize( PlanarCalibrationDetector detector ) {
+			PlanarDetectorChessboard chessboard = (PlanarDetectorChessboard)detector;
+			this.numRows = chessboard.getGridRows();
+			this.numCols = chessboard.getGridColumns();
 
 			pointRows = numRows-1;
 			pointCols = numCols-1;
@@ -50,17 +51,11 @@ public interface CalibrationView {
 
 		@Override
 		public void getSides(List<Point2D_F64> detections, List<Point2D_F64> sides) {
+			sides.clear();
 			sides.add( get(0, 0, detections));
 			sides.add( get(0, pointCols-1, detections));
-
-			sides.add( get(0, pointCols-1, detections));
-			sides.add( get(pointRows-1, pointCols-1, detections));
-
 			sides.add( get(pointRows-1, pointCols-1, detections));
 			sides.add( get(pointRows-1, 0, detections));
-
-			sides.add( get(pointRows-1, 0, detections));
-			sides.add( get(0, 0, detections));
 		}
 
 		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {
@@ -68,18 +63,8 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public double getWidthHeightRatio() {
-			return pointCols/(double)pointRows;
-		}
-
-		@Override
-		public double getWidthBuffer() {
-			return 1.0/(pointCols-1);
-		}
-
-		@Override
-		public double getHeightBuffer() {
-			return 1.0/(pointRows-1);
+		public int getBufferWidth( double gridPixelsWide ) {
+			return (int)(gridPixelsWide/pointCols+0.5);
 		}
 	}
 }

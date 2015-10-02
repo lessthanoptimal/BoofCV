@@ -150,6 +150,14 @@ public class TestDetectChessSquarePoints {
 		return binary;
 	}
 
+	/**
+	 * Crash case.  The outer grid touches the image edge but not the inner.
+	 */
+	@Test
+	public void touchImageEdge() {
+		fail("implement");
+	}
+
 	@Test
 	public void forceToZero() {
 

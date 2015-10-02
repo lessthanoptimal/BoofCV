@@ -64,6 +64,8 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 	private int userAdaptiveRadius = 20;
 	private double userAdaptiveBias = -10;
 
+	// description of the grid its detecting
+	private int numCols,numRows;
 
 	// work space for binary images
 	private T work1;
@@ -82,6 +84,9 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 		work1 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		work2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+
+		this.numCols = numCols;
+		this.numRows = numRows;
 
 		// minContourSize is specified later after the image's size is known
 		// TODO make separation configurable?
@@ -151,5 +156,13 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 	public void setUserAdaptiveBias(double userAdaptiveBias) {
 		this.userAdaptiveBias = userAdaptiveBias;
+	}
+
+	public int getColumns() {
+		return numCols;
+	}
+
+	public int getRows() {
+		return numRows;
 	}
 }

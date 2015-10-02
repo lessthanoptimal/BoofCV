@@ -23,9 +23,9 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.app.calib.AssistedCalibration;
+import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.calibration.MonoPlanarPanel;
-import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -306,13 +306,13 @@ public class CameraCalibration extends BaseWebcamApp {
 
 		webcam.open();
 
-		ImagePanel gui = new ImagePanel();
-		gui.setPreferredSize(webcam.getViewSize());
+		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		ShowImages.showWindow(gui, "Webcam Calibration", true);
 
 		ImageFloat32 gray = new ImageFloat32(webcam.getViewSize().width,webcam.getViewSize().height);
 
-		AssistedCalibration assisted = new AssistedCalibration(detector);
+		AssistedCalibration assisted = new AssistedCalibration(detector,gui);
+		assisted.init(gray.width,gray.height);
 
 		BufferedImage image;
 		while( (image = webcam.getImage()) != null ) {
@@ -325,8 +325,6 @@ public class CameraCalibration extends BaseWebcamApp {
 				UtilImageIO.saveImage(image, "crash_image.png");
 				throw e;
 			}
-
-			gui.setBufferedImage(image);
 		}
 	}
 
