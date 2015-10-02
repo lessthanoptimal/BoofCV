@@ -80,13 +80,16 @@ public class RefinePolyLine {
 
 	/**
 	 * Fits a polygon to the contour given an initial set of candidate corners.  If not looping the corners
-	 * must include the end points still.
+	 * must include the end points still.  Minimum of 3 points required.  Otherwise there's no corner!.
 	 *
 	 * @param contour Contours around the shape
 	 * @param corners (Input) initial set of corners.  (output) refined set of corners
 	 */
 	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 corners )
 	{
+		if( corners.size() < 3 ) {
+			return false;
+		}
 		searchRadius = Math.min(6,Math.max(contour.size()/12,3));
 
 		int startCorner,endCorner;
@@ -194,6 +197,8 @@ public class RefinePolyLine {
 	 */
 	private void createLine( int index0 , int index1 , List<Point2D_I32> contour , LineGeneral2D_F64 line )
 	{
+		if( index1 < 0 )
+			System.out.println("SHIT");
 		Point2D_I32 p0 = contour.get(index0);
 		Point2D_I32 p1 = contour.get(index1);
 

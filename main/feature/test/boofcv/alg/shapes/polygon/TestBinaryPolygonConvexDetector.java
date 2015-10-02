@@ -36,6 +36,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.affine.UtilAffine;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
@@ -359,15 +360,32 @@ public class TestBinaryPolygonConvexDetector {
 				double tol = 0.5;
 				assertEquals(1, alg.getFound().size());
 				Polygon2D_F64 found = (Polygon2D_F64)alg.getFound().get(0);
-				assertEquals(10,found.get(0).x,tol);
-				assertEquals(10,found.get(0).y,tol);
-				assertEquals(30,found.get(1).x,tol);
-				assertEquals(40,found.get(1).y,tol);
-				assertEquals(50,found.get(2).x,tol);
-				assertEquals(10,found.get(2).y,tol);
+				checkPolygon(new double[]{10, 10, 30, 40, 50, 10}, found);
 			} else
 				assertEquals(0,alg.getFound().size());
 		}
+	}
+
+	public static boolean checkPolygon( double[] expected , Polygon2D_F64 found  ) {
+		for (int i = 0; i < found.size(); i++) {
+
+
+			boolean matched = true;
+			for (int j = 0; j < found.size(); j++) {
+				double x = expected[j*2];
+				double y = expected[j*2+1];
+
+				Point2D_F64 p = found.get((i+j)%found.size());
+
+				if( Math.abs(p.x-x) > 1e-5 || Math.abs(p.y-y) > 1e-5 ) {
+					matched = false;
+					break;
+				}
+			}
+			if( matched )
+				return true;
+		}
+		return false;
 	}
 
 

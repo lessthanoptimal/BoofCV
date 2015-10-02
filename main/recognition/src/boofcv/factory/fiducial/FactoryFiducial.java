@@ -153,7 +153,8 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Wrapper around chessboard calibration detector.
+	 * Wrapper around chessboard calibration detector.   Refine with lines is set to true automatically.  This
+	 * isn't being used for calibration and its better to use the whole line.
 	 *
 	 * @param config Description of the chessboard.
 	 * @param imageType Type of image it's processing
@@ -161,11 +162,16 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
+
+		config.square.refineWithCorners = false;
+		config.square.refineWithLines = true;
+
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 
 	/**
-	 * Wrapper around square-grid calibration detector.
+	 * Wrapper around square-grid calibration detector.  Refine with lines is set to true automatically.  This
+	 * isn't being used for calibration and its better to use the whole line.
 	 *
 	 * @param config Description of the chessboard.
 	 * @param imageType Type of image it's processing
@@ -173,6 +179,10 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
+
+		config.square.refineWithCorners = false;
+		config.square.refineWithLines = true;
+
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 }

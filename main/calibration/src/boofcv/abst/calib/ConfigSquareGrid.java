@@ -63,8 +63,6 @@ public class ConfigSquareGrid implements Configuration {
 	public double spaceWidth;
 
 	{
-		square.contour2Poly_splitDistanceFraction = 0.05;
-
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
 

@@ -240,7 +240,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			String arg = args[index];
 
 			if (!arg.startsWith("--")) {
-				throw new RuntimeException("Expected flags for image fiducial");
+				throw new RuntimeException("Expected flags for chessboard calibration fiducial");
 			}
 
 			splitFlag(arg);
@@ -272,7 +272,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			String arg = args[index];
 
 			if (!arg.startsWith("--")) {
-				throw new RuntimeException("Expected flags for image fiducial");
+				throw new RuntimeException("Expected flags for square grid calibration fiducial");
 			}
 
 			splitFlag(arg);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,8 +49,9 @@ public interface DisparitySelect<Array , T extends ImageSingleBand> {
 	public void configure(T imageDisparity, int minDisparity , int maxDisparity, int radiusX);
 
 	/**
-	 * Processes the array of scores.
-	 * The score format is described in {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}.
+	 * Processes the array of scores. The score format is described in
+	 * {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}.  The results are written directly into the
+	 * disparity image passed to it in {@link #configure(ImageSingleBand, int, int, int)}.
 	 *
 	 * @param row Image row the scores are from.
 	 * @param scoresArray Array containing scores. (int[] or float[])

@@ -42,6 +42,9 @@ public class ConfigFiducialImage implements Configuration {
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
 
 	{
+		squareDetector.contour2Poly_splitFraction = 0.05;
+		squareDetector.contour2Poly_minimumSplitFraction = 0.02;
+
 		squareDetector.configRefineLines.cornerOffset = 2;
 	}
 

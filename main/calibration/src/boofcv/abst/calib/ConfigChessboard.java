@@ -64,8 +64,11 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
+
+		square.contour2Poly_splitFraction = 0.25;
+		square.contour2Poly_minimumSplitFraction = 0.01;
+
 		square.minimumEdgeIntensity = 0.1;
-		square.contour2Poly_splitDistanceFraction = 0.05;
 
 		square.minContourImageWidthFraction = 0.05;
 

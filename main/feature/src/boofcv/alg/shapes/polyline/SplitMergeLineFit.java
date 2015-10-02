@@ -34,29 +34,27 @@ import java.util.List;
  * a set of indexes which correspond to points in the original list that compose the line segments.  A minimum
  * of two indexes will be returned.
  *
- * The returned set of line segments is guaranteed to match the original set of points to within a use
+ * The returned set of line segments is guaranteed to match the original set of points to within a user
  * specified tolerance.  That is, no point in the list will be more than 'tol' distance away from a line segment.
- * The split and merge technique works by finding searching for the point which is the greatest distance
- * from the two end points.  If that point is more than 'tol' away the line is split.  This is recursively repeated
- * for each segment until no more are needed.
+ * A line is split when a point between two end points is greater than the split distance.  A corner is removed (two
+ * lines merged) if the corner is less than the split distance away from two of its adjacent neighbors. The split
+ * threshold is specified as a fraction of line distance to maximize scale invariance.  The minimum split threshold
+ * is specified in units of pixels because a simple ratio doesn't work well for small objects.
  *
- * After the initial segmentation the points are split and merged until no more changes happens or the maximum
- * number of iterations has been reached.  Lines are merged if the acute angle between them is less than a tolerance.
- * Then the lines are checked to see if they need to be merged.
- *
- *
+ * Split and merge is repeated until there is no more change or the maximum number of iterations has been reached.
+
  * @author Peter Abeles
  */
 public abstract class SplitMergeLineFit {
 
 	// maximum number of split and merge iterations
-	protected int maxIterations = 100;
+	protected int maxIterations;
 
-	// How far away a point is from the line before it is split.  pixels squared
-	protected double toleranceSplitSq;
+	// How far away a point is from the line before it is split.  In fractions of a line segment's length squared.
+	protected double toleranceFractionSq;
 
-	// Tolerance for how similar two lines angles are before being merged.  in radians
-	protected double toleranceMerge;
+	// The maximum allowed distance a point can be from a line.  Specified in pixels squared.
+	protected double minimumSplitPixelsSq;
 
 	// Reference to the input contour list
 	protected List<Point2D_I32> contour;
@@ -73,18 +71,19 @@ public abstract class SplitMergeLineFit {
 	protected GrowQueue_B changed = new GrowQueue_B();
 
 	/**
+	 * Configures algorithm
 	 *
-	 * @param toleranceSplit A line is split if a point is found that is more than this distance (pixels)
-	 *                       away from the line.
-	 * @param toleranceMerge Two lines are merged together if their angle is less than or equal to this number.
-	 * @param maxIterations  Maximum number of split and merge refinements. Set to zero to disable refinement
+	 * @param splitFraction A line will be split if a point is more than this fraction of its
+	 *                     length away from the line. Try 0.05
+	 * @param minimumSplitPixels A line will always be split if a point is more than this number of pixels away. try 1.0
+	 * @param maxIterations  Maximum number of split and merge refinements. Set to zero to disable refinement. Try 20
 	 */
-	public SplitMergeLineFit(double toleranceSplit,
-							 double toleranceMerge,
+	public SplitMergeLineFit(double splitFraction,
+							 double minimumSplitPixels,
 							 int maxIterations)
 	{
-		setToleranceSplit(toleranceSplit);
-		setToleranceMerge(toleranceMerge);
+		setSplitFraction(splitFraction);
+		setMinimumSplitPixels(minimumSplitPixels);
 		setMaxIterations(maxIterations);
 	}
 
@@ -94,6 +93,13 @@ public abstract class SplitMergeLineFit {
 	 * @param list Ordered list of connected points.
 	 */
 	public abstract void process( List<Point2D_I32> list );
+
+	/**
+	 * Computes the split threshold from the end point of two lines
+	 */
+	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
+		return Math.max(minimumSplitPixelsSq,a.distance2(b)* toleranceFractionSq);
+	}
 
 	/**
 	 * Returns the acute angle in radians between the two lines
@@ -126,11 +132,11 @@ public abstract class SplitMergeLineFit {
 		this.maxIterations = maxIterations;
 	}
 
-	public void setToleranceSplit(double toleranceSplit) {
-		this.toleranceSplitSq = toleranceSplit*toleranceSplit;
+	public void setSplitFraction(double toleranceSplit) {
+		this.toleranceFractionSq = toleranceSplit*toleranceSplit;
 	}
 
-	public void setToleranceMerge(double toleranceMerge) {
-		this.toleranceMerge = toleranceMerge;
+	public void setMinimumSplitPixels(double minimumSplitPixels) {
+		this.minimumSplitPixelsSq = minimumSplitPixels*minimumSplitPixels;
 	}
 }

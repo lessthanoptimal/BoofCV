@@ -24,6 +24,7 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -32,7 +33,6 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 
@@ -70,14 +70,17 @@ public class ShapeFitContourApp
 	List<Contour> contours;
 
 	// parameters for polygon fitting
-	int polyAngleTol = 30;
-	double polyPixelTol = 2;
+	double minimumSplitPixels = 1;
+	double splitFraction = 0.05;
+
+	boolean cornersVisible = false;
 
 	JPanel leftArea;
 	StandardAlgConfigPanel controlPolygon = new StandardAlgConfigPanel();
 
-	JSpinner selectAngle;
-	JSpinner selectPixel;
+	JSpinner selectSplitPixels;
+	JSpinner selectSplitFraction;
+	JCheckBox showCorners;
 
 	int previousActive=-1;
 
@@ -92,17 +95,26 @@ public class ShapeFitContourApp
 
 		leftArea = new JPanel();
 		leftArea.setLayout(new BorderLayout());
-		leftArea.setPreferredSize(new Dimension(150,20));
+		leftArea.setPreferredSize(new Dimension(150, 20));
 
-		selectAngle = new JSpinner(new SpinnerNumberModel(polyAngleTol,5,90,5));
-		selectAngle.addChangeListener(this);
-		selectAngle.setMaximumSize(selectAngle.getPreferredSize());
-		selectPixel = new JSpinner(new SpinnerNumberModel(polyPixelTol,0,10,1));
-		selectPixel.addChangeListener(this);
-		selectPixel.setMaximumSize(selectPixel.getPreferredSize());
+		selectSplitPixels = new JSpinner(new SpinnerNumberModel(minimumSplitPixels,0,50,0.5));
+		selectSplitPixels.addChangeListener(this);
+		selectSplitPixels.setMaximumSize(selectSplitPixels.getPreferredSize());
+		selectSplitFraction = new JSpinner(new SpinnerNumberModel(splitFraction,0,1.0,0.01));
+		selectSplitFraction.setEditor(new JSpinner.NumberEditor(selectSplitFraction, "#,##0.00;(#,##0.00)"));
+//		JComponent editor = selectSplitFraction.getEditor();
+//		JFormattedTextField ftf = ((JSpinner.DefaultEditor) editor).getTextField();
+//		ftf.setColumns(3);
+		showCorners = new JCheckBox();
+		showCorners.setSelected(cornersVisible);
+		showCorners.addChangeListener(this);
 
-		controlPolygon.addLabeled(selectAngle, "Angle", controlPolygon);
-		controlPolygon.addLabeled(selectPixel, "Pixel", controlPolygon);
+		selectSplitFraction.addChangeListener(this);
+		selectSplitFraction.setMaximumSize(selectSplitFraction.getPreferredSize());
+
+		controlPolygon.addLabeled(selectSplitPixels, "Min Pixels", controlPolygon);
+		controlPolygon.addLabeled(selectSplitFraction, "Split", controlPolygon);
+		controlPolygon.addLabeled(showCorners, "Corners", controlPolygon);
 		controlPolygon.addVerticalGlue(controlPolygon);
 
 		gui = new ImagePanel();
@@ -135,19 +147,27 @@ public class ShapeFitContourApp
 		g2.drawImage(inputImage,0,0,null);
 		g2.setStroke(new BasicStroke(3));
 
-		int active = (Integer)cookie;
+		final int active = (Integer)cookie;
 		if( active == 0 ) {
-			double angleTol = UtilAngle.degreeToRadian(polyAngleTol);
+
 			for( Contour c : contours ) {
-				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,polyPixelTol,angleTol,100);
+				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, splitFraction,minimumSplitPixels,100);
 
 				g2.setColor(Color.RED);
-				VisualizeShapes.drawPolygon(vertexes,true,g2);
+				VisualizeShapes.drawPolygon(vertexes, true, g2);
 
-				g2.setColor(Color.BLUE);
-				for( List<Point2D_I32> internal : c.internal ) {
-					vertexes = ShapeFittingOps.fitPolygon(internal,true,polyPixelTol,angleTol,100);
-					VisualizeShapes.drawPolygon(vertexes,true,g2);
+				if( cornersVisible ) {
+					drawCorners(g2, vertexes);
+				}
+
+				for (List<Point2D_I32> internal : c.internal) {
+					g2.setColor(Color.BLUE);
+					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplitPixels, 100);
+					VisualizeShapes.drawPolygon(vertexes, true, g2);
+
+					if( cornersVisible ) {
+						drawCorners(g2, vertexes);
+					}
 				}
 			}
 		} else if( active == 1 ) {
@@ -190,6 +210,14 @@ public class ShapeFitContourApp
 				gui.requestFocusInWindow();
 			}
 		});
+	}
+
+	private void drawCorners(Graphics2D g2, List<PointIndex_I32> vertexes) {
+		for (int i = 0; i < vertexes.size(); i++) {
+			Point2D_I32 p = vertexes.get(i);
+			VisualizeFeatures.drawPoint(g2, p.x, p.y, 3, Color.GREEN, false);
+			VisualizeFeatures.drawPoint(g2, p.x, p.y, 2, Color.BLACK, false);
+		}
 	}
 
 	public void process( final BufferedImage input ) {
@@ -273,10 +301,12 @@ public class ShapeFitContourApp
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectAngle ) {
-			polyAngleTol = (Integer)selectAngle.getValue();
-		} else if( e.getSource() == selectPixel ) {
-			polyPixelTol = (Double)selectPixel.getValue();
+		if( e.getSource() == selectSplitPixels) {
+			minimumSplitPixels = (Double) selectSplitPixels.getValue();
+		} else if( e.getSource() == selectSplitFraction) {
+			splitFraction = (Double) selectSplitFraction.getValue();
+		} else if( e.getSource() == showCorners ) {
+			cornersVisible = showCorners.isSelected();
 		}
 		doRefreshAll();
 	}

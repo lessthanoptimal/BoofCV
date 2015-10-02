@@ -387,7 +387,7 @@ public class TestBaseDetectFiducialSquare {
 		@Override
 		public boolean processSquare(ImageFloat32 square, Result result) {
 
-//			square.printInt();
+			square.printInt();
 
 			int w2 = square.width/2;
 			int h2 = square.height/2;

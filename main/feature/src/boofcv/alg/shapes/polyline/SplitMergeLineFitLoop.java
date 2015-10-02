@@ -40,11 +40,11 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	/**
 	 * @see SplitMergeLineFit#SplitMergeLineFit(double, double, int)
 	 */
-	public SplitMergeLineFitLoop(double toleranceSplit,
-								 double toleranceMerge,
+	public SplitMergeLineFitLoop(double splitFraction,
+								 double minimumSplitPixels,
 								 int maxIterations)
 	{
-		super(toleranceSplit, toleranceMerge, maxIterations);
+		super(splitFraction, minimumSplitPixels, maxIterations);
 	}
 
 
@@ -77,6 +77,9 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		for( int i = 0; i < maxIterations; i++ ) {
 			if( !mergeSegments() )
 				break;
+			if( splits.size() <= 2)
+				return;
+
 			if( !splitSegments() )
 				break;
 		}
@@ -96,8 +99,8 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		Point2D_I32 a = contour.get(indexStart);
 		Point2D_I32 c = contour.get(indexEnd);
 
-		line.p.set(a.x,a.y);
-		line.slope.set(c.x-a.x,c.y-a.y);
+		line.p.set(a.x, a.y);
+		line.slope.set(c.x - a.x, c.y - a.y);
 
 		int splitOffset = selectSplitOffset(indexStart,length);
 
@@ -149,40 +152,27 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		boolean change = false;
 		work.reset();
 
-		Point2D_I32 a = contour.get(splits.data[splits.size - 1]);
-		Point2D_I32 b = contour.get(splits.data[0]);
-		Point2D_I32 c = contour.get(splits.data[1]);
+		Point2D_I32 a = contour.get(splits.data[0]);
+		Point2D_I32 b = contour.get(splits.data[1]);
 
-		double theta = computeAcute(a, b, c);
-		if( theta > toleranceMerge ) {
-			work.add(splits.data[0]);
-			a=b;b=c;
-		} else {
-			b=c;
-			change = true;
-		}
+		for( int i = 0; i < splits.size; i++ ) {
+			Point2D_I32 c = contour.get(splits.data[(i+2)%splits.size]);
 
-		for( int i = 0; i < splits.size-2; i++ ) {
-			c = contour.get(splits.data[i+2]);
+			line.p.set(a.x,a.y);
+			line.slope.set(c.x-a.x,c.y-a.y);
 
-			theta = computeAcute(a, b, c);
+			point2D.set(b.x,b.y);
+			double d = Distance2D_F64.distanceSq(line, point2D);
 
-			if( theta <= toleranceMerge ) {
+			if( d < splitThresholdSq(a,c) ) {
 				// merge the two lines by not adding it
 				change = true;
-				b=c;
 			} else {
-				work.add(splits.data[i+1]);
-				a=b;b=c;
+				work.add(splits.data[(i + 1)%splits.size]);
+				a = b;
 			}
-		}
 
-		c = contour.get(work.data[0]);
-		theta = computeAcute(a, b, c);
-		if( theta > toleranceMerge ) {
-			work.add(splits.data[splits.size-1]);
-		} else {
-			change = true;
+			b = c;
 		}
 
 		// swap the two lists
@@ -194,7 +184,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	}
 
 	/**
-	 * Splits a line in two if there is a paint that is too far away
+	 * Splits a line in two if there is a point that is too far away
 	 * @return true for change
 	 */
 	protected boolean splitSegments() {
@@ -202,10 +192,10 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		work.reset();
 		for( int i = 0; i < splits.size-1; i++ ) {
-			change = checkSplit(change, i,i+1);
+			change |= checkSplit(change, i,i+1);
 		}
 
-		change = checkSplit(change, splits.size-1,0);
+		change |= checkSplit(change, splits.size - 1, 0);
 
 		// swap the two lists
 		GrowQueue_I32 tmp = work;
@@ -218,7 +208,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	private boolean checkSplit(boolean change, int i0 , int i1) {
 		int start = splits.data[i0];
 		int end = splits.data[i1];
-		int length = circularDistance(start,end);
+		int length = circularDistance(start, end);
 
 		Point2D_I32 a = contour.get(start);
 		Point2D_I32 b = contour.get(end);
@@ -240,11 +230,13 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
-	 * (set up prior to calling).  Returns the index if the distance is less than tolerance, otherwise -1
+	 * (set up prior to calling).  Returns the index 0f the distance is less than tolerance, otherwise -1
 	 */
 	protected int selectSplitOffset( int indexStart , int length ) {
 		int bestOffset = -1;
 		double bestDistanceSq = 0;
+
+		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get((indexStart + length) % N));
 
 		// don't try splitting at the two end points
 		for( int i = 1; i < length; i++ ) {

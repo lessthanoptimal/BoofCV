@@ -120,6 +120,7 @@ public class VisualizeShapes {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+			g2.setColor(Color.red);
 			Line2D.Double l = new Line2D.Double();
 
 			for( int i = 0; i < polygon.size()-1; i++ ) {
@@ -133,8 +134,32 @@ public class VisualizeShapes {
 				drawLine(g2, l, p0.x, p0.y, p1.x, p1.y);
 			}
 
+			g2.setColor(Color.cyan);
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p0 = polygon.get(i);
+				VisualizeFeatures.drawCircle(g2,p0.x,p0.y,2);
+			}
+
 		} else {
 			drawPolygon(polygon, loop, g2);
+		}
+	}
+
+	public static void drawPolygonCorners( Polygon2D_F64 polygon, int radius , Graphics2D g2 , boolean interpolate ) {
+		if( interpolate ) {
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p = polygon.get(i);
+				VisualizeFeatures.drawCircle(g2,p.x,p.y,radius);
+			}
+
+		} else {
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p = polygon.get(i);
+				VisualizeFeatures.drawCircle(g2,(int)(p.x+0.5),(int)(p.y+0.5),radius);
+			}
 		}
 	}
 

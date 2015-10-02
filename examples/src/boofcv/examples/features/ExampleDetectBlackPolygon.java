@@ -53,8 +53,8 @@ public class ExampleDetectBlackPolygon {
 
 		ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,7);
 
-		// Tighten the tolerance for what defines a line
-		config.contour2Poly_splitDistanceFraction = 0.02;
+		// need to reduce split fraction to get it to work well with the 7 sided shape
+		config.contour2Poly_splitFraction = 0.1;
 
 		BinaryPolygonConvexDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
 
@@ -83,10 +83,12 @@ public class ExampleDetectBlackPolygon {
 			// visualize results by drawing red polygons
 			FastQueue<Polygon2D_F64> found = detector.getFound();
 			Graphics2D g2 = image.createGraphics();
-			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(3));
 			for (int i = 0; i < found.size; i++) {
-				VisualizeShapes.drawPolygon(found.get(i),true,g2,true);
+				g2.setColor(Color.RED);
+				VisualizeShapes.drawPolygon(found.get(i), true, g2, true);
+				g2.setColor(Color.CYAN);
+				VisualizeShapes.drawPolygonCorners(found.get(i), 2, g2, true);
 			}
 
 			panel.addImage(image,new File(fileName).getName());
