@@ -25,6 +25,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageBase;
@@ -44,9 +45,9 @@ import java.awt.image.BufferedImage;
 public class ExampleBackgroundRemovalStationary {
 	public static void main(String[] args) {
 
-		String fileName = "../data/applet/background/street_intersection.mp4";
-//		String fileName = "../data/applet/background/horse_jitter.mp4"; // degraded performance because of jitter
-//		String fileName = "../data/applet/tracking/chipmunk.mjpeg"; // Camera moves.  Stationary will fail here
+		String fileName = UtilIO.pathExample("background/street_intersection.mp4");
+//		String fileName = UtilIO.pathExample("background/horse_jitter.mp4"); // degraded performance because of jitter
+//		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg"); // Camera moves.  Stationary will fail here
 
 		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(ImageFloat32.class);

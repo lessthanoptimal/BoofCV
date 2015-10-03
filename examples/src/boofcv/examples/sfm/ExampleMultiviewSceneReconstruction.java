@@ -612,9 +612,9 @@ public class ExampleMultiviewSceneReconstruction {
 
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/sfm/chair";
+		String directory = UtilIO.pathExample("sfm/chair");
 
-		IntrinsicParameters intrinsic = UtilIO.loadXML(directory+"/intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
+		IntrinsicParameters intrinsic = UtilIO.loadXML(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 

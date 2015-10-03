@@ -23,8 +23,10 @@ import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -43,7 +45,7 @@ import java.util.List;
 public class ExampleCannyEdge {
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/simple_objects.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 edgeImage = gray.createSameShape();
@@ -68,10 +70,12 @@ public class ExampleCannyEdge {
 		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
 				gray.width,gray.height,null);
 		BufferedImage visualEdgeContour = new BufferedImage(gray.width, gray.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.renderExternal(contours, (int[])null, visualEdgeContour);
+		VisualizeBinaryData.renderExternal(contours, (int[]) null, visualEdgeContour);
 
-		ShowImages.showWindow(visualBinary,"Binary Edges from Canny");
-		ShowImages.showWindow(visualCannyContour,"Canny Trace Graph");
-		ShowImages.showWindow(visualEdgeContour,"Contour from Canny Binary");
+		ListDisplayPanel panel = new ListDisplayPanel();
+		panel.addImage(visualBinary,"Binary Edges from Canny");
+		panel.addImage(visualCannyContour, "Canny Trace Graph");
+		panel.addImage(visualEdgeContour,"Contour from Canny Binary");
+		ShowImages.showWindow(panel,"Canny Edge");
 	}
 }

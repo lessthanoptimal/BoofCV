@@ -59,13 +59,13 @@ import java.awt.image.BufferedImage;
 public class ExampleRectifyCalibratedStereo {
 
 	public static void main( String args[] ) {
-		String dir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
+		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
-		StereoParameters param = UtilIO.loadXML(dir + "stereo.xml");
+		StereoParameters param = UtilIO.loadXML(dir , "stereo.xml");
 
 		// load images
-		BufferedImage origLeft = UtilImageIO.loadImage(dir+"left05.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(dir+"right05.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(dir,"left05.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(dir,"right05.jpg");
 
 		// distorted images
 		MultiSpectral<ImageFloat32> distLeft =

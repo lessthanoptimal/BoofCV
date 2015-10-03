@@ -28,6 +28,7 @@ import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
@@ -78,7 +79,7 @@ public class ExampleVideoMosaic {
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/mosaic/airplane01.mjpeg";
+		String fileName = UtilIO.pathExample("mosaic/airplane01.mjpeg");
 		SimpleImageSequence<MultiSpectral<ImageFloat32>> video =
 				media.openVideo(fileName, ImageType.ms(3, ImageFloat32.class));
 

@@ -69,7 +69,7 @@ public class ClustersIntoGrids {
 			switch( checkNumberOfConnections(graph) ) {
 				case 1:orderIntoLine(graph); break;
 				case 2:orderIntoGrid(graph); break;
-				default: System.out.println("Failed number of connections. size = "+graph.size());
+//				default: System.out.println("Failed number of connections. size = "+graph.size());
 			}
 		}
 	}

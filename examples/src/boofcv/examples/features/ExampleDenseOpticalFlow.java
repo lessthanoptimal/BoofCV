@@ -26,6 +26,7 @@ import boofcv.gui.feature.VisualizeOpticalFlow;
 import boofcv.gui.image.AnimatePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.flow.ImageFlow;
@@ -45,14 +46,14 @@ public class ExampleDenseOpticalFlow {
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-//		String fileName0 = "../data/applet/denseflow/dogdance07.png";
-//		String fileName1 = "../data/applet/denseflow/dogdance08.png";
+//		String fileName0 = UtilIO.pathExample("denseflow/dogdance07.png");
+//		String fileName1 = UtilIO.pathExample("denseflow/dogdance08.png");
 
-		String fileName0 = "../data/applet/denseflow/Urban2_07.png";
-		String fileName1 = "../data/applet/denseflow/Urban2_08.png";
+		String fileName0 = UtilIO.pathExample("denseflow/Urban2_07.png");
+		String fileName1 = UtilIO.pathExample("denseflow/Urban2_08.png");
 
-//		String fileName0 = "../data/applet/denseflow/Grove2_07.png";
-//		String fileName1 = "../data/applet/denseflow/Grove2_09.png";
+//		String fileName0 = UtilIO.pathExample("denseflow/Grove2_07.png");
+//		String fileName1 = UtilIO.pathExample("denseflow/Grove2_09.png");
 
 		DenseOpticalFlow<ImageFloat32> denseFlow =
 //				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);

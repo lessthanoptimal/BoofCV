@@ -26,6 +26,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -47,9 +48,9 @@ import java.io.File;
 public class ExampleDetectBlackPolygon {
 	public static void main(String[] args) {
 		String files[] = new String[]{
-				"../data/applet/polygons01.jpg",
-				"../data/applet/shapes02.png",
-				"../data/applet/fiducial/image/examples/image01.jpg"};
+				"polygons01.jpg",
+				"shapes02.png",
+				"fiducial/image/examples/image01.jpg"};
 
 		ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,7);
 
@@ -64,7 +65,7 @@ public class ExampleDetectBlackPolygon {
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		for( String fileName : files ) {
-			BufferedImage image = UtilImageIO.loadImage(fileName);
+			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
 
 			ImageUInt8 input = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
 			ImageUInt8 binary = new ImageUInt8(input.width,input.height);

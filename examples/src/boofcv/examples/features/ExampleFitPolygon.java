@@ -29,6 +29,7 @@ import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -173,7 +174,7 @@ public class ExampleFitPolygon {
 
 	public static void main( String args[] ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/shapes02.png");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("shapes02.png"));
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 
 		ShowImages.showWindow(image,"Original",true);

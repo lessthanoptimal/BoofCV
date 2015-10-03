@@ -23,6 +23,7 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -40,7 +41,7 @@ import java.awt.image.BufferedImage;
 public class ExampleMorphologicalThinning {
 	public static void main(String[] args) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/standard/fingerprint.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/fingerprint.jpg"));
 
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);

@@ -26,6 +26,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
@@ -110,9 +111,9 @@ public class ExampleRectifyUncalibratedStereo {
 
 		// Load images with lens distortion removed.  If lens distortion has not been
 		// removed then the results will be approximate
-		String dir = "../data/applet/stereo/";
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "mono_wall_01_undist.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "mono_wall_03_undist.jpg");
+		String dir = UtilIO.pathExample("stereo/");
+		BufferedImage imageA = UtilImageIO.loadImage(dir , "mono_wall_01_undist.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir , "mono_wall_03_undist.jpg");
 
 		// Find a set of point feature matches
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA, imageB);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -113,7 +114,7 @@ public class ExampleLineDetection {
 	}
 	
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/simple_objects.jpg");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		detectLines(input,ImageUInt8.class,ImageSInt16.class);
 

@@ -13,28 +13,17 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDir 'visualization/src'
+            srcDir 'src'
         }
         resources {
-            srcDir 'resources/validation'
-        }
-    }
-
-    test {
-        java {
-//            srcDir 'validation/calibration/src'
-            srcDir 'visualization/test'
-            srcDir 'benchmark'
-        }
-        resources {
-            srcDir 'resources/test'
+            srcDir 'resources'
         }
     }
 }
 
 idea {
     module {
-        name = "BoofCV Evaluation"
+        name = "BoofCV Demonstrations"
     }
 }
 

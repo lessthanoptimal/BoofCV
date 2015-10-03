@@ -79,7 +79,7 @@ public class ExampleCalibrateMonocularPoints {
 	 */
 	public static List<List<Point2D_F64>> loadObservations( PlanarCalibrationDetector detector ) {
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 		List<String> imageNames = BoofMiscOps.directoryList(directory, "left");
 
 		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();

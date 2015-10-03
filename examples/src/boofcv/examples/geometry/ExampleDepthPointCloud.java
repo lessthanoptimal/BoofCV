@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,11 +49,9 @@ import java.io.IOException;
 public class ExampleDepthPointCloud {
 
 	public static void main( String args[] ) throws IOException {
-		String baseDir = "../data/applet/kinect/basket/";
-
-		String nameRgb = baseDir+"basket_rgb.png";
-		String nameDepth = baseDir+"basket_depth.png";
-		String nameCalib = baseDir+"visualdepth.xml";
+		String nameRgb = UtilIO.pathExample("kinect/basket/basket_rgb.png");
+		String nameDepth = UtilIO.pathExample("kinect/basket/basket_depth.png");
+		String nameCalib = UtilIO.pathExample("kinect/basket/visualdepth.xml");
 
 		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		String directory = "../data/applet/vo/drc/";
+		String directory = UtilIO.pathExample("vo/drc/");
 
 		// load camera description and the video sequence
 		MonoPlaneParameters calibration = UtilIO.loadXML(media.openFile(directory + "mono_plane.xml"));

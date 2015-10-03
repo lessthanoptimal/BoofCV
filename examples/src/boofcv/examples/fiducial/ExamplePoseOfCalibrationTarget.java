@@ -63,10 +63,10 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Load camera calibration
 		IntrinsicParameters intrinsic =
-				UtilIO.loadXML("../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml");
+				UtilIO.loadXML(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml"));
 
 		// load the video file
-		String fileName = "../data/applet/tracking/chessboard_SonyDSC_01.mjpeg";
+		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");
 		SimpleImageSequence<ImageFloat32> video =
 				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(ImageFloat32.class));
 //				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(ImageFloat32.class));

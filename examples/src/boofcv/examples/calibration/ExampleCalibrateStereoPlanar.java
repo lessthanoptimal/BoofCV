@@ -67,7 +67,7 @@ public class ExampleCalibrateStereoPlanar {
 		// Creates a detector and specifies its physical characteristics
 		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
 		left = BoofMiscOps.directoryList(directory, "left");
 		right = BoofMiscOps.directoryList(directory, "right");
@@ -80,7 +80,7 @@ public class ExampleCalibrateStereoPlanar {
 		// Creates a detector and specifies its physical characteristics
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
 		left = BoofMiscOps.directoryList(directory, "left");
 		right = BoofMiscOps.directoryList(directory, "right");

@@ -43,13 +43,13 @@ import java.awt.image.BufferedImage;
 public class ExampleFiducialBinary {
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/fiducial/binary/";
+		String directory = UtilIO.pathExample("fiducial/binary");
 
 		// load the lens distortion parameters and the input image
-		IntrinsicParameters param = UtilIO.loadXML(directory + "intrinsic.xml");
-		BufferedImage input = UtilImageIO.loadImage(directory + "image0000.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory + "image0001.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory + "image0002.jpg");
+		IntrinsicParameters param = UtilIO.loadXML(directory , "intrinsic.xml");
+		BufferedImage input = UtilImageIO.loadImage(directory , "image0000.jpg");
+//		BufferedImage input = UtilImageIO.loadImage(directory , "image0001.jpg");
+//		BufferedImage input = UtilImageIO.loadImage(directory , "image0002.jpg");
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial

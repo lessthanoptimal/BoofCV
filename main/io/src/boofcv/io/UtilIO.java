@@ -35,6 +35,28 @@ import java.net.URL;
 public class UtilIO {
 
 	/**
+	 * Returns an absolute path to the file that is relative to the example directory
+	 * @param path File path relative to root directory
+	 * @return Absolute path to file
+	 */
+	public static String pathExample( String path ) {
+		File f = new File(getPathToBase(),new File("data/example/",path).getPath());
+		if( f.isDirectory() )
+			return f.getAbsolutePath()+"/";
+		else
+			return f.getAbsolutePath();
+	}
+
+	/**
+	 * Searches for the root BoofCV directory and returns an absolute path from it.
+	 * @param path File path relative to root directory
+	 * @return Absolute path to file
+	 */
+	public static String path( String path ) {
+		return new File(getPathToBase(),path).getAbsolutePath();
+	}
+
+	/**
 	 * Steps back until it finds the base BoofCV directory.
 	 *
 	 * @return Path to the base directory.
@@ -149,6 +171,9 @@ public class UtilIO {
 		return loadXML(url.getPath());
 	}
 
+	public static <T> T loadXML( String directory , String fileName ) {
+		return loadXML(new File(directory,fileName).getPath());
+	}
 	public static <T> T loadXML( String fileName ) {
 		try {
 			return (T)loadXML(new FileReader(fileName));

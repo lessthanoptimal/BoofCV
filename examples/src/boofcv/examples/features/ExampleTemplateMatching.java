@@ -26,6 +26,7 @@ import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
 import boofcv.factory.feature.detect.template.TemplateScoreType;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.Match;
@@ -100,12 +101,12 @@ public class ExampleTemplateMatching {
 	public static void main(String args[]) {
 
 		// Load image and templates
-		String directory = "../data/applet/template/";
+		String directory = UtilIO.pathExample("template");
 
-		ImageFloat32 image = UtilImageIO.loadImage(directory + "desktop.png", ImageFloat32.class);
-		ImageFloat32 templateCursor = UtilImageIO.loadImage(directory + "cursor.png", ImageFloat32.class);
-		ImageFloat32 maskCursor = UtilImageIO.loadImage(directory + "cursor_mask.png", ImageFloat32.class);
-		ImageFloat32 templatePaint = UtilImageIO.loadImage(directory + "paint.png", ImageFloat32.class);
+		ImageFloat32 image = UtilImageIO.loadImage(directory ,"desktop.png", ImageFloat32.class);
+		ImageFloat32 templateCursor = UtilImageIO.loadImage(directory , "cursor.png", ImageFloat32.class);
+		ImageFloat32 maskCursor = UtilImageIO.loadImage(directory , "cursor_mask.png", ImageFloat32.class);
+		ImageFloat32 templatePaint = UtilImageIO.loadImage(directory , "paint.png", ImageFloat32.class);
 
 		// create output image to show results
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);

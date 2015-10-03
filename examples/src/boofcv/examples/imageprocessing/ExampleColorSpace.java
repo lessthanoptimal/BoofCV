@@ -20,6 +20,7 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.color.ColorHsv;
 import boofcv.alg.color.ColorYuv;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -36,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class ExampleColorSpace {
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/sunflowers.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image
 		MultiSpectral<ImageFloat32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, ImageFloat32.class);

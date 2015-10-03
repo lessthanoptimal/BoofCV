@@ -25,6 +25,7 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -44,16 +45,16 @@ import static boofcv.io.image.UtilImageIO.loadImage;
 public class ExampleFiducialImage {
 	public static void main(String[] args) {
 
-		String imagePath   = "../data/applet/fiducial/image/examples/";
-		String patternPath = "../data/applet/fiducial/image/patterns/";
+		String imagePath   = UtilIO.pathExample("fiducial/image/examples/");
+		String patternPath = UtilIO.pathExample("fiducial/image/patterns/");
 
 		String imageName = "image00.jpg";
 //		String imageName = "image01.jpg";
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		IntrinsicParameters param = UtilIO.loadXML(imagePath + "intrinsic.xml");
-		BufferedImage input = loadImage(imagePath + imageName);
+		IntrinsicParameters param = UtilIO.loadXML(imagePath , "intrinsic.xml");
+		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial
@@ -63,18 +64,18 @@ public class ExampleFiducialImage {
 
 		// give it a description of all the targets
 		double width = 4; // 4 cm
-		detector.addPatternImage(loadImage(patternPath + "ke.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "dog.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "yu.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "yu_inverted.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "pentarose.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "text_boofcv.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "leaf01.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "leaf02.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "hand01.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "chicken.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "h2o.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath + "yinyang.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "ke.png",          ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "dog.png",         ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yu.png",          ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yu_inverted.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "pentarose.png",   ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "text_boofcv.png", ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "leaf01.png",      ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "leaf02.png",      ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "hand01.png",      ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "chicken.png",     ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "h2o.png",         ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yinyang.png",     ImageFloat32.class), 100, width);
 
 		detector.setIntrinsic(param);
 

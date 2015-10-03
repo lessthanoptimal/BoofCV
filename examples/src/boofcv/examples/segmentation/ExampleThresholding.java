@@ -23,6 +23,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -79,10 +80,10 @@ public class ExampleThresholding {
 
 	public static void main(String[] args) {
 		// example in which global thresholding works best
-		threshold("../data/applet/particles01.jpg");
+		threshold(UtilIO.pathExample("particles01.jpg"));
 		// example in which adaptive/local thresholding works best
-		threshold("../data/applet/segment/uneven_lighting_squares.jpg");
+		threshold(UtilIO.pathExample("segment/uneven_lighting_squares.jpg"));
 		// hand written text with non-uniform stained background
-		threshold("../data/applet/segment/stained_handwriting.jpg");
+		threshold(UtilIO.pathExample("segment/stained_handwriting.jpg"));
 	}
 }

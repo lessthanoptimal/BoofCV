@@ -27,6 +27,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -46,7 +47,7 @@ import java.awt.image.BufferedImage;
 public class ExampleWatershedWithSeeds {
 	public static void main(String[] args) {
 
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 		ImageUInt8 input = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
 
 		// declare working data

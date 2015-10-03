@@ -251,8 +251,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive();
 		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc,clusterer,nn);
 
-		File trainingDir = new File("../data/applet/learning/scene/train");
-		File testingDir = new File("../data/applet/learning/scene/test");
+		File trainingDir = new File(UtilIO.pathExample("learning/scene/train"));
+		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
 		if( !trainingDir.exists() || !testingDir.exists() ) {
 			System.err.println("Please follow instructions in data/applet/learning/scene and download the");

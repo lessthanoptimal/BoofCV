@@ -65,6 +65,10 @@ public class UtilImageIO {
 		return img;
 	}
 
+	public static BufferedImage loadImage(String directory , String fileName) {
+		return loadImage(new File(directory,fileName).getPath());
+	}
+
 	/**
 	 * Loads all the image in the specified directory which match the provided regex
 	 * @param directory File directory
@@ -119,6 +123,10 @@ public class UtilImageIO {
 			return null;
 
 		return ConvertBufferedImage.convertFromSingle(img, (T) null, imageType);
+	}
+
+	public static <T extends ImageSingleBand> T loadImage( String directory , String fileName, Class<T> imageType ) {
+		return loadImage(new File(directory,fileName).getPath(),imageType);
 	}
 
 	/**

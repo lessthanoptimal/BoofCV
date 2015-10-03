@@ -67,7 +67,7 @@ public class ExampleCalibrateMonocularPlanar {
 		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
 
 		// load image list
-		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
+		String directory = UtilIO.path("data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
 		images = BoofMiscOps.directoryList(directory,"CalibIm");
 	}
 
@@ -79,7 +79,7 @@ public class ExampleCalibrateMonocularPlanar {
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
 
 		// load image list
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 		images = BoofMiscOps.directoryList(directory,"left");
 	}
 

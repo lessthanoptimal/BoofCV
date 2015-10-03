@@ -27,6 +27,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSInt16;
@@ -91,7 +92,7 @@ public class ExampleImageConvert {
 	 * Load and generate images
 	 */
 	public void createImages() {
-		image = UtilImageIO.loadImage("../data/evaluation/standard/barbara.png");
+		image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
 		gray = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
 		derivX = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());

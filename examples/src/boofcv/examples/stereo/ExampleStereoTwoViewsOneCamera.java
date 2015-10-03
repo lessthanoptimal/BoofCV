@@ -72,15 +72,15 @@ public class ExampleStereoTwoViewsOneCamera {
 
 	public static void main(String args[]) {
 		// specify location of images and calibration
-		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
-		String imageDir = "../data/applet/stereo/";
+		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
+		String imageDir = UtilIO.pathExample("stereo/");
 
 		// Camera parameters
-		IntrinsicParameters intrinsic = UtilIO.loadXML(calibDir + "intrinsic.xml");
+		IntrinsicParameters intrinsic = UtilIO.loadXML(calibDir , "intrinsic.xml");
 
 		// Input images from the camera moving left to right
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "mono_wall_01.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir+"mono_wall_02.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir, "mono_wall_02.jpg");
 
 		// Input images with lens distortion
 		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);

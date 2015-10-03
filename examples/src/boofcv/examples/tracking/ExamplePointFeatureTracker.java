@@ -29,6 +29,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
@@ -156,15 +157,15 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 
 		int pause;
 		SimpleImageSequence sequence =
-				media.openVideo("../data/applet/zoom.mjpeg", ImageType.single(imageType)); pause=100;
+				media.openVideo(UtilIO.pathExample("zoom.mjpeg"), ImageType.single(imageType)); pause=100;
 //				media.openCamera(null,640,480,ImageType.single(imageType)); pause = 5;
 		sequence.setLoop(true);
 
 		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType,pause);
 
 		// Comment or un-comment to change the type of tracker being used
-//		app.createKLT();
-		app.createSURF();
+		app.createKLT();
+//		app.createSURF();
 
 		app.process(sequence);
 	}
