@@ -15,6 +15,10 @@ Version : Alpha 0.20
 - ExamplePointFeatureTracker has colorized points to make it easier to identify the same point
 - Polygon Detector
   * Simplified code by removing requirement the CW/CCW must be known by helper classes
+- Merged data/applet and data/evaluation together
+  * Renamed to data/examples
+- Renamed package boofcv/evaluations to boofcv/demonstrations
+  * It no longer served as a place for benchmarks
 
 TODO Polygon shape.  Get it working well on 3,4,5,6 sided shapes
 TODO Easy to use calibration app
