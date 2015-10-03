@@ -76,7 +76,7 @@ public class ConfigSquareGrid implements Configuration {
 		square.configRefineCorners.maxIterations = 5;
 
 		// putting reasonable defaults for if the user decides to optimize by line
-		square.configRefineLines.cornerOffset = 1;
+		square.configRefineCorners.cornerOffset = 1;
 		square.configRefineCorners.lineSamples = 10;
 		square.configRefineCorners.convergeTolPixels = 0.2;
 		square.configRefineCorners.maxIterations = 5;
