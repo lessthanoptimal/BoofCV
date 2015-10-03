@@ -18,11 +18,6 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.GImageSingleBandDistorted;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -35,25 +30,24 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdge<T> {
+public class PolygonEdgeScore<T extends ImageSingleBand>  {
 
 	// distance away from corner that sampling will start and end
-	double cornerOffset;
+	private double cornerOffset;
 	// distnace away from line in tangent direction it will sample
-	double tangentDistance;
-
-	// how many points along the line it will sample
-	int numSamples;
+	private double tangentDistance;
 
 	// the minimum acceptable score/average pixel difference
-	double thresholdScore;
+	private double thresholdScore;
 
 	// storage for points offset from corner
-	Point2D_F64 offsetA = new Point2D_F64();
-	Point2D_F64 offsetB = new Point2D_F64();
+	private Point2D_F64 offsetA = new Point2D_F64();
+	private Point2D_F64 offsetB = new Point2D_F64();
 
 	// the compute score
-	double averageEdgeIntensity;
+	private double averageEdgeIntensity;
+
+	ScoreLineSegmentEdge<T> scorer;
 
 	/**
 	 * Constructor which configures scoring.
@@ -69,11 +63,11 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 							 int numSamples,
 							 double thresholdScore,
 							 Class<T> imageType ) {
-		super(imageType);
 		this.cornerOffset = cornerOffset;
 		this.tangentDistance = tangentDistance;
-		this.numSamples = numSamples;
 		this.thresholdScore = thresholdScore;
+
+		scorer = new ScoreLineSegmentEdge<T>(numSamples,imageType);
 	}
 
 	/**
@@ -85,16 +79,14 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
+		scorer.setTransform(undistToDist);
 	}
 
 	/**
 	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
 	 */
 	public void setImage(T image) {
-		integralImage.wrap(image);
-		integral.setImage(integralImage);
+		scorer.setImage(image);
 	}
 
 	/**
@@ -114,7 +106,6 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 			Point2D_F64 a = polygon.get(i);
 			Point2D_F64 b = polygon.get(j);
 
-
 			double dx = b.x-a.x;
 			double dy = b.y-a.y;
 			double t = Math.sqrt(dx*dx + dy*dy);
@@ -131,41 +122,15 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 			offsetB.x = b.x - cornerOffset*dx;
 			offsetB.y = b.y - cornerOffset*dy;
 
-			total += scoreLine(offsetA,offsetB,-dy,dx);
+			total += scorer.computeAverageEdgeIntensity(offsetA, offsetB, -dy, dx);
 		}
 
-		averageEdgeIntensity = Math.abs(total) / (polygon.size()*numSamples*2*tangentDistance);
+		averageEdgeIntensity = Math.abs(total) / (polygon.size()*tangentDistance);
 
 		return averageEdgeIntensity >= thresholdScore;
 	}
 
-	protected double scoreLine( Point2D_F64 a , Point2D_F64 b , double tanX , double tanY ) {
-		double total = 0;
 
-		for (int i = 0; i < numSamples; i++) {
-			double x = (b.x-a.x)*i/(numSamples-1) + a.x;
-			double y = (b.y-a.y)*i/(numSamples-1) + a.y;
-
-			double x0 = x+tanX;
-			double y0 = y+tanY;
-			if(!BoofMiscOps.checkInside(integralImage.getWidth(),integralImage.getHeight(),x0,y0))
-				continue;
-
-			double x1 = x-tanX;
-			double y1 = y-tanY;
-			if(!BoofMiscOps.checkInside(integralImage.getWidth(),integralImage.getHeight(),x1,y1))
-				continue;
-
-			double up = integral.compute(x,y,x0,y0);
-			double down = integral.compute(x,y,x1,y1);
-
-			// don't take the abs here and require that a high score involves it being entirely black or white around
-			// the edge.  Otherwise a random image would score high
-			total += up-down;
-		}
-
-		return total;
-	}
 
 	public double getCornerOffset() {
 		return cornerOffset;
@@ -181,14 +146,6 @@ public class PolygonEdgeScore<T extends ImageSingleBand> extends BaseIntegralEdg
 
 	public void setTangentDistance(double tangentDistance) {
 		this.tangentDistance = tangentDistance;
-	}
-
-	public int getNumSamples() {
-		return numSamples;
-	}
-
-	public void setNumSamples(int numSamples) {
-		this.numSamples = numSamples;
 	}
 
 	public double getThresholdScore() {
