@@ -424,11 +424,11 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 
 		VisualizeStereoDisparity app = new VisualizeStereoDisparity();
 
-//		app.setBaseDirectory("../data/applet/");
-//		app.loadInputData("../data/applet/disparity.txt");
+//		app.setBaseDirectory(UtilIO.pathExample(""));
+//		app.loadInputData(UtilIO.pathExample("disparity.txt"));
 
-		String dirCalib = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
-		String dirImgs = "../data/applet/stereo/";
+		String dirCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
+		String dirImgs = UtilIO.pathExample("stereo/");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Chair 1",  dirCalib+"stereo.xml",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));

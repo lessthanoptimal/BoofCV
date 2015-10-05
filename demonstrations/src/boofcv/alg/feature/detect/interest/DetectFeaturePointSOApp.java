@@ -29,6 +29,7 @@ import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
@@ -171,10 +172,10 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("amoeba","../data/evaluation/amoeba_shapes.jpg"));
-		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 
 		app.setInputList(inputs);
 

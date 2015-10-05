@@ -28,6 +28,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -82,8 +83,8 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 		VisualizeHoughPolar<ImageFloat32,ImageFloat32> app =
 				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		app.process(UtilImageIO.loadImage("../data/evaluation/simple_objects.jpg"));
-//		app.process(UtilImageIO.loadImage("../data/evaluation/lines_indoors.jpg"));
-//		app.process(UtilImageIO.loadImage("../data/evaluation/outdoors01.jpg"));
+		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
+//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg"));
+//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("outdoors01.jpg"));
 	}
 }

@@ -245,8 +245,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
+//		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
 		List<String> leftImages = BoofMiscOps.directoryList(directory, "left");
 		List<String> rightImages = BoofMiscOps.directoryList(directory, "right");

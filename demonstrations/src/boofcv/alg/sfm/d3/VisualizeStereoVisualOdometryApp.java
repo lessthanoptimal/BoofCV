@@ -55,6 +55,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.feature.TupleDesc_B;
@@ -425,9 +426,9 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 //		app.setMediaManager(new XugglerMediaManager());
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Inside", "../data/applet/vo/library/config.txt"));
-		inputs.add(new PathLabel("Outside", "../data/applet/vo/backyard/config.txt"));
-		inputs.add(new PathLabel("Urban", "../data/applet/vo/rockville/config.txt"));
+		inputs.add(new PathLabel("Inside", UtilIO.pathExample("vo/library/config.txt")));
+		inputs.add(new PathLabel("Outside", UtilIO.pathExample("vo/backyard/config.txt")));
+		inputs.add(new PathLabel("Urban", UtilIO.pathExample("vo/rockville/config.txt")));
 
 		app.setInputList(inputs);
 

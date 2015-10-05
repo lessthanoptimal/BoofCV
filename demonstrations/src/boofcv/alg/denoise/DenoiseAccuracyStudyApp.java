@@ -32,6 +32,7 @@ import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletHaar;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -194,14 +195,14 @@ public class DenoiseAccuracyStudyApp {
 	public static void main( String args[] ) {
 		DenoiseAccuracyStudyApp app = new DenoiseAccuracyStudyApp();
 
-		String path = "../data/evaluation/standard/";
+		String path = UtilIO.pathExample("standard/");
 
 		List<String> fileNames = new ArrayList<String>();
-		fileNames.add(path+"barbara.png");
-		fileNames.add(path+"lena512.bmp");
-		fileNames.add(path+"peppers256.png");
-		fileNames.add(path+"boat.png");
-		fileNames.add(path+"house.png");
+		fileNames.add(path+"barbara.jpg");
+		fileNames.add(path+"lena512.jpg");
+		fileNames.add(path+"peppers256.jpg");
+		fileNames.add(path+"boat.jpg");
+		fileNames.add(path+"house.jpg");
 
 		app.process(createStandard(2,4),fileNames);
 	}

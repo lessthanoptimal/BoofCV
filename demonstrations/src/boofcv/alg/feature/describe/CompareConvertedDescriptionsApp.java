@@ -31,6 +31,7 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
@@ -113,8 +114,8 @@ public class CompareConvertedDescriptionsApp {
 	}
 
 	public static void main( String args[] ) {
-		String file1 = "../data/evaluation/stitch/kayak_01.jpg";
-		String file2 = "../data/evaluation/stitch/kayak_02.jpg";
+		String file1 = UtilIO.pathExample("stitch/kayak_01.jpg");
+		String file2 = UtilIO.pathExample("stitch/kayak_02.jpg");
 
 		InterestPointDetector<ImageFloat32> detector =
 				FactoryInterestPoint.fastHessian(new ConfigFastHessian(1,10,-1,2,9,4,4));

@@ -26,6 +26,7 @@ import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
@@ -240,16 +241,16 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 
-//		app.setBaseDirectory("../data/applet/segment/");
-//		app.loadInputData("../data/applet/segment/segment.txt");
+//		app.setBaseDirectory(UtilIO.pathExample("segment/");
+//		app.loadInputData(UtilIO.pathExample("segment/segment.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Horses", "../data/applet/segment/berkeley_horses.jpg"));
-		inputs.add(new PathLabel("Kangaroo", "../data/applet/segment/berkeley_kangaroo.jpg"));
-		inputs.add(new PathLabel("Man", "../data/applet/segment/berkeley_man.jpg"));
-		inputs.add(new PathLabel("Pines People", "../data/applet/segment/mountain_pines_people.jpg"));
-		inputs.add(new PathLabel("Sunflowers", "../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("Shapes", "../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
+		inputs.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
+		inputs.add(new PathLabel("Man", UtilIO.pathExample("segment/berkeley_man.jpg")));
+		inputs.add(new PathLabel("Pines People", UtilIO.pathExample("segment/mountain_pines_people.jpg")));
+		inputs.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("Shapes", UtilIO.pathExample("shapes01.png")));
 
 		app.setInputList(inputs);
 

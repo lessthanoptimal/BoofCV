@@ -147,8 +147,8 @@ public class VisualizeSquareFiducial {
 
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/fiducial/binary";
-//		String directory = "../data/applet/fiducial/image";
+		String directory = UtilIO.pathExample("fiducial/binary");
+//		String directory = UtilIO.pathExample("fiducial/image");
 
 		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 

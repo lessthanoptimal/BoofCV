@@ -33,6 +33,7 @@ import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
@@ -441,8 +442,8 @@ public class DetectCalibrationChessApp
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp();
 
-//		String prefix = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
-		String prefix = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
+//		String prefix = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
+		String prefix = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
 		app.loadConfigurationFile(prefix + "info.txt");
 //		app.configure(5,7, true);

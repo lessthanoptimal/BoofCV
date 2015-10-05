@@ -28,6 +28,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TldVisualizationPanel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageSingleBand;
@@ -69,7 +70,7 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 
 		image = sequence.next();
 		gui.setFrame((BufferedImage) sequence.getGuiImage());
-		ShowImages.showWindow(gui,"TLD Tracker");
+		ShowImages.showWindow(gui,"TLD Tracker",true);
 
 //		tracker.initialize(image,274,159,356,292);
 //		gui.turnOffSelect();
@@ -128,7 +129,7 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 	public static void main( String args[] ) {
 		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(ImageUInt8.class);
 
-		String fileName = "../data/applet/tracking/track_book.mjpeg";
+		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
 		SimpleImageSequence<ImageUInt8> sequence =
 				DefaultMediaManager.INSTANCE.openVideo(fileName,ImageType.single(ImageUInt8.class));

@@ -24,6 +24,7 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -102,9 +103,9 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(ImageFloat32.class, ImageFloat32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
-		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
-		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));
+		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
+		inputs.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
+		inputs.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
 
 		app.setInputList(inputs);
 

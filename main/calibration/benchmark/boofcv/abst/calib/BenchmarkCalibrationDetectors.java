@@ -19,6 +19,7 @@
 package boofcv.abst.calib;
 
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -73,8 +74,8 @@ public class BenchmarkCalibrationDetectors {
 	}
 
 	public static void main(String[] args) {
-		String chess = "../data/evaluation/calibration/stereo/Bumblebee2_Chess/left01.jpg";
-		String square = "../data/evaluation/calibration/stereo/Bumblebee2_Square/left01.jpg";
+		String chess = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left01.jpg");
+		String square = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left01.jpg");
 
 		imageChess = loadImage(chess);
 		imageSquare = loadImage(square);

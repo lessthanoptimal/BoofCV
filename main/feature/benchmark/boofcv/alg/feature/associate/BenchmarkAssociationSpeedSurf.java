@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
@@ -41,8 +42,8 @@ import java.io.IOException;
  */
 public class BenchmarkAssociationSpeedSurf {
 
-	static final String image1 = "../data/applet/apartment_building_01.jpg";
-	static final String image2 = "../data/applet/apartment_building_02.jpg";
+	static final String image1 = UtilIO.pathExample("apartment_building_01.jpg");
+	static final String image2 = UtilIO.pathExample("apartment_building_02.jpg");
 
 
 	static final long TEST_TIME = 1000;

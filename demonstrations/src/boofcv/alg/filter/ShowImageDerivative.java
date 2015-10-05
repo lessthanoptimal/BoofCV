@@ -27,6 +27,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -166,10 +167,10 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 //				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
-		inputs.add(new PathLabel("xray","../data/applet/xray01.jpg"));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("xray",UtilIO.pathExample("xray01.jpg")));
 
 		app.setInputList(inputs);
 

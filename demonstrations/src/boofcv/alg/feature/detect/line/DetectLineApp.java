@@ -32,6 +32,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -170,8 +171,8 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 		DetectLineApp app = new DetectLineApp(imageType,derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Objects","../data/evaluation/simple_objects.jpg"));
-		inputs.add(new PathLabel("Indoors","../data/evaluation/lines_indoors.jpg"));
+		inputs.add(new PathLabel("Objects", UtilIO.pathExample("simple_objects.jpg")));
+		inputs.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up

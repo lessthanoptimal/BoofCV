@@ -231,13 +231,13 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		FiducialTrackerApp app = new FiducialTrackerApp(type);
 
-		app.setBaseDirectory("../data/applet/fiducial/");
-		app.loadInputData("../data/applet/fiducial/fiducial.txt");
+		app.setBaseDirectory(UtilIO.pathExample("fiducial/"));
+		app.loadInputData(UtilIO.pathExample("fiducial/fiducial.txt"));
 
 //		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-//		inputs.add(new PathLabel(SQUARE_NUMBER, "../data/applet/fiducial/binary/movie.mjpeg"));
-//		inputs.add(new PathLabel(SQUARE_PICTURE, "../data/applet/fiducial/image/video/movie.mjpeg"));
-//		inputs.add(new PathLabel(CALIB_CHESS, "../data/applet/fiducial/calibration/movie.mjpeg"));
+//		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg"));
+//		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg"));
+//		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/calibration/movie.mjpeg"));
 
 //		app.setInputList(inputs);
 

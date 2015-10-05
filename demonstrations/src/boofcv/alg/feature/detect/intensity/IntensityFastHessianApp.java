@@ -23,6 +23,7 @@ import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -36,7 +37,7 @@ import java.awt.image.BufferedImage;
  */
 public class IntensityFastHessianApp {
 //	static String fileName = "data/outdoors01.jpg";
-	static String fileName = "../data/applet/sunflowers.jpg";
+	static String fileName = UtilIO.pathExample("sunflowers.jpg");
 //	static String fileName = "data/particles01.jpg";
 //	static String fileName = "data/scale/beach02.jpg";
 //	static String fileName = "data/scale/mountain_7p1mm.jpg";

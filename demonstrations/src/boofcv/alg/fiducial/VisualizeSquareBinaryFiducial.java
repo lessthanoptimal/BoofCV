@@ -115,7 +115,7 @@ public class VisualizeSquareBinaryFiducial {
 
 	public static void main(String[] args) {
 
-		String directory = "../data/applet/fiducial/binary/";
+		String directory = UtilIO.pathExample("fiducial/binary/");
 
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 

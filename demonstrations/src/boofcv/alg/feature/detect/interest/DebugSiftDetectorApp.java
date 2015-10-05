@@ -24,6 +24,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
@@ -37,8 +38,8 @@ import java.awt.image.BufferedImage;
 public class DebugSiftDetectorApp {
 
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
-//		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/shapes01.png");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
+//		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("shapes01.png");
 
 		ImageFloat32 gray = ConvertBufferedImage.convertFromSingle(input, null, ImageFloat32.class);
 

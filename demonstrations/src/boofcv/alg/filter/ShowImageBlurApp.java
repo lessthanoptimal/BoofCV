@@ -24,6 +24,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -231,9 +232,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		ShowImageBlurApp<ImageUInt8> app = new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
 
 		app.setInputList(inputs);
 

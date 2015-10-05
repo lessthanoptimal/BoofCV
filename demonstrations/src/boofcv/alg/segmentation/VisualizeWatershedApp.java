@@ -22,6 +22,7 @@ import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -36,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class VisualizeWatershedApp {
 
 	public static void main(String[] args) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_horses.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
 		ImageUInt8 gray = new ImageUInt8(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, gray);

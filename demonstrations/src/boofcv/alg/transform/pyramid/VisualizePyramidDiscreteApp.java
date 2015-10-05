@@ -24,6 +24,7 @@ import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -98,9 +99,9 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 		VisualizePyramidDiscreteApp<ImageFloat32> app = new VisualizePyramidDiscreteApp<ImageFloat32>(ImageFloat32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("lena","../data/evaluation/standard/lena512.bmp"));
-		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
-		inputs.add(new PathLabel("fingerprint","../data/evaluation/standard/fingerprint.png"));
+		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
+		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
 
 		app.setInputList(inputs);
 

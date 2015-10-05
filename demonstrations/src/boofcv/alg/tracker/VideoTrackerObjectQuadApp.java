@@ -26,6 +26,7 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -297,18 +298,18 @@ public class VideoTrackerObjectQuadApp<I extends ImageSingleBand>
 
 		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);
 
-//		app.setBaseDirectory("../data/applet/");
-//		app.loadInputData("../data/applet/tracking/file_list.txt");
+//		app.setBaseDirectory(UtilIO.pathExample("");
+//		app.loadInputData(UtilIO.pathExample("tracking/file_list.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("WildCat", "../data/applet/tracking/wildcat_robot.mjpeg"));
-		inputs.add(new PathLabel("Tree", "../data/applet/tracking/tree.mjpeg"));
-		inputs.add(new PathLabel("Book", "../data/applet/tracking/track_book.mjpeg"));
-		inputs.add(new PathLabel("Face", "../data/applet/tracking/track_peter.mjpeg"));
-		inputs.add(new PathLabel("Chipmunk", "../data/applet/tracking/chipmunk.mjpeg"));
-		inputs.add(new PathLabel("Balls", "../data/applet/tracking/balls_blue_red.mjpeg"));
-		inputs.add(new PathLabel("Driving Snow", "../data/applet/tracking/snow_follow_car.mjpeg"));
-		inputs.add(new PathLabel("Driving Night", "../data/applet/tracking/night_follow_car.mjpeg"));
+		inputs.add(new PathLabel("WildCat", UtilIO.pathExample("tracking/wildcat_robot.mjpeg")));
+		inputs.add(new PathLabel("Tree", UtilIO.pathExample("tracking/tree.mjpeg")));
+		inputs.add(new PathLabel("Book", UtilIO.pathExample("tracking/track_book.mjpeg")));
+		inputs.add(new PathLabel("Face", UtilIO.pathExample("tracking/track_peter.mjpeg")));
+		inputs.add(new PathLabel("Chipmunk", UtilIO.pathExample("tracking/chipmunk.mjpeg")));
+		inputs.add(new PathLabel("Balls", UtilIO.pathExample("tracking/balls_blue_red.mjpeg")));
+		inputs.add(new PathLabel("Driving Snow", UtilIO.pathExample("tracking/snow_follow_car.mjpeg")));
+		inputs.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
 
 		app.setInputList(inputs);
 

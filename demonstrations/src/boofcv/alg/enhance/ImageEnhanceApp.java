@@ -23,6 +23,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageUInt8;
 
@@ -162,8 +163,8 @@ public class ImageEnhanceApp
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("dark","../data/applet/enhance/dark.jpg"));
-		inputs.add(new PathLabel("dull","../data/applet/enhance/dull.jpg"));
+		inputs.add(new PathLabel("dark", UtilIO.pathExample("enhance/dark.jpg")));
+		inputs.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));
 
 		app.setInputList(inputs);
 

@@ -23,6 +23,7 @@ import boofcv.gui.SelectInputPanel;
 import boofcv.gui.image.ImagePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -96,9 +97,9 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageSingleBand>
 		VisualizeScaleSpacePyramidApp<ImageUInt8> app = new VisualizeScaleSpacePyramidApp<ImageUInt8>(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);
 

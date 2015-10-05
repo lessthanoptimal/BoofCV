@@ -24,6 +24,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
@@ -216,6 +217,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
 		if (image != null) {
 			process(image);
+		} else {
+			System.err.println("Can't open "+inputRefs.get(index).getPath());
+			System.exit(1);
 		}
 	}
 
@@ -265,9 +269,9 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);
 

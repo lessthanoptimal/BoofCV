@@ -2,13 +2,11 @@ Alpha 0.20
 
 - all-integration module
 
-- Data Directory
-  * merge evaluation into applet and delete evaluation and remove applet directory
-  * rename evaluation to demonstrations?
-
 - BinaryPolygonConvexDetector
   * See if it will work with concave shapes too
   * Filter out
+  * Flag to return shapes which touch the image border
+    - Only optimize sides/corners which don't touch the border
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
@@ -17,10 +15,6 @@ Alpha 0.20
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
-
-- Fiducial Calibration
-  * Add fiducial style regression tests
-
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
   * Or some how estimate both at same time.  using center seems to introduce translation error
@@ -32,7 +26,6 @@ Alpha 0.20
 - Look at Sandreas's NewWarp?
 
 - Background Model
-  * Gaussian Mixture Model for individual pixels
   * Shadow removal
   * remove support for MultiSpectral once Interleaved is supported enough
 

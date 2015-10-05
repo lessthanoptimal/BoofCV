@@ -27,6 +27,7 @@ import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
@@ -182,9 +183,9 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Cave","../data/evaluation/stitch/cave_01.jpg"));
-		inputs.add(new PathLabel("Kayak","../data/evaluation/stitch/kayak_02.jpg"));
-		inputs.add(new PathLabel("Forest","../data/evaluation/scale/rainforest_01.jpg"));
+		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
+		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));
+		inputs.add(new PathLabel("Forest",UtilIO.pathExample("scale/rainforest_01.jpg")));
 
 		app.setPreferredSize(new Dimension(500,500));
 		app.setSize(500,500);

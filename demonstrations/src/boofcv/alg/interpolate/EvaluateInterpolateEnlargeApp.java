@@ -24,6 +24,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -141,12 +142,12 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 		app.setPreferredSize(new Dimension(500,500));
 
-		app.setBaseDirectory("../data/applet/");
-		app.loadInputData("../data/applet/interpolation.txt");
+		app.setBaseDirectory(UtilIO.pathExample(""));
+		app.loadInputData(UtilIO.pathExample("interpolation.txt"));
 
 //		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-//		inputs.add(new PathLabel("eye 1","../data/evaluation/eye01.jpg"));
-//		inputs.add(new PathLabel("eye 2","../data/evaluation/eye02.jpg"));
+//		inputs.add(new PathLabel("eye 1",UtilIO.pathExample("eye01.jpg"));
+//		inputs.add(new PathLabel("eye 2",UtilIO.pathExample("eye02.jpg"));
 //
 //		app.setInputList(inputs);
 

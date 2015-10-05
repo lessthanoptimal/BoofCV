@@ -24,6 +24,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
@@ -39,15 +40,15 @@ import java.awt.image.BufferedImage;
  */
 public class DetectFastHessianApp {
 
-//	static String fileName = "../data/evaluation/outdoors01.jpg";
-//	static String fileName = "../data/evaluation/sunflowers.png";
-//	static String fileName = "../data/evaluation/particles01.jpg";
-//	static String fileName = "../data/evaluation/scale/beach02.jpg";
-//	static String fileName = "../data/evaluation/indoors01.jpg";
-	static String fileName = "../data/evaluation/shapes01.png";
-//	static String fileName = "../data/evaluation/scale/mountain_4p2mm.jpg";
-//	static String fileName = "../data/evaluation/scale/mountain_7p1mm.jpg";
-//	static String fileName = "../data/evaluation/scale/mountain_19p9mm.jpg";
+//	static String fileName = UtilIO.pathExample("outdoors01.jpg";
+//	static String fileName = UtilIO.pathExample("sunflowers.jpg";
+//	static String fileName = UtilIO.pathExample("particles01.jpg";
+//	static String fileName = UtilIO.pathExample("scale/beach02.jpg";
+//	static String fileName = UtilIO.pathExample("indoors01.jpg";
+	static String fileName = UtilIO.pathExample("shapes01.png");
+//	static String fileName = UtilIO.pathExample("scale/mountain_4p2mm.jpg";
+//	static String fileName = UtilIO.pathExample("scale/mountain_7p1mm.jpg";
+//	static String fileName = UtilIO.pathExample("scale/mountain_19p9mm.jpg";
 
 	static int NUM_FEATURES = 120;
 

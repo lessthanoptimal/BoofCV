@@ -25,6 +25,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
@@ -61,7 +62,7 @@ public class ShowColorModelApp
 		addAlgorithm(0,"HSV",1);
 		addAlgorithm(0,"YUV",2);
 		addAlgorithm(0,"XYZ",3);
-		addAlgorithm(0,"LAB",4);
+		addAlgorithm(0, "LAB", 4);
 
 		input = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
 		output = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
@@ -224,6 +225,9 @@ public class ShowColorModelApp
 
 		if (image != null) {
 			process(image);
+		} else {
+			System.err.println("Can't open "+inputRefs.get(index).getPath());
+			System.exit(1);
 		}
 	}
 
@@ -232,9 +236,9 @@ public class ShowColorModelApp
 		ShowColorModelApp app = new ShowColorModelApp();
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("sunflowers","../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach","../data/evaluation/scale/beach02.jpg"));
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
 
 		app.setInputList(inputs);
 

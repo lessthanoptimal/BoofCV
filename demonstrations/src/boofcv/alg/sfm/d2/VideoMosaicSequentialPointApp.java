@@ -24,6 +24,7 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.InvertibleTransform;
@@ -137,9 +138,9 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Plane 1", "../data/applet/mosaic/airplane01.mjpeg"));
-		inputs.add(new PathLabel("Plane 2", "../data/applet/mosaic/airplane02.mjpeg"));
-		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
+		inputs.add(new PathLabel("Plane 1", UtilIO.pathExample("mosaic/airplane01.mjpeg")));
+		inputs.add(new PathLabel("Plane 2", UtilIO.pathExample("mosaic/airplane02.mjpeg")));
+		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
 
 		app.setInputList(inputs);
 

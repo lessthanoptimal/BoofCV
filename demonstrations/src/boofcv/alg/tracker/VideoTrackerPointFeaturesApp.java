@@ -29,6 +29,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -182,9 +183,9 @@ public class VideoTrackerPointFeaturesApp<I extends ImageSingleBand, D extends I
 		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Shake", "../data/applet/shake.mjpeg"));
-		inputs.add(new PathLabel("Zoom", "../data/applet/zoom.mjpeg"));
-		inputs.add(new PathLabel("Rotate", "../data/applet/rotate.mjpeg"));
+		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
+		inputs.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
+		inputs.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
 
 		app.setInputList(inputs);
 

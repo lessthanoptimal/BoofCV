@@ -36,6 +36,7 @@ import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -320,10 +321,10 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(ImageFloat32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("lena","../data/evaluation/standard/lena512.bmp"));
-		inputs.add(new PathLabel("barbara","../data/evaluation/standard/barbara.png"));
-		inputs.add(new PathLabel("boat","../data/evaluation/standard/boat.png"));
-		inputs.add(new PathLabel("fingerprint","../data/evaluation/standard/fingerprint.png"));
+		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
+		inputs.add(new PathLabel("barbara",UtilIO.pathExample("standard/barbara.jpg")));
+		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
 
 		app.setInputList(inputs);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io.wrapper.xuggler;
 
 import boofcv.gui.image.PlaybackImageSequence;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
@@ -33,7 +34,7 @@ public class PlaybackXugglerVideo {
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "../data/applet/vo/backyard/left.mjpeg";
+			fileName = UtilIO.pathExample("vo/backyard/left.mjpeg");
 		} else {
 			fileName = args[0];
 		}

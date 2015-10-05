@@ -26,6 +26,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.edge.VisualizeEdgeFeatures;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -41,12 +42,12 @@ import java.awt.image.BufferedImage;
 // todo abstract image type.  Put in integer images
 public class VisualizeCannySteps {
 
-	//	static String fileName = "data/evaluation/outdoors01.jpg";
-//	static String fileName = "data/evaluation/sunflowers.png";
-//	static String fileName = "data/evaluation/particles01.jpg";
-	static String fileName = "../data/evaluation/scale/beach02.jpg";
-//	static String fileName = "data/evaluation/indoors01.jpg";
-//	static String fileName = "../data/applet/shapes01.png";
+	//	static String fileName = UtilIO.pathExample("outdoors01.jpg");
+//	static String fileName = UtilIO.pathExample("sunflowers.jpg");
+//	static String fileName = UtilIO.pathExample("particles01.jpg");
+	static String fileName = UtilIO.pathExample("scale/beach02.jpg");
+//	static String fileName = UtilIO.pathExample("indoors01.jpg");
+//	static String fileName = UtilIO.pathExample("shapes01.png)";
 
 	public static void main( String args[] ){
 

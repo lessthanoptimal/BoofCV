@@ -202,11 +202,11 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
 				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
 
-//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Square";
-//		String directory = "../data/evaluation/calibration/mono/Sony_DSC-HX5V_Chess";
-//		String directory = "../data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
+//		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square");
+//		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");
+//		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
+//		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
 //		app.configure(detector,BoofMiscOps.directoryList(directory, "frame" ),2,false);

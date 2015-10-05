@@ -47,6 +47,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
@@ -405,8 +406,8 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(type);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Circle", "../data/applet/kinect/circle/config.txt"));
-		inputs.add(new PathLabel("Hallway", "../data/applet/kinect/straight/config.txt"));
+		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
+		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
 
 		app.setInputList(inputs);
 

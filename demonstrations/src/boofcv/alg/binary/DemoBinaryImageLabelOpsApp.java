@@ -29,6 +29,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
@@ -212,8 +213,9 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	private synchronized void renderVisualizeImage() {
 		if( selectedVisualize instanceof ImageUInt8)
 			VisualizeBinaryData.renderBinary((ImageUInt8) selectedVisualize, false, work);
-		else
+		else {
 			VisualizeBinaryData.renderLabeled((ImageSInt32) selectedVisualize, colors, work);
+		}
 	}
 
 	@Override
@@ -257,8 +259,8 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(ImageFloat32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("particles","../data/evaluation/particles01.jpg"));
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
 
 		app.setInputList(inputs);
 

@@ -27,6 +27,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -202,8 +203,8 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("particles","../data/evaluation/particles01.jpg"));
-		inputs.add(new PathLabel("shapes","../data/evaluation/shapes01.png"));
+		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
 
 		app.setInputList(inputs);
 

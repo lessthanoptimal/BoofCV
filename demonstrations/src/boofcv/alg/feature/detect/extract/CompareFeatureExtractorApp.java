@@ -35,6 +35,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -248,9 +249,9 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class, ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes", "../data/evaluation/shapes01.png"));
-		inputs.add(new PathLabel("sunflowers", "../data/evaluation/sunflowers.png"));
-		inputs.add(new PathLabel("beach", "../data/evaluation/scale/beach02.jpg"));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));
 
 		app.setInputList(inputs);
 

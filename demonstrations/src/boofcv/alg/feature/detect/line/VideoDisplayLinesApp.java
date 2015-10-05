@@ -30,6 +30,7 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -158,7 +159,7 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 		VideoDisplayLinesApp app = new VideoDisplayLinesApp(ImageFloat32.class, ImageFloat32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Apartment", "../data/applet/lines_indoors.mjpeg"));
+		inputs.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));
 
 		app.setInputList(inputs);
 

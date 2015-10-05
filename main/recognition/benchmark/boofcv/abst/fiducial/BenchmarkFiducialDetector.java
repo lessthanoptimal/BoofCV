@@ -83,7 +83,7 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 	}
 
 	public static void main(String[] args) {
-		String directory = "../data/applet/fiducial/binary/";
+		String directory = UtilIO.pathExample("fiducial/binary/");
 
 		FiducialDetector detector = FactoryFiducial.
 				squareBinaryFast(new ConfigFiducialBinary(0.2), 100, ImageUInt8.class);

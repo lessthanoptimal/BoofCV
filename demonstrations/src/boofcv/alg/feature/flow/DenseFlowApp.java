@@ -29,6 +29,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageFloat32;
@@ -179,14 +180,14 @@ public class DenseFlowApp
 
 		DenseFlowApp app = new DenseFlowApp();
 
-//		app.setBaseDirectory("../data/applet/denseflow/");
-//		app.loadInputData("../data/applet/denseflow/denseflow.txt");
+//		app.setBaseDirectory(UtilIO.pathExample("denseflow/");
+//		app.loadInputData(UtilIO.pathExample("denseflow/denseflow.txt");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("urban","../data/applet/denseflow/Urban2_07.png","../data/applet/denseflow/Urban2_08.png"));
-		inputs.add(new PathLabel("dog","../data/applet/denseflow/dogdance07.png","../data/applet/denseflow/dogdance08.png"));
-		inputs.add(new PathLabel("grove","../data/applet/denseflow/Grove2_07.png","../data/applet/denseflow/Grove2_08.png"));
+		inputs.add(new PathLabel("urban", UtilIO.pathExample("denseflow/Urban2_07.png"), UtilIO.pathExample("denseflow/Urban2_08.png")));
+		inputs.add(new PathLabel("dog",UtilIO.pathExample("denseflow/dogdance07.png"),UtilIO.pathExample("denseflow/dogdance08.png")));
+		inputs.add(new PathLabel("grove",UtilIO.pathExample("denseflow/Grove2_07.png"),UtilIO.pathExample("denseflow/Grove2_08.png")));
 
 		app.setInputList(inputs);
 

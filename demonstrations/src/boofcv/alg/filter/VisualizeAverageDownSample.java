@@ -21,6 +21,7 @@ package boofcv.alg.filter;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -33,7 +34,7 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeAverageDownSample {
 	public static void main(String[] args) {
-		BufferedImage original = UtilImageIO.loadImage("../data/applet/simple_objects.jpg");
+		BufferedImage original = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
 				original.getWidth(),original.getHeight(),3);

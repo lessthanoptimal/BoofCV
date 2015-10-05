@@ -20,6 +20,7 @@ package boofcv.alg.ip;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -29,9 +30,9 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeFlipRotate {
+public class  VisualizeFlipRotate {
 	public static void main(String[] args) {
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(input,(ImageUInt8)null);
 
 		ImageUInt8 flipH = gray.clone();

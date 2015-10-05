@@ -29,6 +29,7 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
@@ -287,8 +288,8 @@ public class ShapeFitContourApp
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("Particles","../data/applet/particles01.jpg"));
-		inputs.add(new PathLabel("Shapes","../data/applet/shapes02.png"));
+		inputs.add(new PathLabel("Particles", UtilIO.pathExample("particles01.jpg")));
+		inputs.add(new PathLabel("Shapes",UtilIO.pathExample("shapes02.png")));
 		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up

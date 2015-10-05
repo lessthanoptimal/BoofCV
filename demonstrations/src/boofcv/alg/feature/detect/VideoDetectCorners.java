@@ -31,6 +31,7 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ProcessImageSequence;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.BoofDefaults;
@@ -153,7 +154,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		String fileName;
 
 		if (args.length == 0) {
-			fileName = "../applet/data/zoom.mjpeg";
+			fileName = UtilIO.pathExample("zoom.mjpeg");
 		} else {
 			fileName = args[0];
 		}

@@ -139,9 +139,9 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		RemoveLensDistortionApp app = new RemoveLensDistortionApp();
 
 		// camera config, image left, image right
-		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
-		String imageDir = "../data/evaluation/structure/";
-		String bumbleDir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
+		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
+		String imageDir = UtilIO.pathExample("structure/");
+		String bumbleDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Sony HX5V",calibDir + "intrinsic.xml",imageDir + "dist_cyto_01.jpg"));
