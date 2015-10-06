@@ -28,6 +28,7 @@ import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ColorQueue_F32;
@@ -107,14 +108,14 @@ public class ExampleSegmentSuperpixels {
 	}
 
 	public static void main(String[] args) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_horses.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_kangaroo.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/berkeley_man.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/segment/mountain_pines_people.jpg");
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
+//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_kangaroo.jpg"));
+//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
+//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/mountain_pines_people.jpg"));
+//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 
 		// Select input image type.  Some algorithms behave different depending on image type
-		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3, ImageFloat32.class);
 //		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);

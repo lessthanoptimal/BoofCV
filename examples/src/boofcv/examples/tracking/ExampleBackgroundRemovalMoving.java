@@ -33,6 +33,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.ImageBase;
@@ -57,9 +58,9 @@ public class ExampleBackgroundRemovalMoving {
 	public static void main(String[] args) {
 
 		// Example with a moving camera.  Highlights why motion estimation is sometimes required
-		String fileName = "../data/applet/tracking/chipmunk.mjpeg";
+		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg");
 		// Camera has a bit of jitter in it.  Static kinda works but motion reduces false positives
-//		String fileName = "../data/applet/background/horse_jitter.mp4";
+//		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
 
 		// Comment/Uncomment to switch input image type
 		ImageType imageType = ImageType.single(ImageFloat32.class);

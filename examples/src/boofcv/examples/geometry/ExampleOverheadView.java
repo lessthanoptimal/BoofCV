@@ -42,12 +42,12 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleOverheadView {
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage("../data/applet/road/left01.png");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
 
 		MultiSpectral<ImageUInt8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, ImageUInt8.class);
 
-		StereoParameters stereoParam = UtilIO.loadXML("../data/applet/road/stereo01.xml");
-		Se3_F64 groundToLeft = UtilIO.loadXML("../data/applet/road/ground_to_left_01.xml");
+		StereoParameters stereoParam = UtilIO.loadXML(UtilIO.pathExample("road/stereo01.xml"));
+		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));
 
 		CreateSyntheticOverheadView<MultiSpectral<ImageUInt8>> generateOverhead =
 				new CreateSyntheticOverheadViewMS<ImageUInt8>(TypeInterpolate.BILINEAR,3,ImageUInt8.class);

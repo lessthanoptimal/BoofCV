@@ -25,6 +25,7 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -48,7 +49,7 @@ public class ExampleRemovePerspectiveDistortion {
 	public static void main(String[] args) {
 
 		// load a color image
-		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/goals_and_stuff.jpg");
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, ImageFloat32.class);
 
 		// Create a smaller output image for processing later on

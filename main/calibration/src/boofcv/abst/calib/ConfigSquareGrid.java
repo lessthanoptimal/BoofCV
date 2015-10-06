@@ -63,16 +63,20 @@ public class ConfigSquareGrid implements Configuration {
 	public double spaceWidth;
 
 	{
-		square.contour2Poly_splitDistanceFraction = 0.05;
-
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
 
 		// good value for squares.  Set it here to make it not coupled to default values
-		square.configRefineCorners.cornerOffset = 2;
+		square.configRefineCorners.cornerOffset = 1;
 
 		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
 		// very crude corners
+		square.configRefineCorners.lineSamples = 10;
+		square.configRefineCorners.convergeTolPixels = 0.2;
+		square.configRefineCorners.maxIterations = 5;
+
+		// putting reasonable defaults for if the user decides to optimize by line
+		square.configRefineCorners.cornerOffset = 1;
 		square.configRefineCorners.lineSamples = 10;
 		square.configRefineCorners.convergeTolPixels = 0.2;
 		square.configRefineCorners.maxIterations = 5;

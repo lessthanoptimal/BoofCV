@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 
-	String directory = UtilIO.getPathToBase()+"data/applet/fiducial/image/examples/";
+	String directory = UtilIO.pathExample("fiducial/image/examples/");
 
 	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));

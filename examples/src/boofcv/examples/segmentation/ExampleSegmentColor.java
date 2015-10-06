@@ -21,6 +21,7 @@ package boofcv.examples.segmentation;
 import boofcv.alg.color.ColorHsv;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -105,7 +106,7 @@ public class ExampleSegmentColor {
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/sunflowers.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Let the user select a color
 		printClickedColor(image);

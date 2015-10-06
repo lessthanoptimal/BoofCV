@@ -71,6 +71,9 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 	SquareNode seedInner,seedOuter;
 	double seedScore;
 
+	// List of nodes put into clusters
+	List<List<SquareNode>> clusters;
+
 	/**
 	 * Configures chess board detector.
 	 *
@@ -111,7 +114,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
 
-		List<List<SquareNode>> clusters = s2c.process(found.toList());
+		clusters = s2c.process(found.toList());
 
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids();
@@ -230,7 +233,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		// special case with only two "corners" and the next corner isn't in the expected location
 		if( nextCorner == c ) {
 			nextCorner = outer.getCornerByIndex((outerCorner + 2)%4).center;
-			ccw = isVectorsCCW(c,best.center,nextCorner);
+			ccw = isVectorsCCW(c, best.center, nextCorner);
 		} else {
 			ccw = isVectorsCCW(c,nextCorner,best.center);
 		}
@@ -486,7 +489,11 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		return true;
 	}
 
-	public SquaresIntoClusters getClusters() {
+	public List<List<SquareNode>> getGraphs() {
+		return clusters;
+	}
+
+	public SquaresIntoClusters getShapeToClusters() {
 		return s2c;
 	}
 

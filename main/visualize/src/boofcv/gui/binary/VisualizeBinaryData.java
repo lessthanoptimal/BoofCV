@@ -193,6 +193,8 @@ public class VisualizeBinaryData {
 			} else {
 				_renderLabeled(labelImage, out, colors);
 			}
+			// hack so that it knows the image has been modified
+			out.setRGB(0,0,out.getRGB(0,0));
 		} catch( SecurityException e ) {
 			_renderLabeled(labelImage, out, colors);
 		}

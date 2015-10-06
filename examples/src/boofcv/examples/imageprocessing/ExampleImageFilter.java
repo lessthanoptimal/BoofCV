@@ -33,6 +33,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -136,7 +137,7 @@ public class ExampleImageFilter {
 
 	public static void main( String args[] ) {
 
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/standard/lena512.bmp");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"));
 
 		// produces the same results
 		procedural(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));

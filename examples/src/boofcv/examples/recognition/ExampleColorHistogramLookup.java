@@ -26,6 +26,7 @@ import boofcv.alg.feature.color.Histogram_F64;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -197,7 +198,7 @@ public class ExampleColorHistogramLookup {
 
 	public static void main(String[] args) {
 
-		String regex = "../data/applet/recognition/vacation/^\\w*.jpg";
+		String regex = UtilIO.pathExample("recognition/vacation")+"/^\\w*.jpg";
 		List<File> images = Arrays.asList(BoofMiscOps.findMatches(regex));
 		Collections.sort(images);
 

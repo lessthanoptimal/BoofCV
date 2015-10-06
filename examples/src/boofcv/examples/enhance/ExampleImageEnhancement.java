@@ -22,6 +22,7 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -37,13 +38,16 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleImageEnhancement {
 
+	static String imagePath = "enhance/dark.jpg";
+//	static String imagePath = "enhance/dull.jpg";
+
+
 	/**
 	 * Histogram adjustment algorithms aim to spread out pixel intensity values uniformly across the allowed range.
 	 * This if an image is dark, it will have greater contrast and be brighter.
 	 */
 	public static void histogram() {
-//		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
-		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = gray.createSameShape();
 
@@ -70,8 +74,7 @@ public class ExampleImageEnhancement {
 	 * When an image is sharpened the intensity of edges are made more extreme while flat regions remain unchanged.
 	 */
 	public static void sharpen() {
-//		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dull.jpg");
-		BufferedImage buffered = UtilImageIO.loadImage("../data/applet/enhance/dark.jpg");
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
 		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
 		ImageUInt8 adjusted = gray.createSameShape();
 

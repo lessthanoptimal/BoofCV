@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class ExampleVisualOdometryStereo {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		String directory = "../data/applet/vo/backyard/";
+		String directory = UtilIO.pathExample("vo/backyard/");
 
 		// load camera description and the video sequence
 		StereoParameters stereoParam = UtilIO.loadXML(media.openFile(directory + "stereo.xml"));

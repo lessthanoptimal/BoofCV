@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -61,7 +61,7 @@ public class TestRefinePolyLine {
 		corners.add(50+84);
 		corners.add(50+84+50);
 
-		alg.fit(points,corners);
+		assertTrue(alg.fit(points, corners));
 
 		assertEquals(0,   corners.get(0));
 		assertEquals(50,  corners.get(1));
@@ -91,7 +91,7 @@ public class TestRefinePolyLine {
 			corners.add(50 + 84 + rand.nextInt(6)-3);
 			corners.add(points.size()-1);
 
-			alg.fit(points, corners);
+			assertTrue(alg.fit(points, corners));
 
 			assertEquals(0, corners.get(0));
 			assertEquals(50, corners.get(1));
@@ -128,10 +128,10 @@ public class TestRefinePolyLine {
 				corners.data[j] = UtilShapePolygon.addOffset(corners.data[j], rand.nextInt(10) - 5, points.size());
 			}
 
-			alg.fit(points,corners);
+			assertTrue(alg.fit(points, corners));
 
-			assertEquals(0,corners.get(0));
-			assertEquals(20,corners.get(1));
+			assertEquals(0, corners.get(0));
+			assertEquals(20, corners.get(1));
 			assertEquals(40,corners.get(2));
 			assertEquals(60,corners.get(3));
 			assertEquals(80,corners.get(4));
@@ -164,8 +164,8 @@ public class TestRefinePolyLine {
 		addPoints(20, 0, 20, 20, contour);
 
 		// add a kink which could throw it off locally
-		contour.get(17).set(17,1);
-		contour.get(18).set(18,2);
+		contour.get(17).set(17, 1);
+		contour.get(18).set(18, 2);
 
 		RefinePolyLine alg = new RefinePolyLine(true);
 		alg.searchRadius = 5;
@@ -204,6 +204,23 @@ public class TestRefinePolyLine {
 				points.add(new Point2D_I32(x0+dir*x,y0));
 			}
 		}
+	}
+
+	/**
+	 * Test to see if it gracefully handles the case where there are too few points
+	 */
+	@Test
+	public void tooFewPoints() {
+		RefinePolyLine alg = new RefinePolyLine(true);
+
+		GrowQueue_I32 corners = new GrowQueue_I32();
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		for (int i = 0; i < 3; i++) {
+			assertFalse(alg.fit(contour, corners));
+			corners.add(i);
+			contour.add(new Point2D_I32(i, 2));
+		}
+		assertTrue(alg.fit(contour, corners));
 	}
 
 }

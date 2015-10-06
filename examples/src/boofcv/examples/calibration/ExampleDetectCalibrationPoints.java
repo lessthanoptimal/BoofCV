@@ -23,6 +23,7 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -45,8 +46,8 @@ public class ExampleDetectCalibrationPoints {
 	public static void main( String args[] ) {
 
 		// load the test image
-//		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Square";
-		String directory = "../data/evaluation/calibration/stereo/Bumblebee2_Chess";
+//		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
+		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
 		BufferedImage orig = UtilImageIO.loadImage(directory+"/left01.jpg");
 		ImageFloat32 input = ConvertBufferedImage.convertFrom(orig,(ImageFloat32)null);
@@ -55,7 +56,7 @@ public class ExampleDetectCalibrationPoints {
 		PlanarCalibrationDetector detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
-//		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid( new ConfigSquareGrid(5,7,30,30));
+//		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 		detector = FactoryPlanarCalibrationTarget.detectorChessboard( new ConfigChessboard(5,7,30));
 
 		// process the image and check for failure condition

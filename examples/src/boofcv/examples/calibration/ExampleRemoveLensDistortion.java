@@ -50,14 +50,14 @@ import java.awt.image.BufferedImage;
 public class ExampleRemoveLensDistortion {
 
 	public static void main( String args[] ) {
-		String calibDir = "../data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
-		String imageDir = "../data/evaluation/structure/";
+		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
+		String imageDir = UtilIO.pathExample("structure/");
 
 		// load calibration parameters from the previously calibrated camera
-		IntrinsicParameters param = UtilIO.loadXML(calibDir + "intrinsic.xml");
+		IntrinsicParameters param = UtilIO.loadXML(calibDir , "intrinsic.xml");
 
 		// load images and convert the image into a color BoofCV format
-		BufferedImage orig = UtilImageIO.loadImage(imageDir + "dist_cyto_01.jpg");
+		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");
 		MultiSpectral<ImageFloat32> distortedImg =
 				ConvertBufferedImage.convertFromMulti(orig, null,true, ImageFloat32.class);
 

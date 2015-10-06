@@ -29,6 +29,7 @@ import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -52,8 +53,8 @@ import java.util.Random;
 public class ExampleFitPolygon {
 
 	// Polynomial fitting tolerances
-	static double toleranceDist = 2;
-	static double toleranceAngle= Math.PI/10;
+	static double splitFraction = 0.05;
+	static double minimumSplitPixels = 1;
 
 	/**
 	 * Fits polygons to found contours around binary blobs.
@@ -83,7 +84,7 @@ public class ExampleFitPolygon {
 		for( Contour c : contours ) {
 			// Fit the polygon to the found external contour.  Note loop = true
 			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,
-					toleranceDist,toleranceAngle,100);
+					splitFraction, minimumSplitPixels,100);
 
 			g2.setColor(Color.RED);
 			VisualizeShapes.drawPolygon(vertexes,true,g2);
@@ -91,12 +92,12 @@ public class ExampleFitPolygon {
 			// handle internal contours now
 			g2.setColor(Color.BLUE);
 			for( List<Point2D_I32> internal : c.internal ) {
-				vertexes = ShapeFittingOps.fitPolygon(internal,true,toleranceDist,toleranceAngle,100);
+				vertexes = ShapeFittingOps.fitPolygon(internal,true, splitFraction, minimumSplitPixels,100);
 				VisualizeShapes.drawPolygon(vertexes,true,g2);
 			}
 		}
 
-		ShowImages.showWindow(polygon,"Binary Blob Contours");
+		ShowImages.showWindow(polygon,"Binary Blob Contours",true);
 	}
 
 	/**
@@ -127,13 +128,13 @@ public class ExampleFitPolygon {
 			for(EdgeSegment s : e.segments ) {
 				// fit line segments to the point sequence.  Note that loop is false
 				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points,false,
-						toleranceDist,toleranceAngle,100);
+						splitFraction, minimumSplitPixels,100);
 
 				VisualizeShapes.drawPolygon(vertexes, false, g2);
 			}
 		}
 
-		ShowImages.showWindow(displayImage,"Canny Trace");
+		ShowImages.showWindow(displayImage,"Canny Trace",true);
 	}
 
 	/**
@@ -162,21 +163,21 @@ public class ExampleFitPolygon {
 		for( Contour c : contours ) {
 			// Only the external contours are relevant.
 			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true,
-					toleranceDist,toleranceAngle,100);
+					splitFraction, minimumSplitPixels,100);
 
 			g2.setColor(new Color(rand.nextInt()));
 			VisualizeShapes.drawPolygon(vertexes,true,g2);
 		}
 
-		ShowImages.showWindow(displayImage,"Canny Contour");
+		ShowImages.showWindow(displayImage,"Canny Contour",true);
 	}
 
 	public static void main( String args[] ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/shapes02.png");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("shapes02.png"));
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 
-		ShowImages.showWindow(image,"Original");
+		ShowImages.showWindow(image,"Original",true);
 
 		fitCannyEdges(input);
 		fitCannyBinary(input);

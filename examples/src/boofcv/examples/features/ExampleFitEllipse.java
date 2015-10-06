@@ -26,6 +26,7 @@ import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
@@ -46,7 +47,7 @@ public class ExampleFitEllipse {
 
 	public static void main( String args[] ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
 
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);

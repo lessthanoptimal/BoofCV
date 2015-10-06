@@ -23,6 +23,7 @@ import boofcv.alg.tracker.meanshift.TrackerMeanShiftLikelihood;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
@@ -97,7 +98,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/tracking/balls_blue_red.mjpeg";
+		String fileName = UtilIO.pathExample("tracking/balls_blue_red.mjpeg");
 		RectangleLength2D_I32 location = new RectangleLength2D_I32(394,247,475-394,325-247);
 
 		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);

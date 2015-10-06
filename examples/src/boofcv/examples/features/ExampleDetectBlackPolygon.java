@@ -26,6 +26,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -47,14 +48,14 @@ import java.io.File;
 public class ExampleDetectBlackPolygon {
 	public static void main(String[] args) {
 		String files[] = new String[]{
-				"../data/applet/polygons01.jpg",
-				"../data/applet/shapes02.png",
-				"../data/applet/fiducial/image/examples/image01.jpg"};
+				"polygons01.jpg",
+				"shapes02.png",
+				"fiducial/image/examples/image01.jpg"};
 
 		ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,7);
 
-		// Tighten the tolerance for what defines a line
-		config.contour2Poly_splitDistanceFraction = 0.02;
+		// need to reduce split fraction to get it to work well with the 7 sided shape
+		config.contour2Poly_splitFraction = 0.1;
 
 		BinaryPolygonConvexDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
 
@@ -64,7 +65,7 @@ public class ExampleDetectBlackPolygon {
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		for( String fileName : files ) {
-			BufferedImage image = UtilImageIO.loadImage(fileName);
+			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
 
 			ImageUInt8 input = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
 			ImageUInt8 binary = new ImageUInt8(input.width,input.height);
@@ -83,10 +84,12 @@ public class ExampleDetectBlackPolygon {
 			// visualize results by drawing red polygons
 			FastQueue<Polygon2D_F64> found = detector.getFound();
 			Graphics2D g2 = image.createGraphics();
-			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(3));
 			for (int i = 0; i < found.size; i++) {
-				VisualizeShapes.drawPolygon(found.get(i),true,g2,true);
+				g2.setColor(Color.RED);
+				VisualizeShapes.drawPolygon(found.get(i), true, g2, true);
+				g2.setColor(Color.CYAN);
+				VisualizeShapes.drawPolygonCorners(found.get(i), 2, g2, true);
 			}
 
 			panel.addImage(image,new File(fileName).getName());

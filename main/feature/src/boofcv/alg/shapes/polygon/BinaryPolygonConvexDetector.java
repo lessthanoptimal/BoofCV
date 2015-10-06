@@ -78,9 +78,8 @@ import java.util.List;
  */
 public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 
-	// private maximum distance a point can deviate from the edge of the contour and not
-	// cause a new line to formed as a fraction of the contour's size
-	private double splitDistanceFraction;
+	// dynamically set minimum split fraction used in contour to polygon conversion
+	private double minimumSplitFraction;
 
 	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;
@@ -140,8 +139,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
-	 * @param splitDistanceFraction Number of pixels as a fraction of contour length to split a new line in
-*                             SplitMergeLineFitLoop.  Try 0.03
+	 * @param minimumSplitFraction Minimum number of pixels allowed to split a polygon as a fraction of image width.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
@@ -151,7 +149,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 									   RefinePolygonLineToImage<T> refineLine,
 									   RefinePolygonCornersToImage<T> refineCorner,
 									   double minContourFraction,
-									   double splitDistanceFraction,
+									   double minimumSplitFraction,
 									   boolean outputClockwise,
 									   Class<T> inputType) {
 
@@ -162,8 +160,8 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
+		this.minimumSplitFraction = minimumSplitFraction;
 		this.fitPolygon = contourToPolygon;
-		this.splitDistanceFraction = splitDistanceFraction;
 		this.outputClockwise = outputClockwise;
 
 		workPoly = new Polygon2D_F64(1);
@@ -202,7 +200,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		}
 
 		if( refineLine != null ) {
-			refineLine.getSnapToEdge().setTransform(toDistorted);
+			refineLine.setTransform(toDistorted);
 		}
 
 		if( refineCorner != null ) {
@@ -222,6 +220,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	public void process(T gray, ImageUInt8 binary) {
 		InputSanityCheck.checkSameShape(binary, gray);
 
+		fitPolygon.setMinimumSplitPixels(Math.max(1,minimumSplitFraction*gray.width));
 		if( labeled.width != gray.width || labeled.height == gray.width )
 			configure(gray.width,gray.height);
 
@@ -274,9 +273,6 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 					removeDistortionFromContour(c.external);
 				}
 
-				// dynamically set split distance based on polygon's size
-				double splitTolerance = splitDistanceFraction*c.external.size();
-				fitPolygon.setToleranceSplit(splitTolerance);
 				fitPolygon.process(c.external);
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();

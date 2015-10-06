@@ -18,6 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.alg.shapes.edge.ScoreLineSegmentEdge;
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -67,6 +68,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	protected T image;
 	Class<T> imageType;
 
+	// computes the edge intensity.  used to prevent divergence
+	ScoreLineSegmentEdge<T> edgeScorer;
+
+	// edge intensity divided by the number of sides
+	double edgeScore;
+
+	// working variable for line slope
+	double unitX,unitY;
+
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
@@ -84,6 +94,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		this.imageType = imageType;
 
 		previous = new Polygon2D_F64(1);
+
+		edgeScorer = new ScoreLineSegmentEdge<T>(lineSamples,imageType);
 	}
 
 	/**
@@ -95,6 +107,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
 		this.snapToEdge = new SnapToEdge<T>(20,1,imageType);
+		this.edgeScorer = new ScoreLineSegmentEdge<T>(20,imageType);
 	}
 
 	/**
@@ -104,6 +117,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
+		this.edgeScorer.setImage(image);
 	}
 
 	/**
@@ -163,6 +177,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		// pixels squares is faster to compute
 		double convergeTol = convergeTolPixels*convergeTolPixels;
 
+		double previousScore = edgeScore = scorePolygon(seed);
+
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
 			for (int i = 0; i < previous.size(); i++) {
@@ -179,6 +195,17 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			// Find the corners of the quadrilateral from the lines
 			if( !UtilShapePolygon.convert(general,current) )
 				return false;
+
+			// if the score got worse, stop iterating and use the previous solution
+			// this prevents weird divergence issues
+			edgeScore = scorePolygon(current);
+			if( edgeScore < previousScore )  {
+				edgeScore = previousScore;
+				current.set(previous);
+				break;
+			} else {
+				previousScore = edgeScore;
+			}
 
 			// see if it has converged
 			boolean converged = true;
@@ -209,20 +236,59 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	protected boolean optimize( Point2D_F64 a , Point2D_F64 b , LineGeneral2D_F64 found ) {
 
+		computeAdjustedEndPoints(a, b);
+
+		return snapToEdge.refine(adjA, adjB, found);
+	}
+
+	/**
+	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
+	 * image coordinates.  For example if the input image has lens distortion but the edge were found
+	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
+	 * image coordinates in order to read the pixel's value.
+	 *
+	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
+	 */
+	public void setTransform( PixelTransform_F32 undistToDist ) {
+		snapToEdge.setTransform(undistToDist);
+		edgeScorer.setTransform(undistToDist);
+	}
+
+	/**
+	 * Computes the edge score for the polygon
+	 */
+	protected double scorePolygon( Polygon2D_F64 polygon ) {
+		double score = 0;
+		for (int i = 0; i < polygon.size(); i++) {
+			int j = (i + 1) % polygon.size();
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 b = polygon.get(j);
+
+			computeAdjustedEndPoints(a, b);
+
+			score += edgeScorer.computeAverageEdgeIntensity(adjA, adjB, -unitY, unitX);
+		}
+
+		return Math.abs(score)/polygon.size();
+	}
+
+	private void computeAdjustedEndPoints(Point2D_F64 a, Point2D_F64 b) {
 		double slopeX = (b.x - a.x);
 		double slopeY = (b.y - a.y);
 		double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 		// vector of unit length pointing in direction of the slope
-		double unitX = slopeX/r;
-		double unitY = slopeY/r;
+		unitX = slopeX/r;
+		unitY = slopeY/r;
 
 		// offset from corner because the gradient because unstable around there
 		adjA.x = a.x + unitX*cornerOffset;
 		adjA.y = a.y + unitY*cornerOffset;
 		adjB.x = b.x - unitX*cornerOffset;
 		adjB.y = b.y - unitY*cornerOffset;
+	}
 
-		return snapToEdge.refine(adjA,adjB,found);
+	public double getAverageEdgeIntensity() {
+		return edgeScore;
 	}
 
 	public SnapToEdge<T> getSnapToEdge() {

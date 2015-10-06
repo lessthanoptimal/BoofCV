@@ -21,6 +21,7 @@ package boofcv.examples.imageprocessing;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
@@ -69,7 +70,7 @@ public class ExampleMultiSpectralImages {
 		BufferedImage output = new BufferedImage(image.width,image.height,input.getType());
 		ConvertBufferedImage.convertTo(blurred, output,true);
 		ShowImages.showWindow(input,"Input");
-		ShowImages.showWindow(output,"Ouput");
+		ShowImages.showWindow(output,"Output");
 	}
 
 	/**
@@ -117,7 +118,7 @@ public class ExampleMultiSpectralImages {
 	}
 	
 	public static void main( String args[] ) {
-		BufferedImage input = UtilImageIO.loadImage("../data/applet/apartment_building_02.jpg");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("apartment_building_02.jpg"));
 
 		// Uncomment lines below to run each example
 

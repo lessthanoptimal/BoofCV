@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -116,8 +117,8 @@ public class BenchmarkDetectLines<T extends ImageSingleBand, D extends ImageSing
 	}
 
 	public static void main(String args[]) throws IOException {
-		BufferedImage image = ImageIO.read(new File("../data/evaluation/lines_indoors.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/lines_indoors.jpg");
+		BufferedImage image = ImageIO.read(new File(UtilIO.pathExample("lines_indoors.jpg")));
+//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg");
 
 		System.out.println("=========  Profile Image Size " + image.getWidth() + " x " + image.getHeight()+ " ==========");
 		System.out.println();

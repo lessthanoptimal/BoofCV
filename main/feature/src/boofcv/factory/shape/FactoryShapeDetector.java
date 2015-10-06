@@ -47,43 +47,42 @@ public class FactoryShapeDetector {
 	{
 		config.checkValidity();
 
-		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(0,config.contour2Poly_mergeTolerance,
+		double cornerOffset = 2;
+		int numSamples = 15;
+
+		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(
+				config.contour2Poly_splitFraction,
+				0, // dynamically set later on
 				config.contour2Poly_iterations);
 
 		RefinePolygonLineToImage<T> refineLine = null;
-		if( config.refineWithLines )
+		if( config.refineWithLines ) {
+			cornerOffset = config.configRefineLines.cornerOffset;
+			numSamples = config.configRefineLines.lineSamples;
 			refineLine = new RefinePolygonLineToImage<T>(
-					config.configRefineLines.cornerOffset,config.configRefineLines.lineSamples,
-					config.configRefineLines.sampleRadius,config.configRefineLines.maxIterations,
+					config.configRefineLines.cornerOffset, config.configRefineLines.lineSamples,
+					config.configRefineLines.sampleRadius, config.configRefineLines.maxIterations,
 					config.configRefineLines.convergeTolPixels,
 					imageType);
+		}
 		RefinePolygonCornersToImage<T> refineCorner = null;
-		if( config.refineWithCorners )
+		if( config.refineWithCorners ) {
+			cornerOffset = config.configRefineCorners.cornerOffset;
+			numSamples = config.configRefineCorners.lineSamples;
 			refineCorner = new RefinePolygonCornersToImage<T>(
 					config.configRefineCorners.endPointDistance,
-					config.configRefineCorners.cornerOffset,config.configRefineCorners.lineSamples,
-					config.configRefineCorners.sampleRadius,config.configRefineCorners.maxIterations,
-					config.configRefineCorners.convergeTolPixels,imageType);
+					config.configRefineCorners.cornerOffset, config.configRefineCorners.lineSamples,
+					config.configRefineCorners.sampleRadius, config.configRefineCorners.maxIterations,
+					config.configRefineCorners.convergeTolPixels, imageType);
+		}
 
 		PolygonEdgeScore<T> scorer = null;
 		if( config.minimumEdgeIntensity > 0 ) {
-			if (config.refineWithLines) {
-				scorer = new PolygonEdgeScore<T>(
-						config.configRefineLines.cornerOffset,
-						config.configRefineLines.sampleRadius,
-						config.configRefineLines.lineSamples,
-						config.minimumEdgeIntensity, imageType);
-			} else if( config.refineWithCorners ) {
-				scorer = new PolygonEdgeScore<T>(
-						config.configRefineCorners.cornerOffset,
-						config.configRefineCorners.sampleRadius,
-						config.configRefineCorners.lineSamples*2,
-						config.minimumEdgeIntensity, imageType);
-			}
+			scorer = new PolygonEdgeScore<T>(cornerOffset,1.0,numSamples,config.minimumEdgeIntensity,imageType);
 		}
 
 		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,contourToPolygon,
 				scorer, refineLine,refineCorner,config.minContourImageWidthFraction,
-				config.contour2Poly_splitDistanceFraction,config.clockwise,imageType);
+				config.contour2Poly_minimumSplitFraction,config.clockwise,imageType);
 	}
 }

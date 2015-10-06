@@ -30,8 +30,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -45,13 +44,10 @@ public class TestShapeFittingOps {
 	public void fitPolygon_loop() {
 		List<Point2D_I32> sequence = createRectangle();
 
-		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true,0.1,0.01,100);
+		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true,0.05,1.0,100);
 
-		assertEquals(4,result.size());
-		check(0, 0, 0, result.get(0));
-		check(0, 9, 9, result.get(1));
-		check(5,9,14,result.get(2));
-		check(5,0,23,result.get(3));
+		assertEquals(4, result.size());
+		checkPolygon(new int[]{0, 0, 0, 9, 5, 9, 5, 0}, new int[]{0, 9, 14, 23}, result);
 	}
 
 	/**
@@ -61,14 +57,34 @@ public class TestShapeFittingOps {
 	public void fitPolygon_regular() {
 		List<Point2D_I32> sequence = createRectangle();
 
-		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false,0.1,0.01,100);
+		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false,0.05,1.0,100);
 
-		assertEquals(5,result.size());
-		check(0,0,0,result.get(0));
-		check(0,9,9,result.get(1));
-		check(5,9,14,result.get(2));
-		check(5,0,23,result.get(3));
-		check(1,0,27,result.get(4));
+		assertEquals(5, result.size());
+		checkPolygon(new int[]{0, 0, 0, 9, 5, 9, 5, 0, 1, 0}, new int[]{0, 9, 14, 23, 27}, result);
+	}
+
+	/**
+	 * Checks found polygon in a "shift" independent manor
+	 */
+	public static void checkPolygon( int[] coordinate , int indexes[], List<PointIndex_I32> found  ) {
+		assertEquals(indexes.length, found.size());
+
+		for (int i = 0; i < found.size(); i++) {
+			boolean matched = true;
+			for (int j = 0; j < found.size(); j++) {
+				int x = coordinate[j*2];
+				int y = coordinate[j*2+1];
+				int index = indexes[j];
+
+				if( !check(x,y,index,found.get((i+j)%found.size()))) {
+					matched = false;
+					break;
+				}
+			}
+			if( matched )
+				return;
+		}
+		fail("No match");
 	}
 
 	/**
@@ -158,11 +174,11 @@ public class TestShapeFittingOps {
 		EllipseRotated_F64 expected = ShapeFittingOps.fitEllipse_F64(pointsF,0,false,null).shape;
 		EllipseRotated_F64 found = ShapeFittingOps.fitEllipse_I32(pointsI, 0, false, null).shape;
 
-		assertEquals(expected.center.x,found.center.x,1e-8);
-		assertEquals(expected.center.y,found.center.y,1e-8);
-		assertEquals(expected.a,found.a,1e-8);
-		assertEquals(expected.b,found.b,1e-8);
-		assertEquals(expected.phi,found.phi,1e-8);
+		assertEquals(expected.center.x, found.center.x,1e-8);
+		assertEquals(expected.center.y, found.center.y,1e-8);
+		assertEquals(expected.a, found.a,1e-8);
+		assertEquals(expected.b, found.b,1e-8);
+		assertEquals(expected.phi, found.phi,1e-8);
 	}
 
 	@Test
@@ -196,10 +212,10 @@ public class TestShapeFittingOps {
 		assertTrue( found.error > 0 );
 	}
 
-	private void check( int x , int y , int index , PointIndex_I32 found ) {
-		assertEquals(x,found.x);
-		assertEquals(y,found.y);
-		assertEquals(index,found.index);
+	private static boolean check( int x , int y , int index , PointIndex_I32 found ) {
+		if( x != found.x ) return false;
+		if( y != found.y ) return false;
+		return index == found.index;
 	}
 
 	@Test

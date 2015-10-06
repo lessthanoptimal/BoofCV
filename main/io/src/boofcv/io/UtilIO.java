@@ -35,6 +35,44 @@ import java.net.URL;
 public class UtilIO {
 
 	/**
+	 * Returns an absolute path to the file that is relative to the example directory
+	 * @param path File path relative to root directory
+	 * @return Absolute path to file
+	 */
+	public static String pathExample( String path ) {
+		File pathExample = new File(getPathToBase(),"data/example/");
+		if( !pathExample.exists() ) {
+			System.err.println();
+			System.err.println("Can't find data/example directory!  There are three likely causes for this problem.");
+			System.err.println();
+			System.err.println("1) You checked out the source code from git and did not pull the data submodule too.");
+			System.err.println("2) You are trying to run an example from outside the BoofCV directory tree.");
+			System.err.println("3) You are trying to pass in your own image.");
+			System.err.println();
+			System.err.println("Solutions:");
+			System.err.println("1) Follow instructions in the boofcv/readme.md file to grab the data directory.");
+			System.err.println("2) Launch the example from inside BoofCV's directory tree!");
+			System.err.println("3) Don't use this function and just pass in the path directly");
+			System.exit(1);
+		}
+
+		File f = new File(pathExample.getPath(),path);
+		if( f.isDirectory() )
+			return f.getAbsolutePath()+"/";
+		else
+			return f.getAbsolutePath();
+	}
+
+	/**
+	 * Searches for the root BoofCV directory and returns an absolute path from it.
+	 * @param path File path relative to root directory
+	 * @return Absolute path to file
+	 */
+	public static String path( String path ) {
+		return new File(getPathToBase(),path).getAbsolutePath();
+	}
+
+	/**
 	 * Steps back until it finds the base BoofCV directory.
 	 *
 	 * @return Path to the base directory.
@@ -149,6 +187,9 @@ public class UtilIO {
 		return loadXML(url.getPath());
 	}
 
+	public static <T> T loadXML( String directory , String fileName ) {
+		return loadXML(new File(directory,fileName).getPath());
+	}
 	public static <T> T loadXML( String fileName ) {
 		try {
 			return (T)loadXML(new FileReader(fileName));

@@ -25,6 +25,7 @@ import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.convolve.Kernel1D_I32;
@@ -42,7 +43,7 @@ import java.awt.image.BufferedImage;
 public class ExampleConvolution {
 
 	public static void main(String[] args) {
-		BufferedImage image = UtilImageIO.loadImage("../data/applet/sunflowers.jpg");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		ImageUInt8 gray = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
 

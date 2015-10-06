@@ -137,7 +137,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
 		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
 		// will be provided later one
-		poseEstimator.setFiducial(-0.5,0.5,  0.5,0.5,  0.5,-0.5,  -0.5,-0.5);
+		poseEstimator.setFiducial(-0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5);
 
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
@@ -196,6 +196,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		binary.reshape(intrinsic.width,intrinsic.height);
 	}
 
+	Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
 	/**
 	 * Examines the input image to detect fiducials inside of it
 	 *
@@ -215,11 +216,27 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);
-			UtilPolygons2D_F64.convert(p,q);
+
+			// REMOVE EVENTUALLY  This is a hack around how interpolation is performed
+			// Using a surface integral instead would remove the need for this.  Basically by having it start
+			// interpolating from the lower extent it samples inside the image more
+			// A good unit test to see if this hack is no longer needed is to rotate the order of the polygon and
+			// see if it returns the same undistorted image each time
+			double best=Double.MAX_VALUE;
+			for (int j = 0; j < 4; j++) {
+				double found = p.get(0).normSq();
+				if( found < best ) {
+					best = found;
+					interpolationHack.set(p);
+				}
+				UtilPolygons2D_F64.shiftDown(p);
+			}
+
+			UtilPolygons2D_F64.convert(interpolationHack,q);
 
 			// remember, visual clockwise isn't the same as math clockwise, hence
 			// counter clockwise visual to the clockwise quad
-			pairsRemovePerspective.get(0).set( 0            ,      0        , q.a.x , q.a.y);
+			pairsRemovePerspective.get(0).set(0, 0, q.a.x, q.a.y);
 			pairsRemovePerspective.get(1).set( square.width ,      0        , q.b.x , q.b.y );
 			pairsRemovePerspective.get(2).set( square.width , square.height , q.c.x , q.c.y );
 			pairsRemovePerspective.get(3).set( 0            , square.height , q.d.x , q.d.y );

@@ -35,6 +35,7 @@ import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
@@ -233,14 +234,14 @@ public class ExampleImageStitching {
 
 	public static void main( String args[] ) {
 		BufferedImage imageA,imageB;
-		imageA = UtilImageIO.loadImage("../data/evaluation/stitch/mountain_rotate_01.jpg");
-		imageB = UtilImageIO.loadImage("../data/evaluation/stitch//mountain_rotate_03.jpg");
+		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
+		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));
 		stitch(imageA,imageB, ImageFloat32.class);
-		imageA = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_01.jpg");
-		imageB = UtilImageIO.loadImage("../data/evaluation/stitch/kayak_03.jpg");
+		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
+		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
 		stitch(imageA,imageB, ImageFloat32.class);
-		imageA = UtilImageIO.loadImage("../data/evaluation/scale/rainforest_01.jpg");
-		imageB = UtilImageIO.loadImage("../data/evaluation/scale/rainforest_02.jpg");
+		imageA = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_01.jpg"));
+		imageB = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_02.jpg"));
 		stitch(imageA,imageB, ImageFloat32.class);
 	}
 }

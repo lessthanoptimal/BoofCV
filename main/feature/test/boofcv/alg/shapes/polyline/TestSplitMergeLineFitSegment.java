@@ -39,7 +39,7 @@ public class TestSplitMergeLineFitSegment {
 	@Test
 	public void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.1,0.3,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
 		alg.process(contour);
 		assertEquals(0,alg.getSplits().size);
 
@@ -63,11 +63,11 @@ public class TestSplitMergeLineFitSegment {
 		for( int i = 2; i < 5; i++ )
 			contour.add( new Point2D_I32(18,5-i));
 
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.1,0.1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
 		alg.process(contour);
 
 		GrowQueue_I32 splits = alg.getSplits();
-		assertEquals( 5 , splits.size );
+		assertEquals(5 , splits.size );
 		assertEquals(0,alg.splits.data[0]);
 		assertEquals(9,alg.splits.data[1]);
 		assertEquals(13,alg.splits.data[2]);
@@ -77,11 +77,11 @@ public class TestSplitMergeLineFitSegment {
 
 	@Test
 	public void splitSegments() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.9999,0.1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
 		alg.contour = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
-		alg.contour.get(4).y=1;
+		alg.contour.get(4).y=5;
 
 		// single split
 		alg.splits.add(0);
@@ -96,49 +96,48 @@ public class TestSplitMergeLineFitSegment {
 
 	@Test
 	public void selectSplitOffset() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(2,100,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
 
 		alg.contour = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
 		alg.contour.get(4).y = 10;
-		alg.line.slope.x = 1;
+		alg.line.slope.x = 5;
 
 
-		int found = alg.selectSplitOffset(0,9);
+		int found = alg.selectSplitBetween(0, 9);
 		assertEquals(4,found);
-		found = alg.selectSplitOffset(0,5);
+		found = alg.selectSplitBetween(0, 5);
 		assertEquals(4, found);
-		found = alg.selectSplitOffset(0,4);
+		found = alg.selectSplitBetween(0, 4);
 		assertTrue(found < 4);
-		found = alg.selectSplitOffset(0,3);
+		found = alg.selectSplitBetween(0, 3);
 		assertEquals(-1, found);
-		found = alg.selectSplitOffset(5,9);
+		found = alg.selectSplitBetween(5, 9);
 		assertEquals(-1, found);
-		found = alg.selectSplitOffset(1,6);
+		found = alg.selectSplitBetween(1, 6);
 		assertEquals(4, found);
 	}
 
 	@Test
 	public void mergeSegments() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.1,0.1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,1,100);
 		alg.contour = new ArrayList<Point2D_I32>();
 		alg.contour.add(new Point2D_I32(0,0));
 		alg.contour.add(new Point2D_I32(1,0));
 		alg.contour.add(new Point2D_I32(3,0));
-		alg.contour.add(new Point2D_I32(3,2));
-		alg.contour.add(new Point2D_I32(4,2));
-		alg.contour.add(new Point2D_I32(5,2));
+		alg.contour.add(new Point2D_I32(3,4));
+		alg.contour.add(new Point2D_I32(4,4));
+		alg.contour.add(new Point2D_I32(5,4));
 		for( int i = 0; i < alg.contour.size(); i++ ) {
 			alg.splits.add(i);
 		}
 
 		assertTrue(alg.mergeSegments());
 
-		assertEquals(4,alg.splits.size);
+		assertEquals(3,alg.splits.size);
 		assertEquals(0,alg.splits.data[0]);
 		assertEquals(2,alg.splits.data[1]);
-		assertEquals(3,alg.splits.data[2]);
-		assertEquals(5,alg.splits.data[3]);
+		assertEquals(5,alg.splits.data[2]);
 	}
 }

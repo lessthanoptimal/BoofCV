@@ -60,23 +60,24 @@ public class ShapeFittingOps {
 	 *
 	 * @param sequence Ordered and connected list of points.
 	 * @param loop If true the sequence is a connected at both ends, otherwise it is assumed to not be.
-	 * @param toleranceDist Maximum distance away each point in the sequence can be from a line, in pixels.  Try 2.
-	 * @param toleranceAngle Tolerance for fitting angles, in radians. Try 0.1
+	 * @param splitFraction A line will be split if a point is more than this fraction of its
+	 *                     length away from the line. Try 0.05
+	 * @param minimumSplitPixels A line will always be split if a point is more than this number of pixels away. try 1.0
 	 * @param iterations Maximum number of iterations done to improve the fit. Can be 0. Try 50.
 	 * @return Vertexes in the fit polygon.
 	 */
 	public static List<PointIndex_I32> fitPolygon(List<Point2D_I32> sequence,  boolean loop,
-												  double toleranceDist, double toleranceAngle, int iterations) {
+												  double splitFraction, double minimumSplitPixels, int iterations) {
 		GrowQueue_I32 splits;
 
 		if( loop ) {
-			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(toleranceDist,toleranceAngle,iterations);
+			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSplitPixels,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
 			RefinePolyLine refine = new RefinePolyLine(true,10);
 			refine.fit(sequence,splits);
 		} else {
-			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(toleranceDist,toleranceAngle,iterations);
+			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSplitPixels,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
 			RefinePolyLine refine = new RefinePolyLine(false,10);

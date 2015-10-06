@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import java.io.IOException;
 public class DisplayKinectPointCloudApp {
 
 	public static void main( String args[] ) throws IOException {
-		String baseDir = "../data/evaluation/kinect/";
+		String baseDir = UtilIO.pathExample("kinect/");
 
 		String nameRgb = baseDir+"basket.ppm";
 		String nameDepth = baseDir+"basket.depth";

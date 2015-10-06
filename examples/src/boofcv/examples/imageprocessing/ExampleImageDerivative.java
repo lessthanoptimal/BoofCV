@@ -25,6 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -38,7 +39,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleImageDerivative {
 	public static void main(String[] args) {
-		BufferedImage input = UtilImageIO.loadImage("../data/evaluation/simple_objects.jpg");
+		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		// We will use floating point images here, but ImageUInt8 with ImageSInt16 for derivatives also works
 		ImageFloat32 grey = new ImageFloat32(input.getWidth(),input.getHeight());

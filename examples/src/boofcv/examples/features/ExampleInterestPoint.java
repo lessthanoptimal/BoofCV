@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
@@ -91,7 +92,7 @@ public class ExampleInterestPoint {
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage image = UtilImageIO.loadImage("../data/evaluation/sunflowers.png");
+		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 		detect(image, ImageFloat32.class);
 	}
 }

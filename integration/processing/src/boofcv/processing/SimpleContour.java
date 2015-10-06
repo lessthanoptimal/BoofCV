@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.processing;
 
+import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
-import boofcv.alg.filter.binary.Contour;
 import boofcv.struct.PointIndex_I32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -47,18 +47,19 @@ public class SimpleContour {
 	 * @see ShapeFittingOps#fitPolygon(java.util.List, boolean, double, double, int)
 	 *
 	 * @param external true for the external contour or false for all the internal contours
-	 * @param toleranceDist Maximum distance away each point in the sequence can be from a line, in pixels.  Try 2.
-	 * @param toleranceAngle Tolerance for fitting angles, in radians. Try 0.1
+	 * @param splitFraction A line will be split if a point is more than this fraction of its
+	 *                     length away from the line. Try 0.05
+	 * @param minimumSplitPixels A line will always be split if a point is more than this number of pixels away. try 5.0
 	 * @return List of polygons described by their vertexes
 	 */
-	public List<List<Point2D_I32>> fitPolygon( boolean external , double toleranceDist, double toleranceAngle ) {
+	public List<List<Point2D_I32>> fitPolygon( boolean external , double splitFraction, double minimumSplitPixels ) {
 		List<List<Point2D_I32>> polygons = new ArrayList<List<Point2D_I32>>();
 
 		int numIterations = 20;
 
 		if( external ) {
 			List<PointIndex_I32> output = ShapeFittingOps.
-					fitPolygon(contour.external, true, toleranceDist, toleranceAngle, numIterations);
+					fitPolygon(contour.external, true, splitFraction, minimumSplitPixels, numIterations);
 
 			List<Point2D_I32> poly = new ArrayList<Point2D_I32>();
 			for( PointIndex_I32 p : output ) {
@@ -68,7 +69,7 @@ public class SimpleContour {
 		} else {
 			for( List<Point2D_I32> i : contour.internal ) {
 				List<PointIndex_I32> output = ShapeFittingOps.
-						fitPolygon(i, true, toleranceDist, toleranceAngle, numIterations);
+						fitPolygon(i, true, splitFraction, minimumSplitPixels, numIterations);
 
 				List<Point2D_I32> poly = new ArrayList<Point2D_I32>();
 				for (PointIndex_I32 p : output) {

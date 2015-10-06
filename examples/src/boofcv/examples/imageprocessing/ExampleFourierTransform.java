@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImageGridPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -140,7 +141,7 @@ public class ExampleFourierTransform {
 
 	public static void main( String args[] ) {
 
-		ImageFloat32 input = UtilImageIO.loadImage("../data/evaluation/standard/lena512.bmp", ImageFloat32.class);
+		ImageFloat32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"), ImageFloat32.class);
 
 		applyBoxFilter(input.clone());
 	}

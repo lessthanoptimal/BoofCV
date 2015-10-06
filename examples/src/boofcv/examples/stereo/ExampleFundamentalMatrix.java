@@ -35,6 +35,7 @@ import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.SurfFeature;
@@ -161,10 +162,10 @@ public class ExampleFundamentalMatrix {
 
 	public static void main( String args[] ) {
 
-		String dir = "../data/evaluation/structure/";
+		String dir = UtilIO.pathExample("structure/");
 
-		BufferedImage imageA = UtilImageIO.loadImage(dir + "undist_cyto_01.jpg");
-		BufferedImage imageB = UtilImageIO.loadImage(dir + "undist_cyto_02.jpg");
+		BufferedImage imageA = UtilImageIO.loadImage(dir , "undist_cyto_01.jpg");
+		BufferedImage imageB = UtilImageIO.loadImage(dir , "undist_cyto_02.jpg");
 
 		List<AssociatedPair> matches = computeMatches(imageA,imageB);
 

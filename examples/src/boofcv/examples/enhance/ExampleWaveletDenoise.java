@@ -23,6 +23,7 @@ import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
@@ -40,7 +41,7 @@ public class ExampleWaveletDenoise {
 
 		// load the input image, declare data structures, create a noisy image
 		Random rand = new Random(234);
-		ImageFloat32 input = UtilImageIO.loadImage("../data/evaluation/standard/lena512.bmp",ImageFloat32.class);
+		ImageFloat32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"),ImageFloat32.class);
 
 		ImageFloat32 noisy = input.clone();
 		GImageMiscOps.addGaussian(noisy, rand, 20, 0, 255);

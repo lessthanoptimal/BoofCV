@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChecks {
 
 	// selected because it has significant lens distortion
-	String directory = UtilIO.getPathToBase()+"data/applet/calibration/mono/Sony_DSC-HX5V_Chess/";
+	String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 
 	public TestCalibrationFiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
@@ -47,7 +47,7 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
 
-		BufferedImage out = UtilImageIO.loadImage(directory + "frame09.jpg");
+		BufferedImage out = UtilImageIO.loadImage(directory , "frame09.jpg");
 		return ConvertBufferedImage.convertFrom(out, true, imageType);
 	}
 

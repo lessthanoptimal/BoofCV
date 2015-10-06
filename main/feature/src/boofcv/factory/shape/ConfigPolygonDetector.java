@@ -33,9 +33,10 @@ public class ConfigPolygonDetector implements Configuration {
 	public int[] numberOfSides = null;
 
 	/**
-	 * Two lines are merged together if their angle is <= to this number.
+	 * Two lines are merged together if their angle is &le; to this number.  This variable is dependent upon the
+	 * number of sides.  The more sides you wish to detect the more likely you will need to reduce this number.
 	 */
-	public double contour2Poly_mergeTolerance = 0.1;
+	public double contour2Poly_splitFraction = 0.15;
 
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
@@ -43,9 +44,10 @@ public class ConfigPolygonDetector implements Configuration {
 	public int contour2Poly_iterations = 20;
 
 	/**
-	 * Number of pixels, as a fraction of contour length, to split a new line in SplitMergeLineFitLoop.
+	 * The minimum number of pixels away a pixel is from a line to split/merge.  Specified as a fraction
+	 * of total image width.
 	 */
-	public double contour2Poly_splitDistanceFraction = 0.04;
+	public double contour2Poly_minimumSplitFraction = 0.0078125;
 
 	/**
 	 * Subpixel refinement using lines.  This assumes that the lines are straight so it works best when lens
@@ -120,9 +122,9 @@ public class ConfigPolygonDetector implements Configuration {
 		sides += " ]";
 
 		return getClass().getSimpleName()+"{ numberOfSides="+sides+
-				" , contour2Poly_mergeTolerance="+contour2Poly_mergeTolerance+
+				" , contour2Poly_splitFraction="+contour2Poly_splitFraction+
 				" , contour2Poly_iterations="+contour2Poly_iterations+
-				" , contour2Poly_splitDistanceFraction="+contour2Poly_splitDistanceFraction+
+				" , contour2Poly_minimumSplitFraction="+ contour2Poly_minimumSplitFraction +
 				" , refineWithLines="+refineWithLines+
 				" , refineWithCorners="+refineWithCorners+
 				" , minContourImageWidthFraction="+minContourImageWidthFraction+

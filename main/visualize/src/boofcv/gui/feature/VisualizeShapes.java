@@ -138,6 +138,24 @@ public class VisualizeShapes {
 		}
 	}
 
+	public static void drawPolygonCorners( Polygon2D_F64 polygon, int radius , Graphics2D g2 , boolean interpolate ) {
+		if( interpolate ) {
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p = polygon.get(i);
+				VisualizeFeatures.drawCircle(g2,p.x,p.y,radius);
+			}
+
+		} else {
+			for( int i = 0; i < polygon.size(); i++ ) {
+				Point2D_F64 p = polygon.get(i);
+				VisualizeFeatures.drawCircle(g2,(int)(p.x+0.5),(int)(p.y+0.5),radius);
+			}
+		}
+	}
+
 	/**
 	 * Draws the rotated ellipse
 	 * @param ellipse Description of the ellipse

@@ -20,6 +20,7 @@ package boofcv.examples;
 
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.jcodec.JCodecSimplified;
 import boofcv.struct.image.ImageBase;
@@ -37,7 +38,7 @@ import java.awt.image.BufferedImage;
 public class ExampleJCodecDisplayFrames {
 	public static void main(String[] args) {
 
-		String fileName = "../data/applet/background/highway_bridge_jitter.mp4";
+		String fileName = UtilIO.pathExample("background/highway_bridge_jitter.mp4");
 		ImageType type = ImageType.ms(3, ImageUInt8.class);
 //		ImageType type = ImageType.single(ImageUInt8.class);
 //		ImageType type = ImageType.ms(3, ImageFloat32.class);

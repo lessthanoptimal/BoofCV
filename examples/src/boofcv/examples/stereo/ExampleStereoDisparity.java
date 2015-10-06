@@ -142,14 +142,14 @@ public class ExampleStereoDisparity {
 	}
 
 	public static void main( String args[] ) {
-		String calibDir = "../data/applet/calibration/stereo/Bumblebee2_Chess/";
-		String imageDir = "../data/applet/stereo/";
+		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
+		String imageDir = UtilIO.pathExample("stereo/");
 
-		StereoParameters param = UtilIO.loadXML(calibDir + "stereo.xml");
+		StereoParameters param = UtilIO.loadXML(calibDir , "stereo.xml");
 
 		// load and convert images into a BoofCV format
-		BufferedImage origLeft = UtilImageIO.loadImage(imageDir + "chair01_left.jpg");
-		BufferedImage origRight = UtilImageIO.loadImage(imageDir + "chair01_right.jpg");
+		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");
+		BufferedImage origRight = UtilImageIO.loadImage(imageDir , "chair01_right.jpg");
 
 		ImageUInt8 distLeft = ConvertBufferedImage.convertFrom(origLeft,(ImageUInt8)null);
 		ImageUInt8 distRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);

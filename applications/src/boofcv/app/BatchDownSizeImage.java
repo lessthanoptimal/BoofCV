@@ -116,7 +116,8 @@ public class BatchDownSizeImage {
 
 		if( images.size() == 0 ) {
 			System.out.println(fileRegex);
-			throw new IllegalArgumentException("No images found.  Is the path/regex correct?");
+			System.err.println("No images found.  Is the path/regex correct?");
+			System.exit(1);
 		}
 	}
 

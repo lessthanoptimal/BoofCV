@@ -23,6 +23,7 @@ import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.MediaManager;
+import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
@@ -49,7 +50,7 @@ public class ExampleTrackerObjectQuad {
 
 	public static void main(String[] args) {
 		MediaManager media = DefaultMediaManager.INSTANCE;
-		String fileName = "../data/applet/tracking/wildcat_robot.mjpeg";
+		String fileName = UtilIO.pathExample("tracking/wildcat_robot.mjpeg");
 
 		// Create the tracker.  Comment/Uncomment to change the tracker.
 		TrackerObjectQuad tracker =

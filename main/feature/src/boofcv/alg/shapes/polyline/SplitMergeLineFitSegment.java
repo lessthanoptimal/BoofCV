@@ -32,8 +32,8 @@ import java.util.List;
 // TODO only check lines that changed for splitting
 public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 
-	public SplitMergeLineFitSegment(double toleranceSplit, double toleranceMerge, int maxIterations) {
-		super(toleranceSplit, toleranceMerge, maxIterations);
+	public SplitMergeLineFitSegment(double splitFraction, double minimumSplitPixels, int maxIterations) {
+		super(splitFraction, minimumSplitPixels, maxIterations);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		line.p.set(a.x,a.y);
 		line.slope.set(c.x-a.x,c.y-a.y);
 
-		int indexSplit = selectSplitOffset(indexStart,indexStop);
+		int indexSplit = selectSplitBetween(indexStart, indexStop);
 
 		if( indexSplit >= 0 ) {
 			splitPixels(indexStart, indexSplit);
@@ -100,9 +100,9 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 			line.p.set(a.x,a.y);
 			line.slope.set(b.x-a.x,b.y-a.y);
 
-			int bestIndex = selectSplitOffset(start,end);
+			int bestIndex = selectSplitBetween(start, end);
 			if( bestIndex >= 0 ) {
-				change = true;
+				change |= true;
 				work.add(start);
 				work.add(bestIndex);
 			} else {
@@ -123,9 +123,11 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
 	 * (set up prior to calling).  Returns the index if the distance is less than tolerance, otherwise -1
 	 */
-	protected int selectSplitOffset( int indexStart , int indexEnd ) {
+	protected int selectSplitBetween(int indexStart, int indexEnd) {
 		int bestIndex = -1;
 		double bestDistanceSq = 0;
+
+		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
 		// don't try splitting at the two end points
 		for( int i = indexStart+1; i < indexEnd; i++ ) {
@@ -139,7 +141,7 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 			}
 		}
 
-		if( bestDistanceSq > toleranceSplitSq ) {
+		if( bestDistanceSq > toleranceSplitSq) {
 			return bestIndex;
 		} else {
 			return -1;
@@ -167,16 +169,21 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		for( int i = 0; i < splits.size-2; i++ ) {
 			Point2D_I32 c = contour.get(splits.data[i+2]);
 
-			double theta = computeAcute(a, b, c);
+			line.p.set(a.x,a.y);
+			line.slope.set(c.x-a.x,c.y-a.y);
 
-			if( theta <= toleranceMerge ) {
+			point2D.set(b.x,b.y);
+			double d = Distance2D_F64.distanceSq(line, point2D);
+
+			if( d < splitThresholdSq(a,c) ) {
 				// merge the two lines by not adding it
 				change = true;
-				b=c;
 			} else {
-				work.add(splits.data[i+1]);
-				a=b;b=c;
+				work.add(splits.data[i + 1]);
+				a = b;
 			}
+
+			b = c;
 		}
 
 		work.add(splits.data[splits.size-1]);

@@ -62,14 +62,14 @@ If you are new to Java, then using BoofCV will be a challenge.  With just a litt
 
 ## Directories
 
-Directory      | Description
----------------|-------------------------------------------------------------------------------------
-applications/  | Helpful applications
-data/          | Directory containing optional data used by applets and examples.
-evaluation/    | Contains code used to visual and debug.  Where the Applet code resides
-examples/      | Set of example code designed to be easy to read and understand.
-integration/   | Contains code which allows BoofCV to be easily integrated with 3rd party libraries.  Primary for video input/output.
-main/          | Contains the source code for BoofCV
+Directory       | Description
+----------------|-------------------------------------------------------------------------------------
+applications/   | Helpful applications
+data/           | Directory containing optional data used by applets and examples.
+demonstrations/ | Demonstration code which typically lets experiment by changing parameters in real-time
+examples/       | Set of example code designed to be easy to read and understand.
+integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries.  Primary for video input/output.
+main/           | Contains the source code for BoofCV
 
 # Building from Source
 ------------------------------------

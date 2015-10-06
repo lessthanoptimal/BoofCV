@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
@@ -122,7 +123,7 @@ public class ExampleFeatureSurf {
 
 	public static void main( String args[] ) {
 		
-		ImageFloat32 image = UtilImageIO.loadImage("../data/evaluation/particles01.jpg",ImageFloat32.class);
+		ImageFloat32 image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"), ImageFloat32.class);
 		
 		// run each example
 		ExampleFeatureSurf.easy(image);
