@@ -206,7 +206,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
-		FastQueue<Polygon2D_F64> candidates = squareDetector.getFound();
+		FastQueue<Polygon2D_F64> candidates = squareDetector.getFoundPolygons();
 
 		found.reset();
 

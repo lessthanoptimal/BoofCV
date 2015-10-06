@@ -115,7 +115,7 @@ public class TestBinaryPolygonConvexDetector {
 		alg.setLensDistortion(dist.width, dist.height, tranTo, tranFrom);
 		alg.process(dist, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFound();
+		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
 
 		assertEquals(rectangles.size(),found.size);
 
@@ -159,7 +159,7 @@ public class TestBinaryPolygonConvexDetector {
 		BinaryPolygonConvexDetector alg = createDetector(imageType, useLines, numberOfSides);
 		alg.process(dist, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFound();
+		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
 
 		assertEquals(rectangles.size(), found.size);
 
@@ -186,7 +186,7 @@ public class TestBinaryPolygonConvexDetector {
 		BinaryPolygonConvexDetector alg = createDetector(imageType, useLines, 3,4);
 		alg.process(dist, binary);
 
-		FastQueue<Polygon2D_F64> found = alg.getFound();
+		FastQueue<Polygon2D_F64> found = alg.getFoundPolygons();
 
 		assertEquals(polygons.size(), found.size);
 
@@ -335,7 +335,7 @@ public class TestBinaryPolygonConvexDetector {
 			BinaryPolygonConvexDetector alg = createDetector(ImageUInt8.class, true, i);
 
 			alg.process(gray,binary);
-			assertEquals("num sides = "+i,0,alg.getFound().size());
+			assertEquals("num sides = "+i,0,alg.getFoundPolygons().size());
 		}
 	}
 
@@ -358,11 +358,11 @@ public class TestBinaryPolygonConvexDetector {
 			alg.process(gray,binary);
 			if( i == 3 ) {
 				double tol = 0.5;
-				assertEquals(1, alg.getFound().size());
-				Polygon2D_F64 found = (Polygon2D_F64)alg.getFound().get(0);
+				assertEquals(1, alg.getFoundPolygons().size());
+				Polygon2D_F64 found = (Polygon2D_F64)alg.getFoundPolygons().get(0);
 				checkPolygon(new double[]{10, 10, 30, 40, 50, 10}, found);
 			} else
-				assertEquals(0,alg.getFound().size());
+				assertEquals(0,alg.getFoundPolygons().size());
 		}
 	}
 

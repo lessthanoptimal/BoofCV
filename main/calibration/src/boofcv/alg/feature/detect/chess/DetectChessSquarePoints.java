@@ -112,7 +112,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 		detectorSquare.process(input, binary);
 
-		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
+		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
 
 		clusters = s2c.process(found.toList());
 

@@ -107,7 +107,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		inputToBinary.process(image,binary);
 		detectorSquare.process(image, binary);
 
-		FastQueue<Polygon2D_F64> found = detectorSquare.getFound();
+		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
 
 		List<List<SquareNode>> clusters = s2c.process(found.toList());
 		c2g.process(clusters);

@@ -243,7 +243,7 @@ public class DetectCalibrationChessApp
 
 
 		if( calibGUI.doShowSquares ) {
-			FastQueue<Polygon2D_F64> squares =  alg.getFindSeeds().getDetectorSquare().getFound();
+			FastQueue<Polygon2D_F64> squares =  alg.getFindSeeds().getDetectorSquare().getFoundPolygons();
 
 			for (int i = 0; i < squares.size(); i++) {
 				Polygon2D_F64 p = squares.get(i);

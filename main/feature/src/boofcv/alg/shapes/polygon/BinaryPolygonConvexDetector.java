@@ -404,11 +404,13 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		return outputClockwise;
 	}
 
-	public FastQueue<Polygon2D_F64> getFound() {
+	public FastQueue<Polygon2D_F64> getFoundPolygons() {
 		return found;
 	}
 
-	public List<Contour> getFoundContours(){return foundContours;}
+	public List<Contour> getUsedContours(){return foundContours;}
+
+	public List<Contour> getAllContours(){return contourFinder.getContours().toList();}
 
 	public Class<T> getInputType() {
 		return inputType;

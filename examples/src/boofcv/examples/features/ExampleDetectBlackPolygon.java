@@ -82,7 +82,7 @@ public class ExampleDetectBlackPolygon {
 			detector.process(input, binary);
 
 			// visualize results by drawing red polygons
-			FastQueue<Polygon2D_F64> found = detector.getFound();
+			FastQueue<Polygon2D_F64> found = detector.getFoundPolygons();
 			Graphics2D g2 = image.createGraphics();
 			g2.setStroke(new BasicStroke(3));
 			for (int i = 0; i < found.size; i++) {

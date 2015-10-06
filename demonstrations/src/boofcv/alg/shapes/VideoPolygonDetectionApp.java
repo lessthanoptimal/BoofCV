@@ -163,7 +163,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 		detector.process(gray,binary);
 
 		// frame 212 it isn't detecting a square
-		System.out.println(count+"  detected "+detector.getFound().size);
+		System.out.println(count+"  detected "+detector.getFoundPolygons().size);
 
 		if( count == 212 ) {
 			UtilImageIO.saveImage(buffImage,"saved.png");
@@ -183,7 +183,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 		Graphics2D g2 = imageGUI.createGraphics();
 
-		FastQueue<Polygon2D_F64> found = detector.getFound();
+		FastQueue<Polygon2D_F64> found = detector.getFoundPolygons();
 		g2.setColor(new Color(255,0,0,200));
 		g2.setStroke(new BasicStroke(4));
 

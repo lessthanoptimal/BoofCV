@@ -117,7 +117,7 @@ public class VisualizeSquareFiducial {
 			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(2));
 			VisualizeShapes.drawArrow(q,g2);
-			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getFoundContours(),Color.BLUE,outputGray);
+			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 		}
 
 		ShowImages.showWindow(output,"Binary");
