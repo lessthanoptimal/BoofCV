@@ -182,6 +182,11 @@ public class CommandParserFiducialSquare {
 			app.setCentering(false);
 			app.setOffset(offsetX, offsetY, units);
 		}
+		if( !Double.isNaN(borderX)) {
+			app.setPageBorder(borderX,borderY, units);
+		} else {
+			app.setPageBorder(0,0, units);
+		}
 		app.generateGrid(fiducialWidth,whiteBorder,gridX,gridY,paper);
 
 		System.out.println("################### Finished");

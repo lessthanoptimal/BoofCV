@@ -84,7 +84,7 @@ public abstract class BaseFiducialSquareEPS {
 	// offset of the page.  basically changes the origin
 	double offsetX, offsetY;
 
-	//============= These parameters are used to automatically generate some of the above parmeters
+	//============= These parameters are used to automatically generate some of the above parameters
 	// No printing is allowed inside the border and this information is used to adjust offsets with the user request
 	double pageBorderX = 1*CM_TO_POINTS;
 	double pageBorderY = 1*CM_TO_POINTS;
@@ -227,12 +227,12 @@ public abstract class BaseFiducialSquareEPS {
 		double deadZoneY = Math.max(0,pageBorderY-whiteBorder);
 
 		if( pageWidthUnit <= 0 ) {
-			pageWidth = fiducialTotalWidth *numCols + deadZoneX;
+			pageWidth = fiducialTotalWidth*numCols + 2*deadZoneX;
 		} else {
 			pageWidth = pageWidthUnit*UNIT_TO_POINTS;
 		}
 		if( pageHeightUnit <= 0 ) {
-			pageHeight = fiducialTotalWidth *numRows + deadZoneY;
+			pageHeight = fiducialTotalWidth*numRows + 2*deadZoneY;
 		} else {
 			pageHeight = pageHeightUnit*UNIT_TO_POINTS;
 		}
@@ -240,7 +240,7 @@ public abstract class BaseFiducialSquareEPS {
 		// Center the fiducial inside the page.  Reduce the size of the grid if required to fit it inside the
 		// page, including the border
 		if( centerRequested ) {
-			centerPage(deadZoneX, deadZoneY);
+			centerPage();
 		}
 	}
 
@@ -248,7 +248,7 @@ public abstract class BaseFiducialSquareEPS {
 	 * Centers the image while taking in account page border where it can't print.  Reduces the number of elements in
 	 * the grid if necessary.
 	 */
-	private void centerPage(double deadZoneX, double deadZoneY) {
+	private void centerPage() {
 		double validX0 = pageBorderX;
 		double validX1 = pageWidth-pageBorderX;
 		double validY0 = pageBorderY;
@@ -259,8 +259,8 @@ public abstract class BaseFiducialSquareEPS {
 			allGood = true;
 
 			// center the current target inside the page
-			offsetX = (pageWidth  - fiducialTotalWidth * numCols - 2 * deadZoneX) / 2.0;
-			offsetY = (pageHeight - fiducialTotalWidth * numRows - 2 * deadZoneY) / 2.0;
+			offsetX = (pageWidth  - fiducialTotalWidth * numCols ) / 2.0;
+			offsetY = (pageHeight - fiducialTotalWidth * numRows ) / 2.0;
 
 			// Find the edges which bound the regions where printing is done
 			double edgeBlackLeft = offsetX+whiteBorder;
@@ -268,12 +268,12 @@ public abstract class BaseFiducialSquareEPS {
 			double edgeBlackBottom = offsetY+whiteBorder;
 			double edgeBlackTop = offsetY+ fiducialTotalWidth *numRows-whiteBorder;
 
-			if( edgeBlackLeft < validX0 ||edgeBlackRight > validX1 ) {
+			if( edgeBlackLeft+1e-8 < validX0 ||edgeBlackRight-1e-8 > validX1 ) {
 				allGood = false;
 				numCols--;
 			}
 
-			if( edgeBlackBottom < validY0 ||edgeBlackTop > validY1 ) {
+			if( edgeBlackBottom+1e-8 < validY0 ||edgeBlackTop-1e-8 > validY1 ) {
 				allGood = false;
 				numRows--;
 			}

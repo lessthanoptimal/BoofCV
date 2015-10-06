@@ -28,6 +28,10 @@ Version : Alpha 0.20
   * Might spawn into its own project if there is more interest in the future
 - Binary Thresholding
   * Created a generic config class which supports all current types
+- Square Fiducial Generator App
+  * no longer defaults to a page border of 1cm
+  * page border is actually user configurable
+  * border and white border are correctly handled
 
 TODO Easy to use calibration app
 TODO Angular consistency on fiducial tests
