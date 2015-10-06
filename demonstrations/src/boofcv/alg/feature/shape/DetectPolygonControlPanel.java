@@ -100,26 +100,26 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerMinEdge.addChangeListener(this);
 		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_splitFraction,0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSplitFraction,0.0,1.0,0.001));
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSplitFraction, 0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
 		spinnerContourSplit.addChangeListener(this);
-		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations,1,200,1));
+		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations, 1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
 
-		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.configRefineLines.lineSamples,5,100,1));
+		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.configRefineLines.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
-		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(config.configRefineLines.cornerOffset,0,10, 1));
+		spinnerCornerOffset = new JSpinner(new SpinnerNumberModel(config.configRefineLines.cornerOffset, 0, 10, 1));
 		spinnerCornerOffset.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerCornerOffset.addChangeListener(this);
-		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.configRefineLines.sampleRadius,0,10, 1));
+		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.configRefineLines.sampleRadius, 0, 10, 1));
 		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerSampleRadius.addChangeListener(this);
-		spinnerMaxIterations = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxIterations,0,10, 1));
+		spinnerMaxIterations = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxIterations, 0, 10, 1));
 		spinnerMaxIterations.setMaximumSize(spinnerMaxIterations.getPreferredSize());
 		spinnerMaxIterations.addChangeListener(this);
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.configRefineLines.convergeTolPixels,0.0,1.0, 0.005));
+		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.configRefineLines.convergeTolPixels, 0.0, 1.0, 0.005));
 		configureSpinnerFloat(spinnerConvergeTol);
 
 		addLabeled(imageView, "View: ", this);
@@ -139,6 +139,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerSampleRadius, "Sample Radius: ", this);
 		addLabeled(spinnerMaxIterations, "Iterations: ", this);
 		addLabeled(spinnerConvergeTol, "Tolerance Pixels: ", this);
+		addVerticalGlue(this);
 	}
 
 	private void configureSpinnerFloat( JSpinner spinner ) {
@@ -151,6 +152,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		d.width = 60;
 		spinner.setPreferredSize(d);
 		spinner.addChangeListener(this);
+		spinner.setMaximumSize(d);
 	}
 
 	@Override

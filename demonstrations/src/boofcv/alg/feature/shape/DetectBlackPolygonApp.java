@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 // TODO min and max number of sides
-// todo minium contour size
+// todo minimum contour size
 
 /**
  * Application which lets you configure the black polygon detector in real-time
@@ -68,6 +68,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
 	public DetectBlackPolygonApp(Class<T> imageType) {
+		setLayout(new BorderLayout());
 
 		this.imageType = imageType;
 
@@ -189,15 +190,15 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 				break;
 
 			case LOCAL_GAUSSIAN:
-				inputToBinary = FactoryThresholdBinary.adaptiveGaussian(radius, 0, down, imageType);
+				inputToBinary = FactoryThresholdBinary.localGaussian(radius, 0, down, imageType);
 				break;
 
 			case LOCAL_SQUARE:
-				inputToBinary = FactoryThresholdBinary.adaptiveSquare(radius, 0, down, imageType);
+				inputToBinary = FactoryThresholdBinary.localSquare(radius, 0, down, imageType);
 				break;
 
 			case LOCAL_SAVOLA:
-				inputToBinary = FactoryThresholdBinary.adaptiveSauvola(radius, 0.3f, down, imageType);
+				inputToBinary = FactoryThresholdBinary.localSauvola(radius, 0.3f, down, imageType);
 				break;
 
 			default:

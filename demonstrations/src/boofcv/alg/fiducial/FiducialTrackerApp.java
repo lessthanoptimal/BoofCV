@@ -26,6 +26,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
@@ -174,13 +176,15 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		processedInputImage = false;
 
 		String videoName = inputRefs.get(index).getPath();
-		String path = videoName.substring(0,videoName.lastIndexOf('/'));
+		String path = videoName.substring(0, videoName.lastIndexOf('/'));
+
+		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
-			detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1), 10, imageClass);
+			detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
 		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
 			double length = 0.1;
-			detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(), 10, imageClass);
+			detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
 
 			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 

@@ -26,6 +26,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -166,14 +168,18 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 
 		System.out.println("binary: robust = "+robust+" size = "+size);
 
-		ConfigFiducialBinary config = new ConfigFiducialBinary();
-		config.targetWidth = size;
-		config.squareDetector.minimumEdgeIntensity = 10;
+		ConfigFiducialBinary configFid = new ConfigFiducialBinary();
+		configFid.targetWidth = size;
+		configFid.squareDetector.minimumEdgeIntensity = 10;
+
+		ConfigThreshold configThreshold ;
 
 		if( robust )
-			detector = FactoryFiducial.squareBinaryRobust(config,10,ImageUInt8.class);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 		else
-			detector = FactoryFiducial.squareBinaryFast(config, DEFAULT_THRESHOLD, ImageUInt8.class);
+			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
+
+		detector = FactoryFiducial.squareBinary(configFid, configThreshold, ImageUInt8.class);
 	}
 
 	void parseImage( int index , String []args ) {
@@ -210,11 +216,15 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		ConfigFiducialImage config = new ConfigFiducialImage();
 		config.squareDetector.minimumEdgeIntensity = 10;
 
-		SquareImage_to_FiducialDetector<ImageUInt8> detector;
+		ConfigThreshold configThreshold;
+
 		if( robust )
-			detector = FactoryFiducial.squareImageRobust(config,10,ImageUInt8.class);
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 		else
-			detector = FactoryFiducial.squareImageFast(config, DEFAULT_THRESHOLD, ImageUInt8.class);
+			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
+
+		SquareImage_to_FiducialDetector<ImageUInt8> detector =
+				FactoryFiducial.squareImage(config, configThreshold, ImageUInt8.class);
 
 		for (int i = 0; i < paths.size(); i++) {
 			BufferedImage buffered = UtilImageIO.loadImage(paths.get(i));

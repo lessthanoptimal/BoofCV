@@ -30,35 +30,51 @@ public enum ThresholdType {
 	/**
 	 * Fixed threshold
 	 */
-	FIXED,
+	FIXED(false,true),
 	/**
 	 * Globally adaptive set using entropy equation
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy(int[], int, int)
 	 */
-	GLOBAL_ENTROPY,
+	GLOBAL_ENTROPY(true,true),
 	/**
 	 * Globally adaptive set using Otsu's equation
 	 *
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu(int[], int, int)
 	 */
-	GLOBAL_OTSU,
+	GLOBAL_OTSU(true,true),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
 	 * @see ThresholdImageOps#adaptiveGaussian(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
 	 */
-	LOCAL_GAUSSIAN,
+	LOCAL_GAUSSIAN(true,false),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
 	 * @see ThresholdImageOps#adaptiveSquare(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
 	 */
-	LOCAL_SQUARE,
+	LOCAL_SQUARE(true,false),
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *
 	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola
 	 */
-	LOCAL_SAVOLA
+	LOCAL_SAVOLA(true,false);
+
+	boolean adaptive;
+	boolean global;
+
+	ThresholdType(boolean adaptive, boolean global) {
+		this.adaptive = adaptive;
+		this.global = global;
+	}
+
+	public boolean isAdaptive() {
+		return adaptive;
+	}
+
+	public boolean isGlobal() {
+		return global;
+	}
 }

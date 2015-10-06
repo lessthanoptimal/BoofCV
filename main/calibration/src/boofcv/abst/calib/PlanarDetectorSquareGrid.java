@@ -48,7 +48,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		InputToBinary<ImageFloat32> inputToBinary;
 
 		if( config.binaryGlobalThreshold <= 0 ) {
-			inputToBinary = FactoryThresholdBinary.adaptiveSquare(config.binaryAdaptiveRadius,0,true,ImageFloat32.class);
+			inputToBinary = FactoryThresholdBinary.localSquare(config.binaryAdaptiveRadius, 0, true, ImageFloat32.class);
 		} else {
 			inputToBinary = FactoryThresholdBinary.globalFixed(config.binaryGlobalThreshold,true,ImageFloat32.class);
 		}

@@ -19,6 +19,8 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
@@ -40,18 +42,9 @@ public class ConfigChessboard implements Configuration {
 	public int numRows = -1;
 
 	/**
-	 * Global threshold used on the image.  If <= 0 then a local adaptive threshold is used instead
+	 * Configuration for thresholding the image
 	 */
-	public double binaryGlobalThreshold = -1;
-
-	/**
-	 * Size of local region used by adaptive threshold
-	 */
-	public int binaryAdaptiveRadius = 20;
-	/**
-	 * Bias used by local adaptive threshold
-	 */
-	public double binaryAdaptiveBias = -10;
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,20);
 
 	/**
 	 * Configuration for square detector
@@ -64,6 +57,7 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
+		thresholding.bias = -10;
 
 //		square.contour2Poly_splitFraction = 0.25;
 //		square.contour2Poly_minimumSplitFraction = 0.01;

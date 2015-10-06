@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> adaptiveGaussian(int radius, double bias, boolean down, Class<T> inputType) {
+	InputToBinary<T> localGaussian(int radius, double bias, boolean down, Class<T> inputType) {
 		return new AdaptiveGaussianBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
 	}
 
@@ -53,7 +53,7 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> adaptiveSauvola(int radius, float k, boolean down, Class<T> inputType) {
+	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType) {
 		return new AdaptiveSauvolaBinaryFilter<T>(radius,k,down,ImageType.single(inputType));
 	}
 
@@ -67,7 +67,7 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> adaptiveSquare(int radius, double bias, boolean down, Class<T> inputType) {
+	InputToBinary<T> localSquare(int radius, double bias, boolean down, Class<T> inputType) {
 		return new AdaptiveSquareBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
 	}
 
@@ -110,5 +110,37 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> globalOtsu(int minValue, int maxValue, boolean down, Class<T> inputType) {
 		return new GlobalOtsuBinaryFilter<T>(minValue,maxValue,down,ImageType.single(inputType));
+	}
+
+	/**
+	 * Creates threshold using a config class
+	 *
+	 * @param config Configuration
+	 * @param inputType Type of input image
+	 * @return The thresholder
+	 */
+	public static <T extends ImageSingleBand>
+	InputToBinary<T> threshold( ConfigThreshold config, Class<T> inputType) {
+
+		switch( config.type ) {
+			case FIXED:
+				return globalFixed(config.fixedThreshold,config.down,inputType);
+
+			case GLOBAL_OTSU:
+				return globalOtsu(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+
+			case GLOBAL_ENTROPY:
+				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+
+			case LOCAL_GAUSSIAN:
+				return localGaussian(config.radius, config.bias, config.down, inputType);
+
+			case LOCAL_SAVOLA:
+				return localSauvola(config.radius, config.savolaK, config.down, inputType);
+
+			case LOCAL_SQUARE:
+				return localSquare(config.radius, config.bias, config.down, inputType);
+		}
+		throw new IllegalArgumentException("Unknown type "+config.type);
 	}
 }

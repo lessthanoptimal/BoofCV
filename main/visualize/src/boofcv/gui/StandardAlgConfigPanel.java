@@ -70,8 +70,14 @@ public class StandardAlgConfigPanel extends JPanel {
 	public void addSeparator(int width) {
 		add(Box.createRigidArea(new Dimension(1,8)));
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-		separator.setMaximumSize(new Dimension(width,5));
+		separator.setMaximumSize(new Dimension(width, 5));
 		add(separator);
+		add(Box.createRigidArea(new Dimension(1, 8)));
+	}
+
+	public void addSeparator() {
+		add(Box.createRigidArea(new Dimension(1, 8)));
+		add(new JSeparator());
 		add(Box.createRigidArea(new Dimension(1,8)));
 	}
 

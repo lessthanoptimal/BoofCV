@@ -16,9 +16,3 @@ if( file('./integration/openkinect/libfreenect').exists()) {
 } else {
     logger.warn('Skipping integration/openkinect because openkinect/libfreenect is missing! See integration/openkinect/readme.txt')
 }
-
-if( file('./integration/processing/core.jar').exists()) {
-    include 'integration:processing'
-} else {
-    logger.warn('Skipping integration/processing because core.jar is missing!  See integration/processing/readme.txt')
-}

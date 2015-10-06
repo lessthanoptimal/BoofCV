@@ -20,6 +20,7 @@ package boofcv.abst.fiducial;
 
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -85,8 +86,8 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 	public static void main(String[] args) {
 		String directory = UtilIO.pathExample("fiducial/binary/");
 
-		FiducialDetector detector = FactoryFiducial.
-				squareBinaryFast(new ConfigFiducialBinary(0.2), 100, ImageUInt8.class);
+		FiducialDetector detector = FactoryFiducial.squareBinary(
+				new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , ImageUInt8.class);
 		perform(directory, detector);
 
 //		detector = FactoryFiducial.

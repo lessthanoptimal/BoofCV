@@ -20,6 +20,8 @@ package boofcv.abst.fiducial;
 
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -58,6 +60,8 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1),6,imageType.getImageClass());
+		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
+				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6),
+				imageType.getImageClass());
 	}
 }

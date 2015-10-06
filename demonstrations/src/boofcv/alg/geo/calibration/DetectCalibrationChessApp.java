@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.squares.SquareEdge;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -77,6 +78,8 @@ public class DetectCalibrationChessApp
 
 	boolean processed = false;
 
+	ConfigChessboard config;
+
 	public DetectCalibrationChessApp() {
 
 		gray = new ImageFloat32(1,1);
@@ -102,7 +105,7 @@ public class DetectCalibrationChessApp
 	}
 
 	public void configure( int numCols , int numRows , boolean forCalibration ) {
-		ConfigChessboard config = new ConfigChessboard(numCols,numRows,30);
+		config = new ConfigChessboard(numCols,numRows,30);
 
 		if( !forCalibration ) {
 			config.square.refineWithCorners = false;
@@ -159,11 +162,6 @@ public class DetectCalibrationChessApp
 	}
 
 	private synchronized void detectTarget() {
-		if( calibGUI.isManual())
-			alg.setUserBinaryThreshold(calibGUI.getThresholdLevel());
-		else
-			alg.setUserBinaryThreshold(-1);
-
 		foundTarget = alg.process(gray);
 	}
 
@@ -428,6 +426,14 @@ public class DetectCalibrationChessApp
 
 	@Override
 	public void calibEventProcess() {
+
+		if( calibGUI.isManual()) {
+			config.thresholding.type = ThresholdType.FIXED;
+			config.thresholding.fixedThreshold = calibGUI.getThresholdLevel();
+		} else {
+			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
+		}
+		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlg();
 		detectTarget();
 
 		SwingUtilities.invokeLater(new Runnable() {

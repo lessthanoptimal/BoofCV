@@ -18,8 +18,10 @@
 
 package boofcv.abst.calib;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -44,11 +46,11 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
 
+		InputToBinary<ImageFloat32> inputToBinary =
+				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
+
 		alg = new DetectChessboardFiducial<ImageFloat32>(
-				config.numCols,config.numRows,detectorSquare,ImageFloat32.class);
-		alg.setUserBinaryThreshold(config.binaryGlobalThreshold);
-		alg.setUserAdaptiveRadius(config.binaryAdaptiveRadius);
-		alg.setUserAdaptiveBias(config.binaryAdaptiveBias);
+				config.numCols,config.numRows,detectorSquare,inputToBinary);
 
 		layoutPoints = gridChess(config.numCols,config.numRows,config.squareWidth);
 	}

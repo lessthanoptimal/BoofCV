@@ -18,8 +18,10 @@
 
 package boofcv.alg.feature.detect.chess;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
@@ -78,8 +80,9 @@ public class TestDetectChessCalibrationPoints {
 		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
 		detectorSquare.setVerbose(true);
+		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,-10,true,ImageFloat32.class);
 		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numCols,numRows,detectorSquare,ImageFloat32.class);
+				new DetectChessboardFiducial(numCols,numRows,detectorSquare,inputToBinary);
 
 		assertTrue(alg.process(gray));
 
