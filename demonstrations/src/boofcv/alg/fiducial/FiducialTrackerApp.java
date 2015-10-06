@@ -177,10 +177,10 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		String path = videoName.substring(0,videoName.lastIndexOf('/'));
 
 		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
-			detector = FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(0.1), 100, imageClass);
+			detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1), 10, imageClass);
 		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
 			double length = 0.1;
-			detector = FactoryFiducial.squareImageFast(new ConfigFiducialImage(), 100, imageClass);
+			detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(), 10, imageClass);
 
 			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 

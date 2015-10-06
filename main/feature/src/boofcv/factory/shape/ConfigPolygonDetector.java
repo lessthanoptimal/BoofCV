@@ -44,7 +44,7 @@ public class ConfigPolygonDetector implements Configuration {
 	public int contour2Poly_iterations = 20;
 
 	/**
-	 * The minimum number of pixels away a pixel is from a line to split/merge.  Specified as a fraction
+	 * The minimum number of pixels away a contour point is from a line to cause a split/merge.  Specified as a fraction
 	 * of total image width.
 	 */
 	public double contour2Poly_minimumSplitFraction = 0.0078125;

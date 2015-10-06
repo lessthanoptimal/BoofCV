@@ -72,7 +72,7 @@ public class FactoryFiducial {
 	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
-	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
+	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 10.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
@@ -131,7 +131,7 @@ public class FactoryFiducial {
 	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param config Description of the fiducial.  Can't be null.
-	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 6.
+	 * @param thresholdRadius Size of the radius used for adaptive thresholding.  For 640x480 image try radius of 10.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */

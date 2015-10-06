@@ -18,27 +18,142 @@
 
 package boofcv.alg.feature.shape;
 
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author Peter Abeles
  */
-public class ThresholdControlPanel extends StandardAlgConfigPanel {
+class ThresholdControlPanel extends StandardAlgConfigPanel
+		implements ActionListener, ChangeListener
+{
 
 	Listener listener;
 
 	JComboBox comboType;
 	JSpinner spinnerThreshold;
 	JSpinner spinnerRadius;
-	JCheckBox checkUpDown;
+	JButton buttonUpDown;
+
+	boolean thresholdAdaptive;
+	boolean thresholdGlobal;
+
+	ThresholdType vType = ThresholdType.GLOBAL_OTSU;
+	int vThreshold = 50;
+	boolean vDirectionDown = true;
+	int vRadius = 10;
 
 	public ThresholdControlPanel(Listener listener) {
 		this.listener = listener;
+
+		comboType = new JComboBox();
+		for( ThresholdType type : ThresholdType.values() ) {
+			comboType.addItem(type.name());
+		}
+
+		comboType.setMaximumSize(comboType.getPreferredSize());
+		comboType.setSelectedIndex(vType.ordinal());
+
+		spinnerThreshold = new JSpinner(new SpinnerNumberModel(vThreshold,0,255,1));
+		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
+
+		spinnerRadius = new JSpinner(new SpinnerNumberModel(vRadius,1,50,1));
+		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
+
+		buttonUpDown = new JButton();
+		buttonUpDown.setPreferredSize(new Dimension(100, 30));
+		buttonUpDown.setMaximumSize(buttonUpDown.getPreferredSize());
+		buttonUpDown.setMinimumSize(buttonUpDown.getPreferredSize());
+		setToggleText(vDirectionDown);
+
+		comboType.addActionListener(this);
+		spinnerThreshold.addChangeListener(this);
+		spinnerRadius.addChangeListener(this);
+		buttonUpDown.addActionListener(this);
+
+		addLabeled(comboType, "Type", this);
+		addLabeled(spinnerThreshold, "Threshold", this);
+		addLabeled(spinnerRadius, "Radius", this);
+		addAlignCenter(buttonUpDown, this);
+
+
+		updateEnabledByType();
+	}
+
+	private void setToggleText( boolean direction ) {
+		if(direction)
+			buttonUpDown.setText("down");
+		else
+			buttonUpDown.setText("Up");
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == comboType ) {
+			vType = ThresholdType.values()[comboType.getSelectedIndex()];
+			updateEnabledByType();
+			listener.imageThresholdUpdated();
+		} else if( e.getSource() == buttonUpDown ) {
+			vDirectionDown = !vDirectionDown;
+			setToggleText(vDirectionDown);
+			listener.imageThresholdUpdated();
+		}
+	}
+
+	private void updateEnabledByType() {
+		switch( vType ) {
+			case FIXED:
+				thresholdAdaptive = false;
+				break;
+
+			case GLOBAL_ENTROPY:
+			case GLOBAL_OTSU:
+				thresholdAdaptive = true;
+				thresholdGlobal = true;
+				break;
+
+			default:
+				thresholdAdaptive = true;
+				thresholdGlobal = false;
+				break;
+		}
+
+		if( thresholdAdaptive ) {
+			spinnerThreshold.setEnabled(false);
+			if( thresholdGlobal ) {
+				spinnerRadius.setEnabled(false);
+			} else {
+				spinnerRadius.setEnabled(true);
+			}
+		} else {
+			spinnerThreshold.setEnabled(true);
+			spinnerRadius.setEnabled(false);
+		}
+
+		spinnerThreshold.repaint();
+		spinnerRadius.repaint();
+
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( e.getSource() == spinnerThreshold ) {
+			vThreshold = ((Number) spinnerThreshold.getValue()).intValue();
+			listener.imageThresholdUpdated();
+		} else if( e.getSource() == spinnerRadius ) {
+			vRadius = ((Number) spinnerRadius.getValue()).intValue();
+			listener.imageThresholdUpdated();
+		}
 	}
 
 	public interface Listener {
-		void thresholdUpdated();
+		void imageThresholdUpdated();
 	}
 }

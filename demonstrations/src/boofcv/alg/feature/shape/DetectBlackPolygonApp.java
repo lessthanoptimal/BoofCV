@@ -23,7 +23,6 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -42,12 +41,17 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+// TODO min and max number of sides
+// todo minium contour size
+
 /**
  * Application which lets you configure the black polygon detector in real-time
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
+public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
+		implements ThresholdControlPanel.Listener
+{
 
 	Class<T> imageType;
 
@@ -63,8 +67,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 	T input;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5);
-
 	public DetectBlackPolygonApp(Class<T> imageType) {
 
 		this.imageType = imageType;
@@ -78,28 +80,27 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 	}
 
 	private synchronized void createDetector() {
-		inputToBinary = FactoryThresholdBinary.globalOtsu(0,255,true,imageType);
-		detector = FactoryShapeDetector.polygon(config,imageType);
-		input = GeneralizedImageOps.createSingleBand(detector.getInputType(),1,1);
+		detector = FactoryShapeDetector.polygon(controls.getConfig(),imageType);
+		if( input == null )
+			input = GeneralizedImageOps.createSingleBand(detector.getInputType(),1,1);
+		imageThresholdUpdated();
 	}
 
 	private synchronized void processImage() {
-		inputToBinary.process(input,binary);
-		detector.process(input,binary);
-
-		System.out.println("Detector found "+detector.getUsedContours().size());
+		inputToBinary.process(input, binary);
+		detector.process(input, binary);
 	}
 
 	public synchronized void setInput( BufferedImage image ) {
 		this.original = image;
 		work = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_BGR);
 
-		input.reshape(work.getWidth(),work.getHeight());
-		binary.reshape(work.getWidth(),work.getHeight());
+		input.reshape(work.getWidth(), work.getHeight());
+		binary.reshape(work.getWidth(), work.getHeight());
 
-		ConvertBufferedImage.convertFrom(original, input,true);
+		ConvertBufferedImage.convertFrom(original, input, true);
 
-		guiImage.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		processImage();
 		renderImage();
 	}
@@ -107,8 +108,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 	private synchronized void renderImage() {
 		if( work == null )
 			return;
-
-		System.out.println("Render image");
 
 		Graphics2D g2 = work.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
@@ -123,17 +122,15 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 			g2.fillRect(0,0,work.getWidth(),work.getHeight());
 		}
 
-		work.setRGB(0,0,work.getRGB(0,0));
+		work.setRGB(0, 0, work.getRGB(0, 0));
 
 		if (controls.bShowContour) {
-			System.out.println("  Rendering contours");
 			List<Contour> contours = detector.getAllContours();
 
 			VisualizeBinaryData.renderExternal(contours, new Color(0xFF00FF), work);
 		}
 
 		if (controls.bShowLines) {
-			System.out.println("  Rendering lines");
 			List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
 
 			g2.setColor(Color.RED);
@@ -144,7 +141,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 		}
 
 		if (controls.bShowCorners) {
-			System.out.println("  Rendering corners");
 			List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
 
 			g2.setColor(Color.BLUE);
@@ -167,6 +163,51 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 		renderImage();
 	}
 
+	public void configUpdate() {
+		createDetector();
+		// does process and render too
+	}
+
+	@Override
+	public synchronized void imageThresholdUpdated() {
+
+		int threshold = controls.getThreshold().vThreshold;
+		boolean down = controls.getThreshold().vDirectionDown;
+		int radius = controls.getThreshold().vRadius;
+
+		switch( controls.getThreshold().vType ) {
+			case FIXED:
+				inputToBinary = FactoryThresholdBinary.globalFixed(threshold,down,imageType);
+				break;
+
+			case GLOBAL_OTSU:
+				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, down, imageType);
+				break;
+
+			case GLOBAL_ENTROPY:
+				inputToBinary = FactoryThresholdBinary.globalEntropy(0, 255, down, imageType);
+				break;
+
+			case LOCAL_GAUSSIAN:
+				inputToBinary = FactoryThresholdBinary.adaptiveGaussian(radius, 0, down, imageType);
+				break;
+
+			case LOCAL_SQUARE:
+				inputToBinary = FactoryThresholdBinary.adaptiveSquare(radius, 0, down, imageType);
+				break;
+
+			case LOCAL_SAVOLA:
+				inputToBinary = FactoryThresholdBinary.adaptiveSauvola(radius, 0.3f, down, imageType);
+				break;
+
+			default:
+				throw new RuntimeException("Unknown threshold type");
+		}
+
+		processImage();
+		renderImage();
+	}
+
 	public static void main(String[] args) {
 
 		String path = "data/example/polygons01.jpg";
@@ -182,4 +223,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel {
 
 		ShowImages.showWindow(app,"Detect Black Polygons",true);
 	}
+
+
 }
