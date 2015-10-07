@@ -18,6 +18,8 @@
 
 package boofcv.abst.calib;
 
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.Configuration;
 
@@ -39,13 +41,9 @@ public class ConfigSquareGrid implements Configuration {
 	public int numRows = -1;
 
 	/**
-	 * Global threshold used on the image.  If <= 0 then a local adaptive threshold is used instead
+	 * Configuration for thresholding the image
 	 */
-	public double binaryGlobalThreshold = -1;
-	/**
-	 * Size of local region used by adaptive threshold
-	 */
-	public int binaryAdaptiveRadius = 20;
+	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,20);
 
 	/**
 	 * Configuration for square detector
@@ -63,6 +61,8 @@ public class ConfigSquareGrid implements Configuration {
 	public double spaceWidth;
 
 	{
+		thresholding.bias = -10;
+
 		square.refineWithCorners = true;
 		square.refineWithLines = false;
 
