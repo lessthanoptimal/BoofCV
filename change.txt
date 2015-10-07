@@ -32,6 +32,8 @@ Version : Alpha 0.20
   * no longer defaults to a page border of 1cm
   * page border is actually user configurable
   * border and white border are correctly handled
+- Moved PyBoof to it's own repository at https://github.com/lessthanoptimal/PyBoof
+  * It will be update on its own cycle
 
 TODO Easy to use calibration app
 TODO Angular consistency on fiducial tests
