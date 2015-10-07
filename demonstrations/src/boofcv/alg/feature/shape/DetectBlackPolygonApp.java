@@ -41,7 +41,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-// TODO min and max number of sides
 // todo minimum contour size
 
 /**
@@ -137,6 +136,12 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(3));
 			for (Polygon2D_F64 p : polygons) {
+				int red = 255*((p.size()-3)%4)/3;
+				int green = 255*((p.size())%5)/4;
+				int blue = 255*((p.size()+2)%6)/5;
+
+				g2.setColor(new Color(red,green,blue));
+
 				VisualizeShapes.drawPolygon(p, true, g2);
 			}
 		}

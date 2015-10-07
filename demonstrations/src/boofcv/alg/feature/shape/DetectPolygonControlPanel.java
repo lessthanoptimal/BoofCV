@@ -53,7 +53,10 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 
 	ThresholdControlPanel threshold;
 
+	JSpinner spinnerMinSides;
+	JSpinner spinnerMaxSides;
 	JSpinner spinnerMinEdge;
+
 	JSpinner spinnerContourSplit;
 	JSpinner spinnerContourMinSplit;
 	JSpinner spinnerContourIterations;
@@ -65,6 +68,9 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerConvergeTol;
 
 	ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,6);
+
+	int minSides = 3;
+	int maxSides = 6;
 
 	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
 		this.owner = owner;
@@ -94,6 +100,13 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		refineChoice.addItem("None");
 		refineChoice.addActionListener(this);
 		refineChoice.setMaximumSize(refineChoice.getPreferredSize());
+
+		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
+		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
+		spinnerMinSides.addChangeListener(this);
+		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
+		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
+		spinnerMaxSides.addChangeListener(this);
 
 		spinnerMinEdge = new JSpinner(new SpinnerNumberModel(config.minimumEdgeIntensity,0.0,255.0,1.0));
 		spinnerMinEdge.setMaximumSize(spinnerMinEdge.getPreferredSize());
@@ -127,6 +140,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addAlignLeft(showLines, this);
 		addAlignLeft(showContour, this);
 		add(threshold);
+		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
+		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addLabeled(spinnerMinEdge, "Minimum Edge: ", this);
 		addCenterLabel("Contour", this);
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
@@ -193,6 +208,20 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 
 		if( e.getSource() == spinnerMinEdge) {
 			config.minimumEdgeIntensity = ((Number) spinnerMinEdge.getValue()).doubleValue();
+		} else if( e.getSource() == spinnerMinSides ) {
+			minSides = ((Number) spinnerMinSides.getValue()).intValue();
+			if( minSides > maxSides ) {
+				maxSides = minSides;
+				spinnerMaxSides.setValue(minSides);
+			}
+			updateSidesInConfig();
+		} else if( e.getSource() == spinnerMaxSides ) {
+			maxSides = ((Number) spinnerMaxSides.getValue()).intValue();
+			if( maxSides < minSides) {
+				minSides = maxSides;
+				spinnerMinSides.setValue(minSides);
+			}
+			updateSidesInConfig();
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.contour2Poly_splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
@@ -231,6 +260,14 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			}
 		}
 		owner.configUpdate();
+	}
+
+	private void updateSidesInConfig() {
+		int allowed[] = new int[maxSides-minSides+1];
+		for (int i = minSides; i <= maxSides; i++) {
+			allowed[i-minSides] = i;
+		}
+		config.numberOfSides = allowed;
 	}
 
 	private void updateRefineSettings() {
