@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wraps around other {@link SparseImageGradient} classes and checks to see if
- * the image is in bounds or not.  If not the gradient is set to one.
+ * the image is in bounds or not.  If it is out of bounds the return value is set to one.
  * 
  * @author Peter Abeles
  */

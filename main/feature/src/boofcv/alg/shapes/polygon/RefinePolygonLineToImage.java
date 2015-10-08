@@ -18,12 +18,13 @@
 
 package boofcv.alg.shapes.polygon;
 
+import boofcv.alg.shapes.edge.ScoreLineSegmentEdge;
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.geometry.UtilLine2D_F64;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
-import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -72,8 +73,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	protected T image;
 	Class<T> imageType;
 
-	// storage for computing line from two poitns
-	LineSegment2D_F64 lineSegment = new LineSegment2D_F64();
+	// computes the edge intensity.  used to prevent divergence
+	ScoreLineSegmentEdge<T> edgeScorer;
 
 	// working variable for line slope
 	double unitX,unitY;
@@ -96,6 +97,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 		previous = new Polygon2D_F64(1);
 
+		edgeScorer = new ScoreLineSegmentEdge<T>(lineSamples,imageType);
 	}
 
 	/**
@@ -107,6 +109,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
 		this.snapToEdge = new SnapToEdge<T>(20,1,imageType);
+		this.edgeScorer = new ScoreLineSegmentEdge<T>(20,imageType);
 	}
 
 	/**
@@ -116,6 +119,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
+		this.edgeScorer.setImage(image);
 	}
 
 	/**
@@ -175,8 +179,26 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		// pixels squares is faster to compute
 		double convergeTol = convergeTolPixels*convergeTolPixels;
 
-//		double previousScore = edgeScore = scorePolygon(seed);
+		Point2D_F64 tempA = new Point2D_F64();
+		Point2D_F64 tempB = new Point2D_F64();
 
+		for (int i = 0; i < seed.size(); i++) {
+			int j = (i + 1) % seed.size();
+			Point2D_F64 a = seed.get(i);
+			Point2D_F64 b = seed.get(j);
+			UtilLine2D_F64.convert(a,b,general[i]);
+		}
+
+//		System.out.println(seed);
+//		for (int i = 0; i < seed.size(); i++) {
+//			int j = (i + 1) % seed.size();
+//			Point2D_F64 a = seed.get(i);
+//			Point2D_F64 b = seed.get(j);
+//			Intersection2D_F64.intersection(general[i], general[j], tempB);
+//			System.out.println(b+"  "+tempB);
+//		}
+
+		LineGeneral2D_F64 before = new LineGeneral2D_F64();
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
 			for (int i = 0; i < previous.size(); i++) {
@@ -184,16 +206,34 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				Point2D_F64 a = previous.get(i);
 				Point2D_F64 b = previous.get(j);
 
-				double lengthSq = a.distance2(b);
+				double scoreBefore = scoreEdge(a,b);
+				UtilLine2D_F64.convert(a,b,before);
 
-				if( lengthSq < minimumLineLengthSq ) {
-					lineSegment.a = a;
-					lineSegment.b = b;
-					UtilLine2D_F64.convert(lineSegment,general[i]);
-				} else if( !optimize(a,b,general[i]) ) {
-					// if it fails then the line is likely along the wrong edge (not leading into the square)
-					// or in an invalid region
-					return false;
+				boolean failed = false;
+				if( !optimize(a,b,general[i]) ) {
+					failed = true;
+				} else {
+					int k = (i+previous.size()-1) %previous.size();
+//					System.out.println(k+" "+i+" "+j);
+
+					if( Intersection2D_F64.intersection(general[k], general[i],tempA) != null &&
+							Intersection2D_F64.intersection(general[i], general[j],tempB) != null ) {
+						double scoreAfter = scoreEdge(a,b);
+						if( scoreAfter < scoreBefore ) {
+							failed = true;
+						}
+//						System.out.printf("%6.2f %6.2f --- %6.2f %6.2f\n",a.x,a.y,tempA.x,tempA.y);
+//						System.out.printf("%6.2f %6.2f --- %6.2f %6.2f\n",b.x,b.y,tempB.x,tempB.y);
+						if( tempA.distance(a) >3 || tempB.distance(b) > 3 ) {
+							failed = true;
+						}
+					} else {
+						failed = true;
+					}
+				}
+
+				if( failed ) {
+					general[i].set(before);
 				}
 			}
 
@@ -245,6 +285,12 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
 		snapToEdge.setTransform(undistToDist);
+		edgeScorer.setTransform(undistToDist);
+	}
+
+	protected double scoreEdge( Point2D_F64 a, Point2D_F64 b ) {
+		computeAdjustedEndPoints(a, b);
+		return edgeScorer.computeAverageEdgeIntensity(adjA, adjB, -unitY, unitX);
 	}
 
 	private void computeAdjustedEndPoints(Point2D_F64 a, Point2D_F64 b) {
