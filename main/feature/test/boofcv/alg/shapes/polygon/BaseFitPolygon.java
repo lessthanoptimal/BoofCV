@@ -21,8 +21,8 @@ package boofcv.alg.shapes.polygon;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -30,7 +30,6 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
 /**
@@ -70,8 +69,11 @@ public class BaseFitPolygon {
 		}
 
 		if( showRendered ) {
-			BufferedImage out = ConvertBufferedImage.convertTo(image, null, true);
-			ShowImages.showWindow(out, "Rendered");
+			ListDisplayPanel panel = new ListDisplayPanel();
+			panel.addImage(work, "Work");
+			panel.addImage(image, "Image");
+
+			ShowImages.showWindow(panel,"Rendered");
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {

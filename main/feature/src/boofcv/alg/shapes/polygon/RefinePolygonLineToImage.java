@@ -18,7 +18,6 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.alg.shapes.edge.ScoreLineSegmentEdge;
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
@@ -49,7 +48,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	// How far away from a corner will it sample the line
-	double cornerOffset = 2.0;
+	private double cornerOffset = 2.0;
 
 	// maximum number of iterations
 	private int maxIterations = 10;
@@ -57,8 +56,9 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	// convergence tolerance in pixels
 	private double convergeTolPixels = 0.01;
 
-	// a line on the polygon less than this length isn't optimized because the current algorithm becomes unstable
-	private double minimumLineLengthSq = 7*7; // TODO remove.  doesn't seem to help
+	// The maximum number of pixels a corner can move in a single iteration
+	// designed to prevent divergence
+	private double maxCornerChangePixel=2;
 
 	private SnapToEdge<T> snapToEdge;
 
@@ -71,13 +71,12 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 
 	// the input image
 	protected T image;
-	Class<T> imageType;
+	private Class<T> imageType;
 
-	// computes the edge intensity.  used to prevent divergence
-	ScoreLineSegmentEdge<T> edgeScorer;
-
-	// working variable for line slope
-	double unitX,unitY;
+	// work space for checking to see if the line estimate diverged
+	private Point2D_F64 tempA = new Point2D_F64();
+	private Point2D_F64 tempB = new Point2D_F64();
+	private LineGeneral2D_F64 before = new LineGeneral2D_F64();
 
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
@@ -85,19 +84,18 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 *
 	 */
 	public RefinePolygonLineToImage(double cornerOffset, int lineSamples, int sampleRadius,
-									int maxIterations, double convergeTolPixels,
+									int maxIterations, double convergeTolPixels,double maxCornerChangePixel,
 									Class<T> imageType ) {
 
 
 		this.cornerOffset = cornerOffset;
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
+		this.maxCornerChangePixel = maxCornerChangePixel;
 		this.snapToEdge = new SnapToEdge<T>(lineSamples,sampleRadius,imageType);
 		this.imageType = imageType;
 
 		previous = new Polygon2D_F64(1);
-
-		edgeScorer = new ScoreLineSegmentEdge<T>(lineSamples,imageType);
 	}
 
 	/**
@@ -109,7 +107,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
 		this.snapToEdge = new SnapToEdge<T>(20,1,imageType);
-		this.edgeScorer = new ScoreLineSegmentEdge<T>(20,imageType);
 	}
 
 	/**
@@ -119,7 +116,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
-		this.edgeScorer.setImage(image);
 	}
 
 	/**
@@ -179,9 +175,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		// pixels squares is faster to compute
 		double convergeTol = convergeTolPixels*convergeTolPixels;
 
-		Point2D_F64 tempA = new Point2D_F64();
-		Point2D_F64 tempB = new Point2D_F64();
-
+		// initialize the lines since they are used to check for corner divergence
 		for (int i = 0; i < seed.size(); i++) {
 			int j = (i + 1) % seed.size();
 			Point2D_F64 a = seed.get(i);
@@ -189,16 +183,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			UtilLine2D_F64.convert(a,b,general[i]);
 		}
 
-//		System.out.println(seed);
-//		for (int i = 0; i < seed.size(); i++) {
-//			int j = (i + 1) % seed.size();
-//			Point2D_F64 a = seed.get(i);
-//			Point2D_F64 b = seed.get(j);
-//			Intersection2D_F64.intersection(general[i], general[j], tempB);
-//			System.out.println(b+"  "+tempB);
-//		}
-
-		LineGeneral2D_F64 before = new LineGeneral2D_F64();
+		boolean changed = false;
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 			// snap each line to the edge independently.  Lines will be in local coordinates
 			for (int i = 0; i < previous.size(); i++) {
@@ -206,25 +191,19 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 				Point2D_F64 a = previous.get(i);
 				Point2D_F64 b = previous.get(j);
 
-				double scoreBefore = scoreEdge(a,b);
-				UtilLine2D_F64.convert(a,b,before);
+				before.set(general[i]);
 
 				boolean failed = false;
 				if( !optimize(a,b,general[i]) ) {
 					failed = true;
 				} else {
 					int k = (i+previous.size()-1) %previous.size();
-//					System.out.println(k+" "+i+" "+j);
 
+					// see if the corner has diverged
 					if( Intersection2D_F64.intersection(general[k], general[i],tempA) != null &&
 							Intersection2D_F64.intersection(general[i], general[j],tempB) != null ) {
-						double scoreAfter = scoreEdge(a,b);
-						if( scoreAfter < scoreBefore ) {
-							failed = true;
-						}
-//						System.out.printf("%6.2f %6.2f --- %6.2f %6.2f\n",a.x,a.y,tempA.x,tempA.y);
-//						System.out.printf("%6.2f %6.2f --- %6.2f %6.2f\n",b.x,b.y,tempB.x,tempB.y);
-						if( tempA.distance(a) >3 || tempB.distance(b) > 3 ) {
+
+						if( tempA.distance(a) > maxCornerChangePixel || tempB.distance(b) > maxCornerChangePixel ) {
 							failed = true;
 						}
 					} else {
@@ -232,8 +211,11 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 					}
 				}
 
+				// The line fit went south.  Revert it
 				if( failed ) {
 					general[i].set(before);
+				} else {
+					changed = true;
 				}
 			}
 
@@ -257,7 +239,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 			}
 		}
 
-		return true;
+		return changed;
 	}
 
 	/**
@@ -285,12 +267,6 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
 		snapToEdge.setTransform(undistToDist);
-		edgeScorer.setTransform(undistToDist);
-	}
-
-	protected double scoreEdge( Point2D_F64 a, Point2D_F64 b ) {
-		computeAdjustedEndPoints(a, b);
-		return edgeScorer.computeAverageEdgeIntensity(adjA, adjB, -unitY, unitX);
 	}
 
 	private void computeAdjustedEndPoints(Point2D_F64 a, Point2D_F64 b) {
@@ -298,8 +274,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 		double slopeY = (b.y - a.y);
 		double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
 		// vector of unit length pointing in direction of the slope
-		unitX = slopeX/r;
-		unitY = slopeY/r;
+		double unitX = slopeX/r;
+		double unitY = slopeY/r;
 
 		// offset from corner because the gradient because unstable around there
 		adjA.x = a.x + unitX*cornerOffset;
