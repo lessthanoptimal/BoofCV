@@ -189,6 +189,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	}
 
 	public void fit_perfect_transform(boolean black, Affine2D_F64 regToDist, Class imageType) {
+
 		setup(regToDist, black, imageType);
 
 		RefinePolygonLineToImage alg = createAlg(4,imageType);
@@ -209,7 +210,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		transform.set(regToDist);
-		alg.getSnapToEdge().setTransform(transform);
+		alg.setTransform(transform);
 		alg.setImage(image);
 		assertTrue(alg.refine(input, found));
 

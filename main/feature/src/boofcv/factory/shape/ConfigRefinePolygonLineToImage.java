@@ -51,6 +51,12 @@ public class ConfigRefinePolygonLineToImage implements Configuration{
 	 */
 	public double convergeTolPixels = 0.2;
 
+	/**
+	 * Maximum number of pixels a corner can be adjusted in a single iteration.  This becomes important with very
+	 * small shapes and can prevent divergence.
+	 */
+	public double maxCornerChangePixel = 2.0;
+
 	@Override
 	public void checkValidity() {
 
@@ -62,6 +68,8 @@ public class ConfigRefinePolygonLineToImage implements Configuration{
 				" , lineSamples="+lineSamples+
 				" , sampleRadius="+sampleRadius+
 				" , maxIterations="+maxIterations+
-				" , convergeTolPixels="+convergeTolPixels+" }";
+				" , convergeTolPixels="+convergeTolPixels+
+				" , maxCornerChangePixel="+maxCornerChangePixel+
+				" }";
 	}
 }

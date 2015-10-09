@@ -166,7 +166,7 @@ public class RefinePolyLine {
 	}
 
 	/**
-	 * Sum of eclidean distance of contour points along the line
+	 * Sum of Euclidean distance of contour points along the line
 	 */
 	protected double distanceSum( LineGeneral2D_F64 line , int c0 , int c1 , List<Point2D_I32> contour ) {
 		double total = 0;

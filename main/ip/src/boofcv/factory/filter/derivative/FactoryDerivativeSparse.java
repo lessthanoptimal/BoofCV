@@ -20,6 +20,7 @@ package boofcv.factory.filter.derivative;
 
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
+import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.filter.derivative.impl.*;
 import boofcv.core.image.GeneralizedImageOps;
@@ -44,6 +45,8 @@ public class FactoryDerivativeSparse {
 
 	/**
 	 * Creates a sparse Laplacian filter.
+	 *
+	 * @see boofcv.alg.filter.derivative.LaplacianEdge
 	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
@@ -74,6 +77,8 @@ public class FactoryDerivativeSparse {
 	/**
 	 * Creates a sparse sobel gradient operator.
 	 *
+	 * @see GradientSobel
+	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient
@@ -92,6 +97,8 @@ public class FactoryDerivativeSparse {
 
 	/**
 	 * Creates a sparse prewitt gradient operator.
+	 *
+	 * @see boofcv.alg.filter.derivative.GradientPrewitt
 	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
@@ -112,6 +119,8 @@ public class FactoryDerivativeSparse {
 	/**
 	 * Creates a sparse three gradient operator.
 	 *
+	 * @see boofcv.alg.filter.derivative.GradientThree
+	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
@@ -131,6 +140,8 @@ public class FactoryDerivativeSparse {
 	/**
 	 * Creates a sparse two-0 gradient operator.
 	 *
+	 * @see boofcv.alg.filter.derivative.GradientTwo0
+	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
@@ -149,6 +160,8 @@ public class FactoryDerivativeSparse {
 
 	/**
 	 * Creates a sparse two-1 gradient operator.
+	 *
+	 * @see boofcv.alg.filter.derivative.GradientTwo1
 	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
