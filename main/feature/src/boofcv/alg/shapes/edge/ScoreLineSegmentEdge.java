@@ -65,7 +65,7 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 	}
 
 	/**
-	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
+	 * Sets the image which is going to be processed.
 	 */
 	public void setImage(T image) {
 		integralImage.wrap(image);
@@ -73,15 +73,17 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 	}
 
 	/**
-	 * Returns average tangential derivative along the line segment
+	 * Returns average tangential derivative along the line segment.  Derivative is computed in direction
+	 * of tangent.  A positive step in the tangent direction will have a positive value.  If all samples
+	 * go outside the image then zero is returned.
 	 *
 	 * @param a start point
 	 * @param b end point
-	 * @param tanX unit tangent x-axis.  determines length of line itegral
-	 * @param tanY unit tangent y-axis   determines length of line itegral
+	 * @param tanX unit tangent x-axis.  determines length of line integral
+	 * @param tanY unit tangent y-axis   determines length of line integral
 	 * @return average derivative
 	 */
-	public double computeAverageEdgeIntensity(Point2D_F64 a, Point2D_F64 b, double tanX, double tanY) {
+	public double computeAverageDerivative(Point2D_F64 a, Point2D_F64 b, double tanX, double tanY) {
 		double total = 0;
 		int samplesInside = 0;
 
@@ -109,7 +111,9 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 			total += up-down;
 		}
 
-		return total/(samplesInside*2);
+		if( samplesInside == 0 )
+			return 0;
+		return total/samplesInside;
 	}
 
 	public int getNumSamples() {

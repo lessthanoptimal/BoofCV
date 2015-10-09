@@ -71,7 +71,7 @@ public class ConfigPolygonDetector implements Configuration {
 	 *
 	 * @see boofcv.alg.shapes.edge.PolygonEdgeScore
 	 */
-	public double minimumEdgeIntensity = 3.0;
+	public double minimumEdgeIntensity = 6.0;
 
 	/**
 	 * Specifies the minimum allowed contour length as a fraction of the input image's width.  Smaller numbers

@@ -83,7 +83,7 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 	}
 
 	/**
-	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
+	 * Sets the image which is going to be processed.
 	 */
 	public void setImage(T image) {
 		scorer.setImage(image);
@@ -122,15 +122,13 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 			offsetB.x = b.x - cornerOffset*dx;
 			offsetB.y = b.y - cornerOffset*dy;
 
-			total += scorer.computeAverageEdgeIntensity(offsetA, offsetB, -dy, dx);
+			total += scorer.computeAverageDerivative(offsetA, offsetB, -dy, dx);
 		}
 
-		averageEdgeIntensity = Math.abs(total) / (polygon.size()*tangentDistance);
+		averageEdgeIntensity = Math.abs(total) / polygon.size();
 
 		return averageEdgeIntensity >= thresholdScore;
 	}
-
-
 
 	public double getCornerOffset() {
 		return cornerOffset;
