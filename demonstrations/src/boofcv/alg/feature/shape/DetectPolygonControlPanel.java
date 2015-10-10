@@ -64,7 +64,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
 	JSpinner spinnerSampleRadius;
-	JSpinner spinnerMaxIterations;
+	JSpinner spinnerRefineMaxIterations;
 	JSpinner spinnerConvergeTol;
 	JSpinner spinnerMaxCornerChange;
 
@@ -130,12 +130,12 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerSampleRadius = new JSpinner(new SpinnerNumberModel(config.configRefineLines.sampleRadius, 0, 10, 1));
 		spinnerSampleRadius.setMaximumSize(spinnerCornerOffset.getPreferredSize());
 		spinnerSampleRadius.addChangeListener(this);
-		spinnerMaxIterations = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxIterations, 0, 10, 1));
-		spinnerMaxIterations.setMaximumSize(spinnerMaxIterations.getPreferredSize());
-		spinnerMaxIterations.addChangeListener(this);
-		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.configRefineLines.convergeTolPixels, 0.0, 1.0, 0.005));
+		spinnerRefineMaxIterations = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxIterations, 0, 200, 1));
+		spinnerRefineMaxIterations.setMaximumSize(spinnerRefineMaxIterations.getPreferredSize());
+		spinnerRefineMaxIterations.addChangeListener(this);
+		spinnerConvergeTol = new JSpinner(new SpinnerNumberModel(config.configRefineLines.convergeTolPixels, 0.0, 2.0, 0.005));
 		configureSpinnerFloat(spinnerConvergeTol);
-		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxCornerChangePixel, 0.0, 10.0, 1.0));
+		spinnerMaxCornerChange = new JSpinner(new SpinnerNumberModel(config.configRefineLines.maxCornerChangePixel, 0.0, 50.0, 1.0));
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(imageView, "View: ", this);
@@ -155,8 +155,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerLineSamples, "Line Samples: ", this);
 		addLabeled(spinnerCornerOffset, "Corner Offset: ", this);
 		addLabeled(spinnerSampleRadius, "Sample Radius: ", this);
-		addLabeled(spinnerMaxIterations, "Iterations: ", this);
-		addLabeled(spinnerConvergeTol, "Tolerance Pixels: ", this);
+		addLabeled(spinnerRefineMaxIterations, "Iterations: ", this);
+		addLabeled(spinnerConvergeTol, "Converge Tol Pixels: ", this);
 		addLabeled(spinnerMaxCornerChange, "Max Corner Change: ", this);
 		addVerticalGlue(this);
 	}
@@ -250,11 +250,11 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			} else {
 				config.configRefineCorners.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
 			}
-		} else if( e.getSource() == spinnerMaxIterations ) {
+		} else if( e.getSource() == spinnerRefineMaxIterations) {
 			if( refine == 0 ) {
-				config.configRefineLines.maxIterations = ((Number) spinnerMaxIterations.getValue()).intValue();
+				config.configRefineLines.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 			} else {
-				config.configRefineCorners.maxIterations = ((Number) spinnerMaxIterations.getValue()).intValue();
+				config.configRefineCorners.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 			}
 		} else if( e.getSource() == spinnerConvergeTol ) {
 			if( refine == 0 ) {
@@ -288,7 +288,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			spinnerLineSamples.setValue(config.configRefineLines.lineSamples);
 			spinnerCornerOffset.setValue(config.configRefineLines.cornerOffset);
 			spinnerSampleRadius.setValue(config.configRefineLines.sampleRadius);
-			spinnerMaxIterations.setValue(config.configRefineLines.maxIterations);
+			spinnerRefineMaxIterations.setValue(config.configRefineLines.maxIterations);
 			spinnerConvergeTol.setValue(config.configRefineLines.convergeTolPixels);
 			spinnerMaxCornerChange.setValue(config.configRefineLines.maxCornerChangePixel);
 		} else if( selected == 1 ){
@@ -296,7 +296,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			spinnerLineSamples.setValue(config.configRefineCorners.lineSamples);
 			spinnerCornerOffset.setValue(config.configRefineCorners.cornerOffset);
 			spinnerSampleRadius.setValue(config.configRefineCorners.sampleRadius);
-			spinnerMaxIterations.setValue(config.configRefineCorners.maxIterations);
+			spinnerRefineMaxIterations.setValue(config.configRefineCorners.maxIterations);
 			spinnerConvergeTol.setValue(config.configRefineCorners.convergeTolPixels);
 		}
 	}

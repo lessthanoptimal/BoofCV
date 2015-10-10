@@ -74,13 +74,14 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		// ------------  Refine the initial segments by splitting and merging each segment
 		if( splits.size <= 2 )
 			return; // can't merge a single line
+
 		for( int i = 0; i < maxIterations; i++ ) {
-			if( !mergeSegments() )
-				break;
+			boolean merged = mergeSegments();
+
 			if( splits.size() <= 2)
 				return;
 
-			if( !splitSegments() )
+			if( !splitSegments() && !merged )
 				break;
 		}
 	}

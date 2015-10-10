@@ -41,7 +41,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
 	 */
-	public int contour2Poly_iterations = 20;
+	public int contour2Poly_iterations = 10;
 
 	/**
 	 * The minimum number of pixels away a contour point is from a line to cause a split/merge.  Specified as a fraction
