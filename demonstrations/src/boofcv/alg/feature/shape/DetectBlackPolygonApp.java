@@ -38,10 +38,16 @@ import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 // todo minimum contour size
+// todo video support
+// todo webcam support
 
 /**
  * Application which lets you configure the black polygon detector in real-time
@@ -49,7 +55,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
-		implements ThresholdControlPanel.Listener
+		implements ThresholdControlPanel.Listener, ActionListener
 {
 
 	Class<T> imageType;
@@ -66,6 +72,11 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	T input;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
+	final JFileChooser fc = new JFileChooser();
+
+	// menu items
+	JMenuItem menuFile,menuWebcam,menuQuit;
+
 	public DetectBlackPolygonApp(Class<T> imageType) {
 		setLayout(new BorderLayout());
 
@@ -75,8 +86,36 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 
 		add(BorderLayout.WEST,controls);
 		add(BorderLayout.CENTER,guiImage);
+		createMenuBar();
 
 		createDetector();
+	}
+
+	private void createMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+
+		JMenu menu = new JMenu("File");
+		menuBar.add(menu);
+
+		menuFile = new JMenuItem("Open File", KeyEvent.VK_F);
+		menuFile.addActionListener(this);
+		menuFile.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
+		menuWebcam.addActionListener(this);
+		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		menuQuit.addActionListener(this);
+		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+
+		menu.add(menuFile);
+		menu.add(menuWebcam);
+		menu.addSeparator();
+		menu.add(menuQuit);
+
+		add(BorderLayout.NORTH,menuBar);
 	}
 
 	private synchronized void createDetector() {
@@ -214,6 +253,45 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 		renderImage();
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( menuFile == e.getSource()) {
+			int returnVal = fc.showOpenDialog(this);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				BufferedImage buffered = UtilImageIO.loadImage(file.getAbsolutePath());
+				if( buffered == null ) {
+					// TODO see if it's a video instead
+					System.err.println("Couldn't read "+file.getPath());
+				} else {
+					setInput(buffered);
+				}
+			} else {
+			}
+		} else if( menuWebcam == e.getSource() ) {
+
+		} else if( menuQuit == e.getSource() ) {
+			System.exit(0);
+		}
+	}
+
+	class WebcamThread extends Thread {
+
+		boolean requestStop = false;
+		boolean running = true;
+
+//		Webcam
+
+		@Override
+		public void run() {
+			while( !requestStop ) {
+
+			}
+
+		}
+	}
+
 	public static void main(String[] args) {
 
 		String path = "data/example/polygons01.jpg";
@@ -229,6 +307,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 
 		ShowImages.showWindow(app,"Detect Black Polygons",true);
 	}
+
 
 
 }
