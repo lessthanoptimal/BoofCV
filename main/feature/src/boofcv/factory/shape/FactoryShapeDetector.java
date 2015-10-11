@@ -73,7 +73,8 @@ public class FactoryShapeDetector {
 					config.configRefineCorners.endPointDistance,
 					config.configRefineCorners.cornerOffset, config.configRefineCorners.lineSamples,
 					config.configRefineCorners.sampleRadius, config.configRefineCorners.maxIterations,
-					config.configRefineCorners.convergeTolPixels, imageType);
+					config.configRefineCorners.convergeTolPixels, config.configRefineCorners.maxCornerChangePixel,
+					imageType);
 		}
 
 		PolygonEdgeScore<T> scorer = null;

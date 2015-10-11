@@ -26,7 +26,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigRefinePolygonLineToImage implements Configuration{
+public class ConfigRefinePolygonLineToImage implements Configuration {
 
 	/**
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased

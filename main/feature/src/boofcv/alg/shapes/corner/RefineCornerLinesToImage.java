@@ -85,6 +85,10 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	protected T image;
 	Class<T> imageType;
 
+	// the maximum change in corner location allowed from previous iteration
+	// used to prevent divergence
+	double maxCornerChange;
+
 	/**
 	 * Constructor which provides full access to all parameters.  See code documents
 	 * value a description of these variables.
@@ -94,9 +98,10 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * @param sampleRadius How far away from the line will it sample pixels.  >= 1
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 10
 	 * @param convergeTolPixels When the corner changes less than this amount it will stop iterating. Try 1e-5
+	 * @param maxCornerChange maximum change in corner location allowed from previous iteration in pixels.  Try 2.0
 	 */
 	public RefineCornerLinesToImage(double cornerOffset, int maxLineSamples, int sampleRadius,
-									int maxIterations, double convergeTolPixels,
+									int maxIterations, double convergeTolPixels,double maxCornerChange,
 									Class<T> imageType) {
 		if( sampleRadius < 1 )
 			throw new IllegalArgumentException("Sample radius must be >= 1 to work");
@@ -107,6 +112,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 		this.snapToEdge = new SnapToEdge<T>(maxLineSamples,sampleRadius,imageType);
 		this.maxLineSamples = maxLineSamples;
 		this.imageType = imageType;
+		this.maxCornerChange = maxCornerChange;
 	}
 
 	/**
@@ -114,7 +120,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * @param imageType Type of input image it processes
 	 */
 	public RefineCornerLinesToImage( Class<T> imageType) {
-		this(2.0, 10, 2, 10, 1e-5, imageType);
+		this(2.0, 10, 2, 10, 1e-5,2, imageType);
 	}
 
 	/**
@@ -179,6 +185,10 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 			// see if it has converged
 			if( refined.distance2(previous) < convergeTol ) {
+				break;
+			} else if( refined.distance2(previous) > maxCornerChange*maxCornerChange ) {
+				// it diverged, roll back and abort
+				refined.set(previous);
 				break;
 			}
 

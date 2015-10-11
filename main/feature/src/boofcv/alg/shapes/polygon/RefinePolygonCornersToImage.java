@@ -62,15 +62,16 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 	 * @param sampleRadius How far away from the line will it sample pixels.  >= 1
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 10
 	 * @param convergeTolPixels When the corner changes less than this amount it will stop iterating. Try 1e-5
+	 * @param maxCornerChangePixels maximum change in corner location allowed from previous iteration in pixels.  Try 2.0
 	 * @param imageType Type of input image.
 	 */
 	public RefinePolygonCornersToImage(int endPointDistance,
 									   double cornerOffset, int maxLineSamples, int sampleRadius,
-									   int maxIterations, double convergeTolPixels,
+									   int maxIterations, double convergeTolPixels,double maxCornerChangePixels,
 									   Class<T> imageType) {
 		this.pixelsAway = endPointDistance;
 		this.refineCorner = new RefineCornerLinesToImage<T>(cornerOffset,maxLineSamples,sampleRadius,maxIterations,
-				convergeTolPixels,imageType);
+				convergeTolPixels,maxCornerChangePixels,imageType);
 	}
 
 	/**
@@ -79,7 +80,7 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 	 * @param imageType Type of input image.
 	 */
 	public RefinePolygonCornersToImage(Class<T> imageType) {
-		this(12,2,10,1,10,1e-6,imageType);
+		this(12,2,10,1,10,1e-6,2,imageType);
 	}
 
 	/**
