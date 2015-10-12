@@ -76,7 +76,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
+public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	// dynamically set minimum split fraction used in contour to polygon conversion
 	private double minimumSplitFraction;
@@ -85,6 +85,9 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	private double minContourFraction;
 	private int minimumContour; // this is image.width*minContourFraction
 	private double minimumArea; // computed from minimumContour
+
+	// does the polygon have to be convex
+	private boolean convex;
 
 	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	private ImageSInt32 labeled = new ImageSInt32(1,1);
@@ -143,15 +146,16 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
-	public BinaryPolygonConvexDetector(int polygonSides[],
-									   SplitMergeLineFitLoop contourToPolygon,
-									   PolygonEdgeScore differenceScore,
-									   RefinePolygonLineToImage<T> refineLine,
-									   RefinePolygonCornersToImage<T> refineCorner,
-									   double minContourFraction,
-									   double minimumSplitFraction,
-									   boolean outputClockwise,
-									   Class<T> inputType) {
+	public BinaryPolygonDetector(int polygonSides[],
+								 SplitMergeLineFitLoop contourToPolygon,
+								 PolygonEdgeScore differenceScore,
+								 RefinePolygonLineToImage<T> refineLine,
+								 RefinePolygonCornersToImage<T> refineCorner,
+								 double minContourFraction,
+								 double minimumSplitFraction,
+								 boolean outputClockwise,
+								 boolean convex,
+								 Class<T> inputType) {
 
 
 		this.refineLine = refineLine;
@@ -163,6 +167,7 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 		this.minimumSplitFraction = minimumSplitFraction;
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
+		this.convex = convex;
 
 		workPoly = new Polygon2D_F64(1);
 		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
@@ -297,13 +302,13 @@ public class BinaryPolygonConvexDetector<T extends ImageSingleBand> {
 				}
 
 				// Functions below only supports convex polygons
-				if( !UtilPolygons2D_F64.isConvex(workPoly)) {
+				if( convex && !UtilPolygons2D_F64.isConvex(workPoly)) {
 					if( verbose ) System.out.println("Rejected not convex");
 					continue;
 				}
 
 				// make sure it's big enough
-				double area = Area2D_F64.polygonConvex(workPoly);
+				double area = Area2D_F64.polygonSimple(workPoly);
 
 				if( area < minimumArea ) {
 					if( verbose ) System.out.println("Rejected area");

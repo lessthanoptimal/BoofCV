@@ -20,7 +20,7 @@ package boofcv.alg.feature.shape;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -65,7 +65,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	ImagePanel guiImage;
 
 	InputToBinary<T> inputToBinary;
-	BinaryPolygonConvexDetector<T> detector;
+	BinaryPolygonDetector<T> detector;
 
 	BufferedImage original;
 	BufferedImage work;

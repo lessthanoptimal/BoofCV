@@ -40,6 +40,9 @@ public class UtilIO {
 	 * @return Absolute path to file
 	 */
 	public static String pathExample( String path ) {
+		if( new File(path).isAbsolute() )
+			return path;
+
 		File pathExample = new File(getPathToBase(),"data/example/");
 		if( !pathExample.exists() ) {
 			System.err.println();

@@ -23,7 +23,7 @@ import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PixelTransformCached_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -69,7 +69,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 	I gray;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	BinaryPolygonConvexDetector<I> detector;
+	BinaryPolygonDetector<I> detector;
 	InputToBinary<I> inputToBinary;
 
 	IntrinsicParameters intrinsic;

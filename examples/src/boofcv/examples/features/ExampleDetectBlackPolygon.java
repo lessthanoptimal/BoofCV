@@ -20,7 +20,7 @@ package boofcv.examples.features;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
@@ -38,7 +38,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * Example of how to use {@link BinaryPolygonConvexDetector} to find black polygons in an image.  This algorithm
+ * Example of how to use {@link BinaryPolygonDetector} to find black polygons in an image.  This algorithm
  * is the basis for several fiducial detectors in BoofCV and fits the polygon to sub-pixel accuracy and produces
  * reasonable results on blurred images too.  It is highly configurable and can even sparsely fit polygons
  * in a distorted image.  Meaning the expensive step of undistorting the entire image is not needed.
@@ -57,9 +57,9 @@ public class ExampleDetectBlackPolygon {
 		// need to reduce split fraction to get it to work well with the 7 sided shape
 		config.contour2Poly_splitFraction = 0.1;
 
-		BinaryPolygonConvexDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
+		BinaryPolygonDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
 
-		// Is the input image distorted?  Let the detector sparsely undistort it for improved speed and accuracy
+		// Does the input image  have lens distortion?  Let the detector sparsely undistort.
 		// detector.setLensDistortion(...blah...);
 
 		ListDisplayPanel panel = new ListDisplayPanel();

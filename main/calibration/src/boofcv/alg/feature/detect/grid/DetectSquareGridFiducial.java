@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.grid;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.squares.*;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -58,7 +58,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	InputToBinary<T> inputToBinary;
 
 	// detector for squares
-	BinaryPolygonConvexDetector<T> detectorSquare;
+	BinaryPolygonDetector<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoClusters s2c;
@@ -85,7 +85,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	 */
 	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
 									InputToBinary<T> inputToBinary ,
-									BinaryPolygonConvexDetector<T> detectorSquare) {
+									BinaryPolygonDetector<T> detectorSquare) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.inputToBinary = inputToBinary;
@@ -185,7 +185,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		return calibCols;
 	}
 
-	public BinaryPolygonConvexDetector<T> getDetectorSquare() {
+	public BinaryPolygonDetector<T> getDetectorSquare() {
 		return detectorSquare;
 	}
 

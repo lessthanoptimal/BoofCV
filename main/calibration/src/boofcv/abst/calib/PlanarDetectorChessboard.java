@@ -20,7 +20,7 @@ package boofcv.abst.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
@@ -43,7 +43,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
 	public PlanarDetectorChessboard(ConfigChessboard config) {
 
-		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
+		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
 
 		InputToBinary<ImageFloat32> inputToBinary =

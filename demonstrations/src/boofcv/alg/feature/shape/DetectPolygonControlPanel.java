@@ -56,6 +56,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerMinSides;
 	JSpinner spinnerMaxSides;
 	JSpinner spinnerMinEdge;
+	JCheckBox setConvex;
 
 	JSpinner spinnerContourSplit;
 	JSpinner spinnerContourMinSplit;
@@ -121,6 +122,10 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
 
+		setConvex = new JCheckBox("Convex");
+		setConvex.addActionListener(this);
+		setConvex.setSelected(config.convex);
+
 		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(config.configRefineLines.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
 		spinnerLineSamples.addChangeListener(this);
@@ -145,7 +150,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		add(threshold);
 		addLabeled(spinnerMinSides, "Minimum Sides: ", this);
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
-		addLabeled(spinnerMinEdge, "Minimum Edge: ", this);
+		addLabeled(spinnerMinEdge, "Edge Intensity: ", this);
+		addAlignLeft(setConvex, this);
 		addCenterLabel("Contour", this);
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
 		addLabeled(spinnerContourMinSplit, "Min Split: ", this);
@@ -202,6 +208,9 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 				config.refineWithCorners = false;
 			}
 			updateRefineSettings();
+			owner.configUpdate();
+		} else if( e.getSource() == setConvex ) {
+			config.convex = setConvex.isSelected();
 			owner.configUpdate();
 		}
 	}

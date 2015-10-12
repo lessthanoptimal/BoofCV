@@ -20,7 +20,7 @@ package boofcv.abst.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
@@ -48,7 +48,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		InputToBinary<ImageFloat32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
 
-		BinaryPolygonConvexDetector<ImageFloat32> detectorSquare =
+		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
 
 		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows/2+1,config.numCols/2+1,

@@ -18,10 +18,11 @@
 
 package boofcv.factory.shape;
 
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector} for use in {@link FactoryShapeDetector}.
+ * Configuration for {@link BinaryPolygonDetector} for use in {@link FactoryShapeDetector}.
  *
  * @author Peter Abeles
  */
@@ -85,6 +86,11 @@ public class ConfigPolygonDetector implements Configuration {
 	public boolean clockwise = true;
 
 	/**
+	 * Does it require that the found polygons be convex?
+	 */
+	public boolean convex = true;
+
+	/**
 	 * Configuration for refining with lines.  Ignored if not used.
 	 */
 	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
@@ -129,6 +135,7 @@ public class ConfigPolygonDetector implements Configuration {
 				" , refineWithCorners="+refineWithCorners+
 				" , minContourImageWidthFraction="+minContourImageWidthFraction+
 				" , clockwise="+clockwise+
+				" , convex="+convex+
 				" , configRefineLines="+configRefineLines+
 				" , configRefineCorners="+configRefineCorners+" }";
 	}

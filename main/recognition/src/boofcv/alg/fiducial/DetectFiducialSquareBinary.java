@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -77,7 +77,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 *
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareBinary(InputToBinary<T> inputToBinary, BinaryPolygonConvexDetector<T> quadDetector,  Class<T> inputType) {
+	public DetectFiducialSquareBinary(InputToBinary<T> inputToBinary, BinaryPolygonDetector<T> quadDetector,  Class<T> inputType) {
 		super(inputToBinary,quadDetector, w*8, inputType);
 
 		int widthNoBorder = w*4;

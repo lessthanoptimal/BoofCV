@@ -27,7 +27,7 @@ import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -58,7 +58,7 @@ public class FactoryFiducial {
 		configFiducial.squareDetector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		BinaryPolygonConvexDetector<T> squareDetector = FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
+		BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
 
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
@@ -87,7 +87,7 @@ public class FactoryFiducial {
 		configFiducial.squareDetector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		BinaryPolygonConvexDetector<T> squareDetector = 
+		BinaryPolygonDetector<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
 				squareDetector,configFiducial.maxErrorFraction,imageType);

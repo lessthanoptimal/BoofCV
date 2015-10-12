@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.chess;
 import boofcv.alg.feature.detect.squares.*;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageUInt8;
@@ -95,7 +95,7 @@ public class TestDetectChessSquarePoints {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException ignore) {}
 
-		BinaryPolygonConvexDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
+		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4),ImageUInt8.class);
 		DetectChessSquarePoints<ImageUInt8> alg =
 				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);

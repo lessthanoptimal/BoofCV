@@ -19,7 +19,7 @@
 package boofcv.factory.shape;
 
 import boofcv.alg.shapes.edge.PolygonEdgeScore;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
@@ -42,7 +42,7 @@ public class FactoryShapeDetector {
 	 * @return Detector
 	 */
 	public static <T extends ImageSingleBand>
-	BinaryPolygonConvexDetector<T> polygon( ConfigPolygonDetector config,
+	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config,
 											Class<T> imageType)
 	{
 		config.checkValidity();
@@ -82,8 +82,8 @@ public class FactoryShapeDetector {
 			scorer = new PolygonEdgeScore<T>(cornerOffset,1.0,numSamples,config.minimumEdgeIntensity,imageType);
 		}
 
-		return new BinaryPolygonConvexDetector<T>(config.numberOfSides,contourToPolygon,
+		return new BinaryPolygonDetector<T>(config.numberOfSides,contourToPolygon,
 				scorer, refineLine,refineCorner,config.minContourImageWidthFraction,
-				config.contour2Poly_minimumSplitFraction,config.clockwise,imageType);
+				config.contour2Poly_minimumSplitFraction,config.clockwise,config.convex,imageType);
 	}
 }

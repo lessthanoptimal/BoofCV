@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.feature.detect.squares.*;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -41,7 +41,7 @@ import java.util.List;
 public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 	// detector for squares
-	BinaryPolygonConvexDetector<T> detectorSquare;
+	BinaryPolygonDetector<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoClusters s2c;
@@ -82,7 +82,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 	 * @param maxCornerDistance Maximum distance in pixels that two "overlapping" corners can be from each other.
 	 */
 	public DetectChessSquarePoints(int numCols, int numRows, double maxCornerDistance,
-								   BinaryPolygonConvexDetector<T> detectorSquare)
+								   BinaryPolygonDetector<T> detectorSquare)
 	{
 		this.maxCornerDistanceSq = maxCornerDistance*maxCornerDistance;
 
@@ -501,7 +501,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		return c2g;
 	}
 
-	public BinaryPolygonConvexDetector<T> getDetectorSquare() {
+	public BinaryPolygonDetector<T> getDetectorSquare() {
 		return detectorSquare;
 	}
 

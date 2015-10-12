@@ -121,7 +121,7 @@ public class SquareGridTools {
 		poly.vertexes.data[2] = grid.get(grid.rows-1,grid.columns-1).center;
 		poly.vertexes.data[3] = grid.get(grid.rows-1,0).center;
 
-		return Area2D_F64.polygonConvex(poly);
+		return Area2D_F64.polygonSimple(poly);
 	}
 
 	List<SquareNode> tmp = new ArrayList<SquareNode>();

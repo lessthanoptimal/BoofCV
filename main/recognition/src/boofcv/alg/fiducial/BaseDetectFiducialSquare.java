@@ -23,7 +23,7 @@ import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.h.HomographyLinear4;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -76,7 +76,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
 	// Detects the squares
-	private BinaryPolygonConvexDetector<T> squareDetector;
+	private BinaryPolygonDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
 	private ImageFloat32 square;
@@ -116,7 +116,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
-									   BinaryPolygonConvexDetector<T> squareDetector,
+									   BinaryPolygonDetector<T> squareDetector,
 									   int squarePixels,
 									   Class<T> inputType) {
 
@@ -350,7 +350,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	protected abstract boolean processSquare( ImageFloat32 square , Result result );
 
-	public BinaryPolygonConvexDetector getSquareDetector() {
+	public BinaryPolygonDetector getSquareDetector() {
 		return squareDetector;
 	}
 

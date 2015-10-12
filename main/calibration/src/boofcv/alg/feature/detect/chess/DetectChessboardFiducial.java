@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -71,7 +71,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 	 * @param numRows       Number of rows in the grid.  Target dependent.
 	 */
 	public DetectChessboardFiducial(int numCols, int numRows,
-									BinaryPolygonConvexDetector<T> detectorSquare,
+									BinaryPolygonDetector<T> detectorSquare,
 									InputToBinary<T> inputToBinary)
 	{
 		this.numCols = numCols;
