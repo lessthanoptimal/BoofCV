@@ -183,7 +183,7 @@ public class TestSquaresIntoClusters {
 	public void considerConnect_shape_offset() {
 		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
 		squares.add(new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1));
-		squares.add(new Polygon2D_F64( 2, 2, 4, 2, 4, -2, 2, -2));
+		squares.add(new Polygon2D_F64( 3,2,  5,1,  5,-1,   3,-2));
 
 		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
 		alg.computeNodeInfo(squares);
@@ -322,18 +322,20 @@ public class TestSquaresIntoClusters {
 		Point2D_F64 p3 = new Point2D_F64( 2,3);
 
 		SquaresIntoClusters alg = new SquaresIntoClusters(2,6);
-		double maxDistance = 1.0*alg.distanceTol;
 
 		assertTrue(alg.areMiddlePointsClose(p0,p1,p2,p3));
-		p1.set(-1, 3 + maxDistance * 0.99);
+
+		p1.set(-1, 3.1);
+		alg.distanceTol = 0.101/p0.distance(p1);
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
-		p1.set(-1, 3 + maxDistance * 1.01);
+		alg.distanceTol = 0.099/p0.distance(p1);
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 
 		p1.set(-1, 3);
-		p2.set( 1, 3 + maxDistance * 0.99);
+		p2.set( 1, 3.1);
+		alg.distanceTol = 0.101/p2.distance(p3);
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
-		p2.set( 1, 3 + maxDistance * 1.01);
+		alg.distanceTol = 0.099/p2.distance(p3);
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 	}
 

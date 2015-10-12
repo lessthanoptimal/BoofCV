@@ -401,6 +401,14 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		return false;
 	}
 
+	public boolean isConvex() {
+		return convex;
+	}
+
+	public void setConvex(boolean convex) {
+		this.convex = convex;
+	}
+
 	public ImageSInt32 getLabeled() {
 		return labeled;
 	}

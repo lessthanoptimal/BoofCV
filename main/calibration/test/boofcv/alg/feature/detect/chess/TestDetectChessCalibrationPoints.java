@@ -77,6 +77,7 @@ public class TestDetectChessCalibrationPoints {
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(4);
 		configPoly.refineWithCorners = true;
 		configPoly.refineWithLines = false;
+		configPoly.configRefineCorners.maxCornerChangePixel = 5;
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
 		detectorSquare.setVerbose(true);

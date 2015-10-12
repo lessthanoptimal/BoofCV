@@ -120,7 +120,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 * @param imageType Type of input image it processes
 	 */
 	public RefineCornerLinesToImage( Class<T> imageType) {
-		this(2.0, 10, 2, 10, 1e-5,2, imageType);
+		this(2.0, 10, 2, 10, 1e-5,4, imageType);
 	}
 
 	/**

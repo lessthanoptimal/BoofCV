@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,5 +80,11 @@ public abstract class ConfigSurfDescribe implements Configuration {
 
 	@Override
 	public void checkValidity() {
+	}
+
+	public static void main(String[] args) throws ClassNotFoundException {
+		Class c = Class.forName("boofcv.abst.feature.describe.ConfigSurfDescribe$Speed");
+		System.out.println("c = "+c);
+		Configuration a;
 	}
 }

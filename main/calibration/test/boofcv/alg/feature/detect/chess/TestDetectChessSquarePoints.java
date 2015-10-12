@@ -29,6 +29,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ejml.simple.SimpleMatrix;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -48,6 +49,13 @@ public class TestDetectChessSquarePoints {
 	Random rand = new Random(234);
 	int w = 400;
 	int h = 500;
+
+	@Before
+	public void setup() {
+		offsetX = 15;
+		offsetY = 10;
+		squareLength = 30;
+	}
 
 	/**
 	 * Give it a simple target and see if it finds the expected number of squares
@@ -155,7 +163,29 @@ public class TestDetectChessSquarePoints {
 	 */
 	@Test
 	public void touchImageEdge() {
-		fail("implement");
+		offsetX = -10;
+		offsetY = -15;
+
+		int gridWidth=4;
+		int gridHeight=5;
+
+		ImageUInt8 binary = createTarget(gridWidth,gridHeight);
+
+		ImageUInt8 gray = binary.clone();
+		PixelMath.multiply(gray, 200, gray);
+		PixelMath.minus(255,gray,gray);
+
+//		ShowImages.showWindow(gray, "Input");
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException ignore) {}
+
+		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
+				polygon(new ConfigPolygonDetector(4),ImageUInt8.class);
+		DetectChessSquarePoints<ImageUInt8> alg =
+				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
+
+		assertFalse(alg.process(gray, binary));
 	}
 
 	@Test
@@ -167,19 +197,19 @@ public class TestDetectChessSquarePoints {
 			for (int cols = 2; cols <= 5; cols++) {
 				SquareGrid grid = TestSquareGridTools.createGrid(rows,cols);
 
-					SquareNode a = grid.getCornerByIndex(0);
-					SquareNode b = grid.getCornerByIndex(1);
-					SquareNode c = grid.getCornerByIndex(2);
-					SquareNode d = grid.getCornerByIndex(3);
+				SquareNode a = grid.getCornerByIndex(0);
+				SquareNode b = grid.getCornerByIndex(1);
+				SquareNode c = grid.getCornerByIndex(2);
+				SquareNode d = grid.getCornerByIndex(3);
 
-					alg.forceToZero(a, grid);
-					assertTrue(a == grid.get(0, 0));
-					alg.forceToZero(b, grid);
-					assertTrue(b == grid.get(0, 0));
-					alg.forceToZero(d, grid);
-					assertTrue(d == grid.get(0, 0));
-					alg.forceToZero(c, grid);
-					assertTrue(c == grid.get(0, 0));
+				alg.forceToZero(a, grid);
+				assertTrue(a == grid.get(0, 0));
+				alg.forceToZero(b, grid);
+				assertTrue(b == grid.get(0, 0));
+				alg.forceToZero(d, grid);
+				assertTrue(d == grid.get(0, 0));
+				alg.forceToZero(c, grid);
+				assertTrue(c == grid.get(0, 0));
 			}
 		}
 	}

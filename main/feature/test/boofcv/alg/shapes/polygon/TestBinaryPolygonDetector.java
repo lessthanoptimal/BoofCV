@@ -68,7 +68,6 @@ public class TestBinaryPolygonDetector {
 	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
 
 	List<Rectangle2D_I32> rectangles = new ArrayList<Rectangle2D_I32>();
-	List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
 	List<Polygon2D_F64> distorted = new ArrayList<Polygon2D_F64>();
 
 	Affine2D_F64 transform = new Affine2D_F64();
@@ -170,18 +169,19 @@ public class TestBinaryPolygonDetector {
 
 	@Test
 	public void easyTestMultipleShapes() {
+
+		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
 		polygons.add(new Polygon2D_F64(20, 20, 40, 50, 80, 20));
 		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90,40, 60));
 
-
 		for( Class imageType : imageTypes ) {
-			checkDetectedMulti(imageType, true,1.5);
-			checkDetectedMulti(imageType, false,1.5);
+			checkDetectedMulti(imageType, polygons, true,1.5);
+			checkDetectedMulti(imageType, polygons, false,1.5);
 		}
 	}
 
-	private void checkDetectedMulti(Class imageType, boolean useLines,  double tol ) {
-		renderPolygons(imageType);
+	private void checkDetectedMulti(Class imageType,List<Polygon2D_F64> polygons, boolean useLines,  double tol ) {
+		renderPolygons(polygons,imageType);
 
 		BinaryPolygonDetector alg = createDetector(imageType, useLines, 3,4);
 		alg.process(dist, binary);
@@ -233,7 +233,7 @@ public class TestBinaryPolygonDetector {
 	}
 
 
-	public void renderPolygons( Class imageType ) {
+	public void renderPolygons( List<Polygon2D_F64> polygons, Class imageType ) {
 		InputToBinary inputToBinary = FactoryThresholdBinary.globalFixed(100, true, imageType);
 
 		BufferedImage work = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -393,7 +393,18 @@ public class TestBinaryPolygonDetector {
 	 */
 	@Test
 	public void rejectShapes_concave() {
-		fail("implement");
+		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
+		polygons.add(new Polygon2D_F64(20,20, 80,20, 80,80, 40,40, 20,80));
+
+		for( Class imageType : imageTypes ) {
+			renderPolygons(polygons, imageType);
+
+			BinaryPolygonDetector alg = createDetector(imageType, true, 5);
+
+			alg.process(dist,binary);
+
+			assertEquals(0,alg.getFoundPolygons().size());
+		}
 	}
 
 	/**
@@ -401,9 +412,24 @@ public class TestBinaryPolygonDetector {
 	 */
 	@Test
 	public void detect_concave() {
-		fail("implement");
-	}
+		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
+		Polygon2D_F64 expected = new Polygon2D_F64(20, 20, 20, 80, 40, 40, 80, 80, 80, 20);
+		polygons.add(expected);
 
+		for( Class imageType : imageTypes ) {
+			renderPolygons(polygons,imageType );
+
+			BinaryPolygonDetector alg = createDetector(imageType, true, 5);
+			alg.setConvex(false);
+
+			alg.process(dist, binary);
+
+			assertEquals(1, alg.getFoundPolygons().size());
+
+			Polygon2D_F64 found = (Polygon2D_F64)alg.getFoundPolygons().get(0);
+			assertEquals(1, findMatches(found, 1));
+		}
+	}
 
 	@Test
 	public void touchesBorder_false() {

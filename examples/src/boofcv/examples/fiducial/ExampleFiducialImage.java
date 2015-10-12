@@ -50,8 +50,8 @@ public class ExampleFiducialImage {
 		String imagePath   = UtilIO.pathExample("fiducial/image/examples/");
 		String patternPath = UtilIO.pathExample("fiducial/image/patterns/");
 
-		String imageName = "image00.jpg";
-//		String imageName = "image01.jpg";
+//		String imageName = "image00.jpg";
+		String imageName = "image01.jpg";
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image

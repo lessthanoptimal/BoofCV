@@ -62,7 +62,7 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 	 * Maximum number of pixels a corner can be adjusted in a single iteration.  This becomes important with very
 	 * small shapes and can prevent divergence.
 	 */
-	public double maxCornerChangePixel = 2.0;
+	public double maxCornerChangePixel = 4.0;
 
 	@Override
 	public void checkValidity() {

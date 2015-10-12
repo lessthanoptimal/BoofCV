@@ -218,16 +218,18 @@ public class SquaresIntoClusters {
 
 		double distanceApart = lineA.getLength();
 
-		// see if these two sides are the closest to being parallel to each other.
-		// perspective distortion will make the lines not parallel, bit will still have a smaller
+		// Checks to see if the two sides selected above are closest to being parallel to each other.
+		// Perspective distortion will make the lines not parallel, but will still have a smaller
 		// acute angle than the adjacent sides
 		if( !mostParallel(node0, intersection0, node1, intersection1)) {
 			return;
 		}
 
-		// See if the two end points of the selected sides lie close to the line defined by adjacent sides.
+		// The following two tests see if the end points which define the two selected sides are close to
+		// the line created by the end points which define the opposing side.
 		// Another way of saying this, for the "top" corner on the side, is it close to the line defined
 		// by the side "top" sides on both squares.
+		// just look at the code its easier than understanding that description
 		if( !areMiddlePointsClose(node0.corners.get(add(intersection0, -1)), node0.corners.get(intersection0),
 				node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)))) {
 			return;

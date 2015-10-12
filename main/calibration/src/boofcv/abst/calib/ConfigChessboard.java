@@ -59,6 +59,9 @@ public class ConfigChessboard implements Configuration {
 	{
 		thresholding.bias = -10;
 
+		// it erodes the original shape meaning it has to move a greater distance
+		square.configRefineCorners.maxCornerChangePixel = 5;
+
 //		square.contour2Poly_splitFraction = 0.25;
 //		square.contour2Poly_minimumSplitFraction = 0.01;
 

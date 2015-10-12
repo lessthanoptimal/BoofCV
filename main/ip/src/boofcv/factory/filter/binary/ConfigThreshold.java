@@ -49,7 +49,6 @@ public class ConfigThreshold implements Configuration {
 
 	/**
 	 * Radius of adaptive threshold.
-
 	 */
 	public int radius;
 
