@@ -47,8 +47,8 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
 
 			if( image == null ) {
-				System.err.println("Can't find image.  Path = "+ imagePaths.get(i));
-				System.exit(0);
+				System.err.println("Can't read image.  Path = "+ imagePaths.get(i));
+				System.exit(1);
 			} else {
 				System.out.println("  loaded "+imageName);
 			}
@@ -82,6 +82,10 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
 	@Override
 	protected void addPattern(String name) {
+		if( !new File(name).exists() ) {
+			System.err.println("Image file does not exist.  "+name);
+			System.exit(1);
+		}
 		this.imagePaths.add(name);
 	}
 
