@@ -68,6 +68,9 @@ public abstract class BaseFiducialSquareEPS {
 	public int numCols = 1;
 	public int numRows = 1;
 
+	// draw an invisible border around the document.
+	boolean boundaryHack = true;
+
 	//============= These Parameters specify how it's printed
 	// Total length of the target.  image + black border
 	double fiducialBoxWidth;
@@ -139,6 +142,10 @@ public abstract class BaseFiducialSquareEPS {
 	public void setOffset( double offsetX , double offsetY , Unit units) {
 		this.offsetX = units.convert(offsetX,Unit.CENTIMETER)*CM_TO_POINTS;
 		this.offsetY = units.convert(offsetY,Unit.CENTIMETER)*CM_TO_POINTS;
+	}
+
+	public void setBoundaryHack(boolean boundaryHack) {
+		this.boundaryHack = boundaryHack;
 	}
 
 	public void setOutputFileName(String outputFileName)  {
@@ -310,6 +317,8 @@ public abstract class BaseFiducialSquareEPS {
 	 */
 	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
 		printHeader(documentTitle, fiducialWidthUnit);
+		if(boundaryHack)
+			printInvisibleBoundary();
 		printPatternDefinitions();
 
 		if (printInfo) {
@@ -389,6 +398,19 @@ public abstract class BaseFiducialSquareEPS {
 				"  /b1 { wb bb add} def\n" +
 				"  /b2 { b1 " + innerWidth + " add} def\n" +
 				"  /b3 { b2 bb add} def\n");
+	}
+
+	/**
+	 * Prints an invisible boundary around the document to prevent a smart cropping script from cropping the white space
+	 */
+	private void printInvisibleBoundary() {
+		out.println(" 1.0 setgray");
+		out.printf(" newpath 0 0 moveto %f 0 rlineto 0 setlinewidth stroke\n", pageWidth);
+		out.printf(" newpath 0 0 moveto 0 %f lineto 0 setlinewidth stroke\n",pageHeight);
+		out.printf(" newpath %f 0 moveto %f %f lineto 0 setlinewidth stroke\n",pageWidth,pageWidth,pageHeight);
+		out.printf(" newpath 0 %f moveto %f %f lineto 0 setlinewidth stroke\n", pageHeight, pageWidth, pageHeight);
+		out.println(" 0.0 setgray");
+		out.println();
 	}
 
 	/**
