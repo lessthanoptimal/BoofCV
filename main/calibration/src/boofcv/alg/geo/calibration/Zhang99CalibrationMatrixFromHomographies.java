@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -328,5 +328,9 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	public DenseMatrix64F getCalibrationMatrix() {
 		return K;
+	}
+
+	public SingularValueDecomposition<DenseMatrix64F> getSvd() {
+		return svd;
 	}
 }

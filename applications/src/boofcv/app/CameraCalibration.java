@@ -24,6 +24,7 @@ import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
+import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
@@ -306,12 +307,13 @@ public class CameraCalibration extends BaseWebcamApp {
 
 		webcam.open();
 
+		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew,detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		ShowImages.showWindow(gui, "Webcam Calibration", true);
 
 		ImageFloat32 gray = new ImageFloat32(webcam.getViewSize().width,webcam.getViewSize().height);
 
-		AssistedCalibration assisted = new AssistedCalibration(detector,gui);
+		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui);
 		assisted.init(gray.width,gray.height);
 
 		BufferedImage image;

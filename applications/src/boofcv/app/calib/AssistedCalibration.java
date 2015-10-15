@@ -42,11 +42,14 @@ import java.util.List;
 	// TODO Check to see if slant is sufficient and in the correct direction
 	// TODO check blur factor
 
+
+	// TODO compute calibration parameters live?
 public class AssistedCalibration {
 
 	double CENTER_SKEW = 0.93;
 	double shrink = 0.85;
-	double STILL_THRESHOLD = 3.0;
+	double STILL_THRESHOLD = 2.0;
+	double DISPLAY_TIME = 0.5;
 
 	double SIZE_MATCH_THRESHOLD = 0.85;
 
@@ -85,11 +88,14 @@ public class AssistedCalibration {
 	DetectUserActions actions = new DetectUserActions();
 	AssistedCalibrationGui gui;
 
+	ComputeGeometryScore quality;
+
 	State state = State.DETERMINE_SIZE;
 
-	public AssistedCalibration(PlanarCalibrationDetector detector, AssistedCalibrationGui gui) {
+	public AssistedCalibration(PlanarCalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
 		this.detector = detector;
 		this.gui = gui;
+		this.quality = quality;
 
 		view = new CalibrationView.Chessboard();
 		view.initialize(detector);
@@ -126,7 +132,7 @@ public class AssistedCalibration {
 	}
 
 	private void handleDetermineSize( boolean detected ) {
-		String message = "Hold target in view and centered.";
+		String message = "Determine Scale: Hold target in view and center";
 
 		if( detected ) {
 			double stationaryTime = actions.getStationaryTime();
@@ -152,13 +158,13 @@ public class AssistedCalibration {
 				message = String.format(
 						"Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
 			} else {
-				if (stationaryTime > 3.0) {
+				if (stationaryTime > STILL_THRESHOLD) {
 					actions.resetStationary();
 					state = State.FILL_BOTTOM;
 					canonicalWidth = Math.max(top,bottom);
 					padding = view.getBufferWidth(canonicalWidth);
 				}
-				if (stationaryTime > 0.5) {
+				if (stationaryTime > DISPLAY_TIME) {
 					message = String.format("Hold still:  %6.1f", stationaryTime);
 				}
 			}
@@ -214,11 +220,8 @@ public class AssistedCalibration {
 			} else if( stationaryTime >= STILL_THRESHOLD ) {
 				pictureTaken = true;
 				message = "Move somewhere else";
-				Polygon2D_F64 p = regions.grow();
-				for (int i = 0; i < 4; i++) {
-					p.get(i).set( sides.get(i) );
-				}
-			} else if( stationaryTime > 0.5 ) {
+				captureFiducialPoints();
+			} else if( stationaryTime > DISPLAY_TIME ) {
 				message = String.format("Hold still:  %6.1f", stationaryTime);
 			}
 
@@ -248,6 +251,15 @@ public class AssistedCalibration {
 		}
 
 		gui.setMessage(message);
+	}
+
+	private void captureFiducialPoints() {
+		Polygon2D_F64 p = regions.grow();
+		for (int i = 0; i < 4; i++) {
+			p.get(i).set( sides.get(i) );
+		}
+		quality.addObservations(detector.getDetectedPoints());
+		gui.getInfoPanel().updateGeometry(quality.getScore());
 	}
 
 	private void drawPadding() {
