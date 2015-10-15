@@ -225,8 +225,12 @@ public class AssistedCalibration {
 				message = String.format("Hold still:  %6.1f", stationaryTime);
 			}
 
-			int red = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
-			g2.setColor(new Color(red, 0, 0));
+			int shade = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
+			if( pictureTaken ) {
+				g2.setColor(new Color(0, shade, 0));
+			} else {
+				g2.setColor(new Color(shade, 0, 0));
+			}
 
 			int r = 6;
 			int w = 2 * r + 1;

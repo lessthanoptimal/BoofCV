@@ -132,6 +132,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// so it should only check the edge after.  Otherwise its good to filter before optimization.
 	boolean checkEdgeBefore = true;
 
+	// helper used to customize low level behaviors internally
+	private PolygonHelper helper;
+
 	/**
 	 * Configures the detector.
 	 *
@@ -294,11 +297,22 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
+				if( helper != null ) {
+					if( !helper.filterPolygon(c.external,splits) ) {
+						if( verbose ) System.out.println("rejected by helper");
+						continue;
+					}
+				}
+
 				// convert the format of the initial crude polygon
 				workPoly.vertexes.resize(splits.size());
 				for (int j = 0; j < splits.size(); j++) {
 					Point2D_I32 p = c.external.get( splits.get(j));
 					workPoly.get(j).set(p.x,p.y);
+				}
+
+				if( helper != null ) {
+					helper.adjustBeforeOptimize(workPoly);
 				}
 
 				// Functions below only supports convex polygons
@@ -315,7 +329,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
-				// test it again with the full threshold
+				// Test the edge quality and prune before performing an expensive optimization
 				if( checkEdgeBefore && differenceScore != null && !differenceScore.validate(workPoly)) {
 					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
 					continue;
@@ -399,6 +413,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		}
 
 		return false;
+	}
+
+	public void setHelper(PolygonHelper helper) {
+		this.helper = helper;
 	}
 
 	public boolean isConvex() {

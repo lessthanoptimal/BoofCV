@@ -83,7 +83,7 @@ public class TestDetectChessCalibrationPoints {
 		detectorSquare.setVerbose(true);
 		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,-10,true,ImageFloat32.class);
 		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numCols,numRows,detectorSquare,inputToBinary);
+				new DetectChessboardFiducial(numCols,numRows,4,detectorSquare,inputToBinary);
 
 		assertTrue(alg.process(gray));
 

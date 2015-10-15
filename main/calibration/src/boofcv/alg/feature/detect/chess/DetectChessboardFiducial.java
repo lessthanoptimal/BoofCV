@@ -69,8 +69,9 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 	 *
 	 * @param numCols       Number of columns in the grid.  Target dependent.
 	 * @param numRows       Number of rows in the grid.  Target dependent.
+	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
-	public DetectChessboardFiducial(int numCols, int numRows,
+	public DetectChessboardFiducial(int numCols, int numRows, double maxCornerDistance,
 									BinaryPolygonDetector<T> detectorSquare,
 									InputToBinary<T> inputToBinary)
 	{
@@ -79,12 +80,9 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 		this.inputToBinary = inputToBinary;
 
-		// minContourSize is specified later after the image's size is known
-		// TODO make separation configurable?
-		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,4, detectorSquare);
+		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,maxCornerDistance, detectorSquare);
 
-		// tell it not to check the edge intensity before it optimizes
-		detectorSquare.setCheckEdgeBefore(false);
+		detectorSquare.setHelper(new ChessboardPolygonHelper());
 
 		reset();
 	}

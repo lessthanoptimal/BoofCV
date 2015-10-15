@@ -32,6 +32,7 @@ import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
@@ -60,7 +61,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 {
 	public static final String SQUARE_NUMBER = "Square Number";
 	public static final String SQUARE_PICTURE = "Square Picture";
-	public static final String CALIB_CHESS = "Calib Chess";
+	public static final String CALIB_CHESS = "Chessboard";
+	public static final String CALIB_SQUARE_GRID = "Square Grid";
 
 
 	Class<I> imageClass;
@@ -212,6 +214,11 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
+		if( video == null ) {
+			System.err.println("Can't find video "+videoName);
+			System.exit(1);
+		}
+
 		process(video);
 	}
 
@@ -235,15 +242,15 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		FiducialTrackerApp app = new FiducialTrackerApp(type);
 
-		app.setBaseDirectory(UtilIO.pathExample("fiducial/"));
-		app.loadInputData(UtilIO.pathExample("fiducial/fiducial.txt"));
+//		app.setBaseDirectory(UtilIO.pathExample("fiducial/"));
+//		app.loadInputData(UtilIO.pathExample("fiducial/fiducial.txt"));
 
-//		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-//		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg"));
-//		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg"));
-//		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/calibration/movie.mjpeg"));
+		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
+		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
+		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/calibration/movie.mjpeg")));
 
-//		app.setInputList(inputs);
+		app.setInputList(inputs);
 
 		// wait for it to process one image so that the size isn't all screwed up
 		while( !app.getHasProcessedImage() ) {

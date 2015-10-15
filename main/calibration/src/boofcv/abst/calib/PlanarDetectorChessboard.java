@@ -50,7 +50,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
 
 		alg = new DetectChessboardFiducial<ImageFloat32>(
-				config.numCols,config.numRows,detectorSquare,inputToBinary);
+				config.numCols,config.numRows,config.maximumCornerDistance,detectorSquare,inputToBinary);
 
 		layoutPoints = gridChess(config.numCols,config.numRows,config.squareWidth);
 	}
