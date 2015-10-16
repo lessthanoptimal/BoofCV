@@ -18,8 +18,8 @@
 
 package boofcv.examples.geometry;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -74,7 +74,7 @@ public class ExampleRemovePerspectiveDistortion {
 		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
-		DistortImageOps.distortMS(input,output,pixelTransform, null, TypeInterpolate.BILINEAR);
+		new FDistort(input,output).interp(TypeInterpolate.BILINEAR).transform(pixelTransform).apply();
 
 		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
 		ShowImages.showWindow(buffered,"Original Image",true);
