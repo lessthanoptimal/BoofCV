@@ -72,7 +72,7 @@ public class FactoryMultiView {
 	 *
 	 * @see HomographyLinear4
 	 *
-    * @param normalize If input is in pixel coordinates set to true.  False if in normalized image coordinates.
+	 * @param normalize If input is in pixel coordinates set to true.  False if in normalized image coordinates.
 	 * @return Homography estimator.
 	 */
 	public static Estimate1ofEpipolar computeHomography( boolean normalize ) {

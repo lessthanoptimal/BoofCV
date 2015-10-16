@@ -39,7 +39,7 @@ public class DetectUserActions {
 	List<Point2D_F64> previous = new ArrayList<Point2D_F64>();
 
 	List<Point2D_F64> points;
-	boolean stationary;
+	int numMissed;
 
 	public void setImageSize( int width , int height ) {
 		int size = Math.min(width,height);
@@ -53,9 +53,12 @@ public class DetectUserActions {
 		if( detected ) {
 			this.points = points;
 			stationaryTime = checkStationary();
+			numMissed = 0;
 		} else {
-			previous.clear();
-			stationaryStart = System.currentTimeMillis();
+			if( ++numMissed > 5 ) {
+				previous.clear();
+				stationaryStart = System.currentTimeMillis();
+			}
 		}
 	}
 

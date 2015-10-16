@@ -18,30 +18,24 @@
 
 package boofcv.examples.geometry;
 
-import boofcv.abst.distort.FDistort;
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.alg.distort.RemovePerspectiveDistortion;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 /**
  * Certain image processing techniques, such as Optical Character Recognition (OCR), can be performed better if
- * perspective distortion is remove from an image.  In this example a homography is computed from the cour corners
- * of a bulletin board and the image is projected into a square image without perspective distortion.
+ * perspective distortion is remove from an image.  In this example a homography is computed from the four corners
+ * of a bulletin board and the image is projected into a square image without perspective distortion.  The
+ * {@link RemovePerspectiveDistortion} class is used to perform the distortion.  The class is easy to understand
+ * if you know what a homography is, you should look at it!
  *
  * @author Peter Abeles
  */
@@ -52,29 +46,18 @@ public class ExampleRemovePerspectiveDistortion {
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
 		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, ImageFloat32.class);
 
-		// Create a smaller output image for processing later on
-		MultiSpectral<ImageFloat32> output = input._createNew(400,500);
+		RemovePerspectiveDistortion<MultiSpectral<ImageFloat32>> removePerspective =
+				new RemovePerspectiveDistortion<MultiSpectral<ImageFloat32>>(400,500, ImageType.ms(3,ImageFloat32.class));
 
-		// Homography estimation algorithm.  Requires a minimum of 4 points
-		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
+		// Specify the corners in the input image of the region.
+		// Order matters! top-left, top-right, bottom-right, bottom-left
+		if( !removePerspective.apply(input,
+				new Point2D_F64(267, 182), new Point2D_F64(542, 68),
+				new Point2D_F64(519, 736), new Point2D_F64(276, 570)) ){
+			throw new RuntimeException("Failed!?!?");
+		}
 
-		// Specify the pixel coordinates from destination to target
-		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
-		associatedPairs.add(new AssociatedPair(new Point2D_F64(0,0),new Point2D_F64(267,182)));
-		associatedPairs.add(new AssociatedPair(new Point2D_F64(output.width-1,0),new Point2D_F64(542,68)));
-		associatedPairs.add(new AssociatedPair(new Point2D_F64(output.width-1,output.height-1),new Point2D_F64(519,736)));
-		associatedPairs.add(new AssociatedPair(new Point2D_F64(0,output.height-1),new Point2D_F64(276,570)));
-
-		// Compute the homography
-		DenseMatrix64F H = new DenseMatrix64F(3,3);
-		computeHomography.process(associatedPairs, H);
-
-		// Create the transform for distorting the image
-		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H);
-		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
-
-		// Apply distortion and show the results
-		new FDistort(input,output).interp(TypeInterpolate.BILINEAR).transform(pixelTransform).apply();
+		MultiSpectral<ImageFloat32> output = removePerspective.getOutput();
 
 		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
 		ShowImages.showWindow(buffered,"Original Image",true);

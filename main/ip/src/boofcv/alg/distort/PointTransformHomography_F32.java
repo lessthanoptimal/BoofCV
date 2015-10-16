@@ -40,7 +40,7 @@ public class PointTransformHomography_F32 implements PointTransformModel_F32<Hom
 	}
 
 	public PointTransformHomography_F32(DenseMatrix64F homo) {
-		UtilHomography.convert(homo, this.homo);
+		set(homo);
 	}
 
 	public PointTransformHomography_F32(Homography2D_F32 homo) {
@@ -48,6 +48,10 @@ public class PointTransformHomography_F32 implements PointTransformModel_F32<Hom
 	}
 	public PointTransformHomography_F32(Homography2D_F64 homo) {
 		set(homo);
+	}
+
+	public void set( DenseMatrix64F transform ) {
+		UtilHomography.convert(transform,homo);
 	}
 
 	public void set(Homography2D_F32 transform ) {

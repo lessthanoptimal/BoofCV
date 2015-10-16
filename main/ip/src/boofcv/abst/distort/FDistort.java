@@ -34,6 +34,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 
@@ -45,6 +46,9 @@ import georegression.struct.affine.Affine2D_F64;
  */
 public class FDistort
 {
+	// type of input image
+	ImageType inputType;
+
 	// input and output images
 	ImageBase input,output;
 	// specifies how the borders are handled
@@ -66,6 +70,14 @@ public class FDistort
 		init(input, output);
 	}
 
+	/**
+	 * Constructor
+	 * @param inputType Type of input image
+	 */
+	public FDistort(ImageType inputType) {
+		this.inputType = inputType;
+	}
+
 	public FDistort() {
 	}
 
@@ -83,6 +95,8 @@ public class FDistort
 		distorter = null;
 		outputToInput = null;
 
+		inputType = input.getImageType();
+
 		return this;
 	}
 
@@ -93,9 +107,9 @@ public class FDistort
 	public FDistort input( ImageBase input ) {
 		if( this.input == null || this.input.width != input.width || this.input.height != input.height ) {
 			distorter = null;
-			outputToInput = null;
 		}
 		this.input = input;
+		inputType = input.getImageType();
 		return this;
 	}
 
@@ -106,7 +120,6 @@ public class FDistort
 	public FDistort output( ImageBase output ) {
 		if( this.output == null || this.output.width != output.width || this.output.height != output.height ) {
 			distorter = null;
-			outputToInput = null;
 		}
 		this.output = output;
 		return this;
@@ -125,14 +138,14 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
-		return border(FactoryImageBorder.generic(type, input.getImageType()));
+		return border(FactoryImageBorder.generic(type, inputType));
 	}
 
 	/**
 	 * Sets the border to a fixed gray-scale value
 	 */
 	public FDistort border( double value ) {
-		return border(FactoryImageBorder.genericValue(value, input.getImageType()));
+		return border(FactoryImageBorder.genericValue(value, inputType));
 	}
 
 	/**
@@ -157,7 +170,7 @@ public class FDistort
 	 */
 	public FDistort interp(TypeInterpolate type) {
 		distorter = null;
-		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, input.getImageType());
+		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, inputType);
 		;
 		return this;
 	}
