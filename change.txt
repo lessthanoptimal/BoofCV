@@ -36,6 +36,9 @@ Version : Alpha 0.20
   * It will be update on its own cycle
 - Chessboard Detector
   * Improved stability especially for slightly blurred images
+- PointTrackerKltPyramid
+  * Fixed uninitialized variable in one of the constructors.  Thanks ericbhatti
+  * Change it from two constructors down to one constructor
 
 TODO Easy to use calibration app
 TODO Angular consistency on fiducial tests

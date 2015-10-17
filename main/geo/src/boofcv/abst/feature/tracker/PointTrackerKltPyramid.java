@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,13 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
 	 *
 	 * @param config KLT tracker configuration
+	 * @param templateRadius Radius of square templates that are tracked
+	 * @param pyramid The image pyramid which KLT is tracking inside of
+	 * @param detector Feature detector.   If null then no feature detector will be available and spawn won't work.
 	 * @param gradient Computes gradient image pyramid.
+	 * @param interpInput Interpolation used on input image
+	 * @param interpDeriv Interpolation used on gradient images
+	 * @param derivType Type of image the gradient is
 	 */
 	public PointTrackerKltPyramid(KltConfig config,
 								  int templateRadius ,
@@ -92,30 +98,22 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv,
 								  Class<D> derivType ) {
-		this(config,templateRadius,pyramid,gradient,interpInput,interpDeriv,derivType);
-
-		if( detector.getRequiresHessian() )
-			throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
-
-		this.detector = detector;
-		this.derivType = derivType;
-	}
-
-	public PointTrackerKltPyramid(KltConfig config,
-								  int templateRadius ,
-								  PyramidDiscrete<I> pyramid,
-								  ImageGradient<I, D> gradient,
-								  InterpolateRectangle<I> interpInput,
-								  InterpolateRectangle<D> interpDeriv,
-								  Class<D> derivType ) {
 
 		this.config = config;
 		this.templateRadius = templateRadius;
 		this.gradient = gradient;
 		this.basePyramid = pyramid;
+		this.derivType = derivType;
 
 		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv,config);
 		tracker = new PyramidKltTracker<I, D>(klt);
+
+		if( detector != null) {
+			if (detector.getRequiresHessian())
+				throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
+
+			this.detector = detector;
+		}
 	}
 
 	private void addTrackToUnused() {
