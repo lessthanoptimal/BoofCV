@@ -51,7 +51,6 @@ public class ComputeGeometryScore {
 		computeHomography.computeHomography(observations);
 		homographies.add( computeHomography.getHomography().copy() );
 
-		score = 0;
 		try {
 			computeCalib.process(homographies);
 
@@ -61,7 +60,7 @@ public class ComputeGeometryScore {
 			System.out.println("raw singularity score = "+(values[1]/values[2]));
 
 			// 0.2 was a threshold that was emperically determined
-			score = Math.max(score,Math.min(1.0,(values[1]/values[2])/0.2 ));
+			score = Math.min(1.0,(values[1]/values[2])/0.2 );
 		} catch( RuntimeException e ) {
 			score = 0;
 		}

@@ -132,4 +132,36 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	public DetectSquareGridFiducial<ImageFloat32> getDetect() {
 		return detect;
 	}
+
+	/**
+	 * Returns number of rows in the grid
+	 * @return number of rows
+	 */
+	public int getGridRows() {
+		return detect.getRows();
+	}
+
+	/**
+	 * Returns number of columns in the grid
+	 * @return number of columns
+	 */
+	public int getGridColumns() {
+		return detect.getColumns();
+	}
+
+	/**
+	 * Returns number of rows in calibration point grid
+	 * @return number of rows
+	 */
+	public int getPointRows() {
+		return detect.getCalibrationRows();
+	}
+
+	/**
+	 * Returns number of columns in calibration point grid
+	 * @return number of columns
+	 */
+	public int getPointColumns() {
+		return detect.getCalibrationCols();
+	}
 }

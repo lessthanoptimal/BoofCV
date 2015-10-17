@@ -20,6 +20,7 @@ package boofcv.app.calib;
 
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.calib.PlanarDetectorChessboard;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -65,6 +66,39 @@ public interface CalibrationView {
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
 			return (int)(gridPixelsWide/pointCols+0.5);
+		}
+	}
+
+	class SquareGrid implements CalibrationView {
+
+		int gridCols;
+		int pointRows,pointCols;
+
+		public void initialize( PlanarCalibrationDetector detector ) {
+			PlanarDetectorSquareGrid target = (PlanarDetectorSquareGrid)detector;
+			pointRows = target.getPointRows();
+			pointCols = target.getPointColumns();
+
+			gridCols = target.getGridColumns();
+			gridCols += gridCols/2;
+		}
+
+		@Override
+		public void getSides(List<Point2D_F64> detections, List<Point2D_F64> sides) {
+			sides.clear();
+			sides.add( get(0, 0, detections));
+			sides.add( get(0, pointCols-1, detections));
+			sides.add( get(pointRows-1, pointCols-1, detections));
+			sides.add( get(pointRows-1, 0, detections));
+		}
+
+		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {
+			return detections.get(row*pointCols+col);
+		}
+
+		@Override
+		public int getBufferWidth( double gridPixelsWide ) {
+			return (int)(0.15*(gridPixelsWide/gridCols)+0.5);
 		}
 	}
 }

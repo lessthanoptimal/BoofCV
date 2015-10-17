@@ -3,10 +3,9 @@ Alpha 0.20
 - all-integration module
 
 - BinaryPolygonConvexDetector
-  * See if it will work with concave shapes too
-  * Filter out
   * Flag to return shapes which touch the image border
     - Only optimize sides/corners which don't touch the border
+  * Improve concave shape pixel level polygon
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
@@ -15,6 +14,10 @@ Alpha 0.20
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
+
+- Chessboard
+  * Add support for squares which go outside the image
+
 - QuadPoseEstimator
   * For special case, optimize only translation and assume known rotation
   * Or some how estimate both at same time.  using center seems to introduce translation error

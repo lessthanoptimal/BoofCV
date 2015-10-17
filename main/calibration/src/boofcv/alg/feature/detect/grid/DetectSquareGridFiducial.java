@@ -86,13 +86,16 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	public DetectSquareGridFiducial(int numRows, int numCols, double spaceToSquareRatio,
 									InputToBinary<T> inputToBinary ,
 									BinaryPolygonDetector<T> detectorSquare) {
-		this.numCols = numCols;
 		this.numRows = numRows;
+		this.numCols = numCols;
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
 		s2c = new SquaresIntoClusters(spaceToSquareRatio,6);
 		c2g = new ClustersIntoGrids(numCols*numRows);
+
+		calibRows = numRows*2;
+		calibCols = numCols*2;
 	}
 
 	/**
@@ -169,8 +172,8 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 			calibrationPoints.addAll(row1);
 		}
 
-		calibCols = grid.columns*2;
-		calibRows = grid.rows*2;
+//		calibCols = grid.columns*2;
+//		calibRows = grid.rows*2;
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {
@@ -200,4 +203,13 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	public ImageUInt8 getBinary() {
 		return binary;
 	}
+
+	public int getColumns() {
+		return numCols;
+	}
+
+	public int getRows() {
+		return numRows;
+	}
+
 }

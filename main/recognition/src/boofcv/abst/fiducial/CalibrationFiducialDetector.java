@@ -24,7 +24,6 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.geo.FactoryMultiView;
@@ -36,7 +35,6 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +50,6 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 {
 	// detects the calibration target
 	PlanarCalibrationDetector detector;
-	// intrinsic calibration matrix
-	DenseMatrix64F K = new DenseMatrix64F(3,3);
 	// transform to remove lens distortion
 	PointTransform_F64 distortToUndistorted;
 
@@ -168,7 +164,6 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
 		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
-		PerspectiveOps.calibrationMatrix(intrinsic, K);
 	}
 
 	@Override

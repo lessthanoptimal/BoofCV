@@ -19,6 +19,8 @@
 package boofcv.app.calib;
 
 import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.abst.calib.PlanarDetectorChessboard;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -89,7 +91,13 @@ public class AssistedCalibration {
 		this.gui = gui;
 		this.quality = quality;
 
-		view = new CalibrationView.Chessboard();
+		if( detector instanceof PlanarDetectorChessboard ) {
+			view = new CalibrationView.Chessboard();
+		} else if( detector instanceof PlanarDetectorSquareGrid ) {
+			view = new CalibrationView.SquareGrid();
+		} else {
+			throw new RuntimeException("Unknown calibration detector type");
+		}
 		view.initialize(detector);
 	}
 

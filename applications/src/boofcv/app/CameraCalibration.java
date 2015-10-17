@@ -187,9 +187,14 @@ public class CameraCalibration extends BaseWebcamApp {
 			splitFlag(arg);
 			if( flagName.compareToIgnoreCase("Grid") == 0 ) {
 				String words[] = parameters.split(":");
-				if( words.length != 2 )throw new RuntimeException("Expected two values for rows and columns");
+				if (words.length != 2) throw new RuntimeException("Expected two values for rows and columns");
 				numRows = Integer.parseInt(words[0]);
 				numColumns = Integer.parseInt(words[1]);
+			} else if( flagName.compareToIgnoreCase("SquareSpace") == 0 ) {
+				String words[] = parameters.split(":");
+				if( words.length != 2 )throw new RuntimeException("Expected two values for square and space");
+				square = Double.parseDouble(words[0]);
+				space = Double.parseDouble(words[1]);
 			} else {
 				throw new RuntimeException("Unknown image option "+flagName);
 			}
