@@ -39,11 +39,10 @@ Version : Alpha 0.20
 - PointTrackerKltPyramid
   * Fixed uninitialized variable in one of the constructors.  Thanks ericbhatti
   * Change it from two constructors down to one constructor
+- Created built in class for removing perspective distortion
+  * RemovePerspectiveDistortion
 
 TODO Easy to use calibration app
-TODO Angular consistency on fiducial tests
-TODO Add calibration grids to fiducial tests
-TODO delete data/evaluation
 TODO chessboard with squares partially outside the image
 
 ---------------------------------------------

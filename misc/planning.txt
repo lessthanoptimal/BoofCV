@@ -9,7 +9,7 @@ Alpha 0.20
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
-  * Regression tests that can determine if orientation is correct
+  * Regression tests that can determine if orientation is consistent
     - If multiple squares on same surface see if their orientation is the same
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
@@ -29,6 +29,7 @@ Alpha 0.20
 - Look at Sandreas's NewWarp?
 
 - Background Model
+  * GMM model
   * Shadow removal
   * remove support for MultiSpectral once Interleaved is supported enough
 
