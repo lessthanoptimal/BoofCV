@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
+import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.core.image.GConvertImage;
@@ -204,6 +205,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
+		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
+			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(5,7,0.03,0.03), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -248,7 +251,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
-		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/calibration/movie.mjpeg")));
+		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 
 		app.setInputList(inputs);
 
