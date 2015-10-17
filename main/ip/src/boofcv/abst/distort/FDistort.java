@@ -88,6 +88,7 @@ public class FDistort
 		this.input = input;
 		this.output = output;
 
+		inputType = input.getImageType();
 		interp(TypeInterpolate.BILINEAR);
 		border(0);
 
@@ -95,7 +96,7 @@ public class FDistort
 		distorter = null;
 		outputToInput = null;
 
-		inputType = input.getImageType();
+
 
 		return this;
 	}
