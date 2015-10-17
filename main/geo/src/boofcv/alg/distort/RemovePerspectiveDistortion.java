@@ -42,8 +42,12 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 
 	// computes the homography
 	Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
+
+//	RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-8,20, EpipolarError.SIMPLE);
+
 	// storage for computed homography
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
+	DenseMatrix64F Hrefined = new DenseMatrix64F(3,3);
 	// transform which applies the homography
 	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
 
@@ -97,6 +101,11 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 
 		if( !computeHomography.process(associatedPairs, H) )
 			return false;
+
+//		if( !refineHomography.fitModel(associatedPairs,H,Hrefined) ) {
+//			return false;
+//		}
+//		homography.set(Hrefined);
 
 		homography.set(H);
 		distort.input(input).apply();

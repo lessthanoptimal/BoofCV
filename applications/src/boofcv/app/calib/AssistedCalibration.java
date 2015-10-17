@@ -158,6 +158,8 @@ public class AssistedCalibration {
 						"Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
 			} else {
 				if (stationaryTime > STILL_THRESHOLD) {
+					saver.setTemplate(input,sides);
+					gui.getInfoPanel().updateTemplate(saver.getTemplate());
 					actions.resetStationary();
 					state = State.REMOVE_DOTS;
 					canonicalWidth = Math.max(top,bottom);
@@ -222,6 +224,8 @@ public class AssistedCalibration {
 
 		if( detected ) {
 			saver.process(input, sides);
+			gui.getInfoPanel().updateView(saver.getCurrentView());
+			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
 			double stationaryTime = actions.getStationaryTime();
 			List<Point2D_F64> points = detector.getDetectedPoints();
@@ -245,7 +249,7 @@ public class AssistedCalibration {
 					message = "Move somewhere else";
 					captureFiducialPoints();
 
-					gui.getInfoPanel().updateEdge(1.0-(magnets.size()/(double)totalMagnets));
+					gui.getInfoPanel().updateEdgeFill(1.0 - (magnets.size() / (double) totalMagnets));
 
 					if( magnets.isEmpty() ) {
 						state = State.FILL_SCREEN;
@@ -279,6 +283,8 @@ public class AssistedCalibration {
 
 		if( detected ) {
 			saver.process(input, sides);
+			gui.getInfoPanel().updateView(saver.getCurrentView());
+			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
 			double stationaryTime = actions.getStationaryTime();
 			List<Point2D_F64> points = detector.getDetectedPoints();

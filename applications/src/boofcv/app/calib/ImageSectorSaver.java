@@ -19,14 +19,17 @@
 package boofcv.app.calib;
 
 import boofcv.alg.distort.RemovePerspectiveDistortion;
+import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
+import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,19 +37,58 @@ import java.util.List;
  */
 public class ImageSectorSaver {
 
-	RemovePerspectiveDistortion<ImageFloat32> removePerspective =
-			new RemovePerspectiveDistortion<ImageFloat32>(30,30, ImageType.single(ImageFloat32.class));
+	public static int LENGTH = 50;
 
-	ImageFloat32 derivX = new ImageFloat32(30,30);
-	ImageFloat32 derivY = new ImageFloat32(30,30);
+	RemovePerspectiveDistortion<ImageFloat32> removePerspective =
+			new RemovePerspectiveDistortion<ImageFloat32>(LENGTH, LENGTH, ImageType.single(ImageFloat32.class));
+
+	ImageFloat32 templateOriginal = new ImageFloat32(LENGTH, LENGTH);
+	ImageFloat32 template = new ImageFloat32(LENGTH, LENGTH);
+	ImageFloat32 weights = new ImageFloat32(LENGTH, LENGTH);
+	double totalWeight;
+
+
+	ImageFloat32 difference = new ImageFloat32(LENGTH, LENGTH);
+	ImageFloat32 tempImage = new ImageFloat32(LENGTH, LENGTH);
 
 	ImageFloat32 bestImage;
 	double bestScore;
 
-
+	double currentScore;
 
 	public ImageSectorSaver() {
 		bestImage = new ImageFloat32(1,1);
+	}
+
+	public void setTemplate( ImageFloat32 image, List<Point2D_F64> sides) {
+		if( sides.size() != 4 )
+			throw new IllegalArgumentException("Expected 4 sides");
+
+		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
+
+		templateOriginal.setTo(removePerspective.getOutput());
+
+
+		// blur the image a bit so it doesn't have to be a perfect match
+		ImageFloat32 blurred = new ImageFloat32(LENGTH,LENGTH);
+		BlurImageOps.gaussian(templateOriginal,blurred,-1,2,null);
+
+		// place greater importance on pixels which are around edges
+		ImageFloat32 derivX = new ImageFloat32(LENGTH, LENGTH);
+		ImageFloat32 derivY = new ImageFloat32(LENGTH, LENGTH);
+		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred,derivX,derivY, BorderType.EXTENDED);
+
+		GGradientToEdgeFeatures.intensityE(derivX,derivY,weights);
+
+		float max = ImageStatistics.max(weights);
+		PixelMath.divide(weights,max,weights);
+
+		totalWeight = ImageStatistics.sum(weights);
+
+		// compute a normalized templater for later use.  Divide by the mean to add some lighting invariance
+		template.setTo(removePerspective.getOutput());
+		float mean = (float)ImageStatistics.mean(template);
+		PixelMath.divide(template,mean,template);
 	}
 
 	public void clearHistory() {
@@ -54,35 +96,35 @@ public class ImageSectorSaver {
 	}
 
 	public void process(ImageFloat32 image, List<Point2D_F64> sides) {
+		if( sides.size() != 4 )
+			throw new IllegalArgumentException("Expected 4 sides");
+
 		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
 
-		GImageDerivativeOps.gradient(DerivativeType.SOBEL,removePerspective.getOutput(),
-				derivX,derivY, BorderType.EXTENDED);
+		ImageFloat32 current = removePerspective.getOutput();
+		float mean = (float)ImageStatistics.mean(current);
+		PixelMath.divide(current,mean,tempImage);
 
-		double total = 0;
+		PixelMath.diffAbs(tempImage,template,difference);
+		PixelMath.multiply(difference,weights,difference);
 
-		int N = derivX.getWidth()*derivX.getHeight();
-
-		double[] foo = new double[N];
-		for (int i = 0; i < N; i++) {
-			double dx = derivX.data[i];
-			double dy = derivY.data[i];
-
-			total += foo[i] = dx*dx + dy*dy;
-		}
-
-		total /= N;
-
-		Arrays.sort(foo);
-		double focus2 = foo[(int)(N*0.97)];
-		System.out.println("total focus "+total+"   or  "+focus2);
-
-
-
+		// compute score as a weighted average of the difference
+		currentScore  = ImageStatistics.sum(difference)/totalWeight;
 	}
 
 	public void save() {
 
 	}
 
+	public double getFocusScore() {
+		return currentScore;
+	}
+
+	public ImageFloat32 getTemplate() {
+		return templateOriginal;
+	}
+
+	public ImageFloat32 getCurrentView() {
+		return removePerspective.getOutput();
+	}
 }
