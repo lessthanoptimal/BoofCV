@@ -25,7 +25,11 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_I32;
+
+import java.util.List;
 
 /**
  * <p>
@@ -45,7 +49,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonLineToImage<T extends ImageSingleBand> {
+public class RefinePolygonLineToImage<T extends ImageSingleBand> implements RefineBinaryPolygon<T> {
 
 	// How far away from a corner will it sample the line
 	private double cornerOffset = 2.0;
@@ -113,9 +117,15 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * Sets the image which is going to be processed.  If a transform is to be used
 	 * {@link SnapToEdge#setTransform} should be called before this.
 	 */
+	@Override
 	public void setImage(T image) {
 		this.image = image;
 		this.snapToEdge.setImage(image);
+	}
+
+	@Override
+	public void setLensDistortion(int width, int height, PixelTransform_F32 toUndistorted, PixelTransform_F32 toDistorted) {
+		this.snapToEdge.setTransform(toDistorted);
 	}
 
 	/**
@@ -124,7 +134,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> {
 	 * @param input (input) Initial estimate for the polygon.  CW or CCW ordering doesn't matter.
 	 * @param output (output) the fitted polygon
 	 */
-	public boolean refine(Polygon2D_F64 input, Polygon2D_F64 output)
+	@Override
+	public boolean refine(Polygon2D_F64 input, List<Point2D_I32> contour, GrowQueue_I32 splits, Polygon2D_F64 output)
 	{
 		if( input.size() != output.size())
 			throw new IllegalArgumentException("Input and output sides do not match. "+input.size()+" "+output.size());

@@ -19,6 +19,7 @@
 package boofcv.factory.fiducial;
 
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
@@ -36,15 +37,21 @@ public class ConfigFiducialImage implements Configuration {
 	 */
 	public double maxErrorFraction = 0.20;
 
+
 	/**
 	 * Configuration for square detector
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
 
+	/**
+	 * Configuration for refining with lines.  Ignored if not used.
+	 */
+	public ConfigRefinePolygonLineToImage configPolygonRefine = new ConfigRefinePolygonLineToImage();
+
 	{
 		squareDetector.contour2Poly_splitFraction = 0.05;
 
-		squareDetector.configRefineLines.cornerOffset = 2;
+		configPolygonRefine.cornerOffset = 2;
 	}
 
 	public ConfigFiducialImage() {

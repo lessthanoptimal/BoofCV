@@ -20,6 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.alg.shapes.edge.PolygonEdgeScore;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
@@ -42,48 +43,54 @@ public class FactoryShapeDetector {
 	 * @return Detector
 	 */
 	public static <T extends ImageSingleBand>
-	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config,
-											Class<T> imageType)
+	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config, Class<T> imageType)
 	{
 		config.checkValidity();
-
-		double cornerOffset = 2;
-		int numSamples = 15;
 
 		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(
 				config.contour2Poly_splitFraction,
 				0, // dynamically set later on
 				config.contour2Poly_iterations);
 
-		RefinePolygonLineToImage<T> refineLine = null;
-		if( config.refineWithLines ) {
-			cornerOffset = config.configRefineLines.cornerOffset;
-			numSamples = config.configRefineLines.lineSamples;
-			refineLine = new RefinePolygonLineToImage<T>(
-					config.configRefineLines.cornerOffset, config.configRefineLines.lineSamples,
-					config.configRefineLines.sampleRadius, config.configRefineLines.maxIterations,
-					config.configRefineLines.convergeTolPixels, config.configRefineLines.maxCornerChangePixel,
-					imageType);
-		}
-		RefinePolygonCornersToImage<T> refineCorner = null;
-		if( config.refineWithCorners ) {
-			cornerOffset = config.configRefineCorners.cornerOffset;
-			numSamples = config.configRefineCorners.lineSamples;
-			refineCorner = new RefinePolygonCornersToImage<T>(
-					config.configRefineCorners.endPointDistance,
-					config.configRefineCorners.cornerOffset, config.configRefineCorners.lineSamples,
-					config.configRefineCorners.sampleRadius, config.configRefineCorners.maxIterations,
-					config.configRefineCorners.convergeTolPixels, config.configRefineCorners.maxCornerChangePixel,
-					imageType);
+		RefineBinaryPolygon<T> refinePolygon = null;
+		if( config.refine != null ) {
+			if( config.refine instanceof ConfigRefinePolygonLineToImage ) {
+				refinePolygon = refinePolygon((ConfigRefinePolygonLineToImage)config.refine,imageType);
+			} else if( config.refine instanceof ConfigRefinePolygonCornersToImage ) {
+				refinePolygon = refinePolygon((ConfigRefinePolygonCornersToImage)config.refine,imageType);
+			} else {
+				throw new IllegalArgumentException("Unknown refine config type");
+			}
 		}
 
 		PolygonEdgeScore<T> scorer = null;
 		if( config.minimumEdgeIntensity > 0 ) {
+			double cornerOffset = 1;
+			int numSamples = 15;
 			scorer = new PolygonEdgeScore<T>(cornerOffset,1.0,numSamples,config.minimumEdgeIntensity,imageType);
 		}
 
 		return new BinaryPolygonDetector<T>(config.numberOfSides,contourToPolygon,
-				scorer, refineLine,refineCorner,config.minContourImageWidthFraction,
+				scorer, refinePolygon,config.minContourImageWidthFraction,
 				config.contour2Poly_minimumSplitFraction,config.clockwise,config.convex,imageType);
+	}
+
+	public static <T extends ImageSingleBand>
+	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+		return new RefinePolygonLineToImage<T>(
+				config.cornerOffset, config.lineSamples,
+				config.sampleRadius, config.maxIterations,
+				config.convergeTolPixels, config.maxCornerChangePixel,
+				imageType);
+	}
+
+	public static <T extends ImageSingleBand>
+	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonCornersToImage config , Class<T> imageType ) {
+		return new RefinePolygonCornersToImage<T>(
+				config.endPointDistance,
+				config.cornerOffset, config.lineSamples,
+				config.sampleRadius, config.maxIterations,
+				config.convergeTolPixels, config.maxCornerChangePixel,
+				imageType);
 	}
 }

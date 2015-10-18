@@ -58,7 +58,8 @@ public class FactoryFiducial {
 		configFiducial.squareDetector.clockwise = false;
 
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
+		BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.
+				polygon(configFiducial.squareDetector,imageType);
 
 		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
@@ -106,8 +107,7 @@ public class FactoryFiducial {
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
 
-		config.square.refineWithCorners = false;
-		config.square.refineWithLines = true;
+		config.refineWithCorners = false;
 
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
@@ -123,8 +123,7 @@ public class FactoryFiducial {
 	public static <T extends ImageSingleBand>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
 
-		config.square.refineWithCorners = false;
-		config.square.refineWithLines = true;
+		config.refineWithCorners = false;
 
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}

@@ -63,7 +63,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(imageType);
 
 				alg.setImage(image);
-				assertEquals(4, alg.refine(contour, split, found));
+				assertTrue(alg.refine(null, contour, split, found));
 
 				assertTrue(expected.isEquivalent(found, 0.01));
 			}
@@ -85,7 +85,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 				RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(imageType);
 
 				alg.setImage(BoofTesting.createSubImageOf_S(image));
-				assertEquals(4, alg.refine(contour, split, found));
+				assertTrue(alg.refine(null, contour, split, found));
 
 				assertTrue(expected.isEquivalent(found, 0.01));
 			}
@@ -114,7 +114,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 					RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage( imageType);
 
 					alg.setImage(BoofTesting.createSubImageOf_S(image));
-					assertEquals(4, alg.refine(contour, split, found));
+					assertTrue(alg.refine(null, contour, split, found));
 
 					Polygon2D_F64 expected = apply(affine,original);
 					assertTrue(expected.isEquivalent(found, tol));

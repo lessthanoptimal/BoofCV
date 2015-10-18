@@ -41,10 +41,16 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 	List<Point2D_F64> layoutPoints;
 	List<Point2D_F64> detected;
 
-	public PlanarDetectorChessboard(ConfigChessboard config) {
+	public PlanarDetectorChessboard(ConfigChessboard config ) {
+
+		if( config.refineWithCorners) {
+			config.square.refine = config.configRefineCorners;
+		} else {
+			config.square.refine = config.configRefineLines;
+		}
 
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(config.square, ImageFloat32.class);
+				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
 
 		InputToBinary<ImageFloat32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);

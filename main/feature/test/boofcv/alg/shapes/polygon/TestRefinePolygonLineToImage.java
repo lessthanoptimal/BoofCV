@@ -58,7 +58,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 			Polygon2D_F64 output = new Polygon2D_F64(input.size());
 			alg.setImage(image);
-			assertFalse(alg.refine(input, output));
+			assertFalse(alg.refine(input,null,null, output));
 		}
 	}
 
@@ -78,13 +78,13 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 			Polygon2D_F64 output = new Polygon2D_F64(4);
 			alg.setImage(image);
-			assertTrue(alg.refine(input, output));
+			assertTrue(alg.refine(input,null,null, output));
 
 			// do it again with a sub-image
 			Polygon2D_F64 output2 = new Polygon2D_F64(4);
 			image = BoofTesting.createSubImageOf_S(image);
 			alg.setImage(image);
-			assertTrue(alg.refine(input, output2));
+			assertTrue(alg.refine(input,null,null, output2));
 
 			assertTrue(UtilPolygons2D_F64.isIdentical(output, output2, 1e-8));
 		}
@@ -112,7 +112,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 					Polygon2D_F64 output = new Polygon2D_F64(original.size());
 					alg.setImage(image);
-					assertTrue(alg.refine(input, output));
+					assertTrue(alg.refine(input,null,null, output));
 
 					assertTrue(original.isIdentical(output, 0.01));
 				}
@@ -155,7 +155,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		Polygon2D_F64 found = new Polygon2D_F64(4);
 
 		alg.setImage(image);
-		assertTrue(alg.refine(input, found));
+		assertTrue(alg.refine(input,null,null, found));
 
 		// input shouldn't be modified
 		assertTrue(expected.isIdentical(input,0));
@@ -165,7 +165,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		// do it again with a sub-image to see if it handles that
 		image = BoofTesting.createSubImageOf_S(image);
 		alg.setImage(image);
-		assertTrue(alg.refine(input, found));
+		assertTrue(alg.refine(input,null,null, found));
 		assertTrue(expected.isIdentical(input,0));
 		assertTrue(expected.isIdentical(found,0.27));
 	}
@@ -205,14 +205,14 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 		alg.setImage(image);
 		// fail without the transform
-		assertFalse(alg.refine(input, found));
+		assertFalse(alg.refine(input,null,null, found));
 
 		// work when the transform is applied
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32();
 		transform.set(regToDist);
 		alg.setTransform(transform);
 		alg.setImage(image);
-		assertTrue(alg.refine(input, found));
+		assertTrue(alg.refine(input,null,null, found));
 
 		// should be close to the expected
 		assertTrue(expected.isIdentical(found,0.3));
@@ -258,7 +258,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 			addNoise(input, 2);
 
 			alg.setImage(image);
-			assertTrue(alg.refine(input, found));
+			assertTrue(alg.refine(input,null,null, found));
 
 			// should be close to the expected
 			double before = computeMaxDistance(input,expected);
@@ -269,7 +269,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 			//----- Reverse the order and it should still work
 			input.flip();
-			assertTrue(alg.refine(input, found));
+			assertTrue(alg.refine(input,null,null, found));
 			found.flip();
 			after = computeMaxDistance(found, expected);
 

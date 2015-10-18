@@ -25,6 +25,7 @@ import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.gui.SelectInputPanel;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -36,6 +37,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.Configuration;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F32;
@@ -79,6 +81,7 @@ public class DetectCalibrationChessApp
 	boolean processed = false;
 
 	ConfigChessboard config;
+	Configuration configRefine;
 
 	public DetectCalibrationChessApp() {
 
@@ -107,9 +110,10 @@ public class DetectCalibrationChessApp
 	public void configure( int numCols , int numRows , boolean forCalibration ) {
 		config = new ConfigChessboard(numCols,numRows,30);
 
-		if( !forCalibration ) {
-			config.square.refineWithCorners = false;
-			config.square.refineWithLines = true;
+		if( forCalibration ) {
+			configRefine = null;
+		} else {
+			configRefine = new ConfigRefinePolygonLineToImage();
 		}
 
 		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlg();

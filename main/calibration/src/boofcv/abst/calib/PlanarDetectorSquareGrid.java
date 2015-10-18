@@ -43,6 +43,13 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	List<Point2D_F64> detected;
 
 	public PlanarDetectorSquareGrid(ConfigSquareGrid config) {
+
+		if( config.refineWithCorners) {
+			config.square.refine = config.configRefineCorners;
+		} else {
+			config.square.refine = config.configRefineLines;
+		}
+
 		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
 
 		InputToBinary<ImageFloat32> inputToBinary =

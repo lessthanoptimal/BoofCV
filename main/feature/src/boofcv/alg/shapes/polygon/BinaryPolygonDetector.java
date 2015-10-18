@@ -44,7 +44,8 @@ import java.util.List;
 /**
  * <p>
  * Detects convex polygons with the specified number of sides in an image.  Shapes are assumed to be black shapes
- * against a white background, allowing for thresholding to be used.
+ * against a white background, allowing for thresholding to be used.  Subpixel refinement is done using the
+ * provided implementation of {@link RefineBinaryPolygon}.
  * </p>
  *
  * Processing Steps:
@@ -54,19 +55,6 @@ import java.util.List;
  * <li>From the contours polygons are fitted and refined to pixel accuracy.</li>
  * <li>(Optional) Sub-pixel refinement of the polygon's edges and/or corners.</li>
  * </ol>
- *
- * <p>
- * Subpixel refinement is done using the provided {@link RefinePolygonLineToImage} and {@link RefinePolygonCornersToImage}.
- * If straight lines are straight, as is the case with images with lens distortion removes, then the line based
- * refinement will tend to produce better results.  If lens distortion is present then the corner sub-pixel algorithm
- * is more likely to produce better results.
- * </p>
- *
- * <p>
- * NOTE: If both refinement methods are used then corner is applied first followed by line.<br>
- * NOTE: A binary image is not processed as input because the gray-scale image is used in the sub-pixel line/corner
- * refinement.
- * </p>
  *
  * <p>
  * The returned polygons will encompass the entire black polygon.  Here is a simple example in 1D. If all pixels are
@@ -99,9 +87,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private RefinePolyLine improveContour = new RefinePolyLine(true,20);
 
 	// Refines the estimate of the polygon's lines using a subpixel technique
-	private RefinePolygonLineToImage<T> refineLine;
-	// Refines the estimate of the polygon's corners using a subpixel technique
-	private RefinePolygonCornersToImage<T> refineCorner;
+	private RefineBinaryPolygon<T> refinePolygon;
 
 	// List of all squares that it finds
 	private FastQueue<Polygon2D_F64> found;
@@ -142,8 +128,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges.
 	 *                        If null then this test is skipped.
-	 * @param refineLine (Optional) Refines the polygon's lines.  Set to null to skip step
-	 * @param refineCorner (Optional) Refines the polygon's corners.  Set to null to skip step
+	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param minimumSplitFraction Minimum number of pixels allowed to split a polygon as a fraction of image width.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
@@ -152,8 +137,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	public BinaryPolygonDetector(int polygonSides[],
 								 SplitMergeLineFitLoop contourToPolygon,
 								 PolygonEdgeScore differenceScore,
-								 RefinePolygonLineToImage<T> refineLine,
-								 RefinePolygonCornersToImage<T> refineCorner,
+								 RefineBinaryPolygon<T> refinePolygon,
 								 double minContourFraction,
 								 double minimumSplitFraction,
 								 boolean outputClockwise,
@@ -161,8 +145,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 								 Class<T> inputType) {
 
 
-		this.refineLine = refineLine;
-		this.refineCorner = refineCorner;
+		this.refinePolygon = refinePolygon;
 		this.differenceScore = differenceScore;
 		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
@@ -207,12 +190,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					"must be contained by the same bounds as the input distorted image");
 		}
 
-		if( refineLine != null ) {
-			refineLine.setTransform(toDistorted);
-		}
-
-		if( refineCorner != null ) {
-			refineCorner.getSnapToEdge().setTransform(toDistorted);
+		if( refinePolygon != null ) {
+			refinePolygon.setLensDistortion(width, height, toUndistorted, toDistorted);
 		}
 
 		if( differenceScore != null ) {
@@ -339,12 +318,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				refined.vertexes.resize(splits.size);
 
 				boolean success;
-				if( refineCorner != null ) {
-					refineCorner.setImage(gray);
-					success = refineCorner.refine(c.external,splits,refined)>=3;
-				} else if( refineLine != null ){
-					refineLine.setImage(gray);
-					success = refineLine.refine(workPoly, refined);
+				if( refinePolygon != null ) {
+					refinePolygon.setImage(gray);
+					success = refinePolygon.refine(workPoly,c.external,splits,refined);
 				} else {
 					refined.set(workPoly);
 					success = true;
@@ -461,6 +437,14 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	public boolean isCheckEdgeBefore() {
 		return checkEdgeBefore;
+	}
+
+	public RefineBinaryPolygon<T> getRefinePolygon() {
+		return refinePolygon;
+	}
+
+	public void setRefinePolygon(RefineBinaryPolygon<T> refinePolygon) {
+		this.refinePolygon = refinePolygon;
 	}
 
 	/**

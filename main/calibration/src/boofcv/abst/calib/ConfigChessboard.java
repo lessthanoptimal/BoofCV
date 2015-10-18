@@ -22,6 +22,8 @@ import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
+import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
@@ -58,6 +60,21 @@ public class ConfigChessboard implements Configuration {
 	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4);
 
 	/**
+	 * If true then it only refines the corner region.  Otherwise it will refine the entire line.
+	 */
+	public boolean refineWithCorners = true;
+
+	/**
+	 * Configuration for refining with lines.  Ignored if not used.
+	 */
+	public ConfigRefinePolygonLineToImage configRefineLines = new ConfigRefinePolygonLineToImage();
+
+	/**
+	 * Configuration for refining with corners.  Ignored if not used.
+	 */
+	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
+
+	/**
 	 * Physical width of each square on the calibration target
 	 */
 	public double squareWidth;
@@ -66,7 +83,7 @@ public class ConfigChessboard implements Configuration {
 		thresholding.bias = -10;
 
 		// it erodes the original shape meaning it has to move a greater distance
-		square.configRefineCorners.maxCornerChangePixel = 5;
+		configRefineCorners.maxCornerChangePixel = 5;
 
 //		square.contour2Poly_splitFraction = 0.25;
 //		square.contour2Poly_minimumSplitFraction = 0.01;
@@ -75,20 +92,17 @@ public class ConfigChessboard implements Configuration {
 
 		square.minContourImageWidthFraction = 0.05;
 
-		square.refineWithCorners = true;
-		square.refineWithLines = false;
-
 		// good value for squares.  Set it here to make it not coupled to default values
-		square.configRefineCorners.cornerOffset = 1;
-		square.configRefineCorners.lineSamples = 10;
-		square.configRefineCorners.convergeTolPixels = 0.05;
-		square.configRefineCorners.maxIterations = 10;
+		configRefineCorners.cornerOffset = 1;
+		configRefineCorners.lineSamples = 10;
+		configRefineCorners.convergeTolPixels = 0.05;
+		configRefineCorners.maxIterations = 10;
 
 		// defaults for if the user toggles it to lines
-		square.configRefineLines.cornerOffset = 1;
-		square.configRefineLines.lineSamples = 10;
-		square.configRefineLines.convergeTolPixels = 0.05;
-		square.configRefineLines.maxIterations = 10;
+		configRefineLines.cornerOffset = 1;
+		configRefineLines.lineSamples = 10;
+		configRefineLines.convergeTolPixels = 0.05;
+		configRefineLines.maxIterations = 10;
 	}
 
 	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {

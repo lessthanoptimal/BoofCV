@@ -31,6 +31,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.Configuration;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -119,7 +120,17 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	}
 
 	private synchronized void createDetector() {
-		detector = FactoryShapeDetector.polygon(controls.getConfig(),imageType);
+
+		Configuration configRefine = null;
+
+		if( controls.refineType == PolygonRefineType.LINE ) {
+			configRefine = controls.getConfigLine();
+		} else if( controls.refineType == PolygonRefineType.CORNER ) {
+			configRefine = controls.getConfigCorner();
+		}
+		controls.getConfigPolygon().refine = configRefine;
+
+		detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(),imageType);
 		if( input == null )
 			input = GeneralizedImageOps.createSingleBand(detector.getInputType(),1,1);
 		imageThresholdUpdated();

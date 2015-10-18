@@ -18,11 +18,11 @@
 
 package boofcv.alg.feature.detect.chess;
 
+import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -74,12 +74,9 @@ public class TestDetectChessCalibrationPoints {
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
-		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(4);
-		configPoly.refineWithCorners = true;
-		configPoly.refineWithLines = false;
-		configPoly.configRefineCorners.maxCornerChangePixel = 5;
+		ConfigChessboard configChess = new ConfigChessboard(5,5,1);
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(configPoly, ImageFloat32.class);
+				FactoryShapeDetector.polygon(configChess.square, ImageFloat32.class);
 		detectorSquare.setVerbose(true);
 		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,-10,true,ImageFloat32.class);
 		DetectChessboardFiducial alg =

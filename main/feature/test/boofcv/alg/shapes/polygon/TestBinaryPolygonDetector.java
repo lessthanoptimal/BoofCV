@@ -25,6 +25,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
+import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
+import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
@@ -198,8 +200,11 @@ public class TestBinaryPolygonDetector {
 	private BinaryPolygonDetector createDetector(Class imageType, boolean useLines, int ...numberOfSides) {
 		ConfigPolygonDetector config = new ConfigPolygonDetector(numberOfSides);
 
-		config.refineWithLines = useLines;
-		config.refineWithCorners = !useLines;
+		if( useLines ) {
+			config.refine = new ConfigRefinePolygonLineToImage();
+		} else {
+			config.refine = new ConfigRefinePolygonCornersToImage();
+		}
 
 		return FactoryShapeDetector.polygon(config,imageType);
 	}

@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
 import boofcv.alg.shapes.edge.SnapToEdge;
+import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
+public class RefinePolygonCornersToImage<T extends ImageSingleBand> implements RefineBinaryPolygon<T> {
 
 	// number of pixels along the contour away should the end point be from the corner
 	private int pixelsAway;
@@ -88,8 +89,14 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 	 *
 	 * @param input Input image-
 	 */
+	@Override
 	public void setImage( T input ) {
 		refineCorner.setImage(input);
+	}
+
+	@Override
+	public void setLensDistortion(int width, int height, PixelTransform_F32 toUndistorted, PixelTransform_F32 toDistorted) {
+		this.refineCorner.getSnapToEdge().setTransform(toDistorted);
 	}
 
 	/**
@@ -100,7 +107,8 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 	 * @param refined (Output) Refined polygon with sub-pixel accurate corners
 	 * @return Number of corners it successfully optimized.
 	 */
-	public int refine(List<Point2D_I32> contour , GrowQueue_I32 splits, Polygon2D_F64 refined) {
+	@Override
+	public boolean refine(Polygon2D_F64 input, List<Point2D_I32> contour , GrowQueue_I32 splits, Polygon2D_F64 refined) {
 
 		if( refined.size() != splits.size() )
 			throw new IllegalArgumentException("Miss match between number of splits and polygon order");
@@ -131,7 +139,7 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> {
 		}
 
 		// allow partial success
-		return numGood;
+		return numGood >= refined.size()-1;
 	}
 
 	/**
