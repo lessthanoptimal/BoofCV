@@ -55,8 +55,12 @@ public class ChessboardPolygonHelper implements PolygonHelper {
 
 			double r = Math.sqrt(dx*dx + dy*dy);
 
-			p.x += 1.4*dx/r;
-			p.y += 1.4*dy/r;
+			// not really sure how this happens, but it is possible for the center to be exactly equal to one of the
+			// corner points
+			if( r > 0 ) {
+				p.x += 1.4 * dx / r;
+				p.y += 1.4 * dy / r;
+			}
 		}
 	}
 
