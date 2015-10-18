@@ -49,7 +49,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 
 	// converts the input image into a binary one
 	InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,ImageFloat32.class);
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	ImageUInt8 binaryInner = new ImageUInt8(1,1);
 
 	// helper data structures for computing the value of each grid point
 	int counts[] = new int[16];
@@ -82,7 +82,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 
 		int widthNoBorder = w*4;
 
-		binary.reshape(widthNoBorder,widthNoBorder);
+		binaryInner.reshape(widthNoBorder, widthNoBorder);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	@Override
 	protected boolean processSquare(ImageFloat32 gray, Result result) {
 
-		int off = (gray.width-binary.width)/2;
+		int off = (gray.width- binaryInner.width)/2;
 		gray.subimage(off,off,gray.width-off,gray.width-off,grayNoBorder);
 
 //		grayNoBorder.printInt();
@@ -209,26 +209,34 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 
 	private void findBitCounts(ImageFloat32 gray) {
 		// compute binary image using an adaptive algorithm to handle shadows
-		threshold.process(gray,binary);
+		threshold.process(gray, binaryInner);
 
 		Arrays.fill(counts,0);
 		for (int row = 0; row < 4; row++) {
-			int y0 = row*binary.width/4;
-			int y1 = (row+1)*binary.width/4;
+			int y0 = row* binaryInner.width/4;
+			int y1 = (row+1)* binaryInner.width/4;
 			for (int col = 0; col < 4; col++) {
-				int x0 = col*binary.width/4;
-				int x1 = (col+1)*binary.width/4;
+				int x0 = col* binaryInner.width/4;
+				int x1 = (col+1)* binaryInner.width/4;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {
-					int index = i*binary.width + x0;
+					int index = i* binaryInner.width + x0;
 					for( int j = x0; j < x1; j++ ) {
-						total += binary.data[index++];
+						total += binaryInner.data[index++];
 					}
 				}
 
 				counts[row*4 + col] = total;
 			}
 		}
+	}
+
+	public ImageUInt8 getBinaryInner() {
+		return binaryInner;
+	}
+
+	public ImageFloat32 getGrayNoBorder() {
+		return grayNoBorder;
 	}
 }

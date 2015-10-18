@@ -319,4 +319,8 @@ public class SiftDetector {
 	public FastQueue<ScalePoint> getFoundPoints() {
 		return foundPoints;
 	}
+
+	public SiftImageScaleSpace getScaleSpace() {
+		return ss;
+	}
 }

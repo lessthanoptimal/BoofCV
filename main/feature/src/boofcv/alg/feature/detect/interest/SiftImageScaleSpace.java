@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -367,4 +367,22 @@ public class SiftImageScaleSpace {
 	public double imageIndexToPixelScale(int imageIndex) {
 		return pixelScale[ imageIndex/numScales ];
 	}
+
+	public ImageFloat32[] getDog() {
+		return dog;
+	}
+
+	public ImageFloat32[] getScale() {
+		return scale;
+	}
+
+	public ImageFloat32[] getDerivY() {
+		return derivY;
+	}
+
+	public ImageFloat32[] getDerivX() {
+		return derivX;
+	}
+
+
 }
