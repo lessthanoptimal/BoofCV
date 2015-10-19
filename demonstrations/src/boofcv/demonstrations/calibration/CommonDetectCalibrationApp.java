@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.squares.SquareEdge;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
@@ -38,7 +39,8 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -53,8 +55,8 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends JPanel
-		implements ChessboardPanel.Listener, ActionListener
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase
+		implements ChessboardPanel.Listener
 {
 	ImageFloat32 gray = new ImageFloat32(1,1);
 
@@ -66,16 +68,10 @@ public abstract class CommonDetectCalibrationApp extends JPanel
 	BufferedImage input;
 	BufferedImage binary;
 
-	// menu items
-	JMenuItem menuFile,menuWebcam,menuQuit;
-	final JFileChooser fc = new JFileChooser();
-
 	public CommonDetectCalibrationApp(List<String> exampleInputs ) {
-		setLayout(new BorderLayout());
+		super(exampleInputs);
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
-
-		createMenuBar(exampleInputs);
 
 		controlPanel.setListener(this);
 
@@ -86,47 +82,6 @@ public abstract class CommonDetectCalibrationApp extends JPanel
 				System.out.println("clicked at " + (e.getX()/scale) + " " + (e.getY()/scale));
 			}
 		});
-	}
-
-	private void createMenuBar( List<String> exampleInputs ) {
-		JMenuBar menuBar = new JMenuBar();
-
-		JMenu menu = new JMenu("File");
-		menuBar.add(menu);
-
-		menuFile = new JMenuItem("Open File", KeyEvent.VK_O);
-		menuFile.addActionListener(this);
-		menuFile.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
-		menuWebcam.addActionListener(this);
-		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
-		menuQuit.addActionListener(this);
-		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
-
-		menu.add(menuFile);
-		menu.add(menuWebcam);
-		menu.addSeparator();
-		menu.add(menuQuit);
-
-		menu = new JMenu("Examples");
-		menuBar.add(menu);
-
-		for( final String path : exampleInputs ) {
-			JMenuItem menuItem = new JMenuItem(new File(path).getName());
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openFile(new File(path));
-				}
-			});
-			menu.add(menuItem);
-		}
-
-		add(BorderLayout.NORTH,menuBar);
 	}
 
 	protected abstract boolean process( ImageFloat32 image );
@@ -424,23 +379,6 @@ public abstract class CommonDetectCalibrationApp extends JPanel
 			g2.setTransform(origTran);
 			g2.setColor(Color.GREEN);
 			g2.drawString(text, x, y);
-		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( menuFile == e.getSource()) {
-			int returnVal = fc.showOpenDialog(this);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
-				openFile(file);
-			} else {
-			}
-		} else if( menuWebcam == e.getSource() ) {
-
-		} else if( menuQuit == e.getSource() ) {
-			System.exit(0);
 		}
 	}
 

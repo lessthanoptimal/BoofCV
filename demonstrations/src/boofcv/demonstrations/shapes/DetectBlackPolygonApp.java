@@ -24,6 +24,7 @@ import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
@@ -39,12 +40,10 @@ import georegression.struct.shapes.Polygon2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 // todo minimum contour size
@@ -56,8 +55,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
-		implements ThresholdControlPanel.Listener, ActionListener
+public class DetectBlackPolygonApp<T extends ImageSingleBand> extends DemonstrationBase
+		implements ThresholdControlPanel.Listener
 {
 
 	Class<T> imageType;
@@ -79,45 +78,17 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	// menu items
 	JMenuItem menuFile,menuWebcam,menuQuit;
 
-	public DetectBlackPolygonApp(Class<T> imageType) {
-		setLayout(new BorderLayout());
+	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
+		super(examples);
 
 		this.imageType = imageType;
 
 		guiImage = new VisualizePanel();
 
-		add(BorderLayout.WEST,controls);
-		add(BorderLayout.CENTER,guiImage);
-		createMenuBar();
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, guiImage);
 
 		createDetector();
-	}
-
-	private void createMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
-
-		JMenu menu = new JMenu("File");
-		menuBar.add(menu);
-
-		menuFile = new JMenuItem("Open File", KeyEvent.VK_F);
-		menuFile.addActionListener(this);
-		menuFile.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
-		menuWebcam.addActionListener(this);
-		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
-		menuQuit.addActionListener(this);
-		menuQuit.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
-
-		menu.add(menuFile);
-		menu.add(menuWebcam);
-		menu.addSeparator();
-		menu.add(menuQuit);
-
-		add(BorderLayout.NORTH,menuBar);
 	}
 
 	private synchronized void createDetector() {
@@ -226,25 +197,13 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( menuFile == e.getSource()) {
-			int returnVal = fc.showOpenDialog(this);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = fc.getSelectedFile();
-				BufferedImage buffered = UtilImageIO.loadImage(file.getAbsolutePath());
-				if( buffered == null ) {
-					// TODO see if it's a video instead
-					System.err.println("Couldn't read "+file.getPath());
-				} else {
-					setInput(buffered);
-				}
-			} else {
-			}
-		} else if( menuWebcam == e.getSource() ) {
-
-		} else if( menuQuit == e.getSource() ) {
-			System.exit(0);
+	public void openFile(File file) {
+		BufferedImage buffered = UtilImageIO.loadImage(file.getAbsolutePath());
+		if( buffered == null ) {
+			// TODO see if it's a video instead
+			System.err.println("Couldn't read "+file.getPath());
+		} else {
+			setInput(buffered);
 		}
 	}
 
@@ -311,17 +270,15 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	}
 
 	public static void main(String[] args) {
-		String path = "/home/pja/junk5.png";
-//		String path = "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png";
-		BufferedImage buffered = UtilImageIO.loadImage(path);
-		if( buffered == null ) {
-			System.err.println("Couldn't find " + path);
-			System.exit(1);
-		}
 
-		DetectBlackPolygonApp app = new DetectBlackPolygonApp(ImageUInt8.class);
+		List<String> examples = new ArrayList<String>();
+		examples.add("data/example/fiducial/binary/image0000.jpg");
+		examples.add( "/home/pja/junk5.png" );
+		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
 
-		app.setInput(buffered);
+		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageUInt8.class);
+
+		app.openFile(new File(examples.get(0)));
 
 		ShowImages.showWindow(app,"Detect Black Polygons",true);
 	}
