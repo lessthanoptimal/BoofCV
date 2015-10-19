@@ -70,6 +70,9 @@ public abstract class SplitMergeLineFit {
 	// indicates which line segments need to be checked for splits
 	protected GrowQueue_B changed = new GrowQueue_B();
 
+	// if there are more splits than this amount just give up.  It's probably noise
+	protected int abortSplits = Integer.MAX_VALUE;
+
 	/**
 	 * Configures algorithm
 	 *
@@ -129,5 +132,13 @@ public abstract class SplitMergeLineFit {
 
 	public void setMinimumSplitPixels(double minimumSplitPixels) {
 		this.minimumSplitPixelsSq = minimumSplitPixels*minimumSplitPixels;
+	}
+
+	public int getAbortSplits() {
+		return abortSplits;
+	}
+
+	public void setAbortSplits(int abortSplits) {
+		this.abortSplits = abortSplits;
 	}
 }

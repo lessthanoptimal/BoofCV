@@ -50,7 +50,7 @@ public class ConfigSquareGrid implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4,4);
 
 	/**
 	 * Physical width of the square.

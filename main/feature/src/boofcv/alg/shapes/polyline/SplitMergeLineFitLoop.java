@@ -90,7 +90,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 			if( !merged && !splitSegments() )
 				break;
 
-			if( splits.size() <= 2)
+			if( splits.size() <= 2 || splits.size() >= abortSplits )
 				return false;
 		}
 

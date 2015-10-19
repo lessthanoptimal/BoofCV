@@ -74,7 +74,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerConvergeTol;
 	JSpinner spinnerMaxCornerChange;
 
-	ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,6);
+	ConfigPolygonDetector config = new ConfigPolygonDetector(3,6);
 	ConfigRefinePolygonLineToImage configLine = new ConfigRefinePolygonLineToImage();
 	ConfigRefinePolygonCornersToImage configCorner = new ConfigRefinePolygonCornersToImage();
 	PolygonRefineType refineType = PolygonRefineType.LINE;
@@ -297,11 +297,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	}
 
 	private void updateSidesInConfig() {
-		int allowed[] = new int[maxSides-minSides+1];
-		for (int i = minSides; i <= maxSides; i++) {
-			allowed[i-minSides] = i;
-		}
-		config.numberOfSides = allowed;
+		config.minimumSides = minSides;
+		config.maximumSides = maxSides;
 	}
 
 	private void updateRefineSettings() {

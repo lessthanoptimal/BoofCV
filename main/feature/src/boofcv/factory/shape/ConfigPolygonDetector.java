@@ -29,9 +29,15 @@ import boofcv.struct.Configuration;
 public class ConfigPolygonDetector implements Configuration {
 
 	/**
-	 * Number of sides in the polygon it's trying to detect
+	 * Minimum number of sides
 	 */
-	public int[] numberOfSides = null;
+	public int minimumSides;
+
+	/**
+	 * Maximum number of sides
+	 */
+	public int maximumSides;
+
 
 	/**
 	 * Two lines are merged together if their angle is &le; to this number.  This variable is dependent upon the
@@ -90,12 +96,15 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
-	public ConfigPolygonDetector(int ...numberOfSides) {
-		this.numberOfSides = numberOfSides;
+	public ConfigPolygonDetector( int minimumSides , int maximumSides) {
+		this.minimumSides = minimumSides;
+		this.maximumSides = maximumSides;
 	}
 
-	public ConfigPolygonDetector(boolean clockwise, int ...numberOfSides) {
-		this.numberOfSides = numberOfSides;
+	public ConfigPolygonDetector(boolean clockwise, int minimumSides , int maximumSides) {
+		this.minimumSides = minimumSides;
+		this.maximumSides = maximumSides;
+
 		this.clockwise = clockwise;
 	}
 
@@ -106,13 +115,9 @@ public class ConfigPolygonDetector implements Configuration {
 
 	@Override
 	public String toString() {
-		String sides = "[";
-		for (int i = 0; i < numberOfSides.length; i++) {
-			sides += " "+numberOfSides[i];
-		}
-		sides += " ]";
 
-		return getClass().getSimpleName()+"{ numberOfSides="+sides+
+		return getClass().getSimpleName()+"{ minimumSides="+minimumSides+
+				" , maximumSides="+maximumSides+
 				" , contour2Poly_splitFraction="+contour2Poly_splitFraction+
 				" , contour2Poly_iterations="+contour2Poly_iterations+
 				" , contour2Poly_minimumSplitFraction="+ contour2Poly_minimumSplitFraction +

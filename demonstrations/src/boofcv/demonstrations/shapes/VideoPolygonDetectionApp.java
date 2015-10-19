@@ -110,7 +110,7 @@ public class VideoPolygonDetectionApp<I extends ImageSingleBand>
 
 		periodSpinner.setValue(33);
 
-		ConfigPolygonDetector config = new ConfigPolygonDetector(4);
+		ConfigPolygonDetector config = new ConfigPolygonDetector(4,4);
 
 //		inputToBinary = FactoryThresholdBinary.adaptiveSquare(6, 0, true,imageType);
 		inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, imageType);

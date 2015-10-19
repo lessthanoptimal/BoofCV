@@ -23,6 +23,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.edge.PolygonEdgeScore;
+import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLine;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
@@ -83,6 +84,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// finds the initial polygon around a target candidate
 	private SplitMergeLineFitLoop fitPolygon;
 
+	// removes extra corners
+	GrowQueue_I32 pruned = new GrowQueue_I32();
+	MinimizeEnergyPrune pruner = new MinimizeEnergyPrune();
+
 	// Improve the selection of corner pixels in the contour
 	private RefinePolyLine improveContour = new RefinePolyLine(true,20);
 
@@ -96,7 +101,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private Class<T> inputType;
 
 	// number of lines allowed in the polygon
-	private int numberOfSides[];
+	private int minSides,maxSides;
 
 	// work space for initial polygon
 	private Polygon2D_F64 workPoly = new Polygon2D_F64();
@@ -124,7 +129,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	/**
 	 * Configures the detector.
 	 *
-	 * @param polygonSides Number of lines in the polygon
+	 * @param minSides minimum number of sides
+	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges.
 	 *                        If null then this test is skipped.
@@ -134,7 +140,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param inputType Type of input image it's processing
 	 */
-	public BinaryPolygonDetector(int polygonSides[],
+	public BinaryPolygonDetector(int minSides, int maxSides,
 								 SplitMergeLineFitLoop contourToPolygon,
 								 PolygonEdgeScore differenceScore,
 								 RefineBinaryPolygon<T> refinePolygon,
@@ -145,9 +151,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 								 Class<T> inputType) {
 
 
+		this.minSides = minSides;
+		this.maxSides = maxSides;
 		this.refinePolygon = refinePolygon;
 		this.differenceScore = differenceScore;
-		this.numberOfSides = polygonSides;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.minimumSplitFraction = minimumSplitFraction;
@@ -243,6 +250,12 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * below for the requirements.  Those that remain are considered to be target candidates.
 	 */
 	private void findCandidateShapes( T gray , ImageUInt8 binary ) {
+
+		int maxSidesConsider = (int)Math.ceil(maxSides*1.2);
+
+		// stop fitting the polygon if it clearly has way too many sides
+		fitPolygon.setAbortSplits(2*maxSides);
+
 		// find binary blobs
 		contourFinder.process(binary, labeled);
 
@@ -261,9 +274,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					removeDistortionFromContour(c.external);
 				}
 
-//				if( c.external.get(0).x == 80 && c.external.get(0).y == 56 ) {
-//					System.out.println("asdasdas");
-//				}
 
 				if( !fitPolygon.process(c.external) ) {
 					if( verbose ) System.out.println("rejected polygon fit failed. contour size = "+c.external.size());
@@ -271,6 +281,19 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();
+				if( splits.size() > maxSidesConsider ) {
+					if( verbose ) System.out.println("Way too many corners. Aborting before improve. Contour size "+c.external.size());
+				}
+
+				// Perform a local search and improve the corner placements
+				if( !improveContour.fit(c.external,splits) ) {
+					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
+					continue;
+				}
+
+				// reduce the number of corners based on an energy model
+				pruner.fit(c.external,splits,pruned);
+				splits = pruned;
 
 				// only accept polygons with the expected number of sides
 				if (!expectedNumberOfSides(splits)) {
@@ -279,11 +302,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
-				// further improve the selection of corner points
-				if( !improveContour.fit(c.external,splits) ) {
-					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
-					continue;
-				}
 
 				if( helper != null ) {
 					if( !helper.filterPolygon(c.external,splits) ) {
@@ -360,12 +378,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * True if the number of sides found matches what it is looking for
 	 */
 	private boolean expectedNumberOfSides(GrowQueue_I32 splits) {
-		for (int j = 0; j < numberOfSides.length; j++) {
-			if( numberOfSides[j] == splits.size() ) {
-				return true;
-			}
-		}
-		return false;
+		return splits.size() >= minSides && splits.size() <= maxSides;
 	}
 
 	/**
@@ -432,13 +445,24 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		return inputType;
 	}
 
-	public void setNumberOfSides(int[] numberOfSides) {
-		this.numberOfSides = numberOfSides;
+	public void setNumberOfSides( int min , int max ) {
+		if( min < 3 )
+			throw new IllegalArgumentException("The min must be >= 3");
+		if( max < min )
+			throw new IllegalArgumentException("The max must be >= the min");
+
+		this.minSides = min;
+		this.maxSides = max;
 	}
 
-	public int[] getNumberOfSides() {
-		return numberOfSides;
+	public int getMinimumSides() {
+		return minSides;
 	}
+
+	public int getMaximumSides() {
+		return maxSides;
+	}
+
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;

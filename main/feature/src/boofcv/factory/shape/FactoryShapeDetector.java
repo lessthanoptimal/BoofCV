@@ -70,7 +70,7 @@ public class FactoryShapeDetector {
 			scorer = new PolygonEdgeScore<T>(cornerOffset,1.0,numSamples,config.minimumEdgeIntensity,imageType);
 		}
 
-		return new BinaryPolygonDetector<T>(config.numberOfSides,contourToPolygon,
+		return new BinaryPolygonDetector<T>(config.minimumSides,config.maximumSides,contourToPolygon,
 				scorer, refinePolygon,config.minContourImageWidthFraction,
 				config.contour2Poly_minimumSplitFraction,config.clockwise,config.convex,imageType);
 	}

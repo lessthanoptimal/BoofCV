@@ -41,7 +41,7 @@ public class ConfigFiducialImage implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
+	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
 	/**
 	 * Configuration for refining with lines.  Ignored if not used.

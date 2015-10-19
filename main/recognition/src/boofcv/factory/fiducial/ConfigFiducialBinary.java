@@ -44,7 +44,7 @@ public class ConfigFiducialBinary implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4);
+	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
 	{
 		squareDetector.contour2Poly_splitFraction = 0.05;

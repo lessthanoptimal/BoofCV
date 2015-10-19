@@ -52,7 +52,7 @@ public class ExampleDetectBlackPolygon {
 				"shapes02.png",
 				"fiducial/image/examples/image01.jpg"};
 
-		ConfigPolygonDetector config = new ConfigPolygonDetector(3,4,5,7);
+		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
 
 		// need to reduce split fraction to get it to work well with the 7 sided shape
 		config.contour2Poly_splitFraction = 0.1;

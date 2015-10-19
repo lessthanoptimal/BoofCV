@@ -136,7 +136,7 @@ public class VisualizeSquareFiducial {
 		public List<ImageFloat32> squares = new ArrayList<ImageFloat32>();
 
 		protected Detector() {
-			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4), ImageFloat32.class),
+			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class),
 					200,ImageFloat32.class);
 		}
 

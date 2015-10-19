@@ -43,9 +43,6 @@ public class MinimizeEnergyPrune {
 	double energySegment[] = new double[1];
 
 	public void fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
-		if( energySegment.length < input.size() ) {
-			energySegment = new double[ input.size() ];
-		}
 		this.contour = contour;
 
 		output.reset();
@@ -82,17 +79,21 @@ public class MinimizeEnergyPrune {
 	/**
 	 * Computes the energy of each segment individually
 	 */
-	private void computeSegmentEnergy( GrowQueue_I32 corners ) {
+	void computeSegmentEnergy( GrowQueue_I32 corners ) {
+		if( energySegment.length < corners.size() ) {
+			energySegment = new double[ corners.size() ];
+		}
+
 		for (int i = 0,j=corners.size()-1; i < corners.size(); j=i,i++) {
 			energySegment[j] = computeSegmentEnergy(corners, j, i);
 		}
 	}
 
-	private double energyRemoveCorner( int removed , GrowQueue_I32 corners ) {
+	protected double energyRemoveCorner( int removed , GrowQueue_I32 corners ) {
 		double total = 0;
 
-		int cornerA = CircularIndex.addOffset(removed, -1, corners.size());
-		int cornerB = CircularIndex.addOffset(removed, 1, corners.size());
+		int cornerA = CircularIndex.addOffset(removed, -1 , corners.size());
+		int cornerB = CircularIndex.addOffset(removed,  1 , corners.size());
 
 		total += computeSegmentEnergy(corners, cornerA, cornerB);
 
@@ -111,7 +112,7 @@ public class MinimizeEnergyPrune {
 		return total;
 	}
 
-	private double computeSegmentEnergy(GrowQueue_I32 corners, int cornerA, int cornerB) {
+	protected double computeSegmentEnergy(GrowQueue_I32 corners, int cornerA, int cornerB) {
 		int indexA = corners.get(cornerA);
 		int indexB = corners.get(cornerB);
 

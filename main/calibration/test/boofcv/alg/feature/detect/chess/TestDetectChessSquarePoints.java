@@ -104,7 +104,7 @@ public class TestDetectChessSquarePoints {
 //		} catch (InterruptedException ignore) {}
 
 		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4),ImageUInt8.class);
+				polygon(new ConfigPolygonDetector(4,4),ImageUInt8.class);
 		DetectChessSquarePoints<ImageUInt8> alg =
 				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
 
@@ -181,7 +181,7 @@ public class TestDetectChessSquarePoints {
 //		} catch (InterruptedException ignore) {}
 
 		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4),ImageUInt8.class);
+				polygon(new ConfigPolygonDetector(4,4),ImageUInt8.class);
 		DetectChessSquarePoints<ImageUInt8> alg =
 				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
 

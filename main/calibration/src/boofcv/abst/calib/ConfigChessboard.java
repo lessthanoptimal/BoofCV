@@ -57,7 +57,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4,4);
 
 	/**
 	 * If true then it only refines the corner region.  Otherwise it will refine the entire line.
