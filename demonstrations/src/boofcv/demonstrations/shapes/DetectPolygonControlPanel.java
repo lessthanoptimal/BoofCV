@@ -42,6 +42,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	// selects which image to view
 	JComboBox imageView;
 
+	JSpinner selectZoom;
+
 	JCheckBox showCorners;
 	JCheckBox showLines;
 	JCheckBox showContour;
@@ -80,6 +82,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	int minSides = 3;
 	int maxSides = 6;
 
+	double zoom = 1;
+
 	public DetectPolygonControlPanel(DetectBlackPolygonApp owner) {
 		this.owner = owner;
 
@@ -89,6 +93,10 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		imageView.addItem("Black");
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
+
+		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
+		selectZoom.addChangeListener(this);
+		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
 		showCorners = new JCheckBox("Corners");
 		showCorners.addActionListener(this);
@@ -153,6 +161,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		configureSpinnerFloat(spinnerMaxCornerChange);
 
 		addLabeled(imageView, "View: ", this);
+		addLabeled(selectZoom,"Zoom",this);
 		addAlignLeft(showCorners, this);
 		addAlignLeft(showLines, this);
 		addAlignLeft(showContour, this);
@@ -279,6 +288,10 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			} else {
 				configCorner.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 			}
+		} else if( e.getSource() == selectZoom ) {
+			zoom = ((Number) selectZoom.getValue()).doubleValue();
+			owner.viewUpdated();
+			return;
 		}
 		owner.configUpdate();
 	}

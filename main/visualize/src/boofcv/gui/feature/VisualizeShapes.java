@@ -138,6 +138,25 @@ public class VisualizeShapes {
 		}
 	}
 
+	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop,double scale,  Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Line2D.Double l = new Line2D.Double();
+
+		for( int i = 0; i < polygon.size()-1; i++ ) {
+			Point2D_F64 p0 = polygon.get(i);
+			Point2D_F64 p1 = polygon.get(i+1);
+			drawLine(g2, l, scale*p0.x,  scale*p0.y,  scale*p1.x,  scale*p1.y);
+		}
+		if( loop && polygon.size() > 0) {
+			Point2D_F64 p0 = polygon.get(0);
+			Point2D_F64 p1 = polygon.get(polygon.size()-1);
+			drawLine(g2, l, scale*p0.x, scale*p0.y, scale*p1.x,scale* p1.y);
+		}
+	}
+
+
 	public static void drawPolygonCorners( Polygon2D_F64 polygon, int radius , Graphics2D g2 , boolean interpolate ) {
 		if( interpolate ) {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);

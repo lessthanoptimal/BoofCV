@@ -91,29 +91,20 @@ public abstract class SplitMergeLineFit {
 	 * Approximates the input list with a set of line segments
 	 *
 	 * @param list Ordered list of connected points.
+	 * @return true if it could fit a polygon to the points or false if not
 	 */
-	public abstract void process( List<Point2D_I32> list );
+	public abstract boolean process( List<Point2D_I32> list );
 
 	/**
 	 * Computes the split threshold from the end point of two lines
 	 */
 	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
-		return Math.max(minimumSplitPixelsSq,a.distance2(b)* toleranceFractionSq);
-	}
 
-	/**
-	 * Returns the acute angle in radians between the two lines
-	 */
-	protected double computeAcute(Point2D_I32 a, Point2D_I32 b, Point2D_I32 c) {
-		int dx0 = b.x-a.x;
-		int dy0 = b.y-a.y;
+		double foo = a.distance(b);
+//		System.out.println("   splitThresholdSq: line distance "+foo);
+		foo *= foo;
 
-		int dx1 = c.x-b.x;
-		int dy1 = c.y-b.y;
-
-		int dot = dx0*dx1 + dy0*dy1;
-		double bottom = Math.sqrt(dx0*dx0 + dy0*dy0) * Math.sqrt(dx1*dx1 + dy1*dy1);
-		return Math.acos( dot/bottom );
+		return Math.max(minimumSplitPixelsSq,foo* toleranceFractionSq);
 	}
 
 	/**

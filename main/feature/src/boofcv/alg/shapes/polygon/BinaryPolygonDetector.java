@@ -205,6 +205,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * @param gray Input image
 	 */
 	public void process(T gray, ImageUInt8 binary) {
+		if( verbose ) System.out.println("ENTER  BinaryPolygonDetector.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
 		fitPolygon.setMinimumSplitPixels(Math.max(1,minimumSplitFraction*gray.width));
@@ -260,19 +261,27 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					removeDistortionFromContour(c.external);
 				}
 
-				fitPolygon.process(c.external);
+//				if( c.external.get(0).x == 80 && c.external.get(0).y == 56 ) {
+//					System.out.println("asdasdas");
+//				}
+
+				if( !fitPolygon.process(c.external) ) {
+					if( verbose ) System.out.println("rejected polygon fit failed. contour size = "+c.external.size());
+					continue;
+				}
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 
 				// only accept polygons with the expected number of sides
 				if (!expectedNumberOfSides(splits)) {
-					if( verbose ) System.out.println("rejected number of sides. "+splits.size());
+//					System.out.println("First point "+c.external.get(0));
+					if( verbose ) System.out.println("rejected number of sides. "+splits.size()+"  contour "+c.external.size());
 					continue;
 				}
 
 				// further improve the selection of corner points
 				if( !improveContour.fit(c.external,splits) ) {
-					if( verbose ) System.out.println("rejected improve contour");
+					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
 					continue;
 				}
 

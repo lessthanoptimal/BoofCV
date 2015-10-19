@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.chess;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -73,6 +74,8 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 	 */
 	public DetectChessboardFiducial(int numCols, int numRows, double maxCornerDistance,
 									BinaryPolygonDetector<T> detectorSquare,
+									RefineBinaryPolygon<T> refineLine ,
+									RefineBinaryPolygon<T> refineCorner ,
 									InputToBinary<T> inputToBinary)
 	{
 		this.numCols = numCols;
@@ -82,7 +85,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,maxCornerDistance, detectorSquare);
 
-		detectorSquare.setHelper(new ChessboardPolygonHelper());
+		detectorSquare.setHelper(new ChessboardPolygonHelper<T>(detectorSquare,refineLine,refineCorner));
 
 		reset();
 	}

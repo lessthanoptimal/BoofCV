@@ -32,7 +32,7 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
-public class GridCalibPanel extends StandardAlgConfigPanel 
+public class ChessboardPanel extends StandardAlgConfigPanel
 		implements  ChangeListener, ItemListener
 {
 	// indicates if a calibration grid was found or not
@@ -48,6 +48,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	JCheckBox showGrids;
 	JCheckBox showSquares;
 	JCheckBox showOrder;
+	JCheckBox showContour;
 
 	// allows the user to change the image zoom
 	JSpinner selectZoom;
@@ -63,6 +64,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	boolean doShowOrder = false;
 	boolean doShowGrids = false;
 	boolean doShowSquares = false;
+	boolean doShowContour = false;
 
 	double scale = 1;
 	boolean isManual = false;
@@ -72,7 +74,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 	int selectedView = 0;
 	int thresholdLevel = 60;
 
-	public GridCalibPanel( boolean hasManualMode ) {
+	public ChessboardPanel(boolean hasManualMode) {
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
@@ -115,6 +117,11 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		showSquares.addItemListener(this);
 		showSquares.setMaximumSize(showSquares.getPreferredSize());
 
+		showContour = new JCheckBox("Show Contour");
+		showContour.setSelected(doShowContour);
+		showContour.addItemListener(this);
+		showContour.setMaximumSize(showContour.getPreferredSize());
+
 		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
 		thresholdSpinner.addChangeListener(this);
 		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
@@ -143,6 +150,7 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 		addAlignLeft(showGrids,this);
 		addAlignLeft(showOrder,this);
 		addAlignLeft(showSquares, this);
+		addAlignLeft(showContour, this);
 	}
 
 	public void addView( String name ) {
@@ -247,6 +255,9 @@ public class GridCalibPanel extends StandardAlgConfigPanel
 			listener.calibEventGUI();
 		} else if( e.getSource() == showOrder ) {
 			doShowOrder = showOrder.isSelected();
+			listener.calibEventGUI();
+		} else if( e.getSource() == showContour ) {
+			doShowContour = showContour.isSelected();
 			listener.calibEventGUI();
 		} else if( e.getSource() == thresholdSpinner) {
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();

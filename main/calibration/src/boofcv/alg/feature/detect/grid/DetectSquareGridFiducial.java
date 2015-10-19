@@ -74,6 +74,8 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	// storage for binary image
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
+	List<List<SquareNode>> clusters;
+
 	/**
 	 * COnfigures the detector
 	 *
@@ -91,7 +93,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(spaceToSquareRatio,6);
+		s2c = new SquaresIntoClusters(spaceToSquareRatio,Integer.MAX_VALUE );
 		c2g = new ClustersIntoGrids(numCols*numRows);
 
 		calibRows = numRows*2;
@@ -112,7 +114,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 
 		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
 
-		List<List<SquareNode>> clusters = s2c.process(found.toList());
+		clusters = s2c.process(found.toList());
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids();
 
@@ -192,7 +194,11 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		return detectorSquare;
 	}
 
-	public SquaresIntoClusters getClusters() {
+	public List<List<SquareNode>> getClusters() {
+		return clusters;
+	}
+
+	public SquaresIntoClusters getSquaresIntoClusters() {
 		return s2c;
 	}
 

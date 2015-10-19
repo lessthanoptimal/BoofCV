@@ -62,7 +62,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * If true then it only refines the corner region.  Otherwise it will refine the entire line.
 	 */
-	public boolean refineWithCorners = true;
+	public boolean refineWithCorners = false;
 
 	/**
 	 * Configuration for refining with lines.  Ignored if not used.
@@ -80,26 +80,23 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
-		thresholding.bias = -10;
-
 		// it erodes the original shape meaning it has to move a greater distance
-		configRefineCorners.maxCornerChangePixel = 5;
+//		configRefineCorners.maxCornerChangePixel = 5; // TODO reduce
 
-//		square.contour2Poly_splitFraction = 0.25;
-//		square.contour2Poly_minimumSplitFraction = 0.01;
+		square.contour2Poly_splitFraction = 0.25;
+		square.contour2Poly_minimumSplitFraction = 0.0005;
+		square.minContourImageWidthFraction = 0.0005;
 
-		square.minimumEdgeIntensity = 0.1;
-
-		square.minContourImageWidthFraction = 0.05;
+//		square.minimumEdgeIntensity = 0.1;// TODO remove
 
 		// good value for squares.  Set it here to make it not coupled to default values
-		configRefineCorners.cornerOffset = 1;
+		configRefineCorners.cornerOffset = 0;
 		configRefineCorners.lineSamples = 10;
 		configRefineCorners.convergeTolPixels = 0.05;
 		configRefineCorners.maxIterations = 10;
 
 		// defaults for if the user toggles it to lines
-		configRefineLines.cornerOffset = 1;
+		configRefineLines.cornerOffset = 0;
 		configRefineLines.lineSamples = 10;
 		configRefineLines.convergeTolPixels = 0.05;
 		configRefineLines.maxIterations = 10;

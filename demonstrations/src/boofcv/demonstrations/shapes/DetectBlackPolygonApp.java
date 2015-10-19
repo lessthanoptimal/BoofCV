@@ -27,7 +27,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -42,6 +42,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -63,7 +64,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 
 	DetectPolygonControlPanel controls = new DetectPolygonControlPanel(this);
 
-	ImagePanel guiImage;
+	VisualizePanel guiImage;
 
 	InputToBinary<T> inputToBinary;
 	BinaryPolygonDetector<T> detector;
@@ -83,7 +84,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 
 		this.imageType = imageType;
 
-		guiImage = new ImagePanel();
+		guiImage = new VisualizePanel();
 
 		add(BorderLayout.WEST,controls);
 		add(BorderLayout.CENTER,guiImage);
@@ -139,6 +140,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 	private synchronized void processImage() {
 		inputToBinary.process(input, binary);
 		detector.process(input, binary);
+		viewUpdated();
 	}
 
 	public synchronized void setInput( BufferedImage image ) {
@@ -152,71 +154,31 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 
 		guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		processImage();
-		renderImage();
 	}
 
-	private synchronized void renderImage() {
-		if( work == null )
-			return;
-
-		Graphics2D g2 = work.createGraphics();
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-		if( controls.selectedView == 0 ) {
-			g2.drawImage(original, 0, 0, null);
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(binary,false,work);
-		} else {
-			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
-		}
-
-		work.setRGB(0, 0, work.getRGB(0, 0));
-
-		if (controls.bShowContour) {
-			List<Contour> contours = detector.getAllContours();
-
-			VisualizeBinaryData.renderExternal(contours, new Color(0xFF00FF), work);
-		}
-
-		if (controls.bShowLines) {
-			List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
-
-			g2.setColor(Color.RED);
-			g2.setStroke(new BasicStroke(3));
-			for (Polygon2D_F64 p : polygons) {
-				int red = 255*((p.size()-3)%4)/3;
-				int green = 255*((p.size())%5)/4;
-				int blue = 255*((p.size()+2)%6)/5;
-
-				g2.setColor(new Color(red,green,blue));
-
-				VisualizeShapes.drawPolygon(p, true, g2);
-			}
-		}
-
-		if (controls.bShowCorners) {
-			List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
-
-			g2.setColor(Color.BLUE);
-			g2.setStroke(new BasicStroke(1));
-			for (Polygon2D_F64 p : polygons) {
-				for (int i = 0; i < p.size(); i++) {
-					Point2D_F64 c = p.get(i);
-					VisualizeFeatures.drawCircle(g2, c.x, c.y, 5);
-				}
-			}
-		}
-
-		guiImage.setBufferedImage(work);
-	}
 
 	/**
 	 * Called when how the data is visualized has changed
 	 */
 	public void viewUpdated() {
-		renderImage();
+		BufferedImage active = null;
+		if( controls.selectedView == 0 ) {
+			active = original;
+		} else if( controls.selectedView == 1 ) {
+			VisualizeBinaryData.renderBinary(binary,false,work);
+			active = work;
+			work.setRGB(0, 0, work.getRGB(0, 0));
+		} else {
+			Graphics2D g2 = work.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			active = work;
+		}
+
+		guiImage.setScale(controls.zoom);
+
+		guiImage.setBufferedImage(active);
+		guiImage.repaint();
 	}
 
 	public void configUpdate() {
@@ -261,7 +223,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 		}
 
 		processImage();
-		renderImage();
 	}
 
 	@Override
@@ -303,12 +264,58 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends JPanel
 		}
 	}
 
-	public static void main(String[] args) {
+	class VisualizePanel extends ImageZoomPanel {
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			synchronized ( DetectBlackPolygonApp.this ) {
+				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		String path = "data/example/polygons01.jpg";
+				if (controls.bShowContour) {
+					List<Contour> contours = detector.getAllContours();
+					g2.setStroke(new BasicStroke(1));
+					g2.setColor(Color.RED);
+					VisualizeBinaryData.renderExternal(contours, scale, g2);
+				}
+
+				if (controls.bShowLines) {
+					List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
+
+					g2.setColor(Color.RED);
+					g2.setStroke(new BasicStroke(3));
+					for (Polygon2D_F64 p : polygons) {
+						int red = 255 * ((p.size() - 3) % 4) / 3;
+						int green = 255 * ((p.size()) % 5) / 4;
+						int blue = 255 * ((p.size() + 2) % 6) / 5;
+
+						g2.setColor(new Color(red, green, blue));
+
+						VisualizeShapes.drawPolygon(p, true, scale, g2);
+					}
+				}
+
+				if (controls.bShowCorners) {
+					List<Polygon2D_F64> polygons = detector.getFoundPolygons().toList();
+
+					g2.setColor(Color.BLUE);
+					g2.setStroke(new BasicStroke(1));
+					for (Polygon2D_F64 p : polygons) {
+						for (int i = 0; i < p.size(); i++) {
+							Point2D_F64 c = p.get(i);
+							VisualizeFeatures.drawCircle(g2, scale * c.x, scale * c.y, 5);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		String path = "/home/pja/junk5.png";
+//		String path = "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png";
 		BufferedImage buffered = UtilImageIO.loadImage(path);
 		if( buffered == null ) {
-			System.err.println("Couldn't find "+path);
+			System.err.println("Couldn't find " + path);
 			System.exit(1);
 		}
 

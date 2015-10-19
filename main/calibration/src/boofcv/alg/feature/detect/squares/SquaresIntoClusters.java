@@ -81,6 +81,10 @@ public class SquaresIntoClusters {
 	public SquaresIntoClusters(double spaceToSquareRatio , int maxNeighbors ) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
 		this.maxNeighbors = maxNeighbors;
+		//  avoid a roll over later on in the code
+		if( this.maxNeighbors == Integer.MAX_VALUE ) {
+			this.maxNeighbors = Integer.MAX_VALUE-1;
+		}
 
 		searchPoints = new FastQueue<double[]>(double[].class,true) {
 			@Override
@@ -213,6 +217,14 @@ public class SquaresIntoClusters {
 		int intersection1 = findSideIntersect(node1,lineA,lineB);
 
 		if( intersection1 < 0 || intersection0 < 0 ) {
+			return;
+		}
+
+		// compare the size of the two closest sides.  They should be similarish
+		double closeSide0 = node0.sideLengths[intersection0];
+		double closeSide1 = node1.sideLengths[intersection1];
+		double ratio = closeSide0>closeSide1  ? closeSide1/closeSide0 : closeSide0/closeSide1;
+		if( ratio < 0.5 ) {
 			return;
 		}
 

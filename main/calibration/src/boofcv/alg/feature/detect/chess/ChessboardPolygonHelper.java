@@ -18,7 +18,10 @@
 
 package boofcv.alg.feature.detect.chess;
 
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.PolygonHelper;
+import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -32,8 +35,22 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ChessboardPolygonHelper implements PolygonHelper {
+public class ChessboardPolygonHelper<T extends ImageSingleBand> implements PolygonHelper {
+	BinaryPolygonDetector<T> detectorSquare;
+	RefineBinaryPolygon<T> refineLine;
+	RefineBinaryPolygon<T> refineCorner;
+
 	Point2D_F64 center = new Point2D_F64();
+
+	double threshold = 400;
+
+	public ChessboardPolygonHelper(BinaryPolygonDetector<T> detectorSquare,
+								   RefineBinaryPolygon<T> refineLine ,
+								   RefineBinaryPolygon<T> refineCorner ) {
+		this.detectorSquare = detectorSquare;
+		this.refineLine = refineLine;
+		this.refineCorner = refineCorner;
+	}
 
 	@Override
 	public void adjustBeforeOptimize(Polygon2D_F64 polygon) {
@@ -60,6 +77,15 @@ public class ChessboardPolygonHelper implements PolygonHelper {
 			if( r > 0 ) {
 				p.x += 1.4 * dx / r;
 				p.y += 1.4 * dy / r;
+			}
+		}
+
+		if( refineCorner != null ) {
+			double area = polygon.areaSimple();
+			if (area < threshold) {
+				detectorSquare.setRefinePolygon(refineLine);
+			} else {
+				detectorSquare.setRefinePolygon(refineCorner);
 			}
 		}
 	}

@@ -21,6 +21,7 @@ package boofcv.abst.calib;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
@@ -43,11 +44,12 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
 	public PlanarDetectorChessboard(ConfigChessboard config ) {
 
-		if( config.refineWithCorners) {
-			config.square.refine = config.configRefineCorners;
-		} else {
-			config.square.refine = config.configRefineLines;
-		}
+		RefineBinaryPolygon<ImageFloat32> refineLine =
+				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);
+		RefineBinaryPolygon<ImageFloat32> refineCorner =
+				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);
+
+		config.square.refine = null;
 
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
@@ -56,7 +58,8 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
 
 		alg = new DetectChessboardFiducial<ImageFloat32>(
-				config.numCols,config.numRows,config.maximumCornerDistance,detectorSquare,inputToBinary);
+				config.numCols,config.numRows,config.maximumCornerDistance,detectorSquare,
+				refineLine,refineCorner,inputToBinary);
 
 		layoutPoints = gridChess(config.numCols,config.numRows,config.squareWidth);
 	}

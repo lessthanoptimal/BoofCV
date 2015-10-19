@@ -34,6 +34,10 @@ import java.util.List;
 // TODO only check lines that changed for splitting
 public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
+	// 0.2 and 0.3
+	double exceedDistanceFraction = 0.2;
+	double splitExceedFraction = 0.3;
+
 	// number of points in the contour
 	protected int N;
 
@@ -49,7 +53,8 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 
 	@Override
-	public void process( List<Point2D_I32> contour ) {
+	public boolean process( List<Point2D_I32> contour ) {
+//		System.out.println("-000000000--------------------------------------");
 		this.contour = contour;
 		this.N = contour.size();
 
@@ -58,7 +63,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		// can't fit a line to a single point
 		if( N <= 1 ) {
-			return;
+			return false;
 		}
 
 		// Go around the contour looking for two points on opposite ends which are far apart
@@ -73,17 +78,23 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		// ------------  Refine the initial segments by splitting and merging each segment
 		if( splits.size <= 2 )
-			return; // can't merge a single line
+			return false; // can't merge a single line
 
+//		System.out.println("Enter loop");
 		for( int i = 0; i < maxIterations; i++ ) {
 			boolean merged = mergeSegments();
 
-			if( splits.size() <= 2)
-				return;
+			if( splits.size() <= 0)
+				return false;
 
-			if( !splitSegments() && !merged )
+			if( !merged && !splitSegments() )
 				break;
+
+			if( splits.size() <= 2)
+				return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -97,15 +108,11 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		// end points of the line
 		int indexEnd = (indexStart+length)%N;
-		Point2D_I32 a = contour.get(indexStart);
-		Point2D_I32 c = contour.get(indexEnd);
-
-		line.p.set(a.x, a.y);
-		line.slope.set(c.x - a.x, c.y - a.y);
 
 		int splitOffset = selectSplitOffset(indexStart,length);
 
 		if( splitOffset >= 0 ) {
+//			System.out.println("  splitting ");
 			splitPixels(indexStart, splitOffset);
 			int indexSplit = (indexStart+splitOffset)%N;
 			splits.add(indexSplit);
@@ -139,41 +146,36 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 			}
 		}
 
-		if( bestIndex == -1 )
-			System.out.println();
+//		if( bestIndex == -1 )
+//			System.out.println();
 
 		return bestIndex;
 	}
 
 	/**
-	 * Merges lines together which have an acute angle less than the threshold.
+	 * Merges lines together if the common corner is close to a common line
 	 * @return true the list being changed
 	 */
 	protected boolean mergeSegments() {
+
+		// See if merging will cause a degenerate case
+		if( splits.size() <= 3 )
+			return false;
+
 		boolean change = false;
 		work.reset();
 
-		Point2D_I32 a = contour.get(splits.data[0]);
-		Point2D_I32 b = contour.get(splits.data[1]);
-
 		for( int i = 0; i < splits.size; i++ ) {
-			Point2D_I32 c = contour.get(splits.data[(i+2)%splits.size]);
+			int start = splits.data[i];
+			int end = splits.data[(i+2)%splits.size];
 
-			line.p.set(a.x,a.y);
-			line.slope.set(c.x-a.x,c.y-a.y);
-
-			point2D.set(b.x,b.y);
-			double d = Distance2D_F64.distanceSq(line, point2D);
-
-			if( d < splitThresholdSq(a,c) ) {
+			if( selectSplitOffset(start,circularDistance(start,end)) < 0 ) {
 				// merge the two lines by not adding it
 				change = true;
 			} else {
 				work.add(splits.data[(i + 1)%splits.size]);
-				a = b;
 			}
 
-			b = c;
 		}
 
 		// swap the two lists
@@ -211,12 +213,6 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		int end = splits.data[i1];
 		int length = circularDistance(start, end);
 
-		Point2D_I32 a = contour.get(start);
-		Point2D_I32 b = contour.get(end);
-
-		line.p.set(a.x,a.y);
-		line.slope.set(b.x-a.x,b.y-a.y);
-
 		int bestOffset = selectSplitOffset(start,length);
 		if( bestOffset >= 0 ) {
 			change = true;
@@ -235,9 +231,23 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 */
 	protected int selectSplitOffset( int indexStart , int length ) {
 		int bestOffset = -1;
+
+		int indexEnd = (indexStart + length) % N;
+		Point2D_I32 startPt = contour.get(indexStart);
+		Point2D_I32 endPt = contour.get(indexEnd);
+
+		line.p.set(startPt.x,startPt.y);
+		line.slope.set(endPt.x-startPt.x,endPt.y-startPt.y);
+
 		double bestDistanceSq = 0;
 
-		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get((indexStart + length) % N));
+		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
+//		System.out.println("     thishold for split = "+Math.sqrt(toleranceSplitSq));
+
+		double foo = Math.ceil(Math.sqrt(toleranceSplitSq)*exceedDistanceFraction);
+		foo *= foo;
+
+		int totalTooFar = 0;
 
 		// don't try splitting at the two end points
 		for( int i = 1; i < length; i++ ) {
@@ -249,9 +259,12 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 				bestDistanceSq = dist;
 				bestOffset = i;
 			}
+			if( dist > foo ) {
+				totalTooFar++;
+			}
 		}
 
-		if( bestDistanceSq > toleranceSplitSq ) {
+		if( totalTooFar > length*splitExceedFraction || bestDistanceSq > toleranceSplitSq ) {
 			return bestOffset;
 		} else {
 			return -1;

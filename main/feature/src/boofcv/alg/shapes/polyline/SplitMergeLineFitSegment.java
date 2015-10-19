@@ -37,11 +37,11 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	}
 
 	@Override
-	public void process(List<Point2D_I32> list) {
+	public boolean process(List<Point2D_I32> list) {
 		splits.reset();
 		this.contour = list;
 		if( list.size() <= 2 ) { // can't do anything with two or less points
-			return;
+			return false;
 		}
 
 		// initial segmentation
@@ -55,6 +55,8 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 			if( !splitSegments() )
 				break;
 		}
+
+		return true;
 	}
 
 	/**

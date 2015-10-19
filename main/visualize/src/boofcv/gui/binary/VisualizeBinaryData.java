@@ -28,6 +28,7 @@ import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Random;
@@ -179,6 +180,27 @@ public class VisualizeBinaryData {
 		}
 
 		return out;
+	}
+
+	public static void renderExternal( List<Contour> contours , double scale , Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Line2D.Double l = new Line2D.Double();
+
+		g2.setStroke(new BasicStroke(Math.max(1,(float)scale)));
+		for( Contour c : contours ) {
+			List<Point2D_I32> list = c.external;
+
+			for (int i = 0, j = list.size()-1; i < list.size(); j=i, i++) {
+				Point2D_I32 p0 = list.get(i);
+				Point2D_I32 p1 = list.get(j);
+
+				// draw it in the middle
+				l.setLine((p0.x+0.5)*scale,(p0.y+0.5)*scale,(p1.x+0.5)*scale,(p1.y+0.5)*scale);
+				g2.draw(l);
+			}
+		}
 	}
 
 	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int colors[], BufferedImage out) {

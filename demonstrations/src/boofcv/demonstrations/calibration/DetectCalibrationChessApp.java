@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
 import boofcv.alg.feature.detect.squares.SquareEdge;
 import boofcv.alg.feature.detect.squares.SquareGrid;
 import boofcv.alg.feature.detect.squares.SquareNode;
+import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
@@ -60,12 +61,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectCalibrationChessApp
-		extends SelectInputPanel implements VisualizeApp, GridCalibPanel.Listener
+		extends SelectInputPanel implements VisualizeApp, ChessboardPanel.Listener
 
 {
 	DetectChessboardFiducial<ImageFloat32> alg;
 
-	GridCalibPanel calibGUI;
+	ChessboardPanel calibGUI;
 	ImageZoomPanel gui = new ImageZoomPanel();
 
 	// work buffer that stuff is drawn inside of and displayed
@@ -90,7 +91,7 @@ public class DetectCalibrationChessApp
 		JPanel panel = new JPanel();
 		panel.setLayout( new BorderLayout());
 
-		calibGUI = new GridCalibPanel(true);
+		calibGUI = new ChessboardPanel(true);
 		calibGUI.setListener(this);
 		calibGUI.setMinimumSize(calibGUI.getPreferredSize());
 
@@ -183,6 +184,12 @@ public class DetectCalibrationChessApp
 				throw new RuntimeException("Unknown mode");
 		}
 		Graphics2D g2 = workImage.createGraphics();
+
+		if( calibGUI.doShowContour ) {
+			List<Contour> contours = alg.getFindSeeds().getDetectorSquare().getAllContours();
+			VisualizeBinaryData.renderExternal(contours, Color.RED, workImage);
+		}
+
 		if( foundTarget ) {
 
 			if( calibGUI.isShowNumbers() ) {
@@ -462,6 +469,11 @@ public class DetectCalibrationChessApp
 //		app.loadInputData(prefix+"images.txt");
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
+
+		inputs.add(new PathLabel("Asdasd 3","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg"));
+		inputs.add(new PathLabel("Asdasd 1","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distance_angle/image05.jpg"));
+		inputs.add(new PathLabel("Asdasd 0","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0850.jpg"));
+		inputs.add(new PathLabel("Asdasd 2","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg"));
 
 		for (int i = 1; i <= 12; i++) {
 //			inputs.add(new PathLabel(String.format("View %02d",i),String.format("%sframe%02d.jpg",prefix,i)));

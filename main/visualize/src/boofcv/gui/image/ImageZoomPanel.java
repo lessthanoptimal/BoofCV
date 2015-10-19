@@ -134,4 +134,8 @@ public class ImageZoomPanel extends JScrollPane {
 			}
 		}
 	}
+
+	public double getScale() {
+		return scale;
+	}
 }

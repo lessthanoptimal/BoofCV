@@ -78,23 +78,22 @@ public class ConfigSquareGrid implements Configuration {
 	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
 
 	{
-		thresholding.bias = -10;
-
-
-		// good value for squares.  Set it here to make it not coupled to default values
-		configRefineCorners.cornerOffset = 1;
+		square.contour2Poly_splitFraction = 0.25;
+		square.contour2Poly_minimumSplitFraction = 0.0005;
+		square.minContourImageWidthFraction = 0.0005;
 
 		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
 		// very crude corners
+		configRefineCorners.cornerOffset = 0;
 		configRefineCorners.lineSamples = 10;
-		configRefineCorners.convergeTolPixels = 0.2;
-		configRefineCorners.maxIterations = 5;
+		configRefineCorners.convergeTolPixels = 0.1;
+		configRefineCorners.maxIterations = 10;
 
 		// putting reasonable defaults for if the user decides to optimize by line
-		configRefineCorners.cornerOffset = 1;
-		configRefineCorners.lineSamples = 10;
-		configRefineCorners.convergeTolPixels = 0.2;
-		configRefineCorners.maxIterations = 5;
+		configRefineLines.cornerOffset = 0;
+		configRefineLines.lineSamples = 10;
+		configRefineLines.convergeTolPixels = 0.1;
+		configRefineLines.maxIterations = 10;
 	}
 
 	public ConfigSquareGrid(int numCols, int numRows, double squareWidth, double spaceWidth) {
