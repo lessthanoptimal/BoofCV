@@ -20,8 +20,8 @@ package boofcv.alg.shapes.corner;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.shapes.polygon.UtilShapePolygon;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.CircularIndex;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -152,7 +152,7 @@ public class TestRefineCornerLinesToImage {
 
 			for (int j = 0; j < 4; j++) {
 				int left = (j+1)%4;
-				int right = UtilShapePolygon.minusPOffset(j, 1, 4);
+				int right = CircularIndex.minusPOffset(j, 1, 4);
 
 				assertTrue(alg.refine(input.get(j), input.get(left), input.get(right)));
 

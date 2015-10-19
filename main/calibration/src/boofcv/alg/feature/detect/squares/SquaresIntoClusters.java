@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.squares;
 
-import boofcv.alg.shapes.polygon.UtilShapePolygon;
+import boofcv.misc.CircularIndex;
 import georegression.metric.Distance2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.metric.UtilAngle;
@@ -437,7 +437,7 @@ public class SquaresIntoClusters {
 	 * Performs addition in the cyclical array
 	 */
 	private static int add( int index , int value ) {
-		return UtilShapePolygon.addOffset(index, value, 4);
+		return CircularIndex.addOffset(index, value, 4);
 	}
 
 

@@ -20,6 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
 import boofcv.alg.shapes.edge.SnapToEdge;
+import boofcv.misc.CircularIndex;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -152,9 +153,9 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> implements R
 	protected int pickEndIndex(int cornerS, int dir)
 	{
 		int cornerIndex = splits.get(cornerS);
-		int endIndex = splits.get(UtilShapePolygon.addOffset(cornerS, dir, splits.size));
+		int endIndex = splits.get(CircularIndex.addOffset(cornerS, dir, splits.size));
 
-		int distance = UtilShapePolygon.subtract(cornerIndex, endIndex, contour.size());
+		int distance = CircularIndex.subtract(cornerIndex, endIndex, contour.size());
 
 		if( distance > 0 ) {
 			distance = Math.min(distance,pixelsAway);
@@ -162,7 +163,7 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> implements R
 			distance = Math.max(distance,-pixelsAway);
 		}
 
-		return UtilShapePolygon.addOffset(cornerIndex,distance,contour.size());
+		return CircularIndex.addOffset(cornerIndex, distance, contour.size());
 	}
 
 	public int getPixelsAway() {

@@ -21,6 +21,7 @@ package boofcv.alg.shapes.polygon;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.shapes.ShapeFittingOps;
+import boofcv.misc.CircularIndex;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageUInt8;
@@ -146,7 +147,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		List<Point2D_I32> flipped = new ArrayList<Point2D_I32>();
 
 		for (int i = 0; i < input.size(); i++) {
-			int index = UtilShapePolygon.addOffset(0,-i,input.size());
+			int index = CircularIndex.addOffset(0, -i, input.size());
 			flipped.add(input.get(index));
 		}
 
@@ -157,7 +158,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		GrowQueue_I32 flipped = new GrowQueue_I32();
 
 		for (int i = 0; i < input.size(); i++) {
-			int index = UtilShapePolygon.addOffset(0,-i,input.size());
+			int index = CircularIndex.addOffset(0, -i, input.size());
 			flipped.add(input.get(index));
 		}
 

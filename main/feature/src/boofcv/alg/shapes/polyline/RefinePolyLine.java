@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polyline;
 
-import boofcv.alg.shapes.polygon.UtilShapePolygon;
+import boofcv.misc.CircularIndex;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
@@ -106,8 +106,8 @@ public class RefinePolyLine {
 		for( int iteration = 0; iteration < maxIterations && change; iteration++ ) {
 			change = false;
 			for (int i = startCorner; i < endCorner; i++) {
-				int c0 = UtilShapePolygon.minusPOffset(i, 1, corners.size());
-				int c2 = UtilShapePolygon.plusPOffset(i, 1, corners.size());
+				int c0 = CircularIndex.minusPOffset(i, 1, corners.size());
+				int c2 = CircularIndex.plusPOffset(i, 1, corners.size());
 
 				int improved = optimize(contour, corners.get(c0), corners.get(i), corners.get(c2));
 				if( improved != corners.get(i)) {
@@ -144,7 +144,7 @@ public class RefinePolyLine {
 				}
 			}
 		}
-		return UtilShapePolygon.addOffset(c1, bestIndex, contour.size());
+		return CircularIndex.addOffset(c1, bestIndex, contour.size());
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class RefinePolyLine {
 	protected double computeCost(List<Point2D_I32> contour, int c0, int c1, int c2,
 							   int offset)
 	{
-		c1 = UtilShapePolygon.addOffset(c1, offset, contour.size());
+		c1 = CircularIndex.addOffset(c1, offset, contour.size());
 		createLine(c0,c1,contour,line0);
 		createLine(c1,c2,contour,line1);
 		return distanceSum(line0,c0,c1,contour)+distanceSum(line1,c1,c2,contour);

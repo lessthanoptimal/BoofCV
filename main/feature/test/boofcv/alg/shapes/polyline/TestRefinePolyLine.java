@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polyline;
 
-import boofcv.alg.shapes.polygon.UtilShapePolygon;
+import boofcv.misc.CircularIndex;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
@@ -125,7 +125,7 @@ public class TestRefinePolyLine {
 		for (int i = 0; i < 10; i++) {
 			// noise up the inputs
 			for (int j = 0; j < corners.size(); j++) {
-				corners.data[j] = UtilShapePolygon.addOffset(corners.data[j], rand.nextInt(10) - 5, points.size());
+				corners.data[j] = CircularIndex.addOffset(corners.data[j], rand.nextInt(10) - 5, points.size());
 			}
 
 			assertTrue(alg.fit(points, corners));
