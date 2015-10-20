@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolyLine {
+public class RefinePolyLineCorner {
 
 	// maximum number of iterations
 	private int maxIterations = 10;
@@ -66,7 +66,7 @@ public class RefinePolyLine {
 	 * @param looping true if it loops or false if not
 	 * @param maxIterations Number of internal EM iterations
 	 */
-	public RefinePolyLine(boolean looping, int maxIterations) {
+	public RefinePolyLineCorner(boolean looping, int maxIterations) {
 		this.looping = looping;
 		this.maxIterations = maxIterations;
 	}
@@ -74,7 +74,7 @@ public class RefinePolyLine {
 	/**
 	 * Constructor using default parameters
 	 */
-	public RefinePolyLine(boolean looping) {
+	public RefinePolyLineCorner(boolean looping) {
 		this.looping = looping;
 	}
 

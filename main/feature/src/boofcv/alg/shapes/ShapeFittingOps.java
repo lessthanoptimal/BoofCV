@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes;
 
-import boofcv.alg.shapes.polyline.RefinePolyLine;
+import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitSegment;
 import boofcv.struct.PointIndex_I32;
@@ -74,13 +74,13 @@ public class ShapeFittingOps {
 			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSplitPixels,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
-			RefinePolyLine refine = new RefinePolyLine(true,10);
+			RefinePolyLineCorner refine = new RefinePolyLineCorner(true,10);
 			refine.fit(sequence,splits);
 		} else {
 			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSplitPixels,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
-			RefinePolyLine refine = new RefinePolyLine(false,10);
+			RefinePolyLineCorner refine = new RefinePolyLineCorner(false,10);
 			refine.fit(sequence,splits);
 		}
 

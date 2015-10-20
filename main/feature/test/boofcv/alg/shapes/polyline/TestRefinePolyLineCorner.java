@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestRefinePolyLine {
+public class TestRefinePolyLineCorner {
 
 	Random rand = new Random(234);
 
@@ -53,7 +53,7 @@ public class TestRefinePolyLine {
 		addPoints(x1,y1,x0,y1,points);
 		addPoints(x0,y1,x0,y0,points);
 
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		GrowQueue_I32 corners = new GrowQueue_I32();
 		corners.add(0);
@@ -82,7 +82,7 @@ public class TestRefinePolyLine {
 		addPoints(x1,y0,x1,y1,points);
 		addPoints(x1,y1,x0,y1,points);
 
-		RefinePolyLine alg = new RefinePolyLine(false);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(false);
 
 		for( int i = 0; i < 10; i++ ) {
 			GrowQueue_I32 corners = new GrowQueue_I32();
@@ -121,7 +121,7 @@ public class TestRefinePolyLine {
 		corners.add(80);
 		corners.add(120);
 
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 		for (int i = 0; i < 10; i++) {
 			// noise up the inputs
 			for (int j = 0; j < corners.size(); j++) {
@@ -148,7 +148,7 @@ public class TestRefinePolyLine {
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
 
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 		alg.searchRadius = 5;
 		int found = alg.optimize(contour,2,16,36);
 		assertEquals(20,found);
@@ -167,7 +167,7 @@ public class TestRefinePolyLine {
 		contour.get(17).set(17, 1);
 		contour.get(18).set(18, 2);
 
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 		alg.searchRadius = 5;
 		int found = alg.optimize(contour,2,16,36);
 		assertEquals(20,found);
@@ -175,7 +175,7 @@ public class TestRefinePolyLine {
 
 	@Test
 	public void distanceSum() {
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 		for (int i = 0; i < 20; i++) {
@@ -211,7 +211,7 @@ public class TestRefinePolyLine {
 	 */
 	@Test
 	public void tooFewPoints() {
-		RefinePolyLine alg = new RefinePolyLine(true);
+		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		GrowQueue_I32 corners = new GrowQueue_I32();
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();

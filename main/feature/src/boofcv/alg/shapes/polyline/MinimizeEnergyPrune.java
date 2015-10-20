@@ -31,6 +31,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO make looping optional later
+	// TODO replace optimize polygon with something that just optimizes the 3 lines affected by the corner removal
+	//      fit lines to contour at those points
+	//      at end pick point on contour closest to corner
 public class MinimizeEnergyPrune {
 
 	double splitPenalty = 4;

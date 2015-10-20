@@ -24,7 +24,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.edge.PolygonEdgeScore;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
-import boofcv.alg.shapes.polyline.RefinePolyLine;
+import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -89,7 +89,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	MinimizeEnergyPrune pruner;
 
 	// Improve the selection of corner pixels in the contour
-	private RefinePolyLine improveContour = new RefinePolyLine(true,20);
+	private RefinePolyLineCorner improveContour = new RefinePolyLineCorner(true,20);
 
 	// Refines the estimate of the polygon's lines using a subpixel technique
 	private RefineBinaryPolygon<T> refinePolygon;
