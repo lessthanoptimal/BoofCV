@@ -37,11 +37,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Displays detected square grid fiducials.  Visualizes several of its processing steps making it easier to debug.
+ *
  * @author Peter Abeles
  */
 public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 {
-
 	DetectSquareGridFiducial<ImageFloat32> alg;
 	ConfigSquareGrid config;
 

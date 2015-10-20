@@ -105,7 +105,7 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 	}
 
 
-	public DetectChessboardFiducial<ImageFloat32> getAlg() {
+	public DetectChessboardFiducial<ImageFloat32> getAlgorithm() {
 		return alg;
 	}
 

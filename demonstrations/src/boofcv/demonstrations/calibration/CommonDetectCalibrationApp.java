@@ -248,7 +248,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 						for (int j = 0; j < g.nodes.size(); j++) {
 							SquareNode n = g.nodes.get(j);
 							g2.setColor(color);
-							VisualizeShapes.drawPolygon(n.corners, true, g2, true);
+							VisualizeShapes.drawPolygon(n.corners, true, scale, g2);
 
 							drawCornersInside(g2,scale,n.corners);
 						}

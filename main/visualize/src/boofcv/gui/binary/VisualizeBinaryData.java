@@ -188,7 +188,9 @@ public class VisualizeBinaryData {
 
 		Line2D.Double l = new Line2D.Double();
 
-		g2.setStroke(new BasicStroke(Math.max(1,(float)scale)));
+
+
+		g2.setStroke(new BasicStroke(Math.max(1, (float) scale)));
 		for( Contour c : contours ) {
 			List<Point2D_I32> list = c.external;
 
@@ -200,6 +202,25 @@ public class VisualizeBinaryData {
 				l.setLine((p0.x+0.5)*scale,(p0.y+0.5)*scale,(p1.x+0.5)*scale,(p1.y+0.5)*scale);
 				g2.draw(l);
 			}
+		}
+
+		if( scale > 4 ) {
+			Color before = g2.getColor();
+			g2.setStroke(new BasicStroke(1));
+			g2.setColor(Color.BLACK);
+
+			for( Contour c : contours ) {
+				List<Point2D_I32> list = c.external;
+				for (int i = 0, j = list.size() - 1; i < list.size(); j = i, i++) {
+					Point2D_I32 p0 = list.get(i);
+					Point2D_I32 p1 = list.get(j);
+
+					// draw it in the middle
+					l.setLine((p0.x + 0.5) * scale, (p0.y + 0.5) * scale, (p1.x + 0.5) * scale, (p1.y + 0.5) * scale);
+					g2.draw(l);
+				}
+			}
+			g2.setColor(before);
 		}
 	}
 
