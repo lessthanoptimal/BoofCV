@@ -66,6 +66,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerContourSplit;
 	JSpinner spinnerContourMinSplit;
 	JSpinner spinnerContourIterations;
+	JSpinner spinnerSplitPenalty;
 
 	JSpinner spinnerLineSamples;
 	JSpinner spinnerCornerOffset;
@@ -138,6 +139,8 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations, 1, 200, 1));
 		spinnerContourIterations.setMaximumSize(spinnerContourIterations.getPreferredSize());
 		spinnerContourIterations.addChangeListener(this);
+		spinnerSplitPenalty = new JSpinner(new SpinnerNumberModel(config.splitPenalty, 0.0, 100.0, 1.0));
+		configureSpinnerFloat(spinnerSplitPenalty);
 
 		setConvex = new JCheckBox("Convex");
 		setConvex.addActionListener(this);
@@ -175,6 +178,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
 		addLabeled(spinnerContourMinSplit, "Min Split: ", this);
 		addLabeled(spinnerContourIterations, "Max Iterations: ", this);
+		addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
 		addCenterLabel("Refinement", this);
 		addLabeled(refineChoice, "Refine: ", this);
 		addLabeled(spinnerLineSamples, "Line Samples: ", this);
@@ -244,6 +248,10 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 				spinnerMinSides.setValue(minSides);
 			}
 			updateSidesInConfig();
+		} else if( e.getSource() == selectZoom ) {
+			zoom = ((Number) selectZoom.getValue()).doubleValue();
+			owner.viewUpdated();
+			return;
 		} else if( e.getSource() == spinnerMinContourSize ) {
 				config.minContourImageWidthFraction = ((Number) spinnerMinContourSize.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourSplit ) {
@@ -252,46 +260,44 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			config.contour2Poly_minimumSplitFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
 			config.contour2Poly_iterations = ((Number) spinnerContourIterations.getValue()).intValue();
-		} else if( e.getSource() == spinnerLineSamples ) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if( e.getSource() == spinnerSplitPenalty ) {
+			config.splitPenalty = ((Number) spinnerSplitPenalty.getValue()).doubleValue();
+		} else if (e.getSource() == spinnerLineSamples) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 			} else {
 				configCorner.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
 			}
-		} else if( e.getSource() == spinnerCornerOffset ) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if (e.getSource() == spinnerCornerOffset) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
 			} else {
 				configCorner.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
 			}
-		} else if( e.getSource() == spinnerSampleRadius ) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if (e.getSource() == spinnerSampleRadius) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
 			} else {
 				configCorner.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
 			}
-		} else if( e.getSource() == spinnerRefineMaxIterations) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if (e.getSource() == spinnerRefineMaxIterations) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 			} else {
 				configCorner.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
 			}
-		} else if( e.getSource() == spinnerConvergeTol ) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if (e.getSource() == spinnerConvergeTol) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
 			} else {
 				configCorner.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
 			}
-		} else if( e.getSource() == spinnerMaxCornerChange ) {
-			if( refine == PolygonRefineType.LINE ) {
+		} else if (e.getSource() == spinnerMaxCornerChange) {
+			if (refine == PolygonRefineType.LINE) {
 				configLine.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 			} else {
 				configCorner.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
 			}
-		} else if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
-			owner.viewUpdated();
-			return;
 		}
 		owner.configUpdate();
 	}
@@ -302,6 +308,13 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	}
 
 	private void updateRefineSettings() {
+
+		spinnerLineSamples.removeChangeListener(this);
+		spinnerCornerOffset.removeChangeListener(this);
+		spinnerSampleRadius.removeChangeListener(this);
+		spinnerRefineMaxIterations.removeChangeListener(this);
+		spinnerConvergeTol.removeChangeListener(this);
+		spinnerMaxCornerChange.removeChangeListener(this);
 
 		if( refineType == PolygonRefineType.LINE ) {
 			spinnerLineSamples.setValue(configLine.lineSamples);
@@ -318,6 +331,13 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			spinnerConvergeTol.setValue(configCorner.convergeTolPixels);
 			spinnerMaxCornerChange.setValue(configCorner.maxCornerChangePixel);
 		}
+
+		spinnerLineSamples.addChangeListener(this);
+		spinnerCornerOffset.addChangeListener(this);
+		spinnerSampleRadius.addChangeListener(this);
+		spinnerRefineMaxIterations.addChangeListener(this);
+		spinnerConvergeTol.addChangeListener(this);
+		spinnerMaxCornerChange.addChangeListener(this);
 	}
 
 	public ThresholdControlPanel getThreshold() {

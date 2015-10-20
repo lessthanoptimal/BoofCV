@@ -86,7 +86,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	// removes extra corners
 	GrowQueue_I32 pruned = new GrowQueue_I32();
-	MinimizeEnergyPrune pruner = new MinimizeEnergyPrune();
+	MinimizeEnergyPrune pruner;
 
 	// Improve the selection of corner pixels in the contour
 	private RefinePolyLine improveContour = new RefinePolyLine(true,20);
@@ -148,11 +148,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 								 double minimumSplitFraction,
 								 boolean outputClockwise,
 								 boolean convex,
+								 double splitPenalty,
 								 Class<T> inputType) {
 
-
-		this.minSides = minSides;
-		this.maxSides = maxSides;
+		setNumberOfSides(minSides,maxSides);
 		this.refinePolygon = refinePolygon;
 		this.differenceScore = differenceScore;
 		this.inputType = inputType;
@@ -161,6 +160,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
+
+		pruner = new MinimizeEnergyPrune(splitPenalty);
 
 		workPoly = new Polygon2D_F64(1);
 		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
@@ -227,6 +228,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		}
 
 		findCandidateShapes(gray, binary);
+		if( verbose ) System.out.println("EXIT  BinaryPolygonDetector.process()");
 	}
 
 	/**
@@ -274,9 +276,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					removeDistortionFromContour(c.external);
 				}
 
-
 				if( !fitPolygon.process(c.external) ) {
-					if( verbose ) System.out.println("rejected polygon fit failed. contour size = "+c.external.size());
+					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+c.external.size());
 					continue;
 				}
 
@@ -292,7 +293,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				// reduce the number of corners based on an energy model
-				pruner.fit(c.external,splits,pruned);
+				boolean wasPruned = pruner.fit(c.external,splits,pruned);
 				splits = pruned;
 
 				// only accept polygons with the expected number of sides
@@ -302,6 +303,11 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
+				// tweak again if corners were pruned
+				if( wasPruned && !improveContour.fit(c.external,splits) ) {
+					if( verbose ) System.out.println("rejected improve contour second. contour size = "+c.external.size());
+					continue;
+				}
 
 				if( helper != null ) {
 					if( !helper.filterPolygon(c.external,splits) ) {
@@ -321,7 +327,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					helper.adjustBeforeOptimize(workPoly);
 				}
 
-				// Functions below only supports convex polygons
+				// Filter out polygons which are not convex if requested by the user
 				if( convex && !UtilPolygons2D_F64.isConvex(workPoly)) {
 					if( verbose ) System.out.println("Rejected not convex");
 					continue;
@@ -348,6 +354,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				if( refinePolygon != null ) {
 					refinePolygon.setImage(gray);
 					success = refinePolygon.refine(workPoly,c.external,splits,refined);
+					if( verbose ) System.out.println("Rejected after refinePolygon");
 				} else {
 					refined.set(workPoly);
 					success = true;
@@ -368,7 +375,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					foundContours.add(c);
 				} else {
 					found.removeTail();
-					if( verbose ) System.out.println("Rejected after refine");
 				}
 			}
 		}

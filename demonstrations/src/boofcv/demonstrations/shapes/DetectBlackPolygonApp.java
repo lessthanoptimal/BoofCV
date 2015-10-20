@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.DemonstrationBase;
@@ -33,12 +34,12 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.Configuration;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -73,11 +74,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	T input;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	final JFileChooser fc = new JFileChooser();
-
-	// menu items
-	JMenuItem menuFile,menuWebcam,menuQuit;
-
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples);
 
@@ -109,9 +105,14 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	}
 
 	private synchronized void processImage() {
-		inputToBinary.process(input, binary);
-		detector.process(input, binary);
-		viewUpdated();
+		new Thread() {
+			@Override
+			public void run() {
+				inputToBinary.process(input, binary);
+				detector.process(input, binary);
+				viewUpdated();
+			}
+		}.start();
 	}
 
 	public synchronized void setInput( BufferedImage image ) {
@@ -160,39 +161,9 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	@Override
 	public synchronized void imageThresholdUpdated() {
 
-		int threshold = controls.getThreshold().vThreshold;
-		boolean down = controls.getThreshold().vDirectionDown;
-		int radius = controls.getThreshold().vRadius;
+		ConfigThreshold config = controls.getThreshold().config;
 
-		switch( controls.getThreshold().vType ) {
-			case FIXED:
-				inputToBinary = FactoryThresholdBinary.globalFixed(threshold,down,imageType);
-				break;
-
-			case GLOBAL_OTSU:
-				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, down, imageType);
-				break;
-
-			case GLOBAL_ENTROPY:
-				inputToBinary = FactoryThresholdBinary.globalEntropy(0, 255, down, imageType);
-				break;
-
-			case LOCAL_GAUSSIAN:
-				inputToBinary = FactoryThresholdBinary.localGaussian(radius, 0, down, imageType);
-				break;
-
-			case LOCAL_SQUARE:
-				inputToBinary = FactoryThresholdBinary.localSquare(radius, 0, down, imageType);
-				break;
-
-			case LOCAL_SAVOLA:
-				inputToBinary = FactoryThresholdBinary.localSauvola(radius, 0.3f, down, imageType);
-				break;
-
-			default:
-				throw new RuntimeException("Unknown threshold type");
-		}
-
+		inputToBinary = FactoryThresholdBinary.threshold(config,imageType);
 		processImage();
 	}
 
@@ -276,7 +247,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add( "/home/pja/junk5.png" );
 		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
 
-		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageUInt8.class);
+		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 
 		app.openFile(new File(examples.get(0)));
 

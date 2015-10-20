@@ -19,6 +19,7 @@
 package boofcv.factory.shape;
 
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.struct.Configuration;
 
 /**
@@ -38,12 +39,11 @@ public class ConfigPolygonDetector implements Configuration {
 	 */
 	public int maximumSides;
 
-
 	/**
 	 * Two lines are merged together if their angle is &le; to this number.  This variable is dependent upon the
 	 * number of sides.  The more sides you wish to detect the more likely you will need to reduce this number.
 	 */
-	public double contour2Poly_splitFraction = 0.15;
+	public double contour2Poly_splitFraction = 0.10;
 
 	/**
 	 * Number of split and merge iterations when converting contour into polygon
@@ -54,7 +54,14 @@ public class ConfigPolygonDetector implements Configuration {
 	 * The minimum number of pixels away a contour point is from a line to cause a split/merge.  Specified as a fraction
 	 * of total image width.
 	 */
-	public double contour2Poly_minimumSplitFraction = 0.0078125;
+	public double contour2Poly_minimumSplitFraction = 0.002;
+
+	/**
+	 * Magic number used to penalize a polygon when a new corner is added
+	 *
+	 * @see MinimizeEnergyPrune
+	 */
+	public double splitPenalty = 2.0;
 
 	/**
 	 * <p>
@@ -115,14 +122,18 @@ public class ConfigPolygonDetector implements Configuration {
 
 	@Override
 	public String toString() {
-
-		return getClass().getSimpleName()+"{ minimumSides="+minimumSides+
-				" , maximumSides="+maximumSides+
-				" , contour2Poly_splitFraction="+contour2Poly_splitFraction+
-				" , contour2Poly_iterations="+contour2Poly_iterations+
-				" , contour2Poly_minimumSplitFraction="+ contour2Poly_minimumSplitFraction +
-				" , minContourImageWidthFraction="+minContourImageWidthFraction+
-				" , clockwise="+clockwise+
-				" , convex="+convex+"}";
+		return "ConfigPolygonDetector{" +
+				"minimumSides=" + minimumSides +
+				", maximumSides=" + maximumSides +
+				", contour2Poly_splitFraction=" + contour2Poly_splitFraction +
+				", contour2Poly_iterations=" + contour2Poly_iterations +
+				", contour2Poly_minimumSplitFraction=" + contour2Poly_minimumSplitFraction +
+				", splitPenalty=" + splitPenalty +
+				", minimumEdgeIntensity=" + minimumEdgeIntensity +
+				", minContourImageWidthFraction=" + minContourImageWidthFraction +
+				", clockwise=" + clockwise +
+				", convex=" + convex +
+				", refine=" + refine +
+				'}';
 	}
 }

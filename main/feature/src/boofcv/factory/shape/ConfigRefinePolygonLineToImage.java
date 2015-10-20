@@ -32,7 +32,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	 * How far away in pixels it will start sampling the line from a corner.  Corners can become highly aliased
 	 * with ambiguous borders.
 	 */
-	public double cornerOffset = 2;
+	public double cornerOffset = 1;
 	/**
 	 * Number of times along the line it will be sampled
 	 */
@@ -64,12 +64,13 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{ cornerOffset="+cornerOffset+
-				" , lineSamples="+lineSamples+
-				" , sampleRadius="+sampleRadius+
-				" , maxIterations="+maxIterations+
-				" , convergeTolPixels="+convergeTolPixels+
-				" , maxCornerChangePixel="+maxCornerChangePixel+
-				" }";
+		return "ConfigRefinePolygonLineToImage{" +
+				"cornerOffset=" + cornerOffset +
+				", lineSamples=" + lineSamples +
+				", sampleRadius=" + sampleRadius +
+				", maxIterations=" + maxIterations +
+				", convergeTolPixels=" + convergeTolPixels +
+				", maxCornerChangePixel=" + maxCornerChangePixel +
+				'}';
 	}
 }

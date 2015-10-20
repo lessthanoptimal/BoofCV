@@ -78,7 +78,7 @@ public class ConfigSquareGrid implements Configuration {
 	public ConfigRefinePolygonCornersToImage configRefineCorners = new ConfigRefinePolygonCornersToImage();
 
 	{
-		square.contour2Poly_splitFraction = 0.25;
+		square.contour2Poly_splitFraction = 0.1;
 		square.contour2Poly_minimumSplitFraction = 0.0005;
 		square.minContourImageWidthFraction = 0.0005;
 

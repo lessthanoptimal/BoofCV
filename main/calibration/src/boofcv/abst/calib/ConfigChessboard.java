@@ -83,7 +83,7 @@ public class ConfigChessboard implements Configuration {
 		// it erodes the original shape meaning it has to move a greater distance
 //		configRefineCorners.maxCornerChangePixel = 5; // TODO reduce
 
-		square.contour2Poly_splitFraction = 0.25;
+		square.contour2Poly_splitFraction = 0.1;
 		square.contour2Poly_minimumSplitFraction = 0.0005;
 		square.minContourImageWidthFraction = 0.0005;
 

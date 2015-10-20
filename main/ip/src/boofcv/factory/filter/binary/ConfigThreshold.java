@@ -104,4 +104,18 @@ public class ConfigThreshold implements Configuration {
 	public void checkValidity() {
 
 	}
+
+	@Override
+	public String toString() {
+		return "ConfigThreshold{" +
+				"type=" + type +
+				", fixedThreshold=" + fixedThreshold +
+				", bias=" + bias +
+				", down=" + down +
+				", radius=" + radius +
+				", savolaK=" + savolaK +
+				", minPixelValue=" + minPixelValue +
+				", maxPixelValue=" + maxPixelValue +
+				'}';
+	}
 }

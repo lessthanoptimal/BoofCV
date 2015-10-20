@@ -71,11 +71,14 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{ endPointDistance="+endPointDistance
-				+" , cornerOffset="+cornerOffset
-				+" , lineSamples="+lineSamples
-				+" , sampleRadius="+sampleRadius
-				+" , maxIterations="+maxIterations
-				+" , convergeTolPixels="+convergeTolPixels+" }";
+		return "ConfigRefinePolygonCornersToImage{" +
+				"endPointDistance=" + endPointDistance +
+				", cornerOffset=" + cornerOffset +
+				", lineSamples=" + lineSamples +
+				", sampleRadius=" + sampleRadius +
+				", maxIterations=" + maxIterations +
+				", convergeTolPixels=" + convergeTolPixels +
+				", maxCornerChangePixel=" + maxCornerChangePixel +
+				'}';
 	}
 }

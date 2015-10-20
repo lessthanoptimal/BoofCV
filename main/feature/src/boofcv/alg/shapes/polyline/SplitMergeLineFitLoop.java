@@ -34,10 +34,6 @@ import java.util.List;
 // TODO only check lines that changed for splitting
 public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
-	// 0.2 and 0.3
-	double exceedDistanceFraction = 0.2;
-	double splitExceedFraction = 0.3;
-
 	// number of points in the contour
 	protected int N;
 
@@ -242,12 +238,6 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		double bestDistanceSq = 0;
 
 		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
-//		System.out.println("     thishold for split = "+Math.sqrt(toleranceSplitSq));
-
-		double foo = Math.ceil(Math.sqrt(toleranceSplitSq)*exceedDistanceFraction);
-		foo *= foo;
-
-		int totalTooFar = 0;
 
 		// don't try splitting at the two end points
 		for( int i = 1; i < length; i++ ) {
@@ -259,12 +249,9 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 				bestDistanceSq = dist;
 				bestOffset = i;
 			}
-			if( dist > foo ) {
-				totalTooFar++;
-			}
 		}
 
-		if( totalTooFar > length*splitExceedFraction || bestDistanceSq > toleranceSplitSq ) {
+		if( bestDistanceSq > toleranceSplitSq ) {
 			return bestOffset;
 		} else {
 			return -1;

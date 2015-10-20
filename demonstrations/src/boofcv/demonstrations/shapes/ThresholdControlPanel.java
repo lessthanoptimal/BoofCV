@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -45,10 +46,13 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	boolean thresholdAdaptive;
 	boolean thresholdGlobal;
 
-	ThresholdType vType = ThresholdType.GLOBAL_OTSU;
-	int vThreshold = 50;
-	boolean vDirectionDown = true;
-	int vRadius = 10;
+	ConfigThreshold config = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+
+	{
+		config.radius = 10;
+		config.fixedThreshold = 50;
+		config.down = true;
+	}
 
 	public ThresholdControlPanel(Listener listener) {
 		this.listener = listener;
@@ -59,19 +63,19 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 
 		comboType.setMaximumSize(comboType.getPreferredSize());
-		comboType.setSelectedIndex(vType.ordinal());
+		comboType.setSelectedIndex(config.type.ordinal());
 
-		spinnerThreshold = new JSpinner(new SpinnerNumberModel(vThreshold,0,255,1));
+		spinnerThreshold = new JSpinner(new SpinnerNumberModel(config.fixedThreshold,0,255,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
 
-		spinnerRadius = new JSpinner(new SpinnerNumberModel(vRadius,1,50,1));
+		spinnerRadius = new JSpinner(new SpinnerNumberModel(config.radius,1,50,1));
 		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
 
 		buttonUpDown = new JButton();
 		buttonUpDown.setPreferredSize(new Dimension(100, 30));
 		buttonUpDown.setMaximumSize(buttonUpDown.getPreferredSize());
 		buttonUpDown.setMinimumSize(buttonUpDown.getPreferredSize());
-		setToggleText(vDirectionDown);
+		setToggleText(config.down);
 
 		comboType.addActionListener(this);
 		spinnerThreshold.addChangeListener(this);
@@ -97,18 +101,18 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == comboType ) {
-			vType = ThresholdType.values()[comboType.getSelectedIndex()];
+			config.type = ThresholdType.values()[comboType.getSelectedIndex()];
 			updateEnabledByType();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == buttonUpDown ) {
-			vDirectionDown = !vDirectionDown;
-			setToggleText(vDirectionDown);
+			config.down = !config.down;
+			setToggleText(config.down);
 			listener.imageThresholdUpdated();
 		}
 	}
 
 	private void updateEnabledByType() {
-		switch( vType ) {
+		switch( config.type ) {
 			case FIXED:
 				thresholdAdaptive = false;
 				break;
@@ -145,10 +149,10 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerThreshold ) {
-			vThreshold = ((Number) spinnerThreshold.getValue()).intValue();
+			config.fixedThreshold = ((Number) spinnerThreshold.getValue()).intValue();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerRadius ) {
-			vRadius = ((Number) spinnerRadius.getValue()).intValue();
+			config.radius = ((Number) spinnerRadius.getValue()).intValue();
 			listener.imageThresholdUpdated();
 		}
 	}

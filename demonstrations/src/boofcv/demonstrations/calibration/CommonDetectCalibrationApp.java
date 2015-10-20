@@ -107,7 +107,13 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 		binary = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
 
-		calibEventProcess();
+		new Thread() {
+			@Override
+			public void run() {
+				calibEventProcess();
+			}
+		}.start();
+
 	}
 
 	private void renderGraph( Graphics2D g2 , double scale ) {

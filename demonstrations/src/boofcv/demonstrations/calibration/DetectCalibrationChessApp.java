@@ -470,10 +470,11 @@ public class DetectCalibrationChessApp
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("Asdasd 3","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg"));
-		inputs.add(new PathLabel("Asdasd 1","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distance_angle/image05.jpg"));
-		inputs.add(new PathLabel("Asdasd 0","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0850.jpg"));
-		inputs.add(new PathLabel("Asdasd 2","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg"));
+		inputs.add(new PathLabel("ASDASD","/home/pabeles/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg"));
+		inputs.add(new PathLabel("Asdasd 3","/home/pabeles/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg"));
+		inputs.add(new PathLabel("Asdasd 1","/home/pabeles/projects/ValidationBoof/data/fiducials/chessboard/standard/distance_angle/image05.jpg"));
+		inputs.add(new PathLabel("Asdasd 0","/home/pabeles/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0850.jpg"));
+		inputs.add(new PathLabel("Asdasd 2","/home/pabeles/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg"));
 
 		for (int i = 1; i <= 12; i++) {
 //			inputs.add(new PathLabel(String.format("View %02d",i),String.format("%sframe%02d.jpg",prefix,i)));

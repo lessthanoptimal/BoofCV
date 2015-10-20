@@ -41,7 +41,7 @@ public class TestMinimizeEnergyPrune {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 
-		MinimizeEnergyPrune alg = new MinimizeEnergyPrune();
+		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
 		GrowQueue_I32 output = new GrowQueue_I32();
 		alg.fit(contours,corners,output);
@@ -61,7 +61,7 @@ public class TestMinimizeEnergyPrune {
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 		corners.add(corners.get(3)+4);
 
-		MinimizeEnergyPrune alg = new MinimizeEnergyPrune();
+		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
 		GrowQueue_I32 output = new GrowQueue_I32();
 		alg.fit(contours,corners,output);
@@ -77,7 +77,7 @@ public class TestMinimizeEnergyPrune {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 
-		MinimizeEnergyPrune alg = new MinimizeEnergyPrune();
+		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 		alg.contour = contours;
 
 		alg.computeSegmentEnergy(corners);
@@ -108,10 +108,10 @@ public class TestMinimizeEnergyPrune {
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		// test with everything perfectly lining up
-		MinimizeEnergyPrune alg = new MinimizeEnergyPrune();
+		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 		alg.contour = contours;
 
-		double split = alg.splitPentially;
+		double split = alg.splitPenalty;
 
 		double expected[] = new double[]{split/100.0,split/(18.0*18.0),split/100.0,split/(18.0*18.0)};
 

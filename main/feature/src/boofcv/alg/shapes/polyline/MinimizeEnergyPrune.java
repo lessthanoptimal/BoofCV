@@ -33,7 +33,7 @@ import java.util.List;
 // TODO make looping optional later
 public class MinimizeEnergyPrune {
 
-	double splitPentially = 1;
+	double splitPenalty = 4;
 
 	LineParametric2D_F64 line = new LineParametric2D_F64();
 	Point2D_F64 point = new Point2D_F64();
@@ -42,7 +42,22 @@ public class MinimizeEnergyPrune {
 	List<Point2D_I32> contour;
 	double energySegment[] = new double[1];
 
-	public void fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
+	GrowQueue_I32 bestCorners = new GrowQueue_I32();
+	GrowQueue_I32 workCorners1 = new GrowQueue_I32();
+	GrowQueue_I32 workCorners2 = new GrowQueue_I32();
+
+	public MinimizeEnergyPrune(double splitPenalty) {
+		this.splitPenalty = splitPenalty;
+	}
+
+	/**
+	 *
+	 * @param contour
+	 * @param input
+	 * @param output
+	 * @return true if one or more corners were pruned, false if nothing changed
+	 */
+	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
 		this.contour = contour;
 
 		output.reset();
@@ -55,24 +70,90 @@ public class MinimizeEnergyPrune {
 			total += energySegment[i];
 		}
 
+		boolean modified = false;
 		while( output.size() > 3 ) {
 			double bestEnergy = total;
-			int bestIndex = -1;
+			boolean betterFound = false;
+			bestCorners.reset();
 
 			for (int i = 0; i < output.size(); i++) {
-				double found = energyRemoveCorner(i, output);
-				if (found < bestEnergy) {
-					bestEnergy = found;
-					bestIndex = i;
+				// add all but the one which was removed
+				workCorners1.reset();
+				for (int j = 0; j < output.size(); j++) {
+					if( i != j ) {
+						workCorners1.add(output.get(j));
+					}
+				}
+
+				optimizeCorners(workCorners1,workCorners2);
+
+				double score = 0;
+				for (int j = 0, k = workCorners2.size()-1; j < workCorners2.size(); k=j,j++) {
+					score += computeSegmentEnergy(workCorners2,k,j);
+				}
+
+
+				if (score < bestEnergy) {
+					betterFound = true;
+					bestEnergy = score;
+					bestCorners.reset();
+					bestCorners.addAll(workCorners2);
 				}
 			}
 
-			if (bestIndex != -1) {
-				output.remove(bestIndex);
+			if ( betterFound ) {
+				modified = true;
 				total = bestEnergy;
+				output.reset();
+				output.addAll(bestCorners);
 			} else {
 				break;
 			}
+		}
+
+		return modified;
+	}
+
+	void optimizeCorners( GrowQueue_I32 input , GrowQueue_I32 output ) {
+
+		output.reset();
+		for( int target = 0; target < input.size(); target++ )
+		{
+			int indexA = input.get(CircularIndex.minusPOffset(target, 1, input.size()));
+			int indexB = input.get(CircularIndex.plusPOffset(target, 1, input.size()));
+
+			Point2D_I32 a = contour.get(indexA);
+			Point2D_I32 b = contour.get(indexB);
+
+			line.p.x = a.x;
+			line.p.y = a.y;
+			line.slope.set(b.x - a.x, b.y - a.y);
+
+			int length = CircularIndex.distanceP(indexA, indexB, contour.size());
+
+			double best = 0;
+			int bestIndex = -1;
+			for (int i = 1; i < length - 1; i++) {
+				Point2D_I32 c = getContour(indexA + i);
+				point.set(c.x, c.y);
+
+				double d = Distance2D_F64.distanceSq(line, point);
+				if (d > best) {
+					best = d;
+					bestIndex = i;
+				}
+			}
+			int selectedCorner = CircularIndex.addOffset(indexA, bestIndex, contour.size());
+
+			boolean duplicate = false;
+			for (int i = 0; i < output.size(); i++) {
+				if( output.get(i) == selectedCorner ) {
+					duplicate = true;
+					break;
+				}
+			}
+			if( !duplicate )
+				output.add(selectedCorner);
 		}
 	}
 
@@ -126,16 +207,20 @@ public class MinimizeEnergyPrune {
 		double total = 0;
 		int length = circularDistance(indexA,indexB);
 		for (int k = 1; k < length; k++) {
-			Point2D_I32 c = getCircular( indexA+k);
+			Point2D_I32 c = getContour(indexA + k);
 			point.set(c.x,c.y);
 
 			total += Distance2D_F64.distanceSq(line, point);
 		}
 
-		return (total+splitPentially)/a.distance2(b);
+		if( indexA == indexB ) {
+			System.out.println();
+		}
+
+		return (total+ splitPenalty)/a.distance2(b);
 	}
 
-	protected Point2D_I32 getCircular( int index ) {
+	protected Point2D_I32 getContour(int index) {
 		return contour.get(index % contour.size());
 	}
 
