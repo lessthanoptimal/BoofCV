@@ -63,7 +63,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// size of a square in the undistorted image.  Each bit is encoded in a square.
 	protected final static int r=5;       // radius of a square
 	protected final static int w=r*2+1;   // width of a square
-	protected final static int N=w*w;     // width/height of undistorted image (which is a square)
+	protected final static int N=w*w;     // total number of pixels in the undistorted square with the binary data
 
 	// length of a side on the fiducials in world units
 	private double lengthSide = 1;
