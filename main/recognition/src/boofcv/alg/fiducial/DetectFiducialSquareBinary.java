@@ -60,10 +60,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// storage for no border sub-image
 	ImageFloat32 grayNoBorder = new ImageFloat32();
 
-	// size of a square
-	protected final static int r=5;
-	protected final static int w=r*2+1;
-	protected final static int N=w*w;
+	// size of a square in the undistorted image.  Each bit is encoded in a square.
+	protected final static int r=5;       // radius of a square
+	protected final static int w=r*2+1;   // width of a square
+	protected final static int N=w*w;     // width/height of undistorted image (which is a square)
 
 	// length of a side on the fiducials in world units
 	private double lengthSide = 1;
@@ -79,6 +79,8 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 */
 	public DetectFiducialSquareBinary(InputToBinary<T> inputToBinary, BinaryPolygonDetector<T> quadDetector,  Class<T> inputType) {
 		super(inputToBinary,quadDetector, w*8, inputType);
+		// w*8 = undistorted image size.  for a 4x4 grid w*4 would be the internal pattern and 2*w on each side is the
+		// black border.  w*8 = w*2 + w*4 + w*2
 
 		int widthNoBorder = w*4;
 

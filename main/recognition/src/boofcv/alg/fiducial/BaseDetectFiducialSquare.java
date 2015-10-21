@@ -112,7 +112,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
-	 * @param squarePixels  Number of pixels wide the image that stores the target's detector interior is.
+	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
+	 *                      This will include the black border.
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
@@ -256,7 +257,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			UtilHomography.convert(H_refined, transformHomography.getModel());
 
 			// TODO how perspective is removed is introducing artifacts.  If the "square" is larger
-			// than the detected region and bilinear interpolation is used then pixels outside will// influence the value of pixels inside and shift things over.  this is all bad
+			// than the detected region and bilinear interpolation is used then pixels outside will// influence the
+			// value of pixels inside and shift things over.  this is all bad
 
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
