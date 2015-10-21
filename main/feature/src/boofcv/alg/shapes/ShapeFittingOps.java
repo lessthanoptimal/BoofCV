@@ -62,22 +62,22 @@ public class ShapeFittingOps {
 	 * @param loop If true the sequence is a connected at both ends, otherwise it is assumed to not be.
 	 * @param splitFraction A line will be split if a point is more than this fraction of its
 	 *                     length away from the line. Try 0.05
-	 * @param minimumSplitPixels A line will always be split if a point is more than this number of pixels away. try 1.0
+	 * @param minimumSideFraction The minimum allowed side length as a function of contour length.
 	 * @param iterations Maximum number of iterations done to improve the fit. Can be 0. Try 50.
 	 * @return Vertexes in the fit polygon.
 	 */
 	public static List<PointIndex_I32> fitPolygon(List<Point2D_I32> sequence,  boolean loop,
-												  double splitFraction, double minimumSplitPixels, int iterations) {
+												  double splitFraction, double minimumSideFraction, int iterations) {
 		GrowQueue_I32 splits;
 
 		if( loop ) {
-			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSplitPixels,iterations);
+			SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(splitFraction,minimumSideFraction,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
 			RefinePolyLineCorner refine = new RefinePolyLineCorner(true,10);
 			refine.fit(sequence,splits);
 		} else {
-			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSplitPixels,iterations);
+			SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(splitFraction,minimumSideFraction,iterations);
 			alg.process(sequence);
 			splits = alg.getSplits();
 			RefinePolyLineCorner refine = new RefinePolyLineCorner(false,10);

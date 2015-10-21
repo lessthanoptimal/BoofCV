@@ -133,7 +133,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerMinEdge.addChangeListener(this);
 		spinnerContourSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_splitFraction,0.0,1.0,0.01));
 		configureSpinnerFloat(spinnerContourSplit);
-		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSplitFraction, 0.0, 1.0, 0.001));
+		spinnerContourMinSplit = new JSpinner(new SpinnerNumberModel(config.contour2Poly_minimumSideFraction, 0.0, 1.0, 0.001));
 		configureSpinnerFloat(spinnerContourMinSplit);
 		spinnerContourSplit.addChangeListener(this);
 		spinnerContourIterations = new JSpinner(new SpinnerNumberModel(config.contour2Poly_iterations, 1, 200, 1));
@@ -257,7 +257,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == spinnerContourSplit ) {
 			config.contour2Poly_splitFraction = ((Number) spinnerContourSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourMinSplit ) {
-			config.contour2Poly_minimumSplitFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
+			config.contour2Poly_minimumSideFraction = ((Number) spinnerContourMinSplit.getValue()).doubleValue();
 		} else if( e.getSource() == spinnerContourIterations ) {
 			config.contour2Poly_iterations = ((Number) spinnerContourIterations.getValue()).intValue();
 		} else if( e.getSource() == spinnerSplitPenalty ) {

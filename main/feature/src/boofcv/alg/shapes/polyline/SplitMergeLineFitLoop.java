@@ -38,13 +38,13 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	protected int N;
 
 	/**
-	 * @see SplitMergeLineFit#SplitMergeLineFit(double, double, int)
+	 * @see SplitMergeLineFit#SplitMergeLineFit(double,double, int)
 	 */
 	public SplitMergeLineFitLoop(double splitFraction,
-								 double minimumSplitPixels,
+								 double minimumSplitFraction,
 								 int maxIterations)
 	{
-		super(splitFraction, minimumSplitPixels, maxIterations);
+		super(splitFraction,minimumSplitFraction, maxIterations);
 	}
 
 
@@ -53,6 +53,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 //		System.out.println("-000000000--------------------------------------");
 		this.contour = contour;
 		this.N = contour.size();
+		this.minimumSideLengthPixel = (int)Math.ceil(N* minimumSideLengthFraction);
 
 		// ------------- find initial line segments
 		splits.reset();
@@ -99,7 +100,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 */
 	protected void splitPixels(int indexStart, int length) {
 		// too short to split
-		if( length <= 1 )
+		if( length < minimumSideLengthPixel)
 			return;
 
 		// end points of the line
@@ -239,11 +240,10 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
-		int minSeparation = 2;
-		length -= minSeparation;
+		length -= minimumSideLengthPixel;
 
 		// don't try splitting at the two end points
-		for( int i = 1+minSeparation; i < length; i++ ) {
+		for( int i = 1+ minimumSideLengthPixel; i < length; i++ ) {
 			Point2D_I32 b = contour.get((indexStart+i)%N);
 			point2D.set(b.x,b.y);
 

@@ -50,7 +50,7 @@ public class ConfigSquareGrid implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4,4);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(true,4, 4);
 
 	/**
 	 * Physical width of the square.
@@ -79,7 +79,7 @@ public class ConfigSquareGrid implements Configuration {
 
 	{
 		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSplitFraction = 0.0005;
+		square.contour2Poly_minimumSideFraction = 0.1;
 		square.minContourImageWidthFraction = 0.0005;
 
 		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create

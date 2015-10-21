@@ -25,8 +25,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -277,12 +276,13 @@ public class TestSplitMergeLineFitLoop {
 
 
 		// test the threshold
-		alg.minimumSplitPixelsSq = 100.00;
-		found = alg.selectSplitOffset(0,9);
-		assertEquals(-1,found);
-		alg.minimumSplitPixelsSq = 99.999;
-		found = alg.selectSplitOffset(0,9);
-		assertEquals(4,found);
+//		alg.minimumSplitPixelsSq = 100.00;
+//		found = alg.selectSplitOffset(0,9);
+//		assertEquals(-1,found);
+//		alg.minimumSplitPixelsSq = 99.999;
+//		found = alg.selectSplitOffset(0,9);
+//		assertEquals(4,found);
+		fail("update");
 	}
 
 	private List<Point2D_I32> shiftContour( List<Point2D_I32> contour , int offset ) {

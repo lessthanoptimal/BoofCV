@@ -53,8 +53,10 @@ public abstract class SplitMergeLineFit {
 	// How far away a point is from the line before it is split.  In fractions of a line segment's length squared.
 	protected double toleranceFractionSq;
 
-	// The maximum allowed distance a point can be from a line.  Specified in pixels squared.
-	protected double minimumSplitPixelsSq;
+	// The maximum allowed distance a point can be from a line as a function of the overall
+	// contour length
+	protected double minimumSideLengthFraction;
+	protected int minimumSideLengthPixel;
 
 	// Reference to the input contour list
 	protected List<Point2D_I32> contour;
@@ -75,18 +77,17 @@ public abstract class SplitMergeLineFit {
 
 	/**
 	 * Configures algorithm
-	 *
 	 * @param splitFraction A line will be split if a point is more than this fraction of its
 	 *                     length away from the line. Try 0.05
-	 * @param minimumSplitPixels A line will always be split if a point is more than this number of pixels away. try 1.0
+	 * @param minimumSideLengthFraction The minimum length of a side as a function of contour length
 	 * @param maxIterations  Maximum number of split and merge refinements. Set to zero to disable refinement. Try 20
 	 */
 	public SplitMergeLineFit(double splitFraction,
-							 double minimumSplitPixels,
+							 double minimumSideLengthFraction,
 							 int maxIterations)
 	{
 		setSplitFraction(splitFraction);
-		setMinimumSplitPixels(minimumSplitPixels);
+		setMinimumSideLengthFraction(minimumSideLengthFraction);
 		setMaxIterations(maxIterations);
 	}
 
@@ -102,12 +103,7 @@ public abstract class SplitMergeLineFit {
 	 * Computes the split threshold from the end point of two lines
 	 */
 	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
-
-		double foo = a.distance(b);
-//		System.out.println("   splitThresholdSq: line distance "+foo);
-		foo *= foo;
-
-		return Math.max(minimumSplitPixelsSq,foo* toleranceFractionSq);
+		return a.distance2(b)* toleranceFractionSq;
 	}
 
 	/**
@@ -130,15 +126,21 @@ public abstract class SplitMergeLineFit {
 		this.toleranceFractionSq = toleranceSplit*toleranceSplit;
 	}
 
-	public void setMinimumSplitPixels(double minimumSplitPixels) {
-		this.minimumSplitPixelsSq = minimumSplitPixels*minimumSplitPixels;
-	}
-
 	public int getAbortSplits() {
 		return abortSplits;
 	}
 
 	public void setAbortSplits(int abortSplits) {
 		this.abortSplits = abortSplits;
+	}
+
+	public double getMinimumSideLengthFraction() {
+		return minimumSideLengthFraction;
+	}
+
+	public void setMinimumSideLengthFraction(double minimumSideLengthFraction) {
+		if( minimumSideLengthFraction >= 1.0 || minimumSideLengthFraction < 0 )
+			throw new IllegalArgumentException("The minimumSplitFraction must be 0 <= val < 1 ");
+		this.minimumSideLengthFraction = minimumSideLengthFraction;
 	}
 }

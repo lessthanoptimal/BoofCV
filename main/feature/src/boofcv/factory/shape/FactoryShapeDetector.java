@@ -49,7 +49,7 @@ public class FactoryShapeDetector {
 
 		SplitMergeLineFitLoop contourToPolygon = new SplitMergeLineFitLoop(
 				config.contour2Poly_splitFraction,
-				0, // dynamically set later on
+				config.contour2Poly_minimumSideFraction,
 				config.contour2Poly_iterations);
 
 		RefineBinaryPolygon<T> refinePolygon = null;
@@ -72,7 +72,7 @@ public class FactoryShapeDetector {
 
 		return new BinaryPolygonDetector<T>(config.minimumSides,config.maximumSides,contourToPolygon,
 				scorer, refinePolygon,config.minContourImageWidthFraction,
-				config.contour2Poly_minimumSplitFraction,config.clockwise,config.convex,config.splitPenalty,imageType);
+				config.clockwise,config.convex,config.splitPenalty,imageType);
 	}
 
 	public static <T extends ImageSingleBand>

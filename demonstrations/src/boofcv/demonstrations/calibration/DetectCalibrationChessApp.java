@@ -26,6 +26,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -101,6 +102,10 @@ public class DetectCalibrationChessApp
 	public static void main(String args[]) throws FileNotFoundException {
 
 		List<String> examples = new ArrayList<String>();
+
+		for (int i = 1; i <= 11; i++) {
+			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
+		}
 
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg");

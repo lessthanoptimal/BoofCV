@@ -73,7 +73,7 @@ public class ShapeFitContourApp
 	List<Contour> contours;
 
 	// parameters for polygon fitting
-	double minimumSplitPixels = 1;
+	double minimumSplitFraction = 0.01;
 	double splitFraction = 0.05;
 
 	boolean cornersVisible = false;
@@ -81,7 +81,7 @@ public class ShapeFitContourApp
 	JPanel leftArea;
 	StandardAlgConfigPanel controlPolygon = new StandardAlgConfigPanel();
 
-	JSpinner selectSplitPixels;
+	JSpinner selectMinimumSideFraction;
 	JSpinner selectSplitFraction;
 	JCheckBox showCorners;
 
@@ -100,9 +100,10 @@ public class ShapeFitContourApp
 		leftArea.setLayout(new BorderLayout());
 		leftArea.setPreferredSize(new Dimension(150, 20));
 
-		selectSplitPixels = new JSpinner(new SpinnerNumberModel(minimumSplitPixels,0,50,0.5));
-		selectSplitPixels.addChangeListener(this);
-		selectSplitPixels.setMaximumSize(selectSplitPixels.getPreferredSize());
+		selectMinimumSideFraction = new JSpinner(new SpinnerNumberModel(minimumSplitFraction,0,0.999,0.0025));
+		selectMinimumSideFraction.setEditor(new JSpinner.NumberEditor(selectMinimumSideFraction, "#,####0.0000;(#,####0.0000)"));
+		selectMinimumSideFraction.addChangeListener(this);
+		selectMinimumSideFraction.setMaximumSize(selectMinimumSideFraction.getPreferredSize());
 		selectSplitFraction = new JSpinner(new SpinnerNumberModel(splitFraction,0,1.0,0.01));
 		selectSplitFraction.setEditor(new JSpinner.NumberEditor(selectSplitFraction, "#,##0.00;(#,##0.00)"));
 //		JComponent editor = selectSplitFraction.getEditor();
@@ -115,7 +116,7 @@ public class ShapeFitContourApp
 		selectSplitFraction.addChangeListener(this);
 		selectSplitFraction.setMaximumSize(selectSplitFraction.getPreferredSize());
 
-		controlPolygon.addLabeled(selectSplitPixels, "Min Pixels", controlPolygon);
+		controlPolygon.addLabeled(selectMinimumSideFraction, "Min Side", controlPolygon);
 		controlPolygon.addLabeled(selectSplitFraction, "Split", controlPolygon);
 		controlPolygon.addLabeled(showCorners, "Corners", controlPolygon);
 		controlPolygon.addVerticalGlue(controlPolygon);
@@ -154,7 +155,7 @@ public class ShapeFitContourApp
 		if( active == 0 ) {
 
 			for( Contour c : contours ) {
-				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true, splitFraction, minimumSplitPixels, 100);
+				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true, splitFraction, minimumSplitFraction, 100);
 
 				g2.setColor(Color.RED);
 				VisualizeShapes.drawPolygon(vertexes, true, g2);
@@ -165,7 +166,7 @@ public class ShapeFitContourApp
 
 				for (List<Point2D_I32> internal : c.internal) {
 					g2.setColor(Color.BLUE);
-					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplitPixels, 100);
+					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplitFraction, 100);
 					VisualizeShapes.drawPolygon(vertexes, true, g2);
 
 					if( cornersVisible ) {
@@ -304,8 +305,8 @@ public class ShapeFitContourApp
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectSplitPixels) {
-			minimumSplitPixels = (Double) selectSplitPixels.getValue();
+		if( e.getSource() == selectMinimumSideFraction) {
+			minimumSplitFraction = (Double) selectMinimumSideFraction.getValue();
 		} else if( e.getSource() == selectSplitFraction) {
 			splitFraction = (Double) selectSplitFraction.getValue();
 		} else if( e.getSource() == showCorners ) {

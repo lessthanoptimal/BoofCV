@@ -67,9 +67,6 @@ import java.util.List;
  */
 public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
-	// dynamically set minimum split fraction used in contour to polygon conversion
-	private double minimumSplitFraction;
-
 	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;
 	private int minimumContour; // this is image.width*minContourFraction
@@ -145,7 +142,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 								 PolygonEdgeScore differenceScore,
 								 RefineBinaryPolygon<T> refinePolygon,
 								 double minContourFraction,
-								 double minimumSplitFraction,
 								 boolean outputClockwise,
 								 boolean convex,
 								 double splitPenalty,
@@ -156,7 +152,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		this.differenceScore = differenceScore;
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
-		this.minimumSplitFraction = minimumSplitFraction;
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
@@ -216,7 +211,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		if( verbose ) System.out.println("ENTER  BinaryPolygonDetector.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
-		fitPolygon.setMinimumSplitPixels(Math.max(1,minimumSplitFraction*gray.width));
 		if( labeled.width != gray.width || labeled.height == gray.width )
 			configure(gray.width,gray.height);
 

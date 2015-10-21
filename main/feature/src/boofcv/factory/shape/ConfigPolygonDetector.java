@@ -51,10 +51,9 @@ public class ConfigPolygonDetector implements Configuration {
 	public int contour2Poly_iterations = 10;
 
 	/**
-	 * The minimum number of pixels away a contour point is from a line to cause a split/merge.  Specified as a fraction
-	 * of total image width.
+	 * The minimum allowed length of a side as a fraction of the total contour length
 	 */
-	public double contour2Poly_minimumSplitFraction = 0.002;
+	public double contour2Poly_minimumSideFraction = 0.002;
 
 	/**
 	 * Magic number used to penalize a polygon when a new corner is added
@@ -127,7 +126,7 @@ public class ConfigPolygonDetector implements Configuration {
 				", maximumSides=" + maximumSides +
 				", contour2Poly_splitFraction=" + contour2Poly_splitFraction +
 				", contour2Poly_iterations=" + contour2Poly_iterations +
-				", contour2Poly_minimumSplitFraction=" + contour2Poly_minimumSplitFraction +
+				", contour2Poly_minimumSplitFraction=" + contour2Poly_minimumSideFraction +
 				", splitPenalty=" + splitPenalty +
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
 				", minContourImageWidthFraction=" + minContourImageWidthFraction +
