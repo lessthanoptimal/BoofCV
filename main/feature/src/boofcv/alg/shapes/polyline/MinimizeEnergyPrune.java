@@ -61,10 +61,20 @@ public class MinimizeEnergyPrune {
 	 * @return true if one or more corners were pruned, false if nothing changed
 	 */
 	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
-		this.contour = contour;
 
-		output.reset();
-		output.addAll(input);
+		System.out.println("ENTER Minimize prune  contour size = "+contour.size());
+		for (int i = 0; i < input.size(); i++) {
+			System.out.println("  corners "+contour.get( input.get(i)));
+		}
+
+
+		this.contour = contour;
+		output.setTo(input);
+		removeDuplicates(output);
+
+		// can't prune a corner and it will still be a polygon
+		if( output.size() <= 3 )
+			return false;
 
 		computeSegmentEnergy(output);
 
@@ -73,11 +83,18 @@ public class MinimizeEnergyPrune {
 			total += energySegment[i];
 		}
 
+		FitLinesToContour fit = new FitLinesToContour();
+		fit.setContour(contour);
+
 		boolean modified = false;
 		while( output.size() > 3 ) {
 			double bestEnergy = total;
 			boolean betterFound = false;
 			bestCorners.reset();
+
+			// TODO keep a list of candidates which beat the previous best
+			// if a child beats a parent discard the parent
+			// at the end keep the best one
 
 			for (int i = 0; i < output.size(); i++) {
 				// add all but the one which was removed
@@ -88,33 +105,60 @@ public class MinimizeEnergyPrune {
 					}
 				}
 
-				optimizeCorners(workCorners1,workCorners2);
+				// just in case it created a duplicate
+				removeDuplicates(workCorners1);// todo optimize
+				if( workCorners1.size() > 3 ) {
 
-				double score = 0;
-				for (int j = 0, k = workCorners2.size()-1; j < workCorners2.size(); k=j,j++) {
-					score += computeSegmentEnergy(workCorners2,k,j);
-				}
+					int anchor0 = CircularIndex.addOffset(i, -2, workCorners1.size());
+					int anchor1 = CircularIndex.addOffset(i, 1, workCorners1.size());
+
+					if (fit.fitAnchored(anchor0, anchor1, workCorners1, workCorners2)) {
+
+//				optimizeCorners(workCorners1, workCorners2);
+
+						double score = 0;
+						for (int j = 0, k = workCorners2.size() - 1; j < workCorners2.size(); k = j, j++) {
+							score += computeSegmentEnergy(workCorners2, k, j);
+						}
 
 
-				if (score < bestEnergy) {
-					betterFound = true;
-					bestEnergy = score;
-					bestCorners.reset();
-					bestCorners.addAll(workCorners2);
+						if (score < bestEnergy) {
+							betterFound = true;
+							bestEnergy = score;
+							bestCorners.reset();
+							bestCorners.addAll(workCorners2);
+						}
+					}
 				}
 			}
 
 			if ( betterFound ) {
 				modified = true;
 				total = bestEnergy;
-				output.reset();
-				output.addAll(bestCorners);
+				output.setTo(bestCorners);
 			} else {
 				break;
 			}
 		}
 
+		System.out.println("  corners "+output.size()+"  modified "+modified);
 		return modified;
+	}
+
+	void removeDuplicates( GrowQueue_I32 corners ) {
+		// remove duplicates
+		for (int i = 0; i < corners.size(); i++) {
+			Point2D_I32 a = contour.get(corners.get(i));
+
+			for (int j = corners.size()-1; j > i; j--) {
+				Point2D_I32 b = contour.get(corners.get(j));
+
+				if( a.x == b.x && a.y == b.y ) {
+					// this is still ok if j == 0 because it wrapped around.  'i' will now be > size
+					corners.remove(j);
+				}
+			}
+		}
 	}
 
 	void optimizeCorners( GrowQueue_I32 input , GrowQueue_I32 output ) {
@@ -217,7 +261,8 @@ public class MinimizeEnergyPrune {
 		}
 
 		if( indexA == indexB ) {
-			System.out.println();
+			return 100000.0;
+//			System.out.println();
 		}
 
 		return (total+ splitPenalty)/a.distance2(b);

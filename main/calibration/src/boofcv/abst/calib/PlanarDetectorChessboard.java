@@ -46,8 +46,8 @@ public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
 
 		RefineBinaryPolygon<ImageFloat32> refineLine =
 				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);
-		RefineBinaryPolygon<ImageFloat32> refineCorner =
-				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);
+		RefineBinaryPolygon<ImageFloat32> refineCorner = config.refineWithCorners ?
+				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class) : null;
 
 		config.square.refine = null;
 

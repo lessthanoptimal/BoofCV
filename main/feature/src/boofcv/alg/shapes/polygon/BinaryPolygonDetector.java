@@ -115,7 +115,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform_F32 toUndistorted, toDistorted;
 
-	boolean verbose = false;
+	boolean verbose = true;
 
 	// used to remove false positives
 	PolygonEdgeScore differenceScore;
@@ -253,7 +253,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 */
 	private void findCandidateShapes( T gray , ImageUInt8 binary ) {
 
-		int maxSidesConsider = (int)Math.ceil(maxSides*1.2);
+		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
 
 		// stop fitting the polygon if it clearly has way too many sides
 		fitPolygon.setAbortSplits(2*maxSides);
@@ -267,9 +267,13 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 			Contour c = blobs.get(i);
 
 			if( c.external.size() >= minimumContour) {
+				System.out.println("----- candidate "+c.external.size());
+
 				// ignore shapes which touch the image border
-				if( touchesBorder(c.external))
+				if( touchesBorder(c.external)) {
+					if( verbose ) System.out.println("rejected polygon, touched border");
 					continue;
+				}
 
 				// remove lens distortion
 				if( toUndistorted != null ) {
@@ -283,7 +287,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 				GrowQueue_I32 splits = fitPolygon.getSplits();
 				if( splits.size() > maxSidesConsider ) {
-					if( verbose ) System.out.println("Way too many corners. Aborting before improve. Contour size "+c.external.size());
+					if( verbose ) System.out.println("Way too many corners, "+splits.size()+". Aborting before improve. Contour size "+c.external.size());
+					continue;
 				}
 
 				// Perform a local search and improve the corner placements
@@ -354,7 +359,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				if( refinePolygon != null ) {
 					refinePolygon.setImage(gray);
 					success = refinePolygon.refine(workPoly,c.external,splits,refined);
-					if( verbose ) System.out.println("Rejected after refinePolygon");
+					if( verbose && !success ) System.out.println("Rejected after refinePolygon");
 				} else {
 					refined.set(workPoly);
 					success = true;
@@ -371,6 +376,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 				// refine the polygon and add it to the found list
 				if( success ) {
+					System.out.println("SUCCESS!!!\n");
 					c.id = found.size();
 					foundContours.add(c);
 				} else {

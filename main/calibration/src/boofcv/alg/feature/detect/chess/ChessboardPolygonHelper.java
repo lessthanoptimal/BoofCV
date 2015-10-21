@@ -87,6 +87,8 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 			} else {
 				detectorSquare.setRefinePolygon(refineCorner);
 			}
+		} else {
+			detectorSquare.setRefinePolygon(refineLine);
 		}
 	}
 
