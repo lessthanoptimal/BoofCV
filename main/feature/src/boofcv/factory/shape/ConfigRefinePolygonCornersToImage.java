@@ -38,7 +38,7 @@ public class ConfigRefinePolygonCornersToImage implements Configuration
 	 * with ambiguous borders.  Sides with smaller acute angles will be aliased to a greater distance and you
 	 * might need to increase this number.
 	 */
-	public double cornerOffset = 2;
+	public double cornerOffset = 1;
 
 	/**
 	 * Number of times along the line it will be sampled

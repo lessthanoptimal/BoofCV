@@ -82,6 +82,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 				System.out.println("clicked at " + (e.getX()/scale) + " " + (e.getY()/scale));
 			}
 		});
+
+		imagePanel.addMouseWheelListener(controlPanel);
 	}
 
 	protected abstract boolean process( ImageFloat32 image );

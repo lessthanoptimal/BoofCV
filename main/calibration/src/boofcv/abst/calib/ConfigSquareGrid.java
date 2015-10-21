@@ -84,13 +84,13 @@ public class ConfigSquareGrid implements Configuration {
 
 		// since it runs a separate sub-pixel algorithm these parameters can be tuned to create
 		// very crude corners
-		configRefineCorners.cornerOffset = 0;
+		configRefineCorners.cornerOffset = 1;
 		configRefineCorners.lineSamples = 10;
 		configRefineCorners.convergeTolPixels = 0.1;
 		configRefineCorners.maxIterations = 10;
 
 		// putting reasonable defaults for if the user decides to optimize by line
-		configRefineLines.cornerOffset = 0;
+		configRefineLines.cornerOffset = 1;
 		configRefineLines.lineSamples = 10;
 		configRefineLines.convergeTolPixels = 0.1;
 		configRefineLines.maxIterations = 10;

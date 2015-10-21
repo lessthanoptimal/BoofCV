@@ -207,7 +207,7 @@ public class VisualizeBinaryData {
 		if( scale > 4 ) {
 			Color before = g2.getColor();
 			g2.setStroke(new BasicStroke(1));
-			g2.setColor(Color.BLACK);
+			g2.setColor(Color.LIGHT_GRAY);
 
 			for( Contour c : contours ) {
 				List<Point2D_I32> list = c.external;

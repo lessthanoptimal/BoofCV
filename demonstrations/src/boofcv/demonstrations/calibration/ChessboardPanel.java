@@ -26,6 +26,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 /**
  * Shows calibration grid detector status, configure display, and adjust parameters.
@@ -33,8 +35,13 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class ChessboardPanel extends StandardAlgConfigPanel
-		implements  ChangeListener, ItemListener
+		implements  ChangeListener, ItemListener, MouseWheelListener
 {
+	// zoom values
+	private static double ZOOM_MAX = 20;
+	private static double ZOOM_MIN = 0.1;
+	private static double ZOOM_INC = 0.1;
+	
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
 	
@@ -81,7 +88,7 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		viewSelector.addItemListener(this);
 		viewSelector.setMaximumSize(viewSelector.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,0.1,50,1));
+		selectZoom = new JSpinner(new SpinnerNumberModel(1, ZOOM_MIN, ZOOM_MAX, ZOOM_INC));
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 		
@@ -277,6 +284,32 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		}
 	}
 
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+
+		double curr = ((Number)selectZoom.getValue()).doubleValue();
+
+		if( e.getWheelRotation() > 0 )
+			curr *= 1.1;
+		else
+			curr /= 1.1;
+
+		setScale(curr);
+	}
+	public void setScale(double scale) {
+		double curr;
+
+		if( scale >= 1 ) {
+			curr = ZOOM_INC * ((int) (scale / ZOOM_INC + 0.5));
+		} else {
+			curr = scale;
+		}
+		if( curr < ZOOM_MIN ) curr = ZOOM_MIN;
+		if( curr > ZOOM_MAX) curr = ZOOM_MAX;
+
+		selectZoom.setValue(curr);
+	}
+	
 	public interface Listener
 	{
 		void calibEventGUI();

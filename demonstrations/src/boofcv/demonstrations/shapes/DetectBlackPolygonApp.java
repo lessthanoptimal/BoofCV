@@ -244,8 +244,8 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 
 		List<String> examples = new ArrayList<String>();
 		examples.add("data/example/fiducial/binary/image0000.jpg");
-		examples.add( "/home/pja/junk5.png" );
-		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
+		examples.add( "/home/pabeles/hack01.png" );
+		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
 
 		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 

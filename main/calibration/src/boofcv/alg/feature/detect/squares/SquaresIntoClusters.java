@@ -59,6 +59,7 @@ public class SquaresIntoClusters {
 	// Storage for line segments used to calculate center
 	private LineSegment2D_F64 lineA = new LineSegment2D_F64();
 	private LineSegment2D_F64 lineB = new LineSegment2D_F64();
+//	private LineGeneral2D_F64 line = new LineGeneral2D_F64();
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	// used to search for neighbors that which are candidates for connecting
@@ -247,11 +248,34 @@ public class SquaresIntoClusters {
 			return;
 		}
 
-		if( areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
+		if( !areMiddlePointsClose(node0.corners.get(add(intersection0,2)),node0.corners.get(add(intersection0,1)),
 				node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)))) {
-
-			checkConnect(node0,intersection0,node1,intersection1,distanceApart);
+			return;
 		}
+		checkConnect(node0,intersection0,node1,intersection1,distanceApart);
+
+		// The next 4 tests use point corners on one square to create a line and see if the far corner on the
+		// other square is close.  Since all these corners are on a line it should be close.
+		// NOTE: the largest side is used to judge distance.  a better way is to use the side the corner is on
+//		if( !closeToSide(node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)),
+//				node0.corners.get(add(intersection0, -1)),node0.largestSide) ) {
+//			return;
+//		}
+//
+//		if( !closeToSide(node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)),
+//				node0.corners.get(add(intersection0,2)),node0.largestSide) ) {
+//			return;
+//		}
+//
+//		if( !closeToSide(node0.corners.get(add(intersection0, -1)),node0.corners.get(intersection0),
+//				node1.corners.get(add(intersection1, 2)),node1.largestSide) ) {
+//			return;
+//		}
+//
+//		if( closeToSide(node0.corners.get(add(intersection0, 2)),node0.corners.get(add(intersection0,1)),
+//				node1.corners.get(add(intersection1,-1)),node1.largestSide) ) {
+//			checkConnect(node0,intersection0,node1,intersection1,distanceApart);
+//		}
 	}
 
 	/**
@@ -379,6 +403,17 @@ public class SquaresIntoClusters {
 		return Distance2D_F64.distance(lineB, p2) <= tol2;
 	}
 
+//	/**
+//	 * Give a two squares, define a line using either the top or bottom two points on one and see if the
+//	 * farther point on the other square is close to the line
+//	 */
+//	boolean closeToSide( Point2D_F64 p0 , Point2D_F64 p1 , Point2D_F64 test , double largest ) {
+//		UtilLine2D_F64.convert(p0,p1,line);
+//
+//		double d = Distance2D_F64.distance(line,test);
+//
+//		return d < largest*distanceTol;
+//	}
 
 	/**
 	 * Checks to see if the two nodes can be connected.  If one of the nodes is already connected to

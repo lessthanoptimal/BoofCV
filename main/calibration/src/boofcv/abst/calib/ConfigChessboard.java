@@ -84,19 +84,19 @@ public class ConfigChessboard implements Configuration {
 //		configRefineCorners.maxCornerChangePixel = 5; // TODO reduce
 
 		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSideFraction = 0.05;
+		square.contour2Poly_minimumSideFraction = 0.1;
 		square.minContourImageWidthFraction = 0.0005;
 
 //		square.minimumEdgeIntensity = 0.1;// TODO remove
 
 		// good value for squares.  Set it here to make it not coupled to default values
-		configRefineCorners.cornerOffset = 0;
+		configRefineCorners.cornerOffset = 1;
 		configRefineCorners.lineSamples = 10;
 		configRefineCorners.convergeTolPixels = 0.05;
 		configRefineCorners.maxIterations = 10;
 
 		// defaults for if the user toggles it to lines
-		configRefineLines.cornerOffset = 0;
+		configRefineLines.cornerOffset = 1;
 		configRefineLines.lineSamples = 10;
 		configRefineLines.convergeTolPixels = 0.05;
 		configRefineLines.maxIterations = 10;

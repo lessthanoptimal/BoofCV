@@ -103,7 +103,7 @@ public abstract class SplitMergeLineFit {
 	 * Computes the split threshold from the end point of two lines
 	 */
 	protected double splitThresholdSq( Point2D_I32 a , Point2D_I32 b ) {
-		return a.distance2(b)* toleranceFractionSq;
+		return Math.max(2,a.distance2(b)* toleranceFractionSq);
 	}
 
 	/**

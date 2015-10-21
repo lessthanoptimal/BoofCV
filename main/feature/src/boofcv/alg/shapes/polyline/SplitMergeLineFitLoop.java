@@ -53,7 +53,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 //		System.out.println("-000000000--------------------------------------");
 		this.contour = contour;
 		this.N = contour.size();
-		this.minimumSideLengthPixel = (int)Math.ceil(N* minimumSideLengthFraction);
+		this.minimumSideLengthPixel = 2;//(int)Math.ceil(N* minimumSideLengthFraction);
 
 		// ------------- find initial line segments
 		splits.reset();
