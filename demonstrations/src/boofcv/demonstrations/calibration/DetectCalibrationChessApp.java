@@ -103,15 +103,16 @@ public class DetectCalibrationChessApp
 
 		List<String> examples = new ArrayList<String>();
 
-		for (int i = 1; i <= 11; i++) {
-			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
-		}
-
+		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distant/image00005.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distance_angle/image05.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0850.jpg");
 		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/always_visible/set01/frame0910.jpg");
+
+		for (int i = 1; i <= 11; i++) {
+			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
+		}
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(examples);
 

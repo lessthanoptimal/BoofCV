@@ -84,7 +84,7 @@ public class ConfigChessboard implements Configuration {
 //		configRefineCorners.maxCornerChangePixel = 5; // TODO reduce
 
 		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSideFraction = 0.1;
+		square.contour2Poly_minimumSideFraction = 0.05;
 		square.minContourImageWidthFraction = 0.0005;
 
 //		square.minimumEdgeIntensity = 0.1;// TODO remove
