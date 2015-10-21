@@ -239,8 +239,11 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
+		int minSeparation = 2;
+		length -= minSeparation;
+
 		// don't try splitting at the two end points
-		for( int i = 1; i < length; i++ ) {
+		for( int i = 1+minSeparation; i < length; i++ ) {
 			Point2D_I32 b = contour.get((indexStart+i)%N);
 			point2D.set(b.x,b.y);
 

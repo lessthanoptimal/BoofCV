@@ -47,10 +47,10 @@ public class ConfigFiducialBinary implements Configuration {
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
 	{
-		squareDetector.contour2Poly_splitFraction = 0.05;
+		squareDetector.contour2Poly_splitFraction = 0.1;
 
 		ConfigRefinePolygonLineToImage refineLine = new ConfigRefinePolygonLineToImage();
-		refineLine.cornerOffset = 2;
+		refineLine.cornerOffset = 0;
 
 		squareDetector.refine = refineLine;
 	}

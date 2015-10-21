@@ -43,15 +43,14 @@ public class ConfigFiducialImage implements Configuration {
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);
 
-	/**
-	 * Configuration for refining with lines.  Ignored if not used.
-	 */
-	public ConfigRefinePolygonLineToImage configPolygonRefine = new ConfigRefinePolygonLineToImage();
 
 	{
-		squareDetector.contour2Poly_splitFraction = 0.05;
+		squareDetector.contour2Poly_splitFraction = 0.1;
 
-		configPolygonRefine.cornerOffset = 2;
+		ConfigRefinePolygonLineToImage refineLine = new ConfigRefinePolygonLineToImage();
+		refineLine.cornerOffset = 0;
+
+		squareDetector.refine = refineLine;
 	}
 
 	public ConfigFiducialImage() {

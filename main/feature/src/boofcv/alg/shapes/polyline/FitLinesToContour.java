@@ -88,7 +88,7 @@ public class FitLinesToContour {
 
 		Point2D_I32 hack = contour.get(corners.get(0));
 
-		verbose = hack.x == 52 && hack.y == 61;
+//		verbose = hack.x == 52 && hack.y == 61;
 
 		if( verbose ) System.out.println("ENTER FitLinesToContour");
 

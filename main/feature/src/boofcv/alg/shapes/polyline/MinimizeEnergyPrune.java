@@ -62,10 +62,10 @@ public class MinimizeEnergyPrune {
 	 */
 	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
 
-		System.out.println("ENTER Minimize prune  contour size = "+contour.size());
-		for (int i = 0; i < input.size(); i++) {
-			System.out.println("  corners "+contour.get( input.get(i)));
-		}
+//		System.out.println("ENTER Minimize prune  contour size = "+contour.size());
+//		for (int i = 0; i < input.size(); i++) {
+//			System.out.println("  corners "+contour.get( input.get(i)));
+//		}
 
 
 		this.contour = contour;
@@ -141,7 +141,7 @@ public class MinimizeEnergyPrune {
 			}
 		}
 
-		System.out.println("  corners "+output.size()+"  modified "+modified);
+//		System.out.println("  corners "+output.size()+"  modified "+modified);
 		return modified;
 	}
 

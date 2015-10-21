@@ -115,7 +115,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform_F32 toUndistorted, toDistorted;
 
-	boolean verbose = true;
+	boolean verbose = false;
 
 	// used to remove false positives
 	PolygonEdgeScore differenceScore;
@@ -267,7 +267,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 			Contour c = blobs.get(i);
 
 			if( c.external.size() >= minimumContour) {
-				System.out.println("----- candidate "+c.external.size());
+//				System.out.println("----- candidate "+c.external.size());
 
 				// ignore shapes which touch the image border
 				if( touchesBorder(c.external)) {
@@ -376,7 +376,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 				// refine the polygon and add it to the found list
 				if( success ) {
-					System.out.println("SUCCESS!!!\n");
+//					System.out.println("SUCCESS!!!\n");
 					c.id = found.size();
 					foundContours.add(c);
 				} else {
