@@ -21,6 +21,7 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
@@ -44,6 +45,7 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.se.Se3_F64;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -66,6 +68,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	public static final String CALIB_SQUARE_GRID = "Square Grid";
 
 
+	private static final Font font = new Font("Serif", Font.BOLD, 14);
+
 	Class<I> imageClass;
 
 	ImagePanel panel = new ImagePanel();
@@ -78,6 +82,12 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	boolean processedInputImage = false;
 	boolean firstFrame = true;
+
+	JCheckBox computeStability = new JCheckBox("Stability");
+
+	FiducialStability stability = new FiducialStability();
+
+	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
 
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.ms(3, imageType));
@@ -98,6 +108,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			@Override public void mouseEntered(MouseEvent e) {}
 			@Override public void mouseExited(MouseEvent e) {}
 		});
+		addToToolbar(computeStability);
+		computeStability.addActionListener(this);
+		computeStability.setSelected(true);
 
 		setMainGUI(panel);
 
@@ -158,6 +171,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			firstFrame = false;
 		}
 
+		int height = getHeight();
+
 		Graphics2D g2 = imageGUI.createGraphics();
 		Se3_F64 targetToSensor = new Se3_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
@@ -167,9 +182,67 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 			VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, ""+id, g2);
 			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 3, g2);
+
+			if( computeStability.isSelected() ) {
+				handleStability(height, g2, i, id);
+			}
 		}
+
 		panel.setBufferedImageSafe(imageGUI);
 		panel.repaint();
+	}
+
+	/**
+	 * Computes and visualizes the stability
+	 */
+	private void handleStability(int height, Graphics2D g2, int index, int fiducialID) {
+		FiducialInfo info = findFiducial(fiducialID);
+		info.totalObserved++;
+
+		g2.setFont(font);
+		if (detector.computeStability(index, 0.25, stability)) {
+			info.stabilityMax.location = Math.max(stability.location, info.stabilityMax.location);
+			info.stabilityMax.orientation = Math.max(stability.orientation, info.stabilityMax.orientation);
+		}
+
+		if (info.totalObserved > 20) {
+
+			double fractionLocation = stability.location / info.stabilityMax.location;
+			double fractionOrientation = stability.orientation / info.stabilityMax.orientation;
+
+			int maxHeight = (int) (height * 0.15);
+
+			int x = info.grid * 60;
+			int y = 10 + maxHeight;
+
+			g2.setColor(Color.BLUE);
+			int h = (int) (fractionLocation * maxHeight);
+			g2.fillRect(x, y - h, 20, h);
+
+			g2.setColor(Color.CYAN);
+			x += 25;
+			h = (int) (fractionOrientation * maxHeight);
+			g2.fillRect(x, y - h, 20, h);
+
+			g2.setColor(Color.RED);
+			g2.drawString("" + info.id, x - 20, y + 20);
+		}
+	}
+
+	private FiducialInfo findFiducial( int id ) {
+		for (int i = 0; i < fiducialInfo.size(); i++) {
+			FiducialInfo info = fiducialInfo.get(i);
+			if( info.id == id ) {
+				return info;
+			}
+		}
+
+		FiducialInfo found = new FiducialInfo();
+		found.id = id;
+		found.grid = fiducialInfo.size();
+		fiducialInfo.add(found);
+
+		return found;
 	}
 
 	@Override
@@ -215,6 +288,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		detector.setIntrinsic(intrinsic);
 
+		fiducialInfo.clear();
+
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
 		if( video == null ) {
@@ -238,6 +313,12 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		return processedInputImage;
 	}
 
+	private class FiducialInfo {
+		FiducialStability stabilityMax = new FiducialStability();
+		int totalObserved;
+		int id;
+		int grid;
+	}
 
 	public static void main(String[] args) {
 //		Class type = ImageFloat32.class;

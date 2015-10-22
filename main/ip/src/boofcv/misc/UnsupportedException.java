@@ -16,29 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
-
-import georegression.struct.se.Se3_F64;
-import georegression.struct.shapes.Quadrilateral_F64;
+package boofcv.misc;
 
 /**
- * Contains the ID and pose for a fiducial
+ * Exception is thrown if the requested features is not supported by the implementing class.
  *
  * @author Peter Abeles
  */
-public class FoundFiducial {
-	/**
-	 * ID number of the fiducial
-	 */
-	public int index;
-	/**
-	 * Transform from the fiducial to the sensor reference frame
-	 */
-	public Se3_F64 targetToSensor = new Se3_F64();
+public class UnsupportedException extends RuntimeException {
+	public UnsupportedException() {
+	}
 
-	/**
-	 * Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.
-	 */
-	public Quadrilateral_F64 location = new Quadrilateral_F64();
+	public UnsupportedException(String message) {
+		super(message);
+	}
+
+	public UnsupportedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public UnsupportedException(Throwable cause) {
+		super(cause);
+	}
+
+	public UnsupportedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 }
-

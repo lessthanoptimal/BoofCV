@@ -237,4 +237,9 @@ public abstract class GenericFiducialDetectorChecks {
 			}
 		}
 	}
+
+	@Test
+	public void checkStability() {
+		fail("implement");
+	}
 }

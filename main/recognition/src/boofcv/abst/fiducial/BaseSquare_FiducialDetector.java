@@ -19,10 +19,12 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.BaseDetectFiducialSquare;
+import boofcv.alg.fiducial.StabilitySquareFiducialEstimate;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
  * Wrapper around {@link BaseDetectFiducialSquare} for {@link FiducialDetector}
@@ -33,6 +35,8 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	implements FiducialDetector<T>
 {
 	Detector alg;
+
+	StabilitySquareFiducialEstimate stability;
 
 	ImageType<T> type;
 
@@ -49,6 +53,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	@Override
 	public void setIntrinsic(IntrinsicParameters intrinsic) {
 		alg.configure(intrinsic,true);
+		stability = new StabilitySquareFiducialEstimate(alg.getPoseEstimator());
 	}
 
 	@Override
@@ -69,5 +74,16 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	@Override
 	public ImageType<T> getInputType() {
 		return type;
+	}
+
+	@Override
+	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+		Quadrilateral_F64 quad = alg.getFound().get(which).location;
+		if( !this.stability.process(disturbance, quad) ) {
+			return false;
+		}
+		results.location = stability.getLocationStability();
+		results.orientation = stability.getOrientationStability();
+		return true;
 	}
 }

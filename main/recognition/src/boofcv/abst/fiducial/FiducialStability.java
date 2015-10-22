@@ -16,29 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
-
-import georegression.struct.se.Se3_F64;
-import georegression.struct.shapes.Quadrilateral_F64;
+package boofcv.abst.fiducial;
 
 /**
- * Contains the ID and pose for a fiducial
+ * Results from fiducial stability computation.
  *
  * @author Peter Abeles
  */
-public class FoundFiducial {
+public class FiducialStability {
 	/**
-	 * ID number of the fiducial
+	 * Sensitivity of location estimate.  Represents the maximum error found at the given pixel error in the fiducial's
+	 * native units.  Larger number means less stable the estimate is.
 	 */
-	public int index;
+	public double location;
 	/**
-	 * Transform from the fiducial to the sensor reference frame
+	 * Sensitivity of orientation estimate.  Represents the maximum error found at the given pixel error in the radians.
+	 * Larger number means less stable the estimate is.
 	 */
-	public Se3_F64 targetToSensor = new Se3_F64();
-
-	/**
-	 * Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.
-	 */
-	public Quadrilateral_F64 location = new Quadrilateral_F64();
+	public double orientation;
 }
-

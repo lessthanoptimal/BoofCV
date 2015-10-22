@@ -84,7 +84,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// storage for binary image
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	// Used to compute/remove distortion from perspective
+	// Used to compute/remove perspective distortion
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
@@ -96,7 +96,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// used to compute 3D pose of target
 	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
 
-	// transform from undistorted image to distorted
+	// transform from undistorted to distorted image pixels
 	PointTransform_F64 pointUndistToDist;
 
 	// Storage for results of fiducial reading
@@ -105,6 +105,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// type of input image
 	private Class<T> inputType;
 
+	// verbose debugging output
 	private boolean verbose = false;
 
 	/**
@@ -321,7 +322,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * Given observed location of corners, compute the transform from target to world frame.
 	 * See code comments for correct ordering of corners in quad.
 	 *
-	 * @param quad (Input) Observed location of corner points in pixels the specified order.
+	 * @param quad (Input) Observed location of corner points in distorted pixels.  Order is important.
 	 * @param lengthSide (Input) Length of a side on the square
 	 * @param targetToWorld (output) transform from target to world frame.
 	 */
@@ -352,6 +353,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 */
 	protected abstract boolean processSquare( ImageFloat32 square , Result result );
 
+	/**
+	 * Used to toggle on/off verbose debugging information
+	 * @param verbose true for verbose output
+	 */
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
+
 	public BinaryPolygonDetector getSquareDetector() {
 		return squareDetector;
 	}
@@ -362,6 +371,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	public Class<T> getInputType() {
 		return inputType;
+	}
+
+	public QuadPoseEstimator getPoseEstimator() {
+		return poseEstimator;
 	}
 
 	public static class Result {

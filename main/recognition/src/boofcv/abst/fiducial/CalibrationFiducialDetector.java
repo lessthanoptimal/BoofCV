@@ -33,8 +33,10 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Rodrigues_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,9 +157,75 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		}
 
 		// estimate using PNP
-		if( !(estimatePnP.process(points2D3D,initialEstimate) &&
-				refinePnP.fitModel(points2D3D, initialEstimate, targetToCamera)) ) {
-			targetDetected = false;
+		targetDetected = estimatePose(targetToCamera);
+	}
+
+	private boolean estimatePose( Se3_F64 targetToCamera ) {
+		return estimatePnP.process(points2D3D, initialEstimate) &&
+				refinePnP.fitModel(points2D3D, initialEstimate, targetToCamera);
+	}
+
+	Se3_F64 referenceCameraToTarget = new Se3_F64();
+	Se3_F64 targetToCameraSample = new Se3_F64();
+	Se3_F64 difference = new Se3_F64();
+	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
+	// compute metrics.
+	private double maxLocation;
+	private double maxOrientation;
+
+	/**
+	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
+	 */
+	@Override
+	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+
+		if( !targetDetected )
+			return false;
+
+		targetToCamera.invert(referenceCameraToTarget);
+
+		List<Point2D_F64> points = detector.getDetectedPoints();
+		Point2D_F64 workPt = new Point2D_F64();
+
+		maxOrientation = 0;
+		maxLocation = 0;
+		for (int i = 0; i < points2D3D.size(); i++) {
+			Point2D3D p23 = points2D3D.get(i);
+			Point2D_F64 p = points.get(i);
+			workPt.set(p);
+
+			perturb(disturbance,workPt,p,p23);
+		}
+
+		return true;
+	}
+
+	private void perturb( double disturbance , Point2D_F64 pixel , Point2D_F64 original , Point2D3D p23 ) {
+		pixel.x = original.x + disturbance;
+		computeDisturbance(pixel, p23);
+		pixel.x = original.x - disturbance;
+		computeDisturbance(pixel, p23);
+		pixel.y = original.y;
+		pixel.y = original.y + disturbance;
+		computeDisturbance(pixel, p23);
+		pixel.y = original.y - disturbance;
+		computeDisturbance(pixel, p23);
+	}
+
+	private void computeDisturbance(Point2D_F64 pixel, Point2D3D p23) {
+		distortToUndistorted.compute(pixel.x,pixel.y,p23.observation);
+		if( estimatePose(targetToCameraSample) ) {
+			referenceCameraToTarget.concat(targetToCameraSample, difference);
+
+			double d = difference.getT().norm();
+			RotationMatrixGenerator.matrixToRodrigues(difference.getR(), rodrigues);
+			double theta = Math.abs(rodrigues.theta);
+			if (theta > maxOrientation) {
+				maxOrientation = theta;
+			}
+			if (d > maxLocation) {
+				maxLocation = d;
+			}
 		}
 	}
 

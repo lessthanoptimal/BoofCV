@@ -105,7 +105,9 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 		List<String>  examples = new ArrayList<String>();
 
-		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00164.jpg");
+		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00071.jpg");
+		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00219.jpg");
+		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00164.jpg");
 		examples.add( "/home/pabeles/hack01.png");
 		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00202.jpg");
 		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
