@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -238,8 +239,61 @@ public abstract class GenericFiducialDetectorChecks {
 		}
 	}
 
+	/**
+	 * See if the stability estimation is reasonable.  First detect targets in the full sized image.  Then shrink it
+	 * by 15% and see if the instability increases.  The instability should always increase for smaller objects with
+	 * the same orientation since the geometry is worse.
+	 */
 	@Test
 	public void checkStability() {
-		fail("implement");
+
+		for( ImageType type : types ) {
+
+			ImageBase image = loadImage(type);
+			FiducialDetector detector = createDetector(type);
+
+			detector.setIntrinsic(loadIntrinsic());
+
+			detector.detect(image);
+			assertTrue(detector.totalFound() >= 1);
+
+			int foundIds[] = new int[ detector.totalFound() ];
+			double location[] = new double[ detector.totalFound() ];
+			double orientation[] = new double[ detector.totalFound() ];
+
+			FiducialStability results = new FiducialStability();
+			for (int i = 0; i < detector.totalFound(); i++) {
+				detector.computeStability(i,0.2,results);
+
+				foundIds[i] = detector.getId(i);
+				location[i] = results.location;
+				orientation[i] = results.orientation;
+			}
+
+			ImageBase shrunk = image.createSameShape();
+			new FDistort(image,shrunk).affine(0.85,0,0,0.85,0,0).apply();
+
+			detector.detect(shrunk);
+
+
+			assertTrue(detector.totalFound() == foundIds.length);
+
+			for (int i = 0; i < detector.totalFound(); i++) {
+				detector.computeStability(i,0.2,results);
+
+				int id = detector.getId(i);
+
+				boolean matched = false;
+				for (int j = 0; j < foundIds.length; j++) {
+					if( foundIds[j] == id ) {
+						matched = true;
+						assertTrue(location[j] < results.location);
+						assertTrue(orientation[j] < results.orientation);
+						break;
+					}
+				}
+				assertTrue(matched);
+			}
+		}
 	}
 }
