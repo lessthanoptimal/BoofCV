@@ -88,6 +88,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	FiducialStability stability = new FiducialStability();
 
 	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
+	FiducialStability stabilityMax = new FiducialStability();
 
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.ms(3, imageType));
@@ -201,14 +202,14 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 		g2.setFont(font);
 		if (detector.computeStability(index, 0.25, stability)) {
-			info.stabilityMax.location = Math.max(stability.location, info.stabilityMax.location);
-			info.stabilityMax.orientation = Math.max(stability.orientation, info.stabilityMax.orientation);
+			stabilityMax.location = Math.max(stability.location, stabilityMax.location);
+			stabilityMax.orientation = Math.max(stability.orientation, stabilityMax.orientation);
 		}
 
 		if (info.totalObserved > 20) {
 
-			double fractionLocation = stability.location / info.stabilityMax.location;
-			double fractionOrientation = stability.orientation / info.stabilityMax.orientation;
+			double fractionLocation = stability.location / stabilityMax.location;
+			double fractionOrientation = stability.orientation / stabilityMax.orientation;
 
 			int maxHeight = (int) (height * 0.15);
 
@@ -289,6 +290,8 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		detector.setIntrinsic(intrinsic);
 
 		fiducialInfo.clear();
+		stabilityMax.location = 0;
+		stabilityMax.orientation = 0;
 
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
@@ -314,7 +317,6 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	}
 
 	private class FiducialInfo {
-		FiducialStability stabilityMax = new FiducialStability();
 		int totalObserved;
 		int id;
 		int grid;
