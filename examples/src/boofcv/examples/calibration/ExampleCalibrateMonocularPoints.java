@@ -20,6 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -53,7 +54,7 @@ public class ExampleCalibrateMonocularPoints {
 	 * @param observations Observations of the target in different images
 	 */
 	public static void calibrate( List<Point2D_F64> layout,
-								  List<List<Point2D_F64>> observations ) {
+								  List<CalibrationObservation> observations ) {
 
 		// Assume zero skew and model lens distortion with two radial parameters
 		CalibrationPlanarGridZhang99 zhang99 =
@@ -77,14 +78,15 @@ public class ExampleCalibrateMonocularPoints {
 	/**
 	 * Detects calibration points found in several images and returned as a list. Not the focus of this example.
 	 */
-	public static List<List<Point2D_F64>> loadObservations( PlanarCalibrationDetector detector ) {
+	public static List<CalibrationObservation> loadObservations( PlanarCalibrationDetector detector ) {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 		List<String> imageNames = BoofMiscOps.directoryList(directory, "left");
 
-		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
+		List<CalibrationObservation> ret = new ArrayList<CalibrationObservation>();
 
 		for( String n : imageNames ) {
+			CalibrationObservation set = new CalibrationObservation();
 			BufferedImage img = UtilImageIO.loadImage(n);
 			ImageFloat32 input = ConvertBufferedImage.convertFrom(img,(ImageFloat32)null);
 
@@ -101,7 +103,7 @@ public class ExampleCalibrateMonocularPoints {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
 				detectorChessboard(new ConfigChessboard(5, 7, 30));
 
-		List<List<Point2D_F64>> calibPts = loadObservations(detector);
+		List<CalibrationObservation> calibPts = loadObservations(detector);
 
 		calibrate(detector.getLayout(),calibPts);
 	}

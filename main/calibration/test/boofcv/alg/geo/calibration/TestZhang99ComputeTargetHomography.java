@@ -48,7 +48,7 @@ public class TestZhang99ComputeTargetHomography {
 		Vector3D_F64 T = new Vector3D_F64(0,0,-1000);
 		Se3_F64 motion = new Se3_F64(R,T);
 
-		List<Point2D_F64> observations = GenericCalibrationGrid.observations(motion,layout);
+		CalibrationObservation observations = GenericCalibrationGrid.observations(motion,layout);
 
 		// compute the homography
 		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(layout);
@@ -59,9 +59,12 @@ public class TestZhang99ComputeTargetHomography {
 
 		// test this homography property: x2 = H*x1
 		for( int i = 0; i < observations.size(); i++ ) {
-			Point2D_F64 a = GeometryMath_F64.mult(H, layout.get(i), new Point2D_F64());
+			int gridIndex = observations.indexes.get(i);
+			Point2D_F64 p = observations.observations.get(i);
 
-			double diff = a.distance(observations.get(i));
+			Point2D_F64 a = GeometryMath_F64.mult(H, layout.get(gridIndex), new Point2D_F64());
+
+			double diff = a.distance(p);
 			assertEquals(0,diff,1e-8);
 		}
 	}

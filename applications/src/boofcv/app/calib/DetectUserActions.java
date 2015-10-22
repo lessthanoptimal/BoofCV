@@ -18,11 +18,9 @@
 
 package boofcv.app.calib;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -36,9 +34,9 @@ public class DetectUserActions {
 	double stationaryStart;
 	double stationaryTime;
 
-	List<Point2D_F64> previous = new ArrayList<Point2D_F64>();
+	CalibrationObservation previous = new CalibrationObservation();
 
-	List<Point2D_F64> points;
+	CalibrationObservation points;
 	int numMissed;
 
 	public void setImageSize( int width , int height ) {
@@ -49,14 +47,14 @@ public class DetectUserActions {
 		System.out.println("stationary threshold "+thresholdDistance);
 	}
 
-	public void update( boolean detected , List<Point2D_F64> points ) {
+	public void update( boolean detected , CalibrationObservation points ) {
 		if( detected ) {
 			this.points = points;
 			stationaryTime = checkStationary();
 			numMissed = 0;
 		} else {
 			if( ++numMissed > 5 ) {
-				previous.clear();
+				previous.reset();
 				stationaryStart = System.currentTimeMillis();
 			}
 		}
@@ -64,17 +62,14 @@ public class DetectUserActions {
 
 	public double checkStationary( ) {
 		if( previous.size() != points.size() ) {
-			previous.clear();
-			for( int i = 0; i < points.size(); i++ ) {
-				previous.add( points.get(i).copy() );
-			}
+			previous.setTo(points);
 			stationaryStart = System.currentTimeMillis();
 			return 0;
 		} else {
 			double average = 0;
 			for( int i = 0; i < points.size(); i++ ) {
-				double difference = previous.get(i).distance(points.get(i));
-				previous.get(i).set(points.get(i));
+				double difference = previous.observations.get(i).distance(points.observations.get(i));
+				previous.observations.get(i).set(points.observations.get(i));
 
 				average += difference;
 			}
@@ -99,7 +94,7 @@ public class DetectUserActions {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.get(i);
+			Point2D_F64 p = points.observations.get(i);
 
 			centerX += p.x;
 			centerY += p.y;

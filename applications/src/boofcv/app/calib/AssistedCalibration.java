@@ -21,6 +21,7 @@ package boofcv.app.calib;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.calib.PlanarDetectorChessboard;
 import boofcv.abst.calib.PlanarDetectorSquareGrid;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -144,7 +145,7 @@ public class AssistedCalibration {
 		if( detected ) {
 			double stationaryTime = actions.getStationaryTime();
 
-			List<Point2D_F64> points = detector.getDetectedPoints();
+			CalibrationObservation points = detector.getDetectedPoints();
 			view.getSides(points, sides);
 
 			double top = sides.get(0).distance(sides.get(1));
@@ -184,7 +185,7 @@ public class AssistedCalibration {
 			if( skewed ) {
 				g2.setColor(Color.BLUE);
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.get(i);
+					Point2D_F64 p = points.observations.get(i);
 
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.draw(ellipse);
@@ -194,7 +195,7 @@ public class AssistedCalibration {
 				g2.setColor(new Color(red, 0, 0));
 
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.get(i);
+					Point2D_F64 p = points.observations.get(i);
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.fill(ellipse);
 				}
@@ -236,7 +237,7 @@ public class AssistedCalibration {
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
 			double stationaryTime = actions.getStationaryTime();
-			List<Point2D_F64> points = detector.getDetectedPoints();
+			CalibrationObservation points = detector.getDetectedPoints();
 			view.getSides(points, sides);
 
 			boolean closeToMagnet = false;
@@ -272,7 +273,7 @@ public class AssistedCalibration {
 			}
 
 			renderMagnets();
-			renderCalibrationPoints(stationaryTime, points);
+			renderCalibrationPoints(stationaryTime, points.observations);
 		} else {
 			for (int i = 0; i < magnets.size(); i++) {
 				magnets.get(i).handleNoDetection();
@@ -295,7 +296,7 @@ public class AssistedCalibration {
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
 			double stationaryTime = actions.getStationaryTime();
-			List<Point2D_F64> points = detector.getDetectedPoints();
+			CalibrationObservation points = detector.getDetectedPoints();
 			view.getSides(points, sides);
 
 			if( pictureTaken ) {
@@ -313,7 +314,7 @@ public class AssistedCalibration {
 				message = String.format("Hold still:  %6.1f", stationaryTime);
 			}
 
-			renderCalibrationPoints(stationaryTime, points);
+			renderCalibrationPoints(stationaryTime, points.observations);
 		}
 		renderFillPolygons();
 

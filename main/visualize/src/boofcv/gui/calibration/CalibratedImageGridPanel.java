@@ -23,6 +23,7 @@ import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.RectifyImageOps;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
@@ -59,7 +60,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean isUndistorted = false;
 
 	// observed feature locations
-	List<List<Point2D_F64>> features = new ArrayList<List<Point2D_F64>>();
+	List<CalibrationObservation> features = new ArrayList<CalibrationObservation>();
 	// results of calibration
 	List<ImageResults> results = new ArrayList<ImageResults>();
 
@@ -114,7 +115,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		this.images = images;
 	}
 
-	public void setResults( List<List<Point2D_F64>> features , 	List<ImageResults> results ) {
+	public void setResults( List<CalibrationObservation> features , List<ImageResults> results ) {
 		this.features = features;
 		this.results = results;
 	}
@@ -184,7 +185,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		List<Point2D_F64> points = features.get(selectedImage);
+		CalibrationObservation set = features.get(selectedImage);
 
 		Point2D_F32 adj = new Point2D_F32();
 
@@ -192,7 +193,7 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
-			for( Point2D_F64 p : points ) {
+			for( Point2D_F64 p : set.observations ) {
 				if( showUndistorted ) {
 					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
@@ -202,7 +203,7 @@ public class CalibratedImageGridPanel extends JPanel {
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
-			for( Point2D_F64 p : points ) {
+			for( Point2D_F64 p : set.observations ) {
 				if( showUndistorted ) {
 					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
@@ -213,8 +214,8 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 
 		if( showAll ) {
-			for( List<Point2D_F64> l : features ) {
-				for( Point2D_F64 p : l ) {
+			for( CalibrationObservation l : features ) {
+				for( Point2D_F64 p : l.observations ) {
 					if( showUndistorted ) {
 						remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 					} else {
@@ -227,9 +228,9 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		if( showNumbers ) {
 			if( showUndistorted )
-				drawNumbers(g2, points,remove_p_to_p,scale);
+				drawNumbers(g2, set,remove_p_to_p,scale);
 			else
-				drawNumbers(g2, points,null,scale);
+				drawNumbers(g2, set,null,scale);
 		}
 
 		if( showErrors && results != null && results.size() > selectedImage ) {
@@ -238,8 +239,8 @@ public class CalibratedImageGridPanel extends JPanel {
 			Stroke before = g2.getStroke();
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
-			for( int i = 0; i < points.size(); i++ ) {
-				Point2D_F64 p = points.get(i);
+			for( int i = 0; i < set.size(); i++ ) {
+				Point2D_F64 p = set.observations.get(i);
 
 				if( showUndistorted ) {
 					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
@@ -256,8 +257,8 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			g2.setStroke(before);
 			g2.setColor(Color.ORANGE);
-			for( int i = 0; i < points.size(); i++ ) {
-				Point2D_F64 p = points.get(i);
+			for( int i = 0; i < set.size(); i++ ) {
+				Point2D_F64 p = set.observations.get(i);
 
 				if( showUndistorted ) {
 					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
@@ -290,7 +291,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		this.lineY = y;
 	}
 
-	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
+	public static void drawNumbers( Graphics2D g2 , CalibrationObservation foundTarget ,
 									PointTransform_F32 transform ,
 									double scale ) {
 
@@ -301,7 +302,8 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < foundTarget.size(); i++ ) {
-			Point2D_F64 p = foundTarget.get(i);
+			Point2D_F64 p = foundTarget.observations.get(i);
+			int gridIndex = foundTarget.indexes.get(i);
 
 			if( transform != null ) {
 				transform.compute((float)p.x,(float)p.y,adj);
@@ -309,7 +311,7 @@ public class CalibratedImageGridPanel extends JPanel {
 				adj.set((float)p.x,(float)p.y);
 			}
 
-			String text = String.format("%2d",i);
+			String text = String.format("%2d",gridIndex);
 
 			int x = (int)(adj.x*scale);
 			int y = (int)(adj.y*scale);

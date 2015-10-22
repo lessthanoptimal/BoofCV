@@ -48,7 +48,7 @@ public class TestRadialDistortionEstimateLinear {
 
 		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
-		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 
 		for( DenseMatrix64F H : homographies ) {
 			// in calibrated image coordinates
@@ -62,7 +62,14 @@ public class TestRadialDistortionEstimateLinear {
 				GeometryMath_F64.mult(K,p,p);
 			}
 
-			observations.add( pixels );
+			CalibrationObservation set = new CalibrationObservation();
+			set.observations = pixels;
+
+			for (int i = 0; i < pixels.size(); i++) {
+				set.indexes.add(i);
+			}
+
+			observations.add( set );
 		}
 
 		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(layout,distort.length);

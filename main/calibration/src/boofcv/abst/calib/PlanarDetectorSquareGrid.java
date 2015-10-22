@@ -20,6 +20,7 @@ package boofcv.abst.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -40,7 +41,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	DetectSquareGridFiducial<ImageFloat32> detect;
 
 	List<Point2D_F64> layoutPoints;
-	List<Point2D_F64> detected;
+	CalibrationObservation detected;
 
 	public PlanarDetectorSquareGrid(ConfigSquareGrid config) {
 
@@ -68,10 +69,11 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	public boolean process(ImageFloat32 input) {
 
 		if( detect.process(input) )  {
-			detected = new ArrayList<Point2D_F64>();
+			detected = new CalibrationObservation();
 			List<Point2D_F64> found = detect.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.add( found.get(i).copy() );
+				detected.observations.add( found.get(i).copy() );
+				detected.indexes.add(i);
 			}
 			return true;
 		} else {
@@ -127,7 +129,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 	}
 
 	@Override
-	public List<Point2D_F64> getDetectedPoints() {
+	public CalibrationObservation getDetectedPoints() {
 		return detected;
 	}
 

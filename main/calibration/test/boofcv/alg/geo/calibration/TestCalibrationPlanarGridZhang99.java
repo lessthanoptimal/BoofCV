@@ -25,8 +25,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -44,7 +43,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 		Zhang99ParamAll expected = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
 
-		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(expected,grid);
+		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected,grid);
 
 		CalibrationPlanarGridZhang99 alg =
 				new CalibrationPlanarGridZhang99(grid,expected.assumeZeroSkew,2,expected.includeTangential);
@@ -57,6 +56,14 @@ public class TestCalibrationPlanarGridZhang99 {
 	}
 
 	/**
+	 * Full test with some of the observations removed.  This tests to see if it correctly uses the index of each point
+	 */
+	@Test
+	public void fullTest_partial() {
+		fail("implement");
+	}
+
+	/**
 	 * See how well it computes an initial guess at the parameters given perfect inputs
 	 */
 	@Test
@@ -65,7 +72,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		Zhang99ParamAll initial = GenericCalibrationGrid.createEasierParam(true, 2, false, 3, rand);
 		// tangential can't be linearly estimated
 
-		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
+		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 		Helper alg = new Helper(grid,true,2,false);
 
@@ -84,7 +91,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		Zhang99ParamAll initial = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
 		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
 
-		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
+		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 		CalibrationPlanarGridZhang99 alg = new CalibrationPlanarGridZhang99(grid,true,2,true);
 		assertTrue(alg.optimizedParam(observations, grid, initial, found,null));
@@ -103,7 +110,7 @@ public class TestCalibrationPlanarGridZhang99 {
 		Zhang99ParamAll expected = initial.copy();
 		Zhang99ParamAll found = new Zhang99ParamAll(true,2,true,3);
 
-		List<List<Point2D_F64>> observations = GenericCalibrationGrid.createObservations(initial,grid);
+		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(initial,grid);
 
 		// add a tinny bit of noise
 		initial.a += rand.nextDouble()*0.01*Math.abs(initial.a);
@@ -197,7 +204,7 @@ public class TestCalibrationPlanarGridZhang99 {
 			super(layout, assumeZeroSkew, numRadial,includeTangential);
 		}
 
-		public Zhang99ParamAll initialParam( List<List<Point2D_F64>> observations ) {
+		public Zhang99ParamAll initialParam( List<CalibrationObservation> observations ) {
 			return super.initialParam(observations);
 		}
 	}

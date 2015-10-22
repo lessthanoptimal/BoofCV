@@ -24,6 +24,7 @@ import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.geo.FactoryMultiView;
@@ -145,19 +146,23 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		}
 
 		// convert points into normalized image coord
-		List<Point2D_F64> points = detector.getDetectedPoints();
-		if( points2D3D.size() != points.size() )
-			throw new RuntimeException("BUG! should be same size");
+		CalibrationObservation view = detector.getDetectedPoints();
+		if( view.size() >= 3 ) {
 
-		for (int i = 0; i < points2D3D.size(); i++) {
-			Point2D3D p23 = points2D3D.get(i);
-			Point2D_F64 pixel = points.get(i);
+			for (int i = 0; i < view.size(); i++) {
+				int gridIndex = view.indexes.get(i);
 
-			distortToUndistorted.compute(pixel.x,pixel.y,p23.observation);
+				Point2D3D p23 = points2D3D.get(gridIndex);
+				Point2D_F64 pixel = view.observations.get(i);
+
+				distortToUndistorted.compute(pixel.x, pixel.y, p23.observation);
+			}
+
+			// estimate using PNP
+			targetDetected = estimatePose(targetToCamera);
+		} else {
+			targetDetected = false;
 		}
-
-		// estimate using PNP
-		targetDetected = estimatePose(targetToCamera);
 	}
 
 	private boolean estimatePose( Se3_F64 targetToCamera ) {
@@ -184,21 +189,20 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 
 		targetToCamera.invert(referenceCameraToTarget);
 
-		List<Point2D_F64> points = detector.getDetectedPoints();
+		CalibrationObservation view = detector.getDetectedPoints();
 		Point2D_F64 workPt = new Point2D_F64();
 
 		maxOrientation = 0;
 		maxLocation = 0;
-		for (int i = 0; i < points2D3D.size(); i++) {
-			Point2D3D p23 = points2D3D.get(i);
-			Point2D_F64 p = points.get(i);
+		for (int i = 0; i < view.size(); i++) {
+			int gridIndex = view.indexes.get(i);
+
+			Point2D3D p23 = points2D3D.get(gridIndex);
+			Point2D_F64 p = view.observations.get(i);
 			workPt.set(p);
 
 			perturb(disturbance,workPt,p,p23);
 		}
-
-		results.location = maxLocation;
-		results.orientation = maxOrientation;
 
 		return true;
 	}

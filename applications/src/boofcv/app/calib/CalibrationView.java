@@ -21,6 +21,7 @@ package boofcv.app.calib;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.calib.PlanarDetectorChessboard;
 import boofcv.abst.calib.PlanarDetectorSquareGrid;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface CalibrationView {
 
 	void initialize( PlanarCalibrationDetector detector );
 
-	void getSides( List<Point2D_F64> detections , List<Point2D_F64> sides );
+	void getSides( CalibrationObservation detections , List<Point2D_F64> sides );
 
 	int getBufferWidth( double gridPixelsWide );
 
@@ -51,12 +52,12 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public void getSides(List<Point2D_F64> detections, List<Point2D_F64> sides) {
+		public void getSides(CalibrationObservation detections, List<Point2D_F64> sides) {
 			sides.clear();
-			sides.add( get(0, 0, detections));
-			sides.add( get(0, pointCols-1, detections));
-			sides.add( get(pointRows-1, pointCols-1, detections));
-			sides.add( get(pointRows-1, 0, detections));
+			sides.add( get(0, 0, detections.observations));
+			sides.add( get(0, pointCols-1, detections.observations));
+			sides.add( get(pointRows-1, pointCols-1, detections.observations));
+			sides.add( get(pointRows-1, 0, detections.observations));
 		}
 
 		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {
@@ -84,12 +85,12 @@ public interface CalibrationView {
 		}
 
 		@Override
-		public void getSides(List<Point2D_F64> detections, List<Point2D_F64> sides) {
+		public void getSides(CalibrationObservation detections, List<Point2D_F64> sides) {
 			sides.clear();
-			sides.add( get(0, 0, detections));
-			sides.add( get(0, pointCols-1, detections));
-			sides.add( get(pointRows-1, pointCols-1, detections));
-			sides.add( get(pointRows-1, 0, detections));
+			sides.add( get(0, 0, detections.observations));
+			sides.add( get(0, pointCols-1, detections.observations));
+			sides.add( get(pointRows-1, pointCols-1, detections.observations));
+			sides.add( get(pointRows-1, 0, detections.observations));
 		}
 
 		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {

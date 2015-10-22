@@ -19,10 +19,10 @@
 package boofcv.gui.calibration;
 
 import boofcv.abst.calib.ImageResults;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.IntrinsicParameters;
-import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -77,7 +77,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	List<String> names = new ArrayList<String>();
 	List<BufferedImage> images = new ArrayList<BufferedImage>();
-	List<List<Point2D_F64>> features = new ArrayList<List<Point2D_F64>>();
+	List<CalibrationObservation> features = new ArrayList<CalibrationObservation>();
 	List<ImageResults> results = new ArrayList<ImageResults>();
 
 	int errorScale = 20;
@@ -172,7 +172,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		}
 	}
 
-	public void setObservations( List<List<Point2D_F64>> features  ) {
+	public void setObservations( List<CalibrationObservation> features  ) {
 		this.features = features;
 	}
 

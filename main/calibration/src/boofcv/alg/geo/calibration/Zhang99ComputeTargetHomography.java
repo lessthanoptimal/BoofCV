@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class Zhang99ComputeTargetHomography {
 	HomographyLinear4 linear = new HomographyLinear4(true);
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 
-	// location of calibration points in the target frame in world units.
+	// location of calibration points in the target frame's in world units.
 	// the z-axis is assumed to be zero
 	List<Point2D_F64> worldPoints;
 
@@ -61,14 +61,18 @@ public class Zhang99ComputeTargetHomography {
 	 * @param observedPoints List of ordered detected grid points in image pixels.
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
-	public boolean computeHomography( List<Point2D_F64> observedPoints )
+	public boolean computeHomography( CalibrationObservation observedPoints )
 	{
-		if( observedPoints.size() != worldPoints.size() )
-			throw new IllegalArgumentException("Unexpected number of grid points.");
+		if( observedPoints.size() < 4)
+			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
+					" Filter these first please");
 
 		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
 		for( int i = 0; i < observedPoints.size(); i++ ) {
-			pairs.add( new AssociatedPair(worldPoints.get(i),observedPoints.get(i),true));
+			int which = observedPoints.indexes.get(i);
+			Point2D_F64 obs = observedPoints.observations.get(i);
+
+			pairs.add( new AssociatedPair(worldPoints.get(which),obs,true));
 		}
 
 		if( !linear.process(pairs,found) )

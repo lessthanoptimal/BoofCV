@@ -19,10 +19,10 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.calib.ImageResults;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
 import boofcv.struct.calib.IntrinsicParameters;
-import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
@@ -185,8 +185,8 @@ public class StereoPlanarPanel extends JPanel
 		validate();
 	}
 
-	public synchronized void setObservations( List<List<Point2D_F64>> leftObservations , List<ImageResults> leftResults ,
-											  List<List<Point2D_F64>> rightObservations , List<ImageResults> rightResults ) {
+	public synchronized void setObservations( List<CalibrationObservation> leftObservations , List<ImageResults> leftResults ,
+											  List<CalibrationObservation> rightObservations , List<ImageResults> rightResults ) {
 		leftView.setResults(leftObservations,leftResults);
 		rightView.setResults(rightObservations,rightResults);
 

@@ -19,6 +19,7 @@
 package boofcv.abst.calib;
 
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
@@ -109,7 +110,7 @@ public class TestCalibrateStereoPlanar {
 
 		int count = 0;
 
-		List<Point2D_F64> obs;
+		CalibrationObservation obs;
 
 		List<Point2D_F64> layout = PlanarDetectorSquareGrid.createLayout(3, 4, 30, 30);
 
@@ -128,9 +129,11 @@ public class TestCalibrateStereoPlanar {
 				t2l.concat(leftToRight,t2c);
 			}
 
-			obs = new ArrayList<Point2D_F64>();
+			obs = new CalibrationObservation();
 
-			for( Point2D_F64 p2 : layout ) {
+			for( int i = 0; i < layout.size(); i++ ) {
+				Point2D_F64 p2 = layout.get(i);
+
 				// location of calibration point on the target
 				Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
 
@@ -142,14 +145,15 @@ public class TestCalibrateStereoPlanar {
 				if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= input.height-1 )
 					throw new RuntimeException("Adjust test setup, bad observation");
 
-				obs.add(pixel);
+				obs.observations.add(pixel);
+				obs.indexes.add( i );
 			}
 
 			return true;
 		}
 
 		@Override
-		public List<Point2D_F64> getDetectedPoints() {
+		public CalibrationObservation getDetectedPoints() {
 			return obs;
 		}
 

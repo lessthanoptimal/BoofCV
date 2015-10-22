@@ -20,6 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -31,7 +32,6 @@ import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 /**
  * Example that demonstrates how to detect calibration targets.  Calibration points are found on the
@@ -64,11 +64,11 @@ public class ExampleDetectCalibrationPoints {
 			throw new RuntimeException("Target detection failed!");
 
 		// Ordered observations of calibration points on the target
-		List<Point2D_F64> points = detector.getDetectedPoints();
+		CalibrationObservation set = detector.getDetectedPoints();
 
 		// render and display the results
 		Graphics2D g2 = orig.createGraphics();
-		for( Point2D_F64 p : points )
+		for( Point2D_F64 p : set.observations )
 			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.RED);
 
 		ShowImages.showWindow(orig,"Calibration Points", true);

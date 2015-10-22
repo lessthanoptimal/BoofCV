@@ -49,7 +49,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	private Point2D_F64 normPt = new Point2D_F64();
 
 	// observations
-	private List<List<Point2D_F64>> observations;
+	private List<CalibrationObservation> observations;
 
 	/**
 	 * Configurations the optimization function.
@@ -61,7 +61,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	 */
 	public Zhang99OptimizationFunction(Zhang99ParamAll param,
 									   List<Point2D_F64> grid,
-									   List<List<Point2D_F64>> observations) {
+									   List<CalibrationObservation> observations) {
 		if( param.views.length != observations.size() )
 			throw new IllegalArgumentException("For each view there should be one observation");
 
@@ -73,7 +73,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 		}
 
 		N = param.numParameters();
-		M = observations.size()*grid.size()*2;
+		M = CalibrationPlanarGridZhang99.totalPoints(observations)*2;
 	}
 
 	@Override
@@ -102,11 +102,15 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
 
-			List<Point2D_F64> obs = observations.get(indexView);
+			CalibrationObservation viewSet = observations.get(indexView);
 
-			for( int i = 0; i < grid.size(); i++ ) {
+			for( int i = 0; i < viewSet.size(); i++ ) {
+
+				int gridIndex = viewSet.indexes.get(i);
+				Point2D_F64 obs = viewSet.observations.get(i);
+
 				// Put the point in the camera's reference frame
-				SePointOps_F64.transform(se,grid.get(i), cameraPt);
+				SePointOps_F64.transform(se,grid.get(gridIndex), cameraPt);
 
 				// normalized image coordinates
 				normPt.x = cameraPt.x/ cameraPt.z;
@@ -119,10 +123,8 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 				double x = param.a * normPt.x + param.c * normPt.y + param.x0;
 				double y = param.b * normPt.y + param.y0;
 
-				Point2D_F64 p = obs.get(i);
-
-				residuals[index++] = x-p.x;
-				residuals[index++] = y-p.y;
+				residuals[index++] = x-obs.x;
+				residuals[index++] = y-obs.y;
 			}
 		}
 	}

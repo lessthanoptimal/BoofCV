@@ -60,8 +60,8 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	// description of the calibration grid
 	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
 
-	// number of calibration targets that were observed
-	private int numObservedTargets;
+	// List of observation sets.  Required so that it knows the total number of observations in each set
+	private List<CalibrationObservation> observationSets;
 
 	// variables for storing intermediate results
 	private Se3_F64 se = new Se3_F64();
@@ -90,19 +90,18 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	public Zhang99OptimizationJacobian(boolean assumeZeroSkew,
 									   int numRadial ,
 									   boolean includeTangential,
-									   int numObservedTargets ,
+									   List<CalibrationObservation> observationSets,
 									   List<Point2D_F64> grid ) {
 		this.param = new Zhang99ParamCamera(assumeZeroSkew,numRadial,includeTangential);
-		this.numObservedTargets = numObservedTargets;
+		this.observationSets = observationSets;
 
 		for( Point2D_F64 p : grid ) {
 			this.grid.add( new Point3D_F64(p.x,p.y,0) );
 		}
 
-		numParam = param.numParameters()+(3+3)*numObservedTargets;
+		numParam = param.numParameters()+(3+3)*observationSets.size();
 
-		numFuncs = numObservedTargets*grid.size()*2;
-
+		numFuncs = CalibrationPlanarGridZhang99.totalPoints(observationSets)*2;
 		param.zeroNotUsed();
 	}
 
@@ -120,7 +119,9 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	public void process(double[] input, double[] output) {
 		int index = param.setFromParam(input);
 
-		for( int indexView = 0; indexView < numObservedTargets; indexView++ ) {
+		int indexPoint = 0;
+		for( int indexView = 0; indexView < observationSets.size(); indexView++ ) {
+			CalibrationObservation set = observationSets.get(indexView);
 
 			// extract rotation and translation parameters
 			double rodX = input[index++];
@@ -136,13 +137,15 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 			RotationMatrixGenerator.rodriguesToMatrix(rodrigues, se.getR());
 			se.T.set(tranX, tranY, tranZ);
 
-			for( int i = 0; i < grid.size(); i++ ) {
+			for( int i = 0; i < set.size(); i++ , indexPoint++ ) {
+				int gridIndex = set.indexes.get(i);
+
 				// index = (function index)*numParam
-				indexJacX = (2*indexView*grid.size() + i*2     )*numParam;
-				indexJacY = (2*indexView*grid.size() + i*2 + 1 )*numParam;
+				indexJacX = (2*indexPoint     )*numParam;
+				indexJacY = (2*indexPoint + 1 )*numParam;
 
 				// Put the point in the camera's reference frame
-				SePointOps_F64.transform(se, grid.get(i), cameraPt);
+				SePointOps_F64.transform(se, grid.get(gridIndex), cameraPt);
 
 				// normalized pixel coordinates
 				normPt.x = cameraPt.x/ cameraPt.z;

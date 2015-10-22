@@ -92,9 +92,9 @@ public class RadialDistortionEstimateLinear {
 	 */
 	public void process( DenseMatrix64F cameraCalibration ,
 						 List<DenseMatrix64F> homographies ,
-						 List<List<Point2D_F64>> observations )
+						 List<CalibrationObservation> observations )
 	{
-		init( observations.size() );
+		init( observations );
 
 		setupA_and_B(cameraCalibration,homographies,observations);
 
@@ -106,18 +106,21 @@ public class RadialDistortionEstimateLinear {
 
 	/**
 	 * Declares and sets up data structures
-	 *
-	 * @param numGridObservations number of times that the calibration grid was observed.
 	 */
-	private void init( int numGridObservations )
+	private void init( List<CalibrationObservation> observations )
 	{
-		A.reshape(2*numGridObservations*worldPoints.size(),X.numRows,false);
+		int totalPoints = 0;
+		for (int i = 0; i < observations.size(); i++) {
+			totalPoints += observations.get(i).size();
+		}
+
+		A.reshape(2*totalPoints,X.numRows,false);
 		B.reshape(A.numRows,1,false);
 	}
 
 	private void setupA_and_B( DenseMatrix64F K ,
 							   List<DenseMatrix64F> homographies ,
-							   List<List<Point2D_F64>> observations) {
+							   List<CalibrationObservation> observations) {
 
 		final int N = observations.size();
 
@@ -132,9 +135,12 @@ public class RadialDistortionEstimateLinear {
 		int pointIndex = 0;
 		for( int indexObs = 0; indexObs < N; indexObs++ ) {
 			DenseMatrix64F H = homographies.get(indexObs);
-			List<Point2D_F64> obs = observations.get(indexObs);
+			CalibrationObservation set = observations.get(indexObs);
 
-			for( int gridIndex = 0; gridIndex < worldPoints.size(); gridIndex++ ) {
+			for( int i = 0; i < set.size(); i++ ) {
+				int gridIndex = set.indexes.get(i);
+				Point2D_F64 obsPixel = set.observations.get(i);
+
 				// location of grid point in world coordinate (x,y,0)  assume z=0
 				Point2D_F64 gridPt = worldPoints.get(gridIndex);
 
@@ -148,16 +154,14 @@ public class RadialDistortionEstimateLinear {
 				double r2 = projCalibrated.x*projCalibrated.x + projCalibrated.y*projCalibrated.y;
 
 				double a = 1.0;
-				for( int i = 0; i < X.numRows; i++ ) {
+				for( int j = 0; j < X.numRows; j++ ) {
 					a *= r2;
 
-					A.set(pointIndex*2+0,i,(projPixel.x-u0)*a);
-					A.set(pointIndex*2+1,i,(projPixel.y-v0)*a);
+					A.set(pointIndex*2+0,j,(projPixel.x-u0)*a);
+					A.set(pointIndex*2+1,j,(projPixel.y-v0)*a);
 				}
 
 				// observed location
-				Point2D_F64 obsPixel = obs.get(gridIndex);
-
 				B.set(pointIndex*2+0,0,obsPixel.x-projPixel.x);
 				B.set(pointIndex*2+1,0,obsPixel.y-projPixel.y);
 

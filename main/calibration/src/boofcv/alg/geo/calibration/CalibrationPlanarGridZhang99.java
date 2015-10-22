@@ -110,7 +110,7 @@ public class CalibrationPlanarGridZhang99 {
 	 * @param observations Set of observed grid locations in pixel coordinates.
 	 * @return true if successful and false if it failed
 	 */
-	public boolean process( List<List<Point2D_F64>> observations ) {
+	public boolean process( List<CalibrationObservation> observations ) {
 
 		optimized.setNumberOfViews(observations.size());
 
@@ -130,13 +130,13 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected Zhang99ParamAll initialParam( List<List<Point2D_F64>> observations )
+	protected Zhang99ParamAll initialParam( List<CalibrationObservation> observations )
 	{
 		status("Estimating Homographies");
 		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
 		List<Se3_F64> motions = new ArrayList<Se3_F64>();
 
-		for( List<Point2D_F64> obs : observations ) {
+		for( CalibrationObservation obs : observations ) {
 			if( !computeHomography.computeHomography(obs) )
 				return null;
 
@@ -180,7 +180,7 @@ public class CalibrationPlanarGridZhang99 {
 	 * @param found The refined calibration parameters.
 	 * @param optimizer Algorithm used to optimize parameters
 	 */
-	public boolean optimizedParam( List<List<Point2D_F64>> observations ,
+	public boolean optimizedParam( List<CalibrationObservation> observations ,
 								   List<Point2D_F64> grid ,
 								   Zhang99ParamAll initial ,
 								   Zhang99ParamAll found ,
@@ -201,7 +201,7 @@ public class CalibrationPlanarGridZhang99 {
 
 		Zhang99OptimizationJacobian jacobian = new Zhang99OptimizationJacobian(
 				initial.assumeZeroSkew,initial.radial.length,initial.includeTangential,
-				observations.size(),grid);
+				observations,grid);
 
 		optimizer.setFunction(func,jacobian);
 		optimizer.initialize(model,1e-10,1e-25*observations.size());
@@ -293,7 +293,15 @@ public class CalibrationPlanarGridZhang99 {
 		return optimized;
 	}
 
-	public static interface Listener
+	public static int totalPoints( List<CalibrationObservation> observations ) {
+		int total = 0;
+		for (int i = 0; i < observations.size(); i++) {
+			total += observations.get(i).size();
+		}
+		return total;
+	}
+
+	public interface Listener
 	{
 		/**
 		 * Updated to update the status and request that processing be stopped

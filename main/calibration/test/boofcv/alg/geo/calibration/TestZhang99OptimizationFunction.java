@@ -50,7 +50,7 @@ public class TestZhang99OptimizationFunction {
 		
 		List<Point2D_F64> gridPts = GenericCalibrationGrid.standardLayout();
 
-		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
 			observations.add( estimate(param,param.views[i],gridPts));
@@ -70,11 +70,11 @@ public class TestZhang99OptimizationFunction {
 		}
 	}
 	
-	protected static List<Point2D_F64> estimate( Zhang99ParamAll param ,
+	protected static CalibrationObservation estimate( Zhang99ParamAll param ,
 												 Zhang99ParamAll.View v ,
 												 List<Point2D_F64> grid ) {
 
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		CalibrationObservation ret = new CalibrationObservation();
 		
 		Se3_F64 se = new Se3_F64();
 		Point3D_F64 cameraPt = new Point3D_F64();
@@ -100,7 +100,8 @@ public class TestZhang99OptimizationFunction {
 			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
 			double y = param.b*calibratedPt.y + param.y0;
 			
-			ret.add( new Point2D_F64(x,y));
+			ret.observations.add( new Point2D_F64(x,y));
+			ret.indexes.add(i);
 		}
 
 		return ret;

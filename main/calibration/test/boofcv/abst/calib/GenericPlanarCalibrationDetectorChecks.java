@@ -23,6 +23,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.PointTransformHomography_F64;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
@@ -54,13 +55,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	ImageFloat32 original = new ImageFloat32(width,height);
 	ImageFloat32 distorted = new ImageFloat32(width, height);
-	List<List<Point2D_F64>> solutions = new ArrayList<List<Point2D_F64>>();
+	List<CalibrationObservation> solutions = new ArrayList<CalibrationObservation>();
 
 	PointTransform_F32 d2o;
 	PointTransform_F64 o2d;
 
 
-	public abstract void renderTarget( ImageFloat32 original , List<List<Point2D_F64>> solutions );
+	public abstract void renderTarget( ImageFloat32 original , List<CalibrationObservation> solutions );
 
 	public abstract PlanarCalibrationDetector createDetector();
 
@@ -105,15 +106,15 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		PlanarCalibrationDetector detector = createDetector();
 
 		assertTrue(detector.process(original));
-		List<Point2D_F64> found0 = detector.getDetectedPoints();
+		CalibrationObservation found0 = detector.getDetectedPoints();
 
 		assertTrue(detector.process(original));
-		List<Point2D_F64> found1 = detector.getDetectedPoints();
+		CalibrationObservation found1 = detector.getDetectedPoints();
 
 		assertEquals(found0.size(),found1.size());
 		assertTrue(found0 != found1);
-		for (Point2D_F64 a : found0) {
-			assertFalse(found1.contains(a));
+		for (int i = 0; i < found0.size(); i++) {
+			assertFalse(found1.observations.contains(found0.observations.get(0)));
 		}
 	}
 
@@ -128,7 +129,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		assertTrue(detector.process(original));
 
-		List<Point2D_F64> found = detector.getDetectedPoints();
+		CalibrationObservation found = detector.getDetectedPoints();
 
 		checkList(found, false);
 	}
@@ -152,7 +153,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		assertTrue(detector.process(distorted));
 
-		List<Point2D_F64> found = detector.getDetectedPoints();
+		CalibrationObservation found = detector.getDetectedPoints();
 		checkList(found, true);
 	}
 
@@ -167,20 +168,21 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		}
 	}
 
-	public void checkList( List<Point2D_F64> found , boolean applyTransform ) {
-		List<List<Point2D_F64>> expectedList = new ArrayList<List<Point2D_F64>>();
+	public void checkList(CalibrationObservation found , boolean applyTransform ) {
+		List<CalibrationObservation> expectedList = new ArrayList<CalibrationObservation>();
 
 		if( !applyTransform ) {
 			expectedList.addAll(this.solutions);
 		} else {
 			for (int i = 0; i < solutions.size(); i++) {
-				List<Point2D_F64> orig = solutions.get(i);
-				List<Point2D_F64> mod = new ArrayList<Point2D_F64>();
+				CalibrationObservation orig = solutions.get(i);
+				CalibrationObservation mod = new CalibrationObservation();
 				for (int j = 0; j < orig.size(); j++) {
-					Point2D_F64 p = orig.get(i).copy();
+					Point2D_F64 p = orig.observations.get(i).copy();
 
 					o2d.compute(p.x, p.y, p);
-					mod.add(p);
+					mod.observations.add(p);
+					mod.indexes.add( orig.indexes.get(j) );
 				}
 				expectedList.add(mod);
 			}
@@ -191,11 +193,17 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		// the order is important.  check to see that they are close and in the correct order
 		boolean anyMatched = false;
 		for (int i = 0; i < expectedList.size(); i++) {
-			List<Point2D_F64> expected = expectedList.get(i);
+			CalibrationObservation expected = expectedList.get(i);
 			boolean matched = true;
+
 			for (int j = 0; j < expected.size(); j++) {
-				Point2D_F64 f = found.get(i);
-				Point2D_F64 e = expected.get(i);
+				if( found.indexes.get(j) != expected.indexes.get(j) ) {
+					matched = false;
+					break;
+				}
+
+				Point2D_F64 f = found.observations.get(i);
+				Point2D_F64 e = expected.observations.get(i);
 				if( f.distance(e) >= 3 ) {
 					matched = false;
 					break;
@@ -230,5 +238,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		d2o = new PointTransformHomography_F32(H);
 		CommonOps.invert(H);
 		o2d = new PointTransformHomography_F64(H);
+	}
+
+	/**
+	 * Observations points should always be in increasing order
+	 */
+	@Test
+	public void checkPointIndexIncreasingOrder() {
+		fail("Implement");
 	}
 }

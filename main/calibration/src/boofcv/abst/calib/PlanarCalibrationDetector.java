@@ -18,6 +18,7 @@
 
 package boofcv.abst.calib;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -44,7 +45,7 @@ public interface PlanarCalibrationDetector {
 	 *
 	 * @return List of detected points in row major grid order.
 	 */
-	List<Point2D_F64> getDetectedPoints();
+	CalibrationObservation getDetectedPoints();
 
 	/**
 	 * Returns the layout of the calibration points on the target

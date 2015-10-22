@@ -18,6 +18,7 @@
 
 package boofcv.app.calib;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99CalibrationMatrixFromHomographies;
 import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
 import georegression.struct.point.Point2D_F64;
@@ -47,7 +48,7 @@ public class ComputeGeometryScore {
 		computeHomography = new Zhang99ComputeTargetHomography(worldPoints);
 	}
 
-	public void addObservations( List<Point2D_F64> observations ) {
+	public void addObservations( CalibrationObservation observations ) {
 		computeHomography.computeHomography(observations);
 		homographies.add( computeHomography.getHomography().copy() );
 

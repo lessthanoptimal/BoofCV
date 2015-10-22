@@ -79,16 +79,18 @@ public class GenericCalibrationGrid {
 		return ret;
 	}
 
-	public static List<Point2D_F64> observations( Se3_F64 motion , List<Point2D_F64> obs2D )
+	public static CalibrationObservation observations( Se3_F64 motion , List<Point2D_F64> obs2D )
 	{
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		CalibrationObservation ret = new CalibrationObservation();
 
-		for( Point2D_F64 p2 : obs2D ) {
+		for( int i = 0; i < obs2D.size(); i++ ) {
+			Point2D_F64 p2 = obs2D.get(i);
 			Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
 
 			Point3D_F64 t = SePointOps_F64.transform(motion,p3,null);
 
-			ret.add( new Point2D_F64(t.x/t.z,t.y/t.z));
+			ret.observations.add( new Point2D_F64(t.x/t.z,t.y/t.z));
+			ret.indexes.add(i);
 		}
 
 		return ret;
@@ -239,21 +241,22 @@ public class GenericCalibrationGrid {
 	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
 	 * grid.
 	 */
-	public static List<List<Point2D_F64>> createObservations( Zhang99ParamAll config,
+	public static List<CalibrationObservation> createObservations( Zhang99ParamAll config,
 															  List<Point2D_F64> grid)
 	{
-		List<List<Point2D_F64>> ret = new ArrayList<List<Point2D_F64>>();
+		List<CalibrationObservation> ret = new ArrayList<CalibrationObservation>();
 
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
 		for( Zhang99ParamAll.View v : config.views ) {
-			List<Point2D_F64> obs = new ArrayList<Point2D_F64>();
+			CalibrationObservation set = new CalibrationObservation();
 			Se3_F64 se = new Se3_F64();
 			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
 
-			for( Point2D_F64 grid2D : grid ) {
+			for( int i = 0; i < grid.size(); i++ ) {
+				Point2D_F64 grid2D = grid.get(i);
 				Point3D_F64 grid3D = new Point3D_F64(grid2D.x,grid2D.y,0);
 
 				// Put the point in the camera's reference frame
@@ -270,9 +273,10 @@ public class GenericCalibrationGrid {
 				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;
 				double y = config.b*calibratedPt.y + config.y0;
 
-				obs.add(new Point2D_F64(x,y));
+				set.observations.add(new Point2D_F64(x, y));
+				set.indexes.add(i);
 			}
-			ret.add(obs);
+			ret.add(set);
 		}
 		return ret;
 	}

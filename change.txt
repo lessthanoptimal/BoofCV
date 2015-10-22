@@ -41,6 +41,8 @@ Version : Alpha 0.20
   * Change it from two constructors down to one constructor
 - Created built in class for removing perspective distortion
   * RemovePerspectiveDistortion
+- Partially observable calibration targets are now supported
+  * Mathematically at least.  Targets which can be partially observed are not supported yet
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image

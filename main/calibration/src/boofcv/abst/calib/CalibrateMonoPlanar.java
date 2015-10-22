@@ -18,6 +18,7 @@
 
 package boofcv.abst.calib;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
@@ -69,7 +70,7 @@ public class CalibrateMonoPlanar {
 	protected IntrinsicParameters foundIntrinsic;
 
 	// Information on calibration targets and results
-	protected List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+	protected List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
@@ -107,7 +108,7 @@ public class CalibrateMonoPlanar {
 	 * Resets internal data structures.  Must call before adding images
 	 */
 	public void reset() {
-		observations = new ArrayList<List<Point2D_F64>>();
+		observations = new ArrayList<CalibrationObservation>();
 		errors = null;
 		heightImg = widthImg = 0;
 	}
@@ -177,7 +178,7 @@ public class CalibrateMonoPlanar {
 	 * @param param Found calibration parameters
 	 * @return List of error statistics
 	 */
-	public static List<ImageResults> computeErrors( List<List<Point2D_F64>> observation ,
+	public static List<ImageResults> computeErrors( List<CalibrationObservation> observation ,
 													Zhang99ParamAll param ,
 													List<Point2D_F64> grid )
 	{
@@ -239,7 +240,7 @@ public class CalibrateMonoPlanar {
 		System.out.println("Average Mean Error = "+(totalError/results.size()));
 	}
 
-	public List<List<Point2D_F64>> getObservations() {
+	public List<CalibrationObservation> getObservations() {
 		return observations;
 	}
 

@@ -18,13 +18,13 @@
 
 package boofcv.abst.calib;
 
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -49,7 +49,7 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 	}
 
 	@Override
-	public void renderTarget(ImageFloat32 original, List<List<Point2D_F64>> solutions) {
+	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
 
 		ImageMiscOps.fill(original, 255);
 
@@ -74,15 +74,17 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 		int pointsRow = 2*(config.numRows/2) - (1 - config.numRows % 2);
 		int pointsCol = 2*(config.numCols/2) - (1 - config.numCols % 2);
 
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		CalibrationObservation set = new CalibrationObservation();
+		int gridIndex = 0;
 		for (int i = 0; i < pointsRow; i++) {
-			for (int j = 0; j < pointsCol; j++) {
+			for (int j = 0; j < pointsCol; j++,gridIndex++) {
 				double y = y0+(i+1)*square;
 				double x = x0+(j+1)*square;
-				points.add( new Point2D_F64(x,y));
+				set.observations.add(new Point2D_F64(x, y));
+				set.indexes.add(gridIndex);
 			}
 		}
-		solutions.add(points);
+		solutions.add(set);
 	}
 
 	@Override

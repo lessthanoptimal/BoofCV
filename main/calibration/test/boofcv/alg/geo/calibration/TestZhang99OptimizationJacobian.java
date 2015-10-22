@@ -50,7 +50,7 @@ public class TestZhang99OptimizationJacobian {
 
 		List<Point2D_F64> gridPts = PlanarDetectorSquareGrid.createLayout(1, 1, 30, 30);
 
-		List<List<Point2D_F64>> observations = new ArrayList<List<Point2D_F64>>();
+		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
 			observations.add( estimate(param,param.views[i],gridPts));
@@ -63,7 +63,7 @@ public class TestZhang99OptimizationJacobian {
 				new Zhang99OptimizationFunction( param.copy(),gridPts,observations );
 
 		Zhang99OptimizationJacobian alg = new Zhang99OptimizationJacobian(
-				assumeZeroSkew,param.radial.length,param.includeTangential,observations.size(),gridPts);
+				assumeZeroSkew,param.radial.length,param.includeTangential,observations,gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
 		double tol = includeTangential ? 0.05 : 0.01;
