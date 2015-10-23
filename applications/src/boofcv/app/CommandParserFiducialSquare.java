@@ -169,9 +169,8 @@ public class CommandParserFiducialSquare {
 		System.out.println("Print Info           "+printInfo);
 		System.out.println("Print Grid           "+printGrid);
 		System.out.println("Boundary Hack        "+(!noBoundaryHack));
-		if(isBinary) System.out.println("Binary Grid Size    "+ binaryGridSize + "x" + binaryGridSize);
-		if( paper != null )
-			System.out.println("Paper Size       "+paper);
+		if(isBinary) System.out.println("Binary Grid Size     "+ binaryGridSize + "x" + binaryGridSize);
+		if( paper != null )	System.out.println("Paper Size           "+paper);
 		if( gridX < 0)
 			System.out.println("Grid                 automatic");
 		else if( gridX > 1 && gridY > 1)
@@ -190,10 +189,6 @@ public class CommandParserFiducialSquare {
 
 		System.out.println("################### Generating");
 
-		for( String path : patternNames ) {
-			app.addPattern(path);
-		}
-
 		if(app instanceof CreateFiducialSquareBinaryEPS) {
 			switch(binaryGridSize) {
 				case 3:
@@ -208,6 +203,10 @@ public class CommandParserFiducialSquare {
 					((CreateFiducialSquareBinaryEPS) app).setGridSize(BinaryFiducialGridSize.FOUR_BY_FOUR);
 					break;
 			}
+		}
+
+		for( String path : patternNames ) {
+			app.addPattern(path);
 		}
 
 		app.setOutputFileName(outputName);

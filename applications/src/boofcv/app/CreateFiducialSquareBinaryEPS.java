@@ -114,18 +114,18 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 		}
 
 		final int adjustedBit;
-		if( bit < transitionBits[0] )
+		if( bit <= transitionBits[0] )
 			adjustedBit = bit + 1;
-		else if( bit < transitionBits[1] )
+		else if( bit <= transitionBits[1] )
 			adjustedBit = bit + 2;
-		else if( bit < transitionBits[2] )
+		else if( bit <= transitionBits[2] )
 			adjustedBit = bit + 3;
 		else
 			throw new RuntimeException("Bit must be between 0 and " + transitionBits[2]);
 
 		int x = adjustedBit % gridSize.getWidth();
 		int y = adjustedBit / gridSize.getWidth();
-		out.print("  w" + x + " y" + y +" box\n");
+		out.print("  w" + x + " w" + y +" box\n");
 	}
 
 	@Override
