@@ -91,7 +91,7 @@ public class TestZhang99OptimizationJacobian {
 				assumeZeroSkew,param.radial.length,param.includeTangential,observations,gridPts);
 
 		// Why does the tolerance need to be so crude?  Is there a fundamental reason for this?
-		double tol = includeTangential ? 0.15 : 0.01;
+		double tol = includeTangential ? 0.05 : 0.01;
 //		DerivativeChecker.jacobianPrintR(func, alg, dataParam, tol);
 		assertTrue(DerivativeChecker.jacobianR(func, alg, dataParam, tol));
 	}
