@@ -38,8 +38,4 @@ public class UnsupportedException extends RuntimeException {
 	public UnsupportedException(Throwable cause) {
 		super(cause);
 	}
-
-	public UnsupportedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 }
