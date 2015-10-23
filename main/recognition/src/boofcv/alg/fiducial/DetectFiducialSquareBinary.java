@@ -90,11 +90,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
         // and w * gridSize.getWidth() for the inner part.
         super(inputToBinary,quadDetector, (w * gridSize.getWidth() + 4 * w) ,inputType);
         this.gridSize = gridSize;
-        final int elCount = gridSize.getWidth();
-        binaryInner.reshape(w * elCount,w * elCount);
-        counts = new int[elCount];
-        classified = new int[elCount];
-        tmp = new int[elCount];
+        binaryInner.reshape(w * gridSize.getWidth(),w * gridSize.getWidth());
+        counts = new int[gridSize.getNumberOfElements()];
+        classified = new int[gridSize.getNumberOfElements()];
+        tmp = new int[gridSize.getNumberOfElements()];
     }
 
     @Override
