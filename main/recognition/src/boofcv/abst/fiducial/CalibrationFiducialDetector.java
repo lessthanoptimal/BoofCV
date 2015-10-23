@@ -204,6 +204,9 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 			perturb(disturbance,workPt,p,p23);
 		}
 
+		results.location = maxLocation;
+		results.orientation = maxOrientation;
+
 		return true;
 	}
 
