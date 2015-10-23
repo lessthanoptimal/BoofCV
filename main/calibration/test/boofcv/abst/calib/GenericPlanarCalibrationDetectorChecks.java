@@ -245,6 +245,15 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkPointIndexIncreasingOrder() {
-		fail("Implement");
+		PlanarCalibrationDetector detector = createDetector();
+
+		assertTrue(detector.process(original));
+		CalibrationObservation found = detector.getDetectedPoints();
+
+		assertEquals(detector.getLayout().size(),found.size());
+
+		for (int i = 0; i < found.size(); i++) {
+			assertEquals(i,found.indexes.get(i));
+		}
 	}
 }
