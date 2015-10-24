@@ -107,7 +107,7 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 				transitionBits = new int[]{ 1 ,9 , 11 };
 				break;
 			case FIVE_BY_FIVE:
-				transitionBits = new int[]{ 1 ,17 , 20 };
+				transitionBits = new int[]{ 2 ,17 , 20 };
 				break;
 			default:
 				throw new RuntimeException("Unexpected grid size");
