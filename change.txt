@@ -41,6 +41,9 @@ Version : Alpha 0.20
   * Change it from two constructors down to one constructor
 - Created built in class for removing perspective distortion
   * RemovePerspectiveDistortion
+- ConvertBufferedImage.stripAlphaChannel()
+  * Can be used to ensure that an alpha channel is not in the buffered image
+  * Inspired by an issue pete-experimenter had
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image

@@ -114,6 +114,9 @@ public class ExampleSegmentSuperpixels {
 //		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/mountain_pines_people.jpg"));
 //		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 
+		// you probably don't want to segment along the image's alpha channel and the code below assumes 3 channels
+		image = ConvertBufferedImage.stripAlphaChannel(image);
+
 		// Select input image type.  Some algorithms behave different depending on image type
 		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3, ImageFloat32.class);
 //		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
