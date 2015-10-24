@@ -70,7 +70,7 @@ public class FactoryFiducial {
 					add(new DetectFiducialSquareBinary<T>(BinaryFiducialGridSize.FIVE_BY_FIVE, binary,squareDetector,imageType));
 				}
 			};
-			return new SquareBinaryMultiple_to_FidcialDetector<>(algs,configFiducial.targetWidth);
+			return new SquareBinaryMultiple_to_FidcialDetector<T,DetectFiducialSquareBinary<T>>(algs,configFiducial.targetWidth);
 		} else {
 			final DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(configFiducial.gridSize, binary,squareDetector,imageType);
 			alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
