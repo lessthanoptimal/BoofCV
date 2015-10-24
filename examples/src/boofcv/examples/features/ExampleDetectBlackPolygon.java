@@ -47,23 +47,36 @@ import java.io.File;
  */
 public class ExampleDetectBlackPolygon {
 	public static void main(String[] args) {
-		String files[] = new String[]{
-				"polygons01.jpg",
-				"shapes02.png",
+		String imagesConvex[] = new String[]{
+				"shapes/polygons01.jpg",
+				"shapes/shapes02.png",
 				"fiducial/image/examples/image01.jpg"};
 
-		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
-
-		// need to reduce split fraction to get it to work well with the 7 sided shape
-		config.contour2Poly_splitFraction = 0.1;
-
-		BinaryPolygonDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
-
-		// Does the input image  have lens distortion?  Let the detector sparsely undistort.
-		// detector.setLensDistortion(...blah...);
-
+		String imagesConcave[] = new String[]{
+				"shapes/concave01.jpg"};
+		
 		ListDisplayPanel panel = new ListDisplayPanel();
 
+		// first configure the detector to only detect convex shapes with 3 to 7 sides
+		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
+		BinaryPolygonDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
+
+		processImages(imagesConvex, detector, panel);
+
+		// now lets detect concave shapes with many sides
+		config.maximumSides = 12;
+		config.convex = false;
+		detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
+
+		processImages(imagesConcave, detector, panel);
+
+		ShowImages.showWindow(panel,"Found Polygons",true);
+	}
+
+	private static void processImages(String[] files,
+									  BinaryPolygonDetector<ImageUInt8> detector,
+									  ListDisplayPanel panel)
+	{
 		for( String fileName : files ) {
 			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
 
@@ -73,7 +86,7 @@ public class ExampleDetectBlackPolygon {
 			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
 			// The squares are expanded automatically during the subpixel optimization step.
-			int threshold = GThresholdImageOps.computeOtsu(input,0,255);
+			int threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
 			ThresholdImageOps.threshold(input, binary, threshold, true);
 
 			// it takes in a grey scale image and binary image
@@ -94,7 +107,5 @@ public class ExampleDetectBlackPolygon {
 
 			panel.addImage(image,new File(fileName).getName());
 		}
-
-		ShowImages.showWindow(panel,"Found Convex Polygons with 3, 4,5, and 7 sides",true);
 	}
 }
