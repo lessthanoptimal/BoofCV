@@ -130,7 +130,8 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 
 	@Override
 	protected double getFiducialInnerWidth(double fiducialBoxWidth) {
-		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2; 	// border + bits + border squares.
+		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2;
+		// border + bits + border squares.
 		// the whole width of the fiducial (including border), broken into squares,
 		// then the number of squares in the grid.
 		return fiducialBoxWidth / totalWidthInSquares * gridSize.getWidth();
@@ -141,7 +142,8 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 		// To work properly with DetectFidualSquareBinary, we need to make
 		// sure the border is a multiple of 2 the size of a single square inside
 		// the fiducial.
-		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2; 	// border + bits + border squares.
+		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2;
+		// border + bits + border squares.
 		// the whole width of the fiducial, broken into squares, then two of those squares for the border width.
 		return fiducialBoxWidth / totalWidthInSquares * 2;
 	}

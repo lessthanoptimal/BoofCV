@@ -192,8 +192,6 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 
-
-
 		detector = FactoryFiducial.squareBinary(configFid, configThreshold, ImageUInt8.class);
 	}
 

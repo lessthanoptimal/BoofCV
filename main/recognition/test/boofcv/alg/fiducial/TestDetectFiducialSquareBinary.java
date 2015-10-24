@@ -56,7 +56,7 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkFoundRotationMatrix() {
 
-		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480);
 
 		ImageFloat32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
 		ImageUInt8 rendered = new ImageUInt8(rendered_F32.width,rendered_F32.height);
