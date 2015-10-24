@@ -48,6 +48,9 @@ public class RefinePolyLineCorner {
 	// maximum number of iterations
 	private int maxIterations = 10;
 
+	// maximum number of samples along the line
+	private int maxLineSamples = 20;
+
 	// the radius it will search around. computed when contour is passed in
 	protected int searchRadius;
 
@@ -171,15 +174,30 @@ public class RefinePolyLineCorner {
 	protected double distanceSum( LineGeneral2D_F64 line , int c0 , int c1 , List<Point2D_I32> contour ) {
 		double total = 0;
 		if( c0 < c1  ) {
-			for (int i = c0; i <= c1; i++) {
-				total += distance(line,contour.get(i));
+			int length = c1-c0+1;
+			int samples = Math.min(maxLineSamples,length);
+
+			for (int i = 0; i < samples; i++) {
+				int index = c0 + i*(length-1)/(samples-1);
+				total += distance(line,contour.get(index));
 			}
 		} else {
-			for (int i = c0; i < contour.size(); i++) {
-				total += distance(line,contour.get(i));
+			int lengthFirst = contour.size()-c0;
+			int lengthSecond = c1+1;
+
+			int length = lengthFirst+c1+1;
+			int samples = Math.min(maxLineSamples,length);
+
+			int samplesFirst = samples*lengthFirst/length;
+			int samplesSecond = samples*lengthSecond/length;
+
+			for (int i = 0; i < samplesFirst; i++) {
+				int index = c0 + i*lengthFirst/(samples-1);
+				total += distance(line,contour.get(index));
 			}
-			for (int i = 0; i <= c1; i++) {
-				total += distance(line,contour.get(i));
+			for (int i = 0; i < samplesSecond; i++) {
+				int index = i*lengthSecond/(samples-1);
+				total += distance(line,contour.get(index));
 			}
 		}
 		return total;

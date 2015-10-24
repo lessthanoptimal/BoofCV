@@ -292,19 +292,13 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				// reduce the number of corners based on an energy model
-				boolean wasPruned = pruner.fit(c.external,splits,pruned);
+				pruner.fit(c.external,splits,pruned);
 				splits = pruned;
 
 				// only accept polygons with the expected number of sides
 				if (!expectedNumberOfSides(splits)) {
 //					System.out.println("First point "+c.external.get(0));
 					if( verbose ) System.out.println("rejected number of sides. "+splits.size()+"  contour "+c.external.size());
-					continue;
-				}
-
-				// tweak again if corners were pruned
-				if( wasPruned && !improveContour.fit(c.external,splits) ) {
-					if( verbose ) System.out.println("rejected improve contour second. contour size = "+c.external.size());
 					continue;
 				}
 

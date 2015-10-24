@@ -62,12 +62,6 @@ public class MinimizeEnergyPrune {
 	 */
 	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
 
-//		System.out.println("ENTER Minimize prune  contour size = "+contour.size());
-//		for (int i = 0; i < input.size(); i++) {
-//			System.out.println("  corners "+contour.get( input.get(i)));
-//		}
-
-
 		this.contour = contour;
 		output.setTo(input);
 		removeDuplicates(output);
@@ -92,10 +86,6 @@ public class MinimizeEnergyPrune {
 			boolean betterFound = false;
 			bestCorners.reset();
 
-			// TODO keep a list of candidates which beat the previous best
-			// if a child beats a parent discard the parent
-			// at the end keep the best one
-
 			for (int i = 0; i < output.size(); i++) {
 				// add all but the one which was removed
 				workCorners1.reset();
@@ -114,13 +104,10 @@ public class MinimizeEnergyPrune {
 
 					if (fit.fitAnchored(anchor0, anchor1, workCorners1, workCorners2)) {
 
-//				optimizeCorners(workCorners1, workCorners2);
-
 						double score = 0;
 						for (int j = 0, k = workCorners2.size() - 1; j < workCorners2.size(); k = j, j++) {
 							score += computeSegmentEnergy(workCorners2, k, j);
 						}
-
 
 						if (score < bestEnergy) {
 							betterFound = true;
@@ -141,7 +128,6 @@ public class MinimizeEnergyPrune {
 			}
 		}
 
-//		System.out.println("  corners "+output.size()+"  modified "+modified);
 		return modified;
 	}
 

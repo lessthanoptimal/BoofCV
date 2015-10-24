@@ -34,13 +34,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * TODO comment
+ *
  * @author Peter Abeles
  */
 public class FitLinesToContour {
 
+	// maximum number of samples along a line.  After a certain point little is gained by  sampling all of those
+	// points and it becomes very computationally expensive
+	private int maxSamples = 20;
 
 	// number of iterations it will perform before giving up
-	int maxIterations = 5;
+	private int maxIterations = 5;
+
+	// minimum number of pixels a line must have for it to be fit
+	private int minimumLineLength = 4;
 
 	// reference to the list of contour pixels
 	List<Point2D_I32> contour;
@@ -49,11 +57,11 @@ public class FitLinesToContour {
 	FastQueue<LineGeneral2D_F64> lines = new FastQueue<LineGeneral2D_F64>(LineGeneral2D_F64.class,true);
 	FastQueue<Point2D_F64> pointsFit = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-	LinePolar2D_F64 linePolar = new LinePolar2D_F64();
+	private LinePolar2D_F64 linePolar = new LinePolar2D_F64();
 
-	Point2D_F64 intersection = new Point2D_F64();
+	private Point2D_F64 intersection = new Point2D_F64();
 
-	GrowQueue_I32 workCorners = new GrowQueue_I32();
+	private GrowQueue_I32 workCorners = new GrowQueue_I32();
 
 	int anchor0;
 	int anchor1;
@@ -81,32 +89,15 @@ public class FitLinesToContour {
 
 		int numLines = anchor0==anchor1? corners.size() : CircularIndex.distanceP(anchor0,anchor1,corners.size);
 		if( numLines < 2 ) {
-			throw new RuntimeException("The one line is anchored");
+			throw new RuntimeException("The one line is anchored and can't be optimized");
 		}
 
 		lines.resize(numLines);
 
-		Point2D_I32 hack = contour.get(corners.get(0));
-
-//		verbose = hack.x == 52 && hack.y == 61;
-
 		if( verbose ) System.out.println("ENTER FitLinesToContour");
 
 		// Check pre-condition
-		for (int i = 0; i < corners.size();) {
-			int j = (i+1)%corners.size();
-			int index0 = corners.get(i);
-			int index1 = corners.get(j);
-
-			Point2D_I32 a = contour.get(index0);
-			Point2D_I32 b = contour.get(index1);
-
-			if( a.x == b.x && a.y == b.y ) {
-				throw new RuntimeException("Duplicate corner!");
-			} else {
-				i++;
-			}
-		}
+//		checkDuplicateCorner(corners);
 
 		workCorners.setTo(corners);
 
@@ -133,6 +124,26 @@ public class FitLinesToContour {
 		output.setTo(workCorners);
 		return true;
 	}
+
+//	/**
+//	 * Throws an exception of two corners in a row are duplicates
+//	 */
+//	private void checkDuplicateCorner(GrowQueue_I32 corners) {
+//		for (int i = 0; i < corners.size();) {
+//			int j = (i+1)%corners.size();
+//			int index0 = corners.get(i);
+//			int index1 = corners.get(j);
+//
+//			Point2D_I32 a = contour.get(index0);
+//			Point2D_I32 b = contour.get(index1);
+//
+//			if( a.x == b.x && a.y == b.y ) {
+//				throw new RuntimeException("Duplicate corner!");
+//			} else {
+//				i++;
+//			}
+//		}
+//	}
 
 	/**
 	 * All the corners should be in increasing order from the first anchor.
@@ -257,14 +268,11 @@ public class FitLinesToContour {
 				return false;
 
 			if (!fitLine(index0, index1, lines.get(i - 1))) {
-				throw new RuntimeException("Do something here");
+				// TODO do something more intelligent here.  Just leave the corners as is?
+				return false;
 			}
 			LineGeneral2D_F64 l = lines.get(i-1);
 			if( Double.isNaN(l.A) || Double.isNaN(l.B) || Double.isNaN(l.C)) {
-				Point2D_I32 c0 = contour.get(index0);
-				Point2D_I32 c1 = contour.get(index1);
-
-//				throw new RuntimeException("Egads");
 				throw new RuntimeException("This should be impossible");
 			}
 		}
@@ -282,6 +290,10 @@ public class FitLinesToContour {
 	boolean fitLine( int contourIndex0 , int contourIndex1 , LineGeneral2D_F64 line ) {
 		int numPixels = CircularIndex.distanceP(contourIndex0,contourIndex1,contour.size());
 
+		// if its too small
+		if( numPixels < minimumLineLength )
+			return false;
+
 		Point2D_I32 c0 = contour.get(contourIndex0);
 		Point2D_I32 c1 = contour.get(contourIndex1);
 
@@ -289,9 +301,14 @@ public class FitLinesToContour {
 		double centerX = (c1.x+c0.x)/2.0;
 		double centerY = (c1.y+c0.y)/2.0;
 
+		int numSamples = Math.min(20,numPixels);
+
 		pointsFit.reset();
-		for (int i = 0; i < numPixels; i++) {
-			Point2D_I32 c = contour.get( CircularIndex.addOffset(contourIndex0,i,contour.size()));
+		for (int i = 0; i < numSamples; i++) {
+
+			int index = i*(numPixels-1)/(numSamples-1);
+
+			Point2D_I32 c = contour.get( CircularIndex.addOffset(contourIndex0,index,contour.size()));
 
 			Point2D_F64 p = pointsFit.grow();
 			p.x = (c.x-centerX)/scale;
