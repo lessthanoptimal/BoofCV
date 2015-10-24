@@ -18,6 +18,8 @@
 
 package boofcv.app;
 
+import boofcv.abst.fiducial.BinaryFiducialGridSize;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ public class CommandParserFiducialSquare {
 	public boolean printGrid = false;
 	public boolean noBoundaryHack = false;
 	public double fiducialWidth = -1;
+	private boolean isBinary = false;
+	private int binaryGridSize = 4;
 
 	public List<String> patternNames = new ArrayList<String>();
 
@@ -77,6 +81,11 @@ public class CommandParserFiducialSquare {
 		System.out.println("                     example: -Units=cm");
 		System.out.println("-PageSize=<type>     Specify the page: A0, A1, A2, A3, A4, legal, letter");
 		System.out.println("                     example: -PageSize=letter");
+		if(isBinary) {
+			System.out.println("-BinaryGridWidth=<n> Specify the width of the grid used to encode binary numbers. Valid values are 3,4 and 5");
+			System.out.println("                     Maximum distinct fiducials: 3 is 32, 4 is 4096, 5 is 2,097,152. Default is 4");
+			System.out.println("                     example: -BinaryGridSize=4");
+		}
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println("./application -PrintInfo -OutputFile=fiducial.eps 10 "+n0);
@@ -127,6 +136,8 @@ public class CommandParserFiducialSquare {
 					units = Unit.lookup(param(arg));
 				} else if( "PageSize".compareToIgnoreCase(label) == 0 ) {
 					paper = PaperSize.lookup(param(arg));
+				} else if( "BinaryGridWidth".compareToIgnoreCase(label) == 0 ) {
+					binaryGridSize = Integer.parseInt(param(arg));
 				} else {
 					throw new IllegalArgumentException("Unknown: "+label);
 				}
@@ -136,6 +147,8 @@ public class CommandParserFiducialSquare {
 		}
 		return index;
 	}
+
+
 
 	public void execute( String []args , BaseFiducialSquareEPS app) throws IOException {
 		try {
@@ -156,8 +169,8 @@ public class CommandParserFiducialSquare {
 		System.out.println("Print Info           "+printInfo);
 		System.out.println("Print Grid           "+printGrid);
 		System.out.println("Boundary Hack        "+(!noBoundaryHack));
-		if( paper != null )
-			System.out.println("Paper Size       "+paper);
+		if(isBinary) System.out.println("Binary Grid Size     "+ binaryGridSize + "x" + binaryGridSize);
+		if( paper != null )	System.out.println("Paper Size           "+paper);
 		if( gridX < 0)
 			System.out.println("Grid                 automatic");
 		else if( gridX > 1 && gridY > 1)
@@ -175,6 +188,11 @@ public class CommandParserFiducialSquare {
 		}
 
 		System.out.println("################### Generating");
+
+		if(app instanceof CreateFiducialSquareBinaryEPS) {
+			((CreateFiducialSquareBinaryEPS) app).
+					setGridSize(BinaryFiducialGridSize.gridSizeForWidth(binaryGridSize));
+		}
 
 		for( String path : patternNames ) {
 			app.addPattern(path);
@@ -248,5 +266,9 @@ public class CommandParserFiducialSquare {
 	public void setExampleNames( String name0 , String name1 ) {
 		exampleNames.add(name0);
 		exampleNames.add(name1);
+	}
+
+	public void setIsBinary(boolean isBinary) {
+		this.isBinary = isBinary;
 	}
 }
