@@ -18,16 +18,71 @@
 
 package boofcv.alg.distort;
 
+import boofcv.abst.distort.FDistort;
+import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestRemovePerspectiveDistortion {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void undoDistortion() {
+		ImageFloat32 expected = new ImageFloat32(30,40);
+		ImageFloat32 input = new ImageFloat32(200,150);
+
+		Point2D_F64 topLeft = new Point2D_F64(30,20);
+		Point2D_F64 topRight = new Point2D_F64(80,30);
+		Point2D_F64 bottomRight = new Point2D_F64(70,90);
+		Point2D_F64 bottomLeft = new Point2D_F64(25,80);
+
+		GImageMiscOps.fill(expected,255);
+		GImageMiscOps.fillRectangle(expected, 100, 10, 10, 15, 25);
+
+		// apply homography distortion to expected
+		applyForwardTransform(expected, input, topLeft, topRight, bottomRight, bottomLeft);
+
+		// now reverse it with the class
+		RemovePerspectiveDistortion<ImageFloat32> alg =
+				new RemovePerspectiveDistortion<ImageFloat32>(30,40, ImageType.single(ImageFloat32.class));
+
+		assertTrue(alg.apply(input, topLeft, topRight, bottomRight, bottomLeft));
+
+		ImageFloat32 found = alg.getOutput();
+		ImageFloat32 difference = found.createSameShape();
+
+		PixelMath.diffAbs(expected, found, difference);
+		double error = ImageStatistics.sum(difference)/(difference.width*difference.height);
+
+		assertTrue(error < 10);
+
+	}
+
+	private void applyForwardTransform(ImageFloat32 expected, ImageFloat32 input, Point2D_F64 topLeft, Point2D_F64 topRight, Point2D_F64 bottomRight, Point2D_F64 bottomLeft) {
+		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
+
+		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
+		associatedPairs.add( new AssociatedPair(topLeft,new Point2D_F64(0,0)));
+		associatedPairs.add( new AssociatedPair(topRight,new Point2D_F64(expected.width-1,0)));
+		associatedPairs.add( new AssociatedPair(bottomRight,new Point2D_F64(expected.width-1,expected.height-1)));
+		associatedPairs.add( new AssociatedPair(bottomLeft,new Point2D_F64(0,expected.height-1)));
+
+		DenseMatrix64F H = new DenseMatrix64F(3,3);
+		computeHomography.process(associatedPairs,H);
+
+		new FDistort(expected,input).transform(new PointTransformHomography_F32(H)).apply();
 	}
 }
