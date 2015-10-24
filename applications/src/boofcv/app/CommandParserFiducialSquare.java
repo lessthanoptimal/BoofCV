@@ -190,19 +190,8 @@ public class CommandParserFiducialSquare {
 		System.out.println("################### Generating");
 
 		if(app instanceof CreateFiducialSquareBinaryEPS) {
-			switch(binaryGridSize) {
-				case 3:
-					((CreateFiducialSquareBinaryEPS) app).setGridSize(BinaryFiducialGridSize.THREE_BY_THREE);
-					break;
-				case 5:
-					((CreateFiducialSquareBinaryEPS) app).setGridSize(BinaryFiducialGridSize.FIVE_BY_FIVE);
-					break;
-				default:
-					System.out.println("INVALID Binary Grid Width Specified, defaulting to 4x4");
-				case 4:
-					((CreateFiducialSquareBinaryEPS) app).setGridSize(BinaryFiducialGridSize.FOUR_BY_FOUR);
-					break;
-			}
+			((CreateFiducialSquareBinaryEPS) app).
+					setGridSize(BinaryFiducialGridSize.gridSizeForWidth(binaryGridSize));
 		}
 
 		for( String path : patternNames ) {

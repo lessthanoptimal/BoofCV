@@ -260,7 +260,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
    		this.ambiguityThreshold = ambiguityThreshold;
    	}
 
-    // This is only works well as a visiual representation if the output font is mono spaced.
+	// For troubleshooting.
+	public ImageFloat32 getGrayNoBorder() { return grayNoBorder; }
+
+	// This is only works well as a visiual representation if the output font is mono spaced.
     public void printClassified() {
         System.out.println();
         System.out.println("██████");

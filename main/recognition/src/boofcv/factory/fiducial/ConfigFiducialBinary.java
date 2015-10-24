@@ -18,6 +18,7 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.abst.fiducial.BinaryFiducialGridSize;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
@@ -40,6 +41,9 @@ public class ConfigFiducialBinary implements Configuration {
 	 * as black or white.  If it can't be classified then the shape is discarded
 	 */
 	public double ambiguousThreshold = 0.75;
+
+
+	public BinaryFiducialGridSize gridSize = BinaryFiducialGridSize.FOUR_BY_FOUR;
 
 	/**
 	 * Configuration for square detector
@@ -67,6 +71,10 @@ public class ConfigFiducialBinary implements Configuration {
 		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
 			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
 	}
+
+	public void setGridSize(BinaryFiducialGridSize gridSize) { this.gridSize = gridSize; }
+
+	public BinaryFiducialGridSize getGridSize() { return gridSize; }
 
 	public double getTargetWidth() {
 		return targetWidth;

@@ -20,6 +20,7 @@ package boofcv.app;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.BinaryFiducialGridSize;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.alg.geo.PerspectiveOps;
@@ -81,6 +82,10 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("                                     DEFAULT: true");
 		System.out.println("  --Size=<float>                     Specifies the size of all the fiducials");
 		System.out.println("                                     DEFAULT: 1");
+		System.out.println("  --GridWidth=<int | ALL>            Specifies how many squares to expect in the fiducial.");
+		System.out.println("                                     Valid options: 3,4,5 and ALL");
+		System.out.println("                                     Using ALL will attempt detection with all sizes ");
+		System.out.println("                                     but keep in mind this will be slow and less accurate");
 		System.out.println();
 		System.out.println("Flags for IMAGE:");
 		System.out.println();
@@ -104,10 +109,10 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println();
-		System.out.println("./application BINARY --Size=1");
+		System.out.println("./application BINARY --Size=1 --GridWidth=4");
 		System.out.println("        Opens the default camera at default resolution looking for binary patterns with a width of 1");
 		System.out.println();
-		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1");
+		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1 --GridWidth=ALL");
 		System.out.println("        Opens the default camera at default resolution looking for binary patterns with a width of 1");
 	}
 
@@ -148,6 +153,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 	void parseBinary( int index , String []args ) {
 		boolean robust=true;
 		double size=1;
+		BinaryFiducialGridSize gridSize = BinaryFiducialGridSize.FOUR_BY_FOUR; // if null, means all.
 
 		for(; index < args.length; index++ ) {
 			String arg = args[index];
@@ -161,15 +167,22 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 				robust = Boolean.parseBoolean(parameters);
 			} else if( flagName.compareToIgnoreCase("Size") == 0 ) {
 				size = Double.parseDouble(parameters);
+			} else if( flagName.compareToIgnoreCase("GridWidth") == 0 ) {
+				if("ALL".compareToIgnoreCase(parameters) == 0) {
+					gridSize = null; // Use ALL
+				} else {
+					gridSize = BinaryFiducialGridSize.gridSizeForWidth(Integer.parseInt(parameters == null ? "4" :parameters));
+				}
 			} else {
 				throw new RuntimeException("Unknown image option "+flagName);
 			}
 		}
 
-		System.out.println("binary: robust = "+robust+" size = "+size);
+		System.out.println("binary: robust = "+robust+" size = "+size + " grid width = " + (gridSize == null ? "ALL" : gridSize));
 
 		ConfigFiducialBinary configFid = new ConfigFiducialBinary();
 		configFid.targetWidth = size;
+		configFid.gridSize = gridSize;
 		configFid.squareDetector.minimumEdgeIntensity = 10;
 
 		ConfigThreshold configThreshold ;
@@ -178,6 +191,8 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10);
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
+
+
 
 		detector = FactoryFiducial.squareBinary(configFid, configThreshold, ImageUInt8.class);
 	}

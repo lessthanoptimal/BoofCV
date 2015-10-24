@@ -19,23 +19,41 @@ public enum BinaryFiducialGridSize {
     FIVE_BY_FIVE(5);
 
 
-    private int _elements;
+    private int elementsWide;
 
     BinaryFiducialGridSize(final int elements) {
-            _elements = elements;
+            elementsWide = elements;
     }
 
     public int getWidth() {
-            return _elements;
+            return elementsWide;
     }
 
     public int getNumberOfElements() {
-            return _elements * _elements;
+            return elementsWide * elementsWide;
     }
 
 
     public int getNumberOfDistinctFiducials() {
-        return (int) Math.pow(2, _elements * _elements - 4);
+        return (int) Math.pow(2, elementsWide * elementsWide - 4);
+    }
+
+    public static BinaryFiducialGridSize gridSizeForWidth(int gridWidth) {
+        switch (gridWidth) {
+            case 3:
+                return THREE_BY_THREE;
+            case 4:
+                return FOUR_BY_FOUR;
+            case 5:
+                return FIVE_BY_FIVE;
+            default:
+                throw new IllegalArgumentException("3-5 are the only valid values for gridWidth");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return elementsWide + "x" + elementsWide;
     }
 }
 
