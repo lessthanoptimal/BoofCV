@@ -1,6 +1,8 @@
 dependencies {
     compile project(':main:ip')
     compile project(':main:feature')
+
+    testCompile project(':main:visualize')
 }
 
 idea {

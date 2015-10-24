@@ -47,7 +47,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 
 	// storage for computed homography
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
-	DenseMatrix64F Hrefined = new DenseMatrix64F(3,3);
+//	DenseMatrix64F Hrefined = new DenseMatrix64F(3,3);
 	// transform which applies the homography
 	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
 
@@ -87,8 +87,8 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 	 * @param corner0 Top left corner
 	 * @param corner1 Top right corner
 	 * @param corner2 Bottom right corner
-	 * @param corner3 Bottom elft corner
-	 * @return undistorted image.  Memory
+	 * @param corner3 Bottom left corner
+	 * @return true if successful or false if it failed
 	 */
 	public boolean apply( T input ,
 					Point2D_F64 corner0 , Point2D_F64 corner1 ,

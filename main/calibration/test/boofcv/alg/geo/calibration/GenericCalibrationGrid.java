@@ -182,15 +182,15 @@ public class GenericCalibrationGrid {
 		}
 
 		for(Zhang99ParamAll.View v : ret.views ) {
-			double rotX = (rand.nextDouble()-0.5)*0.1;
-			double rotY = (rand.nextDouble()-0.5)*0.1;
-			double rotZ = (rand.nextDouble()-0.5)*0.1;
+			double rotX = (rand.nextDouble()-0.5)*0.05;
+			double rotY = (rand.nextDouble()-0.5)*0.05;
+			double rotZ = (rand.nextDouble()-0.5)*0.05;
 			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
 			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
 
 			double x = rand.nextGaussian()*5;
 			double y = rand.nextGaussian()*5;
-			double z = rand.nextGaussian()*5-100;
+			double z = rand.nextGaussian()*5-300;
 
 			v.T.set(x,y,z);
 		}

@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -40,11 +41,25 @@ public class TestCalibrationPlanarGridZhang99 {
 	 */
 	@Test
 	public void fullTest() {
+		fullTest(false);
+		fullTest(true);
+	}
+
+	public void fullTest( boolean partial ) {
 		List<Point2D_F64> grid = GenericCalibrationGrid.standardLayout();
 		Zhang99ParamAll expected = GenericCalibrationGrid.createStandardParam(true,2,true,3,rand);
 
 		List<CalibrationObservation> observations = GenericCalibrationGrid.createObservations(expected,grid);
 
+		if( partial ) {
+			for (int i = 0; i < observations.size(); i++) {
+				CalibrationObservation o = observations.get(i);
+				for (int j = 0; j < 5; j++) {
+					o.observations.remove(i*2+j);
+					o.indexes.remove(i*2+j);
+				}
+			}
+		}
 		CalibrationPlanarGridZhang99 alg =
 				new CalibrationPlanarGridZhang99(grid,expected.assumeZeroSkew,2,expected.includeTangential);
 
@@ -53,14 +68,6 @@ public class TestCalibrationPlanarGridZhang99 {
 		Zhang99ParamAll found = alg.getOptimized();
 
 		checkIntrinsicOnly(expected, found,0.01,0.1,0.1);
-	}
-
-	/**
-	 * Full test with some of the observations removed.  This tests to see if it correctly uses the index of each point
-	 */
-	@Test
-	public void fullTest_partial() {
-		fail("implement");
 	}
 
 	/**

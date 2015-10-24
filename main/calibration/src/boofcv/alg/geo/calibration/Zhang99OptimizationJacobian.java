@@ -161,9 +161,9 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 				indexJacX += indexView*6;
 				indexJacY += indexView*6;
 
-				rodriguesGradient(rodJacobian.Rx,grid.get(i),cameraPt, normPt,output);
-				rodriguesGradient(rodJacobian.Ry,grid.get(i),cameraPt, normPt,output);
-				rodriguesGradient(rodJacobian.Rz,grid.get(i),cameraPt, normPt,output);
+				rodriguesGradient(rodJacobian.Rx,grid.get(gridIndex),cameraPt, normPt,output);
+				rodriguesGradient(rodJacobian.Ry,grid.get(gridIndex),cameraPt, normPt,output);
+				rodriguesGradient(rodJacobian.Rz,grid.get(gridIndex),cameraPt, normPt,output);
 
 				translateGradient(cameraPt, normPt,output);
 			}

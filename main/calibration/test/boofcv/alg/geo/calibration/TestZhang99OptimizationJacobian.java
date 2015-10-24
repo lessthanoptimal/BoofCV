@@ -37,8 +37,23 @@ public class TestZhang99OptimizationJacobian {
 
 	Random rand = new Random(234);
 
+	boolean partial;
+
 	@Test
 	public void compareToNumeric() {
+		partial = false;
+		compareToNumerical(false,false);
+		compareToNumerical(true,false);
+		compareToNumerical(false,true);
+		compareToNumerical(true, true);
+	}
+
+	/**
+	 * Have only partial set of points for each observation
+	 */
+	@Test
+	public void compareToNumeric_partial() {
+		partial = true;
 		compareToNumerical(false,false);
 		compareToNumerical(true,false);
 		compareToNumerical(false,true);
@@ -48,12 +63,22 @@ public class TestZhang99OptimizationJacobian {
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
 		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
-		List<Point2D_F64> gridPts = PlanarDetectorSquareGrid.createLayout(1, 1, 30, 30);
+		List<Point2D_F64> gridPts = PlanarDetectorSquareGrid.createLayout(2, 3, 30, 30);
 
 		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
 			observations.add( estimate(param,param.views[i],gridPts));
+		}
+
+		if( partial ) {
+			for (int i = 0; i < observations.size(); i++) {
+				CalibrationObservation c = observations.get(i);
+				for (int j = 0; j < 5; j++) {
+					c.indexes.remove(3*i);
+					c.observations.remove(3*i);
+				}
+			}
 		}
 
 		double dataParam[] = new double[ param.numParameters() ];
@@ -70,6 +95,5 @@ public class TestZhang99OptimizationJacobian {
 //		DerivativeChecker.jacobianPrintR(func, alg, dataParam, tol);
 		assertTrue(DerivativeChecker.jacobianR(func, alg, dataParam, tol));
 	}
-
 
 }

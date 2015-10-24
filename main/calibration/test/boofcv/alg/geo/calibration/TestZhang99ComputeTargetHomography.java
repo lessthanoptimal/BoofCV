@@ -41,6 +41,11 @@ public class TestZhang99ComputeTargetHomography {
 	 */
 	@Test
 	public void basicTest() {
+		basicTest(false);
+		basicTest(true);
+	}
+
+	public void basicTest( boolean removeAFew ) {
 		// create a grid an apply an arbitrary transform to it
 		List<Point2D_F64> layout = GenericCalibrationGrid.standardLayout();
 
@@ -49,6 +54,13 @@ public class TestZhang99ComputeTargetHomography {
 		Se3_F64 motion = new Se3_F64(R,T);
 
 		CalibrationObservation observations = GenericCalibrationGrid.observations(motion,layout);
+
+		if( removeAFew ) {
+			for (int i = 0; i < 6; i++) {
+				observations.observations.remove(5);
+				observations.indexes.remove(5);
+			}
+		}
 
 		// compute the homography
 		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(layout);
@@ -67,5 +79,5 @@ public class TestZhang99ComputeTargetHomography {
 			double diff = a.distance(p);
 			assertEquals(0,diff,1e-8);
 		}
-	}
+}
 }

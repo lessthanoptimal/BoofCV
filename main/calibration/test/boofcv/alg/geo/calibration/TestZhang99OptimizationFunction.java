@@ -71,8 +71,8 @@ public class TestZhang99OptimizationFunction {
 	}
 	
 	protected static CalibrationObservation estimate( Zhang99ParamAll param ,
-												 Zhang99ParamAll.View v ,
-												 List<Point2D_F64> grid ) {
+													  Zhang99ParamAll.View v ,
+													  List<Point2D_F64> grid ) {
 
 		CalibrationObservation ret = new CalibrationObservation();
 		
@@ -105,6 +105,50 @@ public class TestZhang99OptimizationFunction {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Have there only be partial observations of the fiducial
+	 */
+	@Test
+	public void computeResidualsPerfect_partial() {
+		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(false, 2, true, 3, rand);
+
+		double array[] = new double[ param.numParameters() ];
+		param.convertToParam(array);
+
+		List<Point2D_F64> gridPts = GenericCalibrationGrid.standardLayout();
+
+		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
+
+		for( int i = 0; i < param.views.length; i++ ) {
+			CalibrationObservation set = estimate(param, param.views[i], gridPts);
+			observations.add( set );
+
+			for (int j = 0; j < 5; j++) {
+				set.observations.remove(i * 2 + j);
+				set.indexes.remove(i*2+j);
+			}
+		}
+
+		int expectedM = 0;
+		for (int i = 0; i < observations.size(); i++) {
+			expectedM += observations.get(i).size()*2;
+		}
+
+		Zhang99OptimizationFunction alg =
+				new Zhang99OptimizationFunction( new Zhang99ParamAll(false,2,true,3),gridPts,observations );
+
+		assertEquals(expectedM,alg.getNumOfOutputsM());
+		double residuals[] = new double[ alg.getNumOfOutputsM()];
+		for( int i = 0; i < residuals.length; i++ )
+			residuals[i] = 1;
+
+		alg.process(array, residuals);
+
+		for( double r : residuals ) {
+			assertEquals(0,r,1e-8);
+		}
 	}
 
 }

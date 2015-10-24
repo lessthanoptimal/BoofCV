@@ -41,6 +41,11 @@ public class TestRadialDistortionEstimateLinear {
 	 */
 	@Test
 	public void perfect() {
+		perfect(false);
+		perfect(true);
+	}
+
+	public void perfect( boolean partial ) {
 
 		double distort[] = new double[]{0.01,-0.002};
 		DenseMatrix64F K = GenericCalibrationGrid.createStandardCalibration();
@@ -64,12 +69,21 @@ public class TestRadialDistortionEstimateLinear {
 
 			CalibrationObservation set = new CalibrationObservation();
 			set.observations = pixels;
-
 			for (int i = 0; i < pixels.size(); i++) {
 				set.indexes.add(i);
 			}
 
 			observations.add( set );
+		}
+
+		if( partial ) {
+			for (int i = 0; i < observations.size(); i++) {
+				CalibrationObservation c = observations.get(i);
+				for (int j = 0; j < 5; j++) {
+					c.observations.remove(2 * i + j);
+					c.indexes.remove(2*i + j);
+				}
+			}
 		}
 
 		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(layout,distort.length);
