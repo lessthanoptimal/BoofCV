@@ -43,6 +43,9 @@ Version : Alpha 0.20
   * RemovePerspectiveDistortion
 - Partially observable calibration targets are now supported
   * Mathematically at least.  Targets which can be partially observed are not supported yet
+- ConvertBufferedImage.stripAlphaChannel()
+  * Can be used to ensure that an alpha channel is not in the buffered image
+  * Inspired by an issue pete-experimenter had
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image

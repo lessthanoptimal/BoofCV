@@ -39,6 +39,26 @@ import java.lang.reflect.Array;
 public class ConvertBufferedImage {
 
 	/**
+	 * Returns an image which doesn't have an alpha channel.  If the input image doesn't have an alpha
+	 * channel to start then its returned as is.  Otherwise a new image is created and the RGB channels are
+	 * copied and the new image returned.
+	 *
+	 * @param image Input image
+	 * @return Image without an alpha channel
+	 */
+	public static BufferedImage stripAlphaChannel( BufferedImage image ) {
+		int numBands = image.getRaster().getNumBands();
+
+		if( numBands == 4 ) {
+			BufferedImage output = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_RGB);
+			output.createGraphics().drawImage(image,0,0,null);
+			return output;
+		} else {
+			return image;
+		}
+	}
+
+	/**
 	 * For BufferedImage stored as a byte array internally it extracts an
 	 * interleaved image.  The input image and the returned image will both
 	 * share the same internal data array.  Using this function allows unnecessary

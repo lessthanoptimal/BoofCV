@@ -43,6 +43,7 @@ public class TestConvertBufferedImage {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
+
 	@Test
 	public void checkInputs() {
 		BufferedImage found;
@@ -86,7 +87,7 @@ public class TestConvertBufferedImage {
 
 		found = ConvertBufferedImage.extractInterleavedU8(origImg);
 
-		assertEquals(2*10*3+3, found.startIndex);
+		assertEquals(2 * 10 * 3 + 3, found.startIndex);
 		assertEquals(imgWidth*3, found.stride);
 		assertEquals(5, found.width);
 		assertEquals(6, found.height);
@@ -374,7 +375,7 @@ public class TestConvertBufferedImage {
 				if( j == 1 ) {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 					imgInt8 = imgInt8.subimage(1,2,imgWidth,imgHeight);
-					imgF32 = imgF32.subimage(1,2,imgWidth,imgHeight);
+					imgF32 = imgF32.subimage(1, 2, imgWidth, imgHeight);
 				}
 //				System.out.println(i+" "+j);
 				ConvertBufferedImage.convertFromInterleaved(origImg, imgInt8, false);
@@ -436,9 +437,9 @@ public class TestConvertBufferedImage {
 	public void convertTo( ImageBase input , int buffType  ) {
 		BufferedImage output = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
 
-		ConvertBufferedImage.convertTo(input, output,false);
+		ConvertBufferedImage.convertTo(input, output, false);
 
-		BoofTesting.checkEquals(output, input,false,  1);
+		BoofTesting.checkEquals(output, input, false, 1);
 	}
 
 	/**
@@ -521,7 +522,7 @@ public class TestConvertBufferedImage {
 		// this always returns it in ARGB order
 		int found = imageA.getRGB(5,6);
 
-		assertTrue(found != 0 );
+		assertTrue(found != 0);
 
 		if( reorder ) {
 			if( numBands == 4 ) {
@@ -654,5 +655,25 @@ public class TestConvertBufferedImage {
 
 		b = a.getSubimage(1,0,19,30);
 		assertTrue(ConvertBufferedImage.isSubImage(b));
+	}
+
+	@Test
+	public void stripAlphaChannel() {
+		BufferedImage a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage b = ConvertBufferedImage.stripAlphaChannel(a);
+
+		assertTrue(a != b);
+		assertEquals(3,b.getRaster().getNumBands());
+
+		BufferedImage c = ConvertBufferedImage.stripAlphaChannel(b);
+		assertTrue(b == c);
+
+		a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_GRAY);
+		c = ConvertBufferedImage.stripAlphaChannel(a);
+		assertTrue(a == c);
+
+		a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_3BYTE_BGR);
+		c = ConvertBufferedImage.stripAlphaChannel(a);
+		assertTrue(a == c);
 	}
 }
