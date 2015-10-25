@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFiducialDetectorChecks {
+public abstract class GenericFiducialPoseDetectorChecks {
 
 	protected List<ImageType> types = new ArrayList<ImageType>();
 
@@ -43,7 +43,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 	public abstract IntrinsicParameters loadIntrinsic();
 
-	public abstract FiducialDetector createDetector( ImageType imageType );
+	public abstract FiducialPoseDetector createDetector( ImageType imageType );
 
 	/**
 	 * See if it blows if if there are no distortion parameters
@@ -58,7 +58,7 @@ public abstract class GenericFiducialDetectorChecks {
 		// normal case.  should work
 		for( ImageType type : types ) {
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 			detector.setIntrinsic(param);
 			detector.detect(image);
 		}
@@ -68,7 +68,7 @@ public abstract class GenericFiducialDetectorChecks {
 		param.t1 = param.t2 = 0;
 		for( ImageType type : types ) {
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 			detector.setIntrinsic(param);
 			detector.detect(image);
 		}
@@ -85,7 +85,7 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 
 			IntrinsicParameters intrinsic = loadIntrinsic();
 			assertTrue(intrinsic.isDistorted());
@@ -151,7 +151,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 			ImageBase image = loadImage(type);
 			ImageBase orig = image.clone();
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -167,7 +167,7 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -206,7 +206,7 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -250,7 +250,7 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
+			FiducialPoseDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -261,7 +261,7 @@ public abstract class GenericFiducialDetectorChecks {
 			double location[] = new double[ detector.totalFound() ];
 			double orientation[] = new double[ detector.totalFound() ];
 
-			FiducialStability results = new FiducialStability();
+			FiducialPoseStability results = new FiducialPoseStability();
 			for (int i = 0; i < detector.totalFound(); i++) {
 				detector.computeStability(i,0.2,results);
 

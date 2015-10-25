@@ -20,9 +20,9 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.abst.fiducial.FiducialStability;
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.FiducialPoseDetector;
+import boofcv.abst.fiducial.FiducialPoseStability;
+import boofcv.abst.fiducial.SquareImage_to_FiducialPoseDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
@@ -76,7 +76,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	I gray;
 
-	FiducialDetector detector;
+	FiducialPoseDetector detector;
 
 	IntrinsicParameters intrinsic;
 
@@ -85,10 +85,10 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	JCheckBox computeStability = new JCheckBox("Stability");
 
-	FiducialStability stability = new FiducialStability();
+	FiducialPoseStability stability = new FiducialPoseStability();
 
 	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
-	FiducialStability stabilityMax = new FiducialStability();
+	FiducialPoseStability stabilityMax = new FiducialPoseStability();
 
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.ms(3, imageType));
@@ -263,7 +263,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			double length = 0.1;
 			detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
 
-			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
+			SquareImage_to_FiducialPoseDetector<I> d = (SquareImage_to_FiducialPoseDetector<I>)detector;
 
 			String pathImg = new File(path,"../patterns").getPath();
 			List<String> names = new ArrayList<String>();

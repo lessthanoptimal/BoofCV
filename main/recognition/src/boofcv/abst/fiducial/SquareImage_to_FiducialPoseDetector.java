@@ -24,14 +24,14 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialDetector}
+ * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialPoseDetector}
  *
  * @author Peter Abeles
  */
-public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
-	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareImage<T>>
+public class SquareImage_to_FiducialPoseDetector<T extends ImageSingleBand>
+	extends BaseSquare_FiducialPoseDetector<T,DetectFiducialSquareImage<T>>
 {
-	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
+	public SquareImage_to_FiducialPoseDetector(DetectFiducialSquareImage<T> alg) {
 		super(alg);
 	}
 

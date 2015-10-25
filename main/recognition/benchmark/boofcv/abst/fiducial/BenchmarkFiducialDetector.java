@@ -35,11 +35,11 @@ import java.util.List;
  */
 public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 
-	FiducialDetector<T> detector;
+	FiducialPoseDetector<T> detector;
 	List<T> images = new ArrayList<T>();
 	IntrinsicParameters param;
 
-	public BenchmarkFiducialDetector(FiducialDetector<T> detector) {
+	public BenchmarkFiducialDetector(FiducialPoseDetector<T> detector) {
 		this.detector = detector;
 	}
 
@@ -68,7 +68,7 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 		return (numIterations*images.size())/seconds;
 	}
 
-	private static void perform(String directory, FiducialDetector detector) {
+	private static void perform(String directory, FiducialPoseDetector detector) {
 		IntrinsicParameters intrinsic = UtilIO.loadXML(directory + "intrinsic.xml");
 
 //		intrinsic.radial = null;
@@ -86,7 +86,7 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 	public static void main(String[] args) {
 		String directory = UtilIO.pathExample("fiducial/binary/");
 
-		FiducialDetector detector = FactoryFiducial.squareBinary(
+		FiducialPoseDetector detector = FactoryFiducial.squareBinary(
 				new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , ImageUInt8.class);
 		perform(directory, detector);
 

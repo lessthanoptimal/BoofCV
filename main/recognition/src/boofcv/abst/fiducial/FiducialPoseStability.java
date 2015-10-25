@@ -23,7 +23,7 @@ package boofcv.abst.fiducial;
  *
  * @author Peter Abeles
  */
-public class FiducialStability {
+public class FiducialPoseStability {
 	/**
 	 * Sensitivity of location estimate.  Represents the maximum error found at the given pixel error in the fiducial's
 	 * native units.  Larger number means less stable the estimate is.

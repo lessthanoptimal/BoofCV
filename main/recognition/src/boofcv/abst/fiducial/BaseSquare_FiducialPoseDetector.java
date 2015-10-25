@@ -27,12 +27,12 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
- * Wrapper around {@link BaseDetectFiducialSquare} for {@link FiducialDetector}
+ * Wrapper around {@link BaseDetectFiducialSquare} for {@link FiducialPoseDetector}
  *
  * @author Peter Abeles
  */
-public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
-	implements FiducialDetector<T>
+public abstract class BaseSquare_FiducialPoseDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
+	implements FiducialPoseDetector<T>
 {
 	Detector alg;
 
@@ -40,7 +40,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 
 	ImageType<T> type;
 
-	public BaseSquare_FiducialDetector(Detector alg) {
+	public BaseSquare_FiducialPoseDetector(Detector alg) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
 	}
@@ -77,7 +77,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	}
 
 	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+	public boolean computeStability(int which, double disturbance, FiducialPoseStability results) {
 		Quadrilateral_F64 quad = alg.getFound().get(which).location;
 		if( !this.stability.process(disturbance, quad) ) {
 			return false;

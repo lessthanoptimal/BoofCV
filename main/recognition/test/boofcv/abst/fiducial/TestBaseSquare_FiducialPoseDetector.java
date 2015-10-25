@@ -21,6 +21,6 @@ package boofcv.abst.fiducial;
 /**
  * @author Peter Abeles
  */
-public class TestBaseSquare_FiducialDetector {
+public class TestBaseSquare_FiducialPoseDetector {
 	// intentionally left blank since it's functionality is tested elsewhere
 }

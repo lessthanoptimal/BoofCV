@@ -36,12 +36,12 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
+public class TestSquareBinary_to_FiducialPoseDetector extends GenericFiducialPoseDetectorChecks {
 
 
 	String directory = UtilIO.pathExample("fiducial/binary/");
 
-	public TestSquareBinary_to_FiducialDetector() {
+	public TestSquareBinary_to_FiducialPoseDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
 		types.add( ImageType.single(ImageFloat32.class));
 	}
@@ -59,7 +59,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	}
 
 	@Override
-	public FiducialDetector createDetector(ImageType imageType) {
+	public FiducialPoseDetector createDetector(ImageType imageType) {
 		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
 				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6),
 				imageType.getImageClass());

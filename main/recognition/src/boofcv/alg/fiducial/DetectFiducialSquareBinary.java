@@ -107,11 +107,11 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
 		super(inputToBinary,quadDetector, (int)Math.ceil(w * gridWidth /(1.0-borderWidthFraction*2.0)) ,inputType);
 
-		if( gridWidth < 3 )
-			throw new IllegalArgumentException("The grid must be at least 3 elements wide");
+		if( gridWidth < 3 || gridWidth > 8)
+			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");
 
-		if( borderWidthFraction <= 0 || borderWidthFraction >= 1.0 )
-			throw new RuntimeException("Border width fraction must be 0 < x < 1.0");
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");
 
 		this.gridWidth = gridWidth;
 		this.borderWidthFraction = borderWidthFraction;

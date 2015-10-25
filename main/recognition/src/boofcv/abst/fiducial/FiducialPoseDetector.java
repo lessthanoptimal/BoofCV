@@ -24,12 +24,13 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Interface for detecting fiducials.  If the {@link boofcv.struct.calib.IntrinsicParameters} specifies lens
- * distortion then it will be automatically removed and if there is no lens distortion then it will skip that step.
+ * Interface for detecting fiducials and estimating their 6-DOF pose.  The camera must be calibrated by
+ * specifying {@link boofcv.struct.calib.IntrinsicParameters}.  When one or more fiducials are detected their IDs and pose
+ * are returned.
  *
  * @author Peter Abeles
  */
-public interface FiducialDetector<T extends ImageBase>
+public interface FiducialPoseDetector<T extends ImageBase>
 {
 	/**
 	 * Call to detect the fiducial inside the image.  Must call
@@ -54,7 +55,7 @@ public interface FiducialDetector<T extends ImageBase>
 	 * @param results (output) Storage for stability metrics.
 	 * @return true if successful or false if it failed for some reason
 	 */
-	boolean computeStability( int which , double disturbance , FiducialStability results );
+	boolean computeStability( int which , double disturbance , FiducialPoseStability results );
 
 	/**
 	 * Specifies the intrinsic camera parameters.  Allows for the euclidean geometry of be extracted from

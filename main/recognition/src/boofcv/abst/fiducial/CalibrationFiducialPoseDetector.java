@@ -48,8 +48,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationFiducialDetector<T extends ImageSingleBand>
-		implements FiducialDetector<T>
+public class CalibrationFiducialPoseDetector<T extends ImageSingleBand>
+		implements FiducialPoseDetector<T>
 {
 	// detects the calibration target
 	PlanarCalibrationDetector detector;
@@ -80,8 +80,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector(ConfigChessboard config,
-									   Class<T> imageType) {
+	public CalibrationFiducialPoseDetector(ConfigChessboard config,
+										   Class<T> imageType) {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
@@ -94,8 +94,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	/**
 	 * Configure it to detect square-grid style targets
 	 */
-	public CalibrationFiducialDetector(ConfigSquareGrid config,
-									   Class<T> imageType) {
+	public CalibrationFiducialPoseDetector(ConfigSquareGrid config,
+										   Class<T> imageType) {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
 		int squareCols = config.numCols/2+1;
 		int squareRows = config.numRows/2+1;
@@ -182,7 +182,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
 	 */
 	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+	public boolean computeStability(int which, double disturbance, FiducialPoseStability results) {
 
 		if( !targetDetected )
 			return false;

@@ -20,8 +20,8 @@ package boofcv.app;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.FiducialPoseDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialPoseDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
@@ -55,7 +55,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 
 	String intrinsicPath;
 
-	FiducialDetector<ImageUInt8> detector;
+	FiducialPoseDetector<ImageUInt8> detector;
 
 	void printHelp() {
 		System.out.println("./application <Camera Options> <Fiducial Type> <Fiducial Specific Options>");
@@ -231,7 +231,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 
-		SquareImage_to_FiducialDetector<ImageUInt8> detector =
+		SquareImage_to_FiducialPoseDetector<ImageUInt8> detector =
 				FactoryFiducial.squareImage(config, configThreshold, ImageUInt8.class);
 
 		for (int i = 0; i < paths.size(); i++) {

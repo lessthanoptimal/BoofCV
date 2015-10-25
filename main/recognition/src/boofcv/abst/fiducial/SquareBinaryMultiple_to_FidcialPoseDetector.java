@@ -36,8 +36,8 @@ import java.util.List;
  *
  * @author Nathan Pahucki, <a href="mailto:npahucki@gmail.com"> npahucki@gmail.com</a>
  */
-public final class SquareBinaryMultiple_to_FidcialDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
-	implements FiducialDetector<T> {
+public final class SquareBinaryMultiple_to_FidcialPoseDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
+	implements FiducialPoseDetector<T> {
 
 	private final List<DetectFiducialSquareBinary<T>> algs;
 	private double targetWidth;
@@ -45,7 +45,7 @@ public final class SquareBinaryMultiple_to_FidcialDetector<T extends ImageSingle
 
 
 
-	public SquareBinaryMultiple_to_FidcialDetector(List<DetectFiducialSquareBinary<T>> algs, double targetWidth) {
+	public SquareBinaryMultiple_to_FidcialPoseDetector(List<DetectFiducialSquareBinary<T>> algs, double targetWidth) {
 		if(algs.isEmpty()) throw new IllegalArgumentException("At least one DetectFiducialSquareBinary must be provided");
 		// Sanity check
 		final Class inputClass = algs.get(0).getInputType();
@@ -70,7 +70,7 @@ public final class SquareBinaryMultiple_to_FidcialDetector<T extends ImageSingle
 	}
 
 	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+	public boolean computeStability(int which, double disturbance, FiducialPoseStability results) {
 		throw new RuntimeException("Not supported yet");
 	}
 

@@ -18,7 +18,7 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialPoseDetector;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
@@ -60,7 +60,7 @@ public class ExampleFiducialImage {
 		ImageFloat32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(ImageFloat32.class));
 
 		// Detect the fiducial
-		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareImage(
+		SquareImage_to_FiducialPoseDetector<ImageFloat32> detector = FactoryFiducial.squareImage(
 				new ConfigFiducialImage(), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), ImageFloat32.class);
 //				new ConfigFiducialImage(), ConfigThreshold.fixed(100), ImageFloat32.class);
 
