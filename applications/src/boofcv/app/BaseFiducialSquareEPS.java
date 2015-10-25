@@ -44,10 +44,6 @@ import java.io.PrintStream;
  */
 public abstract class BaseFiducialSquareEPS {
 
-	// The multiple of a a square inside the grid that the border should be.
-	// In order to work well with the DetectFiducialSquareBi
-	private static final float BLACK_BORDER_MULTIPLE = 2.0F;
-
 	// threshold for converting to a binary image
 	public int threshold = 255/2;
 	public double UNIT_TO_POINTS;
@@ -96,12 +92,14 @@ public abstract class BaseFiducialSquareEPS {
 	double pageBorderX = 1*CM_TO_POINTS;
 	double pageBorderY = 1*CM_TO_POINTS;
 
+	// how wide the fiducial's black border is relative to its total width
+	public double blackBorderFractionalWidth;
+
 	// name of the output file
 	String outputFileName;
 
 	// stream in which the output file is written to
 	PrintStream out;
-
 
 	public Unit getUnit() {
 		return unit;
@@ -147,6 +145,10 @@ public abstract class BaseFiducialSquareEPS {
 	public void setOffset( double offsetX , double offsetY , Unit units) {
 		this.offsetX = units.convert(offsetX,Unit.CENTIMETER)*CM_TO_POINTS;
 		this.offsetY = units.convert(offsetY,Unit.CENTIMETER)*CM_TO_POINTS;
+	}
+
+	public void setBlackBorderFractionalWidth(double blackBorderFractionalWidth) {
+		this.blackBorderFractionalWidth = blackBorderFractionalWidth;
 	}
 
 	public void setBoundaryHack(boolean boundaryHack) {
@@ -230,8 +232,8 @@ public abstract class BaseFiducialSquareEPS {
 
 		fiducialBoxWidth = fiducialWidthUnit* UNIT_TO_POINTS;
 		whiteBorder = whiteBorderUnit* UNIT_TO_POINTS;
-		blackBorder = getBlackBorderWidth(fiducialBoxWidth);
-		innerWidth = getFiducialInnerWidth(fiducialBoxWidth);
+		blackBorder = fiducialBoxWidth*blackBorderFractionalWidth;
+		innerWidth = fiducialBoxWidth*(1.0-2.0*blackBorderFractionalWidth);
 		fiducialTotalWidth = fiducialBoxWidth +whiteBorder*2;
 
 		//  zone in which the target can't be placed unless it will print inside the border, which is not allowed
@@ -411,8 +413,8 @@ public abstract class BaseFiducialSquareEPS {
 	private void printInvisibleBoundary() {
 		out.println(" 1.0 setgray");
 		out.printf(" newpath 0 0 moveto %f 0 rlineto 0 setlinewidth stroke\n", pageWidth);
-		out.printf(" newpath 0 0 moveto 0 %f lineto 0 setlinewidth stroke\n",pageHeight);
-		out.printf(" newpath %f 0 moveto %f %f lineto 0 setlinewidth stroke\n",pageWidth,pageWidth,pageHeight);
+		out.printf(" newpath 0 0 moveto 0 %f lineto 0 setlinewidth stroke\n", pageHeight);
+		out.printf(" newpath %f 0 moveto %f %f lineto 0 setlinewidth stroke\n", pageWidth, pageWidth, pageHeight);
 		out.printf(" newpath 0 %f moveto %f %f lineto 0 setlinewidth stroke\n", pageHeight, pageWidth, pageHeight);
 		out.println(" 0.0 setgray");
 		out.println();
@@ -499,24 +501,4 @@ public abstract class BaseFiducialSquareEPS {
 	 * Name of the image which will go into the EPS document
 	 */
 	public abstract String selectEpsName();
-
-	/**
-	 * The width in points of the black border for the fiducial. Subclasses can override this if
-	 * some special calculation is needed for the type of fiducual. The default is fiducialBoxWidth / 4.0 .
-	 * @param fiducialBoxWidth The width of the total fidcual box, NOT including the white border.
-	 * @return the width in points.
-	 */
-	protected double getBlackBorderWidth(final double fiducialBoxWidth) {
-		return fiducialBoxWidth / 4.0;
-	}
-
-	/**
-	 * The width in points of inner area for the fiducial. Subclasses can override this if
-	 * some special calculation is needed for the type of fiducual. The default is fiducialBoxWidth / 2.0 .
-	 * @param fiducialBoxWidth The width of the total fidcual box, NOT including the white border.
-	 * @return the width in points.
-	 */
-	protected double getFiducialInnerWidth(final double fiducialBoxWidth) {
-		return fiducialBoxWidth / 2.0;
-	}
 }

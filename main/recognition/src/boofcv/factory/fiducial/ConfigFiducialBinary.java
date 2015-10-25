@@ -78,10 +78,10 @@ public class ConfigFiducialBinary implements Configuration {
 	public void checkValidity() {
 		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
 			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
-		if( gridWidth < 3 )
-			throw new IllegalArgumentException("Grid with must be at least 3 elements");
-		if( borderWidthFraction <= 0 || borderWidthFraction > 1 )
-			throw new IllegalArgumentException("Border with fraction must be 0 < fraction < 1");
+		if( gridWidth < 3 || gridWidth > 8 )
+			throw new IllegalArgumentException("Grid width must be at least 3 elements and at most 8");
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+			throw new IllegalArgumentException("Border width fraction must be 0 < fraction < 0.5");
 	}
 
 	public int getGridWidth() {

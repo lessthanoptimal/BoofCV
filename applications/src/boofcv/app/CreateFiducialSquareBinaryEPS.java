@@ -18,8 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.BinaryFiducialGridSize;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.GrowQueue_I64;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -32,30 +31,31 @@ import java.io.PrintStream;
 public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 
 	// list of the fiducial ID's it will print
-	GrowQueue_I32 numbers = new GrowQueue_I32();
+	GrowQueue_I64 numbers = new GrowQueue_I64();
 
-	private BinaryFiducialGridSize gridSize = BinaryFiducialGridSize.FOUR_BY_FOUR;
+	private int gridWidth = 4;
 
 	@Override
 	protected void printPatternDefinitions() {
 
-		out.print("  /sl "+(innerWidth/gridSize.getWidth())+" def\n  /w0 0 def\n");
+		out.print("  /sl "+(innerWidth/gridWidth)+" def\n  /w0 0 def\n");
 		// Handle different size grids.
-		for(int i = 1; i < gridSize.getWidth(); i++) {
+		for(int i = 1; i < gridWidth; i++) {
 			out.print("  /w" + i + " { w" + (i-1) + " sl add} def\n");
 		}
 		out.print("  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n");
 
 		for( int i = 0; i < numbers.size(); i++ ) {
-			int patternNumber = numbers.get(i);
+			long patternNumber = numbers.get(i);
 
 			out.print("  /"+getPatternPrintDef(i)+" {\n"+
 					"% Block corner used to identify orientation\n" +
 					"  0 0 box\n");
-			final int bitCount = gridSize.getNumberOfElements() - 4;
+			final int bitCount = numberOfElements() - 4;
 			for (int j = 0; j < bitCount; j++) {
-				if( (patternNumber & (1<<j)) != 0 ) {
-					box(out,j);
+				if( (patternNumber & (1L<<j)) != 0 ) {
+					System.out.println("bit "+j);
+					box(out, j);
 				}
 			}
 			out.print("} def\n");
@@ -69,11 +69,11 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 
 	@Override
 	protected void addPattern(String name) {
-		final int maxValue = (int) Math.pow(2, gridSize.getNumberOfElements() - 4) - 1;
-		int value = Integer.parseInt(name);
+		final long maxValue = (long) Math.pow(2, numberOfElements() - 4) - 1;
+		long value = Long.parseLong(name);
 		if( value < 0 || value > maxValue)
 			throw new IllegalArgumentException("Values must be tween 0 and " +maxValue + ", inclusive");
-		numbers.add( Integer.parseInt(name));
+		numbers.add( value );
 	}
 
 	@Override
@@ -98,58 +98,33 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 	}
 
 	private void box( PrintStream out , final int bit ) {
-		final int transitionBits[];
-		switch (gridSize) {
-			case THREE_BY_THREE:
-				transitionBits = new int[]{ 0 ,3 , 4 };
-				break;
-			case FOUR_BY_FOUR:
-				transitionBits = new int[]{ 1 ,9 , 11 };
-				break;
-			case FIVE_BY_FIVE:
-				transitionBits = new int[]{ 2 ,17 , 20 };
-				break;
-			default:
-				throw new RuntimeException("Unexpected grid size");
-		}
+
+		int transitionBit0 = gridWidth-3;
+		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
+		int transitionBit2 = transitionBit1 + gridWidth-2;
 
 		final int adjustedBit;
-		if( bit <= transitionBits[0] )
+		if( bit <= transitionBit0 )
 			adjustedBit = bit + 1;
-		else if( bit <= transitionBits[1] )
+		else if( bit <= transitionBit1 )
 			adjustedBit = bit + 2;
-		else if( bit <= transitionBits[2] )
+		else if( bit <= transitionBit2 )
 			adjustedBit = bit + 3;
 		else
-			throw new RuntimeException("Bit must be between 0 and " + transitionBits[2]);
+			throw new RuntimeException("Bit must be between 0 and " + transitionBit2);
 
-		int x = adjustedBit % gridSize.getWidth();
-		int y = adjustedBit / gridSize.getWidth();
+		int x = adjustedBit % gridWidth;
+		int y = adjustedBit / gridWidth;
 		out.print("  w" + x + " w" + y +" box\n");
 	}
 
-	@Override
-	protected double getFiducialInnerWidth(double fiducialBoxWidth) {
-		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2;
-		// border + bits + border squares.
-		// the whole width of the fiducial (including border), broken into squares,
-		// then the number of squares in the grid.
-		return fiducialBoxWidth / totalWidthInSquares * gridSize.getWidth();
+	private int numberOfElements() {
+		return gridWidth*gridWidth;
 	}
 
-	@Override
-	protected double getBlackBorderWidth(double fiducialBoxWidth) {
-		// To work properly with DetectFidualSquareBinary, we need to make
-		// sure the border is a multiple of 2 the size of a single square inside
-		// the fiducial.
-		final double totalWidthInSquares = 2 + gridSize.getWidth() + 2;
-		// border + bits + border squares.
-		// the whole width of the fiducial, broken into squares, then two of those squares for the border width.
-		return fiducialBoxWidth / totalWidthInSquares * 2;
-	}
 
-	public void setGridSize(BinaryFiducialGridSize gridSize) {
-		this.gridSize = gridSize;
+	public void setGridSize(int gridWidth) {
+		this.gridWidth = gridWidth;
 	}
 
 	public static void main(String[] args) throws IOException {
