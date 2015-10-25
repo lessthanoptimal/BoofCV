@@ -51,6 +51,9 @@ import java.util.List;
  */
 public class VisualizeSquareBinaryFiducial {
 
+	final static int gridWidth = 4;
+	final static double borderWidth = 0.25;
+
 	public void process( String nameImage , String nameIntrinsic ) {
 
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
@@ -63,7 +66,7 @@ public class VisualizeSquareBinaryFiducial {
 				ImageType.single(ImageFloat32.class));
 
 		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,ImageFloat32.class);
-		Detector detector = new Detector(inputToBinary);
+		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
 		detector.configure(paramUndist,false);
 		detector.setLengthSide(0.1);
 
@@ -98,8 +101,8 @@ public class VisualizeSquareBinaryFiducial {
 		public List<ImageUInt8> squares = new ArrayList<ImageUInt8>();
 		public List<ImageFloat32> squaresGray = new ArrayList<ImageFloat32>();
 
-		protected Detector( InputToBinary<ImageFloat32> inputToBinary ) {
-			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class)
+		protected Detector( int gridWidth, double borderWidth , InputToBinary<ImageFloat32> inputToBinary ) {
+			super(gridWidth,borderWidth,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class)
 					,ImageFloat32.class);
 		}
 

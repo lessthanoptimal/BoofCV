@@ -20,7 +20,10 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.*;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
+import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
@@ -29,9 +32,6 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageSingleBand;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
@@ -55,29 +55,18 @@ public class FactoryFiducial {
 									  final ConfigThreshold configThreshold,
 									  final Class<T> imageType ) {
 
+		configFiducial.checkValidity();
+
 		configFiducial.squareDetector.clockwise = false;
 
 		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
 		final BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.
 				polygon(configFiducial.squareDetector,imageType);
 
-		if(configFiducial.gridSize == null) {
-			// Config with all sizes.
-			final List<DetectFiducialSquareBinary<T>> algs = new ArrayList<DetectFiducialSquareBinary<T>>() {
-				{
-					add(new DetectFiducialSquareBinary<T>(BinaryFiducialGridSize.THREE_BY_THREE, binary,squareDetector,imageType));
-					add(new DetectFiducialSquareBinary<T>(BinaryFiducialGridSize.FOUR_BY_FOUR, binary,squareDetector,imageType));
-					add(new DetectFiducialSquareBinary<T>(BinaryFiducialGridSize.FIVE_BY_FIVE, binary,squareDetector,imageType));
-				}
-			};
-			return new SquareBinaryMultiple_to_FidcialDetector<T,DetectFiducialSquareBinary<T>>(algs,configFiducial.targetWidth);
-		} else {
-			final DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(configFiducial.gridSize, binary,squareDetector,imageType);
-			alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
-			return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
-		}
-
-
+		final DetectFiducialSquareBinary<T> alg =
+				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth, configFiducial.borderWidthFraction, binary,squareDetector,imageType);
+		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
+		return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
 	}
 
 	/**

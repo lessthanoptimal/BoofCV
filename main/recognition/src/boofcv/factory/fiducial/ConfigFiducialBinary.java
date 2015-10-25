@@ -18,7 +18,6 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.abst.fiducial.BinaryFiducialGridSize;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
@@ -42,8 +41,16 @@ public class ConfigFiducialBinary implements Configuration {
 	 */
 	public double ambiguousThreshold = 0.75;
 
+	/**
+	 * Number of elements wide the encoded grid is. Grids widths of 3, 4, or 5 are common.  4 is the standard.
+	 */
+	public int gridWidth = 4;
 
-	public BinaryFiducialGridSize gridSize = BinaryFiducialGridSize.FOUR_BY_FOUR;
+	/**
+	 * How wide the border is relative to the total fiducial width.  0.25 is standard and is a good compromise
+	 * between ability to view at extreme angles and area to encode information.
+	 */
+	public double borderWidthFraction = 0.25;
 
 	/**
 	 * Configuration for square detector
@@ -71,11 +78,27 @@ public class ConfigFiducialBinary implements Configuration {
 	public void checkValidity() {
 		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
 			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
+		if( gridWidth < 3 )
+			throw new IllegalArgumentException("Grid with must be at least 3 elements");
+		if( borderWidthFraction <= 0 || borderWidthFraction > 1 )
+			throw new IllegalArgumentException("Border with fraction must be 0 < fraction < 1");
 	}
 
-	public void setGridSize(BinaryFiducialGridSize gridSize) { this.gridSize = gridSize; }
+	public int getGridWidth() {
+		return gridWidth;
+	}
 
-	public BinaryFiducialGridSize getGridSize() { return gridSize; }
+	public void setGridWidth(int gridWidth) {
+		this.gridWidth = gridWidth;
+	}
+
+	public double getBorderWidthFraction() {
+		return borderWidthFraction;
+	}
+
+	public void setBorderWidthFraction(double borderWidthFraction) {
+		this.borderWidthFraction = borderWidthFraction;
+	}
 
 	public double getTargetWidth() {
 		return targetWidth;

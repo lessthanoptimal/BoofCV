@@ -45,6 +45,9 @@ import static org.junit.Assert.*;
  */
 public class TestDetectFiducialSquareBinary {
 
+	int gridWidth = 4;
+	double borderWidth = 0.25;
+
 	Random rand = new Random(234);
 	BinaryPolygonDetector squareDetector = FactoryShapeDetector.polygon(
 			new ConfigPolygonDetector(false, 4,4),ImageUInt8.class);
@@ -73,7 +76,8 @@ public class TestDetectFiducialSquareBinary {
 			ImageMiscOps.fill(input, 255);
 			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
-			DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(inputToBinary,squareDetector, ImageUInt8.class);
+			DetectFiducialSquareBinary<ImageUInt8> alg =
+					new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,borderWidth,inputToBinary,squareDetector, ImageUInt8.class);
 			alg.setLengthSide(2);
 			alg.configure(intrinsic, false);
 			alg.process(input);
@@ -108,7 +112,8 @@ public class TestDetectFiducialSquareBinary {
 			for (int j = 0; j < i - 1; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
-			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
+			DetectFiducialSquareBinary alg =
+					new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result));
@@ -126,11 +131,42 @@ public class TestDetectFiducialSquareBinary {
 		ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
-		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
+		DetectFiducialSquareBinary alg =
+				new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertFalse(alg.processSquare(input, result));
 	}
+
+	@Test
+	public void getNumberOfDistinctFiducials() {
+		fail("Implement");
+	}
+
+	/**
+	 * See if it can detect a 3x3 grid
+	 */
+	@Test
+	public void checkGrid3x3() {
+		fail("Implement");
+	}
+
+	/**
+	 * See if it can detect a 3x3 grid
+	 */
+	@Test
+	public void checkGrid5x5() {
+		fail("Implement");
+	}
+
+	/**
+	 * See if it can process a border that isn't 0.25
+	 */
+	@Test
+	public void checkDifferentBorder() {
+		fail("Implement");
+	}
+
 
 
 	public static ImageFloat32 create( int square , int value ) {

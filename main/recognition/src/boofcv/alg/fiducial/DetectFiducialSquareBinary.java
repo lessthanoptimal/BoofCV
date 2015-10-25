@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial;
 
-import boofcv.abst.fiducial.BinaryFiducialGridSize;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -31,24 +30,39 @@ import java.util.Arrays;
 
 /**
  * <p>
- * Fiducial which encores a 21-bit number (0 to 2097151) using a predetermined pattern.  The inner region is broken up
- * into 5 by 5 grid of 25-squares which are either white or black.  The lower left corner is always back and
- * while all the other corners are always white.  This allows orientation to be uniquely determined.
- * <p/>
- * The above image visually shows the fiducials internal coordinate system.  The center of the fiducial is the origin
- * of the coordinate system, e.g. all sides are width/2 distance away from the origin.  +x is to the right, +y is up
- * , and +z out of the paper towards the viewer.  The black orientation corner is pointed out in the image.
- * The fiducial's width refers to the width of each side along the black border NOT the internal encoded image.
+ * Square fiducial that encodes numerical values in a binary N by N grids, where N &ge; 3.  The outer border
+ * is entirely black while the inner portion is divided into a grid of equally sized back and white squares.
+ * Typical grid sizes are 3x3, 4x4, and 5x5, which can encode up to 32, 4096, and 2,097,152 unique values respectively.
+ * In other words, a grid of size N can encode N*N-4 bits, or a number with 2<sup>N*N-4</sup> values.
+ * The lower left corner is always back and while all the other corners are always white.
+ * This allows orientation to be uniquely determined.
  * </p>
+ * <center>
+ * <img src="doc-files/square_binary.png"/>
+ * </center>
+ * <p>
+ * The above image is an example of a 4x4 grid and visually shows the fiducials internal coordinate system.
+ * The center of the fiducial is the origin  of the coordinate system, e.g. all sides are width/2 distance
+ * away from the origin.  +x is to the right, +y is up, and +z out of the paper towards the viewer.
+ * The black orientation corner is pointed out in the above image.
+ * The fiducial's width refers to the width of each side along the black border NOT the internal encoded image.
+ * The size of each square is the same and has a width of (fiducal width)*(1.0 - 2.0*(border fractional width))/N.
+ * </p>
+ * <p>
+ * NOTE: While a larger grid size will allow you to encode more numbers it will increase the rate at which ID numbers
+ * are incorrectly identified.<br>
+ * NOTE: The size of the border can be adjusted, but 0.25 is recommended.  The thinner the black border is the worse
+ * it will perform when viewed at an angle, but the larger the squares can be.
+ * <p>
  *
- * @author Peter Abeles, Nathan Pahucki
+ * @author Peter Abeles Original author/maintainer
+ * @author Nathan Pahucki  Added the ability to use more than 4x4 grid for Capta360, <a href="mailto:npahucki@gmail.com"> npahucki@gmail.com</a>
  */
 public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		extends BaseDetectFiducialSquare<T> {
 
-	// helper data structures for computing the value of each grid point
+	// helper data structures for computing the value of each grid element
 	int[] counts, classified, tmp;
-	private BinaryFiducialGridSize gridSize;
 
 	// converts the input image into a binary one
 	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0, 255, true, ImageFloat32.class);
@@ -56,43 +70,55 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// storage for no border sub-image
 	private ImageFloat32 grayNoBorder = new ImageFloat32();
 
-	// size of a square
-	protected final static int w=11;
+	// number of rows/columns in the encoded binary pattern
+	private int gridWidth;
+
+	// width of a square in the inner undistorted image.
+	protected final static int w=10;
+	// total number of pixels in a square
 	protected final static int N=w*w;
 
-	// length of a side on the fiducials in world units
+	// How wide the border is relative to the fiducial's total width
+	private double borderWidthFraction;
+
+	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
 
 	// ambiguity threshold. 0 to 1.  0 = very strict and 1 = anything goes
 	// Sets how strict a square must be black or white for it to be accepted.
-	// TODO: This should be private, but not changing to avoid breaking any subclasses.
-	protected double ambiguityThreshold = 0.4;
+	double ambiguityThreshold = 0.4;
 
 	/**
-	 * Configures the fiducial detector, using the default 4x4 grid.
+	 * Configures the fiducial detector
 	 *
+	 * @param gridWidth Number of elements wide the encoded square grid is. 3,4, or 5 is recommended.
+	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
+	 * @param inputToBinary Converts the input image into a binary image
+	 * @param quadDetector Detects quadrilaterals in the input image
 	 * @param inputType Type of image it's processing
 	 */
-	public DetectFiducialSquareBinary(final InputToBinary<T> inputToBinary,
+	public DetectFiducialSquareBinary(int gridWidth,
+									  double borderWidthFraction ,
+									  final InputToBinary<T> inputToBinary,
 									  final BinaryPolygonDetector<T> quadDetector, Class<T> inputType) {
-		this(BinaryFiducialGridSize.FOUR_BY_FOUR, inputToBinary,quadDetector, inputType);
-	}
+		// Black borders occupies 2.0*borderWidthFraction of the total width
+		// The number of pixels for each square is held constant and the total pixels for the inner region
+		// is determined by the size of the grid
+		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
+		super(inputToBinary,quadDetector, (int)Math.ceil(w * gridWidth /(1.0-borderWidthFraction*2.0)) ,inputType);
 
-	/**
-	 * Configures the fiducial detector, specifying the grid type.
-	 *
-	 * @param inputType Type of image it's processing
-	 */
-	public DetectFiducialSquareBinary(final BinaryFiducialGridSize gridSize, final InputToBinary<T> inputToBinary,
-									  final BinaryPolygonDetector<T> quadDetector, Class<T> inputType) {
-		// Borders should be 2 * w, on each side which means w * 4 for the border,
-		// and w * gridSize.getWidth() for the inner part.
-		super(inputToBinary,quadDetector, (w * gridSize.getWidth() + 4 * w) ,inputType);
-		this.gridSize = gridSize;
-		binaryInner.reshape(w * gridSize.getWidth(),w * gridSize.getWidth());
-		counts = new int[gridSize.getNumberOfElements()];
-		classified = new int[gridSize.getNumberOfElements()];
-		tmp = new int[gridSize.getNumberOfElements()];
+		if( gridWidth < 3 )
+			throw new IllegalArgumentException("The grid must be at least 3 elements wide");
+
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 1.0 )
+			throw new RuntimeException("Border width fraction must be 0 < x < 1.0");
+
+		this.gridWidth = gridWidth;
+		this.borderWidthFraction = borderWidthFraction;
+		binaryInner.reshape(w * gridWidth,w * gridWidth);
+		counts = new int[getTotalGridElements()];
+		classified = new int[getTotalGridElements()];
+		tmp = new int[getTotalGridElements()];
 	}
 
 	@Override
@@ -105,8 +131,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 
 		if (thresholdBinaryNumber())
 			return false;
-
-
+		
 		// adjust the orientation until the black corner is in the lower left
 		if (rotateUntilInLowerCorner(result))
 			return false;
@@ -123,13 +148,12 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 * @return the int value of the numeral.
 	 */
 	protected int extractNumeral() {
-		//
 		int val = 0;
-		final int topLeft = gridSize.getNumberOfElements() - gridSize.getWidth();
+		final int topLeft = getTotalGridElements() - gridWidth;
 		int shift = 0;
 
 		// -2 because the top and bottom rows have 2 unusable bits (the first and last)
-		for(int i = 1; i < gridSize.getWidth() - 1; i++) {
+		for(int i = 1; i < gridWidth - 1; i++) {
 			final int idx = topLeft + i;
 			val |= classified[idx] << shift;
 			//System.out.println("val |= classified[" + idx + "] << " + shift + ";");
@@ -137,9 +161,9 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		}
 
 		// Don't do the first or last row, handled above and below - special cases
-		for(int ii = 1; ii < gridSize.getWidth() - 1; ii++) {
-			for(int i = 0; i < gridSize.getWidth(); i++) {
-				final int idx = gridSize.getNumberOfElements() - (gridSize.getWidth() * (ii + 1)) + i;
+		for(int ii = 1; ii < gridWidth - 1; ii++) {
+			for(int i = 0; i < gridWidth; i++) {
+				final int idx = getTotalGridElements() - (gridWidth * (ii + 1)) + i;
 				val |= classified[idx] << shift;
 				//  System.out.println("val |= classified[" + idx + "] << " + shift + ";");
 				shift++;
@@ -147,7 +171,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		}
 
 		// The last row
-		for(int i = 1; i < gridSize.getWidth() - 1; i++) {
+		for(int i = 1; i < gridWidth - 1; i++) {
 			val |= classified[i] << shift;
 			//System.out.println("val |= classified[" + i + "] << " + shift + ";");
 			shift++;
@@ -156,18 +180,16 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		return val;
 	}
 
-
 	/**
 	 * Rotate the pattern until the black corner is in the lower right.  Sanity check to make
 	 * sure there is only one black corner
 	 */
 	private boolean rotateUntilInLowerCorner(Result result) {
 		// sanity check corners.  There should only be one exactly one black
-		final int topLeft = gridSize.getNumberOfElements() - gridSize.getWidth();
-		final int topRight = gridSize.getNumberOfElements() - 1;
+		final int topLeft = getTotalGridElements() - gridWidth;
+		final int topRight = getTotalGridElements() - 1;
 		final int bottomLeft = 0;
-		final int bottomRight = gridSize.getWidth() - 1;
-
+		final int bottomRight = gridWidth - 1;
 
 		if (classified[bottomLeft] + classified[bottomRight] + classified[topRight] + classified[topLeft] != 1)
 			return true;
@@ -183,16 +205,19 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	}
 
 	protected void rotateClockWise() {
+
+		final int totalElements = getTotalGridElements();
+
 		// Swap the four corners
-		for (int ii = 0; ii < gridSize.getWidth(); ii++) {
-			for (int i = 0; i < gridSize.getWidth(); i++) {
-				final int fromIdx = ii * gridSize.getWidth() + i;
-				final int toIdx = (gridSize.getNumberOfElements() - (gridSize.getWidth() * (i + 1))) + ii;
+		for (int ii = 0; ii < gridWidth; ii++) {
+			for (int i = 0; i < gridWidth; i++) {
+				final int fromIdx = ii * gridWidth + i;
+				final int toIdx = (totalElements - (gridWidth * (i + 1))) + ii;
 				tmp[fromIdx] = classified[toIdx];
 			}
 		}
 
-		System.arraycopy(tmp, 0, classified, 0, gridSize.getNumberOfElements());
+		System.arraycopy(tmp, 0, classified, 0, totalElements);
 	}
 
 
@@ -205,7 +230,8 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		int lower = (int) (N * (ambiguityThreshold / 2.0));
 		int upper = (int) (N * (1 - ambiguityThreshold / 2.0));
 
-		for (int i = 0; i < gridSize.getNumberOfElements(); i++) {
+		final int totalElements = getTotalGridElements();
+		for (int i = 0; i < totalElements; i++) {
 			if (counts[i] < lower) {
 				classified[i] = 0;
 			} else if (counts[i] > upper) {
@@ -218,17 +244,20 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		return false;
 	}
 
+	/**
+	 * Converts the gray scale image into a binary number
+	 */
 	protected void findBitCounts(ImageFloat32 gray) {
 		// compute binary image using an adaptive algorithm to handle shadows
 		threshold.process(gray, binaryInner);
 
 		Arrays.fill(counts, 0);
-		for (int row = 0; row < gridSize.getWidth(); row++) {
-			int y0 = row * binaryInner.width / gridSize.getWidth();
-			int y1 = (row + 1) * binaryInner.width / gridSize.getWidth();
-			for (int col = 0; col < gridSize.getWidth(); col++) {
-				int x0 = col * binaryInner.width / gridSize.getWidth();
-				int x1 = (col + 1) * binaryInner.width / gridSize.getWidth();
+		for (int row = 0; row < gridWidth; row++) {
+			int y0 = row * binaryInner.width / gridWidth;
+			int y1 = (row + 1) * binaryInner.width / gridWidth;
+			for (int col = 0; col < gridWidth; col++) {
+				int x0 = col * binaryInner.width / gridWidth;
+				int x1 = (col + 1) * binaryInner.width / gridWidth;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {
@@ -238,7 +267,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 					}
 				}
 
-				counts[row * gridSize.getWidth() + col] = total;
+				counts[row * gridWidth + col] = total;
 			}
 		}
 	}
@@ -247,16 +276,37 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		this.lengthSide = lengthSide;
 	}
 
-	public BinaryFiducialGridSize getGridSize() { return gridSize; }
+	/**
+	 * Number of elements wide the grid is
+	 */
+	public int getGridWidth() {
+		return gridWidth;
+	}
 
 	/**
 	 * parameters which specifies how tolerant it is of a square being ambiguous black or white.
-	 * @param ambiguityThreshold 0 to 1, insclusive
+	 * @param ambiguityThreshold 0 to 1, inclusive
 	 */
 	public void setAmbiguityThreshold(double ambiguityThreshold) {
 		if( ambiguityThreshold < 0 || ambiguityThreshold > 1 )
 			throw new IllegalArgumentException("Must be from 0 to 1, inclusive");
 		this.ambiguityThreshold = ambiguityThreshold;
+	}
+
+	/**
+	 * Total number of elements in the grid
+	 */
+	private int getTotalGridElements() {
+		return gridWidth * gridWidth;
+	}
+
+	public double getBorderWidthFraction() {
+		return borderWidthFraction;
+	}
+
+	public long getNumberOfDistinctFiducials() {
+		// The -4 is for the 4 orientation squares
+		return (long) Math.pow(2, gridWidth * gridWidth - 4);
 	}
 
 	// For troubleshooting.
@@ -270,10 +320,10 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	public void printClassified() {
 		System.out.println();
 		System.out.println("██████");
-		for (int row = 0; row < gridSize.getWidth(); row++) {
+		for (int row = 0; row < gridWidth; row++) {
 			System.out.print("█");
-			for (int col = 0; col < gridSize.getWidth(); col++) {
-				System.out.print(classified[row * gridSize.getWidth() + col] == 1 ? "█︎" : "◻");
+			for (int col = 0; col < gridWidth; col++) {
+				System.out.print(classified[row * gridWidth + col] == 1 ? "█︎" : "◻");
 			}
 			System.out.print("█");
 			System.out.println();

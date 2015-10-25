@@ -32,6 +32,10 @@ Version : Alpha 0.20
   * no longer defaults to a page border of 1cm
   * page border is actually user configurable
   * border and white border are correctly handled
+- Square Binary Fiducial
+  * Can now handle grids with arbtirary widths!
+    - Thanks Nathan Pahucki npahucki@gmail.com for submitting this pull request
+  * The width of the border can now be adjusted too
 - Moved PyBoof to it's own repository at https://github.com/lessthanoptimal/PyBoof
   * It will be update on its own cycle
 - Chessboard Detector
