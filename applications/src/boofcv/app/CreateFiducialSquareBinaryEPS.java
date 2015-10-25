@@ -54,7 +54,6 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 			final int bitCount = numberOfElements() - 4;
 			for (int j = 0; j < bitCount; j++) {
 				if( (patternNumber & (1L<<j)) != 0 ) {
-					System.out.println("bit "+j);
 					box(out, j);
 				}
 			}
