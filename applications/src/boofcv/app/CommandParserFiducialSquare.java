@@ -50,6 +50,8 @@ public class CommandParserFiducialSquare {
 	// binary specific flags
 	private int binaryGridSize = 4;
 
+	public String applicationDescription;
+
 	public List<String> patternNames = new ArrayList<String>();
 
 	public List<String> exampleNames = new ArrayList<String>();
@@ -63,10 +65,13 @@ public class CommandParserFiducialSquare {
 		String n0 = exampleNames.get(0);
 		String n1 = exampleNames.get(1);
 
+		System.out.println(applicationDescription);
+		System.out.println();
+		System.out.println();
 		System.out.println("./application <optional flags> <fiducial width>  <"+nameOfPatterns+" 0> ... <"+nameOfPatterns+" N-1>");
 		System.out.println();
 		System.out.println("Optional Flags");
-		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is input file + eps");
+		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is input file + ps");
 		System.out.println("-Grid=fill            Automatically fill the paper with fiducials");
 		System.out.println("-Grid=<rows>,<cols>   Create a grid of fiducials with the specified number of rows and columns");
 		System.out.println("-WhiteBorder=<val>    Size of the white border around the fiducial.");
@@ -90,7 +95,7 @@ public class CommandParserFiducialSquare {
 		}
 		System.out.println();
 		System.out.println("Examples:");
-		System.out.println("./application -PrintInfo -OutputFile=fiducial.eps 10 "+n0);
+		System.out.println("./application -PrintInfo -OutputFile=fiducial.ps 10 "+n0);
 		System.out.println("         10cm fiducial using '"+n0+"' as the pattern with it's size and info");
 		System.out.println("./application -Grid=fill -Units=inch -PageSize=letter 2.5 "+n0);
 		System.out.println("         2.5 inch fiducial, filling letter sized paper with grid, '"+n0+"' as the pattern");
@@ -162,7 +167,7 @@ public class CommandParserFiducialSquare {
 
 
 
-	public void execute( String []args , BaseFiducialSquareEPS app) throws IOException {
+	public void execute( String []args , BaseFiducialSquarePS app) throws IOException {
 		try {
 			parseArguments(args);
 		} catch( IllegalArgumentException e ) {
@@ -202,8 +207,8 @@ public class CommandParserFiducialSquare {
 
 		System.out.println("################### Generating");
 
-		if(app instanceof CreateFiducialSquareBinaryEPS) {
-			((CreateFiducialSquareBinaryEPS) app).
+		if(app instanceof CreateFiducialSquareBinaryPS) {
+			((CreateFiducialSquareBinaryPS) app).
 					setGridSize(binaryGridSize);
 		}
 

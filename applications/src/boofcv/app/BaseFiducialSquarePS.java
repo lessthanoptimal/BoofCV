@@ -27,7 +27,7 @@ import java.io.PrintStream;
 
 /**
  * <p>
- * Base class for generating square fiducials EPS documents for printing.  Fiducials are placed in a regular grid.
+ * Base class for generating square fiducials postscript documents for printing.  Fiducials are placed in a regular grid.
  * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border.  The
  * grid starts in the page's lower left and corner.
  * </p>
@@ -42,7 +42,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public abstract class BaseFiducialSquareEPS {
+public abstract class BaseFiducialSquarePS {
 
 	// threshold for converting to a binary image
 	public int threshold = 255/2;
@@ -100,6 +100,9 @@ public abstract class BaseFiducialSquareEPS {
 
 	// stream in which the output file is written to
 	PrintStream out;
+
+	// file type extension
+	String typeExtension = "ps";
 
 	public Unit getUnit() {
 		return unit;
@@ -202,7 +205,7 @@ public abstract class BaseFiducialSquareEPS {
 			outputName = this.outputFileName;
 		}
 
-		String imageName = selectEpsName();
+		String imageName = selectDocumentName();
 
 		configureDocument(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
 
@@ -323,42 +326,52 @@ public abstract class BaseFiducialSquareEPS {
 	 * @param documentTitle Title of the document
 	 */
 	private void generateDocument(double fiducialWidthUnit, String documentTitle) {
-		printHeader(documentTitle, fiducialWidthUnit);
-		if(boundaryHack)
-			printInvisibleBoundary();
-		printPatternDefinitions();
 
-		if (printInfo) {
-			for (int i = 0; i < totalPatterns(); i++) {
-				String patternName = getPatternName(i);
-				out.print(" /" + getDisplayDef(i) + "\n" +
-						"{\n" +
-						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-						" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
-						"} def\n");
+		int patternsPerPage = numRows*numCols;
+		int numPages = (int)Math.ceil(totalPatterns()/(double)patternsPerPage);
+
+		printHeader(documentTitle, fiducialWidthUnit, numPages);
+
+		for (int i = 0; i < numPages; i++) {
+			printPageHeader(i+1);
+			if(boundaryHack)
+				printInvisibleBoundary();
+			printPatternDefinitions();
+
+			int startPattern = i*patternsPerPage;
+
+			if (printInfo) {
+				for (int pattern = 0; pattern < totalPatterns(); pattern++) {
+					String patternName = getPatternName(startPattern+pattern);
+					out.print(" /" + getDisplayDef(pattern) + "\n" +
+							"{\n" +
+							"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
+							" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
+							"} def\n");
+				}
 			}
-		}
 
-		// draws the black border around the fiducial
-		out.print(" /drawBorder\n"+
-				"{\n" +
-				" newpath b0 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
-				" newpath b1 b2 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
-				" newpath b1 b0 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
-				" newpath b2 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
-				"} def\n");
+			// draws the black border around the fiducial
+			out.print(" /drawBorder\n"+
+					"{\n" +
+					" newpath b0 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
+					" newpath b1 b2 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
+					" newpath b1 b0 moveto iw 0 rlineto 0 bb rlineto -1 iw mul 0 rlineto closepath fill\n" +
+					" newpath b2 b0 moveto 0 ow rlineto bb 0 rlineto 0 -1 ow mul rlineto closepath fill\n" +
+					"} def\n");
 
-		for (int row = 0; row < numRows; row++) {
-			for (int col = 0; col < numCols; col++) {
-				insertFiducial(row,col);
+			for (int row = 0; row < numRows; row++) {
+				for (int col = 0; col < numCols; col++) {
+					insertFiducial(startPattern,row,col);
+				}
 			}
+
+			if( printGrid )
+				printGrid();
+
+			out.print("  showpage\n");
 		}
-
-		if( printGrid )
-			printGrid();
-
-		out.print("  showpage\n" +
-				"%%EOF\n");
+		out.print("%%EOF\n");
 	}
 
 	/**
@@ -387,16 +400,21 @@ public abstract class BaseFiducialSquareEPS {
 		return String.format("displayInfo%03d",num);
 	}
 
-	private void printHeader( String documentTitle , double widthCM) {
-		out.println("%!PS-Adobe-3.0 EPSF-3.0\n" +
+	private void printHeader( String documentTitle , double widthCM, int totalPages) {
+		out.println("%!PS-Adobe-3.0\n" +
 				"%%Creator: BoofCV\n" +
+				"%%DocumentMedia: Plain "+pageWidth+" "+pageHeight+" 75 white ( )\n" +
 				"%%Title: "+documentTitle+" w="+ widthCM +" "+unit.abbreviation+"\n" +
 				"%%DocumentData: Clean7Bit\n" +
-				"%%Origin: 0 0\n" +
-				"%%BoundingBox: 0 0 "+pageWidth+" "+pageHeight+"\n" +
-				"%%LanguageLevel: 3\n" +
-				"%%Pages: 1\n" +
-				"%%Page: 1 1\n" +
+				"%%LanguageLevel: 2\n" +
+				"%%EndComments\n" +
+				"%%BeginProlog\n" +
+				"%%EndProlog\n" +
+				"%%Pages: 1\n");
+	}
+
+	private void printPageHeader( int pageNumber ) {
+		out.println("%%Page: "+pageNumber+" "+pageNumber+"\n" +
 				"  /iw " + innerWidth + " def\n" +
 				"  /ow " + (innerWidth + 2 * blackBorder) + " def\n" +
 				"  /wb " + whiteBorder + " def\n" +
@@ -439,7 +457,7 @@ public abstract class BaseFiducialSquareEPS {
 		}
 	}
 
-	private void insertFiducial(int row, int col ) {
+	private void insertFiducial(int startPattern, int row, int col ) {
 		out.print(
 				"  /originX " + (offsetX + col * fiducialTotalWidth) + " def\n" +
 				"  /originY " + (offsetY + row * fiducialTotalWidth) + " def\n" +
@@ -447,7 +465,7 @@ public abstract class BaseFiducialSquareEPS {
 		out.println();
 		out.println("  drawBorder");
 
-		int imageNum = (row*numCols+col)%totalPatterns();
+		int imageNum = (startPattern+(row*numCols+col))%totalPatterns();
 
 		// print out encoding information for convenience
 		if(printInfo) {
@@ -498,7 +516,7 @@ public abstract class BaseFiducialSquareEPS {
 	public abstract String defaultOutputFileName();
 
 	/**
-	 * Name of the image which will go into the EPS document
+	 * Name of the image which will go into the document.
 	 */
-	public abstract String selectEpsName();
+	public abstract String selectDocumentName();
 }

@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
+public class CreateFiducialSquareImagePS extends BaseFiducialSquarePS {
 
 	// Paths to image files containing fiducial patterns
 	List<String> imagePaths = new ArrayList<String>();
@@ -100,7 +100,7 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 		String inputPath = imagePaths.get(0);
 		File dir = new File(inputPath).getParentFile();
 		String outputName = new File(inputPath).getName();
-		outputName = outputName.substring(0,outputName.length()-3) + "eps";
+		outputName = outputName.substring(0,outputName.length()-3) + "ps";
 		try {
 			outputName = new File(dir,outputName).getCanonicalPath();
 		} catch (IOException e) {
@@ -110,7 +110,7 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 	}
 
 	@Override
-	public String selectEpsName() {
+	public String selectDocumentName() {
 		if( imagePaths.size() == 1 ) {
 			return new File(imagePaths.get(0)).getName();
 		} else {
@@ -122,7 +122,8 @@ public class CreateFiducialSquareImageEPS extends BaseFiducialSquareEPS {
 
 		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("image path");
 
-		parser.setExampleNames("ke.png","dog.png");
-		parser.execute(args,new CreateFiducialSquareImageEPS());
+		parser.applicationDescription = "Generates postscript documents for square image fiducials.";
+		parser.setExampleNames("ke.png","chicken.png");
+		parser.execute(args,new CreateFiducialSquareImagePS());
 	}
 }

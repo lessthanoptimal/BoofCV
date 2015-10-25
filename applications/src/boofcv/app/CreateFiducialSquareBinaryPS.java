@@ -28,7 +28,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
+public class CreateFiducialSquareBinaryPS extends BaseFiducialSquarePS {
 
 	// list of the fiducial ID's it will print
 	GrowQueue_I64 numbers = new GrowQueue_I64();
@@ -83,13 +83,13 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 	@Override
 	public String defaultOutputFileName() {
 		if( numbers.size() == 1 )
-			return "Fiducial"+numbers.get(0)+".eps";
+			return "Fiducial"+numbers.get(0)+".ps";
 		else
-			return "BinaryFiducials.eps";
+			return "BinaryFiducials.ps";
 	}
 
 	@Override
-	public String selectEpsName() {
+	public String selectDocumentName() {
 		if( numbers.size() == 1 )
 			return ""+numbers.get(0);
 		else
@@ -131,7 +131,8 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("number");
 		parser.setIsBinary(true);
 		parser.setExampleNames("284","845");
-		parser.execute(args,new CreateFiducialSquareBinaryEPS());
+		parser.applicationDescription = "Generates postscript documents for square binary fiducials.";
+		parser.execute(args,new CreateFiducialSquareBinaryPS());
 	}
 
 
