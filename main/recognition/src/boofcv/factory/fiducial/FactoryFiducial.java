@@ -93,7 +93,7 @@ public class FactoryFiducial {
 		BinaryPolygonDetector<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
-				squareDetector,configFiducial.maxErrorFraction,imageType);
+				squareDetector,configFiducial.borderWidthFraction,configFiducial.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}

@@ -78,9 +78,6 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	// total number of pixels in a square
 	protected final static int N=w*w;
 
-	// How wide the border is relative to the fiducial's total width
-	private double borderWidthFraction;
-
 	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
 
@@ -105,16 +102,12 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		// The number of pixels for each square is held constant and the total pixels for the inner region
 		// is determined by the size of the grid
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
-		super(inputToBinary,quadDetector, (int)Math.ceil(w * gridWidth /(1.0-borderWidthFraction*2.0)) ,inputType);
+		super(inputToBinary,quadDetector,borderWidthFraction, (int)Math.round(w * gridWidth /(1.0-borderWidthFraction*2.0)) ,inputType);
 
 		if( gridWidth < 3 || gridWidth > 8)
 			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");
 
-		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
-			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");
-
 		this.gridWidth = gridWidth;
-		this.borderWidthFraction = borderWidthFraction;
 		binaryInner.reshape(w * gridWidth,w * gridWidth);
 		counts = new int[getTotalGridElements()];
 		classified = new int[getTotalGridElements()];
@@ -298,10 +291,6 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	 */
 	private int getTotalGridElements() {
 		return gridWidth * gridWidth;
-	}
-
-	public double getBorderWidthFraction() {
-		return borderWidthFraction;
 	}
 
 	public long getNumberOfDistinctFiducials() {

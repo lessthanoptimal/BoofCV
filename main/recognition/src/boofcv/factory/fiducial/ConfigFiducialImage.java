@@ -38,6 +38,11 @@ public class ConfigFiducialImage implements Configuration {
 	 */
 	public double maxErrorFraction = 0.20;
 
+	/**
+	 * How wide the border is relative to the total fiducial width.  0.25 is standard and is a good compromise
+	 * between ability to view at extreme angles and area to encode information.
+	 */
+	public double borderWidthFraction = 0.25;
 
 	/**
 	 * Configuration for square detector
@@ -60,7 +65,8 @@ public class ConfigFiducialImage implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+			throw new IllegalArgumentException("Border width fraction must be 0 < fraction < 0.5");
 	}
 
 	public double getMaxErrorFraction() {
@@ -81,7 +87,9 @@ public class ConfigFiducialImage implements Configuration {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{ maxErrorFraction="+maxErrorFraction+
+		return getClass().getSimpleName()+
+				"{ maxErrorFraction="+maxErrorFraction+
+				" borderWidthFraction="+borderWidthFraction+
 				" squareDetector="+squareDetector+" }";
 	}
 }

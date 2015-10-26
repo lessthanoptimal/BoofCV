@@ -93,6 +93,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private ImageDistort<T,ImageFloat32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
+	// How wide the border is relative to the fiducial's total width
+	private double borderWidthFraction;
+
 	// used to compute 3D pose of target
 	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
 
@@ -113,12 +116,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
+	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
 	 *                      This will include the black border.
 	 * @param inputType Type of input image it's processing
 	 */
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
 									   BinaryPolygonDetector<T> squareDetector,
+									   double borderWidthFraction ,
 									   int squarePixels,
 									   Class<T> inputType) {
 
@@ -126,6 +131,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			throw new IllegalArgumentException("quadDetector not configured to detect quadrilaterals");
 		if( squareDetector.isOutputClockwise() )
 			throw new IllegalArgumentException("output polygons needs to be counter-clockwise");
+
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");
+
+		this.borderWidthFraction = borderWidthFraction;
 
 		this.inputToBinary = inputToBinary;
 		this.squareDetector = squareDetector;
@@ -375,6 +385,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	public QuadPoseEstimator getPoseEstimator() {
 		return poseEstimator;
+	}
+
+	public double getBorderWidthFraction() {
+		return borderWidthFraction;
 	}
 
 	public static class Result {

@@ -116,4 +116,15 @@ public class ConfigFiducialBinary implements Configuration {
 	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
 		this.squareDetector = squareDetector;
 	}
+
+	@Override
+	public String toString() {
+		return "ConfigFiducialBinary{" +
+				"targetWidth=" + targetWidth +
+				", ambiguousThreshold=" + ambiguousThreshold +
+				", gridWidth=" + gridWidth +
+				", borderWidthFraction=" + borderWidthFraction +
+				", squareDetector=" + squareDetector +
+				'}';
+	}
 }
