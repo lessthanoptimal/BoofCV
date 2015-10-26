@@ -332,26 +332,24 @@ public abstract class BaseFiducialSquare {
 
 		printHeader(documentTitle, fiducialWidthUnit, numPages);
 
+		printPatternDefinitions();
+		if (printInfo) {
+			for (int pattern = 0; pattern < totalPatterns(); pattern++) {
+				String patternName = getPatternName(pattern);
+				out.print(" /" + getDisplayDef(pattern) + "\n" +
+						"{\n" +
+						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
+						" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
+						"} def\n");
+			}
+		}
+
 		for (int i = 0; i < numPages; i++) {
 			printPageHeader(i+1);
 			if(boundaryHack)
 				printInvisibleBoundary();
-			int startPattern = i*patternsPerPage;
-			// Just put the definitions needed for this page
-			printPatternDefinitions(startPattern, patternsPerPage);
 
-			if (printInfo) {
-				// Just put the ones on this page that belong on this page
-				for (int ii = 0; ii < patternsPerPage; ii++) {
-					final int pattern = ii + startPattern;
-					String patternName = getPatternName(pattern);
-					out.print(" /" + getDisplayDef(pattern) + "\n" +
-							"{\n" +
-							"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-							" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
-							"} def\n");
-				}
-			}
+			int startPattern = i*patternsPerPage;
 
 			// draws the black border around the fiducial
 			out.print(" /drawBorder\n"+
@@ -379,10 +377,8 @@ public abstract class BaseFiducialSquare {
 	/**
 	 * Creates definitions which will render the pattern.  Each pattern's difintion will have the name returned
 	 * by {@link #getPatternPrintDef(int)}
-	 * @param startPattern
-	 * @param numberOfPatterns
 	 */
-	protected abstract void printPatternDefinitions(final int startPattern, final int numberOfPatterns);
+	protected abstract void printPatternDefinitions();
 
 	/**
 	 * Returns the total number of unqiue patterns
@@ -414,11 +410,7 @@ public abstract class BaseFiducialSquare {
 				"%%EndComments\n" +
 				"%%BeginProlog\n" +
 				"%%EndProlog\n" +
-				"%%Pages: "+totalPages+"\n");
-	}
-
-	private void printPageHeader( int pageNumber ) {
-		out.println("%%Page: "+pageNumber+" "+pageNumber+"\n" +
+				"%%Pages: "+totalPages+"\n" +
 				"  /iw " + innerWidth + " def\n" +
 				"  /ow " + (innerWidth + 2 * blackBorder) + " def\n" +
 				"  /wb " + whiteBorder + " def\n" +
@@ -426,7 +418,12 @@ public abstract class BaseFiducialSquare {
 				"  /b0 wb def\n" +
 				"  /b1 { wb bb add} def\n" +
 				"  /b2 { b1 " + innerWidth + " add} def\n" +
-				"  /b3 { b2 bb add} def\n");
+				"  /b3 { b2 bb add} def\n"
+		);
+	}
+
+	private void printPageHeader( int pageNumber ) {
+		out.println("%%Page: "+pageNumber+" "+pageNumber+"\n");
 	}
 
 	/**
@@ -464,8 +461,8 @@ public abstract class BaseFiducialSquare {
 	private void insertFiducial(int startPattern, int row, int col ) {
 		out.print(
 				"  /originX " + (offsetX + col * fiducialTotalWidth) + " def\n" +
-				"  /originY " + (offsetY + row * fiducialTotalWidth) + " def\n" +
-				"  originX originY translate\n" );
+						"  /originY " + (offsetY + row * fiducialTotalWidth) + " def\n" +
+						"  originX originY translate\n" );
 		out.println();
 		out.println("  drawBorder");
 

@@ -41,7 +41,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 	List<String> imagePaths = new ArrayList<String>();
 
 	@Override
-	protected void printPatternDefinitions(final int startPattern, final int numberOfPatterns) {
+	protected void printPatternDefinitions() {
 		for( int i = 0; i < imagePaths.size(); i++ ) {
 			String imageName = new File(imagePaths.get(i)).getName();
 			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
