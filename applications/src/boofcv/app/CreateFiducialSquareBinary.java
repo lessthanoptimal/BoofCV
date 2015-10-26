@@ -36,8 +36,8 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	private int gridWidth = 4;
 
 	@Override
-	protected void printPatternDefinitions() {
-
+	protected void printPatternDefinitions(final int startPattern, final int numberOfPatterns) {
+		// This always gets printed, every page
 		out.print("  /sl "+(innerWidth/gridWidth)+" def\n  /w0 0 def\n");
 		// Handle different size grids.
 		for(int i = 1; i < gridWidth; i++) {
@@ -45,9 +45,9 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 		}
 		out.print("  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n");
 
-		for( int i = 0; i < numbers.size(); i++ ) {
+		// This one, we only print for the patterns specified
+		for( int i = startPattern; i < startPattern + numberOfPatterns; i++ ) {
 			long patternNumber = numbers.get(i);
-
 			out.print("  /"+getPatternPrintDef(i)+" {\n"+
 					"% Block corner used to identify orientation\n" +
 					"  0 0 box\n");
@@ -60,6 +60,11 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 			out.print("} def\n");
 		}
 	}
+
+	protected void printStandardPatternDefinitions() {
+
+	}
+
 
 	@Override
 	protected int totalPatterns() {

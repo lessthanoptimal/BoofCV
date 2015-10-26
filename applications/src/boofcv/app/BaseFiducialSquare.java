@@ -336,13 +336,15 @@ public abstract class BaseFiducialSquare {
 			printPageHeader(i+1);
 			if(boundaryHack)
 				printInvisibleBoundary();
-			printPatternDefinitions();
-
 			int startPattern = i*patternsPerPage;
+			// Just put the definitions needed for this page
+			printPatternDefinitions(startPattern, patternsPerPage);
 
 			if (printInfo) {
-				for (int pattern = 0; pattern < totalPatterns(); pattern++) {
-					String patternName = getPatternName(startPattern+pattern);
+				// Just put the ones on this page that belong on this page
+				for (int ii = 0; ii < patternsPerPage; ii++) {
+					final int pattern = ii + startPattern;
+					String patternName = getPatternName(pattern);
 					out.print(" /" + getDisplayDef(pattern) + "\n" +
 							"{\n" +
 							"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
@@ -377,8 +379,10 @@ public abstract class BaseFiducialSquare {
 	/**
 	 * Creates definitions which will render the pattern.  Each pattern's difintion will have the name returned
 	 * by {@link #getPatternPrintDef(int)}
+	 * @param startPattern
+	 * @param numberOfPatterns
 	 */
-	protected abstract void printPatternDefinitions();
+	protected abstract void printPatternDefinitions(final int startPattern, final int numberOfPatterns);
 
 	/**
 	 * Returns the total number of unqiue patterns
@@ -410,7 +414,7 @@ public abstract class BaseFiducialSquare {
 				"%%EndComments\n" +
 				"%%BeginProlog\n" +
 				"%%EndProlog\n" +
-				"%%Pages: 1\n");
+				"%%Pages: "+totalPages+"\n");
 	}
 
 	private void printPageHeader( int pageNumber ) {
