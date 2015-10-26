@@ -20,9 +20,9 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.FiducialPoseDetector;
-import boofcv.abst.fiducial.FiducialPoseStability;
-import boofcv.abst.fiducial.SquareImage_to_FiducialPoseDetector;
+import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.FiducialStability;
+import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
@@ -76,7 +76,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	I gray;
 
-	FiducialPoseDetector detector;
+	FiducialDetector detector;
 
 	IntrinsicParameters intrinsic;
 
@@ -85,10 +85,10 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	JCheckBox computeStability = new JCheckBox("Stability");
 
-	FiducialPoseStability stability = new FiducialPoseStability();
+	FiducialStability stability = new FiducialStability();
 
 	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
-	FiducialPoseStability stabilityMax = new FiducialPoseStability();
+	FiducialStability stabilityMax = new FiducialStability();
 
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.ms(3, imageType));
@@ -179,7 +179,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getFiducialToCamera(i, targetToSensor);
 			double width = detector.getWidth(i);
-			int id = detector.getId(i);
+			long id = detector.getId(i);
 
 			VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, ""+id, g2);
 			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 3, g2);
@@ -196,7 +196,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	/**
 	 * Computes and visualizes the stability
 	 */
-	private void handleStability(int height, Graphics2D g2, int index, int fiducialID) {
+	private void handleStability(int height, Graphics2D g2, int index, long fiducialID) {
 		FiducialInfo info = findFiducial(fiducialID);
 		info.totalObserved++;
 
@@ -230,7 +230,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		}
 	}
 
-	private FiducialInfo findFiducial( int id ) {
+	private FiducialInfo findFiducial( long id ) {
 		for (int i = 0; i < fiducialInfo.size(); i++) {
 			FiducialInfo info = fiducialInfo.get(i);
 			if( info.id == id ) {
@@ -263,7 +263,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			double length = 0.1;
 			detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
 
-			SquareImage_to_FiducialPoseDetector<I> d = (SquareImage_to_FiducialPoseDetector<I>)detector;
+			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 
 			String pathImg = new File(path,"../patterns").getPath();
 			List<String> names = new ArrayList<String>();
@@ -318,7 +318,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	private class FiducialInfo {
 		int totalObserved;
-		int id;
+		long id;
 		int grid;
 	}
 

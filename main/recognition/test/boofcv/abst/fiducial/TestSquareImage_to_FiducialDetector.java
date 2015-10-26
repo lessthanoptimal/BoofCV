@@ -36,12 +36,12 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class TestSquareImage_to_FiducialPoseDetector extends GenericFiducialPoseDetectorChecks {
+public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 
 	String directory = UtilIO.pathExample("fiducial/image/examples/");
 
-	public TestSquareImage_to_FiducialPoseDetector() {
+	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
 		types.add( ImageType.single(ImageFloat32.class));
 	}
@@ -59,8 +59,8 @@ public class TestSquareImage_to_FiducialPoseDetector extends GenericFiducialPose
 	}
 
 	@Override
-	public FiducialPoseDetector createDetector(ImageType imageType) {
-		SquareImage_to_FiducialPoseDetector ret = FactoryFiducial.squareImage (
+	public FiducialDetector createDetector(ImageType imageType) {
+		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImage (
 				new ConfigFiducialImage(),
 				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 6),
 				imageType.getImageClass());

@@ -42,7 +42,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public abstract class BaseFiducialSquarePS {
+public abstract class BaseFiducialSquare {
 
 	// threshold for converting to a binary image
 	public int threshold = 255/2;

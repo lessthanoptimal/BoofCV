@@ -290,7 +290,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 		// save the results for output
 		FoundFiducial f = found.grow();
-		f.index = result.which;
+		f.id = result.which;
 		f.location.set(imageShape);
 
 		// put it back into input image coordinates
@@ -333,7 +333,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		}
 
 		targetToWorld.set( poseEstimator.getWorldToCamera() );
-		GeometryMath_F64.scale(targetToWorld.getT(),lengthSide);
+		GeometryMath_F64.scale(targetToWorld.getT(), lengthSide);
 	}
 
 	/**

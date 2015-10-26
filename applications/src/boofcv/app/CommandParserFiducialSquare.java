@@ -167,13 +167,20 @@ public class CommandParserFiducialSquare {
 
 
 
-	public void execute( String []args , BaseFiducialSquarePS app) throws IOException {
+	public void execute( String []args , BaseFiducialSquare app) throws IOException {
 		try {
 			parseArguments(args);
 		} catch( IllegalArgumentException e ) {
 			printHelp();
 			System.out.println();
 			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+
+		if( gridX < 0 && paper == null ) {
+			printHelp();
+			System.out.println();
+			System.err.println("If grid is set to fill then the paper size must be specified");
 			System.exit(-1);
 		}
 
@@ -207,8 +214,8 @@ public class CommandParserFiducialSquare {
 
 		System.out.println("################### Generating");
 
-		if(app instanceof CreateFiducialSquareBinaryPS) {
-			((CreateFiducialSquareBinaryPS) app).
+		if(app instanceof CreateFiducialSquareBinary) {
+			((CreateFiducialSquareBinary) app).
 					setGridSize(binaryGridSize);
 		}
 

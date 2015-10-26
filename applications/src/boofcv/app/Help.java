@@ -30,8 +30,8 @@ public class Help {
 
 	public static void printHelp() {
 		Class []options = new Class[]{
-				CreateFiducialSquareImagePS.class,
-				CreateFiducialSquareBinaryPS.class,
+				CreateFiducialSquareImage.class,
+				CreateFiducialSquareBinary.class,
 				BatchRemoveLensDistortion.class,
 				BatchDownSizeImage.class,
 				WebcamTrackFiducial.class,
@@ -44,7 +44,7 @@ public class Help {
 			System.out.println("  "+c.getName());
 		}
 		System.out.println("Example:");
-		System.out.println("java -cp applications.jar "+CreateFiducialSquareImagePS.class.getSimpleName());
+		System.out.println("java -cp applications.jar "+CreateFiducialSquareImage.class.getSimpleName());
 	}
 
 	public static void main(String[] args) {
@@ -71,8 +71,8 @@ public class Help {
 			}
 		} else {
 			Class[] options = new Class[]{
-					CreateFiducialSquareImagePS.class,
-					CreateFiducialSquareBinaryPS.class,
+					CreateFiducialSquareImage.class,
+					CreateFiducialSquareBinary.class,
 					BatchRemoveLensDistortion.class,
 					BatchDownSizeImage.class,
 					WebcamTrackFiducial.class,
@@ -85,7 +85,7 @@ public class Help {
 				System.out.println("  " + c.getSimpleName());
 			}
 			System.out.println("Example:");
-			System.out.println("java -jar applications.jar " + CreateFiducialSquareImagePS.class.getSimpleName());
+			System.out.println("java -jar applications.jar " + CreateFiducialSquareImage.class.getSimpleName());
 		}
 	}
 }

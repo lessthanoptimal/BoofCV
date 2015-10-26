@@ -18,13 +18,13 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.abst.fiducial.SquareBinary_to_FiducialPoseDetector;
+import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link SquareBinary_to_FiducialPoseDetector}.
+ * Configuration for {@link SquareBinary_to_FiducialDetector}.
  *
  * @see boofcv.alg.fiducial.DetectFiducialSquareBinary
  *

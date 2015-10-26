@@ -27,12 +27,12 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
- * Wrapper around {@link BaseDetectFiducialSquare} for {@link FiducialPoseDetector}
+ * Wrapper around {@link BaseDetectFiducialSquare} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
-public abstract class BaseSquare_FiducialPoseDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
-	implements FiducialPoseDetector<T>
+public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
+	implements FiducialDetector<T>
 {
 	Detector alg;
 
@@ -40,7 +40,7 @@ public abstract class BaseSquare_FiducialPoseDetector<T extends ImageSingleBand,
 
 	ImageType<T> type;
 
-	public BaseSquare_FiducialPoseDetector(Detector alg) {
+	public BaseSquare_FiducialDetector(Detector alg) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
 	}
@@ -67,8 +67,8 @@ public abstract class BaseSquare_FiducialPoseDetector<T extends ImageSingleBand,
 	}
 
 	@Override
-	public int getId( int which ) {
-		return alg.getFound().get(which).index;
+	public long getId( int which ) {
+		return alg.getFound().get(which).id;
 	}
 
 	@Override
@@ -77,13 +77,28 @@ public abstract class BaseSquare_FiducialPoseDetector<T extends ImageSingleBand,
 	}
 
 	@Override
-	public boolean computeStability(int which, double disturbance, FiducialPoseStability results) {
+	public boolean computeStability(int which, double disturbance, FiducialStability results) {
 		Quadrilateral_F64 quad = alg.getFound().get(which).location;
 		if( !this.stability.process(disturbance, quad) ) {
 			return false;
 		}
 		results.location = stability.getLocationStability();
 		results.orientation = stability.getOrientationStability();
+		return true;
+	}
+
+	@Override
+	public boolean isSupportedID() {
+		return true;
+	}
+
+	@Override
+	public boolean isSupportedPose() {
+		return true;
+	}
+
+	@Override
+	public boolean isSizeKnown() {
 		return true;
 	}
 }

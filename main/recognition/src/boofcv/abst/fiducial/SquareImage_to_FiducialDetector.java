@@ -24,14 +24,14 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialPoseDetector}
+ * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
-public class SquareImage_to_FiducialPoseDetector<T extends ImageSingleBand>
-	extends BaseSquare_FiducialPoseDetector<T,DetectFiducialSquareImage<T>>
+public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
+	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareImage<T>>
 {
-	public SquareImage_to_FiducialPoseDetector(DetectFiducialSquareImage<T> alg) {
+	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
 		super(alg);
 	}
 
@@ -60,7 +60,7 @@ public class SquareImage_to_FiducialPoseDetector<T extends ImageSingleBand>
 
 	@Override
 	public double getWidth(int which) {
-		int index = alg.getFound().get(which).index;
+		int index = (int)alg.getFound().get(which).id;
 		return alg.getTargets().get(index).lengthSide;
 	}
 }

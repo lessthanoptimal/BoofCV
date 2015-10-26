@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFiducialPoseDetectorChecks {
+public abstract class GenericFiducialDetectorChecks {
 
 	protected List<ImageType> types = new ArrayList<ImageType>();
 
@@ -43,7 +43,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 
 	public abstract IntrinsicParameters loadIntrinsic();
 
-	public abstract FiducialPoseDetector createDetector( ImageType imageType );
+	public abstract FiducialDetector createDetector( ImageType imageType );
 
 	/**
 	 * See if it blows if if there are no distortion parameters
@@ -58,7 +58,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		// normal case.  should work
 		for( ImageType type : types ) {
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 			detector.setIntrinsic(param);
 			detector.detect(image);
 		}
@@ -68,7 +68,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		param.t1 = param.t2 = 0;
 		for( ImageType type : types ) {
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 			detector.setIntrinsic(param);
 			detector.detect(image);
 		}
@@ -85,7 +85,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 
 			IntrinsicParameters intrinsic = loadIntrinsic();
 			assertTrue(intrinsic.isDistorted());
@@ -96,7 +96,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 
 			assertTrue(detector.totalFound()>= 1);
 
-			int foundID[] = new int[ detector.totalFound() ];
+			long foundID[] = new long[ detector.totalFound() ];
 			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -151,7 +151,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 
 			ImageBase image = loadImage(type);
 			ImageBase orig = image.clone();
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -167,7 +167,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -175,7 +175,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 
 			assertTrue(detector.totalFound()>= 1);
 
-			int foundID[] = new int[ detector.totalFound() ];
+			long foundID[] = new long[ detector.totalFound() ];
 			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -206,7 +206,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
@@ -214,7 +214,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 
 			assertTrue(detector.totalFound()>= 1);
 
-			int foundID[] = new int[ detector.totalFound() ];
+			long foundID[] = new long[ detector.totalFound() ];
 			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -250,18 +250,18 @@ public abstract class GenericFiducialPoseDetectorChecks {
 		for( ImageType type : types ) {
 
 			ImageBase image = loadImage(type);
-			FiducialPoseDetector detector = createDetector(type);
+			FiducialDetector detector = createDetector(type);
 
 			detector.setIntrinsic(loadIntrinsic());
 
 			detector.detect(image);
 			assertTrue(detector.totalFound() >= 1);
 
-			int foundIds[] = new int[ detector.totalFound() ];
+			long foundIds[] = new long[ detector.totalFound() ];
 			double location[] = new double[ detector.totalFound() ];
 			double orientation[] = new double[ detector.totalFound() ];
 
-			FiducialPoseStability results = new FiducialPoseStability();
+			FiducialStability results = new FiducialStability();
 			for (int i = 0; i < detector.totalFound(); i++) {
 				detector.computeStability(i,0.2,results);
 
@@ -281,7 +281,7 @@ public abstract class GenericFiducialPoseDetectorChecks {
 			for (int i = 0; i < detector.totalFound(); i++) {
 				detector.computeStability(i,0.2,results);
 
-				int id = detector.getId(i);
+				long id = detector.getId(i);
 
 				boolean matched = false;
 				for (int j = 0; j < foundIds.length; j++) {

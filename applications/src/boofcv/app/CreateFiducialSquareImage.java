@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImagePS extends BaseFiducialSquarePS {
+public class CreateFiducialSquareImage extends BaseFiducialSquare {
 
 	// Paths to image files containing fiducial patterns
 	List<String> imagePaths = new ArrayList<String>();
@@ -124,6 +124,6 @@ public class CreateFiducialSquareImagePS extends BaseFiducialSquarePS {
 
 		parser.applicationDescription = "Generates postscript documents for square image fiducials.";
 		parser.setExampleNames("ke.png","chicken.png");
-		parser.execute(args,new CreateFiducialSquareImagePS());
+		parser.execute(args,new CreateFiducialSquareImage());
 	}
 }

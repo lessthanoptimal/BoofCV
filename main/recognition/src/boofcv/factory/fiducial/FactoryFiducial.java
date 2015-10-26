@@ -20,10 +20,10 @@ package boofcv.factory.fiducial;
 
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.CalibrationFiducialPoseDetector;
-import boofcv.abst.fiducial.FiducialPoseDetector;
-import boofcv.abst.fiducial.SquareBinary_to_FiducialPoseDetector;
-import boofcv.abst.fiducial.SquareImage_to_FiducialPoseDetector;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
+import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
+import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.DetectFiducialSquareImage;
@@ -34,7 +34,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Factory for creating fiducial detectors which implement {@link FiducialPoseDetector}.
+ * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
  *
  * @author Peter Abeles
  */
@@ -51,7 +51,7 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	FiducialPoseDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
+	FiducialDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
 									  final ConfigThreshold configThreshold,
 									  final Class<T> imageType ) {
 
@@ -66,14 +66,14 @@ public class FactoryFiducial {
 		final DetectFiducialSquareBinary<T> alg =
 				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth, configFiducial.borderWidthFraction, binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
-		return new SquareBinary_to_FiducialPoseDetector<T>(alg,configFiducial.targetWidth);
+		return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
 	}
 
 	/**
 	 * <p>Detector for square image based fiducials. </p>
 	 *
-	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialPoseDetector}
-	 * is returned instead of the more generic {@link FiducialPoseDetector}.</p>
+	 * <p>For this fiducial to work images need to be added to it.  Which is why {@link SquareImage_to_FiducialDetector}
+	 * is returned instead of the more generic {@link FiducialDetector}.</p>
 	 *
 	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
@@ -83,7 +83,7 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static  <T extends ImageSingleBand>
-	SquareImage_to_FiducialPoseDetector<T> squareImage( ConfigFiducialImage configFiducial,
+	SquareImage_to_FiducialDetector<T> squareImage( ConfigFiducialImage configFiducial,
 													ConfigThreshold configThreshold,
 													Class<T> imageType ) {
 
@@ -95,7 +95,7 @@ public class FactoryFiducial {
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
 				squareDetector,configFiducial.maxErrorFraction,imageType);
 
-		return new SquareImage_to_FiducialPoseDetector<T>(alg);
+		return new SquareImage_to_FiducialDetector<T>(alg);
 	}
 
 	/**
@@ -107,11 +107,11 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialPoseDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
 
-		return new CalibrationFiducialPoseDetector<T>(config,imageType);
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 
 	/**
@@ -123,10 +123,10 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	CalibrationFiducialPoseDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
 
-		return new CalibrationFiducialPoseDetector<T>(config,imageType);
+		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 }

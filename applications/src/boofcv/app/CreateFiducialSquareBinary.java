@@ -28,7 +28,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareBinaryPS extends BaseFiducialSquarePS {
+public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
 	// list of the fiducial ID's it will print
 	GrowQueue_I64 numbers = new GrowQueue_I64();
@@ -132,7 +132,7 @@ public class CreateFiducialSquareBinaryPS extends BaseFiducialSquarePS {
 		parser.setIsBinary(true);
 		parser.setExampleNames("284","845");
 		parser.applicationDescription = "Generates postscript documents for square binary fiducials.";
-		parser.execute(args,new CreateFiducialSquareBinaryPS());
+		parser.execute(args,new CreateFiducialSquareBinary());
 	}
 
 

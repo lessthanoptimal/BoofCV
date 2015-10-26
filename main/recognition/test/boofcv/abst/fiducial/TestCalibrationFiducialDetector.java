@@ -34,12 +34,12 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationFiducialPoseDetector extends GenericFiducialPoseDetectorChecks {
+public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChecks {
 
 	// selected because it has significant lens distortion
 	String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 
-	public TestCalibrationFiducialPoseDetector() {
+	public TestCalibrationFiducialDetector() {
 		types.add( ImageType.single(ImageUInt8.class));
 		types.add( ImageType.single(ImageFloat32.class));
 	}
@@ -57,7 +57,7 @@ public class TestCalibrationFiducialPoseDetector extends GenericFiducialPoseDete
 	}
 
 	@Override
-	public FiducialPoseDetector createDetector(ImageType imageType) {
+	public FiducialDetector createDetector(ImageType imageType) {
 		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageType.getImageClass());
 	}
 }

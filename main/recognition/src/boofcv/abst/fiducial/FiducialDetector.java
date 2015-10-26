@@ -30,7 +30,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface FiducialPoseDetector<T extends ImageBase>
+public interface FiducialDetector<T extends ImageBase>
 {
 	/**
 	 * Call to detect the fiducial inside the image.  Must call
@@ -55,7 +55,7 @@ public interface FiducialPoseDetector<T extends ImageBase>
 	 * @param results (output) Storage for stability metrics.
 	 * @return true if successful or false if it failed for some reason
 	 */
-	boolean computeStability( int which , double disturbance , FiducialPoseStability results );
+	boolean computeStability( int which , double disturbance , FiducialStability results );
 
 	/**
 	 * Specifies the intrinsic camera parameters.  Allows for the euclidean geometry of be extracted from
@@ -84,7 +84,7 @@ public interface FiducialPoseDetector<T extends ImageBase>
 	 * @param which Fiducial's index
 	 * @return ID of the fiducial
 	 */
-	int getId( int which );
+	long getId( int which );
 
 	/**
 	 * Returns the width of the fiducial in world units.  If not square then it returns a reasonable
@@ -99,4 +99,23 @@ public interface FiducialPoseDetector<T extends ImageBase>
 	 * Type of input image
 	 */
 	ImageType<T> getInputType();
+
+	/**
+	 * If true then the ID number feature is supported
+	 * @return true if supported or false if not
+	 */
+	boolean isSupportedID();
+
+	/**
+	 * If true then the pose estimate is supported
+	 * @return true if supported or false if not
+	 */
+	boolean isSupportedPose();
+
+	/**
+	 * Does the fiducial have a known size?  If the size is known then {@link #getWidth(int)}
+	 * returns a meaningful number and the location can be fully resolved.
+	 * @return true if it's size is known
+	 */
+	boolean isSizeKnown();
 }
