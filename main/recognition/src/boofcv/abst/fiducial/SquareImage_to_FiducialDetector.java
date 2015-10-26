@@ -60,7 +60,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 
 	@Override
 	public double getWidth(int which) {
-		int index = alg.getFound().get(which).index;
+		int index = (int)alg.getFound().get(which).id;
 		return alg.getTargets().get(index).lengthSide;
 	}
 }

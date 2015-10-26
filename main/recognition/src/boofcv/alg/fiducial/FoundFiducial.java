@@ -30,7 +30,7 @@ public class FoundFiducial {
 	/**
 	 * ID number of the fiducial
 	 */
-	public int index;
+	public long id;
 	/**
 	 * Transform from the fiducial to the sensor reference frame
 	 */

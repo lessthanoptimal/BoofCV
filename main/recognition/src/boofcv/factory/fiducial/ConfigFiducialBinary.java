@@ -18,12 +18,13 @@
 
 package boofcv.factory.fiducial;
 
+import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.abst.fiducial.SquareBinary_to_FiducialDetector}.
+ * Configuration for {@link SquareBinary_to_FiducialDetector}.
  *
  * @see boofcv.alg.fiducial.DetectFiducialSquareBinary
  *
@@ -40,6 +41,17 @@ public class ConfigFiducialBinary implements Configuration {
 	 * as black or white.  If it can't be classified then the shape is discarded
 	 */
 	public double ambiguousThreshold = 0.75;
+
+	/**
+	 * Number of elements wide the encoded grid is. Grids widths of 3, 4, or 5 are common.  4 is the standard.
+	 */
+	public int gridWidth = 4;
+
+	/**
+	 * How wide the border is relative to the total fiducial width.  0.25 is standard and is a good compromise
+	 * between ability to view at extreme angles and area to encode information.
+	 */
+	public double borderWidthFraction = 0.25;
 
 	/**
 	 * Configuration for square detector
@@ -67,6 +79,26 @@ public class ConfigFiducialBinary implements Configuration {
 	public void checkValidity() {
 		if( ambiguousThreshold < 0 || ambiguousThreshold > 1 )
 			throw new IllegalArgumentException("ambiguousThreshold must be from 0 to 1, inclusive");
+		if( gridWidth < 3 || gridWidth > 8 )
+			throw new IllegalArgumentException("Grid width must be at least 3 elements and at most 8");
+		if( borderWidthFraction <= 0 || borderWidthFraction >= 0.5 )
+			throw new IllegalArgumentException("Border width fraction must be 0 < fraction < 0.5");
+	}
+
+	public int getGridWidth() {
+		return gridWidth;
+	}
+
+	public void setGridWidth(int gridWidth) {
+		this.gridWidth = gridWidth;
+	}
+
+	public double getBorderWidthFraction() {
+		return borderWidthFraction;
+	}
+
+	public void setBorderWidthFraction(double borderWidthFraction) {
+		this.borderWidthFraction = borderWidthFraction;
 	}
 
 	public double getTargetWidth() {
@@ -83,5 +115,16 @@ public class ConfigFiducialBinary implements Configuration {
 
 	public void setSquareDetector(ConfigPolygonDetector squareDetector) {
 		this.squareDetector = squareDetector;
+	}
+
+	@Override
+	public String toString() {
+		return "ConfigFiducialBinary{" +
+				"targetWidth=" + targetWidth +
+				", ambiguousThreshold=" + ambiguousThreshold +
+				", gridWidth=" + gridWidth +
+				", borderWidthFraction=" + borderWidthFraction +
+				", squareDetector=" + squareDetector +
+				'}';
 	}
 }

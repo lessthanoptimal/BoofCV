@@ -91,8 +91,11 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 *
 	 * @param matchThreshold Considered a match if the hamming distance is less than this fraction of the maximum
 	 */
-	public DetectFiducialSquareImage(InputToBinary<T> inputToBinary,BinaryPolygonDetector<T> quadDetector, double matchThreshold, Class<T> inputType) {
-		super(inputToBinary,quadDetector, squareLength+squareLength, inputType);
+	public DetectFiducialSquareImage(InputToBinary<T> inputToBinary,
+									 BinaryPolygonDetector<T> quadDetector,
+									 double borderWidthFraction ,
+									 double matchThreshold, Class<T> inputType) {
+		super(inputToBinary,quadDetector,borderWidthFraction, (int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 
@@ -173,8 +176,8 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	@Override
 	protected boolean processSquare(ImageFloat32 gray, Result result) {
 
-		int off = squareLength/2;
-		gray.subimage(off,off,gray.width-off,gray.width-off,grayNoBorder);
+		int off = (gray.width-binary.width)/2;
+		gray.subimage(off,off,off+binary.width,off+binary.width,grayNoBorder);
 
 //		grayNoBorder.printInt();
 

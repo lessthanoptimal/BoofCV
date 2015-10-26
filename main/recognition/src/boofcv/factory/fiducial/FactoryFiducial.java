@@ -51,19 +51,21 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
-									  ConfigThreshold configThreshold,
-									  Class<T> imageType ) {
+	FiducialDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
+									  final ConfigThreshold configThreshold,
+									  final Class<T> imageType ) {
+
+		configFiducial.checkValidity();
 
 		configFiducial.squareDetector.clockwise = false;
 
-		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
-		BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.
+		final InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
+		final BinaryPolygonDetector<T> squareDetector = FactoryShapeDetector.
 				polygon(configFiducial.squareDetector,imageType);
 
-		DetectFiducialSquareBinary<T> alg = new DetectFiducialSquareBinary<T>(binary,squareDetector,imageType);
+		final DetectFiducialSquareBinary<T> alg =
+				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth, configFiducial.borderWidthFraction, binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
-
 		return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
 	}
 
@@ -91,7 +93,7 @@ public class FactoryFiducial {
 		BinaryPolygonDetector<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
-				squareDetector,configFiducial.maxErrorFraction,imageType);
+				squareDetector,configFiducial.borderWidthFraction,configFiducial.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}

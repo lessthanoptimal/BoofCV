@@ -18,7 +18,7 @@
 
 package boofcv.app;
 
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.GrowQueue_I64;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -28,31 +28,33 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
+public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
 	// list of the fiducial ID's it will print
-	GrowQueue_I32 numbers = new GrowQueue_I32();
+	GrowQueue_I64 numbers = new GrowQueue_I64();
+
+	private int gridWidth = 4;
 
 	@Override
 	protected void printPatternDefinitions() {
 
-		out.print(
-				"  /sl "+(innerWidth/4)+" def\n" +
-				"  /w0 0 def\n" +
-				"  /w1 { w0 sl add} def\n" +
-				"  /w2 { w1 sl add} def\n" +
-				"  /w3 { w2 sl add} def\n");
+		out.print("  /sl "+(innerWidth/gridWidth)+" def\n  /w0 0 def\n");
+		// Handle different size grids.
+		for(int i = 1; i < gridWidth; i++) {
+			out.print("  /w" + i + " { w" + (i-1) + " sl add} def\n");
+		}
 		out.print("  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n");
 
 		for( int i = 0; i < numbers.size(); i++ ) {
-			int patternNumber = numbers.get(i);
+			long patternNumber = numbers.get(i);
 
 			out.print("  /"+getPatternPrintDef(i)+" {\n"+
 					"% Block corner used to identify orientation\n" +
 					"  0 0 box\n");
-			for (int j = 0; j < 12; j++) {
-				if( (patternNumber & (1<<j)) != 0 ) {
-					box(out,j);
+			final int bitCount = numberOfElements() - 4;
+			for (int j = 0; j < bitCount; j++) {
+				if( (patternNumber & (1L<<j)) != 0 ) {
+					box(out, j);
 				}
 			}
 			out.print("} def\n");
@@ -66,10 +68,11 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 
 	@Override
 	protected void addPattern(String name) {
-		int value = Integer.parseInt(name);
-		if( value < 0 || value > 4095 )
-			throw new IllegalArgumentException("Values must be tween 0 and 4095, inclusive");
-		numbers.add( Integer.parseInt(name));
+		final long maxValue = (long) Math.pow(2, numberOfElements() - 4) - 1;
+		long value = Long.parseLong(name);
+		if( value < 0 || value > maxValue)
+			throw new IllegalArgumentException("Values must be tween 0 and " +maxValue + ", inclusive");
+		numbers.add( value );
 	}
 
 	@Override
@@ -80,44 +83,56 @@ public class CreateFiducialSquareBinaryEPS  extends BaseFiducialSquareEPS {
 	@Override
 	public String defaultOutputFileName() {
 		if( numbers.size() == 1 )
-			return "Fiducial"+numbers.get(0)+".eps";
+			return "Fiducial"+numbers.get(0)+".ps";
 		else
-			return "BinaryFiducials.eps";
+			return "BinaryFiducials.ps";
 	}
 
 	@Override
-	public String selectEpsName() {
+	public String selectDocumentName() {
 		if( numbers.size() == 1 )
 			return ""+numbers.get(0);
 		else
 			return numbers.get(0)+" and more";
 	}
 
-	private static void box( PrintStream out , int bit ) {
-		if( bit < 2 )
-			bit++;
-		else if( bit < 10 )
-			bit += 2;
-		else if( bit < 12 )
-			bit += 3;
+	private void box( PrintStream out , final int bit ) {
+
+		int transitionBit0 = gridWidth-3;
+		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
+		int transitionBit2 = transitionBit1 + gridWidth-2;
+
+		final int adjustedBit;
+		if( bit <= transitionBit0 )
+			adjustedBit = bit + 1;
+		else if( bit <= transitionBit1 )
+			adjustedBit = bit + 2;
+		else if( bit <= transitionBit2 )
+			adjustedBit = bit + 3;
 		else
-			throw new RuntimeException("Bit must be between 0 and 11");
+			throw new RuntimeException("Bit must be between 0 and " + transitionBit2);
 
-		int x = bit%4;
-		int y = bit/4;
+		int x = adjustedBit % gridWidth;
+		int y = adjustedBit / gridWidth;
+		out.print("  w" + x + " w" + y +" box\n");
+	}
 
-		String wx = "w"+x;
-		String wy = "w"+y;
+	private int numberOfElements() {
+		return gridWidth*gridWidth;
+	}
 
-		out.print("  "+wx+" "+wy+" box\n");
+
+	public void setGridSize(int gridWidth) {
+		this.gridWidth = gridWidth;
 	}
 
 	public static void main(String[] args) throws IOException {
 
 		CommandParserFiducialSquare parser = new CommandParserFiducialSquare("number");
-
+		parser.setIsBinary(true);
 		parser.setExampleNames("284","845");
-		parser.execute(args,new CreateFiducialSquareBinaryEPS());
+		parser.applicationDescription = "Generates postscript documents for square binary fiducials.";
+		parser.execute(args,new CreateFiducialSquareBinary());
 	}
 
 

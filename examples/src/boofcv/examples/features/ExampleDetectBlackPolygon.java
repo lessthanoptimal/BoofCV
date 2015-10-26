@@ -54,7 +54,7 @@ public class ExampleDetectBlackPolygon {
 
 		String imagesConcave[] = new String[]{
 				"shapes/concave01.jpg"};
-		
+
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		// first configure the detector to only detect convex shapes with 3 to 7 sides

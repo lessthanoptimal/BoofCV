@@ -23,7 +23,7 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareBinary} for {@link boofcv.abst.fiducial.FiducialDetector}
+ * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareBinary} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
@@ -32,7 +32,7 @@ public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
 {
 	double targetWidth;
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg,double targetWidth) {
+	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg, double targetWidth) {
 		super(alg);
 		this.targetWidth = targetWidth;
 	}

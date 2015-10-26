@@ -24,8 +24,9 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Interface for detecting fiducials.  If the {@link boofcv.struct.calib.IntrinsicParameters} specifies lens
- * distortion then it will be automatically removed and if there is no lens distortion then it will skip that step.
+ * Interface for detecting fiducials and estimating their 6-DOF pose.  The camera must be calibrated by
+ * specifying {@link boofcv.struct.calib.IntrinsicParameters}.  When one or more fiducials are detected their IDs and pose
+ * are returned.
  *
  * @author Peter Abeles
  */
@@ -83,7 +84,7 @@ public interface FiducialDetector<T extends ImageBase>
 	 * @param which Fiducial's index
 	 * @return ID of the fiducial
 	 */
-	int getId( int which );
+	long getId( int which );
 
 	/**
 	 * Returns the width of the fiducial in world units.  If not square then it returns a reasonable
@@ -98,4 +99,23 @@ public interface FiducialDetector<T extends ImageBase>
 	 * Type of input image
 	 */
 	ImageType<T> getInputType();
+
+	/**
+	 * If true then the ID number feature is supported
+	 * @return true if supported or false if not
+	 */
+	boolean isSupportedID();
+
+	/**
+	 * If true then the pose estimate is supported
+	 * @return true if supported or false if not
+	 */
+	boolean isSupportedPose();
+
+	/**
+	 * Does the fiducial have a known size?  If the size is known then {@link #getWidth(int)}
+	 * returns a meaningful number and the location can be fully resolved.
+	 * @return true if it's size is known
+	 */
+	boolean isSizeKnown();
 }

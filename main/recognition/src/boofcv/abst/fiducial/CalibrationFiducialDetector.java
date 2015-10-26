@@ -256,7 +256,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	}
 
 	@Override
-	public int getId( int which ) {
+	public long getId( int which ) {
 		return 0;
 	}
 
@@ -268,6 +268,21 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	@Override
 	public ImageType<T> getInputType() {
 		return type;
+	}
+
+	@Override
+	public boolean isSupportedID() {
+		return false;
+	}
+
+	@Override
+	public boolean isSupportedPose() {
+		return true;
+	}
+
+	@Override
+	public boolean isSizeKnown() {
+		return true;
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {

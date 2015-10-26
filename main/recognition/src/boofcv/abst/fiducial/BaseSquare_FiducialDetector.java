@@ -67,8 +67,8 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	}
 
 	@Override
-	public int getId( int which ) {
-		return alg.getFound().get(which).index;
+	public long getId( int which ) {
+		return alg.getFound().get(which).id;
 	}
 
 	@Override
@@ -84,6 +84,21 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 		}
 		results.location = stability.getLocationStability();
 		results.orientation = stability.getOrientationStability();
+		return true;
+	}
+
+	@Override
+	public boolean isSupportedID() {
+		return true;
+	}
+
+	@Override
+	public boolean isSupportedPose() {
+		return true;
+	}
+
+	@Override
+	public boolean isSizeKnown() {
 		return true;
 	}
 }

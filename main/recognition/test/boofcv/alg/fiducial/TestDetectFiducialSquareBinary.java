@@ -45,6 +45,9 @@ import static org.junit.Assert.*;
  */
 public class TestDetectFiducialSquareBinary {
 
+	static int gridWidth = 4;
+	static double borderWidth = 0.25;
+
 	Random rand = new Random(234);
 	BinaryPolygonDetector squareDetector = FactoryShapeDetector.polygon(
 			new ConfigPolygonDetector(false, 4,4),ImageUInt8.class);
@@ -56,7 +59,7 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkFoundRotationMatrix() {
 
-		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
+		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480);
 
 		ImageFloat32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
 		ImageUInt8 rendered = new ImageUInt8(rendered_F32.width,rendered_F32.height);
@@ -73,7 +76,8 @@ public class TestDetectFiducialSquareBinary {
 			ImageMiscOps.fill(input, 255);
 			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
-			DetectFiducialSquareBinary<ImageUInt8> alg = new DetectFiducialSquareBinary<ImageUInt8>(inputToBinary,squareDetector, ImageUInt8.class);
+			DetectFiducialSquareBinary<ImageUInt8> alg =
+					new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,borderWidth,inputToBinary,squareDetector, ImageUInt8.class);
 			alg.setLengthSide(2);
 			alg.configure(intrinsic, false);
 			alg.process(input);
@@ -108,7 +112,8 @@ public class TestDetectFiducialSquareBinary {
 			for (int j = 0; j < i - 1; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
-			DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
+			DetectFiducialSquareBinary alg =
+					new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result));
@@ -126,26 +131,104 @@ public class TestDetectFiducialSquareBinary {
 		ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
-		DetectFiducialSquareBinary alg = new DetectFiducialSquareBinary(inputToBinary,squareDetector,ImageUInt8.class);
+		DetectFiducialSquareBinary alg =
+				new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertFalse(alg.processSquare(input, result));
 	}
 
+	@Test
+	public void getNumberOfDistinctFiducials() {
+		DetectFiducialSquareBinary alg =
+				new DetectFiducialSquareBinary(3,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
+		assertEquals(32,alg.getNumberOfDistinctFiducials());
 
-	public static ImageFloat32 create( int square , int value ) {
+		alg = new DetectFiducialSquareBinary(4,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
+		assertEquals(4096,alg.getNumberOfDistinctFiducials());
+		alg = new DetectFiducialSquareBinary(5,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
+		assertEquals(2097152,alg.getNumberOfDistinctFiducials());
+		alg = new DetectFiducialSquareBinary(6,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
+		assertEquals(4294967296L, alg.getNumberOfDistinctFiducials());
+	}
 
-		ImageFloat32 ret = new ImageFloat32(square*8,square*8);
+	/**
+	 * See if it can detect a 3x3 grid
+	 */
+	@Test
+	public void checkGrid3x3() {
+		int number = 9;
+		ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,3, borderWidth);
 
-		int s2 = 2*square;
+		DetectFiducialSquareBinary alg =
+				new DetectFiducialSquareBinary(3,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
-		for (int i = 0; i < 12; i++) {
+		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
+		assertTrue(alg.processSquare(input, result));
+
+		assertEquals(number, result.which);
+	}
+
+	/**
+	 * See if it can detect a 3x3 grid
+	 */
+	@Test
+	public void checkGrid5x5() {
+		int number = 299382;
+		ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,5, borderWidth);
+
+		DetectFiducialSquareBinary alg =
+				new DetectFiducialSquareBinary(5,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
+
+		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
+		assertTrue(alg.processSquare(input, result));
+
+		assertEquals(number, result.which);
+	}
+
+	/**
+	 * See if it can process a border that isn't 0.25
+	 */
+	@Test
+	public void differentBorderSizes() {
+
+		int number = 128;
+		double borders[] = new double[]{0.1,0.15,0.3};
+
+		for( double border : borders ) {
+
+			ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,4, border);
+
+			DetectFiducialSquareBinary alg =
+					new DetectFiducialSquareBinary(gridWidth,border,inputToBinary,squareDetector,ImageUInt8.class);
+
+			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
+			assertTrue(alg.processSquare(input, result));
+
+			assertEquals(number, result.which);
+		}
+	}
+	public static ImageFloat32 create(int square, int value ) {
+		return create(square,value,gridWidth,borderWidth);
+	}
+
+	public static ImageFloat32 create(int square, int value, int gridWidth , double borderFraction) {
+
+		int width = (int)Math.round((square*gridWidth)/(1-2.0*borderFraction));
+
+		ImageFloat32 ret = new ImageFloat32(width,width);
+
+		int s2 = (int)Math.round(ret.width*borderFraction);
+		int s5 = s2+square*(gridWidth-1);
+
+		int N = gridWidth*gridWidth-4;
+		for (int i = 0; i < N; i++) {
 			if( (value& (1<<i)) != 0 )
 				continue;
 
-			int where = index(i);
-			int x = where%4;
-			int y = 3-(where/4);
+			int where = index(i, gridWidth);
+			int x = where%gridWidth;
+			int y = gridWidth-1-(where/gridWidth);
 
 			x = s2 + square*x;
 			y = s2 + square*y;
@@ -153,21 +236,25 @@ public class TestDetectFiducialSquareBinary {
 			ImageMiscOps.fillRectangle(ret,0xFF,x,y,square,square);
 		}
 		ImageMiscOps.fillRectangle(ret,0xFF,s2,s2,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,square*5,square*5,square,square);
-		ImageMiscOps.fillRectangle(ret,0xFF,square*5,s2,square,square);
+		ImageMiscOps.fillRectangle(ret,0xFF,s5,s5,square,square);
+		ImageMiscOps.fillRectangle(ret,0xFF,s5,s2,square,square);
 
 		return ret;
 	}
 
-	private static int index( int bit ) {
-		if( bit < 2 )
+	private static int index( int bit , int gridWidth ) {
+		int transitionBit0 = gridWidth-3;
+		int transitionBit1 = transitionBit0 + gridWidth*(gridWidth-2);
+		int transitionBit2 = transitionBit1 + gridWidth-2;
+
+		if( bit <= transitionBit0 )
 			bit++;
-		else if( bit < 10 )
+		else if( bit <= transitionBit1 )
 			bit += 2;
-		else if( bit < 12 )
+		else if( bit <= transitionBit2 )
 			bit += 3;
 		else
-			throw new RuntimeException("Bit must be between 0 and 11");
+			throw new RuntimeException("Bit out of range");
 
 		return bit;
 	}

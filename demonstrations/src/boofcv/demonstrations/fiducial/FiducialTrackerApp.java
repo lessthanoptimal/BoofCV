@@ -179,7 +179,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getFiducialToCamera(i, targetToSensor);
 			double width = detector.getWidth(i);
-			int id = detector.getId(i);
+			long id = detector.getId(i);
 
 			VisualizeFiducial.drawLabelCenter(targetToSensor, intrinsic, ""+id, g2);
 			VisualizeFiducial.drawCube(targetToSensor, intrinsic, width, 3, g2);
@@ -196,7 +196,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	/**
 	 * Computes and visualizes the stability
 	 */
-	private void handleStability(int height, Graphics2D g2, int index, int fiducialID) {
+	private void handleStability(int height, Graphics2D g2, int index, long fiducialID) {
 		FiducialInfo info = findFiducial(fiducialID);
 		info.totalObserved++;
 
@@ -230,7 +230,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		}
 	}
 
-	private FiducialInfo findFiducial( int id ) {
+	private FiducialInfo findFiducial( long id ) {
 		for (int i = 0; i < fiducialInfo.size(); i++) {
 			FiducialInfo info = fiducialInfo.get(i);
 			if( info.id == id ) {
@@ -318,7 +318,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	private class FiducialInfo {
 		int totalObserved;
-		int id;
+		long id;
 		int grid;
 	}
 
