@@ -70,7 +70,7 @@ public class TestDetectFiducialSquareImage {
 		ImageUInt8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
 
 		DetectFiducialSquareImage<ImageUInt8> alg = new DetectFiducialSquareImage<ImageUInt8>(
-				inputToBinary,squareDetector,0.5,0.1,ImageUInt8.class);
+				inputToBinary,squareDetector,0.25,0.1,ImageUInt8.class);
 		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
 
@@ -124,7 +124,7 @@ public class TestDetectFiducialSquareImage {
 
 		// process it in different orientations
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.5,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.25,0.1,ImageUInt8.class);
 
 		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -165,7 +165,7 @@ public class TestDetectFiducialSquareImage {
 		}
 
 		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.5,0.1,ImageUInt8.class);
+				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.25,0.1,ImageUInt8.class);
 
 		alg.addPattern(threshold(image, 100), 1.0);
 
@@ -191,7 +191,7 @@ public class TestDetectFiducialSquareImage {
 	}
 
 	private void compare( short a[] , short b[] ) {
-		assertEquals(a.length,b.length);
+		assertEquals(a.length, b.length);
 		for (int i = 0; i < a.length; i++) {
 			assertEquals("index = "+i,a[i],b[i]);
 		}
@@ -205,7 +205,7 @@ public class TestDetectFiducialSquareImage {
 
 		short[] out = new short[2];
 
-		DetectFiducialSquareImage.binaryToDef(image,out);
+		DetectFiducialSquareImage.binaryToDef(image, out);
 
 		for (int i = 0; i < 32; i++) {
 			int expected = image.data[i];
@@ -233,10 +233,38 @@ public class TestDetectFiducialSquareImage {
 			expected += valA != valB ? 1 : 0;
 		}
 
-		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,0.5,0.1,ImageFloat32.class);
+		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,0.25,0.1,ImageFloat32.class);
 		int found = alg.hamming(a, b);
 
-		assertEquals(expected,found);
+		assertEquals(expected, found);
+	}
+
+	/**
+	 * See if it can process a border that isn't 0.25
+	 */
+	@Test
+	public void checkDifferentBorder() {
+		double borderWidths[] = new double[]{0.1,0.2,0.3};
+
+		for( double border : borderWidths ) {
+			// randomly create a pattern
+			ImageUInt8 pattern = new ImageUInt8(16*4,16*4);
+			ImageMiscOps.fillUniform(pattern, rand, 0, 2);
+			PixelMath.multiply(pattern,255,pattern);
+
+			// add a border around it
+			int w = (int)Math.round(16*4/(1.0-2.0*border));
+			int r = (w-pattern.width)/2;
+			ImageUInt8 bordered = new ImageUInt8(w,w);
+			bordered.subimage(r, r, r + 16 * 4, r + 16 * 4, null).setTo(pattern);
+			ImageFloat32 input = new ImageFloat32(bordered.width,bordered.height);
+			ConvertImage.convert(bordered,input);
+
+			DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,border,0.1,ImageFloat32.class);
+			alg.addPattern(threshold(pattern, 125), 1.0);
+			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
+			assertTrue(alg.processSquare(input, result));
+		}
 	}
 
 	private ImageUInt8 threshold( ImageSingleBand image , double threshold ) {

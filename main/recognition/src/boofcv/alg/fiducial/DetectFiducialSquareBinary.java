@@ -102,7 +102,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		// The number of pixels for each square is held constant and the total pixels for the inner region
 		// is determined by the size of the grid
 		// The number of pixels in the undistorted image (squarePixels) is selected using the above information
-		super(inputToBinary,quadDetector,borderWidthFraction, (int)Math.round(w * gridWidth /(1.0-borderWidthFraction*2.0)) ,inputType);
+		super(inputToBinary,quadDetector,borderWidthFraction, (int)Math.round((w * gridWidth) /(1.0-borderWidthFraction*2.0)) ,inputType);
 
 		if( gridWidth < 3 || gridWidth > 8)
 			throw new IllegalArgumentException("The grid must be at least 3 and at most 8 elements wide");
@@ -117,7 +117,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	@Override
 	protected boolean processSquare(ImageFloat32 gray, Result result) {
 		int off = (gray.width - binaryInner.width) / 2;
-		gray.subimage(off, off, gray.width - off, gray.width - off, grayNoBorder);
+		gray.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 
 		// convert input image into binary number
 		findBitCounts(grayNoBorder);
