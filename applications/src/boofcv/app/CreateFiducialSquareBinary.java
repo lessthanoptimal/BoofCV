@@ -61,11 +61,6 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 		}
 	}
 
-	protected void printStandardPatternDefinitions() {
-
-	}
-
-
 	@Override
 	protected int totalPatterns() {
 		return numbers.size();
