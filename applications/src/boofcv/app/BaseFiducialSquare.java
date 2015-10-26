@@ -344,6 +344,7 @@ public abstract class BaseFiducialSquare {
 				// Just put the ones on this page that belong on this page
 				for (int ii = 0; ii < patternsPerPage; ii++) {
 					final int pattern = ii + startPattern;
+					if(pattern >= totalPatterns()) break; // Not enough to fill page.
 					String patternName = getPatternName(pattern);
 					out.print(" /" + getDisplayDef(pattern) + "\n" +
 							"{\n" +

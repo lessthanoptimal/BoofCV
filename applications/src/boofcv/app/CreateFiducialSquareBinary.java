@@ -46,7 +46,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 		out.print("  /box {newpath moveto sl 0 rlineto 0 sl rlineto sl neg 0 rlineto closepath fill} def\n");
 
 		// This one, we only print for the patterns specified
-		for( int i = startPattern; i < startPattern + numberOfPatterns; i++ ) {
+		for( int i = startPattern; i < startPattern + numberOfPatterns && i < numbers.size(); i++ ) {
 			long patternNumber = numbers.get(i);
 			out.print("  /"+getPatternPrintDef(i)+" {\n"+
 					"% Block corner used to identify orientation\n" +
