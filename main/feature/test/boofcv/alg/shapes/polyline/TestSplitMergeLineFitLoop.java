@@ -244,7 +244,7 @@ public class TestSplitMergeLineFitLoop {
 	@Test
 	public void selectSplitOffset() {
 
-		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001, MINIMUM_SPLIT_FRACTION,100);
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.0/9.0, MINIMUM_SPLIT_FRACTION,100);
 
 		alg.contour = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < 10; i++ )
@@ -271,20 +271,16 @@ public class TestSplitMergeLineFitLoop {
 		assertEquals(-1,found);
 		found = alg.selectSplitOffset(5,8);
 		assertEquals(-1, found);
-		found = alg.selectSplitOffset(5,10);
-		assertEquals(9, found);
 		found = alg.selectSplitOffset(9,8);
-		assertEquals(5,found);
-
+		assertEquals(5, found);
 
 		// test the threshold
-//		alg.minimumSideLengthPixel = 100.00;
-//		found = alg.selectSplitOffset(0,9);
-//		assertEquals(-1,found);
-//		alg.minimumSplitPixelsSq = 99.999;
-//		found = alg.selectSplitOffset(0,9);
-//		assertEquals(4,found);
-		fail("update");
+		alg.setSplitFraction(10.1/9.00);
+		found = alg.selectSplitOffset(0,9);
+		assertEquals(-1,found);
+		alg.setSplitFraction(9.9/9.00);
+		found = alg.selectSplitOffset(0,9);
+		assertEquals(4,found);
 	}
 
 	/**
@@ -292,7 +288,35 @@ public class TestSplitMergeLineFitLoop {
 	 */
 	@Test
 	public void selectSplitOffset_minimumSideLengthPixel() {
-		fail("implement");
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(9.99/9.0, MINIMUM_SPLIT_FRACTION,100);
+
+		alg.contour = new ArrayList<Point2D_I32>();
+		for( int i = 0; i < 10; i++ )
+			alg.contour.add( new Point2D_I32(i,0));
+		alg.contour.get(5).y = 10;
+		alg.N = alg.contour.size();
+		alg.line.slope.x = 1;
+
+		// check the default of 1 pixel
+		selectSplitOffset_minimumSideLengthPixel(alg,1);
+
+		// user specified value of 2
+		alg.minimumSideLengthPixel = 2;
+		selectSplitOffset_minimumSideLengthPixel(alg,2);
+	}
+
+	private void selectSplitOffset_minimumSideLengthPixel(SplitMergeLineFitLoop alg, int minimum ) {
+		// test positive cases
+		int found = alg.selectSplitOffset(5-minimum,9);
+		assertEquals(minimum,found);
+		found = alg.selectSplitOffset(0, 5+minimum);
+		assertEquals(5,found);
+
+		// negative cases that should be within the threshold
+		found = alg.selectSplitOffset(5-minimum+1,9);
+		assertEquals(-1,found);
+		found = alg.selectSplitOffset(0,5+minimum-1);
+		assertEquals(-1,found);
 	}
 
 	private List<Point2D_I32> shiftContour( List<Point2D_I32> contour , int offset ) {

@@ -224,7 +224,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	/**
 	 * Finds the point between indexStart and the end point which is the greater distance from the line
-	 * (set up prior to calling).  Returns the index 0f the distance is less than tolerance, otherwise -1
+	 * (set up prior to calling).  Returns the index of the element with a distances greater than tolerance, otherwise -1
 	 */
 	protected int selectSplitOffset( int indexStart , int length ) {
 		int bestOffset = -1;
@@ -236,13 +236,12 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 		line.p.set(startPt.x,startPt.y);
 		line.slope.set(endPt.x-startPt.x,endPt.y-startPt.y);
 
-		double bestDistanceSq = 0;
-
-		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
+		double bestDistanceSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
 		// adjusting using 'minimumSideLengthPixel' to ensure it doesn't create a new line which is too short
-		length -= 2*minimumSideLengthPixel;
-		for( int i = 1+ minimumSideLengthPixel; i < length; i++ ) {
+		int minLength = Math.max(1,minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
+		length -= minLength;
+		for( int i = minLength; i <= length; i++ ) {
 			Point2D_I32 b = contour.get((indexStart+i)%N);
 			point2D.set(b.x,b.y);
 
@@ -253,11 +252,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 			}
 		}
 
-		if( bestDistanceSq > toleranceSplitSq ) {
-			return bestOffset;
-		} else {
-			return -1;
-		}
+		return bestOffset;
 	}
 
 	/**
