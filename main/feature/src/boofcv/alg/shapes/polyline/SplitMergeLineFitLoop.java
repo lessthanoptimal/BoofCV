@@ -240,9 +240,8 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
 
-		length -= minimumSideLengthPixel;
-
-		// don't try splitting at the two end points
+		// adjusting using 'minimumSideLengthPixel' to ensure it doesn't create a new line which is too short
+		length -= 2*minimumSideLengthPixel;
 		for( int i = 1+ minimumSideLengthPixel; i < length; i++ ) {
 			Point2D_I32 b = contour.get((indexStart+i)%N);
 			point2D.set(b.x,b.y);

@@ -25,13 +25,14 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestSplitMergeLineFitSegment {
+
+	private static final double MIN_SPLIT = 0.1;
 
 	/**
 	 * Tests contours with zero and one points in them
@@ -39,7 +40,7 @@ public class TestSplitMergeLineFitSegment {
 	@Test
 	public void checkZeroOne() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 		alg.process(contour);
 		assertEquals(0,alg.getSplits().size);
 
@@ -63,7 +64,7 @@ public class TestSplitMergeLineFitSegment {
 		for( int i = 2; i < 5; i++ )
 			contour.add( new Point2D_I32(18,5-i));
 
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 		alg.process(contour);
 
 		GrowQueue_I32 splits = alg.getSplits();
@@ -77,7 +78,7 @@ public class TestSplitMergeLineFitSegment {
 
 	@Test
 	public void splitSegments() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 		alg.contour = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < 10; i++ )
 			alg.contour.add( new Point2D_I32(i,0));
@@ -96,7 +97,7 @@ public class TestSplitMergeLineFitSegment {
 
 	@Test
 	public void selectSplitOffset() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.15,MIN_SPLIT,100);
 
 		alg.contour = new ArrayList<Point2D_I32>();
 		for( int i = 0; i < 10; i++ )
@@ -121,7 +122,7 @@ public class TestSplitMergeLineFitSegment {
 
 	@Test
 	public void mergeSegments() {
-		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,1,100);
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,MIN_SPLIT,100);
 		alg.contour = new ArrayList<Point2D_I32>();
 		alg.contour.add(new Point2D_I32(0,0));
 		alg.contour.add(new Point2D_I32(1,0));
@@ -139,5 +140,18 @@ public class TestSplitMergeLineFitSegment {
 		assertEquals(0,alg.splits.data[0]);
 		assertEquals(2,alg.splits.data[1]);
 		assertEquals(5,alg.splits.data[2]);
+	}
+
+	/**
+	 * Makes sure the selectSplitOffset is obeying the minimumSideLengthPixel parameter
+	 */
+	@Test
+	public void selectSplitOffset_minimumSideLengthPixel() {
+		fail("implement");
+	}
+
+	@Test
+	public void updateForNewParameters() {
+		fail("implement");
 	}
 }

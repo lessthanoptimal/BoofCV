@@ -201,7 +201,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 
 		contour = BinaryImageOps.contour(binary, ConnectRule.FOUR,null).get(0).external;
 
-		List<PointIndex_I32> corners = ShapeFittingOps.fitPolygon(contour,true,0.05,5.0,10);
+		List<PointIndex_I32> corners = ShapeFittingOps.fitPolygon(contour,true,0.05,0.1,10);
 
 		split = new GrowQueue_I32(corners.size());
 		for (int i = 0; i < corners.size(); i++) {
