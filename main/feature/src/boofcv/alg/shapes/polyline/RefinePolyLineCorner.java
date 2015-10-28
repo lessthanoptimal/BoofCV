@@ -49,7 +49,7 @@ public class RefinePolyLineCorner {
 	private int maxIterations = 10;
 
 	// maximum number of samples along the line
-	private int maxLineSamples = 20;
+	private final int maxLineSamples = 20;
 
 	// the radius it will search around. computed when contour is passed in
 	protected int searchRadius;

@@ -37,14 +37,14 @@ public class TestMinimizeEnergyPrune {
 	 * Perfect case.  See if it does nothing
 	 */
 	@Test
-	public void fit_no_change() {
+	public void prine_no_change() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
 		GrowQueue_I32 output = new GrowQueue_I32();
-		alg.fit(contours,corners,output);
+		alg.prune(contours, corners, output);
 
 		assertEquals(corners.size(),output.size());
 		for (int i = 0; i < corners.size(); i++) {
@@ -56,7 +56,7 @@ public class TestMinimizeEnergyPrune {
 	 * Adds an obviously redundant corner and see if it gets removed
 	 */
 	@Test
-	public void fit_obvious() {
+	public void prune_obvious() {
 		List<Point2D_I32> contours = createSquare(10,12,20,30);
 		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
 		corners.add(corners.get(3)+4);
@@ -64,12 +64,13 @@ public class TestMinimizeEnergyPrune {
 		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(1);
 
 		GrowQueue_I32 output = new GrowQueue_I32();
-		alg.fit(contours,corners,output);
+		alg.prune(contours, corners, output);
 
 		assertEquals(4, output.size());
-		for (int i = 0; i < 4; i++) {
-			assertEquals(corners.get(i),output.get(i));
-		}
+
+		// see if the two sets of corners are equivalent, taking in account the possibility of a rotation
+		checkMatched(corners, output);
+
 	}
 
 	@Test
@@ -95,7 +96,15 @@ public class TestMinimizeEnergyPrune {
 		double found = alg.energyRemoveCorner(4,corners);
 		assertEquals(expected,found,1e-8);
 
+		// add it in another location
+		corners.removeTail();
+		corners.insert(3,corners.get(2)+3);
+		alg.computeSegmentEnergy(corners);
+		found = alg.energyRemoveCorner(3,corners);
+		assertEquals(expected,found,1e-8);
+
 		// skip a different corner and the energy should go up
+		corners = createSquareCorners(10, 12, 20, 30);
 		for (int i = 0; i < 4; i++) {
 			assertTrue(expected<alg.energyRemoveCorner(i,corners));
 		}
@@ -130,6 +139,21 @@ public class TestMinimizeEnergyPrune {
 		}
 	}
 
+	@Test
+	public void removeDuplicates() {
+		List<Point2D_I32> contours = createSquare(10,12,20,30);
+
+		GrowQueue_I32 corners = createSquareCorners(10, 12, 20, 30);
+
+		corners.add(corners.get(0));
+		corners.add(corners.get(2));
+
+		MinimizeEnergyPrune alg = new MinimizeEnergyPrune(4);
+		alg.contour = contours;
+		alg.removeDuplicates(corners);
+
+		checkMatched(createSquareCorners(10, 12, 20, 30),corners);
+	}
 
 	private List<Point2D_I32> createSquare( int x0 , int y0 , int x1 , int y1 ) {
 		List<Point2D_I32> output = new ArrayList<Point2D_I32>();
@@ -167,5 +191,23 @@ public class TestMinimizeEnergyPrune {
 		corners.add(c3);
 
 		return corners;
+	}
+
+	private void checkMatched(GrowQueue_I32 corners, GrowQueue_I32 output) {
+		boolean foundMatch = false;
+		for (int offset = 0; offset < 4; offset++) {
+			boolean matched = true;
+			for (int i = 0; i < 4; i++) {
+				if (corners.get(i) != output.get((offset+i)%4)) {
+					matched = false;
+					break;
+				}
+			}
+			if( matched ) {
+				foundMatch = true;
+				break;
+			}
+		}
+		assertTrue(foundMatch);
 	}
 }

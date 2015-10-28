@@ -28,15 +28,26 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.List;
 
 /**
+ * <p>
+ * Prunes corners from a pixel level accuracy contour by minizing a penalized energy function.  The energy of a line
+ * segment is defined as Euclidean distance squared of each point from the line summed plus a penalty divided by the
+ * distance between two end points of the line.  When a corner is removed the location of its neighbors are optimized
+ * again.
+ * </p>
+ * <p>
+ * Energy of line segment = [Sum( distance points from line squared) + penalty ] / (segment length)
+ * </p>
+ *
  * @author Peter Abeles
  */
-// TODO make looping optional later
-	// TODO replace optimize polygon with something that just optimizes the 3 lines affected by the corner removal
-	//      fit lines to contour at those points
-	//      at end pick point on contour closest to corner
 public class MinimizeEnergyPrune {
 
+	// how much a corner adds to the energy calculation
 	double splitPenalty = 4;
+
+	// maximum number of points it will sample along a contour
+	// intended to speed things up for large shapes
+	int maxPointSamples = 20;
 
 	LineParametric2D_F64 line = new LineParametric2D_F64();
 	Point2D_F64 point = new Point2D_F64();
@@ -54,13 +65,13 @@ public class MinimizeEnergyPrune {
 	}
 
 	/**
-	 *
-	 * @param contour
-	 * @param input
-	 * @param output
+	 * Given a contour and initial set of corners compute a new set of corner indexes
+	 * @param contour List of points in the shape's contour
+	 * @param input Initial set of corners
+	 * @param output Pruned set of corners
 	 * @return true if one or more corners were pruned, false if nothing changed
 	 */
-	public boolean fit( List<Point2D_I32> contour , GrowQueue_I32 input , GrowQueue_I32 output ) {
+	public boolean prune(List<Point2D_I32> contour, GrowQueue_I32 input, GrowQueue_I32 output) {
 
 		this.contour = contour;
 		output.setTo(input);
@@ -96,14 +107,19 @@ public class MinimizeEnergyPrune {
 				}
 
 				// just in case it created a duplicate
-				removeDuplicates(workCorners1);// todo optimize
+				removeDuplicates(workCorners1);
 				if( workCorners1.size() > 3 ) {
 
+					// when looking at these anchors remember that they are relative to the new list without
+					// the removed corner and that the two adjacent corners need to be optimized
 					int anchor0 = CircularIndex.addOffset(i, -2, workCorners1.size());
 					int anchor1 = CircularIndex.addOffset(i, 1, workCorners1.size());
 
+					// optimize the two adjacent corners to the removed one
 					if (fit.fitAnchored(anchor0, anchor1, workCorners1, workCorners2)) {
 
+						// TODO this isn't taking advantage of previously computed line segment energy is it?
+						//      maybe a small speed up can be had by doing that
 						double score = 0;
 						for (int j = 0, k = workCorners2.size() - 1; j < workCorners2.size(); k = j, j++) {
 							score += computeSegmentEnergy(workCorners2, k, j);
@@ -131,11 +147,15 @@ public class MinimizeEnergyPrune {
 		return modified;
 	}
 
+	/**
+	 * Look for two corners which point to the same point and removes one of them from the corner list
+	 */
 	void removeDuplicates( GrowQueue_I32 corners ) {
 		// remove duplicates
 		for (int i = 0; i < corners.size(); i++) {
 			Point2D_I32 a = contour.get(corners.get(i));
 
+			// start from the top so that removing a corner doesn't mess with the for loop
 			for (int j = corners.size()-1; j > i; j--) {
 				Point2D_I32 b = contour.get(corners.get(j));
 
@@ -144,49 +164,6 @@ public class MinimizeEnergyPrune {
 					corners.remove(j);
 				}
 			}
-		}
-	}
-
-	void optimizeCorners( GrowQueue_I32 input , GrowQueue_I32 output ) {
-
-		output.reset();
-		for( int target = 0; target < input.size(); target++ )
-		{
-			int indexA = input.get(CircularIndex.minusPOffset(target, 1, input.size()));
-			int indexB = input.get(CircularIndex.plusPOffset(target, 1, input.size()));
-
-			Point2D_I32 a = contour.get(indexA);
-			Point2D_I32 b = contour.get(indexB);
-
-			line.p.x = a.x;
-			line.p.y = a.y;
-			line.slope.set(b.x - a.x, b.y - a.y);
-
-			int length = CircularIndex.distanceP(indexA, indexB, contour.size());
-
-			double best = 0;
-			int bestIndex = -1;
-			for (int i = 1; i < length - 1; i++) {
-				Point2D_I32 c = getContour(indexA + i);
-				point.set(c.x, c.y);
-
-				double d = Distance2D_F64.distanceSq(line, point);
-				if (d > best) {
-					best = d;
-					bestIndex = i;
-				}
-			}
-			int selectedCorner = CircularIndex.addOffset(indexA, bestIndex, contour.size());
-
-			boolean duplicate = false;
-			for (int i = 0; i < output.size(); i++) {
-				if( output.get(i) == selectedCorner ) {
-					duplicate = true;
-					break;
-				}
-			}
-			if( !duplicate )
-				output.add(selectedCorner);
 		}
 	}
 
@@ -203,6 +180,11 @@ public class MinimizeEnergyPrune {
 		}
 	}
 
+	/**
+	 * Returns the total energy after removing a corner
+	 * @param removed index of the corner that is being removed
+	 * @param corners list of corner indexes
+	 */
 	protected double energyRemoveCorner( int removed , GrowQueue_I32 corners ) {
 		double total = 0;
 
@@ -226,9 +208,16 @@ public class MinimizeEnergyPrune {
 		return total;
 	}
 
+	/**
+	 * Computes the energy for a segment defined by the two corner indexes
+	 */
 	protected double computeSegmentEnergy(GrowQueue_I32 corners, int cornerA, int cornerB) {
 		int indexA = corners.get(cornerA);
 		int indexB = corners.get(cornerB);
+
+		if( indexA == indexB ) {
+			return 100000.0;
+		}
 
 		Point2D_I32 a = contour.get(indexA);
 		Point2D_I32 b = contour.get(indexB);
@@ -238,17 +227,25 @@ public class MinimizeEnergyPrune {
 		line.slope.set(b.x-a.x,b.y-a.y);
 
 		double total = 0;
-		int length = circularDistance(indexA,indexB);
-		for (int k = 1; k < length; k++) {
-			Point2D_I32 c = getContour(indexA + k);
-			point.set(c.x,c.y);
+		int length = circularDistance(indexA,indexB)-1;
 
+		int numSamples = Math.min(length,maxPointSamples);
+
+		if( length > 1 ) {
+			for (int k = 0; k < numSamples; k++) {
+				int offset = k * (numSamples - 1) / (length - 1);
+				// don't sample the corners, hence +1 to skip corner A
+				Point2D_I32 c = getContour(indexA + 1 + offset);
+				point.set(c.x, c.y);
+
+				total += Distance2D_F64.distanceSq(line, point);
+			}
+			// adjust the energy's total magnitude back to its original
+			total *= length/(double)numSamples;
+		} else {
+			Point2D_I32 c = getContour(indexA + 1);
+			point.set(c.x, c.y);
 			total += Distance2D_F64.distanceSq(line, point);
-		}
-
-		if( indexA == indexB ) {
-			return 100000.0;
-//			System.out.println();
 		}
 
 		return (total+ splitPenalty)/a.distance2(b);

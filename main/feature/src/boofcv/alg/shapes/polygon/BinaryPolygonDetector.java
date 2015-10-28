@@ -292,7 +292,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				// reduce the number of corners based on an energy model
-				pruner.fit(c.external,splits,pruned);
+				pruner.prune(c.external, splits, pruned);
 				splits = pruned;
 
 				// only accept polygons with the expected number of sides
