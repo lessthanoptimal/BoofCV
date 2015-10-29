@@ -80,14 +80,9 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
-		// it erodes the original shape meaning it has to move a greater distance
-//		configRefineCorners.maxCornerChangePixel = 5; // TODO reduce
-
 		square.contour2Poly_splitFraction = 0.1;
-		square.contour2Poly_minimumSideFraction = 0.1;
+		square.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
 		square.minContourImageWidthFraction = 0.0005;
-
-//		square.minimumEdgeIntensity = 0.1;// TODO remove
 
 		// good value for squares.  Set it here to make it not coupled to default values
 		configRefineCorners.cornerOffset = 1;

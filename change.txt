@@ -55,6 +55,7 @@ Version : Alpha 0.20
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image
+TODO Fix morphological thinning
 
 ---------------------------------------------
 Date    : 2015/09/20

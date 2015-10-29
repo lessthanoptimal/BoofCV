@@ -35,6 +35,8 @@ import org.ddogleg.struct.GrowQueue_I32;
 public class BinaryThinning {
 
 	// -1 means any pixel value is ok
+	//  0 means it is expected to be zero
+	//  1 means it is expected to be one
 
 	public static byte mask0[]=new byte[]{ 0, 0, 0,
 										  -1, 1,-1,
@@ -140,7 +142,7 @@ public class BinaryThinning {
 
 	/**
 	 * Abstract class for applying the mask.  Uses sparse list of black pixels.  Determines if the pixel is along
-	 * the border or not.  If border then generic code is code, otherwise opimized code is called.
+	 * the border or not.  If border then generic code is code, otherwise optimized code is called.
 	 */
 	protected abstract class Mask {
 

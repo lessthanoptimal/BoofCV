@@ -50,10 +50,9 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 
 	@Override
 	public boolean process( List<Point2D_I32> contour ) {
-//		System.out.println("-000000000--------------------------------------");
 		this.contour = contour;
 		this.N = contour.size();
-		this.minimumSideLengthPixel = 2;//(int)Math.ceil(N* minimumSideLengthFraction);
+		this.minimumSideLengthPixel = (int)Math.ceil(N* minimumSideLengthFraction);
 
 		// ------------- find initial line segments
 		splits.reset();
@@ -246,7 +245,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 			point2D.set(b.x,b.y);
 
 			double dist = Distance2D_F64.distanceSq(line, point2D);
-			if( dist > bestDistanceSq ) {
+			if( dist >= bestDistanceSq ) {
 				bestDistanceSq = dist;
 				bestOffset = i;
 			}

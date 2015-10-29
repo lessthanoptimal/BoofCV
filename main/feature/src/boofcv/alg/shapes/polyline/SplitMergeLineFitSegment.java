@@ -51,9 +51,11 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		splits.add(list.size()-1);
 
 		for( int i = 0; i < maxIterations; i++ ) {
-			if( !mergeSegments() )
+			boolean changed = mergeSegments();
+			if( !changed && !splitSegments() )
 				break;
-			if( !splitSegments() )
+
+			if( splits.size() <= 2 || splits.size() >= abortSplits )
 				break;
 		}
 
@@ -68,13 +70,6 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		// too short to split
 		if( indexStart+1 >= indexStop )
 			return;
-
-		// end points of the line
-		Point2D_I32 a = contour.get(indexStart);
-		Point2D_I32 c = contour.get(indexStop);
-
-		line.p.set(a.x,a.y);
-		line.slope.set(c.x-a.x,c.y-a.y);
 
 		int indexSplit = selectSplitBetween(indexStart, indexStop);
 
@@ -96,12 +91,6 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		for( int i = 0; i < splits.size-1; i++ ) {
 			int start = splits.data[i];
 			int end = splits.data[i+1];
-
-			Point2D_I32 a = contour.get(start);
-			Point2D_I32 b = contour.get(end);
-
-			line.p.set(a.x,a.y);
-			line.slope.set(b.x-a.x,b.y-a.y);
 
 			int bestIndex = selectSplitBetween(start, end);
 			if( bestIndex >= 0 ) {
@@ -127,28 +116,33 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 	 * (set up prior to calling).  Returns the index if the distance is less than tolerance, otherwise -1
 	 */
 	protected int selectSplitBetween(int indexStart, int indexEnd) {
-		int bestIndex = -1;
-		double bestDistanceSq = 0;
 
-		double toleranceSplitSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
+		Point2D_I32 a = contour.get(indexStart);
+		Point2D_I32 c = contour.get(indexEnd);
+
+		line.p.set(a.x,a.y);
+		line.slope.set(c.x-a.x,c.y-a.y);
+
+		int bestIndex = -1;
+		double bestDistanceSq = splitThresholdSq(contour.get(indexStart), contour.get(indexEnd));
+
+		// adjusting using 'minimumSideLengthPixel' to ensure it doesn't create a new line which is too short
+		int minLength = Math.max(1,minimumSideLengthPixel);// 1 is the minimum so that you don't split on the same corner
+		int length = indexEnd-indexStart-minLength;
 
 		// don't try splitting at the two end points
-		for( int i = indexStart+1; i < indexEnd; i++ ) {
-			Point2D_I32 b = contour.get(i);
+		for( int i = minLength; i <= length; i++ ) {
+			int index = indexStart+i;
+			Point2D_I32 b = contour.get(index);
 			point2D.set(b.x,b.y);
 
 			double dist = Distance2D_F64.distanceSq(line, point2D);
-			if( dist > bestDistanceSq ) {
+			if( dist >= bestDistanceSq ) {
 				bestDistanceSq = dist;
-				bestIndex = i;
+				bestIndex = index;
 			}
 		}
-
-		if( bestDistanceSq > toleranceSplitSq) {
-			return bestIndex;
-		} else {
-			return -1;
-		}
+		return bestIndex;
 	}
 
 	/**
@@ -166,29 +160,16 @@ public class SplitMergeLineFitSegment extends SplitMergeLineFit {
 		// first point is always at the start
 		work.add(splits.data[0]);
 
-		Point2D_I32 a = contour.get(splits.data[0]);
-		Point2D_I32 b = contour.get(splits.data[1]);
-
 		for( int i = 0; i < splits.size-2; i++ ) {
-			Point2D_I32 c = contour.get(splits.data[i+2]);
-
-			line.p.set(a.x,a.y);
-			line.slope.set(c.x-a.x,c.y-a.y);
-
-			point2D.set(b.x,b.y);
-			double d = Distance2D_F64.distanceSq(line, point2D);
-
-			if( d < splitThresholdSq(a,c) ) {
+			if( selectSplitBetween(splits.data[i],splits.data[i+2]) < 0 ) {
 				// merge the two lines by not adding it
 				change = true;
 			} else {
 				work.add(splits.data[i + 1]);
-				a = b;
 			}
-
-			b = c;
 		}
 
+		// and end
 		work.add(splits.data[splits.size-1]);
 
 		// swap the two lists

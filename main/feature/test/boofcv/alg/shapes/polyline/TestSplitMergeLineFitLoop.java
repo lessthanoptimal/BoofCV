@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -317,6 +318,24 @@ public class TestSplitMergeLineFitLoop {
 		assertEquals(-1,found);
 		found = alg.selectSplitOffset(0,5+minimum-1);
 		assertEquals(-1,found);
+	}
+
+	/**
+	 * Checks to make sure the minimum side length is correctly set
+	 */
+	@Test
+	public void set_minimumSideLengthPixel() {
+		double minSplitFraction = 0.2;
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+
+		for (int i = 0; i < 30; i++) {
+			contour.add(new Point2D_I32(i, 0));
+		}
+
+		SplitMergeLineFitLoop alg = new SplitMergeLineFitLoop(0.001,minSplitFraction,100);
+		alg.process(contour);
+
+		assertEquals(contour.size()/5,alg.minimumSideLengthPixel);
 	}
 
 	private List<Point2D_I32> shiftContour( List<Point2D_I32> contour , int offset ) {

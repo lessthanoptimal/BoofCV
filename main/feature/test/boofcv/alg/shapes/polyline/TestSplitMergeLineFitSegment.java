@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -146,12 +147,48 @@ public class TestSplitMergeLineFitSegment {
 	 * Makes sure the selectSplitOffset is obeying the minimumSideLengthPixel parameter
 	 */
 	@Test
-	public void selectSplitOffset_minimumSideLengthPixel() {
-		fail("implement");
+	public void selectSplitBetween_minimumSideLengthPixel() {
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,MIN_SPLIT,100);
+		alg.contour = new ArrayList<Point2D_I32>();
+
+		// contour is straight with one point that's way off
+		for (int i = 0; i < 20; i++) {
+			alg.contour.add(new Point2D_I32(i, 0));
+		}
+		alg.contour.get(10).set(10,10);
+
+		// force it to use the default of 1 pixel
+		alg.minimumSideLengthPixel = 0;
+		// shouldn't be affect by the min side
+		assertEquals(10,alg.selectSplitBetween(0,19));
+
+		int r = 0;
+		assertEquals(10,alg.selectSplitBetween(10-r-1,10+r+1));
+		assertEquals(-1,alg.selectSplitBetween(10-r,10+r+1));
+		assertEquals(-1,alg.selectSplitBetween(10-r-1,10+r));
+
+		alg.minimumSideLengthPixel = 2;
+		r = 1;
+		assertEquals(10,alg.selectSplitBetween(10-r-1,10+r+1));
+		assertEquals(-1,alg.selectSplitBetween(10-r,10+r+1));
+		assertEquals(-1,alg.selectSplitBetween(10-r-1,10+r));
 	}
 
+	/**
+	 * Checks to make sure the minimum side length is correctly set
+	 */
 	@Test
-	public void updateForNewParameters() {
-		fail("implement");
+	public void set_minimumSideLengthPixel() {
+		double minSplitFraction = 0.1;
+		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+
+		for (int i = 0; i < 30; i++) {
+			contour.add(new Point2D_I32(i, 0));
+		}
+
+		SplitMergeLineFitSegment alg = new SplitMergeLineFitSegment(0.001,minSplitFraction,100);
+		alg.process(contour);
+
+		assertEquals(contour.size()/10,alg.minimumSideLengthPixel);
 	}
 }
