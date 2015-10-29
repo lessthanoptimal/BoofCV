@@ -18,13 +18,13 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.DetectFiducialSquareImage;
+import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareImage} for {@link FiducialDetector}
+ * Wrapper around {@link DetectFiducialSquareImage} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */

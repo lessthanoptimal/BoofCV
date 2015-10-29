@@ -133,8 +133,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 *                        If null then this test is skipped.
 	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
-	 * @param minimumSplitFraction Minimum number of pixels allowed to split a polygon as a fraction of image width.
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
+	 * @param convex If true it will only return convex shapes
+	 * @param splitPenalty Penalty given to a line segment while splitting.  See {@link MinimizeEnergyPrune}
 	 * @param inputType Type of input image it's processing
 	 */
 	public BinaryPolygonDetector(int minSides, int maxSides,

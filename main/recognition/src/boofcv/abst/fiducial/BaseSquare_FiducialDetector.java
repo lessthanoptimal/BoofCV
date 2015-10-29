@@ -18,8 +18,8 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.BaseDetectFiducialSquare;
-import boofcv.alg.fiducial.StabilitySquareFiducialEstimate;
+import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
+import boofcv.alg.fiducial.square.StabilitySquareFiducialEstimate;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;

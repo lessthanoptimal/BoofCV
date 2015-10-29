@@ -19,6 +19,7 @@
 package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
+import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.struct.Configuration;
@@ -26,7 +27,7 @@ import boofcv.struct.Configuration;
 /**
  * Configuration for {@link SquareBinary_to_FiducialDetector}.
  *
- * @see boofcv.alg.fiducial.DetectFiducialSquareBinary
+ * @see DetectFiducialSquareBinary
  *
  * @author Peter Abeles
  */

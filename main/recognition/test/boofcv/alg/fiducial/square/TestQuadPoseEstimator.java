@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.fiducial.square;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;

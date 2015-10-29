@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.fiducial.square;
 
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;

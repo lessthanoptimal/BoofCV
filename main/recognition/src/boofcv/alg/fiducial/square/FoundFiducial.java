@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial;
+package boofcv.alg.fiducial.square;
 
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;

@@ -18,12 +18,12 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.DetectFiducialSquareBinary;
+import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
- * Wrapper around {@link boofcv.alg.fiducial.DetectFiducialSquareBinary} for {@link FiducialDetector}
+ * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
