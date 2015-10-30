@@ -290,8 +290,9 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		detector.setIntrinsic(intrinsic);
 
 		fiducialInfo.clear();
-		stabilityMax.location = 0;
-		stabilityMax.orientation = 0;
+		// give it some initial values so that it doesn't look like there is huge errors right off the bat
+		stabilityMax.location = 0.05;
+		stabilityMax.orientation = 0.02;
 
 		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 

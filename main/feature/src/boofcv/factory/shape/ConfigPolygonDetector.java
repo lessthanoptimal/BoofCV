@@ -40,8 +40,8 @@ public class ConfigPolygonDetector implements Configuration {
 	public int maximumSides;
 
 	/**
-	 * Two lines are merged together if their angle is &le; to this number.  This variable is dependent upon the
-	 * number of sides.  The more sides you wish to detect the more likely you will need to reduce this number.
+	 * A line is split if a point along the contour between the two end points has a distance from the line
+	 * which is greater than this fraction of the line's length
 	 */
 	public double contour2Poly_splitFraction = 0.10;
 
@@ -53,7 +53,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * The minimum allowed length of a side as a fraction of the total contour length
 	 */
-	public double contour2Poly_minimumSideFraction = 0.002;
+	public double contour2Poly_minimumSideFraction = 0.025;
 
 	/**
 	 * Magic number used to penalize a polygon when a new corner is added

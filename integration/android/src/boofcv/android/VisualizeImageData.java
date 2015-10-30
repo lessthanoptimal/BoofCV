@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
-import boofcv.alg.fiducial.edge.EdgeContour;
-import boofcv.alg.fiducial.edge.EdgeSegment;
+import boofcv.alg.feature.detect.edge.EdgeContour;
+import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.struct.image.*;

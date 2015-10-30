@@ -34,4 +34,20 @@ public class FiducialStability {
 	 * Larger number means less stable the estimate is.
 	 */
 	public double orientation;
+
+	public FiducialStability(double location, double orientation) {
+		this.location = location;
+		this.orientation = orientation;
+	}
+
+	public FiducialStability() {
+	}
+
+	@Override
+	public String toString() {
+		return "FiducialStability{" +
+				"location=" + location +
+				", orientation=" + orientation +
+				'}';
+	}
 }
