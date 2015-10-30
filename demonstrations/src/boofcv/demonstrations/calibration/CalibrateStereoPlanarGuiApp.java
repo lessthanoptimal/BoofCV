@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.calib.CalibrateStereoPlanar;
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.PlanarCalibrationDetector;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
+import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;

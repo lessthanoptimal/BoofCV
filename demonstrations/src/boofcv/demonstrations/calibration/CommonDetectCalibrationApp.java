@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.alg.feature.detect.squares.SquareEdge;
-import boofcv.alg.feature.detect.squares.SquareGrid;
-import boofcv.alg.feature.detect.squares.SquareNode;
+import boofcv.alg.fiducial.calib.squares.SquareEdge;
+import boofcv.alg.fiducial.calib.squares.SquareGrid;
+import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;

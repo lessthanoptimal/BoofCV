@@ -18,8 +18,8 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.d3.PointCloudViewer;

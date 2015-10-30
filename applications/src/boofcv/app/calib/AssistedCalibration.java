@@ -18,9 +18,9 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.PlanarDetectorChessboard;
-import boofcv.abst.calib.PlanarDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.PlanarDetectorChessboard;
+import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
+import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;

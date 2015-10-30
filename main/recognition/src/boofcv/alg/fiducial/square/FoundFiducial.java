@@ -37,7 +37,9 @@ public class FoundFiducial {
 	public Se3_F64 targetToSensor = new Se3_F64();
 
 	/**
-	 * Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.
+	 * <p>Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.</p>
+	 *
+	 * <p>For the meaning of each corner see {@link BaseDetectFiducialSquare}. corner a = 0, b = 1, c = 2, d = 3</p>
 	 */
 	public Quadrilateral_F64 location = new Quadrilateral_F64();
 }

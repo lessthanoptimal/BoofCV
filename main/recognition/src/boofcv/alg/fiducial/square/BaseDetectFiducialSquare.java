@@ -63,7 +63,7 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Target orientation. Corner 0 = (-r,r), 1 = (r,r) , 2 = (rr,-r) , 3 = (-r,-r).
+ * Target orientation. Corner 0 = (-r,r), 1 = (r,r) , 2 = (r,-r) , 3 = (-r,-r).
  * </p>
  *
  * @author Peter Abeles

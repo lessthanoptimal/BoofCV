@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.io.MediaManager;
 
 import java.io.BufferedReader;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses a configuration file for {@link boofcv.abst.calib.CalibrateMonoPlanar}.
+ * Parses a configuration file for {@link CalibrateMonoPlanar}.
  * 
  * @author Peter Abeles
  */

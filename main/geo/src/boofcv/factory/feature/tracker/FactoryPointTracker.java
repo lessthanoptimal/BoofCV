@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,9 @@ import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -213,7 +215,7 @@ public class FactoryPointTracker {
 	/**
 	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with BRIEF.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointBrief
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
@@ -250,7 +252,7 @@ public class FactoryPointTracker {
 	/**
 	 * Creates a tracker which detects FAST corner features and describes them with BRIEF.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.FastCornerIntensity
+	 * @see FastCornerIntensity
 	 * @see DescribePointBrief
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
@@ -286,7 +288,7 @@ public class FactoryPointTracker {
 	/**
 	 * Creates a tracker which detects Shi-Tomasi corner features and describes them with NCC.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointPixelRegionNCC
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *
@@ -403,7 +405,7 @@ public class FactoryPointTracker {
 	 * Creates a tracker which detects Shi-Tomasi corner features, describes them with SURF, and
 	 * nominally tracks them using KLT.
 	 *
-	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
+	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
 	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
 	 *

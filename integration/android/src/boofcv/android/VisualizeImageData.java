@@ -19,8 +19,8 @@
 package boofcv.android;
 
 import android.graphics.Bitmap;
-import boofcv.alg.feature.detect.edge.EdgeContour;
-import boofcv.alg.feature.detect.edge.EdgeSegment;
+import boofcv.alg.fiducial.edge.EdgeContour;
+import boofcv.alg.fiducial.edge.EdgeSegment;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.struct.image.*;

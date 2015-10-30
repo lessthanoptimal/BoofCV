@@ -18,10 +18,10 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
-import boofcv.alg.feature.detect.squares.SquareGrid;
-import boofcv.alg.feature.detect.squares.SquareNode;
+import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
+import boofcv.alg.fiducial.calib.squares.SquareGrid;
+import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;

@@ -1,0 +1,114 @@
+/*
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.abst.fiducial.calib;
+
+import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.alg.fiducial.calib.DetectFiducialSquareGrid;
+import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
+
+import java.util.List;
+
+/**
+ * Wrapper around {@link DetectFiducialSquareGrid} for {@link PlanarCalibrationDetector}.  The fiducals coordinate
+ * system is shown in the image below. TODO
+ *
+ * The origin of is in the center.  TODO BLAH
+ *
+ * @author Peter Abeles
+ */
+public class CalibrationDetectorSquareGrid implements PlanarCalibrationDetector {
+
+	// number of squares along each grid axis
+	int numRows;
+	int numCols;
+
+	// number of points along each grid axis
+	int numPointRows;
+	int numPointCols;
+
+	// layout of points in fiducial frame
+	List<Point2D_F64> layoutPoints;
+
+	// square binary fiducial detector
+	DetectFiducialSquareGrid<ImageFloat32> detector;
+
+	// storage for observations
+	CalibrationObservation observations;
+
+	public CalibrationDetectorSquareGrid( ConfigSquareGridBinary config ) {
+
+		DetectFiducialSquareBinary<ImageFloat32> fiducialDetector = FactoryFiducial.
+				squareBinary(config.configDetector, config.configThreshold, ImageFloat32.class).getAlgorithm();
+		detector = new DetectFiducialSquareGrid<ImageFloat32>(config.numRows,config.numCols,config.ids,fiducialDetector);
+
+		numRows = config.numRows;
+		numCols = config.numCols;
+
+		numPointRows = 2*numRows;
+		numPointCols = 2*numCols;
+
+		layoutPoints = PlanarDetectorSquareGrid.createLayout(numRows, numCols, config.squareWidth, config.spaceWidth);
+	}
+
+	@Override
+	public boolean process(ImageFloat32 input) {
+		if( !detector.detect(input) ) {
+			return false;
+		}
+
+		observations = new CalibrationObservation();
+
+		List<DetectFiducialSquareGrid.Detection> detections = detector.getDetections();
+
+		for (int i = 0; i < detections.size(); i++) {
+			DetectFiducialSquareGrid.Detection d = detections.get(i);
+
+			int row = d.gridIndex/numCols;
+			int col = d.gridIndex%numCols;
+
+			int pointRow = row*2;
+			int pointCol = col*2;
+
+			observations.add(d.location.a,getPointIndex(pointRow,   pointCol));
+			observations.add(d.location.b,getPointIndex(pointRow,   pointCol+1));
+			observations.add(d.location.c,getPointIndex(pointRow+1, pointCol+1));
+			observations.add(d.location.d,getPointIndex(pointRow+1, pointCol));
+		}
+
+		return true;
+	}
+
+	private int getPointIndex( int row , int col ) {
+		return row*numPointCols + col;
+	}
+
+	@Override
+	public CalibrationObservation getDetectedPoints() {
+		return observations;
+	}
+
+	@Override
+	public List<Point2D_F64> getLayout() {
+		return layoutPoints;
+	}
+}

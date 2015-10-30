@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.calib.ImageResults;
+import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.CalibratedImageGridPanel;

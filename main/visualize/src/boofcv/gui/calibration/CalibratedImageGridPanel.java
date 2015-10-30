@@ -18,7 +18,7 @@
 
 package boofcv.gui.calibration;
 
-import boofcv.abst.calib.ImageResults;
+import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;

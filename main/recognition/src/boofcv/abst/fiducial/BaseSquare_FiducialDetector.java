@@ -101,4 +101,8 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Dete
 	public boolean isSizeKnown() {
 		return true;
 	}
+
+	public Detector getAlgorithm() {
+		return alg;
+	}
 }

@@ -186,6 +186,6 @@ public class ExampleFitPolygon {
 		fitCannyBinary(input);
 		fitBinaryImage(input);
 
-		ShowImages.showWindow(gui,"Polygon from Contour", true);
+		ShowImages.showWindow(gui, "Polygon from Contour", true);
 	}
 }

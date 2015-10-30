@@ -18,12 +18,12 @@
 
 package boofcv.factory.fiducial;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
@@ -51,9 +51,9 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	FiducialDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
-									  final ConfigThreshold configThreshold,
-									  final Class<T> imageType ) {
+	SquareBinary_to_FiducialDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
+													  final ConfigThreshold configThreshold,
+													  final Class<T> imageType ) {
 
 		configFiducial.checkValidity();
 
