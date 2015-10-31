@@ -60,7 +60,7 @@ import java.util.List;
 public class CalibrateMonoPlanar {
 
 	// detects calibration points inside of images
-	protected PlanarCalibrationDetector detector;
+	protected CalibrationDetector detector;
 
 	// computes calibration parameters
 	protected CalibrationPlanarGridZhang99 zhang99;
@@ -84,7 +84,7 @@ public class CalibrateMonoPlanar {
 	 *
 	 * @param detector Target detection algorithm.
 	 */
-	public CalibrateMonoPlanar(PlanarCalibrationDetector detector ) {
+	public CalibrateMonoPlanar(CalibrationDetector detector ) {
 		this.detector = detector;
 	}
 

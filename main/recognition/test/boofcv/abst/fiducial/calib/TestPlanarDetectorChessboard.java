@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -88,7 +88,7 @@ public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetect
 	}
 
 	@Override
-	public PlanarCalibrationDetector createDetector() {
+	public CalibrationDetector createDetector() {
 		return FactoryPlanarCalibrationTarget.detectorChessboard(config);
 	}
 }

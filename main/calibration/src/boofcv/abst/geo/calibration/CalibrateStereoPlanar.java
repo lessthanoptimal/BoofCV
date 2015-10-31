@@ -69,7 +69,7 @@ public class CalibrateStereoPlanar {
 	 *
 	 * @param detector Target detection algorithm.
 	 */
-	public CalibrateStereoPlanar(PlanarCalibrationDetector detector)
+	public CalibrateStereoPlanar(CalibrationDetector detector)
 	{
 		calibLeft = new CalibrateMonoPlanar(detector);
 		calibRight = new CalibrateMonoPlanar(detector);

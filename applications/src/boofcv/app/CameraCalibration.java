@@ -21,7 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
@@ -53,7 +53,7 @@ public class CameraCalibration extends BaseWebcamApp {
 
 	String inputDirectory;
 	String outputFileName;
-	PlanarCalibrationDetector detector;
+	CalibrationDetector detector;
 	boolean zeroSkew = true;
 	int numRadial = 2;
 	boolean tangential = false;

@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.calibration.MonoPlanarPanel;
@@ -67,7 +67,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		add(gui,BorderLayout.CENTER);
 	}
 
-	public void configure( PlanarCalibrationDetector detector ,
+	public void configure( CalibrationDetector detector ,
 						   List<String> images  ,
 						   int numRadial, boolean includeTangential )
 	{
@@ -197,7 +197,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector =
+		CalibrationDetector detector =
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
 				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));

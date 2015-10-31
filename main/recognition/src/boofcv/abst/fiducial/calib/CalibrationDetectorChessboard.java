@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
@@ -33,18 +33,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectChessboardFiducial} for {@link PlanarCalibrationDetector}
+ * Wrapper around {@link DetectChessboardFiducial} for {@link CalibrationDetector}
  * 
  * @author Peter Abeles
  */
-public class PlanarDetectorChessboard implements PlanarCalibrationDetector {
+public class CalibrationDetectorChessboard implements CalibrationDetector {
 
 	DetectChessboardFiducial<ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public PlanarDetectorChessboard(ConfigChessboard config ) {
+	public CalibrationDetectorChessboard(ConfigChessboard config) {
 
 		RefineBinaryPolygon<ImageFloat32> refineLine =
 				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);

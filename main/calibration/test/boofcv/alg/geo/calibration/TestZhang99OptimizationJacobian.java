@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class TestZhang99OptimizationJacobian {
 	private void compareToNumerical(boolean assumeZeroSkew, boolean includeTangential ) {
 		Zhang99ParamAll param = GenericCalibrationGrid.createStandardParam(assumeZeroSkew, 2,includeTangential, 3, rand);
 
-		List<Point2D_F64> gridPts = PlanarDetectorSquareGrid.createLayout(3, 2, 30, 30);
+		List<Point2D_F64> gridPts = CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 
 		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
 

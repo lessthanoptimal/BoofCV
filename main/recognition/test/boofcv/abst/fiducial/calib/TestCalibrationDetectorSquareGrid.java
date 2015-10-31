@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -82,7 +82,7 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public PlanarCalibrationDetector createDetector() {
+	public CalibrationDetector createDetector() {
 		ConfigSquareGridBinary config = new ConfigSquareGridBinary(numRows,numCols,1.0,1.0);
 		config.squareWidth = 1;
 		config.spaceWidth = 1;

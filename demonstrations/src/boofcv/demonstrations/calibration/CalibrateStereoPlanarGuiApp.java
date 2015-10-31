@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -175,7 +175,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
-	public void configure( PlanarCalibrationDetector detector ,
+	public void configure( CalibrationDetector detector ,
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
@@ -240,7 +240,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		PlanarCalibrationDetector detector =
+		CalibrationDetector detector =
 				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 

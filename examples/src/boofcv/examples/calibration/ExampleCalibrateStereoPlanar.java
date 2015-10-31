@@ -21,7 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -54,7 +54,7 @@ import java.util.List;
 public class ExampleCalibrateStereoPlanar {
 
 	// Detects the target and calibration point inside the target
-	PlanarCalibrationDetector detector;
+	CalibrationDetector detector;
 
 	// List of calibration images
 	List<String> left;

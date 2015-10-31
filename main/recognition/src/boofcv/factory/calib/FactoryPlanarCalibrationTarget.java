@@ -36,10 +36,10 @@ public class FactoryPlanarCalibrationTarget {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarDetectorSquareGrid detectorSquareGrid(ConfigSquareGrid config) {
+	public static CalibrationDetectorSquareGrid detectorSquareGrid(ConfigSquareGrid config) {
 		config.checkValidity();
 
-		return new PlanarDetectorSquareGrid(config);
+		return new CalibrationDetectorSquareGrid(config);
 	}
 
 	/**
@@ -51,23 +51,23 @@ public class FactoryPlanarCalibrationTarget {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static PlanarDetectorChessboard detectorChessboard( ConfigChessboard config ) {
+	public static CalibrationDetectorChessboard detectorChessboard( ConfigChessboard config ) {
 		config.checkValidity();
 
-		return new PlanarDetectorChessboard(config);
+		return new CalibrationDetectorChessboard(config);
 	}
 
 	/**
 	 * Creates a fiducial that is a grid composed of square binary fiducials.
 	 *
-	 * @see CalibrationDetectorBinaryGrid
+	 * @see CalibrationDetectorSquareFiducialGrid
 	 *
 	 * @param config
 	 * @return
 	 */
-	public static CalibrationDetectorBinaryGrid detectorBinaryGrid( ConfigSquareGridBinary config ) {
+	public static CalibrationDetectorSquareFiducialGrid detectorBinaryGrid( ConfigSquareGridBinary config ) {
 		config.checkValidity();
 
-		return new CalibrationDetectorBinaryGrid(config);
+		return new CalibrationDetectorSquareFiducialGrid(config);
 	}
 }

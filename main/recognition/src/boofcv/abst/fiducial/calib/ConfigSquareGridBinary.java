@@ -24,7 +24,7 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for a {@link CalibrationDetectorBinaryGrid} that uses a
+ * Configuration for a {@link CalibrationDetectorSquareFiducialGrid} that uses a
  * {@link boofcv.alg.fiducial.square.DetectFiducialSquareBinary} for the inner fiducials.
  *
  * @author Peter Abeles
@@ -85,6 +85,7 @@ public class ConfigSquareGridBinary implements Configuration {
 
 	@Override
 	public void checkValidity() {
-
+		if( ids == null )
+			throw new IllegalArgumentException("Need to specify expected ids");
 	}
 }

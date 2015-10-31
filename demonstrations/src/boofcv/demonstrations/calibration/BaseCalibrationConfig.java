@@ -20,7 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.MediaManager;
 import boofcv.io.SimpleStringNumberReader;
@@ -42,7 +42,7 @@ public class BaseCalibrationConfig {
 	public boolean assumeZeroSkew;
 	public int numRadial;
 	public boolean includeTangential;
-	public PlanarCalibrationDetector detector;
+	public CalibrationDetector detector;
 
 	public BaseCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -84,7 +84,7 @@ public class BaseCalibrationConfig {
 		} catch (IOException e) {}
 	}
 
-	public PlanarCalibrationDetector getDetector() {
+	public CalibrationDetector getDetector() {
 		return detector;
 	}
 }

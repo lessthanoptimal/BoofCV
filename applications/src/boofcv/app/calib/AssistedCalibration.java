@@ -18,9 +18,9 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.PlanarDetectorChessboard;
-import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
@@ -60,7 +60,7 @@ public class AssistedCalibration {
 
 	ImageFloat32 input;
 
-	PlanarCalibrationDetector detector;
+	CalibrationDetector detector;
 
 	int imageSize;
 	int imageWidth,imageHeight;
@@ -87,14 +87,14 @@ public class AssistedCalibration {
 
 	ImageSectorSaver saver = new ImageSectorSaver();
 
-	public AssistedCalibration(PlanarCalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
+	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
 		this.detector = detector;
 		this.gui = gui;
 		this.quality = quality;
 
-		if( detector instanceof PlanarDetectorChessboard ) {
+		if( detector instanceof CalibrationDetectorChessboard) {
 			view = new CalibrationView.Chessboard();
-		} else if( detector instanceof PlanarDetectorSquareGrid ) {
+		} else if( detector instanceof CalibrationDetectorSquareGrid) {
 			view = new CalibrationView.SquareGrid();
 		} else {
 			throw new RuntimeException("Unknown calibration detector type");

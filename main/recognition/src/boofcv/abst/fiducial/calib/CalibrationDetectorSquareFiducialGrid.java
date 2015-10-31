@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.DetectFiducialSquareGrid;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -29,22 +29,17 @@ import georegression.struct.point.Point2D_F64;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectFiducialSquareGrid} for {@link PlanarCalibrationDetector}.  The fiducals coordinate
- * system is shown in the image below. TODO
- *
- * The origin of is in the center.  TODO BLAH
- *
- * @see DetectFiducialSquareGrid
+ * Wrapper around {@link DetectFiducialSquareGrid} for {@link CalibrationDetector}.
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorBinaryGrid implements PlanarCalibrationDetector {
+public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetector {
 
 	// number of squares along each grid axis
 	int numRows;
 	int numCols;
 
-	// number of points along each grid axis
+	// number of calibration points along each grid axis
 	int numPointRows;
 	int numPointCols;
 
@@ -57,7 +52,7 @@ public class CalibrationDetectorBinaryGrid implements PlanarCalibrationDetector 
 	// storage for observations
 	CalibrationObservation observations;
 
-	public CalibrationDetectorBinaryGrid(ConfigSquareGridBinary config) {
+	public CalibrationDetectorSquareFiducialGrid(ConfigSquareGridBinary config) {
 
 		DetectFiducialSquareBinary<ImageFloat32> fiducialDetector = FactoryFiducial.
 				squareBinary(config.configDetector, config.configThreshold, ImageFloat32.class).getAlgorithm();
@@ -69,7 +64,7 @@ public class CalibrationDetectorBinaryGrid implements PlanarCalibrationDetector 
 		numPointRows = 2*numRows;
 		numPointCols = 2*numCols;
 
-		layoutPoints = PlanarDetectorSquareGrid.createLayout(numRows*2-1, numCols*2-1, config.squareWidth, config.spaceWidth);
+		layoutPoints = CalibrationDetectorSquareGrid.createLayout(numRows * 2 - 1, numCols * 2 - 1, config.squareWidth, config.spaceWidth);
 	}
 
 	@Override

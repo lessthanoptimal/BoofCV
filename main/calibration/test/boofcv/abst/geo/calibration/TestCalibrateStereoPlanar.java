@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -107,13 +107,13 @@ public class TestCalibrateStereoPlanar {
 		assertEquals(intrinsic.t2,found.t2,1e-5);
 	}
 
-	private class FakeDetector implements PlanarCalibrationDetector {
+	private class FakeDetector implements CalibrationDetector {
 
 		int count = 0;
 
 		CalibrationObservation obs;
 
-		List<Point2D_F64> layout = PlanarDetectorSquareGrid.createLayout(4, 3, 30, 30);
+		List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
 
 		@Override
 		public boolean process(ImageFloat32 input) {
@@ -141,7 +141,7 @@ public class TestCalibrateStereoPlanar {
 				Point3D_F64 a = SePointOps_F64.transform(t2c, p3, null);
 
 				Point2D_F64 pixel = new Point2D_F64();
-				normToPixel.compute(a.x/a.z,a.y/a.z,pixel);
+				normToPixel.compute(a.x / a.z, a.y / a.z, pixel);
 
 				if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= input.height-1 )
 					throw new RuntimeException("Adjust test setup, bad observation");

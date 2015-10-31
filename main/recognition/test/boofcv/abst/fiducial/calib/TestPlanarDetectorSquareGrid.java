@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -40,7 +40,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> l = PlanarDetectorSquareGrid.createLayout(5, 3, 0.1, 0.2);
+		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(5, 3, 0.1, 0.2);
 
 		assertEquals(4*6,l.size());
 
@@ -92,7 +92,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 	}
 
 	@Override
-	public PlanarCalibrationDetector createDetector() {
+	public CalibrationDetector createDetector() {
 		return FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
 	}
 }

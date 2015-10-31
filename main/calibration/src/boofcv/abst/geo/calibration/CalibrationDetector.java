@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface PlanarCalibrationDetector {
+public interface CalibrationDetector {
 
 	/**
 	 * Image processing for calibration target detection

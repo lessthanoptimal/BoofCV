@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
@@ -52,7 +52,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		implements FiducialDetector<T>
 {
 	// detects the calibration target
-	PlanarCalibrationDetector detector;
+	CalibrationDetector detector;
 	// transform to remove lens distortion
 	PointTransform_F64 distortToUndistorted;
 
@@ -82,7 +82,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
@@ -96,7 +96,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
 		int squareCols = config.numCols/2+1;
 		int squareRows = config.numRows/2+1;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
@@ -107,7 +107,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		init(detector, width, imageType);
 	}
 
-	protected void init(PlanarCalibrationDetector detector, double width, Class<T> imageType) {
+	protected void init(CalibrationDetector detector, double width, Class<T> imageType) {
 		this.detector = detector;
 		this.type = ImageType.single(imageType);
 		this.converted = new ImageFloat32(1,1);

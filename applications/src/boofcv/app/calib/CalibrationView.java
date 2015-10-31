@@ -18,9 +18,9 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.PlanarDetectorChessboard;
-import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import georegression.struct.point.Point2D_F64;
 
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public interface CalibrationView {
 
-	void initialize( PlanarCalibrationDetector detector );
+	void initialize( CalibrationDetector detector );
 
 	void getSides( CalibrationObservation detections , List<Point2D_F64> sides );
 
@@ -42,8 +42,8 @@ public interface CalibrationView {
 		int numRows,numCols;
 		int pointRows,pointCols;
 
-		public void initialize( PlanarCalibrationDetector detector ) {
-			PlanarDetectorChessboard chessboard = (PlanarDetectorChessboard)detector;
+		public void initialize( CalibrationDetector detector ) {
+			CalibrationDetectorChessboard chessboard = (CalibrationDetectorChessboard)detector;
 			this.numRows = chessboard.getGridRows();
 			this.numCols = chessboard.getGridColumns();
 
@@ -75,8 +75,8 @@ public interface CalibrationView {
 		int gridCols;
 		int pointRows,pointCols;
 
-		public void initialize( PlanarCalibrationDetector detector ) {
-			PlanarDetectorSquareGrid target = (PlanarDetectorSquareGrid)detector;
+		public void initialize( CalibrationDetector detector ) {
+			CalibrationDetectorSquareGrid target = (CalibrationDetectorSquareGrid)detector;
 			pointRows = target.getPointRows();
 			pointCols = target.getPointColumns();
 

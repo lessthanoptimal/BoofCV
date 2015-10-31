@@ -19,7 +19,7 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -52,7 +52,7 @@ public class ExampleDetectCalibrationPoints {
 		ImageFloat32 input = ConvertBufferedImage.convertFrom(orig,(ImageFloat32)null);
 
 		// To select different types of detectors add or remove comments below
-		PlanarCalibrationDetector detector;
+		CalibrationDetector detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
