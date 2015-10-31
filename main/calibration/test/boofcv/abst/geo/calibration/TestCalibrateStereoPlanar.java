@@ -146,8 +146,7 @@ public class TestCalibrateStereoPlanar {
 				if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= input.height-1 )
 					throw new RuntimeException("Adjust test setup, bad observation");
 
-				obs.observations.add(pixel);
-				obs.indexes.add( i );
+				obs.add(pixel, i);
 			}
 
 			return true;

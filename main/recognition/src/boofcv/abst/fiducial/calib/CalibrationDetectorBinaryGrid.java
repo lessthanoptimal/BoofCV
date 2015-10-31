@@ -34,9 +34,11 @@ import java.util.List;
  *
  * The origin of is in the center.  TODO BLAH
  *
+ * @see DetectFiducialSquareGrid
+ *
  * @author Peter Abeles
  */
-public class CalibrationDetectorSquareGrid implements PlanarCalibrationDetector {
+public class CalibrationDetectorBinaryGrid implements PlanarCalibrationDetector {
 
 	// number of squares along each grid axis
 	int numRows;
@@ -55,7 +57,7 @@ public class CalibrationDetectorSquareGrid implements PlanarCalibrationDetector 
 	// storage for observations
 	CalibrationObservation observations;
 
-	public CalibrationDetectorSquareGrid( ConfigSquareGridBinary config ) {
+	public CalibrationDetectorBinaryGrid(ConfigSquareGridBinary config) {
 
 		DetectFiducialSquareBinary<ImageFloat32> fiducialDetector = FactoryFiducial.
 				squareBinary(config.configDetector, config.configThreshold, ImageFloat32.class).getAlgorithm();
@@ -67,7 +69,7 @@ public class CalibrationDetectorSquareGrid implements PlanarCalibrationDetector 
 		numPointRows = 2*numRows;
 		numPointCols = 2*numCols;
 
-		layoutPoints = PlanarDetectorSquareGrid.createLayout(numRows, numCols, config.squareWidth, config.spaceWidth);
+		layoutPoints = PlanarDetectorSquareGrid.createLayout(numRows*2-1, numCols*2-1, config.squareWidth, config.spaceWidth);
 	}
 
 	@Override
@@ -94,6 +96,8 @@ public class CalibrationDetectorSquareGrid implements PlanarCalibrationDetector 
 			observations.add(d.location.c,getPointIndex(pointRow+1, pointCol+1));
 			observations.add(d.location.d,getPointIndex(pointRow+1, pointCol));
 		}
+
+		observations.sort();
 
 		return true;
 	}

@@ -28,7 +28,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -68,8 +67,8 @@ public class ExampleDetectCalibrationPoints {
 
 		// render and display the results
 		Graphics2D g2 = orig.createGraphics();
-		for( Point2D_F64 p : set.observations )
-			VisualizeFeatures.drawPoint(g2,(int)p.x,(int)p.y,3,Color.RED);
+		for( CalibrationObservation.Point p : set.points )
+			VisualizeFeatures.drawPoint(g2,(int)p.pixel.x,(int)p.pixel.y,3,Color.RED);
 
 		ShowImages.showWindow(orig,"Calibration Points", true);
 	}

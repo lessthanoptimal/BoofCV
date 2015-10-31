@@ -69,8 +69,8 @@ public class Zhang99ComputeTargetHomography {
 
 		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
 		for( int i = 0; i < observedPoints.size(); i++ ) {
-			int which = observedPoints.indexes.get(i);
-			Point2D_F64 obs = observedPoints.observations.get(i);
+			int which = observedPoints.get(i).index;
+			Point2D_F64 obs = observedPoints.get(i).pixel;
 
 			pairs.add( new AssociatedPair(worldPoints.get(which),obs,true));
 		}

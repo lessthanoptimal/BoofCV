@@ -138,7 +138,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 			se.T.set(tranX, tranY, tranZ);
 
 			for( int i = 0; i < set.size(); i++ , indexPoint++ ) {
-				int gridIndex = set.indexes.get(i);
+				int gridIndex = set.points.get(i).index;
 
 				// index = (function index)*numParam
 				indexJacX = (2*indexPoint     )*numParam;

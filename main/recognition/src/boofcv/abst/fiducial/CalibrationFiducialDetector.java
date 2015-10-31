@@ -150,10 +150,10 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		if( view.size() >= 3 ) {
 
 			for (int i = 0; i < view.size(); i++) {
-				int gridIndex = view.indexes.get(i);
+				int gridIndex = view.get(i).index;
 
 				Point2D3D p23 = points2D3D.get(gridIndex);
-				Point2D_F64 pixel = view.observations.get(i);
+				Point2D_F64 pixel = view.get(i).pixel;
 
 				distortToUndistorted.compute(pixel.x, pixel.y, p23.observation);
 			}
@@ -195,10 +195,10 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		maxOrientation = 0;
 		maxLocation = 0;
 		for (int i = 0; i < view.size(); i++) {
-			int gridIndex = view.indexes.get(i);
+			int gridIndex = view.get(i).index;
 
 			Point2D3D p23 = points2D3D.get(gridIndex);
-			Point2D_F64 p = view.observations.get(i);
+			Point2D_F64 p = view.get(i).pixel;
 			workPt.set(p);
 
 			perturb(disturbance,workPt,p,p23);

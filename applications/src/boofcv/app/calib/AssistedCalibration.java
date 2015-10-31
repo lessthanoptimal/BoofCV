@@ -185,7 +185,7 @@ public class AssistedCalibration {
 			if( skewed ) {
 				g2.setColor(Color.BLUE);
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.observations.get(i);
+					Point2D_F64 p = points.points.get(i).pixel;
 
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.draw(ellipse);
@@ -195,7 +195,7 @@ public class AssistedCalibration {
 				g2.setColor(new Color(red, 0, 0));
 
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.observations.get(i);
+					Point2D_F64 p = points.points.get(i).pixel;
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.fill(ellipse);
 				}
@@ -273,7 +273,7 @@ public class AssistedCalibration {
 			}
 
 			renderMagnets();
-			renderCalibrationPoints(stationaryTime, points.observations);
+			renderCalibrationPoints(stationaryTime, points.points);
 		} else {
 			for (int i = 0; i < magnets.size(); i++) {
 				magnets.get(i).handleNoDetection();
@@ -314,14 +314,14 @@ public class AssistedCalibration {
 				message = String.format("Hold still:  %6.1f", stationaryTime);
 			}
 
-			renderCalibrationPoints(stationaryTime, points.observations);
+			renderCalibrationPoints(stationaryTime, points.points);
 		}
 		renderFillPolygons();
 
 		gui.setMessage(message);
 	}
 
-	private void renderCalibrationPoints(double stationaryTime, List<Point2D_F64> points) {
+	private void renderCalibrationPoints(double stationaryTime, List<CalibrationObservation.Point> points) {
 		int shade = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
 		if( pictureTaken ) {
 			g2.setColor(new Color(0, shade, 0));
@@ -332,7 +332,7 @@ public class AssistedCalibration {
 		int r = 6;
 		int w = 2 * r + 1;
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.get(i);
+			Point2D_F64 p = points.get(i).pixel;
 			ellipse.setFrame(p.x - r, p.y - r, w, w);
 			g2.fill(ellipse);
 		}

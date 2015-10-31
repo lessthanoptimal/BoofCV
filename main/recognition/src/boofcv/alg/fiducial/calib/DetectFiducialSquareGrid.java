@@ -29,8 +29,18 @@ import java.util.List;
 /**
  * A fiducial composed of {@link boofcv.alg.fiducial.square.BaseDetectFiducialSquare} intended for use in calibration.
  * It allows parts of the fiducial to be visible and uniquely determined across multiple cameras.  The algorithm
- * simply looks for the expected fiducials in an image and saves he corners that they appear at.  If the same
- * fiducial appears multiple times
+ * simply looks for the expected fiducials in an image and saves the corners that they appear at.  Does not check to
+ * see if the ordering is correct.  If the same fiducial appears multiple times that fiducial is ignored.  Only one
+ * grid fiducial is expected to be visible at any time.
+ *
+ * The user must provide a set of fiducial ID numbers. Each unique numbers corresponds to an expected fiducial.  The
+ * first number in the list refers to the fiducial in the top left corner (minus X and positive Y) in the fiducial's
+ * frame.  The other elements are added in a row-major order.
+ *
+ * <center>
+ * <img src="doc-files/binary_grid.jpg"/>
+ * </center>
+ * Example of a grid of square binary fiducials.  Any square fiducial can be used, including those with images inside.
  *
  * @author Peter Abeles
  */
@@ -43,10 +53,20 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 	// expected id numbers of each fiducials in row major grid order
 	long numbers[];
 
+	// square fiducial detector
 	BaseDetectFiducialSquare<T> detector;
 
+	// found squares inside the image
 	FastQueue<Detection> detections = new FastQueue<Detection>(Detection.class,true);
 
+	/**
+	 * Configures the fiducial detector.
+	 *
+	 * @param numRows Number of rows in the grid
+	 * @param numCols Number of columns in the grd
+	 * @param numbers The fiducial ID numbers its expected to see.  Order matters.
+	 * @param detector Fiducial detector
+	 */
 	public DetectFiducialSquareGrid(int numRows, int numCols, long[] numbers,
 									BaseDetectFiducialSquare<T> detector)
 	{
@@ -56,7 +76,15 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 		this.detector = detector;
 	}
 
+	/**
+	 * Searches for the fiducial inside the image.
+	 *
+	 * @param input Input image
+	 * @return true if at least one of the component fiducials is detected.  False otherwise
+	 */
 	public boolean detect( T input ) {
+
+		detections.reset();
 
 		detector.process(input);
 
@@ -82,6 +110,9 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 		return detections.size > 0;
 	}
 
+	/**
+	 * Returns true of the found fiducial ID number was expected
+	 */
 	private int isExpected( long found ) {
 		for (int i = 0; i < numbers.length; i++) {
 			if( numbers[i] == found ) {
@@ -91,6 +122,10 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 		return -1;
 	}
 
+	/**
+	 * Looks up a detection given the fiducial ID number.  If not seen before the gridIndex is saved and
+	 * a new instance returned.
+	 */
 	private Detection lookupDetection( long found , int gridIndex) {
 		for (int i = 0; i < detections.size(); i++) {
 			Detection d = detections.get(i);
@@ -109,6 +144,10 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 
 	public List<Detection> getDetections() {
 		return detections.toList();
+	}
+
+	public BaseDetectFiducialSquare<T> getDetector() {
+		return detector;
 	}
 
 	/**

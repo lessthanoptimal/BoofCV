@@ -75,8 +75,7 @@ public class TestZhang99OptimizationJacobian {
 			for (int i = 0; i < observations.size(); i++) {
 				CalibrationObservation c = observations.get(i);
 				for (int j = 0; j < 5; j++) {
-					c.indexes.remove(3*i);
-					c.observations.remove(3*i);
+					c.points.remove(3*i);
 				}
 			}
 		}

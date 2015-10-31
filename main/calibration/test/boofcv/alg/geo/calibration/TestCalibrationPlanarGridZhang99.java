@@ -55,8 +55,7 @@ public class TestCalibrationPlanarGridZhang99 {
 			for (int i = 0; i < observations.size(); i++) {
 				CalibrationObservation o = observations.get(i);
 				for (int j = 0; j < 5; j++) {
-					o.observations.remove(i*2+j);
-					o.indexes.remove(i*2+j);
+					o.points.remove(i*2+j);
 				}
 			}
 		}

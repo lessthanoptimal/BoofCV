@@ -18,16 +18,75 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.abst.geo.calibration.PlanarCalibrationDetector;
+import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.struct.image.ImageFloat32;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorSquareGrid {
+public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
+
+	private static final int numRows = 3;
+	private static final int numCols = 2;
+
+	public TestCalibrationDetectorSquareGrid() {
+		width = 500;
+		height = 600;
+	}
+
 	@Test
-	public void foo() {
-		fail("Test");
+	public void createLayout() {
+		List<Point2D_F64> l = createDetector().getLayout();
+
+		int pointCols = numCols*2;
+		int pointRows = numRows*2;
+
+		assertEquals(pointCols*pointRows,l.size());
+
+		double w = l.get(1).x - l.get(0).x;
+		double h = l.get(0).y - l.get(pointCols).y ;
+
+		assertEquals(1,w,1e-8);
+		assertEquals(1,h,1e-8);
+
+		double s = l.get(2).x - l.get(1).x;
+
+		assertEquals(1, s, 1e-8);
+	}
+
+	@Override
+	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
+		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
+		renderer.squareWidth = 50;
+
+		ImageFloat32 rendered = renderer.generate(numRows,numCols);
+
+		original.subimage(0,0,rendered.width,rendered.height).setTo(rendered);
+
+		CalibrationObservation set = new CalibrationObservation();
+		List<Point2D_F64> points = renderer.getOrderedExpectedPoints(numRows, numCols);
+		for (int i = 0; i < points.size(); i++) {
+			set.add( points.get(i), i);
+		}
+
+		solutions.add(set);
+	}
+
+	@Override
+	public PlanarCalibrationDetector createDetector() {
+		ConfigSquareGridBinary config = new ConfigSquareGridBinary(numRows,numCols,1.0,1.0);
+		config.squareWidth = 1;
+		config.spaceWidth = 1;
+
+		return FactoryPlanarCalibrationTarget.detectorBinaryGrid(config);
 	}
 }

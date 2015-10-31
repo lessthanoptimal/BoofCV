@@ -54,14 +54,14 @@ public interface CalibrationView {
 		@Override
 		public void getSides(CalibrationObservation detections, List<Point2D_F64> sides) {
 			sides.clear();
-			sides.add( get(0, 0, detections.observations));
-			sides.add( get(0, pointCols-1, detections.observations));
-			sides.add( get(pointRows-1, pointCols-1, detections.observations));
-			sides.add( get(pointRows-1, 0, detections.observations));
+			sides.add( get(0, 0, detections.points));
+			sides.add( get(0, pointCols-1, detections.points));
+			sides.add( get(pointRows-1, pointCols-1, detections.points));
+			sides.add( get(pointRows-1, 0, detections.points));
 		}
 
-		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {
-			return detections.get(row*pointCols+col);
+		private Point2D_F64 get( int row , int col , List<CalibrationObservation.Point> detections ) {
+			return detections.get(row*pointCols+col).pixel;
 		}
 
 		@Override
@@ -87,14 +87,14 @@ public interface CalibrationView {
 		@Override
 		public void getSides(CalibrationObservation detections, List<Point2D_F64> sides) {
 			sides.clear();
-			sides.add( get(0, 0, detections.observations));
-			sides.add( get(0, pointCols-1, detections.observations));
-			sides.add( get(pointRows-1, pointCols-1, detections.observations));
-			sides.add( get(pointRows-1, 0, detections.observations));
+			sides.add( get(0, 0, detections.points));
+			sides.add( get(0, pointCols-1, detections.points));
+			sides.add( get(pointRows-1, pointCols-1, detections.points));
+			sides.add( get(pointRows-1, 0, detections.points));
 		}
 
-		private Point2D_F64 get( int row , int col , List<Point2D_F64> detections ) {
-			return detections.get(row*pointCols+col);
+		private Point2D_F64 get( int row , int col , List<CalibrationObservation.Point> detections ) {
+			return detections.get(row*pointCols+col).pixel;
 		}
 
 		@Override

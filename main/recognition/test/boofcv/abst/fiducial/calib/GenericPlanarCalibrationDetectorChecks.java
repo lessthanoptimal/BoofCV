@@ -39,6 +39,7 @@ import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -54,21 +55,24 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	int width = 300,height= 300;
 
-	ImageFloat32 original = new ImageFloat32(width,height);
-	ImageFloat32 distorted = new ImageFloat32(width, height);
+	ImageFloat32 original;
+	ImageFloat32 distorted;
 	List<CalibrationObservation> solutions = new ArrayList<CalibrationObservation>();
 
 	PointTransform_F32 d2o;
 	PointTransform_F64 o2d;
 
-
 	public abstract void renderTarget( ImageFloat32 original , List<CalibrationObservation> solutions );
 
 	public abstract PlanarCalibrationDetector createDetector();
 
-	public GenericPlanarCalibrationDetectorChecks() {
+	@Before
+	public void setup() {
+		original = new ImageFloat32(width,height);
+		distorted = new ImageFloat32(width, height);
 		renderTarget(original, solutions);
 	}
+
 
 	/**
 	 * Makes sure origin in the target's physical center.  This is done by seeing that most extreme
@@ -115,7 +119,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		assertEquals(found0.size(),found1.size());
 		assertTrue(found0 != found1);
 		for (int i = 0; i < found0.size(); i++) {
-			assertFalse(found1.observations.contains(found0.observations.get(0)));
+			assertFalse(found1.points.contains(found0.points.get(0)));
 		}
 	}
 
@@ -138,7 +142,6 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	/**
 	 * Pinch it a little bit like what is found with perspective distortion
 	 */
-	@Test
 	public void distorted() {
 		PlanarCalibrationDetector detector = createDetector();
 
@@ -179,11 +182,10 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 				CalibrationObservation orig = solutions.get(i);
 				CalibrationObservation mod = new CalibrationObservation();
 				for (int j = 0; j < orig.size(); j++) {
-					Point2D_F64 p = orig.observations.get(i).copy();
+					Point2D_F64 p = orig.points.get(i).pixel.copy();
 
 					o2d.compute(p.x, p.y, p);
-					mod.observations.add(p);
-					mod.indexes.add( orig.indexes.get(j) );
+					mod.add(p, orig.get(j).index );
 				}
 				expectedList.add(mod);
 			}
@@ -198,13 +200,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 			boolean matched = true;
 
 			for (int j = 0; j < expected.size(); j++) {
-				if( found.indexes.get(j) != expected.indexes.get(j) ) {
+				if( found.get(j).index != expected.get(j).index ) {
 					matched = false;
 					break;
 				}
 
-				Point2D_F64 f = found.observations.get(i);
-				Point2D_F64 e = expected.observations.get(i);
+				Point2D_F64 f = found.get(i).pixel;
+				Point2D_F64 e = expected.get(i).pixel;
 				if( f.distance(e) >= 3 ) {
 					matched = false;
 					break;
@@ -254,7 +256,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		assertEquals(detector.getLayout().size(),found.size());
 
 		for (int i = 0; i < found.size(); i++) {
-			assertEquals(i,found.indexes.get(i));
+			assertEquals(i,found.get(i).index);
 		}
 	}
 }

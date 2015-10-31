@@ -73,8 +73,7 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 			detected = new CalibrationObservation();
 			List<Point2D_F64> found = detect.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.observations.add( found.get(i).copy() );
-				detected.indexes.add(i);
+				detected.add( found.get(i), i );
 			}
 			return true;
 		} else {

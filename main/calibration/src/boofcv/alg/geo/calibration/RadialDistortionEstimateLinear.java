@@ -138,8 +138,8 @@ public class RadialDistortionEstimateLinear {
 			CalibrationObservation set = observations.get(indexObs);
 
 			for( int i = 0; i < set.size(); i++ ) {
-				int gridIndex = set.indexes.get(i);
-				Point2D_F64 obsPixel = set.observations.get(i);
+				int gridIndex = set.get(i).index;
+				Point2D_F64 obsPixel = set.get(i).pixel;
 
 				// location of grid point in world coordinate (x,y,0)  assume z=0
 				Point2D_F64 gridPt = worldPoints.get(gridIndex);

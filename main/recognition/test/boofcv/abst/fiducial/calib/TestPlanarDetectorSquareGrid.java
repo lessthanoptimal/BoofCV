@@ -85,8 +85,7 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 			for (int j = 0; j < pointsCol; j++, gridIndex++) {
 				double y = y0 + i*square;
 				double x = x0 + j*square;
-				set.observations.add(new Point2D_F64(x, y));
-				set.indexes.add(gridIndex);
+				set.add(new Point2D_F64(x, y), gridIndex);
 			}
 		}
 		solutions.add(set);

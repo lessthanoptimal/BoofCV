@@ -79,7 +79,7 @@ public class CommandParserFiducialSquare {
 		System.out.println("-PrintInfo            Will print the size and name of each fiducial.");
 		System.out.println("-PrintGrid            Will draw a light gray grid around the fiducials");
 		System.out.println("-NoBoundaryHack       By default an invisible rectangle around the document border is added.");
-		System.out.println("                      The invisible border prevents some smart printers from crop the document.");
+		System.out.println("                      The invisible border prevents some smart printers from cropping the document.");
 		System.out.println("                      Using this flag will turn off this option.");
 		System.out.println("-PageBorder=<x>,<y>   Specifies the border of the page in which it can't print. default = 1cm");
 		System.out.println("-Offsets=<x>,<y>      Shift the fiducial/grid");

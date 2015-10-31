@@ -20,17 +20,24 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.struct.Configuration;
 
 /**
- * TODO fill in
+ * Configuration for a {@link CalibrationDetectorBinaryGrid} that uses a
+ * {@link boofcv.alg.fiducial.square.DetectFiducialSquareBinary} for the inner fiducials.
  *
  * @author Peter Abeles
  */
-public class ConfigSquareGridBinary {
+public class ConfigSquareGridBinary implements Configuration {
 
-	public ConfigFiducialBinary configDetector;
-	public ConfigThreshold configThreshold;
+	public ConfigFiducialBinary configDetector = new ConfigFiducialBinary();
+	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,20);
 
+	/**
+	 * Ordered list of expected square fiducial ID numbers.  Starts from top left and follows a row major
+	 * ordering.
+	 */
 	public long ids[];
 
 	/**
@@ -52,4 +59,32 @@ public class ConfigSquareGridBinary {
 	 * Physical width of hte space between each square
 	 */
 	public double spaceWidth;
+
+	{
+		configDetector.gridWidth = 3;
+	}
+
+	/**
+	 * Configures the grid with the following specifications and configures the fiducial detector to be
+	 * 3x3 with fiducials id number 0 to (numRows*numCols)-1.
+	 */
+	public ConfigSquareGridBinary(int numRows, int numCols , double squareWidth , double spaceWidth ) {
+		this.numRows = numRows;
+		this.numCols = numCols;
+		this.squareWidth = squareWidth;
+		this.spaceWidth = spaceWidth;
+
+		this.ids = new long[numRows*numCols];
+		for (int i = 0; i < ids.length; i++) {
+			ids[i] = i;
+		}
+	}
+
+	public ConfigSquareGridBinary() {
+	}
+
+	@Override
+	public void checkValidity() {
+
+	}
 }

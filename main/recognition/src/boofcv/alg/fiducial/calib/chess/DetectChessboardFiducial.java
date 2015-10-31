@@ -41,13 +41,10 @@ import java.util.List;
  * the y-axis points down.  If there are multiple valid solution then the solution with the (0,0) grid point closest
  * top the origin is selected.
  * </p>
- *
- * </p>
  * <center>
  * <img src="doc-files/chessboard.jpg"/>
  * </center>
  * Example of a 5 by 7 grid; column, row.
- * <p>
  *
  * @author Peter Abeles
  */

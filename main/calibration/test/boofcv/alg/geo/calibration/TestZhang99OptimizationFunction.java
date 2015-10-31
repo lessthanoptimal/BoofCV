@@ -100,8 +100,7 @@ public class TestZhang99OptimizationFunction {
 			double x = param.a*calibratedPt.x + param.c*calibratedPt.y + param.x0;
 			double y = param.b*calibratedPt.y + param.y0;
 			
-			ret.observations.add( new Point2D_F64(x,y));
-			ret.indexes.add(i);
+			ret.add( new Point2D_F64(x,y), i);
 		}
 
 		return ret;
@@ -126,8 +125,7 @@ public class TestZhang99OptimizationFunction {
 			observations.add( set );
 
 			for (int j = 0; j < 5; j++) {
-				set.observations.remove(i * 2 + j);
-				set.indexes.remove(i*2+j);
+				set.points.remove(i * 2 + j);
 			}
 		}
 

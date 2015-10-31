@@ -18,10 +18,7 @@
 
 package boofcv.factory.calib;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.calib.PlanarDetectorChessboard;
-import boofcv.abst.fiducial.calib.PlanarDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 
 /**
@@ -58,5 +55,19 @@ public class FactoryPlanarCalibrationTarget {
 		config.checkValidity();
 
 		return new PlanarDetectorChessboard(config);
+	}
+
+	/**
+	 * Creates a fiducial that is a grid composed of square binary fiducials.
+	 *
+	 * @see CalibrationDetectorBinaryGrid
+	 *
+	 * @param config
+	 * @return
+	 */
+	public static CalibrationDetectorBinaryGrid detectorBinaryGrid( ConfigSquareGridBinary config ) {
+		config.checkValidity();
+
+		return new CalibrationDetectorBinaryGrid(config);
 	}
 }

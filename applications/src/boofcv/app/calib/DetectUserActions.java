@@ -68,8 +68,8 @@ public class DetectUserActions {
 		} else {
 			double average = 0;
 			for( int i = 0; i < points.size(); i++ ) {
-				double difference = previous.observations.get(i).distance(points.observations.get(i));
-				previous.observations.get(i).set(points.observations.get(i));
+				double difference = previous.points.get(i).pixel.distance(points.points.get(i).pixel);
+				previous.get(i).pixel.set(points.points.get(i).pixel);
 
 				average += difference;
 			}
@@ -94,7 +94,7 @@ public class DetectUserActions {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.observations.get(i);
+			Point2D_F64 p = points.points.get(i).pixel;
 
 			centerX += p.x;
 			centerY += p.y;

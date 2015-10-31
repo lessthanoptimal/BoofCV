@@ -245,19 +245,19 @@ public class TestBaseDetectFiducialSquare {
 		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distortSB(false, interp, ImageUInt8.class);
 		distorter.setModel(new PointToPixelTransform_F32(distToUndistort));
 		ImageUInt8 distorted = new ImageUInt8(640,480);
-		distorter.apply(image,distorted);
+		distorter.apply(image, distorted);
 
 		detector.configure(intrinsic, false);
 		detector.process(distorted);
 
-		assertEquals( 1, detector.getFound().size());
+		assertEquals(1, detector.getFound().size());
 		FoundFiducial ff = detector.getFound().get(0);
 
 		// see if the returned corners
 		Point2D_F64 expectedImage = new Point2D_F64();
 		for (int j = 0; j < 4; j++) {
 			Point2D_F64 f = ff.location.get(j);
-			Point2D_F64 e = expected.get((j+1)%4);
+			Point2D_F64 e = expected.get((j + 1) % 4);
 			undistTodist.compute(e.x, e.y, expectedImage);
 			assertTrue(f.distance(expectedImage) <= 0.4 );
 		}
@@ -265,6 +265,48 @@ public class TestBaseDetectFiducialSquare {
 		// The check to see if square is correctly undistorted is inside the processing function itself
 	}
 
+	/**
+	 * See if it can handle the situations where intrinsic camera parameters was not set.  Should just
+	 * detect its location and
+	 */
+	@Test
+	public void intrinsicNotSet() {
+		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		expected.add( new Point2D_F64(200,300+120));
+		expected.add( new Point2D_F64(200,300));
+		expected.add( new Point2D_F64(200+120,300));
+		expected.add( new Point2D_F64(200+120,300+120));
+
+		// create a pattern with a corner for orientation and put it into the image
+		ImageUInt8 pattern = createPattern(6*20, true);
+
+		ImageUInt8 image = new ImageUInt8(640,480);
+
+		for (int i = 0; i < 4; i++) {
+
+			ImageMiscOps.fill(image, 255);
+
+			image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
+
+			DetectCorner detector = new DetectCorner();
+
+			detector.process(image);
+
+			assertEquals(1, detector.getFound().size());
+			FoundFiducial ff = detector.getFound().get(0);
+
+			// make sure the returned quadrilateral makes sense
+			for (int j = 0; j < 4; j++) {
+				int index = j - i;
+				if (index < 0) index = 4 + index;
+				Point2D_F64 f = ff.location.get(index);
+				Point2D_F64 e = expected.get((j + 1) % 4);
+				assertTrue(f.distance(e) <= 1e-8);
+			}
+
+			ImageMiscOps.rotateCW(pattern);
+		}
+	}
 
 	/**
 	 * Creates a square pattern image of the specified size

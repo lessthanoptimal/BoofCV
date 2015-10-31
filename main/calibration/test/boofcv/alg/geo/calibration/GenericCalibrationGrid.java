@@ -89,8 +89,7 @@ public class GenericCalibrationGrid {
 
 			Point3D_F64 t = SePointOps_F64.transform(motion,p3,null);
 
-			ret.observations.add( new Point2D_F64(t.x/t.z,t.y/t.z));
-			ret.indexes.add(i);
+			ret.add( new Point2D_F64(t.x/t.z,t.y/t.z), i);
 		}
 
 		return ret;
@@ -273,8 +272,7 @@ public class GenericCalibrationGrid {
 				double x = config.a*calibratedPt.x + config.c*calibratedPt.y + config.x0;
 				double y = config.b*calibratedPt.y + config.y0;
 
-				set.observations.add(new Point2D_F64(x, y));
-				set.indexes.add(i);
+				set.add(new Point2D_F64(x, y),i);
 			}
 			ret.add(set);
 		}

@@ -102,6 +102,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// transform from undistorted to distorted image pixels
 	PointTransform_F64 pointUndistToDist;
 
+	// boolean indicating if camera intrinsic parameters
+	boolean wasIntrinsicSet = false;
+
 	// Storage for results of fiducial reading
 	private Result result = new Result();
 
@@ -156,6 +159,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
 		interp.setBorder(FactoryImageBorder.single(inputType, BorderType.EXTENDED));
 		removePerspective = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
+
+		// if no camera parameters is specified default to this
+		pointUndistToDist = new DoNothingTransform_F64();
+		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
 	}
 
 	/**
@@ -166,7 +173,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *              if no lens distortion
 	 */
 	public void configure( IntrinsicParameters intrinsic , boolean cache ) {
-
+		wasIntrinsicSet = true;
 		PointTransform_F32 pointSquareToInput;
 		if( intrinsic.isDistorted() ) {
 
@@ -215,6 +222,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param gray Undistorted input image
 	 */
 	public void process( T gray ) {
+
+		binary.reshape(gray.width,gray.height);
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
@@ -310,7 +319,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		}
 
 		// estimate position
-		computeTargetToWorld(imageShape, result.lengthSide, f.targetToSensor);
+		if( wasIntrinsicSet )
+			computeTargetToWorld(imageShape, result.lengthSide, f.targetToSensor);
+		else {
+			f.targetToSensor.reset();
+		}
 	}
 
 	/**

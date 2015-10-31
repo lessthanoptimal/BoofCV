@@ -68,9 +68,8 @@ public class TestRadialDistortionEstimateLinear {
 			}
 
 			CalibrationObservation set = new CalibrationObservation();
-			set.observations = pixels;
 			for (int i = 0; i < pixels.size(); i++) {
-				set.indexes.add(i);
+				set.add(pixels.get(i),i);
 			}
 
 			observations.add( set );
@@ -80,8 +79,7 @@ public class TestRadialDistortionEstimateLinear {
 			for (int i = 0; i < observations.size(); i++) {
 				CalibrationObservation c = observations.get(i);
 				for (int j = 0; j < 5; j++) {
-					c.observations.remove(2 * i + j);
-					c.indexes.remove(2*i + j);
+					c.points.remove(2 * i + j);
 				}
 			}
 		}
