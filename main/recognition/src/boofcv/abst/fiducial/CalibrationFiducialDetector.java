@@ -20,6 +20,7 @@ package boofcv.abst.fiducial;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.calibration.CalibrationDetector;
@@ -73,6 +74,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 
 	// Known 3D location of points on calibration grid and current obsrevations
 	List<Point2D3D> points2D3D;
+	List<Point2D3D> used2D3D = new ArrayList<Point2D3D>();
 
 	// average of width and height
 	double width;
@@ -100,6 +102,22 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		int squareCols = config.numCols/2+1;
 		int squareRows = config.numRows/2+1;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
+		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+
+		double width = (sideWidth+sideHeight)/2.0;
+
+		init(detector, width, imageType);
+	}
+
+		/**
+	 * Configure it to detect square-grid style targets
+	 */
+	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
+									   Class<T> imageType) {
+		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorBinaryGrid(config);
+		int squareCols = config.numCols;
+		int squareRows = config.numRows;
+		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
 		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 
 		double width = (sideWidth+sideHeight)/2.0;
@@ -149,6 +167,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		CalibrationObservation view = detector.getDetectedPoints();
 		if( view.size() >= 3 ) {
 
+			used2D3D.clear();
 			for (int i = 0; i < view.size(); i++) {
 				int gridIndex = view.get(i).index;
 
@@ -156,6 +175,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 				Point2D_F64 pixel = view.get(i).pixel;
 
 				distortToUndistorted.compute(pixel.x, pixel.y, p23.observation);
+
+				used2D3D.add(p23);
 			}
 
 			// estimate using PNP
@@ -166,8 +187,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	}
 
 	private boolean estimatePose( Se3_F64 targetToCamera ) {
-		return estimatePnP.process(points2D3D, initialEstimate) &&
-				refinePnP.fitModel(points2D3D, initialEstimate, targetToCamera);
+		return estimatePnP.process(used2D3D, initialEstimate) &&
+				refinePnP.fitModel(used2D3D, initialEstimate, targetToCamera);
 	}
 
 	Se3_F64 referenceCameraToTarget = new Se3_F64();

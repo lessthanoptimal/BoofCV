@@ -23,6 +23,7 @@ import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
@@ -50,7 +51,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +70,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	public static final String SQUARE_PICTURE = "Square Picture";
 	public static final String CALIB_CHESS = "Chessboard";
 	public static final String CALIB_SQUARE_GRID = "Square Grid";
+	public static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
 
 
 	private static final Font font = new Font("Serif", Font.BOLD, 14);
@@ -281,6 +286,16 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
 			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(5, 7, 0.03, 0.03), imageClass);
+		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {
+			File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
+			try {
+				ConfigSquareGridBinary config =
+						ConfigSquareGridBinary.parseSimple(new BufferedReader(new FileReader(configFile)));
+				detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -337,6 +352,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
+		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
 
 		app.setInputList(inputs);
 

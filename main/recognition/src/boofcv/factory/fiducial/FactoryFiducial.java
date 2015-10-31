@@ -24,6 +24,7 @@ import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
@@ -91,7 +92,7 @@ public class FactoryFiducial {
 
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
 		BinaryPolygonDetector<T> squareDetector =
-				FactoryShapeDetector.polygon(configFiducial.squareDetector,imageType);
+				FactoryShapeDetector.polygon(configFiducial.squareDetector, imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
 				squareDetector,configFiducial.borderWidthFraction,configFiducial.maxErrorFraction,imageType);
 
@@ -126,6 +127,12 @@ public class FactoryFiducial {
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
+
+		return new CalibrationFiducialDetector<T>(config,imageType);
+	}
+
+	public static <T extends ImageSingleBand>
+	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
 
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}

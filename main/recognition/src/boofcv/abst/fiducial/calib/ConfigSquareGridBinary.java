@@ -23,6 +23,9 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.Configuration;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 /**
  * Configuration for a {@link CalibrationDetectorSquareFiducialGrid} that uses a
  * {@link boofcv.alg.fiducial.square.DetectFiducialSquareBinary} for the inner fiducials.
@@ -87,5 +90,49 @@ public class ConfigSquareGridBinary implements Configuration {
 	public void checkValidity() {
 		if( ids == null )
 			throw new IllegalArgumentException("Need to specify expected ids");
+	}
+
+	/**
+	 * Parses a simple configuration text sequence that describes the target type.  Example is shown below:
+	 * <pre>
+	 * # Description of a binary grid calibration target
+	 * binary_width 3
+	 * grid_shape 4
+	 * square_width 40
+	 * space_width 20
+	 * numbers 0 1 2 3 4 5 6 7 8 9 10 11
+	 * </pre>
+	 * @param reader Input
+	 * @return Configuration
+	 * @throws IOException
+	 */
+	public static ConfigSquareGridBinary parseSimple( BufferedReader reader ) throws IOException {
+		ConfigSquareGridBinary config = new ConfigSquareGridBinary();
+
+		String line = reader.readLine();
+		while( line != null ) {
+			if( line.charAt(0) != '#') {
+				String words[] = line.split(" ");
+				if( words[0].equals("binary_width")) {
+					config.configDetector.gridWidth = Integer.parseInt(words[1]);
+				} else if( words[0].equals("grid_shape")) {
+					config.numRows = Integer.parseInt(words[1]);
+					config.numCols = Integer.parseInt(words[2]);
+				} else if( words[0].equals("square_width")) {
+					config.squareWidth = Double.parseDouble(words[1]);
+				} else if( words[0].equals("space_width")) {
+					config.spaceWidth = Double.parseDouble(words[1]);
+				} else if( words[0].equals("numbers")) {
+					config.ids = new long[ words.length-1 ];
+					for (int i = 1; i < words.length; i++) {
+						config.ids[i-1] = Integer.parseInt(words[i]);
+					}
+				}
+			}
+
+			line = reader.readLine();
+		}
+
+		return config;
 	}
 }
