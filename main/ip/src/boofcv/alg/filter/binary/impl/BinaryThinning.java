@@ -25,14 +25,26 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Applies binary thinning operators to the input image.  Thinning discards most of objects foreground
- * (value one) pixels are leaves behind a "skinny" object which still mostly describes the original object's shape.
+ * (value one) pixels and leaves behind a "skinny" object which still mostly describes the original object's shape.
  *
- * This implementation is known as the morphological thinning.  It works by applying 8 masks to the image.  If a pixel
- * matches a mask it is removed.  This cycle is repeated until the image no longer changes.
+ * This implementation is known as the morphological thinning.  It works by applying 8 masks to the image sequence.
+ * When a mask is applied pixels which need to be set to zero are recorded in a list.  After the mask as been
+ * applied the pixels are modified, then the next mask is applied.  This cycle is repeated until the image
+ * no longer changes.
+ *
+ * Based off the description in [1] using masks from [2]. The masks in those two sources are very similar but
+ * there is a one pixel difference which appears to create a smoother image in a couple of test cases.
+ *
+ * <ol>
+ * <li> Rafael C. Gonzalez and Richard E. Woods, "Digital Image Processing" 2nd Ed. 2001.</li>
+ * <li> http://homepages.inf.ed.ac.uk/rbf/HIPR2/thin.htm, October 31, 2015  </li>
+ * </ol>
  *
  * @author Peter Abeles
  */
 public class BinaryThinning {
+// Thanks Emil Hellman for pointing out an issue in this implementation and helped solve/improve the implementation
+
 
 	// -1 means any pixel value is ok
 	//  0 means it is expected to be zero
@@ -43,17 +55,17 @@ public class BinaryThinning {
 										   1, 1, 1};
 	public static byte mask1[]=new byte[]{-1, 0, 0,
 										   1, 1, 0,
-										   1, 1,-1};
+										  -1, 1,-1};
 	public static byte mask2[]=new byte[]{ 1,-1, 0,
 										   1, 1, 0,
 										   1,-1, 0};
-	public static byte mask3[]=new byte[]{ 1, 1,-1,
+	public static byte mask3[]=new byte[]{-1, 1,-1,
 										   1, 1, 0,
 										  -1, 0, 0};
 	public static byte mask4[]=new byte[]{ 1, 1, 1,
 										  -1, 1,-1,
 										   0, 0, 0};
-	public static byte mask5[]=new byte[]{-1, 1, 1,
+	public static byte mask5[]=new byte[]{-1, 1,-1,
 										   0, 1, 1,
 										   0, 0,-1};
 	public static byte mask6[]=new byte[]{ 0,-1, 1,
@@ -61,7 +73,7 @@ public class BinaryThinning {
 										   0,-1, 1};
 	public static byte mask7[]=new byte[]{ 0, 0,-1,
 										   0, 1, 1,
-										  -1, 1, 1};
+										  -1, 1,-1};
 
 	Mask masks[] = new Mask[]{
 			new Mask0(), new Mask1(), new Mask2(), new Mask3(),
@@ -94,34 +106,31 @@ public class BinaryThinning {
 		findOnePixels(ones0);
 
 		for (int loop = 0; (loop < maxLoops || maxLoops == -1) && ones0.size > 0; loop++) {
+
+			boolean changed = false;
+
 			// do one cycle through all the masks
-			zerosOut.reset();
 			for (int i = 0; i < masks.length; i++) {
-				Mask mask = masks[i];
-				mask.apply(ones0, zerosOut);
-			}
 
-			if( zerosOut.size() == 0 )
-				break;
+				zerosOut.reset();
+				ones1.reset();
+				masks[i].apply(ones0, ones1, zerosOut);
 
-			// mark all the pixels that need to be set to 0 as 0
-			for (int i = 0; i < zerosOut.size(); i++) {
-				int index = zerosOut.get(i);
-				binary.data[index] = 0;
-			}
+				changed |= ones0.size != ones1.size;
 
-			// update the ones list
-			ones1.reset();
-			for (int i = 0; i < ones0.size(); i++) {
-				if( binary.data[ones0.get(i)] == 1 ) {
-					ones1.add(ones0.get(i));
+				// mark all the pixels that need to be set to 0 as 0
+				for (int j = 0; j < zerosOut.size(); j++) {
+					binary.data[ zerosOut.get(j)] = 0;
 				}
+
+				// swap the lists
+				GrowQueue_I32 tmp = ones0;
+				ones0 = ones1;
+				ones1 = tmp;
 			}
 
-			// swap the lists
-			GrowQueue_I32 tmp = ones0;
-			ones0 = ones1;
-			ones1 = tmp;
+			if( !changed )
+				break;
 		}
 
 	}
@@ -155,9 +164,10 @@ public class BinaryThinning {
 		/**
 		 *
 		 * @param onesIn (input) Indexes of pixels with a value of 1
+		 * @param onesOut (output) Indexes of pixels with a value of 1 after the mask is applied
 		 * @param zerosOut (output) Indexes of pixels whose values have changed form 1 to 0
 		 */
-		public void apply( GrowQueue_I32 onesIn , GrowQueue_I32 zerosOut ) {
+		public void apply( GrowQueue_I32 onesIn , GrowQueue_I32 onesOut, GrowQueue_I32 zerosOut ) {
 			int w = binary.width-1;
 			int h = binary.height-1;
 
@@ -172,9 +182,9 @@ public class BinaryThinning {
 				} else {
 					staysAsOne = innerMask(indexIn);
 				}
-				if( !staysAsOne ) {
-					// yes some pixels will be marked more than once.  less memory and maybe faster than
-					// having  second binary image to keep track of what was already marked
+				if( staysAsOne ) {
+					onesOut.add(indexIn);
+				} else {
 					zerosOut.add(indexIn);
 				}
 			}
@@ -247,7 +257,7 @@ public class BinaryThinning {
 			int rowTop = indexIn- binary.stride;
 			int rowBottom = indexIn+ binary.stride;
 
-			if( binary.data[indexIn-1] != 1 || binary.data[rowBottom-1] != 1  || binary.data[rowBottom] != 1 ) {
+			if( binary.data[indexIn-1] != 1 || binary.data[rowBottom] != 1  ) {
 				return true;
 			}
 
@@ -268,7 +278,8 @@ public class BinaryThinning {
 		@Override
 		protected boolean innerMask(int indexIn) {
 			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 1 || binary.data[rowTop-1] != 1  || binary.data[rowTop+1] != 0 ) {
+			if( binary.data[indexIn-1] != 1 || binary.data[indexIn+1] != 0 ||
+					binary.data[rowTop-1] != 1  || binary.data[rowTop+1] != 0 ) {
 				return true;
 			}
 
@@ -290,7 +301,7 @@ public class BinaryThinning {
 		@Override
 		protected boolean innerMask(int indexIn) {
 			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 1 || binary.data[rowTop-1] != 1 || binary.data[rowTop] != 1 ) {
+			if( binary.data[indexIn-1] != 1 || binary.data[indexIn+1] != 0 || binary.data[rowTop] != 1 ) {
 				return true;
 			}
 
@@ -334,7 +345,7 @@ public class BinaryThinning {
 		@Override
 		protected boolean innerMask(int indexIn) {
 			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 || binary.data[rowTop] != 1 || binary.data[rowTop+1] != 1 ) {
+			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 || binary.data[rowTop] != 1 ) {
 				return true;
 			}
 
@@ -356,7 +367,8 @@ public class BinaryThinning {
 		@Override
 		protected boolean innerMask(int indexIn) {
 			int rowTop = indexIn- binary.stride;
-			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1  || binary.data[rowTop-1] != 0 ||  binary.data[rowTop+1] != 1 ) {
+			if( binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1  ||
+					binary.data[rowTop-1] != 0 ||  binary.data[rowTop+1] != 1 ) {
 				return true;
 			}
 
@@ -378,12 +390,13 @@ public class BinaryThinning {
 		@Override
 		protected boolean innerMask(int indexIn) {
 			int rowTop = indexIn- binary.stride;
-			if( binary.data[rowTop-1] != 0 || binary.data[rowTop] != 0 || binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 ) {
+			if( binary.data[rowTop-1] != 0 || binary.data[rowTop] != 0 ||
+					binary.data[indexIn-1] != 0 || binary.data[indexIn+1] != 1 ) {
 				return true;
 			}
 
 			int rowBottom = indexIn+ binary.stride;
-			if( binary.data[rowBottom] != 1 || binary.data[rowBottom+1] != 1 ) {
+			if( binary.data[rowBottom] != 1 ) {
 				return true;
 			}
 

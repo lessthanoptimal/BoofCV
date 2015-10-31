@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Simple example showing you how to thin a binary image.  This is also known as skeletonalization.  Thinning
@@ -40,28 +41,35 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleMorphologicalThinning {
 	public static void main(String[] args) {
-		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/fingerprint.jpg"));
 
-		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
+		String[] images = new String[]{"drawings/drawing_text.png","standard/fingerprint.jpg","drawings/drawing_face.png"};
 
-		// Adaptive threshold to better handle changes in local image intensity
-		GThresholdImageOps.adaptiveGaussian(input,binary,10,0,true,null,null);
+		ListDisplayPanel uberPanel = new ListDisplayPanel();
+		for( String path : images ) {
+			// load and convert the image into a usable format
+			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(path));
 
-		// Tell it to thin the image until there are no more changes
-		ImageUInt8 thinned = BinaryImageOps.thin(binary, -1, null);
+			// convert into a usable format
+			ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
+			ImageUInt8 binary = new ImageUInt8(input.width, input.height);
 
-		// display the results
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, false, null);
-		BufferedImage visualThinned = VisualizeBinaryData.renderBinary(thinned, false, null);
+			// Fixed threshold is best for B&W images, but the adaptive would improve results for the finger print
+			GThresholdImageOps.threshold(input, binary, 120, true);
 
-		ListDisplayPanel panel = new ListDisplayPanel();
-		panel.addImage(visualThinned, "Thinned");
-		panel.addImage(visualBinary, "Binary");
-		panel.addImage(image, "Original");
+			// Tell it to thin the image until there are no more changes
+			ImageUInt8 thinned = BinaryImageOps.thin(binary, -1, null);
 
-		ShowImages.showWindow(panel,"Thinned/Skeletonalized Image", true);
+			// display the results
+			BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, false, null);
+			BufferedImage visualThinned = VisualizeBinaryData.renderBinary(thinned, false, null);
+
+			ListDisplayPanel panel = new ListDisplayPanel();
+			panel.addImage(visualThinned, "Thinned");
+			panel.addImage(visualBinary, "Binary");
+			panel.addImage(image, "Original");
+
+			uberPanel.addItem(panel,new File(path).getName());
+		}
+		ShowImages.showWindow(uberPanel, "Thinned/Skeletonalized Images", true);
 	}
 }

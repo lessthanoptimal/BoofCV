@@ -25,12 +25,16 @@ import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestBinaryThinning {
+
+	Random rand = new Random(234);
 
 	/**
 	 * Run the overall algorithm and compare against a known result
@@ -39,13 +43,34 @@ public class TestBinaryThinning {
 	public void thinning() {
 		ImageUInt8 img = new ImageUInt8(20,25);
 
-		ImageMiscOps.fill(img.subimage(0, 5, 20, 8), 1);
+		ImageMiscOps.fill(img.subimage(1, 5, 19, 10), 1);
 
 		BinaryThinning alg = new BinaryThinning();
 
 		alg.apply(img, -1);
 
-		assertEquals(18, ImageStatistics.sum(img));
+		// the tests below aren't really that great.  really just checks to see if the algorithm has changed
+		assertEquals(24, ImageStatistics.sum(img));
+
+		for (int i = 2; i <18; i++) {
+			assertEquals(1,img.get(i,7));
+		}
+	}
+
+	/**
+	 * A line 2 pixels thick.  Should be left with a line 1 pixel thick
+	 */
+	@Test
+	public void thinning_line2pixel() {
+		ImageUInt8 img = new ImageUInt8(20,25);
+
+		ImageMiscOps.fill(img.subimage(0, 5, 20, 7), 1);
+
+		BinaryThinning alg = new BinaryThinning();
+
+		alg.apply(img, -1);
+
+		assertEquals(20, ImageStatistics.sum(img));
 
 		for (int i = 1; i <19; i++) {
 			assertEquals(1,img.get(i,6));
@@ -141,6 +166,36 @@ public class TestBinaryThinning {
 				alg.binary = imgA;
 				assertTrue(mask.innerMask(imgA.getIndex(1, 1)));
 				ImageMiscOps.rotateCW(imgB);
+			}
+		}
+	}
+
+	/**
+	 * Randomly generate an image to create a whole bunch of potential patterns then see if the border
+	 * and inner algorithms produce the same result
+	 */
+	@Test
+	public void checkSameInnerAndOuter() {
+		ImageUInt8 img = new ImageUInt8(200,300);
+
+		ImageMiscOps.fillUniform(img,rand,0,2);
+
+		BinaryThinning alg = new BinaryThinning();
+		alg.binary = img;
+		alg.inputBorder.setImage(img);
+
+		for (int maskIndex = 0; maskIndex < alg.masks.length; maskIndex++) {
+			System.out.println("mask "+maskIndex);
+			BinaryThinning.Mask mask = alg.masks[maskIndex];
+
+			for (int i = 1; i < img.height - 1; i++) {
+				for (int j = 1; j < img.width - 1; j++) {
+					if( img.get(j,i) == 1 ) {
+						boolean border = mask.borderMask(j, i);
+						boolean inner = mask.innerMask(img.getIndex(j, i));
+						assertEquals(i + " " + j, border, inner);
+					}
+				}
 			}
 		}
 	}

@@ -52,10 +52,11 @@ Version : Alpha 0.20
   * Inspired by an issue pete-experimenter had
 - Renamed FiducialDetector to FiducialPoseDetector
   * Done to accommodate fiducials in which you don't care about the pose
+- Morphological Thinning has been fixed and tweaked
+  * Thanks Emil Hellman who first pointed out the issue and helped solve/improve the implementation
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image
-TODO Fix morphological thinning
 
 ---------------------------------------------
 Date    : 2015/09/20
