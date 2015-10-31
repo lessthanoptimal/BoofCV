@@ -142,7 +142,9 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 			points2D3D.add(p);
 		}
 
-		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+		// TODO more robust estimator that uses multiple approaches.  Similar to 4 point estimator
+//		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.1);
+		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
 		this.refinePnP = FactoryMultiView.refinePnP(1e-8,100);
 	}
 
@@ -166,7 +168,6 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 		// convert points into normalized image coord
 		CalibrationObservation view = detector.getDetectedPoints();
 		if( view.size() >= 3 ) {
-
 			used2D3D.clear();
 			for (int i = 0; i < view.size(); i++) {
 				int gridIndex = view.get(i).index;
