@@ -92,13 +92,18 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private RefineBinaryPolygon<T> refinePolygon;
 
 	// List of all squares that it finds
-	private FastQueue<Polygon2D_F64> found;
+	private FastQueue<Polygon2D_F64> found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
+	// extera information for found shapes
+	private FastQueue<Info> foundInfo = new FastQueue<Info>(Info.class,true);
 
 	// type of input image
 	private Class<T> inputType;
 
 	// number of lines allowed in the polygon
 	private int minSides,maxSides;
+
+	// true if points touching the border are NOT pruned
+	private boolean canTouchBorder;
 
 	// work space for initial polygon
 	private Polygon2D_F64 workPoly = new Polygon2D_F64();
@@ -125,16 +130,16 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	/**
 	 * Configures the detector.
-	 *
-	 * @param minSides minimum number of sides
+	 *  @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
-	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges.
+	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges
 	 *                        If null then this test is skipped.
 	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
+	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param splitPenalty Penalty given to a line segment while splitting.  See {@link MinimizeEnergyPrune}
 	 * @param inputType Type of input image it's processing
 	 */
@@ -145,7 +150,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 								 double minContourFraction,
 								 boolean outputClockwise,
 								 boolean convex,
-								 double splitPenalty,
+								 boolean touchBorder, double splitPenalty,
 								 Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
@@ -156,11 +161,11 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
+		this.canTouchBorder = touchBorder;
 
 		pruner = new MinimizeEnergyPrune(splitPenalty);
 
 		workPoly = new Polygon2D_F64(1);
-		found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
 	}
 
 	/**
@@ -217,6 +222,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 		found.reset();
 		foundContours.clear();
+		foundInfo.reset();
 
 		if( differenceScore != null ) {
 			differenceScore.setImage(gray);
@@ -265,7 +271,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 //				System.out.println("----- candidate "+c.external.size());
 
 				// ignore shapes which touch the image border
-				if( touchesBorder(c.external)) {
+				boolean touchesBorder = touchesBorder(c.external);
+				if( !canTouchBorder && touchesBorder ) {
 					if( verbose ) System.out.println("rejected polygon, touched border");
 					continue;
 				}
@@ -368,6 +375,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 //					System.out.println("SUCCESS!!!\n");
 					c.id = found.size();
 					foundContours.add(c);
+
+					Info info = foundInfo.grow();
+					info.external = true;
+					info.touchingBorder = touchesBorder;
 				} else {
 					found.removeTail();
 				}
@@ -488,5 +499,17 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 */
 	public void setCheckEdgeBefore(boolean checkEdgeBefore) {
 		this.checkEdgeBefore = checkEdgeBefore;
+	}
+
+	public static class Info
+	{
+		/**
+		 * Was the shape touching the image border?
+		 */
+		public boolean touchingBorder;
+		/**
+		 * Was it created from an external or internal contour
+		 */
+		public boolean external;
 	}
 }

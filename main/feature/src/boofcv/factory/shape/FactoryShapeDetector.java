@@ -72,7 +72,7 @@ public class FactoryShapeDetector {
 
 		return new BinaryPolygonDetector<T>(config.minimumSides,config.maximumSides,contourToPolygon,
 				scorer, refinePolygon,config.minContourImageWidthFraction,
-				config.clockwise,config.convex,config.splitPenalty,imageType);
+				config.clockwise,config.convex, config.canTouchBorder, config.splitPenalty,imageType);
 	}
 
 	public static <T extends ImageSingleBand>

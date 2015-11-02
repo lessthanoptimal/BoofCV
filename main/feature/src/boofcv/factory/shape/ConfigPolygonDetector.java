@@ -40,6 +40,11 @@ public class ConfigPolygonDetector implements Configuration {
 	public int maximumSides;
 
 	/**
+	 * If false then polygons which touch the image border are pruned
+	 */
+	public boolean canTouchBorder = false;
+
+	/**
 	 * A line is split if a point along the contour between the two end points has a distance from the line
 	 * which is greater than this fraction of the line's length
 	 */
