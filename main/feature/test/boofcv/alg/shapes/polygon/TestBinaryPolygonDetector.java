@@ -149,7 +149,7 @@ public class TestBinaryPolygonDetector {
 
 		for( Class imageType : imageTypes ) {
 			checkDetected(imageType,true,0.3);
-			checkDetected(imageType,false,0.35);// works with 0.5
+			checkDetected(imageType,false,0.5);
 		}
 	}
 
@@ -178,7 +178,7 @@ public class TestBinaryPolygonDetector {
 
 		for( Class imageType : imageTypes ) {
 			checkDetectedMulti(imageType, polygons, true,1.5);
-			checkDetectedMulti(imageType, polygons, false,1.5);// works with 2
+			checkDetectedMulti(imageType, polygons, false,2);
 		}
 	}
 

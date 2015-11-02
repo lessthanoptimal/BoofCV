@@ -34,7 +34,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO comment
+ * Refines a set of corner points along a contour by fitting lines to the points between the corners using a
+ * least-squares technique.  It then refines the corners estimates by interesting the lines and finding
+ * the closest point on the contour.
+ *
+ * A surprising number of things can go wrong and there are a lot of adhoc rules in this class and probably valid
+ * shapes are rejected.  It's well tested but wouldn't be shocked if it contains bugs that are compensated for else
+ * where in the code.
  *
  * @author Peter Abeles
  */
@@ -42,13 +48,13 @@ public class FitLinesToContour {
 
 	// maximum number of samples along a line.  After a certain point little is gained by  sampling all of those
 	// points and it becomes very computationally expensive
-	private int maxSamples = 20;
+	int maxSamples = 20;
 
 	// number of iterations it will perform before giving up
-	private int maxIterations = 5;
+	int maxIterations = 5;
 
 	// minimum number of pixels a line must have for it to be fit
-	private int minimumLineLength = 4;
+	int minimumLineLength = 4;
 
 	// reference to the list of contour pixels
 	List<Point2D_I32> contour;
@@ -164,14 +170,16 @@ public class FitLinesToContour {
 		return true;
 	}
 
+	GrowQueue_I32 skippedCorners = new GrowQueue_I32();
 	/**
 	 * finds the intersection of a line and update the corner index
 	 */
 	boolean linesIntoCorners( int numLines, GrowQueue_I32 contourCorners ) {
 
-		GrowQueue_I32 skippedCorners = new GrowQueue_I32();
+		skippedCorners.reset();
 
-//		System.out.println("total corners "+contourCorners.size()+"  numLines "+numLines);
+		// this is the index in the contour of the previous corner.  When a new corner is found this is used
+		// to see if the newly fit lines point to the same corner.  If that happens a corner is "skipped"
 		int contourIndexPrevious = contourCorners.get(anchor0);
 		for (int i = 1; i < numLines; i++) {
 			LineGeneral2D_F64 line0 = lines.get(i - 1);
@@ -204,8 +212,7 @@ public class FitLinesToContour {
 						contourIndexPrevious = contourIndex;
 					}
 				} else {
-					if( verbose )
-						System.out.println("  SKIPPING duplicate corner index");
+					if( verbose ) System.out.println("  SKIPPING duplicate corner index");
 					skipped = true;
 				}
 			}
@@ -223,7 +230,6 @@ public class FitLinesToContour {
 			skippedCorners.add( cornerIndex );
 		}
 
-
 		// now handle all the skipped corners
 		Arrays.sort(skippedCorners.data,0,skippedCorners.size);
 
@@ -240,10 +246,12 @@ public class FitLinesToContour {
 		}
 //		cornerIndexes.size -= skippedCorners.size();
 
-		for (int i = 0; i < contourCorners.size(); i++) {
-			int j = (i+1)%contourCorners.size();
-			a = contour.get(contourCorners.get(i));
-			b = contour.get(contourCorners.get(j));
+		numLines -= skippedCorners.size;
+		for (int i = 0; i < numLines; i++) {
+			int c0 = CircularIndex.addOffset(anchor0, i, contourCorners.size);
+			int c1 = CircularIndex.addOffset(anchor0, i+1, contourCorners.size);
+			a = contour.get(contourCorners.get(c0));
+			b = contour.get(contourCorners.get(c1));
 
 			if( a.x == b.x && a.y == b.y ) {
 				throw new RuntimeException("Well I screwed up");
@@ -301,7 +309,7 @@ public class FitLinesToContour {
 		double centerX = (c1.x+c0.x)/2.0;
 		double centerY = (c1.y+c0.y)/2.0;
 
-		int numSamples = Math.min(20,numPixels);
+		int numSamples = Math.min(maxSamples,numPixels);
 
 		pointsFit.reset();
 		for (int i = 0; i < numSamples; i++) {

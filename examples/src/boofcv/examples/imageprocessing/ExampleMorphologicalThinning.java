@@ -55,6 +55,7 @@ public class ExampleMorphologicalThinning {
 
 			// Fixed threshold is best for B&W images, but the adaptive would improve results for the finger print
 			GThresholdImageOps.threshold(input, binary, 120, true);
+//			GThresholdImageOps.adaptiveSquare(input, binary, 20,0,true,null,null);
 
 			// Tell it to thin the image until there are no more changes
 			ImageUInt8 thinned = BinaryImageOps.thin(binary, -1, null);

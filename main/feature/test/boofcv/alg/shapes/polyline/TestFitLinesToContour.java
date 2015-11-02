@@ -75,7 +75,7 @@ public class TestFitLinesToContour {
 
 		input.set(2, input.get(2) + 3);
 
-		alg.fitAnchored(1,3,input,found);
+		alg.fitAnchored(1, 3, input, found);
 
 		for (int i = 0; i < found.size(); i++) {
 			assertEquals(expected.get(i), found.get(i));
@@ -102,8 +102,9 @@ public class TestFitLinesToContour {
 
 		// should fail
 		corners.add(8);
+		corners.add(3);
 		alg.anchor0 = 3;
-		assertFalse(alg.sanityCheckCornerOrder(3, corners));
+		assertFalse(alg.sanityCheckCornerOrder(4, corners));
 	}
 
 	@Test
@@ -140,7 +141,7 @@ public class TestFitLinesToContour {
 
 		alg.lines.resize(3);
 		alg.anchor0 = 1;
-		alg.fitLinesUsingCorners(3,corners);
+		alg.fitLinesUsingCorners(3, corners);
 
 		LineGeneral2D_F64 expected = new LineGeneral2D_F64();
 		for (int i = 0; i < 3; i++) {
@@ -158,14 +159,16 @@ public class TestFitLinesToContour {
 	public void fitLine() {
 		FitLinesToContour alg = new FitLinesToContour();
 
-		alg.contour = createSquare( 10,12 , 30,40);
-		GrowQueue_I32 corners = createSquareCorners(10,12 , 30,40);
+		// create the rectangle so that two sizes are less than max samples and the other two more
+		int w = alg.maxSamples;
+		alg.contour = createSquare( 10,12 , 10+w-1,12+w+4);
+		GrowQueue_I32 corners = createSquareCorners(10,12 , 10+w-1,12+w+4);
 
 		LineGeneral2D_F64 line = new LineGeneral2D_F64();
 		for (int i = 0,j=corners.size()-1; i < corners.size(); j=i,i++) {
 			alg.fitLine(corners.get(j),corners.get(i),line);
 
-			// see if the line lies perfectly along hat side
+			// see if the line lies perfectly along the side
 			int contour0 = corners.get(j);
 			int contour1 = corners.get(i);
 
