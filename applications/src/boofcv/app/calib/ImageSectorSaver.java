@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
@@ -51,13 +52,12 @@ public class ImageSectorSaver {
 	ImageFloat32 difference = new ImageFloat32(LENGTH, LENGTH);
 	ImageFloat32 tempImage = new ImageFloat32(LENGTH, LENGTH);
 
-	ImageFloat32 bestImage;
+	BufferedImage bestImage;
 	double bestScore;
 
 	double currentScore;
 
 	public ImageSectorSaver() {
-		bestImage = new ImageFloat32(1,1);
 	}
 
 	public void setTemplate( ImageFloat32 image, List<Point2D_F64> sides) {
@@ -91,11 +91,12 @@ public class ImageSectorSaver {
 		PixelMath.divide(template,mean,template);
 	}
 
-	public void clearHistory() {
-		bestScore = 0;
+	public synchronized void clearHistory() {
+		bestScore = Double.MAX_VALUE;
+		bestImage = null;
 	}
 
-	public void process(ImageFloat32 image, List<Point2D_F64> sides) {
+	public synchronized void process(BufferedImage original , ImageFloat32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
 
@@ -110,10 +111,19 @@ public class ImageSectorSaver {
 
 		// compute score as a weighted average of the difference
 		currentScore  = ImageStatistics.sum(difference)/totalWeight;
+
+		if( currentScore < bestScore ) {
+			bestScore = currentScore;
+			if( bestImage == null )
+				bestImage = new BufferedImage(original.getWidth(),original.getHeight(),original.getType());
+			bestImage.createGraphics().drawImage(original,0,0,null);
+		}
 	}
 
-	public void save() {
+	public synchronized void save() {
+		if( bestImage != null ) {
 
+		}
 	}
 
 	public double getFocusScore() {

@@ -78,6 +78,7 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 
 	/**
 	 * Searches for the fiducial inside the image.
+	 * If at least a partial match is found true is returned.
 	 *
 	 * @param input Input image
 	 * @return true if at least one of the component fiducials is detected.  False otherwise
@@ -111,7 +112,10 @@ public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Returns true of the found fiducial ID number was expected
+	 * Checks to see if the provided ID number is expected or not
+	 *
+	 * @param found Fiducial ID number
+	 * @return true if it's looking for this ID number
 	 */
 	private int isExpected( long found ) {
 		for (int i = 0; i < numbers.length; i++) {

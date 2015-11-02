@@ -41,12 +41,12 @@ import java.util.List;
 // TODO Determine if the target is stationary enough
 
 // TODO Option to flip image?
-	// TODO Check to see if sufficient area is inside desired rectangle
-	// TODO Check to see if slant is sufficient and in the correct direction
-	// TODO check blur factor
+// TODO Check to see if sufficient area is inside desired rectangle
+// TODO Check to see if slant is sufficient and in the correct direction
+// TODO check blur factor
 
 
-	// TODO compute calibration parameters live?
+// TODO compute calibration parameters live?
 public class AssistedCalibration {
 
 	double CENTER_SKEW = 0.93;
@@ -59,6 +59,7 @@ public class AssistedCalibration {
 	int padding;
 
 	ImageFloat32 input;
+	BufferedImage inputBuffered;
 
 	CalibrationDetector detector;
 
@@ -72,8 +73,6 @@ public class AssistedCalibration {
 
 	Graphics2D g2;
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
-
-	Side targetSide;
 
 	DetectUserActions actions = new DetectUserActions();
 	AssistedCalibrationGui gui;
@@ -111,6 +110,7 @@ public class AssistedCalibration {
 	public void process( ImageFloat32 gray , BufferedImage image ) {
 
 		this.input = gray;
+		this.inputBuffered = image;
 		imageWidth = gray.width;
 		imageHeight = gray.height;
 		imageSize = Math.min(gray.width, gray.height);
@@ -232,7 +232,7 @@ public class AssistedCalibration {
 		drawPadding();
 
 		if( detected ) {
-			saver.process(input, sides);
+			saver.process(inputBuffered, input, sides);
 			gui.getInfoPanel().updateView(saver.getCurrentView());
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
@@ -291,7 +291,7 @@ public class AssistedCalibration {
 		drawPadding();
 
 		if( detected ) {
-			saver.process(input, sides);
+			saver.process(inputBuffered,input, sides);
 			gui.getInfoPanel().updateView(saver.getCurrentView());
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
@@ -332,8 +332,8 @@ public class AssistedCalibration {
 		int r = 6;
 		int w = 2 * r + 1;
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.get(i).pixel;
-			ellipse.setFrame(p.x - r, p.y - r, w, w);
+			CalibrationObservation.Point p = points.get(i);
+			ellipse.setFrame(p.pixel.x - r, p.pixel.y - r, w, w);
 			g2.fill(ellipse);
 		}
 	}
@@ -481,6 +481,11 @@ public class AssistedCalibration {
 		}
 
 		public boolean handleDetection() {
+			close = findClosest() <= MAGNET_RADIUS*2;
+			return close;
+		}
+
+		public void drawArrows() {
 			double distance = findClosest();
 
 			if( distance <= MAGNET_RADIUS*10 ) {
@@ -489,9 +494,6 @@ public class AssistedCalibration {
 
 				drawArrow(closest.x,closest.y,pointingX,pointingY);
 			}
-
-			close = distance <= MAGNET_RADIUS*2;
-			return close;
 		}
 
 		public void handleNoDetection() {
