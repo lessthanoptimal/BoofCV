@@ -80,7 +80,8 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
-//		thresholding.scale = 0.85;
+		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
+		thresholding.scale = 0.9;
 
 		square.contour2Poly_splitFraction = 0.1;
 		square.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
