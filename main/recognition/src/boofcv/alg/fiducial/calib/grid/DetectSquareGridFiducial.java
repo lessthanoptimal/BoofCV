@@ -93,7 +93,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(spaceToSquareRatio,Integer.MAX_VALUE );
+		s2c = new SquaresIntoClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
 		c2g = new ClustersIntoGrids(numCols*numRows);
 
 		calibRows = numRows*2;

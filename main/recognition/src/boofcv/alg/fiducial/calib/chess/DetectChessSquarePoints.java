@@ -95,7 +95,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(1.0,Integer.MAX_VALUE );
+		s2c = new SquaresIntoClusters(1.0,Integer.MAX_VALUE, 1.35);
 		c2g = new ClustersIntoGrids(innerCols*innerRows);
 	}
 

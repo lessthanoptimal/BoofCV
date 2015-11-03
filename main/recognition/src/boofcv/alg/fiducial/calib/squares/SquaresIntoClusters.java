@@ -48,7 +48,10 @@ public class SquaresIntoClusters {
 	public int maxNeighbors;
 
 	// tolerance for fractional distance away a point can be from a line to be considered on the line
-	double distanceTol = 0.20;
+	double distanceTol = 0.2;
+
+	// maximum distance two squares can be from each other relative to the size of a square
+	double maxNeighborDistanceRatio;
 
 	// ratio of the length of a square to the distance separating the square
 	private double spaceToSquareRatio;
@@ -75,17 +78,19 @@ public class SquaresIntoClusters {
 
 	/**
 	 * Declares data structures and configures algorithm
-	 *
 	 * @param spaceToSquareRatio Ratio of space between squares to square lengths
 	 * @param maxNeighbors The maximum number of neighbors it will look at when connecting a node
+	 * @param maxNeighborDistanceRatio Maximum distance away a neighbor can be from a square to be connected.  Relative
+	 *                                 to the size of the square.  Try 1.35
 	 */
-	public SquaresIntoClusters(double spaceToSquareRatio , int maxNeighbors ) {
+	public SquaresIntoClusters(double spaceToSquareRatio, int maxNeighbors, double maxNeighborDistanceRatio) {
 		this.spaceToSquareRatio = spaceToSquareRatio;
 		this.maxNeighbors = maxNeighbors;
 		//  avoid a roll over later on in the code
 		if( this.maxNeighbors == Integer.MAX_VALUE ) {
 			this.maxNeighbors = Integer.MAX_VALUE-1;
 		}
+		this.maxNeighborDistanceRatio = maxNeighborDistanceRatio;
 
 		searchPoints = new FastQueue<double[]>(double[].class,true) {
 			@Override
@@ -176,7 +181,7 @@ public class SquaresIntoClusters {
 			// distance between center when viewed head on will be space + 0.5*2*width.
 			// when you factor in foreshortening this search will not be symmetric
 			// the smaller will miss its larger neighbor but the larger one will find the smaller one.
-			double neighborDistance = n.largestSide*(1.0+spaceToSquareRatio)*1.2;
+			double neighborDistance = n.largestSide*(1.0+spaceToSquareRatio)*maxNeighborDistanceRatio;
 
 			// find it's neighbors
 			searchResults.reset();
@@ -218,6 +223,14 @@ public class SquaresIntoClusters {
 		int intersection1 = findSideIntersect(node1,lineA,lineB);
 
 		if( intersection1 < 0 || intersection0 < 0 ) {
+			return;
+		}
+
+		// see if they have a similar shape
+		double sideSideRatio0 = node0.largestSide/node0.smallestSideLength();
+		double sideSideRatio1 = node1.largestSide/node1.smallestSideLength();
+
+		if( Math.abs(sideSideRatio0-sideSideRatio1) > 1.2 ) {
 			return;
 		}
 

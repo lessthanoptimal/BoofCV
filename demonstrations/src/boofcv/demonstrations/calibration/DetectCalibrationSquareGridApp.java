@@ -26,6 +26,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -105,14 +106,9 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 		List<String>  examples = new ArrayList<String>();
 
-		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00071.jpg");
-		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00219.jpg");
-		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00164.jpg");
-		examples.add( "/home/pabeles/hack01.png");
-		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00202.jpg");
-		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
-		examples.add( "/home/pja/projects/ValidationBoof/data/fiducials/square_grid/static/front_far/frame00208.jpg" );
-		examples.add( "/home/pja/junk5.png" );
+		for (int i = 1; i <= 11; i++) {
+			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Square/left%02d.jpg", i)));
+		}
 
 		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(examples);
 

@@ -86,4 +86,15 @@ public class SquareNode {
 		}
 		return ret;
 	}
+
+	public double smallestSideLength() {
+		double smallest = Double.MAX_VALUE;
+		for (int i = 0; i < 4; i++) {
+			double length = sideLengths[i];
+			if( length < smallest ) {
+				smallest = length;
+			}
+		}
+		return smallest;
+	}
 }
