@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestAdaptiveGaussianBinaryFilter {
+public class TestLocalGaussianBinaryFilter {
 
 	Random rand = new Random(234);
 
@@ -49,10 +49,10 @@ public class TestAdaptiveGaussianBinaryFilter {
 
 			GImageMiscOps.fillUniform(input,rand,0,200);
 
-			AdaptiveGaussianBinaryFilter alg = new AdaptiveGaussianBinaryFilter(4,-1,true, ImageType.single(type));
+			LocalGaussianBinaryFilter alg = new LocalGaussianBinaryFilter(4,0.95,true, ImageType.single(type));
 
 			alg.process(input,found);
-			GThresholdImageOps.adaptiveGaussian(input,expected,4,-1,true,null,null);
+			GThresholdImageOps.localGaussian(input, expected, 4, 0.95, true, null, null);
 
 			BoofTesting.assertEquals(found,expected,0);
 		}

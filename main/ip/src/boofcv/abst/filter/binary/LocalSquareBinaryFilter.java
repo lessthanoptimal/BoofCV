@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,13 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Adaptive/local threshold using a Gaussian region
+ * Adaptive/local threshold using a square region
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#adaptiveGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
  *
  * @author Peter Abeles
  */
-public class AdaptiveGaussianBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class LocalSquareBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
@@ -38,13 +38,13 @@ public class AdaptiveGaussianBinaryFilter<T extends ImageSingleBand> implements 
 	ImageSingleBand work2;
 
 	int radius;
-	double bias;
+	double scale;
 	boolean down;
 
-	public AdaptiveGaussianBinaryFilter(int radius, double bias, boolean down,
-										ImageType<T> inputType) {
+	public LocalSquareBinaryFilter(int radius, double scale, boolean down,
+								   ImageType<T> inputType) {
 		this.radius = radius;
-		this.bias = bias;
+		this.scale = scale;
 		this.down = down;
 		this.inputType = inputType;
 		work1 = inputType.createImage(1,1);
@@ -55,7 +55,7 @@ public class AdaptiveGaussianBinaryFilter<T extends ImageSingleBand> implements 
 	public void process(T input, ImageUInt8 output) {
 		work1.reshape(input.width,input.height);
 		work2.reshape(input.width,input.height);
-		GThresholdImageOps.adaptiveGaussian(input, output, radius, bias, down, work1, work2);
+		GThresholdImageOps.localSquare(input, output, radius, scale, down, work1, work2);
 	}
 
 	@Override

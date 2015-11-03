@@ -54,6 +54,8 @@ Version : Alpha 0.20
   * Done to accommodate fiducials in which you don't care about the pose
 - Morphological Thinning has been fixed and tweaked
   * Thanks Emil Hellman who first pointed out the issue and helped solve/improve the implementation
+- Locally adaptive threshold techniques that had a bias term now have a scale term.
+  * Much more useful since bias was intensity and value range dependent
 
 TODO Easy to use calibration app
 TODO chessboard with squares partially outside the image

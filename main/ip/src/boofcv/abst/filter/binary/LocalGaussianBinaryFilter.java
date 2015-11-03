@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,45 +18,44 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.impl.ThresholdSauvola;
-import boofcv.core.image.GConvertImage;
-import boofcv.struct.image.*;
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
 
 /**
- * Adaptive/local threshold using a Sauvola calculation
+ * Adaptive/local threshold using a Gaussian region
  *
- * @see ThresholdSauvola
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
  *
  * @author Peter Abeles
  */
-public class AdaptiveSauvolaBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class LocalGaussianBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
-	ThresholdSauvola alg;
-	ImageFloat32 input;
+	T work1;
+	ImageSingleBand work2;
 
-	public AdaptiveSauvolaBinaryFilter(int radius, float k, boolean down,
-									   ImageType<T> inputType) {
+	int radius;
+	double scale;
+	boolean down;
 
+	public LocalGaussianBinaryFilter(int radius, double scale, boolean down,
+									 ImageType<T> inputType) {
+		this.radius = radius;
+		this.scale = scale;
+		this.down = down;
 		this.inputType = inputType;
-
-		if( inputType.getDataType() != ImageDataType.F32 ) {
-			input = new ImageFloat32(1,1);
-		}
-
-		alg = new ThresholdSauvola(radius,k, down);
+		work1 = inputType.createImage(1,1);
+		work2 = inputType.createImage(1,1);
 	}
 
 	@Override
 	public void process(T input, ImageUInt8 output) {
-		if( this.input == null )
-			alg.process((ImageFloat32)input,output);
-		else {
-			this.input.reshape(input.width,input.height);
-			GConvertImage.convert(input,this.input);
-			alg.process(this.input,output);
-		}
+		work1.reshape(input.width,input.height);
+		work2.reshape(input.width,input.height);
+		GThresholdImageOps.localGaussian(input, output, radius, scale, down, work1, work2);
 	}
 
 	@Override

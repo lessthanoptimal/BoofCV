@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,28 +64,28 @@ public class BenchmarkThresholding {
 		}
 	}
 
-	public static class AdaptiveSquare extends PerformerBase {
+	public static class LocalSquare extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.adaptiveSquare(input, output_U8, adaptiveRadius, 0, true, work, work2);
+			ThresholdImageOps.localSquare(input, output_U8, adaptiveRadius, 0, true, work, work2);
 		}
 	}
 
-	public static class AdaptiveGaussian extends PerformerBase {
+	public static class LocalGaussian extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.adaptiveGaussian(input, output_U8, adaptiveRadius,0, true,work,work2);
+			ThresholdImageOps.localGaussian(input, output_U8, adaptiveRadius, 0, true, work, work2);
 		}
 	}
 
-	public static class AdaptiveSauvola extends PerformerBase {
+	public static class LocalSauvola extends PerformerBase {
 		@Override
 		public void process() {
 			GThresholdImageOps.adaptiveSauvola(input, output_U8, adaptiveRadius, 0.3f, true);
 		}
 	}
 
-	public static class AdaptiveSauvola2 extends PerformerBase {
+	public static class LocalSauvola2 extends PerformerBase {
 		ThresholdSauvola alg = new ThresholdSauvola(adaptiveRadius,0.3f, true);
 		@Override
 		public void process() {
@@ -99,9 +99,9 @@ public class BenchmarkThresholding {
 		System.out.println();
 
 		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new AdaptiveSquare(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new AdaptiveGaussian(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new AdaptiveSauvola(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new AdaptiveSauvola2(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
 	}
 }

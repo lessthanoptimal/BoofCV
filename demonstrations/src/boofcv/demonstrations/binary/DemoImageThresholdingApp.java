@@ -55,7 +55,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 	BufferedImage work;
 
 	ImagePanel gui = new ImagePanel();
-	DemoThresholdingPanel control = new DemoThresholdingPanel(100,false,20,0,this);
+	DemoThresholdingPanel control = new DemoThresholdingPanel(100,false,20,1.0,this);
 
 	boolean processedImage = false;
 
@@ -81,7 +81,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 		int threshValue = control.getValueThreshold();
 		boolean thresholdDown = control.getDirection();
 		int threshRadius = control.getThreshRadius();
-		double threshBias = control.getBias();
+		double threshScale = control.getScale();
 
 		switch( which ) {
 			case 0:
@@ -99,13 +99,13 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 			} break;
 
 			case 3:
-				GThresholdImageOps.adaptiveSquare(imageInput, imageBinary,
-						threshRadius, threshBias, thresholdDown,null,null);
+				GThresholdImageOps.localSquare(imageInput, imageBinary,
+						threshRadius, threshScale, thresholdDown, null, null);
 				break;
 
 			case 4:
-				GThresholdImageOps.adaptiveGaussian(imageInput, imageBinary,
-						threshRadius, threshBias, thresholdDown, null, null);
+				GThresholdImageOps.localGaussian(imageInput, imageBinary,
+						threshRadius, threshScale, thresholdDown, null, null);
 				break;
 
 			case 5:

@@ -46,13 +46,13 @@ public enum ThresholdType {
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#adaptiveGaussian(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localGaussian(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_GAUSSIAN(true,false),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#adaptiveSquare(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_SQUARE(true,false),
 	/**

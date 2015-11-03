@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestAdaptiveSquareBinaryFilter {
+public class TestLocalSquareBinaryFilter {
 	Random rand = new Random(234);
 
 	@Test
@@ -48,10 +48,10 @@ public class TestAdaptiveSquareBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			AdaptiveSquareBinaryFilter alg = new AdaptiveSquareBinaryFilter(4,-1,true, ImageType.single(type));
+			LocalSquareBinaryFilter alg = new LocalSquareBinaryFilter(4,0.95,true, ImageType.single(type));
 
 			alg.process(input,found);
-			GThresholdImageOps.adaptiveSquare(input, expected, 4, -1, true, null, null);
+			GThresholdImageOps.localSquare(input, expected, 4, 0.95, true, null, null);
 
 			BoofTesting.assertEquals(found, expected, 0);
 		}

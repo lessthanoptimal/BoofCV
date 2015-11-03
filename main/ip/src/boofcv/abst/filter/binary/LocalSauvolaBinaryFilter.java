@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,44 +18,45 @@
 
 package boofcv.abst.filter.binary;
 
-import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.alg.filter.binary.impl.ThresholdSauvola;
+import boofcv.core.image.GConvertImage;
+import boofcv.struct.image.*;
 
 /**
- * Adaptive/local threshold using a square region
+ * Adaptive/local threshold using a Sauvola calculation
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#adaptiveSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+ * @see ThresholdSauvola
  *
  * @author Peter Abeles
  */
-public class AdaptiveSquareBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class LocalSauvolaBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
-	T work1;
-	ImageSingleBand work2;
+	ThresholdSauvola alg;
+	ImageFloat32 input;
 
-	int radius;
-	double bias;
-	boolean down;
+	public LocalSauvolaBinaryFilter(int radius, float k, boolean down,
+									ImageType<T> inputType) {
 
-	public AdaptiveSquareBinaryFilter(int radius, double bias, boolean down,
-									  ImageType<T> inputType) {
-		this.radius = radius;
-		this.bias = bias;
-		this.down = down;
 		this.inputType = inputType;
-		work1 = inputType.createImage(1,1);
-		work2 = inputType.createImage(1,1);
+
+		if( inputType.getDataType() != ImageDataType.F32 ) {
+			input = new ImageFloat32(1,1);
+		}
+
+		alg = new ThresholdSauvola(radius,k, down);
 	}
 
 	@Override
 	public void process(T input, ImageUInt8 output) {
-		work1.reshape(input.width,input.height);
-		work2.reshape(input.width,input.height);
-		GThresholdImageOps.adaptiveSquare(input,output,radius,bias,down,work1,work2);
+		if( this.input == null )
+			alg.process((ImageFloat32)input,output);
+		else {
+			this.input.reshape(input.width,input.height);
+			GConvertImage.convert(input,this.input);
+			alg.process(this.input,output);
+		}
 	}
 
 	@Override

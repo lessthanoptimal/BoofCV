@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
 public class FactoryThresholdBinary {
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#adaptiveGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
 	 *
 	 * @param radius Radius of square region.
 	 * @param bias Bias used to adjust threshold
@@ -40,7 +40,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> localGaussian(int radius, double bias, boolean down, Class<T> inputType) {
-		return new AdaptiveGaussianBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
+		return new LocalGaussianBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
 	}
 
 	/**
@@ -54,11 +54,11 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType) {
-		return new AdaptiveSauvolaBinaryFilter<T>(radius,k,down,ImageType.single(inputType));
+		return new LocalSauvolaBinaryFilter<T>(radius,k,down,ImageType.single(inputType));
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#adaptiveSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
 	 *
 	 * @param radius Radius of square region.
 	 * @param bias Bias used to adjust threshold
@@ -68,7 +68,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> localSquare(int radius, double bias, boolean down, Class<T> inputType) {
-		return new AdaptiveSquareBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
+		return new LocalSquareBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
 	}
 
 	/**
@@ -133,13 +133,13 @@ public class FactoryThresholdBinary {
 				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.down, inputType);
 
 			case LOCAL_GAUSSIAN:
-				return localGaussian(config.radius, config.bias, config.down, inputType);
+				return localGaussian(config.radius, config.scale, config.down, inputType);
 
 			case LOCAL_SAVOLA:
 				return localSauvola(config.radius, config.savolaK, config.down, inputType);
 
 			case LOCAL_SQUARE:
-				return localSquare(config.radius, config.bias, config.down, inputType);
+				return localSquare(config.radius, config.scale, config.down, inputType);
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
 	}

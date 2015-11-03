@@ -62,9 +62,9 @@ public class ExampleThresholding {
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Global: Entropy");
 
 		// Local method
-		GThresholdImageOps.adaptiveSquare(input, binary, 28, 0, true, null, null);
+		GThresholdImageOps.localSquare(input, binary, 28, 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Square");
-		GThresholdImageOps.adaptiveGaussian(input, binary, 42, 0, true, null, null);
+		GThresholdImageOps.localGaussian(input, binary, 42, 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Gaussian");
 		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.30f, true);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Sauvola");

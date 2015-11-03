@@ -78,7 +78,7 @@ public class TestDetectChessCalibrationPoints {
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configChess.square, ImageFloat32.class);
 //		detectorSquare.setVerbose(true);
-		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,-10,true,ImageFloat32.class);
+		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,1.0,true,ImageFloat32.class);
 		DetectChessboardFiducial alg =
 				new DetectChessboardFiducial(numCols,numRows,4,detectorSquare,null,null,inputToBinary);
 

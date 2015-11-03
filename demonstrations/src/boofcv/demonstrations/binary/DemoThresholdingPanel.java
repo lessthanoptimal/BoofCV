@@ -26,6 +26,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
@@ -37,33 +38,33 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 	JButton directionButton;
 	JSlider thresholdLevel;
 	JSpinner spinnerRadius;
-	JSpinner spinnerBias;
+	JSpinner spinnerScale;
 
 	Listener listener;
 
 	int valueThreshold;
 	boolean directionDown;
 	int threshRadius;
-	double bias;
+	double scale;
 
 	public DemoThresholdingPanel(int threshold ,
 								 boolean directionDown,
-								 int radius, double bias,
+								 int radius, double scale,
 								 Listener listener) {
 		this.listener = listener;
 		this.valueThreshold = threshold;
 		this.directionDown = directionDown;
 		this.threshRadius = radius;
-		this.bias = bias;
+		this.scale = scale;
 
-		String[] algStrings = { "Fixed", "Otsu" , "Entropy" , "Adaptive Square", "Adaptive Gaussian", "Adaptive Sauvola"};
+		String[] algStrings = { "Fixed", "Global Otsu" , "Global Entropy" , "Local Square", "Local Gaussian", "Local Sauvola"};
 
 		comboSelect = new JComboBox(algStrings);
 		comboSelect.addActionListener(this);
 		comboSelect.setMaximumSize(comboSelect.getPreferredSize());
 
 		directionButton = new JButton();
-		directionButton.setPreferredSize(new Dimension(100,30));
+		directionButton.setPreferredSize(new Dimension(100, 30));
 		directionButton.setMaximumSize(directionButton.getPreferredSize());
 		directionButton.setMinimumSize(directionButton.getPreferredSize());
 		setToggleText(directionDown);
@@ -79,9 +80,16 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		spinnerRadius.addChangeListener(this);
 		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
 
-		spinnerBias = new JSpinner(new SpinnerNumberModel(bias,-50,50,10));
-		spinnerBias.addChangeListener(this);
-		spinnerBias.setMaximumSize(spinnerBias.getPreferredSize());
+		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.01));
+		spinnerScale.addChangeListener(this);
+		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinnerScale.getEditor();
+		DecimalFormat format = editor.getFormat();
+		format.setMinimumFractionDigits(2);
+		format.setMinimumIntegerDigits(1);
+		Dimension d = spinnerScale.getPreferredSize();
+		d.width = 60;
+		spinnerScale.setPreferredSize(d);
+		spinnerScale.setMaximumSize(d);
 
 		updateActive(comboSelect.getSelectedIndex());
 
@@ -90,7 +98,7 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		addAlignLeft(directionButton, this);
 		addAlignLeft(thresholdLevel, this);
 		addLabeled(spinnerRadius, "Radius", this);
-		addLabeled(spinnerBias, "Bias", this);
+		addLabeled(spinnerScale, "Scale", this);
 		add(Box.createVerticalGlue());
 	}
 
@@ -105,11 +113,11 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		if( which == 0 ) {
 			thresholdLevel.setEnabled(true);
 			spinnerRadius.setEnabled(false);
-			spinnerBias.setEnabled(false);
+			spinnerScale.setEnabled(false);
 		} else {
 			thresholdLevel.setEnabled(false);
 			spinnerRadius.setEnabled(true);
-			spinnerBias.setEnabled(true);
+			spinnerScale.setEnabled(true);
 		}
 	}
 
@@ -137,8 +145,8 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		return threshRadius;
 	}
 
-	public double getBias() {
-		return bias;
+	public double getScale() {
+		return scale;
 	}
 
 	@Override
@@ -149,8 +157,8 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		} else if( e.getSource() == spinnerRadius) {
 			threshRadius = ((Number) spinnerRadius.getValue()).intValue();
 			listener.settingChanged();
-		} else if( e.getSource() == spinnerBias) {
-			bias = ((Number) spinnerBias.getValue()).doubleValue();
+		} else if( e.getSource() == spinnerScale) {
+			scale = ((Number) spinnerScale.getValue()).doubleValue();
 			listener.settingChanged();
 		}
 	}

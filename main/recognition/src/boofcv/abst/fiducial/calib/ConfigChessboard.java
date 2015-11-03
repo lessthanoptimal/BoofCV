@@ -80,6 +80,8 @@ public class ConfigChessboard implements Configuration {
 	public double squareWidth;
 
 	{
+//		thresholding.scale = 0.85;
+
 		square.contour2Poly_splitFraction = 0.1;
 		square.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
 		square.minContourImageWidthFraction = 0.0005;

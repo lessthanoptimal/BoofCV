@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestAdaptiveSauvolaBinaryFilter {
+public class TestLocalSauvolaBinaryFilter {
 	Random rand = new Random(234);
 
 	@Test
@@ -48,7 +48,7 @@ public class TestAdaptiveSauvolaBinaryFilter {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			AdaptiveSauvolaBinaryFilter alg = new AdaptiveSauvolaBinaryFilter(4,0.3f,true, ImageType.single(type));
+			LocalSauvolaBinaryFilter alg = new LocalSauvolaBinaryFilter(4,0.3f,true, ImageType.single(type));
 
 			alg.process(input,found);
 			GThresholdImageOps.adaptiveSauvola(input, expected, 4, 0.3f, true);

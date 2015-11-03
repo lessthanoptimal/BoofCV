@@ -38,9 +38,9 @@ public class ConfigThreshold implements Configuration {
 	public double fixedThreshold;
 
 	/**
-	 * Bias added the pixel value.  Only used with adaptive.
+	 * Scale factor applied to computed threshold.  Only used with adaptive techniques.
 	 */
-	public double bias = 0;
+	public double scale = 1.0;
 
 	/**
 	 * If true then it thresholds down
@@ -110,7 +110,7 @@ public class ConfigThreshold implements Configuration {
 		return "ConfigThreshold{" +
 				"type=" + type +
 				", fixedThreshold=" + fixedThreshold +
-				", bias=" + bias +
+				", scale=" + scale +
 				", down=" + down +
 				", radius=" + radius +
 				", savolaK=" + savolaK +

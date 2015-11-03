@@ -48,12 +48,12 @@ public class TestThresholdImageOps {
 	Random rand = new Random(234);
 
 	@Test
-	public void adaptiveSquare() {
+	public void localSquare() {
 		int total = 0;
 		Method[] list = ThresholdImageOps.class.getMethods();
 
 		for( Method m : list ) {
-			if( !m.getName().equals("adaptiveSquare"))
+			if( !m.getName().equals("localSquare"))
 				continue;
 
 			Class param[] = m.getParameterTypes();
@@ -63,41 +63,41 @@ public class TestThresholdImageOps {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			BoofTesting.checkSubImage(this,"performAdaptiveSquare",true,m,input,output);
+			BoofTesting.checkSubImage(this,"performLocalSquare",true,m,input,output);
 			total++;
 		}
 
 		assertEquals(2, total);
 	}
 
-	public void performAdaptiveSquare( Method m , ImageSingleBand input , ImageUInt8 output )
+	public void performLocalSquare( Method m , ImageSingleBand input , ImageUInt8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		ImageUInt8 expected = new ImageUInt8(output.width,output.height);
 
 		for( int radius = 1; radius <= 5; radius++ ) {
-			for( int indexBias = 0; indexBias < 4; indexBias++ ) {
-				int bias = indexBias*10-20;
+			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
+				float scale = (float)(0.8+0.4*(indexScale/3.0));
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,bias,true,null,null);
-				naiveAdaptiveSquare(input, expected, radius, bias, true);
+				m.invoke(null,input,output,radius,scale,true,null,null);
+				naiveLocalSquare(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected,output,0);
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,bias,false,null,null);
-				naiveAdaptiveSquare(input, expected, radius, bias, false);
+				m.invoke(null,input,output,radius,scale,false,null,null);
+				naiveLocalSquare(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected,output,0);
 			}
 		}
 	}
 
-	public void naiveAdaptiveSquare(ImageSingleBand input, ImageUInt8 output,
-									int radius, double bias, boolean down) {
+	public void naiveLocalSquare(ImageSingleBand input, ImageUInt8 output,
+									int radius, double scale, boolean down) {
 
 		int w = radius*2+1;
 
@@ -111,7 +111,7 @@ public class TestThresholdImageOps {
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
 
-				double threshold = GeneralizedImageOps.get(blur,x,y)+bias;
+				double threshold = GeneralizedImageOps.get(blur,x,y)*scale;
 				double v = GeneralizedImageOps.get(input,x,y);
 
 				if( down ) {
@@ -133,12 +133,12 @@ public class TestThresholdImageOps {
 	}
 
 	@Test
-	public void adaptiveGaussian() {
+	public void localGaussian() {
 		int total = 0;
 		Method[] list = ThresholdImageOps.class.getMethods();
 
 		for( Method m : list ) {
-			if( !m.getName().equals("adaptiveGaussian"))
+			if( !m.getName().equals("localGaussian"))
 				continue;
 
 			Class param[] = m.getParameterTypes();
@@ -148,41 +148,41 @@ public class TestThresholdImageOps {
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-			BoofTesting.checkSubImage(this,"performAdaptiveGaussian",true,m,input,output);
+			BoofTesting.checkSubImage(this,"performLocalGaussian",true,m,input,output);
 			total++;
 		}
 
 		assertEquals(2, total);
 	}
 
-	public void performAdaptiveGaussian( Method m , ImageSingleBand input , ImageUInt8 output )
+	public void performLocalGaussian( Method m , ImageSingleBand input , ImageUInt8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		ImageUInt8 expected = new ImageUInt8(output.width,output.height);
 
 		for( int radius = 1; radius <= 5; radius++ ) {
-			for( int indexBias = 0; indexBias < 4; indexBias++ ) {
-				int bias = indexBias*10-20;
+			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
+				float scale = (float)(0.8+0.4*(indexScale/3.0));
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,radius,bias,true,null,null);
-				naiveAdaptiveGaussian(input, expected, radius, bias, true);
+				m.invoke(null,input,output,radius,scale,true,null,null);
+				naiveLocalGaussian(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected,output,0);
 
 				ImageMiscOps.fillUniform(output, rand, 0, 200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null, input, output, radius, bias, false, null, null);
-				naiveAdaptiveGaussian(input, expected, radius, bias, false);
+				m.invoke(null, input, output, radius, scale, false, null, null);
+				naiveLocalGaussian(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected,output,0);
 			}
 		}
 	}
 
-	public void naiveAdaptiveGaussian( ImageSingleBand input , ImageUInt8 output ,
-									   int radius , double bias , boolean down ) {
+	public void naiveLocalGaussian( ImageSingleBand input , ImageUInt8 output ,
+									   int radius , double scale , boolean down ) {
 
 		ImageSingleBand blur;
 		if( input instanceof ImageUInt8 ) {
@@ -193,7 +193,7 @@ public class TestThresholdImageOps {
 
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
-				double threshold = GeneralizedImageOps.get(blur,x,y)+bias;
+				double threshold = GeneralizedImageOps.get(blur,x,y)*scale;
 				double v = GeneralizedImageOps.get(input,x,y);
 
 				if( down ) {
