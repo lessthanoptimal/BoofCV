@@ -31,6 +31,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.Configuration;
@@ -74,6 +75,10 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	T input;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
+	volatile boolean processRequested = false;
+	volatile boolean threadRunning = false;
+	final Object handShakeLock = new Object();
+
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples);
 
@@ -104,15 +109,51 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		imageThresholdUpdated();
 	}
 
+	/**
+	 * Creates a thread to process the image.  if a thread is already running it's told to run again.
+	 */
 	private synchronized void processImage() {
-		new Thread() {
-			@Override
-			public void run() {
-				inputToBinary.process(input, binary);
-				detector.process(input, binary);
-				viewUpdated();
+		boolean spawnThread = false;
+
+		synchronized (handShakeLock) {
+			if( threadRunning ) {
+				processRequested = true;
+			} else {
+				spawnThread = true;
+				processRequested = true;
+				threadRunning = true;
 			}
-		}.start();
+		}
+
+		if( spawnThread ) {
+			synchronized (handShakeLock) {
+				threadRunning = true;
+			}
+			new Thread() {
+				@Override
+				public void run() {
+					// run until there are no more requestes to run
+					while( true ) {
+						boolean doStuff;
+						synchronized (handShakeLock) {
+							doStuff = processRequested;
+							processRequested = false;
+						}
+
+						if( doStuff ) {
+							inputToBinary.process(input, binary);
+							detector.process(input, binary);
+							viewUpdated();
+						} else {
+							break;
+						}
+					}
+					synchronized (handShakeLock) {
+						threadRunning = false;
+					}
+				}
+			}.start();
+		}
 	}
 
 	public synchronized void setInput( BufferedImage image ) {
@@ -169,7 +210,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 
 	@Override
 	public void openFile(File file) {
-		BufferedImage buffered = UtilImageIO.loadImage(file.getAbsolutePath());
+		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(file.getPath()));
 		if( buffered == null ) {
 			// TODO see if it's a video instead
 			System.err.println("Couldn't read "+file.getPath());
@@ -243,9 +284,11 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	public static void main(String[] args) {
 
 		List<String> examples = new ArrayList<String>();
-		examples.add("data/example/fiducial/binary/image0000.jpg");
-		examples.add( "/home/pabeles/hack01.png" );
-		examples.add( "/home/pabeles/projects/ValidationBoof/data/fiducials/square_grid/standard/rotation/image00028.png" );
+		examples.add("shapes/polygons01.jpg");
+		examples.add("shapes/shapes01.png");
+		examples.add("shapes/shapes02.png");
+		examples.add("shapes/concave01.jpg");
+		examples.add("fiducial/binary/image0000.jpg");
 
 		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 

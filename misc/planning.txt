@@ -14,6 +14,9 @@ Alpha 0.20
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
+  * A large performance gain is likely if a way can be found to suppress highly textured backgrounds when using
+    an adaptive threshold
+      - local with variance calculation?  How to make pixel intensity invariant?
 
 - Chessboard
   * Add support for squares which go outside the image

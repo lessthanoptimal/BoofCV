@@ -62,6 +62,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerMaxSides;
 	JSpinner spinnerMinEdge;
 	JCheckBox setConvex;
+	JCheckBox setBorder;
 
 	JSpinner spinnerContourSplit;
 	JSpinner spinnerContourMinSplit;
@@ -145,6 +146,9 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		setConvex = new JCheckBox("Convex");
 		setConvex.addActionListener(this);
 		setConvex.setSelected(config.convex);
+		setBorder = new JCheckBox("Image Border");
+		setBorder.addActionListener(this);
+		setBorder.setSelected(config.canTouchBorder);
 
 		spinnerLineSamples = new JSpinner(new SpinnerNumberModel(configLine.lineSamples, 5, 100, 1));
 		spinnerLineSamples.setMaximumSize(spinnerLineSamples.getPreferredSize());
@@ -174,6 +178,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addLabeled(spinnerMinEdge, "Edge Intensity: ", this);
 		addAlignLeft(setConvex, this);
+		addAlignLeft(setBorder, this);
 		addCenterLabel("Contour", this);
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
 		addLabeled(spinnerContourMinSplit, "Min Split: ", this);
@@ -224,6 +229,9 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 			owner.configUpdate();
 		} else if( e.getSource() == setConvex ) {
 			config.convex = setConvex.isSelected();
+			owner.configUpdate();
+		} else if( e.getSource() == setBorder ) {
+			config.convex = setBorder.isSelected();
 			owner.configUpdate();
 		}
 	}

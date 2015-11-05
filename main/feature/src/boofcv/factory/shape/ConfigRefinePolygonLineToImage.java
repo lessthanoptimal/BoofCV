@@ -36,7 +36,7 @@ public class ConfigRefinePolygonLineToImage implements Configuration {
 	/**
 	 * Number of times along the line it will be sampled
 	 */
-	public int lineSamples = 30;
+	public int lineSamples = 10;
 	/**
 	 * Number of points tangent to the line in each direction it samples.  In total the number of
 	 * samples along a line will be lineSamples*(2*sampleRadius+1)
