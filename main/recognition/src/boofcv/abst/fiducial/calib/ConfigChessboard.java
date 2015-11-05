@@ -89,13 +89,13 @@ public class ConfigChessboard implements Configuration {
 
 		// good value for squares.  Set it here to make it not coupled to default values
 		configRefineCorners.cornerOffset = 1;
-		configRefineCorners.lineSamples = 10;
+		configRefineCorners.lineSamples = 15;
 		configRefineCorners.convergeTolPixels = 0.2;
 		configRefineCorners.maxIterations = 5;
 
 		// defaults for if the user toggles it to lines
 		configRefineLines.cornerOffset = 1;
-		configRefineLines.lineSamples = 10;
+		configRefineLines.lineSamples = 15;
 		configRefineLines.convergeTolPixels = 0.2;
 		configRefineLines.maxIterations = 5;
 	}

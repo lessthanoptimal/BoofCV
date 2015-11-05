@@ -271,7 +271,7 @@ public abstract class GenericFiducialDetectorChecks {
 			}
 
 			ImageBase shrunk = image.createSameShape();
-			new FDistort(image,shrunk).affine(0.85,0,0,0.85,0,0).apply();
+			new FDistort(image,shrunk).affine(0.8,0,0,0.8,0,0).apply();
 
 			detector.detect(shrunk);
 
