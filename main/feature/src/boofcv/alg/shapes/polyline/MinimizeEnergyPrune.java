@@ -43,11 +43,7 @@ import java.util.List;
 public class MinimizeEnergyPrune {
 
 	// how much a corner adds to the energy calculation
-	double splitPenalty = 4;
-
-	// maximum number of points it will sample along a contour
-	// intended to speed things up for large shapes
-	int maxPointSamples = 20;
+	double splitPenalty;
 
 	LineParametric2D_F64 line = new LineParametric2D_F64();
 	Point2D_F64 point = new Point2D_F64();
@@ -227,24 +223,12 @@ public class MinimizeEnergyPrune {
 		line.slope.set(b.x-a.x,b.y-a.y);
 
 		double total = 0;
-		int length = circularDistance(indexA,indexB)-1;
+		int length = circularDistance(indexA,indexB);
 
-		int numSamples = Math.min(length,maxPointSamples);
-
-		if( length > 1 ) {
-			for (int k = 0; k < numSamples; k++) {
-				int offset = k * (numSamples - 1) / (length - 1);
-				// don't sample the corners, hence +1 to skip corner A
-				Point2D_I32 c = getContour(indexA + 1 + offset);
-				point.set(c.x, c.y);
-
-				total += Distance2D_F64.distanceSq(line, point);
-			}
-			// adjust the energy's total magnitude back to its original
-			total *= length/(double)numSamples;
-		} else {
-			Point2D_I32 c = getContour(indexA + 1);
+		for (int k = 1; k < length; k++) {
+			Point2D_I32 c = getContour(indexA + 1 + k);
 			point.set(c.x, c.y);
+
 			total += Distance2D_F64.distanceSq(line, point);
 		}
 
