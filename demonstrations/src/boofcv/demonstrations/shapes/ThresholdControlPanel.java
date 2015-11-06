@@ -28,6 +28,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 
 /**
  * @author Peter Abeles
@@ -41,6 +42,7 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	JComboBox comboType;
 	JSpinner spinnerThreshold;
 	JSpinner spinnerRadius;
+	JSpinner spinnerScale;
 	JButton buttonUpDown;
 
 	boolean thresholdAdaptive;
@@ -52,6 +54,7 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.radius = 10;
 		config.fixedThreshold = 50;
 		config.down = true;
+		config.scale = 1.0;
 	}
 
 	public ThresholdControlPanel(Listener listener) {
@@ -71,6 +74,9 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 		spinnerRadius = new JSpinner(new SpinnerNumberModel(config.radius,1,50,1));
 		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
 
+		spinnerScale = new JSpinner(new SpinnerNumberModel(config.scale,0,2.0,0.05));
+		configureSpinnerFloat(spinnerScale);
+
 		buttonUpDown = new JButton();
 		buttonUpDown.setPreferredSize(new Dimension(100, 30));
 		buttonUpDown.setMaximumSize(buttonUpDown.getPreferredSize());
@@ -80,15 +86,30 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 		comboType.addActionListener(this);
 		spinnerThreshold.addChangeListener(this);
 		spinnerRadius.addChangeListener(this);
+		spinnerScale.addChangeListener(this);
 		buttonUpDown.addActionListener(this);
 
 		addLabeled(comboType, "Type", this);
 		addLabeled(spinnerThreshold, "Threshold", this);
 		addLabeled(spinnerRadius, "Radius", this);
+		addLabeled(spinnerScale, "Scale", this);
 		addAlignCenter(buttonUpDown, this);
 
 
 		updateEnabledByType();
+	}
+
+	private void configureSpinnerFloat( JSpinner spinner ) {
+		JSpinner.NumberEditor editor = (JSpinner.NumberEditor)spinner.getEditor();
+		DecimalFormat format = editor.getFormat();
+		format.setMinimumFractionDigits(3);
+		format.setMinimumIntegerDigits(1);
+		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+		Dimension d = spinner.getPreferredSize();
+		d.width = 60;
+		spinner.setPreferredSize(d);
+		spinner.addChangeListener(this);
+		spinner.setMaximumSize(d);
 	}
 
 	private void setToggleText( boolean direction ) {
@@ -133,17 +154,20 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerThreshold.setEnabled(false);
 			if( thresholdGlobal ) {
 				spinnerRadius.setEnabled(false);
+				spinnerScale.setEnabled(false);
 			} else {
 				spinnerRadius.setEnabled(true);
+				spinnerScale.setEnabled(true);
 			}
 		} else {
 			spinnerThreshold.setEnabled(true);
 			spinnerRadius.setEnabled(false);
+			spinnerScale.setEnabled(false);
 		}
 
 		spinnerThreshold.repaint();
 		spinnerRadius.repaint();
-
+		spinnerScale.repaint();
 	}
 
 	@Override
@@ -153,6 +177,9 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerRadius ) {
 			config.radius = ((Number) spinnerRadius.getValue()).intValue();
+			listener.imageThresholdUpdated();
+		} else if( e.getSource() == spinnerScale ) {
+			config.scale = ((Number) spinnerScale.getValue()).doubleValue();
 			listener.imageThresholdUpdated();
 		}
 	}

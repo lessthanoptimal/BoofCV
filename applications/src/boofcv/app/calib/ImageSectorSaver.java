@@ -85,7 +85,7 @@ public class ImageSectorSaver {
 
 		totalWeight = ImageStatistics.sum(weights);
 
-		// compute a normalized templater for later use.  Divide by the mean to add some lighting invariance
+		// compute a normalized template for later use.  Divide by the mean to add some lighting invariance
 		template.setTo(removePerspective.getOutput());
 		float mean = (float)ImageStatistics.mean(template);
 		PixelMath.divide(template,mean,template);

@@ -58,7 +58,6 @@ Version : Alpha 0.20
   * Much more useful since bias was intensity and value range dependent
 
 TODO Easy to use calibration app
-TODO chessboard with squares partially outside the image
 
 ---------------------------------------------
 Date    : 2015/09/20

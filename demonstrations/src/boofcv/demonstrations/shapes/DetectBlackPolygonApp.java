@@ -31,9 +31,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.Configuration;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -41,6 +39,7 @@ import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -75,9 +74,6 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	T input;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	volatile boolean processRequested = false;
-	volatile boolean threadRunning = false;
-	final Object handShakeLock = new Object();
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples);
@@ -109,66 +105,40 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		imageThresholdUpdated();
 	}
 
-	/**
-	 * Creates a thread to process the image.  if a thread is already running it's told to run again.
-	 */
-	private synchronized void processImage() {
-		boolean spawnThread = false;
+	@Override
+	public synchronized void processImage(final BufferedImage image ) {
+		if( image != null ) {
+			original = conditionalDeclare(image,original);
+			work = conditionalDeclare(image,work);
 
-		synchronized (handShakeLock) {
-			if( threadRunning ) {
-				processRequested = true;
-			} else {
-				spawnThread = true;
-				processRequested = true;
-				threadRunning = true;
+			this.original.createGraphics().drawImage(image,0,0,null);
+
+			input.reshape(work.getWidth(), work.getHeight());
+			binary.reshape(work.getWidth(), work.getHeight());
+
+			ConvertBufferedImage.convertFrom(original, input, true);
+
+			Dimension d = guiImage.getPreferredSize();
+			if( d.getWidth() != image.getWidth() || d.getHeight() != image.getHeight() ) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+					}
+				});
 			}
 		}
 
-		if( spawnThread ) {
-			synchronized (handShakeLock) {
-				threadRunning = true;
+		inputToBinary.process(input, binary);
+		detector.process(input, binary);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				viewUpdated();
 			}
-			new Thread() {
-				@Override
-				public void run() {
-					// run until there are no more requestes to run
-					while( true ) {
-						boolean doStuff;
-						synchronized (handShakeLock) {
-							doStuff = processRequested;
-							processRequested = false;
-						}
-
-						if( doStuff ) {
-							inputToBinary.process(input, binary);
-							detector.process(input, binary);
-							viewUpdated();
-						} else {
-							break;
-						}
-					}
-					synchronized (handShakeLock) {
-						threadRunning = false;
-					}
-				}
-			}.start();
-		}
+		});
 	}
-
-	public synchronized void setInput( BufferedImage image ) {
-		this.original = image;
-		work = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_BGR);
-
-		input.reshape(work.getWidth(), work.getHeight());
-		binary.reshape(work.getWidth(), work.getHeight());
-
-		ConvertBufferedImage.convertFrom(original, input, true);
-
-		guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-		processImage();
-	}
-
 
 	/**
 	 * Called when how the data is visualized has changed
@@ -205,34 +175,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		ConfigThreshold config = controls.getThreshold().config;
 
 		inputToBinary = FactoryThresholdBinary.threshold(config,imageType);
-		processImage();
-	}
-
-	@Override
-	public void openFile(File file) {
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(file.getPath()));
-		if( buffered == null ) {
-			// TODO see if it's a video instead
-			System.err.println("Couldn't read "+file.getPath());
-		} else {
-			setInput(buffered);
-		}
-	}
-
-	class WebcamThread extends Thread {
-
-		boolean requestStop = false;
-		boolean running = true;
-
-//		Webcam
-
-		@Override
-		public void run() {
-			while( !requestStop ) {
-
-			}
-
-		}
+		processImageThread(null);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
@@ -289,6 +232,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add("shapes/shapes02.png");
 		examples.add("shapes/concave01.jpg");
 		examples.add("fiducial/binary/image0000.jpg");
+		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
 
 		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 

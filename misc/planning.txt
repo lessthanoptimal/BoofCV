@@ -6,6 +6,8 @@ Alpha 0.20
   * Flag to return shapes which touch the image border
     - Only optimize sides/corners which don't touch the border
   * Improve concave shape pixel level polygon
+  * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of thw two
+    - Should supress noisy regions
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width

@@ -28,7 +28,6 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
@@ -44,7 +43,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,14 +98,15 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 	protected abstract java.util.List<SquareGrid> getGrids();
 
-	public void process( final BufferedImage input ) {
+	@Override
+	public void processImage( final BufferedImage input ) {
 		this.input = input;
 
 		imagePanel.setBufferedImage(this.input);
 		gray.reshape(input.getWidth(), input.getHeight());
 		ConvertBufferedImage.convertFrom(input, gray, true);
 
-		binary = new BufferedImage(input.getWidth(),input.getHeight(),BufferedImage.TYPE_INT_RGB);
+		binary = conditionalDeclare(input,binary,BufferedImage.TYPE_INT_RGB);
 
 		new Thread() {
 			@Override
@@ -387,17 +386,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			g2.setTransform(origTran);
 			g2.setColor(Color.GREEN);
 			g2.drawString(text, x, y);
-		}
-	}
-
-	public void openFile(File file) {
-		BufferedImage buffered = UtilImageIO.loadImage(file.getAbsolutePath());
-		if( buffered == null ) {
-			// TODO see if it's a video instead
-			System.err.println("Couldn't read "+file.getPath());
-			System.exit(0);
-		} else {
-			process(buffered);
 		}
 	}
 }
