@@ -78,7 +78,6 @@ public class TestThresholdImageOps {
 		for( int radius = 1; radius <= 5; radius++ ) {
 			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
 				float scale = (float)(0.8+0.4*(indexScale/3.0));
-
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
 				m.invoke(null,input,output,radius,scale,true,null,null);
@@ -99,35 +98,44 @@ public class TestThresholdImageOps {
 	public void naiveLocalSquare(ImageSingleBand input, ImageUInt8 output,
 									int radius, double scale, boolean down) {
 
-		int w = radius*2+1;
-
 		ImageSingleBand blur;
+		boolean isInt;
 		if( input instanceof ImageUInt8 ) {
+			isInt = true;
 			blur = BlurImageOps.mean((ImageUInt8)input,null,radius,null);
 		} else {
+			isInt = false;
 			blur = BlurImageOps.mean((ImageFloat32)input,null,radius,null);
 		}
+
+		float fscale = (float)scale;
 
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
 
-				double threshold = GeneralizedImageOps.get(blur,x,y)*scale;
+				double threshold = GeneralizedImageOps.get(blur,x,y);
 				double v = GeneralizedImageOps.get(input,x,y);
 
+				boolean one;
 				if( down ) {
-					if( v <= threshold ) {
-						output.set(x,y,1);
+					if( isInt ) {
+						one = (int)v <= ((int)threshold)*fscale;
 					} else {
-						output.set(x,y,0);
+						one = v <= threshold*fscale;
 					}
 				} else {
-					if( v > threshold ) {
-						output.set(x,y,1);
+					if( isInt ) {
+						one = ((int)v)*fscale > (int)threshold;
 					} else {
-						output.set(x,y,0);
+						one = v*fscale > threshold;
 					}
 				}
 
+				if( one ) {
+					output.set(x,y,1);
+				} else {
+					output.set(x,y,0);
+				}
 			}
 		}
 	}
@@ -185,29 +193,41 @@ public class TestThresholdImageOps {
 									   int radius , double scale , boolean down ) {
 
 		ImageSingleBand blur;
+		boolean isInt;
 		if( input instanceof ImageUInt8 ) {
+			isInt = true;
 			blur = BlurImageOps.gaussian((ImageUInt8) input, null, -1, radius, null);
 		} else {
+			isInt = false;
 			blur = BlurImageOps.gaussian((ImageFloat32) input, null, -1, radius, null);
 		}
 
+		float fscale = (float)scale;
+
 		for( int y = 0; y < input.height; y++ ) {
 			for( int x = 0; x < input.width; x++ ) {
-				double threshold = GeneralizedImageOps.get(blur,x,y)*scale;
+				double threshold = GeneralizedImageOps.get(blur,x,y);
 				double v = GeneralizedImageOps.get(input,x,y);
 
+				boolean one;
 				if( down ) {
-					if( v <= threshold ) {
-						output.set(x,y,1);
+					if( isInt ) {
+						one = (int)v <= ((int)threshold)*fscale;
 					} else {
-						output.set(x,y,0);
+						one = v <= threshold*fscale;
 					}
 				} else {
-					if( v > threshold ) {
-						output.set(x,y,1);
+					if( isInt ) {
+						one = ((int)v)*fscale > (int)threshold;
 					} else {
-						output.set(x,y,0);
+						one = v*fscale > threshold;
 					}
+				}
+
+				if( one ) {
+					output.set(x,y,1);
+				} else {
+					output.set(x,y,0);
 				}
 
 			}

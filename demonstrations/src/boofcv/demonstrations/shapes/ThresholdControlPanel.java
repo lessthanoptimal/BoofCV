@@ -53,8 +53,6 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	{
 		config.radius = 10;
 		config.fixedThreshold = 50;
-		config.down = true;
-		config.scale = 1.0;
 	}
 
 	public ThresholdControlPanel(Listener listener) {

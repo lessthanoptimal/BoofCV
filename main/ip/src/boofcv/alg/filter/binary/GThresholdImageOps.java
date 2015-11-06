@@ -260,7 +260,7 @@ public class GThresholdImageOps {
 			return ThresholdImageOps.localSquare((ImageFloat32) input, output, radius, (float) scale, down,
 					(ImageFloat32) work1, (ImageFloat32) work2);
 		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.localSquare((ImageUInt8) input, output, radius, (int) scale, down,
+			return ThresholdImageOps.localSquare((ImageUInt8) input, output, radius, (float) scale, down,
 					(ImageUInt8) work1, (ImageUInt8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
@@ -298,7 +298,7 @@ public class GThresholdImageOps {
 			return ThresholdImageOps.localGaussian((ImageFloat32) input, output, radius, (float) scale, down,
 					(ImageFloat32) work1, (ImageFloat32) work2);
 		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.localGaussian((ImageUInt8) input, output, radius, (int) scale, down,
+			return ThresholdImageOps.localGaussian((ImageUInt8) input, output, radius, (float) scale, down,
 					(ImageUInt8) work1, (ImageUInt8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());

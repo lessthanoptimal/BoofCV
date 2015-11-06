@@ -31,6 +31,7 @@ import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -47,14 +48,18 @@ public class FactoryFiducial {
 	 * @see DetectFiducialSquareBinary DetectFiducialSquareBinary for a description of this fiducial type.
 	 *
 	 * @param configFiducial Description of the fiducial.  Can't be null.
-	 * @param configThreshold Threshold for binary image.  Can't be null.
+	 * @param configThreshold Threshold for binary image.  null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageSingleBand>
-	SquareBinary_to_FiducialDetector<T> squareBinary( final ConfigFiducialBinary configFiducial,
-													  final ConfigThreshold configThreshold,
-													  final Class<T> imageType ) {
+	SquareBinary_to_FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
+													  ConfigThreshold configThreshold,
+													  Class<T> imageType ) {
+
+		if( configThreshold == null ) {
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,10);
+		}
 
 		configFiducial.checkValidity();
 
@@ -79,7 +84,7 @@ public class FactoryFiducial {
 	 * @see DetectFiducialSquareImage DetectFiducialSquareImage for a description of this fiducial type.
 	 *
 	 * @param configFiducial Description of the fiducial.  Can't be null.
-	 * @param configThreshold Threshold for binary image. Can't be null.
+	 * @param configThreshold Threshold for binary image. null for default.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
@@ -87,6 +92,10 @@ public class FactoryFiducial {
 	SquareImage_to_FiducialDetector<T> squareImage( ConfigFiducialImage configFiducial,
 													ConfigThreshold configThreshold,
 													Class<T> imageType ) {
+
+		if( configThreshold == null ) {
+			configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,10);
+		}
 
 		configFiducial.squareDetector.clockwise = false;
 

@@ -332,20 +332,20 @@ public class ThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of square region.
-	 * @param scale Scale factor used to adjust threshold
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
 	 * @param down Should it threshold up or down.
 	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
 	public static ImageUInt8 localSquare( ImageUInt8 input , ImageUInt8 output ,
-										  int radius , float scale , boolean down ,
-										  ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+											 int radius , float scale , boolean down ,
+											 ImageUInt8 storage1 , ImageUInt8 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
@@ -353,7 +353,7 @@ public class ThresholdImageOps {
 
 		ImageUInt8 mean = storage1;
 
-		BlurImageOps.mean(input, mean, radius, storage2);
+		BlurImageOps.mean(input,mean,radius,storage2);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -380,10 +380,11 @@ public class ThresholdImageOps {
 
 				int end = indexIn + input.width;
 
-				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (mean.data[indexMean]& 0xFF) * scale;
+				int x = 0;
+				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ , x++) {
+					int threshold = (mean.data[indexMean]& 0xFF);
 
-					if( (input.data[indexIn]& 0xFF) > threshold )
+					if( (input.data[indexIn]& 0xFF) * scale > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -398,20 +399,20 @@ public class ThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of square region.
-	 * @param scale Scale factor used to adjust threshold
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
 	 * @param down Should it threshold up or down.
 	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
 	public static ImageUInt8 localGaussian( ImageUInt8 input , ImageUInt8 output ,
-											int radius , float scale , boolean down ,
-											ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+											   int radius , float scale , boolean down ,
+											   ImageUInt8 storage1 , ImageUInt8 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
@@ -447,9 +448,9 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (blur.data[indexMean]& 0xFF) * scale;
+					int threshold = (blur.data[indexMean]& 0xFF);
 
-					if( (input.data[indexIn]& 0xFF) > threshold )
+					if( (input.data[indexIn]& 0xFF) * scale > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -464,20 +465,20 @@ public class ThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of square region.
-	 * @param scale Scale factor used to adjust threshold
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
 	 * @param down Should it threshold up or down.
 	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
 	public static ImageUInt8 localSquare( ImageFloat32 input , ImageUInt8 output ,
-										  int radius , float scale , boolean down ,
-										  ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+											 int radius , float scale , boolean down ,
+											 ImageFloat32 storage1 , ImageFloat32 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
@@ -513,9 +514,9 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (mean.data[indexMean]) * scale;
+					float threshold = (mean.data[indexMean]);
 
-					if( (input.data[indexIn]) > threshold )
+					if( (input.data[indexIn]) * scale > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;
@@ -530,20 +531,20 @@ public class ThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
 	 * @param radius Radius of square region.
-	 * @param scale Scale factor used to adjust threshold
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
 	 * @param down Should it threshold up or down.
 	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
 	public static ImageUInt8 localGaussian( ImageFloat32 input , ImageUInt8 output ,
-											int radius , float scale , boolean down ,
-											ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+											   int radius , float scale , boolean down ,
+											   ImageFloat32 storage1 , ImageFloat32 storage2 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
@@ -579,9 +580,9 @@ public class ThresholdImageOps {
 				int end = indexIn + input.width;
 
 				for( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {
-					float threshold = (blur.data[indexMean]) * scale;
+					float threshold = (blur.data[indexMean]);
 
-					if( (input.data[indexIn]) > threshold )
+					if( (input.data[indexIn]) * scale > threshold )
 						output.data[indexOut] = 1;
 					else
 						output.data[indexOut] = 0;

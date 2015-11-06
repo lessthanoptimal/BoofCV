@@ -38,9 +38,11 @@ public class ConfigThreshold implements Configuration {
 	public double fixedThreshold;
 
 	/**
-	 * Scale factor applied to computed threshold.  Only used with adaptive techniques.
+	 * Scale factor applied to computed threshold.  Only used with adaptive techniques.  0.95 is a good starting value
+	 * when tuning.  It will remove much of the noise in nearly uniform regions without degrading interesting features
+	 * by much.
 	 */
-	public double scale = 1.0;
+	public double scale = 0.95;
 
 	/**
 	 * If true then it thresholds down

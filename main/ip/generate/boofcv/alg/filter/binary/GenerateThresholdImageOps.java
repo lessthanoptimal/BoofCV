@@ -139,19 +139,19 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered\n" +
 				"\t * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.\n" +
 				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise\n" +
-				"\t * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1\n" +
+				"\t * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1\n" +
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
 				"\t * @param radius Radius of square region.\n" +
-				"\t * @param scale Scale factor used to adjust threshold\n" +
+				"\t * @param scale Scale factor used to adjust threshold.  Try 0.95\n" +
 				"\t * @param down Should it threshold up or down.\n" +
 				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
 				"\tpublic static ImageUInt8 localSquare( "+imageName+" input , ImageUInt8 output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t int radius , "+sumType+" scale , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t int radius , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
@@ -171,7 +171,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+") * scale;\n" +
+				"\t\t\t\t\tfloat threshold = (mean.data[indexMean]"+bitwise+") * scale;\n" +
 				"\n" +
 				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") <= threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
@@ -188,9 +188,9 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+") * scale;\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (mean.data[indexMean]"+bitwise+");\n" +
 				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") > threshold )\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") * scale > threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
 				"\t\t\t\t\telse\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
@@ -212,19 +212,19 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered\n" +
 				"\t * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.\n" +
 				"\t * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise\n" +
-				"\t * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1\n" +
+				"\t * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1\n" +
 				"\t *\n" +
 				"\t * @param input Input image.\n" +
 				"\t * @param output (optional) Output binary image.  If null it will be declared internally.\n" +
 				"\t * @param radius Radius of square region.\n" +
-				"\t * @param scale Scale factor used to adjust threshold\n" +
+				"\t * @param scale Scale factor used to adjust threshold.  Try 0.95\n" +
 				"\t * @param down Should it threshold up or down.\n" +
 				"\t * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
 				"\tpublic static ImageUInt8 localGaussian( "+imageName+" input , ImageUInt8 output ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t   int radius , "+sumType+" scale , boolean down ,\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t   int radius , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t   "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
@@ -244,7 +244,7 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+") * scale;\n" +
+				"\t\t\t\t\tfloat threshold = (blur.data[indexMean]"+bitwise+") * scale;\n" +
 				"\n" +
 				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") <= threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
@@ -261,9 +261,9 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\tint end = indexIn + input.width;\n" +
 				"\n" +
 				"\t\t\t\tfor( ; indexIn < end; indexIn++ , indexOut++, indexMean++ ) {\n" +
-				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+") * scale;\n" +
+				"\t\t\t\t\t"+sumType+" threshold = (blur.data[indexMean]"+bitwise+");\n" +
 				"\n" +
-				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") > threshold )\n" +
+				"\t\t\t\t\tif( (input.data[indexIn]"+bitwise+") * scale > threshold )\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 1;\n" +
 				"\t\t\t\t\telse\n" +
 				"\t\t\t\t\t\toutput.data[indexOut] = 0;\n" +
