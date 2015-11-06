@@ -331,7 +331,7 @@ public class VisualizeBinaryData {
 
 		try {
 			if( out.getRaster() instanceof ByteInterleavedRaster ) {
-				renderBinary(binaryImage, invert, (ByteInterleavedRaster)out.getRaster());
+				renderBinary(binaryImage, invert, (ByteInterleavedRaster) out.getRaster());
 			} else {
 				_renderBinary(binaryImage, invert,  out);
 			}
@@ -373,18 +373,43 @@ public class VisualizeBinaryData {
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
 
-		if( invert ) {
-			for (int y = 0; y < h; y++) {
-				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
-				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = (byte)((1-binaryImage.data[indexSrc++]) * 255);
+		int numBands = raster.getNumBands();
+		if( numBands == 1 ) {
+			if (invert) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						data[rasterIndex++] = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
+					}
+				}
+			} else {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						data[rasterIndex++] = (byte) (binaryImage.data[indexSrc++] * 255);
+					}
 				}
 			}
 		} else {
-			for (int y = 0; y < h; y++) {
-				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
-				for (int x = 0; x < w; x++) {
-					data[rasterIndex++] = (byte)(binaryImage.data[indexSrc++] * 255);
+			if (invert) {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						byte val = (byte) ((1 - binaryImage.data[indexSrc++]) * 255);
+						for (int i = 0; i < numBands; i++) {
+							data[rasterIndex++] = val;
+						}
+					}
+				}
+			} else {
+				for (int y = 0; y < h; y++) {
+					int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+					for (int x = 0; x < w; x++) {
+						byte val = (byte) (binaryImage.data[indexSrc++] * 255);
+						for (int i = 0; i < numBands; i++) {
+							data[rasterIndex++] = val;
+						}
+					}
 				}
 			}
 		}
