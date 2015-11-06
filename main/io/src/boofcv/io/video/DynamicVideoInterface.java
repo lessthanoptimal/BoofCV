@@ -85,7 +85,7 @@ public class DynamicVideoInterface implements VideoInterface {
 			}
 		} catch( RuntimeException ignore ){}
 
-		throw new IllegalArgumentException("Unsupported video type!");
+		return null;
 	}
 
 	/**

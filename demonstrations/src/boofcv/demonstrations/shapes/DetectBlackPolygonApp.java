@@ -21,7 +21,6 @@ package boofcv.demonstrations.shapes;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -31,10 +30,10 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.Configuration;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -56,7 +55,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonApp<T extends ImageSingleBand> extends DemonstrationBase
+public class DetectBlackPolygonApp<T extends ImageSingleBand> extends DemonstrationBase<T>
 		implements ThresholdControlPanel.Listener
 {
 
@@ -71,12 +70,12 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 
 	BufferedImage original;
 	BufferedImage work;
-	T input;
+	T inputPrev;
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
-		super(examples);
+		super(examples, ImageType.single(imageType));
 
 		this.imageType = imageType;
 
@@ -84,6 +83,8 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
+
+		inputPrev = super.imageType.createImage(1,1);
 
 		createDetector();
 	}
@@ -100,34 +101,30 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		controls.getConfigPolygon().refine = configRefine;
 
 		detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(),imageType);
-		if( input == null )
-			input = GeneralizedImageOps.createSingleBand(detector.getInputType(),1,1);
 		imageThresholdUpdated();
 	}
 
 	@Override
-	public synchronized void processImage(final BufferedImage image ) {
-		if( image != null ) {
-			original = conditionalDeclare(image,original);
-			work = conditionalDeclare(image,work);
+	public synchronized void processImage(final BufferedImage buffered, T input ) {
+		if( buffered != null ) {
+			original = conditionalDeclare(buffered,original);
+			work = conditionalDeclare(buffered,work);
 
-			this.original.createGraphics().drawImage(image,0,0,null);
+			this.original.createGraphics().drawImage(buffered,0,0,null);
 
-			input.reshape(work.getWidth(), work.getHeight());
 			binary.reshape(work.getWidth(), work.getHeight());
-
-			ConvertBufferedImage.convertFrom(original, input, true);
+			inputPrev.setTo(input);
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					Dimension d = guiImage.getPreferredSize();
-					if( d.getWidth() < image.getWidth() || d.getHeight() < image.getHeight() ) {
-						guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+						guiImage.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
 					}
 				}});
-		} else if( input.width == 1 ) {
-			return;
+		} else {
+			input = inputPrev;
 		}
 
 		inputToBinary.process(input, binary);
@@ -176,7 +173,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		ConfigThreshold config = controls.getThreshold().config;
 
 		inputToBinary = FactoryThresholdBinary.threshold(config,imageType);
-		processImageThread(null);
+		processImageThread(null,null);
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
@@ -234,6 +231,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add("shapes/concave01.jpg");
 		examples.add("fiducial/binary/image0000.jpg");
 		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
+		examples.add("fiducial/square_grid/movie.mp4");
 
 		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 

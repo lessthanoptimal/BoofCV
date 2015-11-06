@@ -18,10 +18,14 @@
 
 package boofcv.gui;
 
+import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.io.webcamcapture.UtilWebcamCapture;
-import com.github.sarxos.webcam.Webcam;
+import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,14 +41,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DemonstrationBase extends JPanel {
+public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuFile, menuWebcam, menuQuit;
 	final JFileChooser fc = new JFileChooser();
 
 	protected InputMethod inputMethod = InputMethod.NONE;
 
-	WebcamThread webcamThread;
+	ImageSequenceThread sequenceThread;
 
 	volatile boolean waitingToOpenImage = false;
 	final Object waitingLock = new Object();
@@ -56,10 +60,16 @@ public abstract class DemonstrationBase extends JPanel {
 	BufferedImage imageCopy0;
 	BufferedImage imageCopy1;
 
-	public DemonstrationBase(List<String> exampleInputs) {
-		setLayout(new BorderLayout());
+	protected ImageType<T> imageType;
+	T input;
+	MediaManager media = new DefaultMediaManager();
 
+	public DemonstrationBase(List<String> exampleInputs, ImageType<T> imageType) {
+		super(new BorderLayout());
 		createMenuBar(exampleInputs);
+
+		this.input = imageType.createImage(1,1);
+		this.imageType = imageType;
 	}
 
 	private void createMenuBar(List<String> exampleInputs) {
@@ -109,12 +119,12 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Process the image.  Will be called in its own thread, but doesn't need to be re-entrant.  If image
 	 * is null then reprocess the previous image.
 	 */
-	public abstract void processImage( BufferedImage image );
+	public abstract void processImage(final BufferedImage buffered , final T input  );
 
-	protected void processImageThread( final BufferedImage image ) {
+	protected void processImageThread( final BufferedImage buffered , final T input ) {
 		synchronized (processLock) {
-			if( image != null )
-				imageCopy1 = checkCopyBuffered(image, imageCopy1);
+			if( buffered != null )
+				imageCopy1 = checkCopyBuffered(buffered, imageCopy1);
 
 			if( processRunning ) {
 				processRequested = true;
@@ -131,16 +141,16 @@ public abstract class DemonstrationBase extends JPanel {
 									break;
 								}
 								processRequested = false;
-								if( image != null )
+								if( buffered != null )
 									imageCopy0 = checkCopyBuffered(imageCopy1, imageCopy0);
 							}
 							synchronized (waitingLock) {
 								waitingToOpenImage = false;
 							}
-							if( image != null )
-								processImage(imageCopy0);
+							if( buffered != null )
+								processImage(imageCopy0,input);
 							else
-								processImage(null);
+								processImage(null,null);
 						}
 
 						synchronized (processLock) {
@@ -182,34 +192,62 @@ public abstract class DemonstrationBase extends JPanel {
 
 	private void stopPreviousInput() {
 		switch ( inputMethod ) {
-			case WEBCAM:
-				System.out.println("Stopping webcam!");
-				webcamThread.requestStop = true;
-				WaitingThread waiting = new WaitingThread("Shuttind down webcam");
-				waiting.start();
-				while( webcamThread.running ) {
-					Thread.yield();
-				}
-				waiting.closeRequested = true;
-				break;
+			case WEBCAM: stopSequenceRunning("Shutting down webcam");break;
+			case VIDEO: stopSequenceRunning("Shutting down video");break;
 		}
 	}
 
+	private void stopSequenceRunning( String message ) {
+		sequenceThread.requestStop = true;
+		WaitingThread waiting = new WaitingThread(message);
+		waiting.start();
+		while( sequenceThread.running ) {
+			Thread.yield();
+		}
+		waiting.closeRequested = true;
+	}
+
+	/**
+	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
+	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
+	 * be stopped.
+	 */
 	public void openFile(File file) {
 		synchronized (waitingLock) {
-			if (waitingToOpenImage)
+			if (waitingToOpenImage) {
+				System.out.println("Waiting to open an image");
 				return;
+			}
 			waitingToOpenImage = true;
 		}
 
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(file.getPath()));
+		stopPreviousInput();
+
+		String filePath = UtilIO.pathExample(file.getPath());
+		// mjpegs can be opened up as images.  so override the default behavior
+		BufferedImage buffered = filePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(filePath);
 		if( buffered == null ) {
-			// TODO see if it's a video instead
-			System.err.println("Couldn't read "+file.getPath());
+			SimpleImageSequence<T> sequence = media.openVideo(filePath, imageType);
+			if( sequence != null ) {
+				inputMethod = InputMethod.VIDEO;
+				sequenceThread = new ImageSequenceThread(sequence,30);
+				sequenceThread.start();
+			} else {
+				inputMethod = InputMethod.NONE;
+				waitingToOpenImage = false;
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						JOptionPane.showMessageDialog(DemonstrationBase.this, "Can't open file");
+					}
+				});
+			}
 		} else {
-			stopPreviousInput();
+
 			inputMethod = InputMethod.IMAGE;
-			processImageThread(buffered);
+			input.reshape(buffered.getWidth(),buffered.getHeight());
+			ConvertBufferedImage.convertFrom(buffered,input,true);
+			processImageThread(buffered, input);
 		}
 	}
 
@@ -234,11 +272,10 @@ public abstract class DemonstrationBase extends JPanel {
 		new WaitingThread("Opening Webcam").start();
 		new Thread() {
 			public void run() {
-
-				Webcam webcam = UtilWebcamCapture.openDefault(640, 480);
-				if(webcam.open()) {
-					webcamThread = new WebcamThread(webcam);
-					webcamThread.start();
+				SimpleImageSequence<T> sequence = media.openCamera(null,640,480,imageType);
+				if(sequence != null) {
+					sequenceThread = new ImageSequenceThread(sequence,0);
+					sequenceThread.start();
 				} else {
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
@@ -291,29 +328,43 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
-	class WebcamThread extends Thread {
+	class ImageSequenceThread extends Thread {
 
 		boolean requestStop = false;
 		boolean running = true;
 
-		Webcam webcam;
+		SimpleImageSequence<T> sequence;
+		long pause;
 
-		public WebcamThread(Webcam webcam) {
-			this.webcam = webcam;
+		public ImageSequenceThread(SimpleImageSequence<T> sequence, long pause ) {
+			this.sequence = sequence;
+			this.pause = pause;
 		}
 
 		@Override
 		public void run() {
-			while( !requestStop ) {
-				BufferedImage image = webcam.getImage();
-				if( image == null ) {
+			long before = System.currentTimeMillis();
+			while( !requestStop && sequence.hasNext() ) {
+				T input = sequence.next();
+
+				if( input == null ) {
 					break;
 				} else {
-					processImageThread(image);
+					BufferedImage buffered = sequence.getGuiImage();
+					processImageThread(buffered,input);
+					if( pause > 0 ) {
+						long time = Math.max(0,pause-(System.currentTimeMillis()-before));
+						if( time > 0 ) {
+							try {Thread.sleep(time);} catch (InterruptedException ignore) {}
+						} else {
+							Thread.yield();
+						}
+					}
 					Thread.yield();
+					before = System.currentTimeMillis();
 				}
 			}
-			webcam.close();
+			sequence.close();
 			running = false;
 		}
 	}

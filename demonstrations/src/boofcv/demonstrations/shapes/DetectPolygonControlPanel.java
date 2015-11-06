@@ -178,7 +178,7 @@ public class DetectPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerMaxSides, "Maximum Sides: ", this);
 		addLabeled(spinnerMinEdge, "Edge Intensity: ", this);
 		addAlignLeft(setConvex, this);
-		addAlignLeft(setBorder, this);
+//		addAlignLeft(setBorder, this);
 		addCenterLabel("Contour", this);
 		addLabeled(spinnerContourSplit, "Split Fraction: ", this);
 		addLabeled(spinnerContourMinSplit, "Min Split: ", this);

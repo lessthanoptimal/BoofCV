@@ -166,6 +166,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		pruner = new MinimizeEnergyPrune(splitPenalty);
 
 		workPoly = new Polygon2D_F64(1);
+
+		if( canTouchBorder )
+			throw new RuntimeException("CanTouchBorder not supported yet");
 	}
 
 	/**

@@ -27,9 +27,9 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -53,11 +53,9 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends DemonstrationBase
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase<ImageFloat32>
 		implements ChessboardPanel.Listener
 {
-	ImageFloat32 gray = new ImageFloat32(1,1);
-
 	boolean success;
 
 	ChessboardPanel controlPanel = new ChessboardPanel(true);
@@ -65,9 +63,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	VisualizePanel imagePanel = new VisualizePanel();
 	BufferedImage input;
 	BufferedImage binary;
+	ImageFloat32 grayPrev = new ImageFloat32(1,1);
 
 	public CommonDetectCalibrationApp(List<String> exampleInputs ) {
-		super(exampleInputs);
+		super(exampleInputs, ImageType.single(ImageFloat32.class));
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
@@ -99,14 +98,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	protected abstract java.util.List<SquareGrid> getGrids();
 
 	@Override
-	public void processImage( final BufferedImage input ) {
-		this.input = input;
+	public void processImage( final BufferedImage buffered , ImageFloat32 gray ) {
+		this.input = buffered;
 
 		synchronized ( this ) {
-			gray.reshape(input.getWidth(), input.getHeight());
-			ConvertBufferedImage.convertFrom(input, gray, true);
-
-			binary = conditionalDeclare(input, binary, BufferedImage.TYPE_INT_RGB);
+			binary = conditionalDeclare(buffered, binary, BufferedImage.TYPE_INT_RGB);
+			grayPrev.setTo(gray);
 		}
 
 		calibEventProcess();
@@ -161,7 +158,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	@Override
 	public void calibEventProcess() {
 		synchronized ( this ) {
-			success = process(gray);
+			success = process(grayPrev);
 			VisualizeBinaryData.renderBinary(getBinaryImage(), false, binary);
 		}
 
