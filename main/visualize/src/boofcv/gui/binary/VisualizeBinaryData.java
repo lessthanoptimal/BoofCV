@@ -422,8 +422,6 @@ public class VisualizeBinaryData {
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
 
-		System.out.println("Integer raster");
-
 		if (invert) {
 			for (int y = 0; y < h; y++) {
 				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
