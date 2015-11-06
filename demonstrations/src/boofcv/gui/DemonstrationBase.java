@@ -46,6 +46,9 @@ public abstract class DemonstrationBase extends JPanel {
 
 	WebcamThread webcamThread;
 
+	volatile boolean waitingToOpenImage = false;
+	final Object waitingLock = new Object();
+
 	volatile boolean processRunning = false;
 	volatile boolean processRequested = false;
 
@@ -70,7 +73,7 @@ public abstract class DemonstrationBase extends JPanel {
 		menuFile = new JMenuItem("Open File", KeyEvent.VK_O);
 		menuFile.addActionListener(listener);
 		menuFile.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+				KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		menuWebcam = new JMenuItem("Open Webcam", KeyEvent.VK_W);
 		menuWebcam.addActionListener(listener);
 		menuWebcam.setAccelerator(KeyStroke.getKeyStroke(
@@ -131,6 +134,9 @@ public abstract class DemonstrationBase extends JPanel {
 								if( image != null )
 									imageCopy0 = checkCopyBuffered(imageCopy1, imageCopy0);
 							}
+							synchronized (waitingLock) {
+								waitingToOpenImage = false;
+							}
 							if( image != null )
 								processImage(imageCopy0);
 							else
@@ -175,16 +181,26 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	private void stopPreviousInput() {
-		// TODO Open dialog saying "Shutting Down Webcam" and wait for it to close
 		switch ( inputMethod ) {
 			case WEBCAM:
 				System.out.println("Stopping webcam!");
 				webcamThread.requestStop = true;
+				WaitingThread waiting = new WaitingThread("Shuttind down webcam");
+				waiting.start();
+				while( webcamThread.running ) {
+					Thread.yield();
+				}
+				waiting.closeRequested = true;
+				break;
 		}
 	}
 
 	public void openFile(File file) {
-		System.out.println("Opening file!!  "+file.getPath());
+		synchronized (waitingLock) {
+			if (waitingToOpenImage)
+				return;
+			waitingToOpenImage = true;
+		}
 
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(file.getPath()));
 		if( buffered == null ) {
@@ -197,16 +213,42 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
+	/**
+	 * waits until the processing thread is done.
+	 */
+	public void waitUntilDoneProcessing() {
+		while( processRunning ) {
+			Thread.yield();
+		}
+	}
+
 	public void openWebcam() {
+		if(waitingToOpenImage)
+			return;
+
 		stopPreviousInput();
 
-		// TODO open dialog saying "Opening WEbcam"
+		waitingToOpenImage = true;
 		inputMethod = InputMethod.WEBCAM;
-		Webcam webcam = UtilWebcamCapture.openDefault(640,480);
-		if( webcam.open() ) {
-			webcamThread = new WebcamThread(webcam);
-			webcamThread.start();
-		}
+
+		new WaitingThread("Opening Webcam").start();
+		new Thread() {
+			public void run() {
+
+				Webcam webcam = UtilWebcamCapture.openDefault(640, 480);
+				if(webcam.open()) {
+					webcamThread = new WebcamThread(webcam);
+					webcamThread.start();
+				} else {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							JOptionPane.showMessageDialog(DemonstrationBase.this, "Failed to open webcam");
+						}
+					});
+				}
+			}
+		}.start();
 	}
 
 	private ActionListener createActionListener() {
@@ -228,6 +270,25 @@ public abstract class DemonstrationBase extends JPanel {
 				}
 			}
 		};
+	}
+
+	class WaitingThread extends Thread {
+		ProgressMonitor progress;
+		public volatile boolean closeRequested = false;
+		public WaitingThread( String message ) {
+			progress = new ProgressMonitor(DemonstrationBase.this,message,"", 0, 100);
+		}
+
+		@Override
+		public void run() {
+			while( waitingToOpenImage && !closeRequested ) {
+				SwingUtilities.invokeLater(new Runnable() { @Override public void run() { progress.setProgress(0); } });
+				try {Thread.sleep(250);} catch (InterruptedException ignore) {}
+			}
+			SwingUtilities.invokeLater(
+					new Runnable() { @Override public void run() { progress.close(); } }
+			);
+		}
 	}
 
 	class WebcamThread extends Thread {
@@ -252,7 +313,6 @@ public abstract class DemonstrationBase extends JPanel {
 					Thread.yield();
 				}
 			}
-			System.out.println("Exit webcam thread");
 			webcam.close();
 			running = false;
 		}

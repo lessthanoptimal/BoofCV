@@ -188,8 +188,6 @@ public class VisualizeBinaryData {
 
 		Line2D.Double l = new Line2D.Double();
 
-
-
 		g2.setStroke(new BasicStroke(Math.max(1, (float) scale)));
 		for( Contour c : contours ) {
 			List<Point2D_I32> list = c.external;
@@ -332,6 +330,8 @@ public class VisualizeBinaryData {
 		try {
 			if( out.getRaster() instanceof ByteInterleavedRaster ) {
 				renderBinary(binaryImage, invert, (ByteInterleavedRaster) out.getRaster());
+			} else if( out.getRaster() instanceof  IntegerInterleavedRaster ) {
+				renderBinary(binaryImage, invert, (IntegerInterleavedRaster) out.getRaster());
 			} else {
 				_renderBinary(binaryImage, invert,  out);
 			}
@@ -413,5 +413,32 @@ public class VisualizeBinaryData {
 				}
 			}
 		}
+	}
+
+	private static void renderBinary(ImageUInt8 binaryImage, boolean invert, IntegerInterleavedRaster raster) {
+		int rasterIndex = 0;
+		int data[] = raster.getDataStorage();
+
+		int w = binaryImage.getWidth();
+		int h = binaryImage.getHeight();
+
+		System.out.println("Integer raster");
+
+		if (invert) {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? 0 : 0xFFFFFFFF;
+				}
+			}
+		} else {
+			for (int y = 0; y < h; y++) {
+				int indexSrc = binaryImage.startIndex + y * binaryImage.stride;
+				for (int x = 0; x < w; x++) {
+					data[rasterIndex++] = binaryImage.data[indexSrc++] > 0 ? 0xFFFFFFFF : 0;
+				}
+			}
+		}
+
 	}
 }

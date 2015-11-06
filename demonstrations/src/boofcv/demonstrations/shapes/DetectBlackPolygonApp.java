@@ -118,15 +118,16 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 
 			ConvertBufferedImage.convertFrom(original, input, true);
 
-			Dimension d = guiImage.getPreferredSize();
-			if( d.getWidth() != image.getWidth() || d.getHeight() != image.getHeight() ) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Dimension d = guiImage.getPreferredSize();
+					if( d.getWidth() < image.getWidth() || d.getHeight() < image.getHeight() ) {
 						guiImage.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 					}
-				});
-			}
+				}});
+		} else if( input.width == 1 ) {
+			return;
 		}
 
 		inputToBinary.process(input, binary);
@@ -237,6 +238,8 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
 
 		app.openFile(new File(examples.get(0)));
+
+		app.waitUntilDoneProcessing();
 
 		ShowImages.showWindow(app,"Detect Black Polygons",true);
 	}

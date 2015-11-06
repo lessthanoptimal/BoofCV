@@ -112,6 +112,7 @@ public class DetectCalibrationChessApp
 		app.configure(5,7,false);
 
 		app.openFile(new File(examples.get(0)));
+		app.waitUntilDoneProcessing();
 
 		ShowImages.showWindow(app, "Calibration Target Detection",true);
 	}

@@ -102,19 +102,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	public void processImage( final BufferedImage input ) {
 		this.input = input;
 
-		imagePanel.setBufferedImage(this.input);
-		gray.reshape(input.getWidth(), input.getHeight());
-		ConvertBufferedImage.convertFrom(input, gray, true);
+		synchronized ( this ) {
+			gray.reshape(input.getWidth(), input.getHeight());
+			ConvertBufferedImage.convertFrom(input, gray, true);
 
-		binary = conditionalDeclare(input,binary,BufferedImage.TYPE_INT_RGB);
+			binary = conditionalDeclare(input, binary, BufferedImage.TYPE_INT_RGB);
+		}
 
-		new Thread() {
-			@Override
-			public void run() {
-				calibEventProcess();
-			}
-		}.start();
-
+		calibEventProcess();
 	}
 
 	private void renderGraph( Graphics2D g2 , double scale ) {
@@ -177,9 +172,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 				else
 					controlPanel.setSuccessMessage("FAILED", false);
 				imagePanel.setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
+				calibEventGUI();
+				imagePanel.repaint();
 			}
 		});
-		imagePanel.repaint();
 	}
 
 	class VisualizePanel extends ImageZoomPanel {
