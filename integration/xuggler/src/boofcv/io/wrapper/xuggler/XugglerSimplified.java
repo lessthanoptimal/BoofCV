@@ -67,6 +67,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 	int frameID=-1;
 
 	String fileName;
+	boolean loop = false;
 
 	public XugglerSimplified(String filename, ImageType<T> typeOutput) {
 		image = typeOutput.createImage(1,1);
@@ -169,6 +170,9 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 		if( hasNextBeenCalled ) {
 			hasNext = readNextFrame();
 			hasNextBeenCalled = false;
+			if( !hasNext && loop ) {
+				open(fileName,typeOutput);
+			}
 		}
 		return hasNext;
 	}
@@ -234,8 +238,6 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 			} else {
 				// This packet isn't part of our video stream, so we just
 				// silently drop it.
-				do {
-				} while (false);
 			}
 		}
 
@@ -266,6 +268,7 @@ public class XugglerSimplified<T extends ImageBase> implements SimpleImageSequen
 
 	@Override
 	public void setLoop(boolean loop) {
+		this.loop = loop;
 	}
 
 	@Override
