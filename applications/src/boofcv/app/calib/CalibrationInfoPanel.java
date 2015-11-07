@@ -26,12 +26,16 @@ import boofcv.struct.image.ImageFloat32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 /**
  * @author Peter Abeles
  */
-public class CalibrationInfoPanel extends StandardAlgConfigPanel {
+public class CalibrationInfoPanel extends StandardAlgConfigPanel
+	implements ActionListener
+{
 	JProgressBar geometryProgress;
 	JProgressBar fillProgress;
 	JProgressBar focusMeter;
@@ -41,7 +45,14 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel {
 	BufferedImage imageView;
 	BufferedImage imageTemplate;
 
+	JButton forceSaveButton = new JButton("Force Save");
+	JButton finishedButton = new JButton("Finished");
+
 	double focusMax = 1.0;
+
+	// when true that means the user has requested to save the results and compute intrinsic parameters
+	boolean saveRequested = false;
+	boolean forceSaveImage = false;
 
 	public CalibrationInfoPanel() {
 		geometryProgress = new JProgressBar(0, 100);
@@ -66,6 +77,11 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel {
 		imageRow.add(undistortedView);
 		imageRow.setMaximumSize(imageRow.getPreferredSize());
 
+		finishedButton.addActionListener(this);
+		finishedButton.setEnabled(false);
+
+		forceSaveButton.addActionListener(this);
+
 		addCenterLabel("Geometry", this);
 		addAlignCenter(geometryProgress, this);
 		addCenterLabel("Edge Fill",this);
@@ -73,8 +89,10 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel {
 		add(Box.createRigidArea(new Dimension(5, 5)));
 		add(imageRow);
 		addAlignCenter(focusMeter, this);
-		add(Box.createRigidArea(new Dimension(5, 5)));
+		add(Box.createRigidArea(new Dimension(5, 50)));
+		add(finishedButton);
 		add(Box.createVerticalGlue());
+		add(forceSaveButton);
 	}
 
 	public void updateTemplate( ImageFloat32 image ) {
@@ -122,5 +140,31 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel {
 				focusMeter.setValue((int)(100*value));
 			}
 		});
+	}
+
+	public boolean isFinished() {
+		return saveRequested;
+	}
+
+	public void enabledFinishedButton() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				finishedButton.setEnabled(true);
+			}
+		});
+	}
+
+	public void resetForceSave() {
+		forceSaveImage = false;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == finishedButton) {
+			saveRequested = true;
+		} else if( e.getSource() == forceSaveButton ) {
+			forceSaveImage = true;
+		}
 	}
 }

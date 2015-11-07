@@ -215,7 +215,7 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		if( showAll ) {
 			for( CalibrationObservation l : features ) {
-				for( CalibrationObservation.Point p : set.points ) {
+				for( CalibrationObservation.Point p : l.points ) {
 					if( showUndistorted ) {
 						remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
 					} else {

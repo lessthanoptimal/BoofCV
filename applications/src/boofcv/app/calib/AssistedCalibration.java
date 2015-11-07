@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -48,6 +49,9 @@ import java.util.List;
 
 // TODO compute calibration parameters live?
 public class AssistedCalibration {
+
+	public static final String OUTPUT_DIRECTORY = "calibration_data";
+	public static final String IMAGE_DIRECTORY = OUTPUT_DIRECTORY+"/images";
 
 	double CENTER_SKEW = 0.93;
 	double STILL_THRESHOLD = 2.0;
@@ -84,7 +88,7 @@ public class AssistedCalibration {
 	List<Magnet> magnets = new ArrayList<Magnet>();
 	int totalMagnets;
 
-	ImageSectorSaver saver = new ImageSectorSaver();
+	ImageSectorSaver saver = new ImageSectorSaver(IMAGE_DIRECTORY);
 
 	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
 		this.detector = detector;
@@ -122,6 +126,12 @@ public class AssistedCalibration {
 		boolean success = detector.process(gray);
 
 		actions.update(success,detector.getDetectedPoints());
+
+		if( gui.getInfoPanel().forceSaveImage ) {
+			System.out.println("Saved image forced");
+			UtilImageIO.saveImage(image,"force_save.png");
+			gui.getInfoPanel().resetForceSave();
+		}
 
 		switch( state ) {
 			case DETERMINE_SIZE:
@@ -172,7 +182,7 @@ public class AssistedCalibration {
 					actions.resetStationary();
 					state = State.REMOVE_DOTS;
 					canonicalWidth = Math.max(top,bottom);
-					padding = view.getBufferWidth(canonicalWidth);
+					padding = (int)(view.getBufferWidth(canonicalWidth)*1.1);
 					selectMagnetLocations();
 				}
 				if (stationaryTime > DISPLAY_TIME) {
@@ -232,7 +242,7 @@ public class AssistedCalibration {
 		drawPadding();
 
 		if( detected ) {
-			saver.process(inputBuffered, input, sides);
+
 			gui.getInfoPanel().updateView(saver.getCurrentView());
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
@@ -245,6 +255,7 @@ public class AssistedCalibration {
 				closeToMagnet |= magnets.get(i).handleDetection();
 			}
 
+			boolean resetImageSelector = true;
 			if( pictureTaken ) {
 				if( stationaryTime >= STILL_THRESHOLD ) {
 					message = "Move somewhere else";
@@ -267,14 +278,23 @@ public class AssistedCalibration {
 			} else if( stationaryTime > DISPLAY_TIME ) {
 				if( closeToMagnet ) {
 					message = String.format("Hold still:  %6.1f", stationaryTime);
+					resetImageSelector = false;
 				} else {
 					message = "Move closer to a dot";
 				}
 			}
 
+			// save the images if the fiducial is being held still prior to capture
+			if( resetImageSelector ) {
+				saver.clearHistory();
+			} else {
+				saver.process(inputBuffered, input, sides);
+			}
+
 			renderMagnets();
 			renderCalibrationPoints(stationaryTime, points.points);
 		} else {
+			saver.clearHistory();
 			for (int i = 0; i < magnets.size(); i++) {
 				magnets.get(i).handleNoDetection();
 			}
@@ -299,6 +319,7 @@ public class AssistedCalibration {
 			CalibrationObservation points = detector.getDetectedPoints();
 			view.getSides(points, sides);
 
+			boolean resetImageSelector = true;
 			if( pictureTaken ) {
 				if( stationaryTime >= STILL_THRESHOLD ) {
 					message = "Move somewhere else";
@@ -311,7 +332,15 @@ public class AssistedCalibration {
 				message = "Move somewhere else";
 				captureFiducialPoints();
 			} else if( stationaryTime > DISPLAY_TIME ) {
+				resetImageSelector = false;
 				message = String.format("Hold still:  %6.1f", stationaryTime);
+			}
+
+			// save the images if the fiducial is being held still prior to capture
+			if( resetImageSelector ) {
+				saver.clearHistory();
+			} else {
+				saver.process(inputBuffered, input, sides);
 			}
 
 			renderCalibrationPoints(stationaryTime, points.points);
@@ -360,6 +389,10 @@ public class AssistedCalibration {
 		}
 	}
 
+	/**
+	 * Record the area covered in the image by the fiducial, update the quality calculation, and see if it should
+	 * enable the save button.
+	 */
 	private void captureFiducialPoints() {
 		Polygon2D_F64 p = regions.grow();
 		for (int i = 0; i < 4; i++) {
@@ -367,8 +400,16 @@ public class AssistedCalibration {
 		}
 		quality.addObservations(detector.getDetectedPoints());
 		gui.getInfoPanel().updateGeometry(quality.getScore());
+
+		// once the user has sufficient geometric variation enable save
+		if( quality.getScore() >= 1.0 && magnets.isEmpty() ) {
+			gui.getInfoPanel().enabledFinishedButton();
+		}
 	}
 
+	/**
+	 * Checks to see if its near one of the magnets in the image broder
+	 */
 	private boolean checkMagnetCapturePicture() {
 		boolean captured = false;
 		Iterator<Magnet> iter = magnets.iterator();
@@ -530,10 +571,8 @@ public class AssistedCalibration {
 		}
 	}
 
-
-
-	enum Side {
-		LEFT,RIGHT,TOP,BOTTOM
+	public boolean isFinished() {
+		return gui.getInfoPanel().isFinished();
 	}
 
 	enum State {

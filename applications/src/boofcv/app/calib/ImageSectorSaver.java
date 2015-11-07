@@ -26,11 +26,13 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderType;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -57,7 +59,18 @@ public class ImageSectorSaver {
 
 	double currentScore;
 
-	public ImageSectorSaver() {
+	File outputDirectory;
+	int imageNumber = 0;
+
+	public ImageSectorSaver( String outputDirectory ) {
+		this.outputDirectory = new File(outputDirectory);
+
+		if( !this.outputDirectory.exists() ) {
+			if( !this.outputDirectory.mkdirs() ) {
+				throw new RuntimeException("Can't create output directory. "+this.outputDirectory.getPath());
+			}
+		}
+		// TODO see if there are images in the output directory.  Ask if it should delete it
 	}
 
 	public void setTemplate( ImageFloat32 image, List<Point2D_F64> sides) {
@@ -110,19 +123,29 @@ public class ImageSectorSaver {
 		PixelMath.multiply(difference,weights,difference);
 
 		// compute score as a weighted average of the difference
-		currentScore  = ImageStatistics.sum(difference)/totalWeight;
+		currentScore = ImageStatistics.sum(difference)/totalWeight;
 
 		if( currentScore < bestScore ) {
 			bestScore = currentScore;
-			if( bestImage == null )
-				bestImage = new BufferedImage(original.getWidth(),original.getHeight(),original.getType());
+			if( bestImage == null ) {
+				int imageType = original.getType();
+				if( imageType == 0 ) {
+					imageType = BufferedImage.TYPE_INT_RGB;
+				}
+				bestImage = new BufferedImage(original.getWidth(), original.getHeight(),imageType);
+			}
 			bestImage.createGraphics().drawImage(original,0,0,null);
 		}
 	}
 
+	/**
+	 * Saves the image to a file
+	 */
 	public synchronized void save() {
 		if( bestImage != null ) {
-
+			File path = new File(outputDirectory, String.format("image%04d.png",imageNumber));
+			UtilImageIO.saveImage(bestImage,path.getAbsolutePath());
+			imageNumber++;
 		}
 	}
 

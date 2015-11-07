@@ -314,7 +314,7 @@ public class CameraCalibration extends BaseWebcamApp {
 
 		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew,detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
-		ShowImages.showWindow(gui, "Webcam Calibration", true);
+		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
 		ImageFloat32 gray = new ImageFloat32(webcam.getViewSize().width,webcam.getViewSize().height);
 
@@ -322,7 +322,7 @@ public class CameraCalibration extends BaseWebcamApp {
 		assisted.init(gray.width,gray.height);
 
 		BufferedImage image;
-		while( (image = webcam.getImage()) != null ) {
+		while( (image = webcam.getImage()) != null && !assisted.isFinished()) {
 			ConvertBufferedImage.convertFrom(image, gray);
 
 			try {
@@ -333,6 +333,13 @@ public class CameraCalibration extends BaseWebcamApp {
 				throw e;
 			}
 		}
+		webcam.close();
+		frame.setVisible(false);
+
+		inputDirectory = AssistedCalibration.IMAGE_DIRECTORY;
+		outputFileName = new File(inputDirectory,"intrinsic.xml").getPath();
+
+		handleDirectory();
 	}
 
 	public static void main(String[] args) {

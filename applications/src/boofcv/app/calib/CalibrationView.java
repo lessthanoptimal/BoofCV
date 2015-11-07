@@ -66,7 +66,7 @@ public interface CalibrationView {
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
-			return (int)(gridPixelsWide/pointCols+0.5);
+			return (int)(gridPixelsWide/(pointCols-1)+0.5);
 		}
 	}
 
