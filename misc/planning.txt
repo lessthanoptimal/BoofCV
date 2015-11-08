@@ -1,31 +1,33 @@
-Alpha 0.20
-
-- all-integration module
+Alpha 0.21
 
 - BinaryPolygonConvexDetector
+  * Reject a shape if after optimization contour points are really far away from it on average
   * Flag to return shapes which touch the image border
     - Only optimize sides/corners which don't touch the border
-  * Improve concave shape pixel level polygon
-  * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of thw two
-    - Should supress noisy regions
+  * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of the two
+    - Should supress noisy regions?
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
+
+- Chessboard
+  * Add support for squares which go outside the image
+
+- Improve pose estimate for calibration fiducials
+
+- Assisted Calibration
+  * binary pattern grid
+  * Ability to change calibration model and recompute
+  * Ability to remove images and recompute
+
+Future
+
+- Fiducial Square
   * Regression tests that can determine if orientation is consistent
     - If multiple squares on same surface see if their orientation is the same
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
-  * A large performance gain is likely if a way can be found to suppress highly textured backgrounds when using
-    an adaptive threshold
-      - local with variance calculation?  How to make pixel intensity invariant?
-
-- Chessboard
-  * Add support for squares which go outside the image
-
-- QuadPoseEstimator
-  * For special case, optimize only translation and assume known rotation
-  * Or some how estimate both at same time.  using center seems to introduce translation error
 
 - Multi camera calibration using square binary patterns.
 

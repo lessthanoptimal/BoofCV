@@ -19,9 +19,11 @@
 package boofcv.alg.fiducial.calib.squares;
 
 import boofcv.misc.CircularIndex;
+import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Distance2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector2D_F64;
@@ -62,7 +64,8 @@ public class SquaresIntoClusters {
 	// Storage for line segments used to calculate center
 	private LineSegment2D_F64 lineA = new LineSegment2D_F64();
 	private LineSegment2D_F64 lineB = new LineSegment2D_F64();
-//	private LineGeneral2D_F64 line = new LineGeneral2D_F64();
+	private LineGeneral2D_F64 line = new LineGeneral2D_F64();
+
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	// used to search for neighbors that which are candidates for connecting
@@ -267,28 +270,6 @@ public class SquaresIntoClusters {
 		}
 		checkConnect(node0,intersection0,node1,intersection1,distanceApart);
 
-		// The next 4 tests use point corners on one square to create a line and see if the far corner on the
-		// other square is close.  Since all these corners are on a line it should be close.
-		// NOTE: the largest side is used to judge distance.  a better way is to use the side the corner is on
-//		if( !closeToSide(node1.corners.get(add(intersection1, 1)), node1.corners.get(add(intersection1, 2)),
-//				node0.corners.get(add(intersection0, -1)),node0.largestSide) ) {
-//			return;
-//		}
-//
-//		if( !closeToSide(node1.corners.get(intersection1),node1.corners.get(add(intersection1,-1)),
-//				node0.corners.get(add(intersection0,2)),node0.largestSide) ) {
-//			return;
-//		}
-//
-//		if( !closeToSide(node0.corners.get(add(intersection0, -1)),node0.corners.get(intersection0),
-//				node1.corners.get(add(intersection1, 2)),node1.largestSide) ) {
-//			return;
-//		}
-//
-//		if( closeToSide(node0.corners.get(add(intersection0, 2)),node0.corners.get(add(intersection0,1)),
-//				node1.corners.get(add(intersection1,-1)),node1.largestSide) ) {
-//			checkConnect(node0,intersection0,node1,intersection1,distanceApart);
-//		}
 	}
 
 	/**
@@ -401,32 +382,33 @@ public class SquaresIntoClusters {
 	 * Returns true if point p1 and p2 are close to the line defined by points p0 and p3.
 	 */
 	boolean areMiddlePointsClose( Point2D_F64 p0 , Point2D_F64 p1 , Point2D_F64 p2 , Point2D_F64 p3 ) {
-		lineB.a = p0;
-		lineB.b = p3;
+		UtilLine2D_F64.convert(p0,p3,line);
 
 		// (computed expected length of a square) * (fractional tolerance)
 		double tol1 = p0.distance(p1)*distanceTol;
 
 		// see if inner points are close to the line
-		if(Distance2D_F64.distance(lineB, p1) > tol1 )
+		if(Distance2D_F64.distance(line, p1) > tol1 )
 			return false;
 
 		double tol2 = p2.distance(p3)*distanceTol;
 
-		return Distance2D_F64.distance(lineB, p2) <= tol2;
+		if( Distance2D_F64.distance(lineB, p2) > tol2 )
+			return false;
+
+		//------------ Now see if the line defined by one side of a square is close to the closest point on the same
+		//             side on the other square
+		UtilLine2D_F64.convert(p0,p1,line);
+		if(Distance2D_F64.distance(line, p2) > tol2 )
+			return false;
+
+		UtilLine2D_F64.convert(p3,p2,line);
+		if(Distance2D_F64.distance(line, p1) > tol1 )
+			return false;
+
+		return true;
 	}
 
-//	/**
-//	 * Give a two squares, define a line using either the top or bottom two points on one and see if the
-//	 * farther point on the other square is close to the line
-//	 */
-//	boolean closeToSide( Point2D_F64 p0 , Point2D_F64 p1 , Point2D_F64 test , double largest ) {
-//		UtilLine2D_F64.convert(p0,p1,line);
-//
-//		double d = Distance2D_F64.distance(line,test);
-//
-//		return d < largest*distanceTol;
-//	}
 
 	/**
 	 * Checks to see if the two nodes can be connected.  If one of the nodes is already connected to

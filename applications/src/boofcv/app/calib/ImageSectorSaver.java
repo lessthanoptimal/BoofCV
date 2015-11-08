@@ -113,17 +113,7 @@ public class ImageSectorSaver {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
 
-		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
-
-		ImageFloat32 current = removePerspective.getOutput();
-		float mean = (float)ImageStatistics.mean(current);
-		PixelMath.divide(current,mean,tempImage);
-
-		PixelMath.diffAbs(tempImage,template,difference);
-		PixelMath.multiply(difference,weights,difference);
-
-		// compute score as a weighted average of the difference
-		currentScore = ImageStatistics.sum(difference)/totalWeight;
+		updateScore(image,sides);
 
 		if( currentScore < bestScore ) {
 			bestScore = currentScore;
@@ -136,6 +126,20 @@ public class ImageSectorSaver {
 			}
 			bestImage.createGraphics().drawImage(original,0,0,null);
 		}
+	}
+
+	public synchronized void updateScore(ImageFloat32 image, List<Point2D_F64> sides) {
+		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
+
+		ImageFloat32 current = removePerspective.getOutput();
+		float mean = (float)ImageStatistics.mean(current);
+		PixelMath.divide(current,mean,tempImage);
+
+		PixelMath.diffAbs(tempImage,template,difference);
+		PixelMath.multiply(difference,weights,difference);
+
+		// compute score as a weighted average of the difference
+		currentScore = ImageStatistics.sum(difference)/totalWeight;
 	}
 
 	/**

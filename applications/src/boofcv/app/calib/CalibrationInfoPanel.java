@@ -45,7 +45,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 	BufferedImage imageView;
 	BufferedImage imageTemplate;
 
-	JButton forceSaveButton = new JButton("Force Save");
+	JButton forceSaveButton = new JButton("Debug Save");
 	JButton finishedButton = new JButton("Finished");
 
 	double focusMax = 1.0;
@@ -87,7 +87,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 		addCenterLabel("Edge Fill",this);
 		addAlignCenter(fillProgress, this);
 		add(Box.createRigidArea(new Dimension(5, 5)));
-		add(imageRow);
+		addAlignCenter(imageRow, this);
 		addAlignCenter(focusMeter, this);
 		add(Box.createRigidArea(new Dimension(5, 50)));
 		add(finishedButton);

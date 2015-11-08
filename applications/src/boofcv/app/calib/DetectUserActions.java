@@ -35,6 +35,7 @@ public class DetectUserActions {
 	double stationaryTime;
 
 	CalibrationObservation previous = new CalibrationObservation();
+	CalibrationObservation first = new CalibrationObservation();
 
 	CalibrationObservation points;
 	int numMissed;
@@ -63,23 +64,31 @@ public class DetectUserActions {
 	public double checkStationary( ) {
 		if( previous.size() != points.size() ) {
 			previous.setTo(points);
+			first.setTo(points);
 			stationaryStart = System.currentTimeMillis();
 			return 0;
 		} else {
-			double average = 0;
-			for( int i = 0; i < points.size(); i++ ) {
-				double difference = previous.points.get(i).pixel.distance(points.points.get(i).pixel);
-				previous.get(i).pixel.set(points.points.get(i).pixel);
+			double averagePrev = averageDifference(previous);
+			double averageFirst = averageDifference(first);
 
-				average += difference;
-			}
-			average /= points.size();
-
-			if( average > thresholdDistance ) {
+			previous.setTo(points);
+			if( averagePrev > thresholdDistance || averageFirst > thresholdDistance*10 ) {
 				stationaryStart = System.currentTimeMillis();
+				first.setTo(points);
 			}
 			return (System.currentTimeMillis()-stationaryStart)/1000.0;
 		}
+	}
+
+	private double averageDifference( CalibrationObservation reference ) {
+		double average = 0;
+		for( int i = 0; i < points.size(); i++ ) {
+			double difference = reference.points.get(i).pixel.distance(points.points.get(i).pixel);
+
+			average += difference;
+		}
+		average /= points.size();
+		return average;
 	}
 
 	public void resetStationary() {

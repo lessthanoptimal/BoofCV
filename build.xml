@@ -33,20 +33,6 @@
             <link offline="false" href="http://ejml.org/javadoc/" packagelistloc="package-list" />
 
             <doctitle><![CDATA[<h1>BoofCV API Specification</h1>]]></doctitle>
-            <header><![CDATA[
-<script type="text/javascript"><!--
-google_ad_client = "ca-pub-0419821832107208";
-/* boofcv javadoc banner */
-google_ad_slot = "3257872658";
-google_ad_width = 468;
-google_ad_height = 60;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-]]>
-            </header>
             <bottom><![CDATA[<script type="text/javascript">
 
   var _gaq = _gaq || [];

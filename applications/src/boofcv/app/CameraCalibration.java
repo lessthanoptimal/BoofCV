@@ -48,11 +48,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO finish real-time mode
 public class CameraCalibration extends BaseWebcamApp {
 
 	String inputDirectory;
-	String outputFileName;
+	String outputFileName = "intrinsic.xml";
 	CalibrationDetector detector;
 	boolean zeroSkew = true;
 	int numRadial = 2;
@@ -296,7 +295,7 @@ public class CameraCalibration extends BaseWebcamApp {
 		}
 
 		// save results to a file and print out
-		UtilIO.saveXML(intrinsic, "intrinsic.xml");
+		UtilIO.saveXML(intrinsic,outputFileName);
 
 		calibrationAlg.printStatistics();
 		System.out.println();
@@ -305,6 +304,9 @@ public class CameraCalibration extends BaseWebcamApp {
 		intrinsic.print();
 	}
 
+	/**
+	 * Captures calibration data live using a webcam and a GUI to assist the user
+	 */
 	public void handleWebcam() {
 		Webcam webcam = Webcam.getWebcams().get(cameraId);
 		if( desiredWidth > 0 && desiredHeight > 0 )
@@ -334,12 +336,14 @@ public class CameraCalibration extends BaseWebcamApp {
 			}
 		}
 		webcam.close();
-		frame.setVisible(false);
+		if( assisted.isFinished() ) {
+			frame.setVisible(false);
 
-		inputDirectory = AssistedCalibration.IMAGE_DIRECTORY;
-		outputFileName = new File(inputDirectory,"intrinsic.xml").getPath();
+			inputDirectory = AssistedCalibration.IMAGE_DIRECTORY;
+			outputFileName = new File(inputDirectory, "intrinsic.xml").getPath();
 
-		handleDirectory();
+			handleDirectory();
+		}
 	}
 
 	public static void main(String[] args) {

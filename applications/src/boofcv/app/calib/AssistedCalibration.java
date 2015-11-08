@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import georegression.geometry.UtilPoint2D_F64;
@@ -32,22 +33,17 @@ import org.ddogleg.struct.FastQueue;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
+ * GUI which guides a person along to help ensure sufficient geometry varation and that they cover the entire screen,
+ * including the edges, sufficiently.
+ *
  * @author Peter Abeles
  */
-// TODO Determine if the target is stationary enough
-
-// TODO Option to flip image?
-// TODO Check to see if sufficient area is inside desired rectangle
-// TODO Check to see if slant is sufficient and in the correct direction
-// TODO check blur factor
-
-
-// TODO compute calibration parameters live?
 public class AssistedCalibration {
 
 	public static final String OUTPUT_DIRECTORY = "calibration_data";
@@ -88,12 +84,22 @@ public class AssistedCalibration {
 	List<Magnet> magnets = new ArrayList<Magnet>();
 	int totalMagnets;
 
-	ImageSectorSaver saver = new ImageSectorSaver(IMAGE_DIRECTORY);
+	ImageSectorSaver saver;
+
+	// if true then there was sufficient geometric diversity at least once
+	boolean geometryTrigger = false;
 
 	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
+		File outputDir = new File(OUTPUT_DIRECTORY);
+		if( outputDir.exists() ) {
+			System.out.println("Deleting output directory "+OUTPUT_DIRECTORY);
+			UtilIO.deleteRecursive(outputDir);
+		}
+
 		this.detector = detector;
 		this.gui = gui;
 		this.quality = quality;
+		this.saver = new ImageSectorSaver(IMAGE_DIRECTORY);
 
 		if( detector instanceof CalibrationDetectorChessboard) {
 			view = new CalibrationView.Chessboard();
@@ -129,7 +135,7 @@ public class AssistedCalibration {
 
 		if( gui.getInfoPanel().forceSaveImage ) {
 			System.out.println("Saved image forced");
-			UtilImageIO.saveImage(image,"force_save.png");
+			UtilImageIO.saveImage(image,"debug_save.png");
 			gui.getInfoPanel().resetForceSave();
 		}
 
@@ -173,8 +179,7 @@ public class AssistedCalibration {
 				ratioHorizontal *= 100.0;
 				ratioVertical *= 100.0;
 
-				message = String.format(
-						"Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
+				message = String.format("Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
 			} else {
 				if (stationaryTime > STILL_THRESHOLD) {
 					saver.setTemplate(input,sides);
@@ -201,14 +206,7 @@ public class AssistedCalibration {
 					g2.draw(ellipse);
 				}
 			} else {
-				int red = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
-				g2.setColor(new Color(red, 0, 0));
-
-				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.points.get(i).pixel;
-					ellipse.setFrame(p.x - r, p.y - r, w, w);
-					g2.fill(ellipse);
-				}
+				renderCalibrationPoints(stationaryTime,points.points);
 			}
 		}
 
@@ -287,11 +285,13 @@ public class AssistedCalibration {
 			// save the images if the fiducial is being held still prior to capture
 			if( resetImageSelector ) {
 				saver.clearHistory();
+				saver.updateScore(input, sides);
 			} else {
 				saver.process(inputBuffered, input, sides);
 			}
 
 			renderMagnets();
+			renderArrows();
 			renderCalibrationPoints(stationaryTime, points.points);
 		} else {
 			saver.clearHistory();
@@ -351,11 +351,11 @@ public class AssistedCalibration {
 	}
 
 	private void renderCalibrationPoints(double stationaryTime, List<CalibrationObservation.Point> points) {
-		int shade = Math.min(255, (int) (150.0 * (stationaryTime / STILL_THRESHOLD) + 105.0));
+		int shade = Math.min(255, (int) (255.0 * (stationaryTime / STILL_THRESHOLD)));
 		if( pictureTaken ) {
 			g2.setColor(new Color(0, shade, 0));
 		} else {
-			g2.setColor(new Color(shade, 0, 0));
+			g2.setColor(new Color(shade, 0, Math.max(0,255-shade*2)));
 		}
 
 		int r = 6;
@@ -389,6 +389,12 @@ public class AssistedCalibration {
 		}
 	}
 
+	private void renderArrows() {
+		for (int i = 0; i < magnets.size(); i++) {
+			magnets.get(i).drawArrows();
+		}
+	}
+
 	/**
 	 * Record the area covered in the image by the fiducial, update the quality calculation, and see if it should
 	 * enable the save button.
@@ -402,7 +408,8 @@ public class AssistedCalibration {
 		gui.getInfoPanel().updateGeometry(quality.getScore());
 
 		// once the user has sufficient geometric variation enable save
-		if( quality.getScore() >= 1.0 && magnets.isEmpty() ) {
+		geometryTrigger |= quality.getScore() >= 1.0;
+		if( geometryTrigger && magnets.isEmpty() ) {
 			gui.getInfoPanel().enabledFinishedButton();
 		}
 	}

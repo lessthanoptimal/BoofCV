@@ -241,4 +241,15 @@ public class UtilIO {
 		}
 	}
 
+	/**
+	 * Deletes all the file/directory and all of its children
+	 */
+	public static void deleteRecursive( File f ) {
+		if (f.isDirectory()) {
+			for (File c : f.listFiles())
+				deleteRecursive(c);
+		}
+		if (!f.delete())
+			throw new RuntimeException("Failed to delete file: " + f);
+	}
 }
