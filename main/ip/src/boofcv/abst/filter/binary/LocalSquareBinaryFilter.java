@@ -41,6 +41,9 @@ public class LocalSquareBinaryFilter<T extends ImageSingleBand> implements Input
 	double scale;
 	boolean down;
 
+	/**
+	 * @see GThresholdImageOps#localSquare
+	 */
 	public LocalSquareBinaryFilter(int radius, double scale, boolean down,
 								   ImageType<T> inputType) {
 		this.radius = radius;

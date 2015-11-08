@@ -75,7 +75,7 @@ public class FactoryThresholdBinary {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy
 	 *
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -102,7 +102,7 @@ public class FactoryThresholdBinary {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu
 	 *
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image.  (exclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,9 @@ public class GlobalOtsuBinaryFilter<T extends ImageSingleBand> implements InputT
 	int minValue;
 	int maxValue;
 
+	/**
+	 * @see GThresholdImageOps#computeOtsu
+	 */
 	public GlobalOtsuBinaryFilter(int minValue, int maxValue,
 								  boolean down, ImageType<T> inputType) {
 		this.minValue = minValue;

@@ -36,6 +36,9 @@ public class LocalSauvolaBinaryFilter<T extends ImageSingleBand> implements Inpu
 	ThresholdSauvola alg;
 	ImageFloat32 input;
 
+	/**
+	 * @see ThresholdSauvola
+	 */
 	public LocalSauvolaBinaryFilter(int radius, float k, boolean down,
 									ImageType<T> inputType) {
 

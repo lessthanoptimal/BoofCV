@@ -41,6 +41,9 @@ public class LocalGaussianBinaryFilter<T extends ImageSingleBand> implements Inp
 	double scale;
 	boolean down;
 
+	/**
+	 * @see GThresholdImageOps#localGaussian
+	 */
 	public LocalGaussianBinaryFilter(int radius, double scale, boolean down,
 									 ImageType<T> inputType) {
 		this.radius = radius;

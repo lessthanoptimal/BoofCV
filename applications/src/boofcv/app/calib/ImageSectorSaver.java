@@ -81,7 +81,6 @@ public class ImageSectorSaver {
 
 		templateOriginal.setTo(removePerspective.getOutput());
 
-
 		// blur the image a bit so it doesn't have to be a perfect match
 		ImageFloat32 blurred = new ImageFloat32(LENGTH,LENGTH);
 		BlurImageOps.gaussian(templateOriginal,blurred,-1,2,null);

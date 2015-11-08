@@ -182,6 +182,7 @@ public class AssistedCalibration {
 				message = String.format("Straighten out.  H %3d   V %3d", (int) ratioHorizontal, (int) ratioVertical);
 			} else {
 				if (stationaryTime > STILL_THRESHOLD) {
+					actions.resetStationary();
 					saver.setTemplate(input,sides);
 					gui.getInfoPanel().updateTemplate(saver.getTemplate());
 					actions.resetStationary();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,9 @@ public class GlobalFixedBinaryFilter<T extends ImageSingleBand> implements Input
 	double threshold;
 	boolean down;
 
+	/**
+	 * @see GThresholdImageOps#threshold
+	 */
 	public GlobalFixedBinaryFilter(double threshold, boolean down, ImageType<T> inputType) {
 		this.threshold = threshold;
 		this.down = down;
