@@ -142,7 +142,7 @@ public class FourierVisualizeApp
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);

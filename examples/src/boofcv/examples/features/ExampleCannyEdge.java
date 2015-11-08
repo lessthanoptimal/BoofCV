@@ -76,6 +76,6 @@ public class ExampleCannyEdge {
 		panel.addImage(visualBinary,"Binary Edges from Canny");
 		panel.addImage(visualCannyContour, "Canny Trace Graph");
 		panel.addImage(visualEdgeContour,"Contour from Canny Binary");
-		ShowImages.showWindow(panel,"Canny Edge");
+		ShowImages.showWindow(panel,"Canny Edge", true);
 	}
 }

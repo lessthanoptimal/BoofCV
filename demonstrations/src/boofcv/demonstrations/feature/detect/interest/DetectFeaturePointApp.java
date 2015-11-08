@@ -202,7 +202,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));

@@ -98,7 +98,7 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageSingleBand>
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 
 		app.setInputList(inputs);

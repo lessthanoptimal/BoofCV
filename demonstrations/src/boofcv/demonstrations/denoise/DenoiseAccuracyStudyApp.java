@@ -202,7 +202,7 @@ public class DenoiseAccuracyStudyApp {
 		fileNames.add(path+"lena512.jpg");
 		fileNames.add(path+"peppers256.jpg");
 		fileNames.add(path+"boat.jpg");
-		fileNames.add(path+"house.jpg");
+		fileNames.add(path+"house.png");
 
 		app.process(createStandard(2,4),fileNames);
 	}

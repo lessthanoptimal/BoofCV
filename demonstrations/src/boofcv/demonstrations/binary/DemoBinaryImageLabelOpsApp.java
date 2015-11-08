@@ -260,7 +260,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

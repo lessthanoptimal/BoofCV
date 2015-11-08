@@ -155,7 +155,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
 
 		app.setInputList(inputs);

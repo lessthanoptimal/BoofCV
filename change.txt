@@ -57,8 +57,6 @@ Version : Alpha 0.20
 - Locally adaptive threshold techniques that had a bias term now have a scale term.
   * Much more useful since bias was intensity and value range dependent
 
-TODO Easy to use calibration app
-
 ---------------------------------------------
 Date    : 2015/09/20
 Version : Alpha 0.19

@@ -41,6 +41,7 @@ public class ExampleImageEnhancement {
 	static String imagePath = "enhance/dark.jpg";
 //	static String imagePath = "enhance/dull.jpg";
 
+	static ListDisplayPanel mainPanel = new ListDisplayPanel();
 
 	/**
 	 * Histogram adjustment algorithms aim to spread out pixel intensity values uniformly across the allowed range.
@@ -56,18 +57,18 @@ public class ExampleImageEnhancement {
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 
-		ImageStatistics.histogram(gray,histogram);
+		ImageStatistics.histogram(gray, histogram);
 		EnhanceImageOps.equalize(histogram, transform);
 		EnhanceImageOps.applyTransform(gray, transform, adjusted);
-		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Global");
+		panel.addImage(ConvertBufferedImage.convertTo(adjusted, null), "Global");
 
 		EnhanceImageOps.equalizeLocal(gray, 50, adjusted, histogram, transform);
 		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Local");
 
-		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
+		panel.addImage(ConvertBufferedImage.convertTo(gray, null), "Original");
 
-		panel.setPreferredSize(new Dimension(gray.width,gray.height));
-		ShowImages.showWindow(panel,"Histogram",true);
+		panel.setPreferredSize(new Dimension(gray.width, gray.height));
+		mainPanel.addItem(panel, "Histogram");
 	}
 
 	/**
@@ -90,13 +91,14 @@ public class ExampleImageEnhancement {
 		panel.addImage(ConvertBufferedImage.convertTo(gray,null),"Original");
 
 		panel.setPreferredSize(new Dimension(gray.width,gray.height));
-		ShowImages.showWindow(panel,"Sharpen",true);
+		mainPanel.addItem(panel, "Sharpen");
 	}
 
 	public static void main( String args[] )
 	{
 		histogram();
 		sharpen();
+		ShowImages.showWindow(mainPanel,"Enhancement",true);
 	}
 
 }

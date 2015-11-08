@@ -46,7 +46,7 @@ public class DetectFastHessianApp {
 //	static String fileName = UtilIO.pathExample("particles01.jpg";
 //	static String fileName = UtilIO.pathExample("scale/beach02.jpg";
 //	static String fileName = UtilIO.pathExample("indoors01.jpg";
-	static String fileName = UtilIO.pathExample("shapes01.png");
+	static String fileName = UtilIO.pathExample("shapes/shapes01.png");
 //	static String fileName = UtilIO.pathExample("scale/mountain_4p2mm.jpg";
 //	static String fileName = UtilIO.pathExample("scale/mountain_7p1mm.jpg";
 //	static String fileName = UtilIO.pathExample("scale/mountain_19p9mm.jpg";

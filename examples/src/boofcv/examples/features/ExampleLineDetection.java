@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -49,6 +50,8 @@ public class ExampleLineDetection {
 	private static final float edgeThreshold = 25;
 	// adjust the maximum number of found lines in the image
 	private static final int maxLines = 10;
+
+	private static ListDisplayPanel listPanel = new ListDisplayPanel();
 
 	/**
 	 * Detects lines inside the image using different types of Hough detectors
@@ -81,7 +84,7 @@ public class ExampleLineDetection {
 		gui.setLines(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
-		ShowImages.showWindow(gui,"Found Lines");
+		listPanel.addItem(gui, "Found Lines");
 	}
 
 	/**
@@ -110,15 +113,17 @@ public class ExampleLineDetection {
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
-		ShowImages.showWindow(gui,"Found Line Segments");
+		listPanel.addItem(gui, "Found Line Segments");
 	}
 	
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		detectLines(input,ImageUInt8.class,ImageSInt16.class);
+		detectLines(input, ImageUInt8.class, ImageSInt16.class);
 
 		// line segment detection is still under development and only works for F32 images right now
 		detectLineSegments(input, ImageFloat32.class, ImageFloat32.class);
+
+		ShowImages.showWindow(listPanel, "Detected Lines", true);
 	}
 }

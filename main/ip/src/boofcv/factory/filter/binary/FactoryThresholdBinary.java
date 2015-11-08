@@ -33,14 +33,14 @@ public class FactoryThresholdBinary {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
 	 *
 	 * @param radius Radius of square region.
-	 * @param bias Bias used to adjust threshold
+	 * @param scale Threshold scale adjustment
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> localGaussian(int radius, double bias, boolean down, Class<T> inputType) {
-		return new LocalGaussianBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
+	InputToBinary<T> localGaussian(int radius, double scale, boolean down, Class<T> inputType) {
+		return new LocalGaussianBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
 	}
 
 	/**
@@ -61,14 +61,14 @@ public class FactoryThresholdBinary {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
 	 *
 	 * @param radius Radius of square region.
-	 * @param bias Bias used to adjust threshold
+	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> localSquare(int radius, double bias, boolean down, Class<T> inputType) {
-		return new LocalSquareBinaryFilter<T>(radius,bias,down,ImageType.single(inputType));
+	InputToBinary<T> localSquare(int radius, double scale, boolean down, Class<T> inputType) {
+		return new LocalSquareBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
 	}
 
 	/**

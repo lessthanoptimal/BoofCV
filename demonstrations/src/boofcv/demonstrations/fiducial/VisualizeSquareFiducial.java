@@ -56,7 +56,7 @@ import java.util.List;
 public class VisualizeSquareFiducial {
 
 //	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,ImageFloat32.class);
-	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(6, 0, true, ImageFloat32.class);
+	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(6, 1.0, true, ImageFloat32.class);
 
 	public void process( String nameImage , String nameIntrinsic ) {
 

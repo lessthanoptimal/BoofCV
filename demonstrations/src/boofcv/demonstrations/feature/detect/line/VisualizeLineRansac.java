@@ -133,7 +133,7 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 				new VisualizeLineRansac<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
-//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("shapes01.png"));
+//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes01.png"));
 		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg")));
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("outdoors01.jpg"));
 	}

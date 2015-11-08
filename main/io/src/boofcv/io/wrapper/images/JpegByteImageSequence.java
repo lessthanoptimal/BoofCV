@@ -49,6 +49,8 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 	BufferedImage imageGUI;
 	T output;
 
+	BufferedImage imageNext;
+
 	// loop back and forth in the sequence
 	boolean loop = false;
 	// is it traversing in the forwards or backwards direction
@@ -60,40 +62,33 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 		this.loop = loop;
 
 		output = imageType.createImage(1,1);
+		loadNext();
 	}
 
 	public JpegByteImageSequence(Class<T> imageType, List<byte[]> jpegData, boolean loop) {
-		this.imageType = new ImageType<T>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
-		this.jpegData = jpegData;
-		this.loop = loop;
-
-		output = this.imageType.createImage(1,1);
+		this(ImageType.single((Class)imageType), jpegData,loop);
 	}
 
 	@Override
 	public int getNextWidth() {
-		return output.getWidth();
+		return imageNext.getWidth();
 	}
 
 	@Override
 	public int getNextHeight() {
-		return output.getHeight();
+		return imageNext.getHeight();
 	}
 
 	@Override
 	public boolean hasNext() {
-		if( loop )
-			return true;
-		return index < jpegData.size();
+		return loop || index < jpegData.size();
 	}
 
 	@Override
 	public T next() {
-		try {
-			imageGUI = ImageIO.read(new ByteArrayInputStream(jpegData.get(index)));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		imageGUI = imageNext;
+		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
+		ConvertBufferedImage.convertFrom(imageGUI, output, true);
 
 		if(forward) {
 			index++;
@@ -108,11 +103,18 @@ public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSe
 				forward = true;
 			}
 		}
-
-		output.reshape(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI, output, true );
+		if( hasNext())
+			loadNext();
 
 		return output;
+	}
+
+	private void loadNext() {
+		try {
+			imageNext = ImageIO.read(new ByteArrayInputStream(jpegData.get(index)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

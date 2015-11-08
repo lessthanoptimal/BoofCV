@@ -148,7 +148,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));

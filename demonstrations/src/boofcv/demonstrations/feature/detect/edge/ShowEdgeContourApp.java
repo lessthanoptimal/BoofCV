@@ -216,7 +216,7 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("Room",UtilIO.pathExample("indoors01.jpg")));
 		inputs.add(new PathLabel("Objects",UtilIO.pathExample("simple_objects.jpg")));
 		inputs.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));

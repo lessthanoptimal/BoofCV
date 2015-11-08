@@ -242,7 +242,7 @@ public class ShowColorModelApp
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

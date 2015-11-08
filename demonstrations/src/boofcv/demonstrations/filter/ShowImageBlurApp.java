@@ -232,7 +232,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		ShowImageBlurApp<ImageUInt8> app = new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
 

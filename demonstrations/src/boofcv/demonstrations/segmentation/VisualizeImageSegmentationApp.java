@@ -252,7 +252,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 		inputs.add(new PathLabel("Man", UtilIO.pathExample("segment/berkeley_man.jpg")));
 		inputs.add(new PathLabel("Pines People", UtilIO.pathExample("segment/mountain_pines_people.jpg")));
 		inputs.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("Shapes", UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("Shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 

@@ -204,7 +204,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes01.png")));
+		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 
 		app.setInputList(inputs);
 
@@ -213,7 +213,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Image Noise Removal", true);
+		ShowImages.showWindow(app, "Binary Image Ops", true);
 
 		System.out.println("Done");
 	}
