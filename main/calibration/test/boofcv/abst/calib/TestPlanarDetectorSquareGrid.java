@@ -18,14 +18,13 @@
 
 package boofcv.abst.calib;
 
+import java.util.List;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -58,25 +57,25 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
 		ImageMiscOps.fill(original, 255);
 
-		int square = original.getWidth() / (Math.max(config.numCols, config.numRows) + 4);
+		int square = original.getWidth() / (Math.max(config.numSquareInCols, config.numSquareInRows) + 4);
 
-		int targetWidth = square * config.numCols;
-		int targetHeight = square * config.numRows;
+		int targetWidth = square * config.numSquareInCols;
+		int targetHeight = square * config.numSquareInRows;
 
 		int x0 = (original.width - targetWidth) / 2;
 		int y0 = (original.height - targetHeight) / 2;
 
-		for (int i = 0; i < config.numRows; i += 2) {
+		for (int i = 0; i < config.numSquareInRows; i += 2) {
 			int y = y0 + i * square;
 
-			for (int j = 0; j < config.numCols; j += 2) {
+			for (int j = 0; j < config.numSquareInCols; j += 2) {
 				int x = x0 + j * square;
 				ImageMiscOps.fillRectangle(original, 0, x, y, square, square);
 			}
 		}
 
-		int pointsRow = config.numRows+1;
-		int pointsCol = config.numCols+1;
+		int pointsRow = config.numSquareInRows +1;
+		int pointsCol = config.numSquareInCols +1;
 
 		CalibrationObservation set = new CalibrationObservation();
 		int gridIndex = 0;
