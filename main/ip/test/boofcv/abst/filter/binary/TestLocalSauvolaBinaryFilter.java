@@ -51,7 +51,7 @@ public class TestLocalSauvolaBinaryFilter {
 			LocalSauvolaBinaryFilter alg = new LocalSauvolaBinaryFilter(4,0.3f,true, ImageType.single(type));
 
 			alg.process(input,found);
-			GThresholdImageOps.adaptiveSauvola(input, expected, 4, 0.3f, true);
+			GThresholdImageOps.localSauvola(input, expected, 4, 0.3f, true);
 
 			BoofTesting.assertEquals(found, expected, 0);
 		}

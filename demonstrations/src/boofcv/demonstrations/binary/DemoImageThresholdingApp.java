@@ -109,7 +109,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 				break;
 
 			case 5:
-				GThresholdImageOps.adaptiveSauvola(imageInput, imageBinary,
+				GThresholdImageOps.localSauvola(imageInput, imageBinary,
 						threshRadius, 0.3f, thresholdDown);
 				break;
 		}

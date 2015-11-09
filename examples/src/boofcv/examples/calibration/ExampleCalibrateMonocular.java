@@ -37,7 +37,7 @@ import java.util.List;
  * Example of how to calibrate a single (monocular) camera using a high level interface that processes images of planar
  * calibration targets.  The entire calibration target must be observable in the image and for best results images
  * should be in focus and not blurred.  For a lower level example of camera calibration which processes a set of
- * observed calibration points see {@link ExampleCalibrateMonocularPlanar}.
+ * observed calibration points see {@link ExampleCalibrateMonocular}.
  *
  * After processing both intrinsic camera parameters and lens distortion are estimated.  Square grid and chessboard
  * targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleCalibrateMonocularPlanar {
+public class ExampleCalibrateMonocular {
 
 	// Detects the target and calibration point inside the target
 	CalibrationDetector detector;
@@ -117,7 +117,7 @@ public class ExampleCalibrateMonocularPlanar {
 
 
 	public static void main( String args[] ) {
-		ExampleCalibrateMonocularPlanar alg = new ExampleCalibrateMonocularPlanar();
+		ExampleCalibrateMonocular alg = new ExampleCalibrateMonocular();
 
 		// which target should it process
 //		alg.setupZhang99();

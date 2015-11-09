@@ -81,7 +81,7 @@ public class BenchmarkThresholding {
 	public static class LocalSauvola extends PerformerBase {
 		@Override
 		public void process() {
-			GThresholdImageOps.adaptiveSauvola(input, output_U8, adaptiveRadius, 0.3f, true);
+			GThresholdImageOps.localSauvola(input, output_U8, adaptiveRadius, 0.3f, true);
 		}
 	}
 

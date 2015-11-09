@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleCalibrateStereoPlanar {
+public class ExampleCalibrateStereo {
 
 	// Detects the target and calibration point inside the target
 	CalibrationDetector detector;
@@ -124,7 +124,7 @@ public class ExampleCalibrateStereoPlanar {
 	}
 
 	public static void main( String args[] ) {
-		ExampleCalibrateStereoPlanar alg = new ExampleCalibrateStereoPlanar();
+		ExampleCalibrateStereo alg = new ExampleCalibrateStereo();
 
 		// Select which set of targets to use
 		alg.setupBumblebeeChess();

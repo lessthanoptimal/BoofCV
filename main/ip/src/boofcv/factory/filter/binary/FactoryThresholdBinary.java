@@ -44,7 +44,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#adaptiveSauvola(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, float, boolean)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, float, boolean)
 	 *
 	 * @param radius Radius of local region.  Try 15
 	 * @param k Positive parameter used to tune threshold.  Try 0.3

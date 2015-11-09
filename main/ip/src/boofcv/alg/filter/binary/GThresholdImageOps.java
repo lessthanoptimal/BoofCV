@@ -319,7 +319,7 @@ public class GThresholdImageOps {
 	 * @return binary image
 	 */
 	public static <T extends ImageSingleBand>
-	ImageUInt8 adaptiveSauvola( T input , ImageUInt8 output , int radius , float k , boolean down )
+	ImageUInt8 localSauvola(T input, ImageUInt8 output, int radius, float k, boolean down)
 	{
 		ThresholdSauvola alg = new ThresholdSauvola(radius,k, down);
 

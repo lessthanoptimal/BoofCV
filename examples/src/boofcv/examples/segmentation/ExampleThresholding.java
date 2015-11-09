@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
 /**
  * Demonstration of different techniques for automatic thresholding an image to create a binary image.  The binary
  * image can then be used for shape analysis and other applications.  Global methods apply the same threshold
- * to the entire image.  Local/adaptive methods compute a local threshold around each pixel and can handle uneven
+ * to the entire image.  Local methods compute a local threshold around each pixel and can handle uneven
  * lighting, but produce noisy results in regions with uniform lighting.
  *
  * @see boofcv.examples.imageprocessing.ExampleBinaryOps
@@ -63,11 +63,11 @@ public class ExampleThresholding {
 
 		// Local method
 		GThresholdImageOps.localSquare(input, binary, 28, 1.0, true, null, null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Square");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Square");
 		GThresholdImageOps.localGaussian(input, binary, 42, 1.0, true, null, null);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Gaussian");
-		GThresholdImageOps.adaptiveSauvola(input, binary, 5, 0.30f, true);
-		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Adaptive: Sauvola");
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
+		GThresholdImageOps.localSauvola(input, binary, 5, 0.30f, true);
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Sauvola");
 
 		// Sauvola is tuned for text image.  Change radius to make it run better in others.
 
