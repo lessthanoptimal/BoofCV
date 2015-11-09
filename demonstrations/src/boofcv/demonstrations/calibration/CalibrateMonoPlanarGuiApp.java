@@ -18,27 +18,22 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.calib.CalibrateMonoPlanar;
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.PlanarCalibrationDetector;
+import java.io.File;
+import java.util.*;
+import java.util.List;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.swing.*;
+import boofcv.abst.calib.*;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.calibration.MonoPlanarPanel;
-import boofcv.io.MediaManager;
-import boofcv.io.ProgressMonitorThread;
-import boofcv.io.UtilIO;
+import boofcv.io.*;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Computes intrinsic camera calibration parameters from a set of calibration images.  Results
@@ -198,7 +193,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		PlanarCalibrationDetector detector =
-//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
+//				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
 				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
 

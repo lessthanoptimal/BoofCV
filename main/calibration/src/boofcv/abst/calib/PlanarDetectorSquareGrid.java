@@ -18,6 +18,7 @@
 
 package boofcv.abst.calib;
 
+import java.util.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -26,9 +27,6 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of {@link PlanarCalibrationDetector} for square grid target types.
@@ -59,10 +57,10 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
 
-		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows/2+1,config.numCols/2+1,
+		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numSquareInRows,config.numSquareInCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
-		layoutPoints = createLayout(config.numCols,config.numRows,config.squareWidth,config.spaceWidth);
+		layoutPoints = createLayout(config.numSquareInCols,config.numSquareInRows,config.squareWidth,config.spaceWidth);
 	}
 
 	@Override
@@ -96,9 +94,6 @@ public class PlanarDetectorSquareGrid implements PlanarCalibrationDetector {
 		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
 
 		// modify the size so that it's just the number of black squares in the grid
-		numCols = numCols/2 + 1;
-		numRows = numRows/2 + 1;
-
 		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
 		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
 

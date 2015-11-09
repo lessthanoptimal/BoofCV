@@ -18,17 +18,14 @@
 
 package boofcv.abst.calib;
 
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.misc.*;
 import boofcv.struct.image.ImageFloat32;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Peter Abeles
@@ -53,7 +50,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Square extends PerformerBase {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.
-				detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
+				detectorSquareGrid(new ConfigSquareGrid(3, 4, 30, 30));
 
 		@Override
 		public void process() {

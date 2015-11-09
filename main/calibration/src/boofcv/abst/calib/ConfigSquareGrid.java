@@ -36,11 +36,11 @@ public class ConfigSquareGrid implements Configuration {
 	/**
 	 * Number of squares wide the grid is. Target dependent.
 	 */
-	public int numCols = -1;
+	public int numSquareInCols = -1;
 	/**
 	 * Number of squares tall the grid is. Target dependent.
 	 */
-	public int numRows = -1;
+	public int numSquareInRows = -1;
 
 	/**
 	 * Configuration for thresholding the image
@@ -96,9 +96,9 @@ public class ConfigSquareGrid implements Configuration {
 		configRefineLines.maxIterations = 5;
 	}
 
-	public ConfigSquareGrid(int numCols, int numRows, double squareWidth, double spaceWidth) {
-		this.numCols = numCols;
-		this.numRows = numRows;
+	public ConfigSquareGrid(int numSquareInCols, int numSquareInRows, double squareWidth, double spaceWidth) {
+		this.numSquareInCols = numSquareInCols;
+		this.numSquareInRows = numSquareInRows;
 		this.squareWidth = squareWidth;
 		this.spaceWidth = spaceWidth;
 	}
@@ -109,7 +109,7 @@ public class ConfigSquareGrid implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( numCols <= 0 || numRows <= 0 )
+		if( numSquareInCols <= 0 || numSquareInRows <= 0 )
 			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
 	}
 }

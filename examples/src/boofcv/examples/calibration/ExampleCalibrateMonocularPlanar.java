@@ -18,20 +18,15 @@
 
 package boofcv.examples.calibration;
 
-import boofcv.abst.calib.CalibrateMonoPlanar;
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.calib.PlanarCalibrationDetector;
+import java.util.List;
+import java.awt.image.BufferedImage;
+import boofcv.abst.calib.*;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
-
-import java.awt.image.BufferedImage;
-import java.util.List;
 
 /**
  * Example of how to calibrate a single (monocular) camera using a high level interface that processes images of planar
@@ -64,10 +59,10 @@ public class ExampleCalibrateMonocularPlanar {
 	 */
 	private void setupZhang99() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 
 		// load image list
-		String directory = UtilIO.path("data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
+		String directory = UtilIO.path("data/example/calibration/mono/PULNiX_CCD_6mm_Zhang");
 		images = BoofMiscOps.directoryList(directory,"CalibIm");
 	}
 
@@ -120,8 +115,8 @@ public class ExampleCalibrateMonocularPlanar {
 		ExampleCalibrateMonocularPlanar alg = new ExampleCalibrateMonocularPlanar();
 
 		// which target should it process
-//		alg.setupZhang99();
-		alg.setupBumbleBee();
+		alg.setupZhang99();
+		//alg.setupBumbleBee();
 
 		// compute and save results
 		alg.process();

@@ -18,41 +18,26 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.abst.fiducial.FiducialStability;
-import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.ConfigFiducialImage;
-import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import java.io.File;
+import java.util.*;
+import java.util.List;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import javax.swing.JCheckBox;
+import boofcv.abst.calib.*;
+import boofcv.abst.fiducial.*;
+import boofcv.core.image.*;
+import boofcv.factory.fiducial.*;
+import boofcv.factory.filter.binary.*;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.fiducial.VisualizeFiducial;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
-import boofcv.io.PathLabel;
-import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.SimpleImageSequence;
+import boofcv.gui.image.*;
+import boofcv.io.*;
+import boofcv.io.image.*;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Let's the user select a region in the image and tracks it using different algorithms.
@@ -280,7 +265,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
-			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(5, 7, 0.03, 0.03), imageClass);
+			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(3, 4, 0.03, 0.03), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

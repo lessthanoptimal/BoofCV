@@ -18,21 +18,15 @@
 
 package boofcv.examples.calibration;
 
-import boofcv.abst.calib.CalibrateStereoPlanar;
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.calib.PlanarCalibrationDetector;
+import java.util.*;
+import java.awt.image.BufferedImage;
+import boofcv.abst.calib.*;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
+import boofcv.io.image.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
-
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Example of how to calibrate a stereo camera system using a planar calibration grid given a set of images.
@@ -65,7 +59,7 @@ public class ExampleCalibrateStereoPlanar {
 	 */
 	public void setupBumblebeeSquare() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
+		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3, 4, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -127,8 +121,8 @@ public class ExampleCalibrateStereoPlanar {
 		ExampleCalibrateStereoPlanar alg = new ExampleCalibrateStereoPlanar();
 
 		// Select which set of targets to use
-		alg.setupBumblebeeChess();
-//		alg.setupBumblebeeSquare();
+		//alg.setupBumblebeeChess();
+		alg.setupBumblebeeSquare();
 
 		// compute and save results
 		alg.process();
