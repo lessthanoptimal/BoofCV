@@ -83,7 +83,7 @@ public class ExampleWatershedWithSeeds {
 		gui.addImage(image, "Watersheds");
 		gui.addImage(outRegions, "Regions");
 		gui.addImage(outLabeled, "Seeds");
-		ShowImages.showWindow(gui, "Waterhsed", true);
+		ShowImages.showWindow(gui, "Watershed", true);
 
 		// Additional processing would be needed for this example to be really useful.
 		// The watersheds can be used to characterize the background while the seed binary image the particles
