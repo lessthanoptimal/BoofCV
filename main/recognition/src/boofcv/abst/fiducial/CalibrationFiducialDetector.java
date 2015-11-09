@@ -310,4 +310,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	public List<Point2D_F64> getCalibrationPoints() {
 		return detector.getLayout();
 	}
+
+	public CalibrationDetector getDetector() {
+		return detector;
+	}
 }
