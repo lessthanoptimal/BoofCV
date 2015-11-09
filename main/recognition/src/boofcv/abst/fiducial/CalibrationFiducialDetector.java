@@ -18,11 +18,9 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.RefinePnP;
+import java.util.*;
+import boofcv.abst.calib.*;
+import boofcv.abst.geo.*;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
@@ -31,16 +29,11 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wrapper which allows a calibration target to be used like a fiducial for pose estimation.  The
@@ -97,9 +90,9 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
 		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
-		int squareCols = config.numCols/2+1;
-		int squareRows = config.numRows/2+1;
-		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
+		int squareCols = config.numSquareInCols;
+		int squareRows = config.numSquareInRows;
+		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
 		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 
 		double width = (sideWidth+sideHeight)/2.0;
