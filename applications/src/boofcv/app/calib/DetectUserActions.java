@@ -23,13 +23,14 @@ import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * used to detect when the user is holding the fiducial still.
+ *
  * @author Peter Abeles
  */
 public class DetectUserActions {
 
 	//-------------- motion parameters
 	double thresholdDistance;
-	int thresholdConsecutive = 10;
 
 	double stationaryStart;
 	double stationaryTime;

@@ -39,8 +39,35 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * GUI which guides a person along to help ensure sufficient geometry varation and that they cover the entire screen,
- * including the edges, sufficiently.
+ * <p>GUI which guides a person along to help ensure sufficient geometry variation and that they cover the entire screen,
+ * including the edges, sufficiently.  The calibration process is broken up into three steps.</p>
+ * <ol>
+ * <li>Scale determination</li>
+ * <li>Remove the dot<li>
+ * <li>Fill the image<li>
+ * </ol>
+ *
+ * <p>1) Scale Determination.  In this step user holds up the target approximately perpendicular to the camera and
+ * it determines its visual size.  This information is then used to select the outer boundary that it's going
+ * to attempt to fill.  That boundary is filled with a blue rectangle.  The canonical target is also found.  This
+ * target is used to estimation how blurred the target is later on.
+ * </p>
+ *
+ * <p>2) Remove The Dots.  Here the user is directed to move dots from the border of the image.  This is done to ensure
+ * that the edges are sufficiently sampled to produce a good estimate of lens distortion.  Circles are drawn to
+ * each location the fiducial should be moved to and are refered to as magnets.</p>
+ *
+ * <p>3) Fill The Image.  The location of previously sampled location is tinted blue and here the user can sample
+ * more locations in an attempt to cover the image with blue.  A percentage of the image is not enforced and the
+ * user can click finish at any point, as long as the geometric requirement is meet.</p>
+ *
+ * <p>Motion blue or other sources of distortion are minimized by requiring the user keep the fiducial still before
+ * a picture is taken.  Then it selects the most in focus image from the period of time it has being held still. The
+ * user is shown visually how blurred the image with a "preview" and a meter showing the blur error magnitude.</p>
+ *
+ * <p>For the initial linear estimate to work the fiducial needs to be seen at different orientations.  Feedback is
+ * provided to the user through progress bar.  The percent filled is set by solving the linear system at looking at
+ * the second smallest singular value.  One its hits the minimum number at least once the requirement has been meet.</p>
  *
  * @author Peter Abeles
  */
@@ -49,18 +76,26 @@ public class AssistedCalibration {
 	public static final String OUTPUT_DIRECTORY = "calibration_data";
 	public static final String IMAGE_DIRECTORY = OUTPUT_DIRECTORY+"/images";
 
+	// determines how straight the target needs to be when selecting the canonical size
 	double CENTER_SKEW = 0.93;
+	// how long in seconds does the fiducial need to be held still
 	double STILL_THRESHOLD = 2.0;
+	// The still time is displayed after this number of seconds
 	double DISPLAY_TIME = 0.5;
 
 
+	// visual size of a magnet in pixels
 	int MAGNET_RADIUS;
 
+	// how far from the image border should the rectangle be drawn.  This limited by how close to the border
+	// the fiducial is allowed to go
 	int padding;
 
+	// input image
 	ImageFloat32 input;
 	BufferedImage inputBuffered;
 
+	// detects the calibration target
 	CalibrationDetector detector;
 
 	int imageSize;
@@ -77,14 +112,18 @@ public class AssistedCalibration {
 	DetectUserActions actions = new DetectUserActions();
 	AssistedCalibrationGui gui;
 
+	// used to compute the geometric quality of collected fiducials
 	ComputeGeometryScore quality;
 
+	// state that the algorithm is in
 	State state = State.DETERMINE_SIZE;
 
+	// List of active magnets that need to be collected
 	List<Magnet> magnets = new ArrayList<Magnet>();
 	int totalMagnets;
 
-	ImageSectorSaver saver;
+	// Selects which image to save
+	ImageSelectorAndSaver saver;
 
 	// if true then there was sufficient geometric diversity at least once
 	boolean geometryTrigger = false;
@@ -99,7 +138,7 @@ public class AssistedCalibration {
 		this.detector = detector;
 		this.gui = gui;
 		this.quality = quality;
-		this.saver = new ImageSectorSaver(IMAGE_DIRECTORY);
+		this.saver = new ImageSelectorAndSaver(IMAGE_DIRECTORY);
 
 		if( detector instanceof CalibrationDetectorChessboard) {
 			view = new CalibrationView.Chessboard();

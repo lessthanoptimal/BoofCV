@@ -27,14 +27,26 @@ import georegression.struct.point.Point2D_F64;
 import java.util.List;
 
 /**
+ * Interface used to provide calibration target specific information
+ *
  * @author Peter Abeles
  */
 public interface CalibrationView {
 
+	/**
+	 * Intialize by providing it a reference to the detector.  This is then used to determine the appearance
+	 * of the target
+	 */
 	void initialize( CalibrationDetector detector );
 
+	/**
+	 * Returns the 4 sides around the fiducial
+	 */
 	void getSides( CalibrationObservation detections , List<Point2D_F64> sides );
 
+	/**
+	 * Returns how wide the image border should be given the visual width of the canonical fiducial
+	 */
 	int getBufferWidth( double gridPixelsWide );
 
 	class Chessboard implements CalibrationView {

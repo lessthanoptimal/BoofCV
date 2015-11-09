@@ -325,17 +325,20 @@ public class TestSquaresIntoClusters {
 
 		assertTrue(alg.areMiddlePointsClose(p0,p1,p2,p3));
 
-		p1.set(-1, 3.1);
-		alg.distanceTol = 0.101/p0.distance(p1);
+
+		double off = 0.1;
+		double thresh = 0.1*3;// threshold which will pass all checks inside
+		p1.set(-1, 3 + off);
+		alg.distanceTol = thresh*1.01;
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
-		alg.distanceTol = 0.099/p0.distance(p1);
+		alg.distanceTol = thresh*0.99;
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 
 		p1.set(-1, 3);
-		p2.set( 1, 3.1);
-		alg.distanceTol = 0.101/p2.distance(p3);
+		p2.set( 1, 3 + off);
+		alg.distanceTol = thresh*1.01;
 		assertTrue(alg.areMiddlePointsClose(p0, p1, p2, p3));
-		alg.distanceTol = 0.099/p2.distance(p3);
+		alg.distanceTol = thresh*0.99;
 		assertFalse(alg.areMiddlePointsClose(p0, p1, p2, p3));
 	}
 

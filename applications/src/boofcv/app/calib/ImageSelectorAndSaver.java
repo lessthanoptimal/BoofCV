@@ -36,9 +36,11 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * Selects which image to same based on how sharp it is and then saves them to the disk
+ *
  * @author Peter Abeles
  */
-public class ImageSectorSaver {
+public class ImageSelectorAndSaver {
 
 	public static int LENGTH = 50;
 
@@ -62,7 +64,7 @@ public class ImageSectorSaver {
 	File outputDirectory;
 	int imageNumber = 0;
 
-	public ImageSectorSaver( String outputDirectory ) {
+	public ImageSelectorAndSaver(String outputDirectory) {
 		this.outputDirectory = new File(outputDirectory);
 
 		if( !this.outputDirectory.exists() ) {
@@ -73,6 +75,9 @@ public class ImageSectorSaver {
 		// TODO see if there are images in the output directory.  Ask if it should delete it
 	}
 
+	/**
+	 * Creates a template of the fiducial and this is then used to determine how blurred the image is
+	 */
 	public void setTemplate( ImageFloat32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
@@ -103,11 +108,20 @@ public class ImageSectorSaver {
 		PixelMath.divide(template,mean,template);
 	}
 
+	/**
+	 * Discard the current best image
+	 */
 	public synchronized void clearHistory() {
 		bestScore = Double.MAX_VALUE;
 		bestImage = null;
 	}
 
+	/**
+	 * Computes the sharpness score for the current image, if better than the current best image it's then saved.
+	 * @param original original image.  A copy is potentially created for saving to disk later on.
+	 * @param image Gray scale input image for detector
+	 * @param sides Location of 4 corners on fiducial
+	 */
 	public synchronized void process(BufferedImage original , ImageFloat32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
@@ -127,6 +141,9 @@ public class ImageSectorSaver {
 		}
 	}
 
+	/**
+	 * Used when you just want to update the score for visualization purposes but not update the best image.
+	 */
 	public synchronized void updateScore(ImageFloat32 image, List<Point2D_F64> sides) {
 		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
 
@@ -150,6 +167,7 @@ public class ImageSectorSaver {
 			UtilImageIO.saveImage(bestImage,path.getAbsolutePath());
 			imageNumber++;
 		}
+		clearHistory();
 	}
 
 	public double getFocusScore() {
