@@ -51,8 +51,6 @@ integration:android       | Useful functions for working inside of Android devic
 integration:applet        | Code for using BoofCV inside a Java applet.
 integration:jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 integration:openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
-integration:processing    | Easy to use interface in [Processing](https://processing.org/) programming language.
-integration:pyboof        | Wrapper around BoofCV for the Python programming language using [Py4J](https://www.py4j.org/).
 integration:WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 integration:xuggler       | [Xuggler](http://www.xuggle.com/xuggler/) is a wrapper around FFMPEG for reading video files.
 
