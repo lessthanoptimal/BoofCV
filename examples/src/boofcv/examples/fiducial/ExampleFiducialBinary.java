@@ -73,7 +73,7 @@ public class ExampleFiducialBinary {
 			System.out.println(targetToSensor);
 
 			VisualizeFiducial.drawCube(targetToSensor,param,detector.getWidth(i), 3, g2);
-//			VisualizeFiducial.drawLabelCenter(targetToSensor,param,""+detector.getId(i), g2);
+			VisualizeFiducial.drawLabelCenter(targetToSensor,param,""+detector.getId(i), g2);
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);

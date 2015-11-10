@@ -97,6 +97,5 @@ public class ExampleFiducialImage {
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);
-
 	}
 }
