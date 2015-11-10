@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2015
+Date    : 2015/11/09
 Version : Alpha 0.20
 
 - Improved pose stability of calibration targets as fiducials

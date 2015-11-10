@@ -9,6 +9,7 @@ Alpha 0.21
 
 - Fiducial Square
   * Have base class compute threshold, binarize, and have adjustable black rectangle width
+  * Change how the grid is specified
 
 - Chessboard
   * Add support for squares which go outside the image

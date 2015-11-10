@@ -340,7 +340,7 @@ public class CameraCalibration extends BaseWebcamApp {
 			frame.setVisible(false);
 
 			inputDirectory = AssistedCalibration.IMAGE_DIRECTORY;
-			outputFileName = new File(inputDirectory, "intrinsic.xml").getPath();
+			outputFileName = new File(AssistedCalibration.OUTPUT_DIRECTORY, "intrinsic.xml").getPath();
 
 			handleDirectory();
 		}

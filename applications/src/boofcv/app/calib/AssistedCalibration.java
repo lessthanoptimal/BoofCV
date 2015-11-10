@@ -277,7 +277,6 @@ public class AssistedCalibration {
 
 	private void handleClearDots( boolean detected ) {
 		String message = "Clear the dots!";
-		drawPadding();
 
 		if( detected ) {
 
@@ -330,10 +329,12 @@ public class AssistedCalibration {
 				saver.process(inputBuffered, input, sides);
 			}
 
+			drawPadding();
 			renderMagnets();
 			renderArrows();
 			renderCalibrationPoints(stationaryTime, points.points);
 		} else {
+			drawPadding();
 			saver.clearHistory();
 			for (int i = 0; i < magnets.size(); i++) {
 				magnets.get(i).handleNoDetection();
