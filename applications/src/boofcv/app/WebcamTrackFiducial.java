@@ -81,10 +81,11 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("                                     DEFAULT: true");
 		System.out.println("  --Size=<float>                     Specifies the size of all the fiducials");
 		System.out.println("                                     DEFAULT: 1");
-		System.out.println("  --GridWidth=<int | ALL>            Specifies how many squares to expect in the fiducial.");
-		System.out.println("                                     Valid options: 3,4,5 and ALL");
-		System.out.println("                                     Using ALL will attempt detection with all sizes ");
-		System.out.println("                                     but keep in mind this will be slow and less accurate");
+		System.out.println("  --GridWidth=<int>                  Specifies how many inner squares to expect in the fiducial.");
+		System.out.println("                                     Valid options: 3 to 8");
+		System.out.println("                                     Default is 4");
+		System.out.println("  --Border=<float>                   Specifies relative width of the border.");
+		System.out.println("                                     DEFAULT: 0.25");
 		System.out.println();
 		System.out.println("Flags for IMAGE:");
 		System.out.println();
@@ -92,6 +93,8 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("                                     DEFAULT: true");
 		System.out.println("  --Image=<size float>:<image path>  Adds a single image with the specified size");
 		System.out.println("                                     Can be called multiple times for several images");
+		System.out.println("  --Border=<float>                   Specifies relative width of the border.");
+		System.out.println("                                     DEFAULT: 0.25");
 		System.out.println("Flags for CHESSBOARD:");
 		System.out.println();
 		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
@@ -108,11 +111,12 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println();
 		System.out.println("Examples:");
 		System.out.println();
-		System.out.println("./application BINARY --Size=1 --GridWidth=4");
-		System.out.println("        Opens the default camera at default resolution looking for binary patterns with a width of 1");
+		System.out.println("./application BINARY --Size=1 --GridWidth=3");
+		System.out.println("        Opens the default camera at default resolution looking for a 3x3 binary patterns with a width of 1");
 		System.out.println();
-		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1 --GridWidth=ALL");
-		System.out.println("        Opens the default camera at default resolution looking for binary patterns with a width of 1");
+		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1");
+		System.out.println("        Opens the camera 1 at a resolution of 640x480 using a fast thresholding technique, " +
+				           "looking for 4x4 binary patterns with a width of 1");
 	}
 
 	void parse( String []args ) {
@@ -152,7 +156,8 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 	void parseBinary( int index , String []args ) {
 		boolean robust=true;
 		double size=1;
-		int gridWidth = 4; // if null, means all.
+		int gridWidth = 4;
+		double borderWidth = 0.25;
 
 		for(; index < args.length; index++ ) {
 			String arg = args[index];
@@ -167,18 +172,21 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			} else if( flagName.compareToIgnoreCase("Size") == 0 ) {
 				size = Double.parseDouble(parameters);
 			} else if( flagName.compareToIgnoreCase("GridWidth") == 0 ) {
-				size = Integer.parseInt(parameters);
+				gridWidth = Integer.parseInt(parameters);
+			} else if( flagName.compareToIgnoreCase("Border") == 0 ) {
+				borderWidth = Double.parseDouble(parameters);
 			} else {
 				throw new RuntimeException("Unknown image option "+flagName);
 			}
 		}
 
-		System.out.println("binary: robust = "+robust+" size = "+size + " grid width = " + gridWidth);
+		System.out.println("binary: robust = "+robust+" size = "+size + " grid width = " + gridWidth+" border = "+borderWidth);
 
 		ConfigFiducialBinary configFid = new ConfigFiducialBinary();
 		configFid.targetWidth = size;
 		configFid.gridWidth = gridWidth;
 		configFid.squareDetector.minimumEdgeIntensity = 10;
+		configFid.borderWidthFraction = borderWidth;
 
 		ConfigThreshold configThreshold ;
 
@@ -195,6 +203,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 
 		List<String> paths = new ArrayList<String>();
 		GrowQueue_F64 sizes = new GrowQueue_F64();
+		double borderWidth = 0.25;
 
 		for(; index < args.length; index++ ) {
 			String arg = args[index];
@@ -211,6 +220,8 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 				if( words.length != 2 )throw new RuntimeException("Expected two for width and image path");
 				sizes.add(Double.parseDouble(words[0]));
 				paths.add(words[1]);
+			} else if( flagName.compareToIgnoreCase("Border") == 0 ) {
+				borderWidth = Double.parseDouble(parameters);
 			} else {
 				throw new RuntimeException("Unknown image option "+flagName);
 			}
@@ -219,11 +230,10 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		if( paths.isEmpty() )
 			throw new RuntimeException("Need to specify patterns");
 
-		System.out.println("image: robust = "+robust+" total patterns = "+paths.size());
+		System.out.println("image: robust = "+robust+" total patterns = "+paths.size()+" border = "+borderWidth);
 
 		ConfigFiducialImage config = new ConfigFiducialImage();
-		config.squareDetector.minimumEdgeIntensity = 10;
-
+		config.borderWidthFraction = borderWidth;
 		ConfigThreshold configThreshold;
 
 		if( robust )
