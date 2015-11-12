@@ -3,6 +3,23 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    :
+Version : Alpha 0.21
+
+
+- TODO Polygon handle shapes which touch the image border
+- TODO         side optimization needs to handle this case too
+- TODO         reject shapes if final polygon doesn't match the initial contour at all
+- TODO SIFT  FIX
+- TODO       dense
+- TODO Update chessboard to create grid from connecting corners of squares
+- TODO Have image fiducial threshold be computed from sampling along square border
+- TODO Have binary threshold be computed from known black/white regions?
+- TODO Assisted Calibration - remove images after collected
+- TODO                      - change calibration settings and recompute
+- TODO Submit bug report to gradle for javadoc header/footer bug
+
+---------------------------------------------
 Date    : 2015/11/09
 Version : Alpha 0.20
 
