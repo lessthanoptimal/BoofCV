@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSiftDetector extends GenericFeatureDetector {
+public class TestSiftDetector extends GenericFeatureDetectorTests {
 
 	SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
 

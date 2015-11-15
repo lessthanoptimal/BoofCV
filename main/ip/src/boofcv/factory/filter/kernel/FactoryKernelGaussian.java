@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -239,7 +239,7 @@ public class FactoryKernelGaussian {
 	 */
 	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
 		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
-		Kernel2D_F32 ret = KernelMath.convolve(kernel1D,kernel1D);
+		Kernel2D_F32 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
@@ -250,7 +250,7 @@ public class FactoryKernelGaussian {
 
 	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean normalize) {
 		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius,false);
-		Kernel2D_F64 ret = KernelMath.convolve(kernel1D,kernel1D);
+		Kernel2D_F64 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);

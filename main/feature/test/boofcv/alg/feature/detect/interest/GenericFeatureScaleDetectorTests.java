@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFeatureScaleDetector extends GenericFeatureDetector {
+public abstract class GenericFeatureScaleDetectorTests extends GenericFeatureDetectorTests {
 
 	int r = 2;
 

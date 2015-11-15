@@ -31,17 +31,6 @@ import boofcv.struct.image.ImageFloat32;
  * Each octave is half the width/height of the previous octave.  Scales are computed inside an octave
  * by applying Gaussian blur.   See SIFT paper for the details.
  *
- * <p>
- * OCTAVE SCALES: The scales sampled are different from the SIFT paper.  In each octave the scales are sampled
- * across a linear function. s(i) = sigma*i.  In the paper scales are sampled using an exponential function
- * s(i) = sigma*s(i-1)
- * </p>
- *
- * <p>
- * When computing the next octave in the sequence it is seeded with the image from the second scale in the previous
- * octave.  The first octave is seeded with the input image or the input image scaled.
- * </p>
- *
  * @author Peter Abeles
  */
 public class SiftImageScaleSpace {
@@ -88,7 +77,7 @@ public class SiftImageScaleSpace {
 	 * Configures the scale-space.
 	 *
 	 * @param blurSigma Amount of blur applied to each scale inside an octaves.  Try 1.6
-	 * @param numScales Number of scales per octaves.  Try 5.  Must be >= 3
+	 * @param numScales Number of scales per octaves. (variable 's' in paper) Try 2.
 	 * @param numOctaves Number of octaves to detect.  Try 4
 	 * @param doubleInputImage Should the input image be doubled? Try false.
 	 */
@@ -115,7 +104,7 @@ public class SiftImageScaleSpace {
 			priorSigmaFirstScale[o] = computeScaleSigma(o-1,1);
 		}
 
-		int totalImages = numScales*numOctaves;
+		int totalImages = (numScales+3)*numOctaves;
 
 		scale = new ImageFloat32[totalImages];
 		derivX = new ImageFloat32[totalImages];

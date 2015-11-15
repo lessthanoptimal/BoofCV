@@ -122,7 +122,6 @@ public class SiftDetector {
 	 * Define sparse image derivative operators.
 	 */
 	private void createDerivatives() {
-		// TODO optimize usign a sparse kernel?
 		Kernel2D_F32 kerX = new Kernel2D_F32(3,new float[]{
 				 0,0,0,
 				-1,0,1,
@@ -135,9 +134,9 @@ public class SiftDetector {
 		Kernel2D_F32 kerXY = KernelMath.convolve2D(kerX,kerY);
 		Kernel2D_F32 kerYY = KernelMath.convolve2D(kerY,kerY);
 
-		derivXX = FactoryConvolveSparse.create(ImageFloat32.class,kerXX);
-		derivXY = FactoryConvolveSparse.create(ImageFloat32.class,kerXY);
-		derivYY = FactoryConvolveSparse.create(ImageFloat32.class,kerYY);
+		derivXX = FactoryConvolveSparse.convolve2D(ImageFloat32.class, kerXX);
+		derivXY = FactoryConvolveSparse.convolve2D(ImageFloat32.class, kerXY);
+		derivYY = FactoryConvolveSparse.convolve2D(ImageFloat32.class, kerYY);
 
 		// treat pixels outside the image border as having a value of zero
 		ImageBorder<ImageFloat32> border = FactoryImageBorder.singleValue(ImageFloat32.class, 0);
@@ -268,7 +267,7 @@ public class SiftDetector {
 	 * @param c_y y-coordinate of maximum
 	 * @param value The maximum value it is checking
 	 * @param signAdj Adjust the sign so that it can check for maximums
-	 * @return
+	 * @return true if its a local max
 	 */
 	private boolean isScaleSpaceMax( ImageFloat32 scale0 , ImageFloat32 scale2,
 									 int c_x , int c_y , float value , float signAdj ) {

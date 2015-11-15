@@ -145,9 +145,19 @@ public class KernelMath {
 		return ret;
 	}
 
-	// TODO rename convolve2D
-	// todo these might not be swapping the direction of one of the kernels during the convolution
-	public static Kernel2D_F32 convolve( Kernel1D_F32 a , Kernel1D_F32 b ) {
+	/**
+	 * Convolve two 1D kernels together to form a 2D kernel.
+	 *
+	 * @param a Input vertical 1D kernel
+	 * @param b Input horizontal 1D kernel
+	 * @return Resulting 2D kernel
+	 */
+	public static Kernel2D_F32 convolve2D(Kernel1D_F32 a, Kernel1D_F32 b) {
+		if( a.width != b.width )
+			throw new IllegalArgumentException("Only kernels with the same width supported");
+		if( a.offset != b.width/2 )
+			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
+
 		int w = a.width;
 
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
@@ -162,7 +172,19 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_F64 convolve( Kernel1D_F64 a , Kernel1D_F64 b ) {
+	/**
+	 * Convolve two 1D kernels together to form a 2D kernel.
+	 *
+	 * @param a Input vertical 1D kernel
+	 * @param b Input horizontal 1D kernel
+	 * @return Resulting 2D kernel
+	 */
+	public static Kernel2D_F64 convolve2D(Kernel1D_F64 a, Kernel1D_F64 b) {
+		if( a.width != b.width )
+			throw new IllegalArgumentException("Only kernels with the same width supported");
+		if( a.offset != b.width/2 )
+			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
+
 		int w = a.width;
 
 		Kernel2D_F64 ret = new Kernel2D_F64(w);
@@ -177,7 +199,19 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convolve( Kernel1D_I32 a , Kernel1D_I32 b ) {
+	/**
+	 * Convolve two 1D kernels together to form a 2D kernel.
+	 *
+	 * @param a Input vertical 1D kernel
+	 * @param b Input horizontal 1D kernel
+	 * @return Resulting 2D kernel
+	 */
+	public static Kernel2D_I32 convolve2D(Kernel1D_I32 a, Kernel1D_I32 b) {
+		if( a.width != b.width )
+			throw new IllegalArgumentException("Only kernels with the same width supported");
+		if( a.offset != b.width/2 )
+			throw new IllegalArgumentException("Only kernels with the offset in the middle supported");
+
 		int w = a.width;
 
 		Kernel2D_I32 ret = new Kernel2D_I32(w);

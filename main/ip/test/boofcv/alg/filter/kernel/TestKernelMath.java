@@ -140,14 +140,16 @@ public class TestKernelMath {
 	}
 
 	@Test
-	public void convolve_1D_F32() {
-		Kernel1D_F32 k1 = FactoryKernel.random1D_F32(5,2,-1,1,rand);
-		Kernel1D_F32 k2 = FactoryKernel.random1D_F32(5,2,-1,1,rand);
+	public void convolve2D_1D_F32() {
+		Kernel1D_F32 k1 = new Kernel1D_F32(new float[]{4,3,2},3,1);
+		Kernel1D_F32 k2 = new Kernel1D_F32(new float[]{9,5,1},3,1);
 
-		Kernel2D_F32 c = KernelMath.convolve(k1,k2);
+		Kernel2D_F32 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1, c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
 				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
 			}
 		}
@@ -155,28 +157,32 @@ public class TestKernelMath {
 
 	@Test
 	public void convolve_1D_F64() {
-		Kernel1D_F64 k1 = FactoryKernel.random1D_F64(5,2,-1,1,rand);
-		Kernel1D_F64 k2 = FactoryKernel.random1D_F64(5,2,-1,1,rand);
+		Kernel1D_F64 k1 = new Kernel1D_F64(new double[]{4,3,2},3,1);
+		Kernel1D_F64 k2 = new Kernel1D_F64(new double[]{9,5,1},3,1);
 
-		Kernel2D_F64 c = KernelMath.convolve(k1,k2);
+		Kernel2D_F64 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1,c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
-				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-8);
 			}
 		}
 	}
 
 	@Test
 	public void convolve_1D_I32() {
-		Kernel1D_I32 k1 = FactoryKernel.random1D_I32(5,2,-1,1,rand);
-		Kernel1D_I32 k2 = FactoryKernel.random1D_I32(5,2,-1,1,rand);
+		Kernel1D_I32 k1 = new Kernel1D_I32(new int[]{4,3,2},3,1);
+		Kernel1D_I32 k2 = new Kernel1D_I32(new int[]{9,5,1},3,1);
 
-		Kernel2D_I32 c = KernelMath.convolve(k1,k2);
+		Kernel2D_I32 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1,c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
-				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i));
 			}
 		}
 	}

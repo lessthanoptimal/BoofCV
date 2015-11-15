@@ -30,7 +30,7 @@ import boofcv.struct.pyramid.PyramidFloat;
 /**
  * @author Peter Abeles
  */
-public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetector {
+public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetectorTests {
 
 	public TestFeatureLaplacePyramid() {
 		// just make one of these tests work
