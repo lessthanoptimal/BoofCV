@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class VisualizeFeatures {
 	}
 
 	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color ) {
-		drawPoint(g2,x,y,r,color,true);
+		drawPoint(g2, x, y, r, color, true);
 	}
 
 	public static void drawPoint( Graphics2D g2 , int x , int y ,int r,  Color color , boolean hasBorder) {
@@ -65,7 +65,7 @@ public class VisualizeFeatures {
 			int w2 = r2*2+1;
 
 			g2.setColor(Color.BLACK);
-			g2.fillOval(x-r2,y-r2,w2,w2);
+			g2.fillOval(x - r2, y - r2, w2, w2);
 		}
 
 		g2.setColor(color);
@@ -104,10 +104,15 @@ public class VisualizeFeatures {
 	}
 
 	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
-		g2.setColor(Color.RED);
+
 		g2.setStroke(new BasicStroke(3));
 
 		for( ScalePoint p : points ) {
+			if( p.white ) {
+				g2.setColor(Color.RED);
+			} else {
+				g2.setColor(Color.BLUE);
+			}
 			int r = (int)(radius*p.scale);
 			int w = r*2+1;
 			g2.drawOval((int)p.x-r,(int)p.y-r,w,w);
