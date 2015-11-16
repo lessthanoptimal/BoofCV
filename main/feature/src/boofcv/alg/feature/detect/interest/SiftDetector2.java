@@ -114,7 +114,7 @@ public class SiftDetector2 {
 	public void process( ImageFloat32 input ) {
 
 		scaleSpace.initialize(input);
-//		octaveDetection.reset();
+		octaveDetection.reset();
 
 		do {
 			// scale from octave to input image
@@ -160,7 +160,7 @@ public class SiftDetector2 {
 		derivXY.setImage(dogTarget);
 		derivYY.setImage(dogTarget);
 
-		octaveDetection.reset();
+//		octaveDetection.reset();
 
 		for (int i = 0; i < found.size; i++) {
 			NonMaxLimiter.LocalExtreme e = found.get(i);

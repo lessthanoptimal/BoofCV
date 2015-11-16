@@ -160,6 +160,6 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Feature Pyramid");
+		ShowImages.showWindow(app, "Feature Pyramid", true);
 	}
 }

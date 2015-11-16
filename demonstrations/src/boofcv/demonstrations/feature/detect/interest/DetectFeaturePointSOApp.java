@@ -54,7 +54,7 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 	static int maxFeatures = 400;
 	static int maxScaleFeatures = maxFeatures / 3;
 
-	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 12};
+	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 10,12,14,16,18};
 	int radius = 2;
 	float thresh = 1;
 	T grayImage;
@@ -185,6 +185,6 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Point Feature");
+		ShowImages.showWindow(app, "Point Feature", true);
 	}
 }
