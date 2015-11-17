@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    :
 Version : Alpha 0.21
 
+- SURF
+  * Fixed a bug dealing with gradient calculation and improve stability for very small objects
 
 - TODO Polygon handle shapes which touch the image border
 - TODO         side optimization needs to handle this case too
