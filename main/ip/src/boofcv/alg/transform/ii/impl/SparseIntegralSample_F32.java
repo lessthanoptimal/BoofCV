@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,18 +28,12 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  * @author Peter Abeles
  */
 public class SparseIntegralSample_F32 extends SparseScaleSample_F64<ImageFloat32> {
-	
-	int baseR;
+
 	int r;
 
-	public SparseIntegralSample_F32(int baseR) {
-		this.baseR = baseR;
-		setScale(1);
-	}
-
 	@Override
-	public void setScale(double scale) {
-		r = (int)(baseR*scale + 0.5);
+	public void setWidth(double width) {
+		r = ((int)( width + 0.5 ))/2;
 		if( r <= 0 )
 			r = 1;
 		

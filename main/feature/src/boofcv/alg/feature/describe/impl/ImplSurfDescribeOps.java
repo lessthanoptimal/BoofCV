@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
-import boofcv.struct.sparse.SparseImageGradient;
+import boofcv.struct.sparse.SparseScaleGradient;
 
 
 /**
@@ -163,9 +163,10 @@ public class ImplSurfDescribeOps {
 					   int regionSize, double kernelSize,
 					   boolean useHaar, double[] derivX, double derivY[])
 	{
-		SparseImageGradient<T,?> g =  SurfDescribeOps.createGradient(useHaar,(int)(kernelSize+0.5),(Class<T>)ii.getClass());
-		g.setImage(ii);
-		g = new SparseGradientSafe(g);
+		SparseScaleGradient<T,?> gg =  SurfDescribeOps.createGradient(useHaar,(Class<T>)ii.getClass());
+		gg.setWidth(kernelSize);
+		gg.setImage(ii);
+		SparseGradientSafe g = new SparseGradientSafe(gg);
 
 		// add 0.5 to c_x and c_y to have it round when converted to an integer pixel
 		// this is faster than the straight forward method

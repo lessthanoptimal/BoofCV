@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	protected Kernel2D_F64 kerSine;
 
 	private SparseScaleSample_F64<T> sampler;
-	
+
 	/**
 	 *
 	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
@@ -70,7 +70,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 		kerCosine.set(radius,radius,0);
 		kerSine.set(radius,radius,0);
 
-		sampler = FactorySparseIntegralFilters.sample(sampleWidth/2,imageType);
+		sampler = FactorySparseIntegralFilters.sample(imageType);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	@Override
 	public void setScale(double scale) {
 		super.setScale(scale);
-		sampler.setScale(scale);
+		sampler.setWidth(sampleWidth * scale);
 	}
 
 	@Override

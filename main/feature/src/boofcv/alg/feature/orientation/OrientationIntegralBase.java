@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,13 +79,13 @@ public abstract class OrientationIntegralBase<II extends ImageSingleBand,G exten
 		if( weightSigma != 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma,radius);
 
-		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, sampleWidth, integralType);
+		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, integralType);
 	}
 	
 	@Override
 	public void setScale(double scale) {
 		this.scale = scale;
-		g.setScale(scale);
+		g.setWidth(scale * sampleWidth);
 	}
 
 	@Override

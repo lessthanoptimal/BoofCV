@@ -124,8 +124,8 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		// each sub-region provides 4 features
 		featureDOF = widthLargeGrid*widthLargeGrid*4;
 
-		// create the function that the gradient is sampled with
-		gradient = SurfDescribeOps.createGradient(useHaar,widthSample, inputType);
+		// create the function that the gradient is sampled with=
+		gradient = SurfDescribeOps.createGradient(useHaar, inputType);
 		gradientSafe = new SparseGradientSafe(this.gradient);
 
 		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2;
@@ -196,7 +196,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		gradient.setImage(ii);
-		gradient.setScale(scale);
+		gradient.setWidth(widthSample*scale);
 
 		// use a safe method if its along the image border
 		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;

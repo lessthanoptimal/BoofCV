@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,9 @@ public class SparseIntegralGradient_NoBorder_F32
 
 	private GradientValue_F32 ret = new GradientValue_F32();
 
-	public SparseIntegralGradient_NoBorder_F32(int radius) {
-		super(radius);
-	}
-
 	@Override
-	public void setScale(double scale) {
-		super.setScale(scale);
+	public void setWidth(double width) {
+		super.setWidth(width);
 
 		x0 = y0 = -r-1;
 		x1 = y1 =  r;

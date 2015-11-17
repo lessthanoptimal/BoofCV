@@ -92,21 +92,16 @@ public class SurfDescribeOps {
 	 * All these kernels assume that the kernel is entirely contained inside the image!
 	 *
 	 * @param useHaar Should it use a haar wavelet or an derivative kernel.
-	 * @param kernelWidth Size of the kernel's width in pixels (before scale adjustment).
 	 * @param imageType Type of image being processed.
 	 * @return Sparse gradient algorithm
 	 */
 	public static <T extends ImageSingleBand>
-	SparseScaleGradient<T,?> createGradient( boolean useHaar , int kernelWidth ,
-											 Class<T> imageType )
+	SparseScaleGradient<T,?> createGradient( boolean useHaar , Class<T> imageType )
 	{
-		int regionRadius = kernelWidth/2;
-		if( regionRadius <= 0 ) regionRadius = 1;
-
 		if( useHaar )
-			return FactorySparseIntegralFilters.haar(regionRadius, imageType);
+			return FactorySparseIntegralFilters.haar(imageType);
 		else
-			return FactorySparseIntegralFilters.gradient(regionRadius,imageType);
+			return FactorySparseIntegralFilters.gradient(imageType);
 	}
 
 	/**

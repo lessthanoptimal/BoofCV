@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,23 +33,15 @@ import boofcv.struct.sparse.SparseScaleGradient;
 public abstract class SparseIntegralGradient_NoBorder <T extends ImageSingleBand, G extends GradientValue>
 		extends SparseScaleGradient<T, G>
 {
-	// the radius at a scale of one
-	protected int baseR;
-	
 	// radius of the kernel
 	protected int r;
 	// width of the kernel
 	protected int w;
 
-	public SparseIntegralGradient_NoBorder(int baseRadius) {
-		baseR = baseRadius;
-		setScale(1);
-	}
-
 	@Override
-	public void setScale(double scale) {
-		r = (int)(baseR*scale+0.5);
-		if( r < 0 )
+	public void setWidth(double width) {
+		r = ((int)(width+0.5))/2;
+		if( r <= 0 )
 			r = 1;
 		w = r*2+1;
 	}
