@@ -67,7 +67,7 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.5,5,ImageFloat32.class);
+		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,ImageFloat32.class);
 		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 

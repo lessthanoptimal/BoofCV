@@ -68,7 +68,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		double objectToScale = 1.0/2.5;
+		double objectToScale = 1.0/2.0;
 
 		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(objectToScale,radius, imageType));
 		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(objectToScale,radius, false, derivType));

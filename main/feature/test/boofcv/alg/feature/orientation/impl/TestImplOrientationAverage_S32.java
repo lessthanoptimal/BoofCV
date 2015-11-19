@@ -35,7 +35,7 @@ public class TestImplOrientationAverage_S32 {
 	public void standardUnweighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.5,false);
+		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,false);
 		alg.setSampleRadius(r);
 
 		tests.setup(angleTol, r*2+1 , alg);
@@ -46,7 +46,7 @@ public class TestImplOrientationAverage_S32 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.5,true);
+		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,true);
 		alg.setSampleRadius(r);
 
 		tests.setup(angleTol, r*2+1 ,alg);

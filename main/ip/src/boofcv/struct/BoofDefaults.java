@@ -26,7 +26,7 @@ import boofcv.core.image.border.*;
  */
 public class BoofDefaults {
 
-	public static final double SURF_SCALE_TO_RADIUS = 2.5;
+	public static final double SURF_SCALE_TO_RADIUS = 2.0;
 	public static final double SIFT_SCALE_TO_RADIUS = 1.5;
 
 	/**

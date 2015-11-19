@@ -35,7 +35,7 @@ public class TestImplOrientationImageAverage_U8 {
 	public void standardUnweighted() {
 		GenericOrientationImageTests<ImageUInt8> tests = new GenericOrientationImageTests<ImageUInt8>();
 
-		OrientationImageAverage<ImageUInt8> alg = new ImplOrientationImageAverage_U8(1.0/2.5,r);
+		OrientationImageAverage<ImageUInt8> alg = new ImplOrientationImageAverage_U8(1.0/2.0,r);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageUInt8.class);
 		tests.performAll();

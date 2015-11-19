@@ -109,7 +109,7 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 
 		// if null then no orientation will be computed
 		OrientationImageAverage<T> orientation = null;
-		orientation = FactoryOrientationAlgs.nogradient(1.0/2.5,radius,imageType);
+		orientation = FactoryOrientationAlgs.nogradient(1.0/2.0,radius,imageType);
 
 		InterestPointDetector<T> detector;
 

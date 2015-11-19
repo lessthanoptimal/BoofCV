@@ -35,7 +35,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 	public void standardUnweighted() {
 		GenericOrientationGradientTests<ImageFloat32> tests = new GenericOrientationGradientTests<ImageFloat32>();
 
-		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.5,N,window,false);
+		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,false);
 		alg.setObjectRadius(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 , alg);
@@ -46,7 +46,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageFloat32> tests = new GenericOrientationGradientTests<ImageFloat32>();
 
-		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.5,N,window,true);
+		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,true);
 		alg.setObjectRadius(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);

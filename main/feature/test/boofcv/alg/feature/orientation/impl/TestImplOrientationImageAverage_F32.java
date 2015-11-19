@@ -35,7 +35,7 @@ public class TestImplOrientationImageAverage_F32 {
 	public void standardUnweighted() {
 		GenericOrientationImageTests<ImageFloat32> tests = new GenericOrientationImageTests<ImageFloat32>();
 
-		OrientationImageAverage<ImageFloat32> alg = new ImplOrientationImageAverage_F32(1.0/2.5,r);
+		OrientationImageAverage<ImageFloat32> alg = new ImplOrientationImageAverage_F32(1.0/2.0,r);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageFloat32.class);
 		tests.performAll();

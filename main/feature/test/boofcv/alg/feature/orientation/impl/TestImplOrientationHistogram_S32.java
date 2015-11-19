@@ -45,7 +45,7 @@ public class TestImplOrientationHistogram_S32 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(1.0/2.5,N,true);
+		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(1.0/2.0,N,true);
 		alg.setObjectToSample(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ public class TestOrientationIntegralToImage {
 	public void generic() {
 		ConfigAverageIntegral config = new ConfigAverageIntegral();
 		config.radius = r;
+		config.objectRadiusToScale = 1/3.0;
 		OrientationIntegral<ImageFloat32> orig = FactoryOrientationAlgs.average_ii(config, ImageFloat32.class);
 
 		OrientationIntegralToImage<ImageFloat32,ImageFloat32>

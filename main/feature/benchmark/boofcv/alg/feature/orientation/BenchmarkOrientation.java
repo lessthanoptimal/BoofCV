@@ -47,7 +47,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	static Random rand = new Random(234234);
 	static int NUM_POINTS = 1000;
 	static int RADIUS = 6;
-	static double OBJECt_TO_SCALE = 1.0/2.5;
+	static double OBJECt_TO_SCALE = 1.0/2.0;
 
 	final static int width = 640;
 	final static int height = 480;
@@ -194,8 +194,8 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(0.5,15, RADIUS, true, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, false, derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(1.0/2.5,RADIUS, 1, 4, 0, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(1.0/2.5,RADIUS, 1, 4, -1, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(1.0/2.0,RADIUS, 1, 4, 0, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(1.0/2.0,RADIUS, 1, 4, -1, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(null, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(confAverageIIW, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(null, imageType)), TEST_TIME);

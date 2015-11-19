@@ -38,7 +38,7 @@ public class TestOrientationGradientToImage {
 	 */
 	@Test
 	public void generic() {
-		OrientationGradient<ImageFloat32> orig = FactoryOrientationAlgs.average(1.0/2.5,r,false, ImageFloat32.class);
+		OrientationGradient<ImageFloat32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, ImageFloat32.class);
 
 		ImageGradient<ImageFloat32,ImageFloat32> gradient =
 				FactoryDerivative.sobel_F32();

@@ -29,6 +29,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 
 import java.awt.image.BufferedImage;
@@ -55,7 +56,7 @@ public class DebugSiftDetectorApp {
 		System.out.println("total features found: "+alg.getFoundPoints().size());
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),
-				alg.getFoundPoints().toList(),1);
+				alg.getFoundPoints().toList(), BoofDefaults.SIFT_SCALE_TO_RADIUS);
 
 
 		ListDisplayPanel dog = new ListDisplayPanel();
