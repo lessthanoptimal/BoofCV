@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ public class TestImplOrientationHistogram_S32 {
 	public void standardUnweighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(N,false);
-		alg.setRadius(r);
+		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(r,N,false);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 , alg);
 		tests.performAll();
@@ -46,8 +45,8 @@ public class TestImplOrientationHistogram_S32 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(N,true);
-		alg.setRadius(r);
+		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(1.0/2.5,N,true);
+		alg.setObjectToSample(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);
 		tests.performAll();

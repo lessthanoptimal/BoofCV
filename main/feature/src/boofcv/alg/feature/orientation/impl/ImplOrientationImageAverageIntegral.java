@@ -46,29 +46,30 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 
 	/**
 	 *
-	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
+	 * @param sampleRadius Radius of the region being considered in terms of Wavelet samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 */
-	public ImplOrientationImageAverageIntegral(int radius, double period,
+	public ImplOrientationImageAverageIntegral(double radiusToScale,
+											   int sampleRadius, double period,
 											   int sampleWidth, double weightSigma,
 											   Class<T> imageType) {
-		super(radius,period,sampleWidth,weightSigma,imageType);
+		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma,imageType);
 
-		int w = radius*2+1;
+		int w = sampleRadius*2+1;
 		kerCosine = new Kernel2D_F64(w);
 		kerSine = new Kernel2D_F64(w);
 
-		for( int y=-radius; y <= radius; y++ ) {
-			int pixelY = y+radius;
-			for( int x=-radius; x <= radius; x++ ) {
-				int pixelX = x+radius;
+		for( int y=-sampleRadius; y <= sampleRadius; y++ ) {
+			int pixelY = y+sampleRadius;
+			for( int x=-sampleRadius; x <= sampleRadius; x++ ) {
+				int pixelX = x+sampleRadius;
 				float r = (float)Math.sqrt(x*x+y*y);
 				kerCosine.set(pixelX,pixelY,(float)x/r);
 				kerSine.set(pixelX,pixelY,(float)y/r);
 			}
 		}
-		kerCosine.set(radius,radius,0);
-		kerSine.set(radius,radius,0);
+		kerCosine.set(sampleRadius,sampleRadius,0);
+		kerSine.set(sampleRadius,sampleRadius,0);
 
 		sampler = FactorySparseIntegralFilters.sample(imageType);
 	}
@@ -80,17 +81,17 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	}
 
 	@Override
-	public void setScale(double scale) {
-		super.setScale(scale);
-		sampler.setWidth(sampleWidth * scale);
+	public void setObjectRadius(double radius) {
+		super.setObjectRadius(radius);
+		sampler.setWidth(kernelWidth * scale);
 	}
 
 	@Override
 	public double compute(double c_x, double c_y) {
 
 		double period = scale*this.period;
-		double tl_x = c_x - radius*period;
-		double tl_y = c_y - radius*period;
+		double tl_x = c_x - sampleRadius *period;
+		double tl_y = c_y - sampleRadius *period;
 
 		if( weights == null )
 			return computeUnweighted(tl_x,tl_y,period);
@@ -107,10 +108,10 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 		
 		double Dx=0,Dy=0;
 		int i = 0;
-		for( int y = 0; y < width; y++ ) {
+		for(int y = 0; y < sampleWidth; y++ ) {
 			int pixelY = (int)(tl_y + y * samplePeriod);
 
-			for( int x = 0; x < width; x++ , i++ ) {
+			for(int x = 0; x < sampleWidth; x++ , i++ ) {
 				int pixelX = (int)(tl_x + x * samplePeriod);
 
 				if( sampler.isInBounds(pixelX,pixelY)) {
@@ -139,10 +140,10 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 
 		double Dx=0,Dy=0;
 		int i = 0;
-		for( int y = 0; y < width; y++ ) {
+		for(int y = 0; y < sampleWidth; y++ ) {
 			int pixelY = (int)(tl_y + y * samplePeriod);
 
-			for( int x = 0; x < width; x++ , i++ ) {
+			for(int x = 0; x < sampleWidth; x++ , i++ ) {
 				int pixelX = (int)(tl_x + x * samplePeriod);
 
 				if( sampler.isInBounds(pixelX,pixelY)) {

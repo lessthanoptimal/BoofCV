@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class TestDetectDescribeMultiFusion {
 	@Test
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5, ImageFloat32.class);
+		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,5, ImageFloat32.class);
 		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
@@ -150,7 +150,7 @@ public class TestDetectDescribeMultiFusion {
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
+		public double getRadius(int featureIndex) {
 			return 2;
 		}
 

@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.abst.feature.detect.interest.WrapSiftDetector;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.struct.feature.SurfFeature;
@@ -57,15 +58,15 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, SurfFeature storage)
+	public boolean process(double x, double y, double orientation, double radius, SurfFeature storage)
 	{
-		alg.process(x,y,scale,orientation,storage);
+		alg.process(x,y, radius/WrapSiftDetector.SCALE_TO_RADUS,orientation,storage);
 
 		return true;
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return true;
 	}
 

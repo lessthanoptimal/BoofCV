@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,21 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.struct.BoofDefaults;
+
 /**
  * Configuration for {@link boofcv.alg.feature.orientation.impl.ImplOrientationAverageGradientIntegral}.
  *
  * @author Peter Abeles
  */
 public class ConfigAverageIntegral implements ConfigOrientation {
+
+	/**
+	 * How to convert the radius to the internal canonical scale.  Can be used to adjust how
+	 * big or small the region is.
+	 */
+	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
+
 	/**
 	 * Radius of the region being considered in terms of samples. Typically 6.
 	 */

@@ -78,10 +78,10 @@ public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc exte
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, Desc description) {
+	public boolean process(double x, double y, double orientation, double radius, Desc description) {
 		// compute descriptions individually
 		for( int i = 0; i < describers.length; i++ ) {
-			if( !describers[i].process(x,y,orientation,scale,descBand[i]) )
+			if( !describers[i].process(x,y,orientation, radius,descBand[i]) )
 				return false;
 		}
 
@@ -99,8 +99,8 @@ public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc exte
 	protected abstract void combine( Desc description );
 
 	@Override
-	public boolean requiresScale() {
-		return describers[0].requiresScale();
+	public boolean requiresRadius() {
+		return describers[0].requiresRadius();
 	}
 
 	@Override

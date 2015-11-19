@@ -57,7 +57,7 @@ public class TestDetectDescribeFusion {
 		assertEquals(9, alg.getNumberOfFeatures());
 
 		for( int i = 0; i < 9; i++ ) {
-			assertEquals(2,alg.getScale(i),1e-8);
+			assertEquals(2,alg.getRadius(i),1e-8);
 			assertEquals(1,alg.getOrientation(i),1e-8);
 			assertTrue(alg.getDescription(i) != null);
 			assertTrue(alg.getLocation(i) != null);
@@ -67,7 +67,7 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,ImageFloat32.class);
+		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.5,5,ImageFloat32.class);
 		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
@@ -111,7 +111,7 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
+		public double getRadius(int featureIndex) {
 			return 2;
 		}
 
@@ -144,12 +144,12 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double scale, TupleDesc ret) {
+		public boolean process(double x, double y, double orientation, double radius, TupleDesc ret) {
 			return calls++ != 5;
 		}
 
 		@Override
-		public boolean requiresScale() {
+		public boolean requiresRadius() {
 			return false;
 		}
 

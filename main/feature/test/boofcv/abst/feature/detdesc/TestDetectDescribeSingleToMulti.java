@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class TestDetectDescribeSingleToMulti {
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
+		public double getRadius(int featureIndex) {
 			return 1.5;
 		}
 

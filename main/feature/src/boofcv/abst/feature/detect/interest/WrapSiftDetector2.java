@@ -54,7 +54,7 @@ public class WrapSiftDetector2 implements InterestPointDetector<ImageFloat32> {
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
+	public double getRadius(int featureIndex) {
 		return detector.getOctaveDetection().get(featureIndex).scale;
 	}
 

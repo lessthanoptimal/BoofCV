@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,8 +63,8 @@ public class InterestPointDetectorOverride< T extends ImageSingleBand>
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return detector.getScale(featureIndex);
+	public double getRadius(int featureIndex) {
+		return detector.getRadius(featureIndex);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class InterestPointDetectorOverride< T extends ImageSingleBand>
 			return detector.getOrientation(featureIndex);
 
 		Point2D_F64 p = detector.getLocation(featureIndex);
-		orientation.setScale(getScale(featureIndex));
+		orientation.setObjectRadius(getRadius(featureIndex));
 		return orientation.compute(p.x,p.y);
 	}
 

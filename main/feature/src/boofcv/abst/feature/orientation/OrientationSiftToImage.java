@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,13 +52,13 @@ public class OrientationSiftToImage implements OrientationImage<ImageFloat32>
 	}
 
 	@Override
-	public void setScale(double scale) {
-		this.scale = scale;
+	public void setObjectRadius(double radius) {
+		this.scale = radius;
 	}
 
 	@Override
 	public double compute(double c_x, double c_y) {
-		alg.process(c_x,c_y,scale);
+		alg.process(c_x,c_y, scale);
 
 		return alg.getPeakOrientation();
 	}

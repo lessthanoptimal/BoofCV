@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 
 			for( int i = 0; i < N; i++ ) {
 				Point2D_F64 p = alg.getLocation(i);
-				double scale = alg.getScale(i);
+				double radius = alg.getRadius(i);
 				double angle = alg.getOrientation(i);
 				D desc = alg.getDescription(i);
 
@@ -103,7 +103,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 				assertTrue(p.x != 0 && p.y != 0);
 				assertTrue(p.x >= 0 && p.y >= 0 && p.x < image.width && p.y < image.height );
 
-				if( scale != 1 )
+				if( radius != 1 )
 					numScaleNotOne++;
 				if( angle != 0 )
 					numOrientationNotZero++;
@@ -187,7 +187,7 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase,D exte
 			Point2D_F64 p2 = alg2.getLocation(i);
 
 			assertTrue(p1.isIdentical(p2,1e-16));
-			assertTrue(alg1.getScale(i) == alg2.getScale(i));
+			assertTrue(alg1.getRadius(i) == alg2.getRadius(i));
 			assertTrue(alg1.getOrientation(i) == alg2.getOrientation(i));
 
 			D desc1 = alg1.getDescription(i);

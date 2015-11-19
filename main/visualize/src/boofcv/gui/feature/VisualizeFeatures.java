@@ -103,7 +103,8 @@ public class VisualizeFeatures {
 		g2.draw(l);
 	}
 
-	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points , double radius ) {
+	public static void drawScalePoints( Graphics2D g2 , java.util.List<ScalePoint> points ,
+										double scaleToRadius ) {
 
 		g2.setStroke(new BasicStroke(3));
 
@@ -113,7 +114,7 @@ public class VisualizeFeatures {
 			} else {
 				g2.setColor(Color.BLUE);
 			}
-			int r = (int)(radius*p.scale);
+			int r = (int)(p.scale*scaleToRadius +0.5);
 			int w = r*2+1;
 			g2.drawOval((int)p.x-r,(int)p.y-r,w,w);
 		}

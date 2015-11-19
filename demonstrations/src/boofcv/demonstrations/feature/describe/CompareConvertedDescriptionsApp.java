@@ -100,11 +100,11 @@ public class CompareConvertedDescriptionsApp {
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 p = detector.getLocation(i);
-			double scale = detector.getScale(i);
+			double radius = detector.getRadius(i);
 			double ori = detector.getOrientation(i);
 
 			TD d = describe.createDescription();
-			if( describe.process(p.x,p.y,ori,scale,d) ) {
+			if( describe.process(p.x,p.y,ori,radius,d) ) {
 				list.add( d );
 				location.add( p.copy() );
 			}

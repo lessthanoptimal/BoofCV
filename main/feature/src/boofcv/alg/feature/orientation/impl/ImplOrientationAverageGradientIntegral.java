@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,25 +39,26 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageSingleBand,G 
 {
 	/**
 	 *
-	 * @param radius Radius of the region being considered in terms of Wavelet samples. Typically 6.
+	 * @param sampleRadius Radius of the region being considered in terms of Wavelet samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 */
-	public ImplOrientationAverageGradientIntegral(int radius, double period,
+	public ImplOrientationAverageGradientIntegral(double radiusToScale,
+												  int sampleRadius, double period,
 												  int sampleWidth, double weightSigma,
 												  Class<T> imageType) {
-		super(radius,period,sampleWidth,weightSigma,imageType);
+		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma,imageType);
 	}
 
 	@Override
 	public double compute(double c_x, double c_y) {
 
 		double period = scale*this.period;
-		double tl_x = c_x - radius*period;
-		double tl_y = c_y - radius*period;
+		double tl_x = c_x - sampleRadius *period;
+		double tl_y = c_y - sampleRadius *period;
 
 		SparseImageGradient<T,G> g;
 		// use a faster algorithm if it is entirely inside
-		if( !SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y,width*period,sampleWidth*scale))  {
+		if( !SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y, sampleWidth *period, kernelWidth *scale))  {
 			g = new SparseGradientSafe<T, G>(this.g);
 		} else {
 			g = this.g;
@@ -81,10 +82,10 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageSingleBand,G 
 		tl_y += 0.5;
 
 		double Dx=0,Dy=0;
-		for( int y = 0; y < width; y++ ) {
+		for(int y = 0; y < sampleWidth; y++ ) {
 			int pixelsY = (int)(tl_y + y * samplePeriod);
 
-			for( int x = 0; x < width; x++ ) {
+			for(int x = 0; x < sampleWidth; x++ ) {
 				int pixelsX = (int)(tl_x + x * samplePeriod);
 
 				GradientValue v = g.compute(pixelsX,pixelsY);
@@ -108,10 +109,10 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageSingleBand,G 
 
 		double Dx=0,Dy=0;
 		int i = 0;
-		for( int y = 0; y < width; y++ ) {
+		for(int y = 0; y < sampleWidth; y++ ) {
 			int pixelsY = (int)(tl_y + y * samplePeriod);
 
-			for( int x = 0; x < width; x++ , i++ ) {
+			for(int x = 0; x < sampleWidth; x++ , i++ ) {
 				int pixelsX = (int)(tl_x + x * samplePeriod);
 
 				double w = weights.data[i];

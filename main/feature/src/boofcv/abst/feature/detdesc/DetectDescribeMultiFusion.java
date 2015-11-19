@@ -84,16 +84,17 @@ public class DetectDescribeMultiFusion<T extends ImageSingleBand, TD extends Tup
 			// describe each detected feature
 			for( int j = 0; j < points.getNumberOfFeatures(); j++ ) {
 				Point2D_F64 p = points.getLocation(j);
-				double scale = points.getScale(j);
+				double radius = points.getRadius(j);
 				double ori = points.getOrientation(j);
 
 				if( orientation != null ) {
+					orientation.setObjectRadius(radius);
 					ori = orientation.compute(p.x,p.y);
 				}
 
 				TD d = setInfo.descriptors.grow();
 
-				if( describe.process(p.x,p.y,ori,scale,d)) {
+				if( describe.process(p.x,p.y,ori,radius,d)) {
 					setInfo.location.grow().set(p);
 				} else {
 					setInfo.descriptors.removeTail();

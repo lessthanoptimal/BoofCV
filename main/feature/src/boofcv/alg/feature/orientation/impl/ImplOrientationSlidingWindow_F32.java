@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import georegression.metric.UtilAngle;
  */
 public class ImplOrientationSlidingWindow_F32 extends OrientationSlidingWindow<ImageFloat32> {
 
-	public ImplOrientationSlidingWindow_F32(int numAngles, double windowSize, boolean isWeighted) {
-		super(numAngles, windowSize, isWeighted);
+	public ImplOrientationSlidingWindow_F32(double objectRadiusToScale, int numAngles, double windowSize, boolean isWeighted) {
+		super(objectRadiusToScale, numAngles, windowSize, isWeighted);
 	}
 
 	@Override

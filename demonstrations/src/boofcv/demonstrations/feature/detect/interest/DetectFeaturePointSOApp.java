@@ -32,7 +32,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -129,12 +128,10 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 		final InterestPointDetector<T> det = (InterestPointDetector<T>) cookie;
 		det.detect(corruptImage);
 
-		double detectorRadius = BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
-
 		render.reset();
 		for (int i = 0; i < det.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = det.getLocation(i);
-			int radius = (int) Math.ceil(det.getScale(i) * detectorRadius);
+			int radius = (int) Math.ceil(det.getRadius(i));
 			render.addCircle((int) p.x, (int) p.y, radius);
 		}
 

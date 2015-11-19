@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	static Random rand = new Random(234234);
 	static int NUM_POINTS = 1000;
 	static int RADIUS = 6;
+	static double OBJECt_TO_SCALE = 1.0/2.5;
 
 	final static int width = 640;
 	final static int height = 480;
@@ -57,7 +58,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	ImageSingleBand ii;
 
 	Point2D_I32 pts[];
-	double scales[];
+	double radiuses[];
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -81,13 +82,13 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		gradient.process(image,derivX,derivY);
 
 		pts = new Point2D_I32[NUM_POINTS];
-		scales = new double[NUM_POINTS];
+		radiuses = new double[NUM_POINTS];
 		int border = 6;
 		for( int i = 0; i < NUM_POINTS; i++ ) {
 			int x = rand.nextInt(width-border*2)+border;
 			int y = rand.nextInt(height-border*2)+border;
 			pts[i] = new Point2D_I32(x,y);
-			scales[i] = rand.nextDouble()*10+0.8;
+			radiuses[i] = rand.nextDouble()*100+10;
 		}
 
 	}
@@ -107,7 +108,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 			alg.setImage(derivX,derivY);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.setScale(scales[i]);
+				alg.setObjectRadius(radiuses[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -133,7 +134,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 			alg.setImage(image);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.setScale(scales[i]);
+				alg.setObjectRadius(radiuses[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -159,7 +160,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 			alg.setImage(ii);
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.setScale(scales[i]);
+				alg.setObjectRadius(radiuses[i]);
 				alg.compute(p.x,p.y);
 			}
 		}
@@ -186,15 +187,15 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 
 
 		ProfileOperation.printOpsPerSec(new Image("SIFT", siftWrapped), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(RADIUS,imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Average", average(RADIUS,false,derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(15, RADIUS, false, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(15, RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(15, Math.PI / 3.0, RADIUS, false, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(RADIUS, 1, 4, 0, imageType)), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(RADIUS, 1, 4, -1, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(OBJECt_TO_SCALE,RADIUS,imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Average", average(OBJECt_TO_SCALE,RADIUS,false,derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(OBJECt_TO_SCALE,RADIUS, true, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Histogram", histogram(0.5,15, RADIUS, false, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Histogram W", histogram(0.5,15, RADIUS, true, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Sliding", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, false, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Gradient("Sliding W", sliding(OBJECt_TO_SCALE,15, Math.PI / 3.0, RADIUS, true, derivType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II", image_ii(1.0/2.5,RADIUS, 1, 4, 0, imageType)), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Integral("Image II W", image_ii(1.0/2.5,RADIUS, 1, 4, -1, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II", average_ii(null, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Average II W", average_ii(confAverageIIW, imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Integral("Sliding II", sliding_ii(null, imageType)), TEST_TIME);

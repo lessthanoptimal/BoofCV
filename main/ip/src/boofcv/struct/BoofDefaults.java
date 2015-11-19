@@ -26,6 +26,9 @@ import boofcv.core.image.border.*;
  */
 public class BoofDefaults {
 
+	public static final double SURF_SCALE_TO_RADIUS = 2.5;
+	public static final double SIFT_SCALE_TO_RADIUS = 1.5;
+
 	/**
 	 * String specifying BoofCV's version.
 	 */
@@ -33,9 +36,6 @@ public class BoofDefaults {
 
 	// Use extended borders when computing image derivatives 
 	public static BorderType DERIV_BORDER_TYPE = BorderType.EXTENDED;
-
-	// multiplication factor to go from scale to pixel radius
-	public static final double SCALE_SPACE_CANONICAL_RADIUS = 2.5;
 
 	/**
 	 * Creates a new instance of the default border for derivatives of integer images

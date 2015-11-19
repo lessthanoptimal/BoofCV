@@ -28,7 +28,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
@@ -70,7 +69,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 		addAlgorithm(1 , "Scale-Space", 1);
 
 
-		panel = new ScaleSpacePyramidPointPanel(BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+		panel = new ScaleSpacePyramidPointPanel(2.5);
 
 		setMainGUI(panel);
 	}

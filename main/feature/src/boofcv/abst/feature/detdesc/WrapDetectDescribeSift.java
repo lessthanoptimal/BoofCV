@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -67,8 +68,8 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return alg.getFeatureScales().get(featureIndex);
+	public double getRadius(int featureIndex) {
+		return alg.getFeatureScales().get(featureIndex)*BoofDefaults.SIFT_SCALE_TO_RADIUS;
 	}
 
 	@Override

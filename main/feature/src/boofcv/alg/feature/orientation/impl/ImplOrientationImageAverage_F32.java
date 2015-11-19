@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,9 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<ImageFloat32> {
 
-	public ImplOrientationImageAverage_F32(int radius) {
-		super(radius);
+	public ImplOrientationImageAverage_F32(double objectToSample, int radius) {
+		super(objectToSample,radius);
 	}
-
 
 	@Override
 	public double computeAngle( int c_x , int c_y ) {
@@ -48,7 +47,7 @@ public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<Ima
 
 		for( int y = rect.y0; y < rect.y1; y++ ) {
 			int index = image.startIndex + image.stride*y + rect.x0;
-			int indexW = (y-c_y+radiusScale)*kerCosine.width + rect.x0-c_x+radiusScale;
+			int indexW = (y-c_y+ sampleRadius)*kerCosine.width + rect.x0-c_x+ sampleRadius;
 
 			for( int x = rect.x0; x < rect.x1; x++ , index++ , indexW++ ) {
 				float val = image.data[index];

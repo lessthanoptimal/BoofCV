@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,8 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class WrapSiftDetector implements InterestPointDetector<ImageFloat32> {
+
+	public static final double SCALE_TO_RADUS = 1.5;
 
 	SiftImageScaleSpace ss;
 	SiftDetector detector;
@@ -60,8 +62,8 @@ public class WrapSiftDetector implements InterestPointDetector<ImageFloat32> {
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return detector.getFoundPoints().get(featureIndex).scale;
+	public double getRadius(int featureIndex) {
+		return detector.getFoundPoints().get(featureIndex).scale*SCALE_TO_RADUS;
 	}
 
 	@Override

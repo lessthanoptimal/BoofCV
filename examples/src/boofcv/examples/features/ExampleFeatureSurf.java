@@ -33,6 +33,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
@@ -106,7 +107,7 @@ public class ExampleFeatureSurf {
 
 		for( ScalePoint p : points ) {
 			// estimate orientation
-			orientation.setScale(p.scale);
+			orientation.setObjectRadius(p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS);
 			double angle = orientation.compute(p.x,p.y);
 			
 			// extract the SURF description for this region

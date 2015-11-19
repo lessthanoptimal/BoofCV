@@ -39,8 +39,7 @@ import java.util.List;
  */
 public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener {
 
-	PyramidFloat ss;
-	double radius;
+	private PyramidFloat ss;
 	BufferedImage background;
 	List<ScalePoint> points = new ArrayList<ScalePoint>();
 	List<ScalePoint> unused = new ArrayList<ScalePoint>();
@@ -49,9 +48,10 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	int activeLevel = 0;
 
-	public ScaleSpacePyramidPointPanel(double radius) {
-		this.ss = ss;
-		this.radius = radius;
+	double scaleToRadius;
+
+	public ScaleSpacePyramidPointPanel( double scaleToRadius ) {
+		this.scaleToRadius = scaleToRadius;
 		addMouseListener(this);
 	}
 
@@ -131,7 +131,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 			showAll(g);
 		else {
 			g.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(),null);
-			VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
+			VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,scaleToRadius);
 		}
 
 	}
@@ -141,7 +141,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 		if (background != null)
 			g.drawImage(background, 0, 0, background.getWidth(), background.getHeight(),null);
 
-		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,radius);
+		VisualizeFeatures.drawScalePoints((Graphics2D)g,levelPoints,scaleToRadius);
 	}
 
 	@Override

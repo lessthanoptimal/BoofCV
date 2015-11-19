@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,20 +50,13 @@ public interface FoundPointSO {
 
 	/**
 	 * <p>
-	 * Scale of the detected feature in scale space.  This is the standard deviation of the Gaussian blur
-	 * applied to the image when the feature was detected.  While the object's size is not exactly defined,
-	 * multiplying this number by 2.5 or 3 is typically considered the object's radius.
+	 * Returns the detected object's circular radius
 	 * </p>
 	 *
-	 * <p>
-	 * NOTE: In the future this might be changed to getRadius() to remove any ambiguity over the detected
-	 * object's size.
-	 * </p>
-	 *
-	 * @param featureIndex Feature whose scale is being requested.
-	 * @return Size of the interest point relative to canonical size.
+	 * @param featureIndex Feature whose radius is being requested.
+	 * @return Object's radius
 	 */
-	double getScale( int featureIndex );
+	double getRadius( int featureIndex );
 
 	/**
 	 * Returns the features found orientation.

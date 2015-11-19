@@ -22,6 +22,7 @@ import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -72,15 +73,15 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, SurfFeature description) {
+	public boolean process(double x, double y, double orientation, double radius, SurfFeature description) {
 
-		alg.describe(x,y,orientation,scale,description);
+		alg.describe(x,y,orientation, radius/ BoofDefaults.SURF_SCALE_TO_RADIUS,description);
 
 		return true;
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return true;
 	}
 

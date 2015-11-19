@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
@@ -109,8 +110,9 @@ public class WrapDetectDescribeSurf
 
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
+			double radius = p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
 
-			orientation.setScale(p.scale);
+			orientation.setObjectRadius(radius);
 			double angle = orientation.compute(p.x,p.y);
 			describe.describe(p.x,p.y, angle, p.scale, features.grow());
 			featureAngles.push(angle);
@@ -128,8 +130,8 @@ public class WrapDetectDescribeSurf
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return foundPoints.get(featureIndex).scale;
+	public double getRadius(int featureIndex) {
+		return foundPoints.get(featureIndex).scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
 	}
 
 	@Override

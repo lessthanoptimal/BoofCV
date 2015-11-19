@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TestGeneralToInterestPoint {
 
 		assertEquals(6,alg.getNumberOfFeatures());
 		for( int i = 0; i < alg.getNumberOfFeatures(); i++) {
-			assertEquals(2.5, alg.getScale(i),1e-8);
+			assertEquals(2.5, alg.getRadius(i),1e-8);
 			assertEquals(0, alg.getOrientation(i),1e-8);
 		}
 

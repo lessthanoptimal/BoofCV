@@ -44,17 +44,19 @@ public abstract class OrientationIntegralBase<II extends ImageSingleBand,G exten
 	protected double scale=1;
 
 	// size of the area being considered in wavelets samples
-	protected int radius;
-	protected int width;
+	protected int sampleRadius;
+	protected int sampleWidth;
 
 	// optional weights
 	protected Kernel2D_F64 weights;
 
 	// size of sample kernels
-	protected int sampleWidth;
+	protected int kernelWidth;
 
 	// how often the image is sampled
 	protected double period;
+
+	double objectRadiusToScale;
 
 	// used to sample the image when it's on the image's border
 	protected SparseScaleGradient<II,G> g;
@@ -63,29 +65,32 @@ public abstract class OrientationIntegralBase<II extends ImageSingleBand,G exten
 	/**
 	 * Configure orientation estimation.
 	 *
-	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
-	 * @param period How often the image is sampled.  This number is scaled.  Typically 1.   
-	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
+	 * @param sampleRadius The radius of samples that it will do.  Typically 6.
+	 * @param period How often the image is sampled in pixels at canonical size. Internally, this value
+	 *               is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
+	 * @param kernelWidth How wide of a kernel should be used to sample. Try 4
 	 * @param weightSigma Sigma for weighting.  zero for unweighted.
 	 */
-	public OrientationIntegralBase(int radius, double period, 
-								   int sampleWidth , double weightSigma ,
+	public OrientationIntegralBase(double objectRadiusToScale, int sampleRadius, double period,
+								   int kernelWidth, double weightSigma ,
 								   Class<II> integralType) {
-		this.radius = radius;
+		this.objectRadiusToScale = objectRadiusToScale;
+		this.sampleRadius = sampleRadius;
 		this.period = period;
-		this.sampleWidth = sampleWidth;
-		this.width = radius*2+1;
+		this.kernelWidth = kernelWidth;
+		this.sampleWidth = sampleRadius *2+1;
 		this.integralType = integralType;
 		if( weightSigma != 0 )
-			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma,radius);
+			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma, sampleRadius);
 
 		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, integralType);
+		setObjectRadius(1.0/objectRadiusToScale);
 	}
 	
 	@Override
-	public void setScale(double scale) {
-		this.scale = scale;
-		g.setWidth(scale * sampleWidth);
+	public void setObjectRadius(double radius) {
+		this.scale = radius* objectRadiusToScale;
+		g.setWidth(scale * kernelWidth);
 	}
 
 	@Override

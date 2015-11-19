@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 	private FastQueue<TD> descs;
 
 	// storage for found orientations
-	private GrowQueue_F64 featureScales = new GrowQueue_F64(10);
+	private GrowQueue_F64 featureRadiuses = new GrowQueue_F64(10);
 	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
 	private FastQueue<Point2D_F64> location = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
 
@@ -98,7 +98,7 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 	@Override
 	public void detect(T input) {
 		descs.reset();
-		featureScales.reset();
+		featureRadiuses.reset();
 		featureAngles.reset();
 		location.reset();
 
@@ -113,16 +113,16 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p = detector.getLocation(i);
-			double scale = detector.getScale(i);
+			double radius = detector.getRadius(i);
 			double yaw = detector.getOrientation(i);
 
 			if( orientation != null ) {
-				orientation.setScale(scale);
+				orientation.setObjectRadius(radius);
 				yaw = orientation.compute(p.x,p.y);
 			}
 
-			if( describe.process(p.x,p.y,yaw,scale,descs.grow()) ) {
-				featureScales.push(scale);
+			if( describe.process(p.x,p.y,yaw,radius,descs.grow()) ) {
+				featureRadiuses.push(radius);
 				featureAngles.push(yaw);
 				location.add(p);
 			} else {
@@ -142,8 +142,8 @@ public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDes
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return featureScales.get(featureIndex);
+	public double getRadius(int featureIndex) {
+		return featureRadiuses.get(featureIndex);
 	}
 
 	@Override

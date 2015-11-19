@@ -58,9 +58,9 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, Out storage) {
+	public boolean process(double x, double y, double orientation, double radius, Out storage) {
 
-		if( !original.process(x,y,orientation,scale, this.storage) )
+		if( !original.process(x,y,orientation, radius, this.storage) )
 			return false;
 		converter.convert(this.storage, storage);
 
@@ -68,8 +68,8 @@ public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends Tup
 	}
 
 	@Override
-	public boolean requiresScale() {
-		return original.requiresScale();
+	public boolean requiresRadius() {
+		return original.requiresRadius();
 	}
 
 	@Override

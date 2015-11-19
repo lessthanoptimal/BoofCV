@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TestImplOrientationAverageGradientIntegral {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
 		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
-				new ImplOrientationAverageGradientIntegral(r,1,2,0,ImageFloat32.class);
+				new ImplOrientationAverageGradientIntegral(1.0/2.5,r,1,2,0,ImageFloat32.class);
 
 		tests.setup(angleTol, r*2+1+2 , alg,ImageFloat32.class);
 		tests.checkSubImages();
@@ -49,7 +49,7 @@ public class TestImplOrientationAverageGradientIntegral {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
 		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
-				new ImplOrientationAverageGradientIntegral(r,1,2,-1,ImageFloat32.class);
+				new ImplOrientationAverageGradientIntegral(1.0/2.5,r,1,2,-1,ImageFloat32.class);
 
 		tests.setup(angleTol, r*2+1+2 ,alg,ImageFloat32.class);
 		tests.performAll();

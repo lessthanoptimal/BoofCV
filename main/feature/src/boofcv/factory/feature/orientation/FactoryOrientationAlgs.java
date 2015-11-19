@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,81 +34,81 @@ import boofcv.struct.image.*;
 public class FactoryOrientationAlgs {
 
 	public static <T extends ImageSingleBand>
-	OrientationHistogram<T> histogram( int numAngles , int radius , boolean weighted ,
+	OrientationHistogram<T> histogram( double objectToSample, int numAngles , int radius , boolean weighted ,
 									   Class<T> derivType )
 	{
 		OrientationHistogram<T> ret;
 
 		if( derivType == ImageFloat32.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_F32(numAngles,weighted);
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_F32(objectToSample,numAngles,weighted);
 		} else if( derivType == ImageSInt16.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(numAngles,weighted);
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(objectToSample,numAngles,weighted);
 		} else if( derivType == ImageSInt32.class ) {
-			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(numAngles,weighted);
+			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(objectToSample,numAngles,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
-		ret.setRadius(radius);
+		ret.setObjectToSample(radius);
 
 		return ret;
 	}
 
 	public static <T extends ImageSingleBand>
-	OrientationImageAverage<T> nogradient( int radius , Class<T> imageType )
+	OrientationImageAverage<T> nogradient( double objectToSample , int radius , Class<T> imageType )
 	{
 		OrientationImageAverage<T> ret;
 
 		if( imageType == ImageFloat32.class ) {
-			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_F32(radius);
+			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_F32(objectToSample,radius);
 		} else if( imageType == ImageUInt8.class ) {
-			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_U8(radius);
+			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_U8(objectToSample,radius);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
-		ret.setRadius(radius);
+		ret.setObjectRadius(radius);
 
 		return ret;
 	}
 
 	public static <T extends ImageSingleBand>
-	OrientationAverage<T> average( int radius , boolean weighted , Class<T> derivType )
+	OrientationAverage<T> average( double objectToSample, int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationAverage<T> ret;
 
 		if( derivType == ImageFloat32.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_F32(weighted);
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_F32(objectToSample,weighted);
 		} else if( derivType == ImageSInt16.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16(weighted);
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16(objectToSample,weighted);
 		} else if( derivType == ImageSInt32.class ) {
-			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32(weighted);
+			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32(objectToSample,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
-		ret.setRadius(radius);
+		ret.setSampleRadius(radius);
 
 		return ret;
 	}
 
 	public static <T extends ImageSingleBand>
-	OrientationSlidingWindow<T> sliding( int numAngles, double windowSize , 
+	OrientationSlidingWindow<T> sliding( double objectRadiusToScale, int numAngles, double windowSize ,
 										 int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationSlidingWindow<T> ret;
 
 		if( derivType == ImageFloat32.class ) {
-			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_F32(numAngles,windowSize,weighted);
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_F32(objectRadiusToScale,numAngles,windowSize,weighted);
 		} else if( derivType == ImageSInt16.class ) {
-			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S16(numAngles,windowSize,weighted);
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S16(objectRadiusToScale,numAngles,windowSize,weighted);
 		} else if( derivType == ImageSInt32.class ) {
-			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S32(numAngles,windowSize,weighted);
+			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S32(objectRadiusToScale,numAngles,windowSize,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
 		}
 
-		ret.setRadius(radius);
+		ret.setObjectRadius(radius);
 
 		return ret;
 	}
@@ -128,7 +128,8 @@ public class FactoryOrientationAlgs {
 			config = new ConfigAverageIntegral();
 
 		return (OrientationIntegral<II>)
-				new ImplOrientationAverageGradientIntegral(config.radius,config.samplePeriod,config.sampleWidth,
+				new ImplOrientationAverageGradientIntegral(config.objectRadiusToScale,
+						config.radius,config.samplePeriod,config.sampleWidth,
 						config.weightSigma ,integralType);
 	}
 
@@ -137,7 +138,7 @@ public class FactoryOrientationAlgs {
 	 *
 	 * @see ImplOrientationImageAverageIntegral
 	 *
-	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
+	 * @param sampleRadius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
 	 * @param sampleWidth How wide of a kernel should be used to sample. Try 4
 	 * @param weightSigma Sigma for weighting.  zero for unweighted.
@@ -145,12 +146,13 @@ public class FactoryOrientationAlgs {
 	 * @return OrientationIntegral
 	 */
 	public static <II extends ImageSingleBand>
-	OrientationIntegral<II> image_ii( int radius , double samplePeriod , int sampleWidth,
+	OrientationIntegral<II> image_ii( double objectRadiusToScale,
+									  int sampleRadius , double samplePeriod , int sampleWidth,
 									 double weightSigma , Class<II> integralImage)
 	{
 		return (OrientationIntegral<II>)
-				new ImplOrientationImageAverageIntegral(radius,samplePeriod,sampleWidth,weightSigma
-						,integralImage);
+				new ImplOrientationImageAverageIntegral(objectRadiusToScale,
+						sampleRadius,samplePeriod,sampleWidth,weightSigma,integralImage);
 	}
 
 	/**
@@ -171,7 +173,7 @@ public class FactoryOrientationAlgs {
 		config.checkValidity();
 
 		return (OrientationIntegral<II>)
-				new ImplOrientationSlidingWindowIntegral(config.samplePeriod,
+				new ImplOrientationSlidingWindowIntegral(config.objectRadiusToScale,config.samplePeriod,
 						config.windowSize,config.radius,config.weightSigma, config.sampleWidth,integralType);
 	}
 

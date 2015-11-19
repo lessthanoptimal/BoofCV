@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,6 @@ import java.util.List;
 public class ScaleSpacePointPanel extends JPanel {
 
 	GaussianScaleSpace ss;
-	double radius;
 	BufferedImage background;
 	List<ScalePoint> points = new ArrayList<ScalePoint>();
 	List<ScalePoint> unused = new ArrayList<ScalePoint>();
@@ -43,10 +42,10 @@ public class ScaleSpacePointPanel extends JPanel {
 	List<ScalePoint> levelPoints = new ArrayList<ScalePoint>();
 
 	int activeLevel = 0;
+	double scaleToRadius;
 
-	public ScaleSpacePointPanel( GaussianScaleSpace ss , double radius) {
+	public ScaleSpacePointPanel( GaussianScaleSpace ss , double scaleToRadius ) {
 		this.ss = ss;
-		this.radius = radius;
 	}
 
 	public void setBackground( BufferedImage background ) {
@@ -120,7 +119,7 @@ public class ScaleSpacePointPanel extends JPanel {
 			showAll(g);
 		else {
 			g2.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(),null);
-			VisualizeFeatures.drawScalePoints(g2,levelPoints,radius);
+			VisualizeFeatures.drawScalePoints(g2,levelPoints,scaleToRadius);
 		}
 
 	}
@@ -130,7 +129,7 @@ public class ScaleSpacePointPanel extends JPanel {
 		if (background != null)
 			g.drawImage(background, 0, 0, background.getWidth(),background.getHeight(),null);
 
-		VisualizeFeatures.drawScalePoints((Graphics2D)g,points,radius);
+		VisualizeFeatures.drawScalePoints((Graphics2D)g,points,scaleToRadius);
 	}
 
 }

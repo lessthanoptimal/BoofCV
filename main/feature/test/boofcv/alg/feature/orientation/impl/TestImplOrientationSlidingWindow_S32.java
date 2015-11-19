@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ public class TestImplOrientationSlidingWindow_S32 {
 	public void standardUnweighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationSlidingWindow_S32 alg = new ImplOrientationSlidingWindow_S32(N,window,false);
-		alg.setRadius(r);
+		ImplOrientationSlidingWindow_S32 alg = new ImplOrientationSlidingWindow_S32(r,N,window,false);
+		alg.setObjectRadius(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 , alg);
 		tests.performAll();
@@ -46,8 +46,8 @@ public class TestImplOrientationSlidingWindow_S32 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
 
-		ImplOrientationSlidingWindow_S32 alg = new ImplOrientationSlidingWindow_S32(N,window,true);
-		alg.setRadius(r);
+		ImplOrientationSlidingWindow_S32 alg = new ImplOrientationSlidingWindow_S32(r,N,window,true);
+		alg.setObjectRadius(r);
 
 		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);
 		tests.performAll();

@@ -49,14 +49,14 @@ public class WrapDescribeBriefSo<T extends ImageSingleBand> implements DescribeR
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
+	public boolean process(double x, double y, double orientation, double radius, TupleDesc_B storage)
 	{
-		alg.process((float) x, (float) y, (float) orientation, (float) scale, storage);
+		alg.process((float) x, (float) y, (float) orientation, (float) radius, storage);
 		return true;
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return true;
 	}
 

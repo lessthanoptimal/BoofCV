@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageSInt16;
  */
 public class ImplOrientationHistogram_S16 extends OrientationHistogram<ImageSInt16> {
 
-	public ImplOrientationHistogram_S16(int numAngles , boolean isWeighted ) {
-		super(numAngles,isWeighted);
+	public ImplOrientationHistogram_S16(double objectToSample, int numAngles , boolean isWeighted ) {
+		super(objectToSample,numAngles,isWeighted);
 	}
 
 	@Override

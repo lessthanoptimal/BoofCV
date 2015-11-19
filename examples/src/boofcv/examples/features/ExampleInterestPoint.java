@@ -26,7 +26,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -76,8 +75,7 @@ public class ExampleInterestPoint {
 
 			// note how it checks the capabilities of the detector
 			if( detector.hasScale() ) {
-				double scale = detector.getScale(i);
-				int radius = (int)(scale* BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+				int radius = (int)(detector.getRadius(i));
 				render.addCircle((int)pt.x,(int)pt.y,radius);
 			} else {
 				render.addPoint((int) pt.x, (int) pt.y);

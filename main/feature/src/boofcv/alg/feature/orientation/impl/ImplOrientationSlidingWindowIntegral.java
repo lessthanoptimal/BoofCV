@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,21 +58,21 @@ public class ImplOrientationSlidingWindowIntegral
 	 *
 	 * @param samplePeriod How often the image is sampled.  This number is scaled.  Typically 1.
 	 * @param windowSize Angular window that is slide across
-	 * @param radius Radius of the region being considered in terms of samples. Typically 6.
+	 * @param sampleRadius Radius of the region being considered in terms of samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution.  Zero for unweighted.
 	 * @param sampleKernelWidth Size of kernel doing the sampling.  Typically 4.
 	 * @param integralType Type of integral image being processed.
 	 */
-	public ImplOrientationSlidingWindowIntegral(double samplePeriod, double windowSize,
-												int radius, double weightSigma, int sampleKernelWidth,
+	public ImplOrientationSlidingWindowIntegral(double radiusToScale , double samplePeriod, double windowSize,
+												int sampleRadius, double weightSigma, int sampleKernelWidth,
 												Class<T> integralType) {
-		super(radius,samplePeriod,sampleKernelWidth,weightSigma,integralType);
+		super(radiusToScale,sampleRadius,samplePeriod,sampleKernelWidth,weightSigma,integralType);
 		this.windowSize = windowSize;
 
-		derivX = new double[width*width];
-		derivY = new double[width*width];
+		derivX = new double[sampleWidth * sampleWidth];
+		derivY = new double[sampleWidth * sampleWidth];
 
-		angles = new double[ width*width ];
+		angles = new double[ sampleWidth * sampleWidth];
 		order = new int[ angles.length ];
 	}
 
@@ -81,8 +81,8 @@ public class ImplOrientationSlidingWindowIntegral
 
 		double period = scale*this.period;
 		// top left corner of the region being sampled
-		double tl_x = c_x - radius*period;
-		double tl_y = c_y - radius*period;
+		double tl_x = c_x - sampleRadius *period;
+		double tl_y = c_y - sampleRadius *period;
 
 		computeGradient(tl_x,tl_y,period);
 
@@ -112,19 +112,14 @@ public class ImplOrientationSlidingWindowIntegral
 		tl_x += 0.5;
 		tl_y += 0.5;
 
-		int thresh = radius*radius;
-		
 		total = 0;
-		for( int y = 0; y < width; y++ ) {
-			int ry = y-radius;
+		for(int y = 0; y < sampleWidth; y++ ) {
 			
-			for( int x = 0; x < width; x++ , total++ ) {
-				int rx = x-radius;
+			for(int x = 0; x < sampleWidth; x++ , total++ ) {
 
 				int xx = (int)(tl_x + x * samplePeriod);
 				int yy = (int)(tl_y + y * samplePeriod);
 
-//				if( ry*ry + rx*rx <= thresh && gradient.isInBounds(xx,yy) ) {
 				if( g.isInBounds(xx,yy) ) {
 					GradientValue deriv = g.compute(xx,yy);
 					double dx = deriv.getX();

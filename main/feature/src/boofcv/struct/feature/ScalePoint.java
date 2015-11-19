@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,9 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class ScalePoint extends Point2D_F64 {
-	// the scale the feature was detected at
+	/**
+	 * The scale the feature was detected at.  Exact meaning of "scale" is implementation dependent
+	 */
 	public double scale;
 	// does the blob correspond to a black or white region
 	public boolean white;
@@ -72,7 +74,7 @@ public class ScalePoint extends Point2D_F64 {
 	}
 
 	public ScalePoint copy() {
-		return new ScalePoint(x,y,scale,white);
+		return new ScalePoint(x,y, scale,white);
 	}
 
 	public void set(ScalePoint p) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class TestImplOrientationImageAverage_U8 {
 	public void standardUnweighted() {
 		GenericOrientationImageTests<ImageUInt8> tests = new GenericOrientationImageTests<ImageUInt8>();
 
-		OrientationImageAverage<ImageUInt8> alg = new ImplOrientationImageAverage_U8(r);
+		OrientationImageAverage<ImageUInt8> alg = new ImplOrientationImageAverage_U8(1.0/2.5,r);
 
 		tests.setup(angleTol, r*2+1 , alg,ImageUInt8.class);
 		tests.performAll();

@@ -55,7 +55,7 @@ public class DebugSiftDetectorApp {
 		System.out.println("total features found: "+alg.getFoundPoints().size());
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),
-				alg.getFoundPoints().toList(), 1);
+				alg.getFoundPoints().toList(),1);
 
 
 		ListDisplayPanel dog = new ListDisplayPanel();

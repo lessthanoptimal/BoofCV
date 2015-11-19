@@ -30,7 +30,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -78,12 +77,11 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 		render.reset();
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 pt = detector.getLocation(i);
-			double scale = detector.getScale(i);
 
-			int radius = (int)Math.round(BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS*scale);
+			int radius = (int)Math.round( detector.getRadius(i));
 
 			if( orientation != null ) {
-				orientation.setScale(scale);
+				orientation.setObjectRadius(radius);
 				double angle = orientation.compute(pt.x,pt.y);
 				render.addCircle((int)pt.x,(int)pt.y,radius,Color.red,angle);
 			} else {
@@ -111,7 +109,7 @@ public class VideoDetectInterestPoints<T extends ImageSingleBand>
 
 		// if null then no orientation will be computed
 		OrientationImageAverage<T> orientation = null;
-		orientation = FactoryOrientationAlgs.nogradient(radius,imageType);
+		orientation = FactoryOrientationAlgs.nogradient(1.0/2.5,radius,imageType);
 
 		InterestPointDetector<T> detector;
 

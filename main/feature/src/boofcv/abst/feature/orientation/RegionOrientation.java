@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,17 +20,18 @@ package boofcv.abst.feature.orientation;
 
 
 /**
- * Estimates the orientation of a region.  Often used to create rotation invariant features.
+ * Estimates the orientation of a region which is approximately circular. This is typically
+ * used to rotationally invariant scale/size dependent features.
  *
  * @author Peter Abeles
  */
 public interface RegionOrientation {
 	/**
-	 * Specifies scale at which the orientation is estimated.
+	 * Specifies the circle's radius that the orientation should be
 	 *
-	 * @param scale Scale of the orientation region.
+	 * @param radius Object's radius.
 	 */
-	public void setScale( double scale );
+	void setObjectRadius( double radius );
 
 	/**
 	 * Computes the orientation of a region about its center.
@@ -40,5 +41,5 @@ public interface RegionOrientation {
 	 *
 	 * @return Orientation in radians.  Angle zero points along x-axis and pi/2 along y-axis.
 	 */
-	public double compute( double c_x , double c_y );
+	double compute( double c_x , double c_y );
 }

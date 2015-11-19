@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
-			orientation.setScale(p.scale);
+			orientation.setObjectRadius(p.scale);
 			double angle = orientation.compute(p.x,p.y);
 
 			describe.describe(p.x, p.y, angle, p.scale, descriptions.grow());
@@ -121,7 +121,7 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 		return foundPoints.get(featureIndex);
 	}
 
-	public double getScale(int featureIndex) {
+	public double getRadius(int featureIndex) {
 		return foundPoints.get(featureIndex).scale;
 	}
 

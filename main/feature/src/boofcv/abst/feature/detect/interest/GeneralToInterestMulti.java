@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSi
 	protected EasyGeneralFeatureDetector<T,D> detector;
 
 	// scale of detected objects
-	protected double scale;
+	protected double radius;
 
 	// list of found points
 	protected FastQueue<Point2D_F64> foundMin = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
@@ -49,10 +49,10 @@ public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSi
 	protected FoundPointSO sets[];
 
 	public GeneralToInterestMulti(GeneralFeatureDetector<T, D> detector,
-								  double scale,
+								  double radius,
 								  Class<T> imageType, Class<D> derivType) {
 		this.detector = new EasyGeneralFeatureDetector<T, D>(detector,imageType,derivType);
-		this.scale = scale;
+		this.radius = radius;
 
 		if( detector.isDetectMinimums() && detector.isDetectMaximums()) {
 			sets = new FoundPointSO[]{new FoundMin(), new FoundMax()};
@@ -104,8 +104,8 @@ public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSi
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
-			return scale;
+		public double getRadius(int featureIndex) {
+			return radius;
 		}
 
 		@Override
@@ -126,8 +126,8 @@ public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSi
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
-			return scale;
+		public double getRadius(int featureIndex) {
+			return radius;
 		}
 
 		@Override

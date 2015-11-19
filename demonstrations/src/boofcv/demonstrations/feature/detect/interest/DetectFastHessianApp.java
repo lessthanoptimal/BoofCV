@@ -41,15 +41,15 @@ import java.awt.image.BufferedImage;
  */
 public class DetectFastHessianApp {
 
-//	static String fileName = UtilIO.pathExample("outdoors01.jpg";
-//	static String fileName = UtilIO.pathExample("sunflowers.jpg";
-//	static String fileName = UtilIO.pathExample("particles01.jpg";
-//	static String fileName = UtilIO.pathExample("scale/beach02.jpg";
-//	static String fileName = UtilIO.pathExample("indoors01.jpg";
-	static String fileName = UtilIO.pathExample("shapes/shapes01.png");
-//	static String fileName = UtilIO.pathExample("scale/mountain_4p2mm.jpg";
-//	static String fileName = UtilIO.pathExample("scale/mountain_7p1mm.jpg";
-//	static String fileName = UtilIO.pathExample("scale/mountain_19p9mm.jpg";
+//	static String fileName = UtilIO.pathExample("outdoors01.jpg");
+	static String fileName = UtilIO.pathExample("sunflowers.jpg");
+//	static String fileName = UtilIO.pathExample("particles01.jpg");
+//	static String fileName = UtilIO.pathExample("scale/beach02.jpg");
+//	static String fileName = UtilIO.pathExample("indoors01.jpg");
+//	static String fileName = UtilIO.pathExample("shapes/shapes01.png");
+//	static String fileName = UtilIO.pathExample("scale/mountain_4p2mm.jpg");
+//	static String fileName = UtilIO.pathExample("scale/mountain_7p1mm.jpg");
+//	static String fileName = UtilIO.pathExample("scale/mountain_19p9mm.jpg");
 
 	static int NUM_FEATURES = 120;
 
@@ -64,7 +64,8 @@ public class DetectFastHessianApp {
 
 		System.out.println("total features found: "+det.getFoundPoints().size());
 
-		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(), BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS);
+		VisualizeFeatures.drawScalePoints(input.createGraphics(),det.getFoundPoints(),
+				BoofDefaults.SURF_SCALE_TO_RADIUS);
 
 		ShowImages.showWindow(input,"Found Features: "+imageType.getSimpleName(),true);
 	}

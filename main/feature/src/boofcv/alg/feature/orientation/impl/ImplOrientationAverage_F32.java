@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class ImplOrientationAverage_F32 extends OrientationAverage<ImageFloat32> {
 	
-	public ImplOrientationAverage_F32(boolean weighted) {
-		super(weighted);
+	public ImplOrientationAverage_F32(double objectToSample, boolean weighted) {
+		super(objectToSample,weighted);
 	}
 
 	@Override

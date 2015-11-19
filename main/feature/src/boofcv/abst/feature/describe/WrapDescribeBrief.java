@@ -48,14 +48,14 @@ public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeReg
 		alg.setImage(image);
 	}
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, TupleDesc_B storage)
+	public boolean process(double x, double y, double orientation, double radius, TupleDesc_B storage)
 	{
 		alg.process(x, y, storage);
 		return true;
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return false;
 	}
 

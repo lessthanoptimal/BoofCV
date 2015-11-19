@@ -255,21 +255,21 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 				double yaw = 0;
 
 				Point2D_F64 pt = detector.getLocation(i);
-				double scale = detector.getScale(i);
+				double radius = detector.getRadius(i);
 				if (describe.requiresOrientation()) {
-					orientation.setScale(scale);
+					orientation.setObjectRadius(radius);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
 				TupleDesc d = descs.grow();
-				if (describe.process(pt.x, pt.y, yaw, scale, d)) {
+				if (describe.process(pt.x, pt.y, yaw, radius, d)) {
 					locs.add(pt.copy());
 				} else {
 					descs.removeTail();
 				}
 			}
 		} else {
-			orientation.setScale(1);
+			orientation.setObjectRadius(10);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 
