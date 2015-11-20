@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -340,6 +340,29 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		float b = 0.5f*upper - 0.5f*lower;
 
 		return -b/(2.0f*a);
+	}
+
+	public static double polyPeak( double lower , double middle , double upper )
+	{
+//		if( lower >= middle || upper >= middle )
+//			throw new IllegalArgumentException("Crap");
+
+		// only need two coefficients to compute the peak's location
+		double a = 0.5*lower - middle + 0.5*upper;
+		double b = 0.5*upper - 0.5*lower;
+
+		return -b/(2.0*a);
+	}
+
+	public static double polyPeak( double lower , double middle , double upper,
+								   double lowerVal , double middleVal , double upperVal )
+	{
+		double offset = polyPeak(lower,middle,upper);
+		if( offset < 0 ) {
+			return -lowerVal*offset + (1.0+offset)*middle;
+		} else {
+			return upperVal*offset + offset*middle;
+		}
 	}
 
 	/**

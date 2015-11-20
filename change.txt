@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    :
 Version : Alpha 0.21
 
+- Scale-Space Features
+  * getScale() has been replaced with getRadius(), which refers to the radius of the detected object
 - SURF
   * Fixed a bug dealing with gradient calculation and improve stability for very small objects
 
