@@ -34,7 +34,7 @@ public class Help {
 				CreateFiducialSquareBinary.class,
 				BatchRemoveLensDistortion.class,
 				BatchDownSizeImage.class,
-				WebcamTrackFiducial.class,
+				FiducialDetection.class,
 				CameraCalibration.class};
 
 		System.out.println("Trying to run a command-line application?  Here are your options!");
@@ -75,7 +75,7 @@ public class Help {
 					CreateFiducialSquareBinary.class,
 					BatchRemoveLensDistortion.class,
 					BatchDownSizeImage.class,
-					WebcamTrackFiducial.class,
+					FiducialDetection.class,
 					CameraCalibration.class};
 
 			System.out.println("Trying to run a command-line application?  Here are your options!");

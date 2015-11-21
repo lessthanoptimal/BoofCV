@@ -43,8 +43,8 @@ public interface MediaManager {
 	/**
 	 * Opens the specified webcam.
 	 * @param device Reference to the webcam device.  null if you just want to open the default
-	 * @param width requested image width
-	 * @param height requested image height
+	 * @param width requested image width. Default resolution is any value less than 0
+	 * @param height requested image height. Default resolution is any value less than 0
 	 * @param imageType Type of input image
 	 * @return The image sequence.
 	 */
