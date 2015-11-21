@@ -2,6 +2,11 @@ Change Log
 
 Date Format: year/month/day
 
+- WebcamTrackFiducial renamed to FiducialDetection
+  * Can now take in more inputs types.  still images, videos, and webcams
+
+TODO CameraCalibration should handle video sequences and disable still images
+
 ---------------------------------------------
 Date    : 2015/11/09
 Version : Alpha 0.20

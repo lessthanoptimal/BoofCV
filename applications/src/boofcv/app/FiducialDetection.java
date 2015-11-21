@@ -31,43 +31,67 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.io.webcamcapture.UtilWebcamCapture;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
-import com.github.sarxos.webcam.Webcam;
+import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.so.Quaternion_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Command line application for detecting different types of fiducials in different types of input methods.
+ *
  * @author Peter Abeles
  */
-public class WebcamTrackFiducial extends BaseWebcamApp {
+public class FiducialDetection extends BaseStandardInputApp {
 
 	public static final int DEFAULT_THRESHOLD = 100;
 
+	// path to intrinsic file
 	String intrinsicPath;
+	// path to where the results should be stored
+	String outputPath;
+
+	PrintStream outputFile;
 
 	FiducialDetector<ImageUInt8> detector;
 
 	void printHelp() {
-		System.out.println("./application <Camera Options> <Fiducial Type> <Fiducial Specific Options>");
+		System.out.println("java -jar BLAH <Input Flags> <Fiducial Type> <Fiducial Flags>");
 		System.out.println();
-		System.out.println("Camera Options:  (Optional)");
+		System.out.println("   Detects different types of fiducials inside of webcam streams, video files, or still images.");
+		System.out.println("   Results are visualized in a window and optionally saved to file.");
 		System.out.println();
-		System.out.println("  --Camera=<int>                     Opens the specified camera using WebcamCapture ID");
-		System.out.println("                                     DEFAULT: Whatever WebcamCapture opens");
-		System.out.println("  --Resolution=<width>:<height>      Specifies the image resolution.");
-		System.out.println("                                     DEFAULT: Who knows or intrinsic, if specified");
+		System.out.println("----------------------------------- Input Flags -----------------------------------------");
+		System.out.println();
+		printInputHelp();
+		System.out.println();
+		System.out.println("----------------------------------- Other Flags -----------------------------------------");
+		System.out.println();
+		System.out.println("These flags are common for all input methods.  They can be specified any time before the");
+		System.out.println("fidcuial flags are specified");
+		System.out.println();
 		System.out.println("  --Intrinsic=<path>                 Specifies location of the intrinsic parameters file.");
 		System.out.println("                                     DEFAULT: Make a crude guess.");
+		System.out.println();
+		System.out.println("  --OutputFile=<path>                Writes the ID and pose of detected fiducials out to a file");
+		System.out.println("                                     File format is described in the file's header.");
+		System.out.println();
+		System.out.println("----------------------------------- Fiducial Flags --------------------------------------");
 		System.out.println();
 		System.out.println("Fiducial Types:");
 		System.out.println("   BINARY");
@@ -75,7 +99,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("   CHESSBOARD");
 		System.out.println("   SQUAREGRID");
 		System.out.println();
-		System.out.println("Flags for BINARY:");
+		System.out.println("Flags for BINARY");
 		System.out.println();
 		System.out.println("  --Robust=<true/false>              If slower but more robust technique should be used");
 		System.out.println("                                     DEFAULT: true");
@@ -87,7 +111,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("  --Border=<float>                   Specifies relative width of the border.");
 		System.out.println("                                     DEFAULT: 0.25");
 		System.out.println();
-		System.out.println("Flags for IMAGE:");
+		System.out.println("Flags for IMAGE");
 		System.out.println();
 		System.out.println("  --Robust=<true/false>              If slower but more robust technique should be used");
 		System.out.println("                                     DEFAULT: true");
@@ -95,13 +119,13 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("                                     Can be called multiple times for several images");
 		System.out.println("  --Border=<float>                   Specifies relative width of the border.");
 		System.out.println("                                     DEFAULT: 0.25");
-		System.out.println("Flags for CHESSBOARD:");
+		System.out.println("Flags for CHESSBOARD");
 		System.out.println();
 		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
 		System.out.println("  --SquareWidth=<float>              The width of each square");
 		System.out.println("                                     Can be called multiple times for several images");
 		System.out.println("                                     DEFAULT: 1");
-		System.out.println("Flags for SQUAREGRID:");
+		System.out.println("Flags for SQUAREGRID");
 		System.out.println();
 		System.out.println("  --Shape=<rows int>:<cols int>      Number of rows/columns it expects to see");
 		System.out.println("  --SquareWidth=<float>              The width of each square");
@@ -115,8 +139,12 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 		System.out.println("        Opens the default camera at default resolution looking for a 3x3 binary patterns with a width of 1");
 		System.out.println();
 		System.out.println("./application --Camera=1 --Resolution=640:480 BINARY --Robust=false --Size=1");
-		System.out.println("        Opens the camera 1 at a resolution of 640x480 using a fast thresholding technique, " +
-				           "looking for 4x4 binary patterns with a width of 1");
+		System.out.println("        Opens the camera 1 at a resolution of 640x480 using a fast thresholding technique, ");
+		System.out.println("        looking for 4x4 binary patterns with a width of 1");
+		System.out.println();
+		System.out.println("./application -ImageFile=image.jpeg BINARY");
+		System.out.println("        Opens \"image.jpg\" and detects binary square fiducials inside of it");
+		System.out.println();
 	}
 
 	void parse( String []args ) {
@@ -131,6 +159,8 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 				if( !checkCameraFlag(arg) ) {
 					if( flagName.compareToIgnoreCase("Intrinsic") == 0 ) {
 						intrinsicPath = parameters;
+					} else if( flagName.compareToIgnoreCase("OutputFile") == 0 ) {
+						outputPath = parameters;
 					} else {
 						throw new RuntimeException("Unknown camera option "+flagName);
 					}
@@ -340,57 +370,47 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 			return PerspectiveOps.createIntrinsic(width, height, 35);
 		} else {
 			if( intrinsic.width != width || intrinsic.height != height ) {
+				System.out.println();
+				System.out.println("The image resolution in the intrinsics file doesn't match the input.");
+				System.out.println("Massaging the intrinsic for this input.  If the results are poor calibrate");
+				System.out.println("your camera at the correct resolution!");
+				System.out.println();
+
 				double ratioW = width/(double)intrinsic.width;
 				double ratioH = height/(double)intrinsic.height;
 
-				if( Math.abs(ratioW-ratioH) > 1e-8 )
-					throw new RuntimeException("Can't adjust intrinsic parameters because camera ratios are different");
+				if( Math.abs(ratioW-ratioH) > 1e-8 ) {
+					System.err.println("Can't adjust intrinsic parameters because camera ratios are different");
+					System.exit(1);
+				}
 				PerspectiveOps.scaleIntrinsic(intrinsic,ratioW);
 			}
 			return intrinsic;
 		}
 	}
 
-	private void process() {
-
-		IntrinsicParameters intrinsic = intrinsicPath == null ? null : (IntrinsicParameters)UtilIO.loadXML(intrinsicPath);
-
-		Webcam webcam = Webcam.getWebcams().get(cameraId);
-		if( desiredWidth > 0 && desiredHeight > 0 )
-			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);
-		else if( intrinsic != null ) {
-			System.out.println("Using intrinsic parameters for resolution "+intrinsic.width+" "+intrinsic.height);
-			UtilWebcamCapture.adjustResolution(webcam, intrinsic.width, intrinsic.height);
-		}
-		webcam.open();
-
-		ImagePanel gui = new ImagePanel();
-		gui.setPreferredSize(webcam.getViewSize());
-		ShowImages.showWindow(gui,"Fiducial Detector",true);
-
-		int actualWidth = (int)webcam.getViewSize().getWidth();
-		int actualHeight = (int)webcam.getViewSize().getHeight();
-
-		ImageUInt8 gray = new ImageUInt8(actualWidth,actualHeight);
-
-		intrinsic = handleIntrinsic(intrinsic, actualWidth, actualHeight);
-		detector.setIntrinsic(intrinsic);
+	/**
+	 * Displays a continuous stream of images
+	 */
+	private void processStream( IntrinsicParameters intrinsic , SimpleImageSequence<ImageUInt8> sequence , ImagePanel gui , long pauseMilli) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
-		BufferedImage image;
-		while( (image = webcam.getImage()) != null ) {
-			ConvertBufferedImage.convertFrom(image, gray);
-
+		int frameNumber = 0;
+		while( sequence.hasNext() ) {
+			long before = System.currentTimeMillis();
+			ImageUInt8 input = sequence.next();
+			BufferedImage buffered = sequence.getGuiImage();
 			try {
-				detector.detect(gray);
+				detector.detect(input);
 			} catch( RuntimeException e ) {
 				System.err.println("BUG!!! saving image to crash_image.png");
-				UtilImageIO.saveImage(image,"crash_image.png");
+				UtilImageIO.saveImage(buffered,"crash_image.png");
 				throw e;
 			}
-			Graphics2D g2 = image.createGraphics();
+
+			Graphics2D g2 = buffered.createGraphics();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
 				detector.getFiducialToCamera(i,fiducialToCamera);
@@ -400,6 +420,7 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 				VisualizeFiducial.drawCube(fiducialToCamera,intrinsic,width,3,g2);
 				VisualizeFiducial.drawLabelCenter(fiducialToCamera,intrinsic,""+id,g2);
 			}
+			saveResults(frameNumber++);
 
 			if( intrinsicPath == null ) {
 				g2.setColor(Color.RED);
@@ -407,12 +428,144 @@ public class WebcamTrackFiducial extends BaseWebcamApp {
 				g2.drawString("Uncalibrated",10,20);
 			}
 
-			gui.setBufferedImage(image);
+			gui.setBufferedImage(buffered);
+
+			long after = System.currentTimeMillis();
+			long time = Math.max(0,pauseMilli-(after-before));
+			if( time > 0 ) {
+				try { Thread.sleep(time); } catch (InterruptedException ignore) {}
+			}
 		}
 	}
 
+	/**
+	 * Displays a simple image
+	 */
+	private void processImage( IntrinsicParameters intrinsic , BufferedImage buffered , ImagePanel gui ) {
+
+		Font font = new Font("Serif", Font.BOLD, 24);
+
+		ImageUInt8 gray = new ImageUInt8(buffered.getWidth(),buffered.getHeight());
+		ConvertBufferedImage.convertFrom(buffered,gray);
+
+		Se3_F64 fiducialToCamera = new Se3_F64();
+		try {
+			detector.detect(gray);
+		} catch( RuntimeException e ) {
+			System.err.println("BUG!!! saving image to crash_image.png");
+			UtilImageIO.saveImage(buffered,"crash_image.png");
+			throw e;
+		}
+
+		Graphics2D g2 = buffered.createGraphics();
+
+		for (int i = 0; i < detector.totalFound(); i++) {
+			detector.getFiducialToCamera(i,fiducialToCamera);
+			long id = detector.getId(i);
+			double width = detector.getWidth(i);
+
+			VisualizeFiducial.drawCube(fiducialToCamera,intrinsic,width,3,g2);
+			VisualizeFiducial.drawLabelCenter(fiducialToCamera,intrinsic,""+id,g2);
+		}
+		saveResults(0);
+
+		if( intrinsicPath == null ) {
+			g2.setColor(Color.RED);
+			g2.setFont(font);
+			g2.drawString("Uncalibrated",10,20);
+		}
+
+		gui.setBufferedImage(buffered);
+	}
+
+	private void saveResults( int frameNumber ) {
+		if( outputFile == null )
+			return;
+
+		Quaternion_F64 quat = new Quaternion_F64();
+		Se3_F64 fiducialToCamera = new Se3_F64();
+
+		outputFile.printf("%d %d",frameNumber,detector.totalFound());
+		for (int i = 0; i < detector.totalFound(); i++) {
+			long id = detector.getId(i);
+			detector.getFiducialToCamera(i,fiducialToCamera);
+
+			RotationMatrixGenerator.matrixToQuaternion(fiducialToCamera.getR(),quat);
+
+			outputFile.printf(" %d %.10f %.10f %.10f %.10f %.10f %.10f %.10f",id,
+					fiducialToCamera.T.x,fiducialToCamera.T.y,fiducialToCamera.T.z,
+					quat.w,quat.x,quat.y,quat.z);
+		}
+		outputFile.println();
+	}
+
+	private void process() {
+		if( detector == null ) {
+			System.err.println("Need to specify which fiducial you wish to detect");
+			System.exit(1);
+		}
+
+		if( outputPath != null ) {
+			try {
+				outputFile = new PrintStream(outputPath);
+				outputFile.println("# Results from fiducial detection ");
+				outputFile.println("# These comments should include the data source and the algorithm used, but I'm busy.");
+				outputFile.println("# ");
+				outputFile.println("# <frame #> <number of fiducials> <fiducial id> <X> <Y> <Z> <Q1> <Q2> <Q3> <Q4> ...");
+				outputFile.println("# ");
+				outputFile.println("# The special Euclidean transform saved each fiducial is from fiducial to camera");
+				outputFile.println("# (X,Y,Z) is the translation and (Q1,Q2,Q3,Q4) specifies a quaternion");
+				outputFile.println("# ");
+			} catch (FileNotFoundException e) {
+				System.err.println("Failed to open output file.");
+				System.err.println(e.getMessage());
+				System.exit(1);
+			}
+		}
+
+		MediaManager media = DefaultMediaManager.INSTANCE;
+
+		IntrinsicParameters intrinsic = intrinsicPath == null ? null : (IntrinsicParameters)UtilIO.loadXML(intrinsicPath);
+
+		SimpleImageSequence<ImageUInt8> sequence = null;
+		long pause = 0;
+		BufferedImage buffered = null;
+		if( inputType == InputType.VIDEO || inputType == InputType.WEBCAM ) {
+			if( inputType == InputType.WEBCAM ) {
+				String device = ""+cameraId;
+				sequence = media.openCamera(device,desiredWidth, desiredHeight,ImageType.single(ImageUInt8.class));
+			} else {
+				// just assume 30ms is appropriate.  Should let the use specify this number
+				pause = 30;
+				sequence = media.openVideo(filePath,ImageType.single(ImageUInt8.class));
+				sequence.setLoop(true);
+			}
+			intrinsic = handleIntrinsic(intrinsic, sequence.getNextWidth(), sequence.getNextHeight());
+		} else {
+			buffered = UtilImageIO.loadImage(filePath);
+			if( buffered == null ) {
+				System.err.println("Can't find image or it can't be read.  "+filePath);
+				System.exit(1);
+			}
+			intrinsic = handleIntrinsic(intrinsic, buffered.getWidth(),buffered.getHeight());
+		}
+
+
+		ImagePanel gui = new ImagePanel();
+		gui.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
+		ShowImages.showWindow(gui,"Fiducial Detector",true);
+		detector.setIntrinsic(intrinsic);
+
+		if( sequence != null ) {
+			processStream(intrinsic,sequence,gui,pause);
+		} else {
+			processImage(intrinsic,buffered, gui);
+		}
+
+	}
+
 	public static void main(String[] args) {
-		WebcamTrackFiducial app = new WebcamTrackFiducial();
+		FiducialDetection app = new FiducialDetection();
 		try {
 			app.parse(args);
 		} catch( RuntimeException e ) {
