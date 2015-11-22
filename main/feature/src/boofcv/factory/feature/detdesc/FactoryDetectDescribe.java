@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,22 +23,26 @@ import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.*;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.*;
-import boofcv.alg.feature.describe.DescribePointSift;
-import boofcv.alg.feature.describe.DescribePointSurf;
-import boofcv.alg.feature.describe.DescribePointSurfMod;
-import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
+import boofcv.alg.feature.describe.*;
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.alg.feature.detdesc.DetectDescribeSift2;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.alg.feature.orientation.OrientationHistogramSift2;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.SurfFeature;
@@ -85,6 +89,22 @@ public class FactoryDetectDescribe {
 		DetectDescribeSift combined = new DetectDescribeSift(ss,detector,orientation,describe);
 
 		return new WrapDetectDescribeSift(combined);
+	}
+
+	public static DetectDescribePoint<ImageFloat32,SurfFeature>
+	sift2() {
+		SiftScaleSpace2 scaleSpace = new SiftScaleSpace2(-1,5,3,1.6);
+		OrientationHistogramSift2 orientation = new OrientationHistogramSift2(36,2.5,1.5);
+		DescribePointSiftLowe describe = new DescribePointSiftLowe(4,4,8,2.5,0.5,0.2);
+
+		ConfigExtract configExtract = new ConfigExtract(3,0);
+		configExtract.detectMaximums = true;
+		configExtract.detectMinimums = true;
+		configExtract.ignoreBorder = 1;
+		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configExtract);
+		NonMaxLimiter nonMax = new NonMaxLimiter(nns,1000);
+		DetectDescribeSift2 dds = new DetectDescribeSift2(scaleSpace,10,nonMax,orientation,describe);
+		return new WrapDetectDescribeSift2(dds);
 	}
 
 	/**

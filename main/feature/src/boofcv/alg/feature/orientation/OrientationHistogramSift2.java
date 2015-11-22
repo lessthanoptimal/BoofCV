@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.CircularIndex;
@@ -40,15 +39,13 @@ import java.util.Arrays;
  * </p>
  *
  * <p>
- * To get the orientation for the largest peak invoke {@link #getPeakOrientation()}.  To get a list
- * of all the found orientations call {@link #getOrientations()}.
+ * To get the orientation for the largest peak invoke {@link #getPeakOrientation()}.  Other
  * </p>
  *
  * Differences from paper:
  * <ul>
  * <li>The angle in each bin is set to the atan2(y,x) of the weighted sum of image derivative</li>
  * <li>Interpolation is done using a 2nd degree polynomial instead of a parabola.</li>
- * <li>This can be used with the input image, not just the corresponding scale image in scale-space.</li>
  * </ul>
  *
  * <p>
@@ -73,9 +70,6 @@ public class OrientationHistogramSift2 {
 	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
 	private double histAngleBin;
 
-	// used to compute the image gradient
-	private ImageGradient<ImageFloat32,ImageFloat32> gradient;
-
 	// peaks in histogram
 	private GrowQueue_I32 peaks = new GrowQueue_I32(10);
 
@@ -88,10 +82,8 @@ public class OrientationHistogramSift2 {
 	private ImageRectangle bound = new ImageRectangle();
 
 
-	// local scale space from which the orientation is computed from
-	private ImageFloat32 image;
-	private ImageFloat32 derivX = new ImageFloat32(1,1);
-	private ImageFloat32 derivY = new ImageFloat32(1,1);
+	// spacial image gradient of closest image in scale-space
+	private ImageFloat32 derivX,derivY;
 
 	InterpolateArray approximateGauss;
 	double approximateStep = 0.1;
@@ -102,12 +94,10 @@ public class OrientationHistogramSift2 {
 	 * @param histogramSize Number of elements in the histogram.  Standard is 36
 	 * @param sigmaToRadius Convert a sigma to region radius.  Try 2.5  (98.8% containment)
 	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
-	 * @param gradient Used to compute the image derivative.  Standard is "three".
 	 */
 	public OrientationHistogramSift2(int histogramSize ,
 									 double sigmaToRadius,
-									 double sigmaEnlarge ,
-									 ImageGradient<ImageFloat32,ImageFloat32> gradient )
+									 double sigmaEnlarge )
 	{
 		this.histogramMag = new double[ histogramSize ];
 		this.histogramX = new double[ histogramSize ];
@@ -115,7 +105,6 @@ public class OrientationHistogramSift2 {
 
 		this.sigmaToRadius = sigmaToRadius;
 		this.sigmaEnlarge = sigmaEnlarge;
-		this.gradient = gradient;
 
 		this.histAngleBin = 2.0*Math.PI/histogramSize;
 
@@ -130,14 +119,10 @@ public class OrientationHistogramSift2 {
 
 	/**
 	 * Specify the input image
-	 *
-	 * @param image Input image
 	 */
-	public void setInputImage( ImageFloat32 image ) {
-		this.image = image;
-		derivX.reshape(image.width,image.height);
-		derivY.reshape(image.width,image.height);
-		gradient.process(image,derivX,derivY);
+	public void setImageGradient(ImageFloat32 derivX, ImageFloat32 derivY ) {
+		this.derivX = derivX;
+		this.derivY = derivY;
 	}
 
 	/**
@@ -177,7 +162,7 @@ public class OrientationHistogramSift2 {
 		bound.y1 = c_y + r + 1;
 
 		// make sure it is contained in the image bounds
-		BoofMiscOps.boundRectangleInside(image,bound);
+		BoofMiscOps.boundRectangleInside(derivX,bound);
 
 		// clear the histogram
 		Arrays.fill(histogramMag,0);
@@ -316,7 +301,7 @@ public class OrientationHistogramSift2 {
 	}
 
 	/**
-	 * A list of found orientations, in radians
+	 * A list of found orientations
 	 *
 	 * @return orientations
 	 */
@@ -325,7 +310,7 @@ public class OrientationHistogramSift2 {
 	}
 
 	/**
-	 * Orientation of the largest peak, in radians
+	 * Orientation of the largest peak
 	 */
 	public double getPeakOrientation() {
 		return peakAngle;

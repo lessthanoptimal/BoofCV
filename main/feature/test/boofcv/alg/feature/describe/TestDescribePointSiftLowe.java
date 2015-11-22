@@ -16,25 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.interest;
+package boofcv.alg.feature.describe;
 
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class DescribeSift2 {
-	ImageFloat32 input;
-
-	double orientation;
-
-	public void setInput(ImageFloat32 input) {
-		this.input = input;
+public class TestDescribePointSiftLowe {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
-
-	public void compute( double x , double y , double scale ) {
-
-	}
-
-
 }

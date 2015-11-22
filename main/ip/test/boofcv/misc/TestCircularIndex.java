@@ -63,6 +63,14 @@ public class TestCircularIndex {
 	}
 
 	@Test
+	public void distance() {
+		assertEquals(0, CircularIndex.distance(2, 2, 4));
+		assertEquals(1, CircularIndex.distance(2, 3, 4));
+		assertEquals(1, CircularIndex.distance(2, 1, 4));
+		assertEquals(2, CircularIndex.distance(2, 0, 4));
+	}
+
+	@Test
 	public void subtract() {
 		assertEquals( 0, CircularIndex.subtract(2, 2, 4));
 		assertEquals( 1, CircularIndex.subtract(2, 3, 4));

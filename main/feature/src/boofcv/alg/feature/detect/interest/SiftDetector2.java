@@ -35,6 +35,10 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
 
 /**
  *
+ * TODO describe algorithm
+ *
+ * TODO highlight differences
+ *
  * Math Notes:
  * Convolving an image twice with a Guassian kernel of sigma is the same as convolving it once with a kernel
  * of sqrt(2)*sigma.
@@ -44,17 +48,17 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
 public class SiftDetector2 {
 
 	// image pyramid that it processes
-	SiftScaleSpace2 scaleSpace;
+	protected SiftScaleSpace2 scaleSpace;
 
-	// convertion factor to go from pixel coordinate in current octave to input image
-	double pixelScaleToInput;
+	// conversion factor to go from pixel coordinate in current octave to input image
+	protected double pixelScaleToInput;
 
 	// edge detector threshold
 	// In the paper this is (r+1)**2/r
 	double edgeThreshold;
 
 	// all the found detections in a single octave
-	FastQueue<ScalePoint> octaveDetection = new FastQueue<ScalePoint>(ScalePoint.class,true);
+	protected FastQueue<ScalePoint> detections = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 	// Computes image derivatives. used in edge rejection
 	private ImageConvolveSparse<ImageFloat32,?> derivXX;
@@ -70,6 +74,12 @@ public class SiftDetector2 {
 	// finds features from 2D intensity image
 	private NonMaxLimiter extractor;
 
+	/**
+	 *
+	 * @param scaleSpace
+	 * @param edgeR Threshold used to remove edge responses.  Try 10
+	 * @param extractor
+	 */
 	public SiftDetector2( SiftScaleSpace2 scaleSpace ,
 						  double edgeR ,
 						  NonMaxLimiter extractor ) {
@@ -114,7 +124,7 @@ public class SiftDetector2 {
 	public void process( ImageFloat32 input ) {
 
 		scaleSpace.initialize(input);
-		octaveDetection.reset();
+		detections.reset();
 
 		do {
 			// scale from octave to input image
@@ -134,25 +144,27 @@ public class SiftDetector2 {
 				sigmaTarget = (scaleImage1+scaleImage2)/2.0;
 				sigmaUpper = (scaleImage2+scaleImage3)/2.0;
 
-//				sigmaLower = scaleImage0;
-//				sigmaTarget = scaleImage1;
-//				sigmaUpper = scaleImage2;
-
+				sigmaLower = scaleImage0;
+				sigmaTarget = scaleImage1;
+				sigmaUpper = scaleImage2;
 
 				// grab the local DoG scale space images
 				dogLower  = scaleSpace.getDifferenceOfGaussian(j-1);
 				dogTarget = scaleSpace.getDifferenceOfGaussian(j  );
 				dogUpper  = scaleSpace.getDifferenceOfGaussian(j+1);
 
-				detectFeatures();
+				detectFeatures(j);
 			}
 		} while( scaleSpace.computeNextOctave() );
 	}
 
 	/**
 	 * Detect features inside the Difference-of-Gaussian image at the current scale
+	 *
+	 * @param scaleIndex Which scale in the octave is it detecting features inside up.
+	 *              Primarily provided here for use in child classes.
 	 */
-	private void detectFeatures() {
+	protected void detectFeatures( int scaleIndex ) {
 		extractor.process(dogTarget);
 		FastQueue<NonMaxLimiter.LocalExtreme> found = extractor.getLocalExtreme();
 
@@ -206,7 +218,7 @@ public class SiftDetector2 {
 		return true;
 	}
 
-	void processFeatureCandidate( int x , int y , float value ,boolean white ) {
+	protected void processFeatureCandidate( int x , int y , float value ,boolean white ) {
 		// suppress response along edges
 		if( isEdge(x,y) )
 			return;
@@ -223,11 +235,11 @@ public class SiftDetector2 {
 		float s0 =  dogLower.unsafe_get(x , y )*signAdj;
 		float s2 =  dogUpper.unsafe_get(x , y )*signAdj;
 
-		ScalePoint p = octaveDetection.grow();
+		ScalePoint p = detections.grow();
 
 		// Compute the interpolated coordinate of the point in the original image coordinates
-		p.x = pixelScaleToInput *(x + polyPeak(x0, value, x2));
-		p.y = pixelScaleToInput *(y + polyPeak(y0, value, y2));
+		p.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
+		p.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
 
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
@@ -237,7 +249,16 @@ public class SiftDetector2 {
 			p.scale = sigmaUpper*sigmaInterp + (1-sigmaInterp)*sigmaTarget;
 		}
 		p.white = white;
+
+		handleDetection(p);
 	}
+
+	/**
+	 * Function for handling a detected point.  Does nothing here, but can be used by a child class
+	 * to process detections
+	 * @param p Detected point in scale-space.
+	 */
+	protected void handleDetection( ScalePoint p ){}
 
 	/**
 	 * Performs an edge test to remove false positives.  See 4.1 in [1].
@@ -262,7 +283,7 @@ public class SiftDetector2 {
 		return( Math.abs(Tr*Tr) >= Math.abs(edgeThreshold*det));
 	}
 
-	public FastQueue<ScalePoint> getOctaveDetection() {
-		return octaveDetection;
+	public FastQueue<ScalePoint> getDetections() {
+		return detections;
 	}
 }

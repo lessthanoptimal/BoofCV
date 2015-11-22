@@ -53,10 +53,10 @@ public class DebugSiftDetector2App {
 
 		alg.process(gray);
 
-		System.out.println("total features found: " + alg.getOctaveDetection().size());
+		System.out.println("total features found: " + alg.getDetections().size());
 
 		VisualizeFeatures.drawScalePoints(input.createGraphics(),
-				alg.getOctaveDetection().toList(),1);
+				alg.getDetections().toList(),1);
 
 
 //		ListDisplayPanel dog = new ListDisplayPanel();
