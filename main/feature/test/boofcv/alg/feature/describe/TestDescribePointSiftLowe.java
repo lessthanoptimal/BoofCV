@@ -27,7 +27,28 @@ import static org.junit.Assert.fail;
  */
 public class TestDescribePointSiftLowe {
 	@Test
-	public void stuff() {
+	public void process() {
 		fail("Implement");
 	}
+
+	@Test
+	public void createGaussianWeightKernel() {
+		fail("Implement");
+	}
+
+	@Test
+	public void massageDescriptor() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeRawDescriptor() {
+		fail("Implement");
+	}
+
+	@Test
+	public void trilinearInterpolation() {
+		fail("Implement");
+	}
+
 }

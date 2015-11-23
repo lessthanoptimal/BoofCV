@@ -22,6 +22,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.misc.CircularIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
+import georegression.metric.UtilAngle;
 
 /**
  * <p>A faithful implementation of the SIFT descriptor.</p>
@@ -185,20 +186,22 @@ public class DescribePointSiftLowe {
 		double s = Math.sin(orientation);
 
 		int sampleWidth = widthGrid*widthSubregion;
-		int sampleRadius = sampleWidth/2;
+		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
+
+		double histogramWidth = 2.0*Math.PI/numHistogramBins;
 
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
 			float subY = (sampleY + 0.5f)/widthSubregion;
-			int localSampleY = sampleY-sampleRadius;
+			double localSampleY = sampleY-sampleRadius;
 			double y = sampleToPixels*localSampleY;
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
 				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
 				float subX = (sampleX + 0.5f)/widthSubregion;
 				// local sample coordinate
-				int localSampleX = sampleX-sampleRadius;
+				double localSampleX = sampleX-sampleRadius;
 				// recentered local pixel sample coordinate
 				double x = sampleToPixels*localSampleX;
 
@@ -212,8 +215,17 @@ public class DescribePointSiftLowe {
 					float spacialDX = imageDerivX.unsafe_get(pixelX, pixelY);
 					float spacialDY = imageDerivY.unsafe_get(pixelX, pixelY);
 
-					double angle = Math.atan2(spacialDY,spacialDX);
-					int orientationBin = (int)((angle+Math.PI)/numHistogramBins) % numHistogramBins;
+					double angle = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
+					int orientationBin = (int)(angle/histogramWidth) % numHistogramBins;
+
+					if( angle/histogramWidth > numHistogramBins )
+						throw new RuntimeException("Egads");
+
+					if( subX > numHistogramBins )
+						throw new RuntimeException("Egads");
+
+					if( subY > numHistogramBins )
+						throw new RuntimeException("Egads");
 
 					float weightGaussian = gaussianWeight[sampleY*sampleWidth+sampleX];
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
@@ -230,17 +242,29 @@ public class DescribePointSiftLowe {
 	 */
 	private void trilinearInterpolation( float weight , float sampleX , float sampleY , int histogramIndex )
 	{
-		float fWidthGrid = widthGrid;
-		float fNumBins = numHistogramBins;
+		float fWidthGrid = 1.0f;//widthGrid;
+		float fNumBins = 1.0f;//numHistogramBins;
 
 		int descriptorIndex = 0;
 		for (int i = 0; i < widthGrid; i++) {
-			float weightGridY = 1.0f - Math.abs(i-sampleY)/fWidthGrid;
+			float weightGridY = 1.0f - (sampleY-i)/fWidthGrid;
+			weightGridY = Math.max(0,weightGridY);
+			if( weightGridY < 0 || weightGridY > 1)
+				throw new RuntimeException();
+//			weightGridY *= weightGridY;
 			for (int j = 0; j < widthGrid; j++) {
 				float weightGridX = 1.0f - Math.abs(j-sampleX)/fWidthGrid;
+				weightGridX = Math.max(0,weightGridX);
+				if( weightGridX < 0 || weightGridX > 1)
+					throw new RuntimeException();
+//				weightGridX *= weightGridX;
 				for (int k = 0; k < numHistogramBins; k++) {
 					int indexDistance = CircularIndex.distance(k,histogramIndex,numHistogramBins);
 					float weightHistogram = 1.0f - indexDistance/fNumBins;
+					weightHistogram = Math.max(0,weightHistogram);
+					if( weightHistogram < 0 || weightHistogram > 1)
+						throw new RuntimeException();
+//					weightHistogram *= weightHistogram;
 
 					descriptor.value[descriptorIndex++] += weight*weightGridX*weightGridY*weightHistogram;
 				}
@@ -249,7 +273,7 @@ public class DescribePointSiftLowe {
 	}
 
 	public int getDescriptorLength() {
-		return widthGrid*numHistogramBins*numHistogramBins;
+		return widthGrid*widthGrid*numHistogramBins;
 	}
 
 	public int getCanonicalRadius() {

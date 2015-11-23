@@ -57,9 +57,6 @@ import java.util.Arrays;
  */
 public class OrientationHistogramSift2 {
 
-	// Converts a distribution's sigma into a region radius to sample
-	private double sigmaToRadius;
-
 	// How much does it inflate the scale by
 	private double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin
@@ -92,18 +89,15 @@ public class OrientationHistogramSift2 {
 	 * Configures orientation estimation
 	 *
 	 * @param histogramSize Number of elements in the histogram.  Standard is 36
-	 * @param sigmaToRadius Convert a sigma to region radius.  Try 2.5  (98.8% containment)
 	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
 	 */
 	public OrientationHistogramSift2(int histogramSize ,
-									 double sigmaToRadius,
 									 double sigmaEnlarge )
 	{
 		this.histogramMag = new double[ histogramSize ];
 		this.histogramX = new double[ histogramSize ];
 		this.histogramY = new double[ histogramSize ];
 
-		this.sigmaToRadius = sigmaToRadius;
 		this.sigmaEnlarge = sigmaEnlarge;
 
 		this.histAngleBin = 2.0*Math.PI/histogramSize;
@@ -139,7 +133,7 @@ public class OrientationHistogramSift2 {
 		int y = (int)(c_y + 0.5);
 
 		// Estimate its orientation(s)
-		computeHistogram(x, y, sigma*sigmaEnlarge );
+		computeHistogram(x, y, sigma );
 
 		// compute the descriptor
 		findHistogramPeaks();
@@ -153,7 +147,7 @@ public class OrientationHistogramSift2 {
 	 * @param sigma Scale of feature, adjusted for local octave
 	 */
 	void computeHistogram(int c_x, int c_y, double sigma) {
-		int r = (int)Math.ceil(sigma * sigmaToRadius);
+		int r = (int)Math.ceil(sigma * sigmaEnlarge);
 
 		// specify the area being sampled
 		bound.x0 = c_x - r;
