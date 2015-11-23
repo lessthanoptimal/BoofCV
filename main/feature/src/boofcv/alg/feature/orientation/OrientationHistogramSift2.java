@@ -63,10 +63,10 @@ public class OrientationHistogramSift2 {
 	// How much does it inflate the scale by
 	private double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin
-	private double histogramMag[];
+	double histogramMag[];
 	// histograms containing the sum of each derivative
-	private double histogramX[];
-	private double histogramY[];
+	double histogramX[];
+	double histogramY[];
 	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
 	private double histAngleBin;
 
@@ -142,7 +142,7 @@ public class OrientationHistogramSift2 {
 		computeHistogram(x, y, sigma*sigmaEnlarge );
 
 		// compute the descriptor
-		computeOrientations();
+		findHistogramPeaks();
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class OrientationHistogramSift2 {
 	 * @param c_y Center y-axis
 	 * @param sigma Scale of feature, adjusted for local octave
 	 */
-	private void computeHistogram(int c_x, int c_y, double sigma) {
+	void computeHistogram(int c_x, int c_y, double sigma) {
 		int r = (int)Math.ceil(sigma * sigmaToRadius);
 
 		// specify the area being sampled
@@ -181,8 +181,9 @@ public class OrientationHistogramSift2 {
 
 				// edge intensity and angle
 				double magnitude = Math.sqrt(dx*dx + dy*dy);
-				double theta = Math.atan2(dy,dx) + Math.PI;
-				// weight
+				double theta = UtilAngle.domain2PI(Math.atan2(dy,dx));
+
+				// weight from gaussian
 				double weight = computeWeight( x-c_x, y-c_y , sigma );
 
 				// histogram index
@@ -197,11 +198,15 @@ public class OrientationHistogramSift2 {
 	}
 
 	/**
-	 * Finds peaks in histogram and selects orientations.  Location of peaks is interpolated.
+	 * Finds local peaks in histogram and selects orientations.  Location of peaks is interpolated.
 	 */
-	private void computeOrientations() {
-		// identify peaks and find the highest peak
+	void findHistogramPeaks() {
+		// reset data structures
 		peaks.reset();
+		angles.reset();
+		peakAngle = 0;
+
+		// identify peaks and find the highest peak
 		double largest = 0;
 		int largestIndex = -1;
 		double before = histogramMag[ histogramMag.length-2 ];
@@ -210,10 +215,11 @@ public class OrientationHistogramSift2 {
 			double after = histogramMag[ i ];
 
 			if( current > before && current > after ) {
-				peaks.push(i);
+				int currentIndex = CircularIndex.addOffset(i,-1,histogramMag.length);
+				peaks.push(currentIndex);
 				if( current > largest ) {
 					largest = current;
-					largestIndex = i;
+					largestIndex = currentIndex;
 				}
 			}
 			before = current;
@@ -224,12 +230,11 @@ public class OrientationHistogramSift2 {
 			return;
 
 		// see if any of the other peaks are within 80% of the max peak
-		angles.reset();
 		double threshold = largest*0.8;
 		for( int i = 0; i < peaks.size; i++ ) {
 			int index = peaks.data[i];
 			current = histogramMag[index];
-			if( current > threshold) {
+			if( current >= threshold) {
 				double angle = computeAngle(index);
 
 				angles.push( angle );
@@ -248,7 +253,7 @@ public class OrientationHistogramSift2 {
 	 * @param index1 Histogram index of the peak
 	 * @return angle of the peak. -pi to pi
 	 */
-	private double computeAngle( int index1 ) {
+	double computeAngle( int index1 ) {
 
 		int index0 = CircularIndex.addOffset(index1,-1, histogramMag.length);
 		int index2 = CircularIndex.addOffset(index1, 1, histogramMag.length);
@@ -261,16 +266,16 @@ public class OrientationHistogramSift2 {
 		double offset = FastHessianFeatureDetector.polyPeak(v0,v1,v2);
 
 		// interpolate using the index offset and angle of its neighbor
-		return interpolateAngle(index1, index0, index2, offset);
+		return interpolateAngle(index0, index1, index2, offset);
 	}
 
 	/**
 	 * Given the interpolated index, compute the angle from the 3 indexes.  The angle for each index
 	 * is computed from the weighted gradients.
-	 * @param offset Interpolated index.
+	 * @param offset Interpolated index offset relative to index0.  range -1 to 1
 	 * @return Interpolated angle.
 	 */
-	private double interpolateAngle(int index1, int index0, int index2, double offset) {
+	double interpolateAngle(int index0, int index1, int index2, double offset) {
 		double angle1 = Math.atan2(histogramY[index1],histogramX[index1]);
 		double deltaAngle;
 		if( offset < 0 ) {
@@ -287,7 +292,7 @@ public class OrientationHistogramSift2 {
 	/**
 	 * Computes the weight based on a centered Gaussian shaped function.  Interpolation is used to speed up the process
 	 */
-	private double computeWeight( double deltaX , double deltaY , double sigma ) {
+	double computeWeight( double deltaX , double deltaY , double sigma ) {
 		// the exact equation
 //		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 

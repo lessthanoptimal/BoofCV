@@ -18,51 +18,205 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.testing.BoofTesting;
+import georegression.metric.UtilAngle;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestOrientationHistogramSift2 {
+
+	Random rand = new Random(234324);
+
+	int width = 50;
+	int height = 60;
+
 	@Test
 	public void process_easy() {
-		fail("Implement");
+		ImageFloat32 derivX = new ImageFloat32(width, height);
+		ImageFloat32 derivY = new ImageFloat32(width, height);
+
+		process_easy(derivX,derivY);
+		BoofTesting.checkSubImage(this,"process_easy",true,derivX,derivY);
+	}
+
+	public void process_easy( ImageFloat32 derivX, ImageFloat32 derivY ) {
+		double theta0 = 0.5, theta1 = -1.2;
+		ImageMiscOps.fill(derivX, (float) Math.cos(theta0)*1.5f);
+		ImageMiscOps.fill(derivY, (float) Math.sin(theta0)*1.5f);
+		GImageMiscOps.fillRectangle(derivX,(float) Math.cos(theta1),20,0,30,60);
+		GImageMiscOps.fillRectangle(derivY,(float) Math.sin(theta1),20,0,30,60);
+
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36, 2.5, 1);
+		alg.setImageGradient(derivX, derivY);
+
+		alg.process(20,25,4);
+
+		assertEquals(2,alg.getOrientations().size);
+		assertEquals(theta0,alg.getPeakOrientation(),1e-5);
+		// the order isn't garenteed, this might need to be made more robust later on
+		assertEquals(theta0,alg.getOrientations().get(0),1e-5);
+		assertTrue(UtilAngle.dist(theta1,alg.getOrientations().get(1)) <= 1e-5);
+	}
+
+	/**
+	 * Real basic check to see if a uniform gradient is added to the histogram.  Goes through
+	 * all angles and makes sure it doesn't blow up at the border
+	 */
+	@Test
+	public void computeHistogram() {
+		ImageFloat32 derivX = new ImageFloat32(width, height);
+		ImageFloat32 derivY = new ImageFloat32(width, height);
+		int N = 36;
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(N, 2.5, 1);
+		alg.setImageGradient(derivX, derivY);
+
+		for (int degrees = 5; degrees < 360; degrees+=10) {
+			double theta = UtilAngle.degreeToRadian(degrees);
+
+			int bin = degrees * N / 360;
+
+			ImageMiscOps.fill(derivX, (float) Math.cos(theta));
+			ImageMiscOps.fill(derivY, (float) Math.sin(theta));
+
+			alg.computeHistogram(20, 15, 3);
+			checkHistogram(N, alg, theta, bin);
+
+			alg.computeHistogram(0, 0, 3);
+			checkHistogram(N, alg, theta, bin);
+		}
+	}
+
+	private void checkHistogram(int n, OrientationHistogramSift2 alg, double theta, int index) {
+		for (int i = 0; i < n; i++) {
+			if (i == index) {
+				double found = Math.atan2(alg.histogramY[i], alg.histogramX[i]);
+				assertTrue( UtilAngle.dist(theta, found) <= 1e-5);
+				assertTrue(alg.histogramMag[i] > 0);
+			} else {
+				assertEquals(0, alg.histogramX[i], 1e-5);
+				assertEquals(0, alg.histogramY[i], 1e-5);
+				assertEquals(0, alg.histogramMag[i], 1e-5);
+			}
+		}
 	}
 
 	@Test
-	public void checkImageBorders() {
-		fail("Implement");
+	public void findHistogramPeaks() {
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,2.5,1);
+
+		int N = alg.histogramX.length;
+
+		double expected[] = new double[N];
+		for (int i = 0; i < N; i++) {
+			double angle = expected[i] = UtilAngle.bound( 2.0*i*Math.PI/N );
+
+			alg.histogramMag[i] = 1.0;
+			alg.histogramX[i] = Math.cos(angle);
+			alg.histogramY[i] = Math.sin(angle);
+		}
+
+		// largest local max
+		alg.histogramMag[5] = 5.0;
+
+		// should result in a single peak even though all 3 are valid
+		alg.histogramMag[15] = 4.4;
+		alg.histogramMag[16] = 4.5;
+		alg.histogramMag[17] = 4.4;
+
+		// not a local max since they have identical values
+		alg.histogramMag[20] = 6;
+		alg.histogramMag[21] = 6;
+
+		alg.findHistogramPeaks();
+
+		assertEquals(2,alg.getOrientations().size);
+		assertEquals(expected[5],alg.getPeakOrientation(),1e-8);
+		assertEquals(expected[5],alg.getOrientations().get(0),1e-8);
+		assertEquals(expected[16],alg.getOrientations().get(1),1e-8);
 	}
 
-	@Test
-	public void computeHistogram_single() {
-		fail("Implement");
-	}
-
-	@Test
-	public void computeHistogram_multiple() {
-		fail("Implement");
-	}
-
-	@Test
-	public void computeOrientations() {
-		fail("Implement");
-	}
 	@Test
 	public void computeAngle() {
-		fail("Implement");
+		double theta0 = 0.5, theta1 = 0.7, theta2 = 0.8;
+		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
+		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
+
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,2.5,1);
+
+		// repeat this test all the way around the histogram to ensure wrapping is handled correctly.
+		int N = alg.histogramX.length;
+
+		for (int i = N-2,j=N-1,k=0; k < alg.histogramX.length; i=j,j=k,k++) {
+			alg.histogramX[i] = dx0; alg.histogramY[i] = dy0;
+			alg.histogramX[j] = dx1; alg.histogramY[j] = dy1;
+			alg.histogramX[k] = dx2; alg.histogramY[k] = dy2;
+
+			// symmetric magnitude, no interpolation
+			alg.histogramMag[i] = 1.5;
+			alg.histogramMag[j] = 3.1;
+			alg.histogramMag[k] = 1.5;
+
+			// bias the results
+			assertEquals(theta1,alg.computeAngle(j),1e-8);
+			alg.histogramMag[i] = 2.0;
+			assertTrue(alg.computeAngle(j) < theta1);
+			alg.histogramMag[i] = 1.5;
+			alg.histogramMag[k] = 2.0;
+			assertTrue(alg.computeAngle(j) > theta1);
+		}
+
+
 	}
 
 	@Test
 	public void interpolateAngle() {
-		fail("Implement");
+		double theta0 = 0.5, theta1 = 0.7, theta2 = 0.8;
+		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
+		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
+
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,2.5,1);
+
+		alg.histogramX[2] = dx0; alg.histogramY[2] = dy0;
+		alg.histogramX[3] = dx1; alg.histogramY[3] = dy1;
+		alg.histogramX[4] = dx2; alg.histogramY[4] = dy2;
+
+		assertEquals(theta0,alg.interpolateAngle(2,3,4,-1),1e-6);
+		assertEquals(theta1,alg.interpolateAngle(2,3,4, 0),1e-6);
+		assertEquals(theta2,alg.interpolateAngle(2,3,4, 1),1e-6);
+		assertEquals(0.6,alg.interpolateAngle(2,3,4, -0.5),1e-6);
+		assertEquals(0.75,alg.interpolateAngle(2,3,4, 0.5),1e-6);
 	}
 
 	@Test
 	public void computeWeight() {
-		fail("Implement");
+
+		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,2.5,1);
+
+		double sigma = 2;
+
+		for (int i = 0; i < 50; i++) {
+			double dx = (rand.nextDouble()-0.5)*3;
+			double dy = (rand.nextDouble()-0.5)*3;
+
+			double found = alg.computeWeight(dx,dy,sigma);
+			double expected = exactWeight(dx,dy,sigma);
+
+			assertEquals(expected,found,1e-3);
+		}
+	}
+
+	private double exactWeight( double deltaX , double deltaY , double sigma ) {
+		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 	}
 
 }

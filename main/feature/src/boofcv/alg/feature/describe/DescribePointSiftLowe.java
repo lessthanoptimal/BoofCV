@@ -190,13 +190,13 @@ public class DescribePointSiftLowe {
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
-			int subY = sampleY/widthSubregion;
+			float subY = (sampleY + 0.5f)/widthSubregion;
 			int localSampleY = sampleY-sampleRadius;
 			double y = sampleToPixels*localSampleY;
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
-				// find the sub-region its inside of
-				int subX = sampleX/widthSubregion;
+				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
+				float subX = (sampleX + 0.5f)/widthSubregion;
 				// local sample coordinate
 				int localSampleX = sampleX-sampleRadius;
 				// recentered local pixel sample coordinate

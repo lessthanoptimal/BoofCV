@@ -133,20 +133,11 @@ public class SiftDetector2 {
 			// detect features in the image
 			for (int j = 1; j < scaleSpace.getNumScales()+1; j++) {
 
-				// not really sure how to compute the scale for features found at a particular DoG
-				// image.  Maybe the average of the two scales it was computed from is reasonable?
-				double scaleImage0 = scaleSpace.computeSigmaScale( j - 1);
-				double scaleImage1 = scaleSpace.computeSigmaScale( j    );
-				double scaleImage2 = scaleSpace.computeSigmaScale( j + 1);
-				double scaleImage3 = scaleSpace.computeSigmaScale( j + 2);
-
-				sigmaLower = (scaleImage0+scaleImage1)/2.0;
-				sigmaTarget = (scaleImage1+scaleImage2)/2.0;
-				sigmaUpper = (scaleImage2+scaleImage3)/2.0;
-
-				sigmaLower = scaleImage0;
-				sigmaTarget = scaleImage1;
-				sigmaUpper = scaleImage2;
+				// not really sure how to compute the scale for features found at a particular DoG image
+				// using the average resulted in less visually appealing circles in a test image
+				sigmaLower  = scaleSpace.computeSigmaScale( j - 1);
+				sigmaTarget = scaleSpace.computeSigmaScale( j    );
+				sigmaUpper  = scaleSpace.computeSigmaScale( j + 1);
 
 				// grab the local DoG scale space images
 				dogLower  = scaleSpace.getDifferenceOfGaussian(j-1);
@@ -171,8 +162,6 @@ public class SiftDetector2 {
 		derivXX.setImage(dogTarget);
 		derivXY.setImage(dogTarget);
 		derivYY.setImage(dogTarget);
-
-//		octaveDetection.reset();
 
 		for (int i = 0; i < found.size; i++) {
 			NonMaxLimiter.LocalExtreme e = found.get(i);
@@ -227,13 +216,13 @@ public class SiftDetector2 {
 		// This is different from the original paper
 		float signAdj = white ? 1 : -1;
 
-		float x0 =  dogTarget.unsafe_get(x - 1, y)*signAdj;
-		float x2 =  dogTarget.unsafe_get(x + 1, y)*signAdj;
-		float y0 =  dogTarget.unsafe_get(x , y - 1)*signAdj;
-		float y2 =  dogTarget.unsafe_get(x , y + 1)*signAdj;
+		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
+		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
+		float y0 = dogTarget.unsafe_get(x , y - 1)*signAdj;
+		float y2 = dogTarget.unsafe_get(x , y + 1)*signAdj;
 
-		float s0 =  dogLower.unsafe_get(x , y )*signAdj;
-		float s2 =  dogUpper.unsafe_get(x , y )*signAdj;
+		float s0 = dogLower.unsafe_get(x , y )*signAdj;
+		float s2 = dogUpper.unsafe_get(x , y )*signAdj;
 
 		ScalePoint p = detections.grow();
 
