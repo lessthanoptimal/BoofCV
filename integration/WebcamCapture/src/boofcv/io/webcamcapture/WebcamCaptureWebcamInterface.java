@@ -37,6 +37,20 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
 	open(String device, int width, int height, ImageType<T> imageType) {
+
+		if( device != null ) {
+			try {
+				int which = Integer.parseInt(device);
+				Webcam webcam = Webcam.getWebcams().get(which);
+
+				if (width >= 0 && height >= 0) {
+					UtilWebcamCapture.adjustResolution(webcam, width, height);
+				}
+				webcam.open();
+
+				return new SimpleSequence<T>(webcam, imageType);
+			} catch (RuntimeException ignore) {}
+		}
 		return new SimpleSequence<T>(device,width,height,imageType);
 	}
 

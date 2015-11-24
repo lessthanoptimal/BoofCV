@@ -21,17 +21,48 @@ package boofcv.app;
 /**
  * @author Peter Abeles
  */
-public class BaseWebcamApp {
+public class BaseStandardInputApp {
+
+	InputType inputType = InputType.WEBCAM;
+
 	int cameraId=0;
 	int desiredWidth=-1,desiredHeight=-1;
+
+	String filePath;
 
 	String flagName;
 	String parameters;
 
+	protected void printInputHelp() {
+		System.out.println("Camera Input:  (default)");
+		System.out.println();
+		System.out.println("  --Camera=<int>                     Opens the specified camera using WebcamCapture ID");
+		System.out.println("                                     DEFAULT: Whatever WebcamCapture opens");
+		System.out.println("  --Resolution=<width>:<height>      Specifies the image resolution.");
+		System.out.println("                                     DEFAULT: Who knows or intrinsic, if specified");
+		System.out.println();
+		System.out.println("Image Input:");
+		System.out.println();
+		System.out.println("  --ImageFile=<path>                 Path to image file");
+		System.out.println();
+		System.out.println("Video Input:");
+		System.out.println();
+		System.out.println("  --VideoFile=<path>                 Path to video file");
+	}
+
 	protected boolean checkCameraFlag( String argument ) {
 		splitFlag(argument);
 		if( flagName.compareToIgnoreCase("Camera") == 0 ) {
+			inputType = InputType.WEBCAM;
 			cameraId = Integer.parseInt(parameters);
+			return true;
+		} else if( flagName.compareToIgnoreCase("ImageFile") == 0 ) {
+			inputType = InputType.IMAGE;
+			filePath = parameters;
+			return true;
+		} else if( flagName.compareToIgnoreCase("videoFile") == 0 ) {
+			inputType = InputType.VIDEO;
+			filePath = parameters;
 			return true;
 		} else if( flagName.compareToIgnoreCase("Resolution") == 0 ) {
 			String words[] = parameters.split(":");
@@ -56,5 +87,11 @@ public class BaseWebcamApp {
 
 		flagName = word.substring(2,indexEquals);
 		parameters = word.substring(indexEquals+1,word.length());
+	}
+
+	enum InputType {
+		WEBCAM,
+		IMAGE,
+		VIDEO
 	}
 }

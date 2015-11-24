@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CameraCalibration extends BaseWebcamApp {
+public class CameraCalibration extends BaseStandardInputApp {
 
 	String inputDirectory;
 	String outputFileName = "intrinsic.xml";
