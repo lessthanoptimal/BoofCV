@@ -37,12 +37,11 @@ public class CalibrationObservation {
 	 */
 	public List<Point> points = new ArrayList<Point>();
 
-
 	public void setTo( CalibrationObservation obs ) {
 		reset();
 		for (int i = 0; i < obs.size(); i++) {
 			Point p = obs.points.get(i);
-			points.add( new Point(p.pixel,p.index));
+			points.add( new Point(p.pixel.copy(),p.index));
 		}
 	}
 
@@ -95,5 +94,11 @@ public class CalibrationObservation {
 
 		public Point() {
 		}
+	}
+
+	public CalibrationObservation copy() {
+		CalibrationObservation c = new CalibrationObservation();
+		c.setTo(this);
+		return c;
 	}
 }
