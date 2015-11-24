@@ -95,14 +95,14 @@ public class FactoryDetectDescribe {
 	sift2() {
 		SiftScaleSpace2 scaleSpace = new SiftScaleSpace2(-1,5,3,1.6);
 		OrientationHistogramSift2 orientation = new OrientationHistogramSift2(36,1.5);
-		DescribePointSiftLowe describe = new DescribePointSiftLowe(4,4,8,1.0,0.5,0.2);
+		DescribePointSiftLowe describe = new DescribePointSiftLowe(4,4,8,2,0.5,0.2);
 
 		ConfigExtract configExtract = new ConfigExtract(2,1);
 		configExtract.detectMaximums = true;
 		configExtract.detectMinimums = true;
 		configExtract.ignoreBorder = 1;
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configExtract);
-		NonMaxLimiter nonMax = new NonMaxLimiter(nns,1200);
+		NonMaxLimiter nonMax = new NonMaxLimiter(nns,800);
 		DetectDescribeSift2 dds = new DetectDescribeSift2(scaleSpace,10,nonMax,orientation,describe);
 		return new WrapDetectDescribeSift2(dds);
 	}

@@ -19,7 +19,6 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.misc.CircularIndex;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import georegression.metric.UtilAngle;
@@ -39,10 +38,10 @@ import georegression.metric.UtilAngle;
  * <p>There are no intentional differences from the paper.  Submit a bug report if you find any areas with a detailed
  * description.   However the paper is ambiguous.</p>
  * <ul>
- *     <li>Interpolation method for sample points isn't specified.  Nearest-neighbor is assumed and that's what
+ *     <li>Interpolation method for sampling image pixels isn't specified.  Nearest-neighbor is assumed and that's what
  *     VLFeat uses.</li>
- *     <li>Size of sample region.  Weirdly enough I can't find this very important parameter specified anywhere.
- *     The suggested value comes from emperical testing.</li>
+ *     <li>Size of sample region.  Oddly enough, I can't find this very important parameter specified anywhere.
+ *     The suggested value comes from empirical testing.</li>
  * </ul>
  *
  * <p>
@@ -64,6 +63,7 @@ public class DescribePointSiftLowe {
 
 	// number of bins in the orientation histogram
 	int numHistogramBins;
+	double histogramBinWidth;
 
 	// conversion from scale-space sigma to image pixels
 	double sigmaToPixels;
@@ -95,6 +95,8 @@ public class DescribePointSiftLowe {
 		this.numHistogramBins = numHistogramBins;
 		this.sigmaToPixels = sigmaToPixels;
 		this.maxDescriptorElementValue = maxDescriptorElementValue;
+
+		this.histogramBinWidth = 2.0*Math.PI/numHistogramBins;
 
 		// number of samples wide the descriptor window is
 		int descriptorWindow = widthSubregion*widthGrid;
@@ -188,8 +190,6 @@ public class DescribePointSiftLowe {
 		int sampleWidth = widthGrid*widthSubregion;
 		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
 
-		double histogramWidth = 2.0*Math.PI/numHistogramBins;
-
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
@@ -216,9 +216,9 @@ public class DescribePointSiftLowe {
 					float spacialDY = imageDerivY.unsafe_get(pixelX, pixelY);
 
 					double angle = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
-					int orientationBin = (int)(angle/histogramWidth) % numHistogramBins;
+//					int orientationBin = (int)(angle/histogramWidth) % numHistogramBins;
 
-					if( angle/histogramWidth > numHistogramBins )
+					if( angle/histogramBinWidth > numHistogramBins )
 						throw new RuntimeException("Egads");
 
 					if( subX > numHistogramBins )
@@ -231,7 +231,7 @@ public class DescribePointSiftLowe {
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
 
 					// trilinear interpolation intro descriptor
-					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,orientationBin);
+					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle);
 				}
 			}
 		}
@@ -240,33 +240,21 @@ public class DescribePointSiftLowe {
 	/**
 	 * Applies trilinear interpolation across the descriptor
 	 */
-	private void trilinearInterpolation( float weight , float sampleX , float sampleY , int histogramIndex )
+	private void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle )
 	{
-		float fWidthGrid = 1.0f;//widthGrid;
-		float fNumBins = 1.0f;//numHistogramBins;
-
-		int descriptorIndex = 0;
 		for (int i = 0; i < widthGrid; i++) {
-			float weightGridY = 1.0f - (sampleY-i)/fWidthGrid;
-			weightGridY = Math.max(0,weightGridY);
-			if( weightGridY < 0 || weightGridY > 1)
-				throw new RuntimeException();
-//			weightGridY *= weightGridY;
+			double weightGridY = 1.0 - Math.abs(sampleY-i);
+			if( weightGridY <= 0) continue;
 			for (int j = 0; j < widthGrid; j++) {
-				float weightGridX = 1.0f - Math.abs(j-sampleX)/fWidthGrid;
-				weightGridX = Math.max(0,weightGridX);
-				if( weightGridX < 0 || weightGridX > 1)
-					throw new RuntimeException();
-//				weightGridX *= weightGridX;
+				double weightGridX = 1.0 - Math.abs(sampleX-j);
+				if( weightGridX <= 0 ) continue;
 				for (int k = 0; k < numHistogramBins; k++) {
-					int indexDistance = CircularIndex.distance(k,histogramIndex,numHistogramBins);
-					float weightHistogram = 1.0f - indexDistance/fNumBins;
-					weightHistogram = Math.max(0,weightHistogram);
-					if( weightHistogram < 0 || weightHistogram > 1)
-						throw new RuntimeException();
-//					weightHistogram *= weightHistogram;
+					double angleBin = k*histogramBinWidth;
+					double weightHistogram = 1.0 - UtilAngle.dist(angle,angleBin)/histogramBinWidth;
+					if( weightHistogram <= 0 ) continue;
 
-					descriptor.value[descriptorIndex++] += weight*weightGridX*weightGridY*weightHistogram;
+					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
+					descriptor.value[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
 				}
 			}
 		}
