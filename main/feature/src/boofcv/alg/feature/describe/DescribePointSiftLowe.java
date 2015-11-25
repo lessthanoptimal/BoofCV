@@ -188,22 +188,20 @@ public class DescribePointSiftLowe {
 		double s = Math.sin(orientation);
 
 		int sampleWidth = widthGrid*widthSubregion;
+		// compute radius and ensure its symmetric for even and odd cases
 		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
 
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
-			float subY = (sampleY + 0.5f)/widthSubregion;
-			double localSampleY = sampleY-sampleRadius;
-			double y = sampleToPixels*localSampleY;
+			float subY = sampleY/widthSubregion;
+			double y = sampleToPixels*(sampleY-sampleRadius);
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
 				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
-				float subX = (sampleX + 0.5f)/widthSubregion;
-				// local sample coordinate
-				double localSampleX = sampleX-sampleRadius;
+				float subX = sampleX/widthSubregion;
 				// recentered local pixel sample coordinate
-				double x = sampleToPixels*localSampleX;
+				double x = sampleToPixels*(sampleX-sampleRadius);
 
 				// pixel coordinate in the image that is to be sampled.  Note the rounding
 				int pixelX = (int)(x*c - y*s + c_x + 0.5);
@@ -216,16 +214,6 @@ public class DescribePointSiftLowe {
 					float spacialDY = imageDerivY.unsafe_get(pixelX, pixelY);
 
 					double angle = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
-//					int orientationBin = (int)(angle/histogramWidth) % numHistogramBins;
-
-					if( angle/histogramBinWidth > numHistogramBins )
-						throw new RuntimeException("Egads");
-
-					if( subX > numHistogramBins )
-						throw new RuntimeException("Egads");
-
-					if( subY > numHistogramBins )
-						throw new RuntimeException("Egads");
 
 					float weightGaussian = gaussianWeight[sampleY*sampleWidth+sampleX];
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);

@@ -26,7 +26,8 @@ import org.ddogleg.struct.FastQueue;
 
 /**
  * Adds the ability to specify the maximum number of points that you wish to return.  The selected
- * points will be sorted by feature intensity
+ * points will be sorted by feature intensity.  If maximums and minimums are found then the total
+ * number refers to the total combined number of features.  The intensity that it sorts by is the absolute value.
  *
  * @author Peter Abeles
  */
@@ -40,11 +41,21 @@ public class NonMaxLimiter {
 
 	FastQueue<LocalExtreme> localExtreme = new FastQueue<LocalExtreme>(LocalExtreme.class,true);
 
+	/**
+	 * Configures the limiter
+	 * @param nonmax Non-maximum suppression algorithm
+	 * @param maxTotalFeatures The total number of allowed features it can return
+	 */
 	public NonMaxLimiter(NonMaxSuppression nonmax, int maxTotalFeatures) {
 		this.nonmax = nonmax;
 		this.maxTotalFeatures = maxTotalFeatures;
 	}
 
+	/**
+	 * Extracts local max and/or min from the intensity image.  If more than the maximum features are found then
+	 * only the most intense ones will be returned
+	 * @param intensity Feature image intensity
+	 */
 	public void process(ImageFloat32 intensity ) {
 
 		originalMin.reset();
@@ -55,12 +66,12 @@ public class NonMaxLimiter {
 		for (int i = 0; i < originalMin.size; i++) {
 			Point2D_I16 p = originalMin.get(i);
 			float val = intensity.unsafe_get(p.x,p.y);
-			localExtreme.grow().set(val,false,p);
+			localExtreme.grow().set(-val,false,p);
 		}
 		for (int i = 0; i < originalMax.size; i++) {
 			Point2D_I16 p = originalMax.get(i);
 			float val = intensity.unsafe_get(p.x, p.y);
-			localExtreme.grow().set(-val,true,p);
+			localExtreme.grow().set(val,true,p);
 		}
 
 		if( localExtreme.size > maxTotalFeatures ) {
@@ -85,7 +96,13 @@ public class NonMaxLimiter {
 		return nonmax;
 	}
 
+	/**
+	 * Data structure which provides information on a local extremum.
+	 */
 	public static class LocalExtreme implements Comparable<LocalExtreme>{
+		/**
+		 * Absolute value of image intensity
+		 */
 		public float intensity;
 		public boolean max;
 		public Point2D_I16 location;
@@ -97,18 +114,21 @@ public class NonMaxLimiter {
 			return this;
 		}
 
+		/**
+		 * Returns the value of the feature in the intensity image.  Adds the sign back
+		 */
 		public float getValue() {
 			if( max )
-				return -intensity;
-			else
 				return intensity;
+			else
+				return -intensity;
 		}
 
 		@Override
 		public int compareTo(LocalExtreme o) {
-			if (intensity > o.intensity) {
+			if (intensity < o.intensity) {
 				return 1;
-			} else if( intensity < o.intensity ) {
+			} else if( intensity > o.intensity ) {
 				return -1;
 			} else {
 				return 0;

@@ -19,14 +19,19 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.BorderType;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -73,22 +78,96 @@ public class TestSiftScaleSpace2 {
 	 */
 	@Test
 	public void checkScaleBlur() {
-		fail("implement");
+		ImageFloat32 original = new ImageFloat32(300,340);
+		GImageMiscOps.fillUniform(original,rand,0,100);
+
+		ImageFloat32 expected = new ImageFloat32(300,340);
+
+		float sigma0 = 1.6f;
+		SiftScaleSpace2 alg = new SiftScaleSpace2(0,3,2,sigma0);
+
+		alg.initialize(original);
+		assertEquals(5,alg.getNumScaleImages());
+
+		for (int i = 0; i < 5; i++) {
+			double sigma = alg.computeSigmaScale(i);
+
+			GBlurImageOps.gaussian(original, expected, sigma, -1, null);
+
+			double averageError = compareImage(expected, alg.getImageScale(i), 0);
+
+			assertTrue(" scale "+i+" error = "+averageError,averageError<2);
+		}
 	}
 
 	@Test
 	public void computeSigmaScale() {
-		fail("implement");
+		SiftScaleSpace2 alg = new SiftScaleSpace2(-1,4,3,1.6);
+		alg.initialize(new ImageFloat32(60,50));
+
+		double k = Math.pow(2.0,1.0/3.0);
+		for (int i = 0; i < 5; i++) {
+			assertEquals(0.8*Math.pow(k,i),alg.computeSigmaScale(i),1e-8);
+		}
+		alg.computeNextOctave();
+		for (int i = 0; i < 5; i++) {
+			assertEquals(1.6*Math.pow(k,i),alg.computeSigmaScale(i),1e-8);
+		}
+
 	}
 
 	@Test
 	public void scaleImageUp() {
-		fail("implement");
+		ImageFloat32 input = new ImageFloat32(15, 8);
+		ImageFloat32 output = new ImageFloat32(1, 1);
+		ImageMiscOps.fillUniform(input, rand, -10, 10);
+
+		SiftScaleSpace2 alg = new SiftScaleSpace2(0,4,3,1.6);
+
+		alg.scaleImageUp(input,output,2);
+
+		assertEquals(30,output.width );
+		assertEquals(16,output.height);
+
+		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.
+				createPixelS(0,255, TypeInterpolate.BILINEAR, BorderType.EXTENDED,ImageFloat32.class);
+
+		interp.setImage(input);
+
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				float inputY = y/2.0f;
+				float inputX = x/2.0f;
+
+				float expected = interp.get(inputX,inputY);
+				float found = output.get(x,y);
+
+				assertEquals(expected,found,1e-4);
+			}
+		}
 	}
 
 	@Test
 	public void scaleDown2() {
-		fail("implement");
+		int sizes [] = new int[]{30,31};
+
+		for( int width : sizes ) {
+			int height = width*2/3 + width%2;
+			ImageFloat32 input = new ImageFloat32(width, height);
+			ImageFloat32 output = new ImageFloat32(1, 1);
+
+			ImageMiscOps.fillUniform(input, rand, -10, 10);
+			SiftScaleSpace2.scaleDown2(input, output);
+
+			assertEquals(width/2, output.width);
+			assertEquals(height/2, output.height);
+
+			for (int y = 0; y < output.height; y++) {
+				for (int x = 0; x < output.width; x++) {
+					assertEquals(input.get(x * 2, y * 2), output.get(x, y), 1e-4);
+				}
+			}
+		}
 	}
 
 	/**

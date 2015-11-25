@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -92,6 +91,7 @@ public class SiftScaleSpace2 {
 			FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
 
 	/**
+	 * Configures the scale-space
 	 *
 	 * @param firstOctave Initial octave.  Negative numbers means it will scale up.  Recommend 0 or -1.
 	 * @param lastOctave  Last octave, inclusive.  Recommend ????
@@ -148,10 +148,16 @@ public class SiftScaleSpace2 {
 //		}
 	}
 
+	/**
+	 * Computes the effective amount of blur at the given scale in the current octave.
+	 */
 	public double computeSigmaScale( int scale ) {
 		return computeSigmaScale(currentOctave,scale);
 	}
 
+	/**
+	 * Returns the blur at the given octave and scale
+	 */
 	private double computeSigmaScale(int octave, int scale) {
 		return sigma0*Math.pow(2,octave+scale/(double)numScales);
 	}
@@ -184,7 +190,10 @@ public class SiftScaleSpace2 {
 		computeOctaveScales();
 	}
 
-	private void scaleImageUp(ImageFloat32 input , ImageFloat32 output , int scale ) {
+	/**
+	 * Scales an image up using interpolation
+	 */
+	void scaleImageUp(ImageFloat32 input , ImageFloat32 output , int scale ) {
 		output.reshape(input.width*scale,input.height*scale);
 
 		float fdiv = 1.0f/scale;
@@ -202,7 +211,10 @@ public class SiftScaleSpace2 {
 		}
 	}
 
-	private void scaleDown2( ImageFloat32 input , ImageFloat32 output ) {
+	/**
+	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
+	 */
+	static void scaleDown2( ImageFloat32 input , ImageFloat32 output ) {
 		
 		output.reshape(input.width / 2, input.height / 2);
 
@@ -215,6 +227,10 @@ public class SiftScaleSpace2 {
 		}
 	}
 
+	/**
+	 * Computes the next octave.  If the last octave has already been computed false is returned.
+	 * @return true if an octave was computed or false if the last one was already reached
+	 */
 	public boolean computeNextOctave() {
 		currentOctave += 1;
 		if( currentOctave > lastOctave ) {
@@ -227,6 +243,9 @@ public class SiftScaleSpace2 {
 		return true;
 	}
 
+	/**
+	 * Computes all the scale images in an octave.  This includes DoG images.
+	 */
 	private void computeOctaveScales() {
 		octaveImages[0] = tempImage0;
 		for (int i = 1; i < numScales+3; i++) {
@@ -248,20 +267,9 @@ public class SiftScaleSpace2 {
 		return differenceOfGaussian[dogIndex];
 	}
 
-	void computeOctaveScales(ImageFloat32 input) {
-		octaveImages[0] = input;
-		for (int i = 0; i < kernelSigmaToK.length; i++) {
-			octaveImages[i+1].reshape(input.width,input.height);
-			applyGaussian(octaveImages[i], octaveImages[i + 1], kernelSigmaToK[i]);
-		}
-	}
-
-	void computeScaleDifference() {
-		for (int i = 1; i < octaveImages.length; i++) {
-			GPixelMath.subtract(octaveImages[i], octaveImages[i - 1], differenceOfGaussian[i - 1]);
-		}
-	}
-
+	/**
+	 * Applies the separable kernel to the input image and stores the results in the output image.
+	 */
 	void applyGaussian(ImageFloat32 input, ImageFloat32 output, Kernel1D kernel) {
 		tempBlur.reshape(input.width, input.height);
 		GConvolveImageOps.horizontalNormalized(kernel, input, tempBlur);
@@ -270,6 +278,10 @@ public class SiftScaleSpace2 {
 
 	public int getNumScales() {
 		return numScales;
+	}
+
+	public int getNumScaleImages() {
+		return numScales+3;
 	}
 
 	public int getCurrentOctave() {

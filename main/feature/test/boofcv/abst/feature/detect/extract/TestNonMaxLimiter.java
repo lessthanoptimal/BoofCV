@@ -18,16 +18,69 @@
 
 package boofcv.abst.feature.detect.extract;
 
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import boofcv.struct.image.ImageFloat32;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestNonMaxLimiter {
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void checkNoLimit() {
+		ImageFloat32 intensity = new ImageFloat32(30,25);
+		intensity.set(10,15,20);
+		intensity.set(12,20,25);
+
+		intensity.set(1,15,-20);
+		intensity.set(1,20,-25);
+
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
+
+		NonMaxLimiter limiter = new NonMaxLimiter(extractor,20);
+
+		limiter.process(intensity);
+
+		FastQueue<NonMaxLimiter.LocalExtreme> found = limiter.getLocalExtreme();
+		assertEquals(4,found.size());
+
+		for (int i = 0; i < found.size(); i++) {
+			NonMaxLimiter.LocalExtreme a = found.get(i);
+			assertEquals(a.getValue(),intensity.get(a.location.x,a.location.y));
+			assertEquals( a.getValue() > 0 , a.max);
+		}
+	}
+
+	/**
+	 * 4 features, but a max of 2 is requested.
+	 */
+	@Test
+	public void checkLimit() {
+		ImageFloat32 intensity = new ImageFloat32(30,25);
+		intensity.set(10,15,20);
+		intensity.set(12,20,25);
+
+		intensity.set(1,15,-20);
+		intensity.set(1,20,-25);
+
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
+
+		NonMaxLimiter limiter = new NonMaxLimiter(extractor,2);
+
+		limiter.process(intensity);
+
+		FastQueue<NonMaxLimiter.LocalExtreme> found = limiter.getLocalExtreme();
+		assertEquals(2,found.size());
+
+		for (int i = 0; i < found.size(); i++) {
+			NonMaxLimiter.LocalExtreme a = found.get(i);
+			assertEquals(a.getValue(),intensity.get(a.location.x,a.location.y));
+			assertEquals( a.getValue() > 0 , a.max);
+			assertEquals(25,a.intensity,1e-8);
+
+		}
 	}
 }
