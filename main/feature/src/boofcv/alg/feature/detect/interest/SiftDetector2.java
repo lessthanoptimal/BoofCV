@@ -34,14 +34,49 @@ import org.ddogleg.struct.FastQueue;
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 
 /**
+ * <p>Implementation of SIFT [1] feature detector. Feature detection is first done by creating the first octave in
+ * a {@link SiftScaleSpace2 scale space}.  Then the Difference-of-Gaussian (DoG) is computed from sequential
+ * scales inside the scale-space.  From the DoG images, pixels which are maximums and minimums spatially and with
+ * in scale are found.  Edges of objects can cause false positives so those are suppressed.  The remaining
+ * features are interpolated spatially and across scale.</p>
  *
- * TODO describe algorithm
+ * <p>This class is designed so that it can operate as a stand alone feature detector or so that it can be
+ * extended to compute feature descriptors too.  The advantage of the former is that the scale-space only
+ * needs to be constructed once.</p>
  *
- * TODO highlight differences
+ * <h2>Processing Steps</h2>
+ * <ol>
+ * <li>Construct first octave of DoG images using {@link SiftScaleSpace2}</li>
+ * <li>For DoG images 1 to N+1, detect features</li>
+ * <li>Use {@link NonMaxLimiter} to detect features spatially.</li>
+ * <li>Check to see if detected features are minimums or maximums in DoG scale space by checking the equivalent 3x3
+ * regions in the DoG images above and below it. {@link #isScaleSpaceExtremum}
+ * <li>Detect false positive edges using trace and determinant from Hessian of DoG image</li>
+ * <li>Interpolate feature's (x,y,sigma) coordinate using the peak of a 2nd order polynomial (quadratic).
+ * {@link #processFeatureCandidate}</li>
+ * </ol>
+ * <p>Where N is the number of scale parameters.  There are N+3 scale images and N+2 DoG images in an octave.
  *
- * Math Notes:
- * Convolving an image twice with a Guassian kernel of sigma is the same as convolving it once with a kernel
- * of sqrt(2)*sigma.
+ * <h2>Edge Detection</h2>
+ * <p>Edges can also cause local extremes (false positives) in the DoG image.  To remove those false positives an
+ * edge detector is proposed by Lowe.  The edge detector is turned with the parameter 'r' and a point is considered
+ * an edge if the following is true:<br>
+ * Tr<sup>2</sup>/Det < (r+1)<sup>2</sup>/r<br>
+ * where Tr and Det are the trace an determinant of a 2x2 hessian matrix computed from the DoG hessian at that point,
+ * [dXX,dXY;dYX,dYY]</p>
+ *
+ * <h2>Deviations from standard SIFT</h2>
+ * <ol>
+ * <li>Spatial maximums are not limited to a 3x3 region like they are in the paper.  User configurable.</li>
+ * <li>Quadratic interpolation is used independently on x,y, and scale axis.</li>
+ * <li>What the scale of a DoG image is isn't specified in the paper.  Assumed to be the same as the lower indexed
+ * scale image it was computed from.</li>
+ * </ol>
+ *
+ * <p>
+ * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".  International Journal of
+ * Computer Vision, 60, 2 (2004), pp.91--110.
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -61,9 +96,9 @@ public class SiftDetector2 {
 	protected FastQueue<ScalePoint> detections = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 	// Computes image derivatives. used in edge rejection
-	private ImageConvolveSparse<ImageFloat32,?> derivXX;
-	private ImageConvolveSparse<ImageFloat32,?> derivXY;
-	private ImageConvolveSparse<ImageFloat32,?> derivYY;
+	ImageConvolveSparse<ImageFloat32,?> derivXX;
+	ImageConvolveSparse<ImageFloat32,?> derivXY;
+	ImageConvolveSparse<ImageFloat32,?> derivYY;
 
 	// local scale space around the current scale image being processed
 	ImageFloat32 dogLower;  // DoG image in lower scale
@@ -75,10 +110,11 @@ public class SiftDetector2 {
 	private NonMaxLimiter extractor;
 
 	/**
+	 * Configures SIFT detector
 	 *
-	 * @param scaleSpace
+	 * @param scaleSpace Provides the scale space
 	 * @param edgeR Threshold used to remove edge responses.  Try 10
-	 * @param extractor
+	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
 	public SiftDetector2( SiftScaleSpace2 scaleSpace ,
 						  double edgeR ,
@@ -121,6 +157,11 @@ public class SiftDetector2 {
 		derivYY.setImageBorder(border);
 	}
 
+	/**
+	 * Detects SIFT features inside the input image
+	 *
+	 * @param input Input image.  Not modified.
+	 */
 	public void process( ImageFloat32 input ) {
 
 		scaleSpace.initialize(input);
@@ -185,7 +226,7 @@ public class SiftDetector2 {
 	 * @param signAdj Adjust the sign so that it can check for maximums
 	 * @return true if its a local extremum
 	 */
-	private boolean isScaleSpaceExtremum(int c_x, int c_y, float value, float signAdj) {
+	boolean isScaleSpaceExtremum(int c_x, int c_y, float value, float signAdj) {
 		if( c_x <= 1 || c_y <= 1 || c_x >= dogLower.width-1 || c_y >= dogLower.height-1)
 			return false;
 
@@ -207,14 +248,25 @@ public class SiftDetector2 {
 		return true;
 	}
 
-	protected void processFeatureCandidate( int x , int y , float value ,boolean white ) {
+	/**
+	 * Examines a local spatial extremum and interpolates its coordinates using a quadratic function.  Very first
+	 * thing it does is check to see if the feature is really an edge/false positive.  After that interpolates
+	 * the coordinate independently using a quadratic function along each axis.  Resulting coordinate will be
+	 * in the image image's coordinate system.
+	 *
+	 * @param x x-coordinate of extremum
+	 * @param y y-coordinate of extremum
+	 * @param value value of the extremum
+	 * @param maximum true if it was a maximum
+	 */
+	protected void processFeatureCandidate( int x , int y , float value ,boolean maximum ) {
 		// suppress response along edges
 		if( isEdge(x,y) )
 			return;
 
 		// Estimate the scale and 2D point by fitting 2nd order polynomials
 		// This is different from the original paper
-		float signAdj = white ? 1 : -1;
+		float signAdj = maximum ? 1 : -1;
 
 		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
 		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
@@ -237,7 +289,9 @@ public class SiftDetector2 {
 		} else {
 			p.scale = sigmaUpper*sigmaInterp + (1-sigmaInterp)*sigmaTarget;
 		}
-		p.white = white;
+
+		// a maximum corresponds to a dark object and a minimum to a whiter object
+		p.white = !maximum;
 
 		handleDetection(p);
 	}
@@ -252,7 +306,7 @@ public class SiftDetector2 {
 	/**
 	 * Performs an edge test to remove false positives.  See 4.1 in [1].
 	 */
-	private boolean isEdge( int x , int y ) {
+	boolean isEdge( int x , int y ) {
 		if( edgeThreshold <= 0 )
 			return false;
 
