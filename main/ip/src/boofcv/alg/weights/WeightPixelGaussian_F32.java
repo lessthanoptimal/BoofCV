@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
 		int radius = radiusX;
 		if( kernel == null || kernel.getRadius() != radius ) {
 			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
-			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius,true);
+			kernel = FactoryKernelGaussian.gaussian2D_F32((float)sigma,radius, true, true);
 		}
 	}
 }

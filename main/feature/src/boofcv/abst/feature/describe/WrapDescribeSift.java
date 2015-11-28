@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.abst.feature.detect.interest.WrapSiftDetector;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDescribeSift
-		implements DescribeRegionPoint<ImageFloat32,SurfFeature>
+		implements DescribeRegionPoint<ImageFloat32,BrightFeature>
 {
 	DescribePointSift alg;
 	SiftImageScaleSpace ss;
@@ -53,12 +53,12 @@ public class WrapDescribeSift
 	}
 
 	@Override
-	public SurfFeature createDescription() {
-		return new SurfFeature(alg.getDescriptorLength());
+	public BrightFeature createDescription() {
+		return new BrightFeature(alg.getDescriptorLength());
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double radius, SurfFeature storage)
+	public boolean process(double x, double y, double orientation, double radius, BrightFeature storage)
 	{
 		alg.process(x,y, radius/WrapSiftDetector.SCALE_TO_RADUS,orientation,storage);
 
@@ -85,7 +85,7 @@ public class WrapDescribeSift
 		throw new RuntimeException("Not yet implemented");
 	}
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 }

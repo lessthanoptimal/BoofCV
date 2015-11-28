@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
@@ -28,15 +28,15 @@ import boofcv.struct.image.MultiSpectral;
  * @author Peter Abeles
  */
 public class TestSurfMultiSpectral_to_DetectDescribePoint extends
-		GenericTestsDetectDescribePoint<MultiSpectral<ImageFloat32>,SurfFeature>
+		GenericTestsDetectDescribePoint<MultiSpectral<ImageFloat32>,BrightFeature>
 {
 
 	public TestSurfMultiSpectral_to_DetectDescribePoint() {
-		super(true, true, ImageType.ms(3, ImageFloat32.class), SurfFeature.class);
+		super(true, true, ImageType.ms(3, ImageFloat32.class), BrightFeature.class);
 	}
 
 	@Override
-	public DetectDescribePoint<MultiSpectral<ImageFloat32>, SurfFeature> createDetDesc() {
+	public DetectDescribePoint<MultiSpectral<ImageFloat32>, BrightFeature> createDetDesc() {
 		return FactoryDetectDescribe.surfColorStable(null, null, null, imageType);
 	}
 }

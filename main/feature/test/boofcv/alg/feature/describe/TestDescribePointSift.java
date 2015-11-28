@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,8 +68,8 @@ public class TestDescribePointSift {
 
 		alg.setScaleSpace(ss);
 
-		SurfFeature f1 = new SurfFeature(128);
-		SurfFeature f2 = new SurfFeature(128);
+		BrightFeature f1 = new BrightFeature(128);
+		BrightFeature f2 = new BrightFeature(128);
 
 		alg.process(30,31,2,0,f1);
 		alg.process(30,31,3,0,f2);
@@ -86,8 +86,8 @@ public class TestDescribePointSift {
 
 		alg.setScaleSpace(ss);
 
-		SurfFeature f1 = new SurfFeature(128);
-		SurfFeature f2 = new SurfFeature(128);
+		BrightFeature f1 = new BrightFeature(128);
+		BrightFeature f2 = new BrightFeature(128);
 
 		alg.process(30, 31, 2, 0, f1);
 		alg.process(30,31,2,0.1,f2);
@@ -104,19 +104,19 @@ public class TestDescribePointSift {
 
 		alg.setScaleSpace(ss);
 
-		SurfFeature f = new SurfFeature(128);
+		BrightFeature f = new BrightFeature(128);
 		alg.process(0,0,2,0,f);
 		checkNotTrivial(f);
 
-		f = new SurfFeature(128);
+		f = new BrightFeature(128);
 		alg.process(width-1,0,2,0,f);
 		checkNotTrivial(f);
 
-		f = new SurfFeature(128);
+		f = new BrightFeature(128);
 		alg.process(width-1,height-1,2,0,f);
 		checkNotTrivial(f);
 
-		f = new SurfFeature(128);
+		f = new BrightFeature(128);
 		alg.process(0,height-1,2,0,f);
 		checkNotTrivial(f);
 	}
@@ -124,7 +124,7 @@ public class TestDescribePointSift {
 	/**
 	 * Make sure the descriptor has been filled in with some values that change
 	 */
-	private void checkNotTrivial( SurfFeature f ) {
+	private void checkNotTrivial( BrightFeature f ) {
 		int numNotZero = 0;
 		for( int i = 0; i < f.value.length; i++ ) {
 			if( f.value[i] != 0 )
@@ -134,8 +134,8 @@ public class TestDescribePointSift {
 		assertTrue(numNotZero!= 0);
 	}
 
-	private boolean checkSimilar( SurfFeature f1 , SurfFeature f2 ) {
-		if( f2.laplacianPositive != f2.laplacianPositive )
+	private boolean checkSimilar(BrightFeature f1 , BrightFeature f2 ) {
+		if( f2.white != f2.white)
 			return false;
 
 		for( int i = 0; i < f1.value.length; i++ ) {

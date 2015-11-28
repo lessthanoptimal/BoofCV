@@ -21,7 +21,7 @@ package boofcv.abst.feature.describe;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleBand>
-		implements DescribeRegionPoint<T,SurfFeature> {
+		implements DescribeRegionPoint<T,BrightFeature> {
 
 	// computes SURF feature descriptor
 	DescribePointSurf<II> surf;
@@ -46,8 +46,8 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public SurfFeature createDescription() {
-		return new SurfFeature(surf.getDescriptionLength());
+	public BrightFeature createDescription() {
+		return new BrightFeature(surf.getDescriptionLength());
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation , double radius, SurfFeature storage) {
+	public boolean process(double x, double y, double orientation , double radius, BrightFeature storage) {
 
 		surf.describe(x,y, orientation, radius/ BoofDefaults.SURF_SCALE_TO_RADIUS, storage);
 
@@ -90,7 +90,7 @@ public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleB
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 }

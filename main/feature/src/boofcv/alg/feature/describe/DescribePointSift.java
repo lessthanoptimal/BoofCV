@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 
 /**
@@ -111,7 +111,7 @@ public class DescribePointSift {
 	}
 
 	public void process(double c_x , double c_y , double scale , double orientation ,
-						SurfFeature desc ) {
+						BrightFeature desc ) {
 		// determine where this feature lies inside the scale-space
 		int imageIndex = ss.scaleToImageIndex( scale );
 		double pixelScale = ss.imageIndexToPixelScale( imageIndex );
@@ -133,7 +133,7 @@ public class DescribePointSift {
 	public void process( double c_x , double c_y , double scale , double orientation ,
 						 int imageIndex ,
 						 double pixelScale ,
-						 SurfFeature desc )
+						 BrightFeature desc )
 	{
 		image = ss.getPyramidLayer(imageIndex);
 		derivX = ss.getDerivativeX(imageIndex);
@@ -246,7 +246,7 @@ public class DescribePointSift {
 		}
 	}
 
-	private void computeDescriptor( SurfFeature desc ) {
+	private void computeDescriptor( BrightFeature desc ) {
 		int index = 0;
 		int indexGrid = 0;
 		double sumSq = 0;

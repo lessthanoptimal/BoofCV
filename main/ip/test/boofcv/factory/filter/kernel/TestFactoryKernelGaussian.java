@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,62 +43,74 @@ public class TestFactoryKernelGaussian {
 
 	@Test
 	public void gaussian1D_F32() {
-		// un-normalized it should be the same as the PDF
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, false);
+		for( boolean odd : new boolean[]{true,false}) {
+			double adj = odd ? 0 : 0.5;
+			// un-normalized it should be the same as the PDF
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, odd, false);
 
-		float g[] = kernel.data;
+			if( odd )
+				assertEquals(5,kernel.getWidth());
+			else
+				assertEquals(4,kernel.getWidth());
 
-		assertEquals(UtilGaussian.computePDF(0, 1, -2), g[0], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, -1), g[1], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 0), g[2], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 1), g[3], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 2), g[4], 1e-4);
+			float g[] = kernel.data;
 
-		// if normalized it should add up to one
-		kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, true);
+			assertEquals(UtilGaussian.computePDF(0, 1, -2+adj), g[0], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, -1+adj), g[1], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, 0+adj), g[2], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, 1+adj), g[3], 1e-4);
+			if( odd )
+				assertEquals(UtilGaussian.computePDF(0, 1, 2+adj), g[4], 1e-4);
 
-		g = kernel.data;
-		double normalizer = 0;
-		double total = 0;
-		for (int i = 0; i < g.length; i++) {
-			total += g[i];
-			normalizer += UtilGaussian.computePDF(0, 1, i - 2);
+			// if normalized it should add up to one
+			kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, odd, true);
+
+			g = kernel.data;
+			double normalizer = 0;
+			double total = 0;
+			for (int i = 0; i < g.length; i++) {
+				total += g[i];
+				normalizer += UtilGaussian.computePDF(0, 1, i - 2 + adj);
+			}
+			assertEquals(1.0, total, 1e-4);
+
+			assertEquals(UtilGaussian.computePDF(0, 1, -2+adj) / normalizer, g[0], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, -1+adj) / normalizer, g[1], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, 0+adj) / normalizer, g[2], 1e-4);
+			assertEquals(UtilGaussian.computePDF(0, 1, 1+adj) / normalizer, g[3], 1e-4);
+			if( odd )
+				assertEquals(UtilGaussian.computePDF(0, 1, 2+adj) / normalizer, g[4], 1e-4);
 		}
-		assertEquals(1.0, total, 1e-8);
-
-		assertEquals(UtilGaussian.computePDF(0, 1, -2) / normalizer, g[0], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, -1) / normalizer, g[1], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 0) / normalizer, g[2], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 1) / normalizer, g[3], 1e-4);
-		assertEquals(UtilGaussian.computePDF(0, 1, 2) / normalizer, g[4], 1e-4);
 
 	}
 
 	@Test
 	public void gaussian2D_F32() {
-		// testing using the separable property
-		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, false);
-		Kernel2D_F32 kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, false);
+		for( boolean odd : new boolean[]{true,false}) {
+			// testing using the separable property
+			Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian1D_F32(1.0, 2, odd, false);
+			Kernel2D_F32 kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, odd, false);
 
-		for( int i = 0; i < kernel2.width; i++ ) {
-			for( int j = 0; j < kernel2.width; j++ ) {
-				float expected = kernel.data[i]*kernel.data[j];
-				assertEquals(expected,kernel2.get(j,i),1e-4f);
+			for (int i = 0; i < kernel2.width; i++) {
+				for (int j = 0; j < kernel2.width; j++) {
+					float expected = kernel.data[i] * kernel.data[j];
+					assertEquals(expected, kernel2.get(j, i), 1e-4f);
+				}
 			}
-		}
 
-		// normalized it should add up to one
-		kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, true);
+			// normalized it should add up to one
+			kernel2 = FactoryKernelGaussian.gaussian2D_F32(1.0, 2, odd, true);
 
-		float total = 0;
+			float total = 0;
 
-		for( int i = 0; i < kernel2.width; i++ ) {
-			for( int j = 0; j < kernel2.width; j++ ) {
-				total += kernel2.get(j,i);
+			for (int i = 0; i < kernel2.width; i++) {
+				for (int j = 0; j < kernel2.width; j++) {
+					total += kernel2.get(j, i);
+				}
 			}
-		}
 
-		assertEquals(1,total,1e-4);
+			assertEquals(1, total, 1e-4);
+		}
 	}
 
 	@Test

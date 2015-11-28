@@ -25,24 +25,29 @@ import boofcv.alg.feature.detect.interest.SiftDetector2;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
 import boofcv.alg.feature.orientation.OrientationHistogramSift2;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
 /**
- * SIFT combined together to simultaneously detect and describe the keypoints it finds.
+ * SIFT combined together to simultaneously detect and describe the key points it finds.  Memory is conserved by
+ * only having one octave of the scale-space in memory at any given time.
+ *
+ * @see OrientationHistogramSift2
+ * @see DescribePointSiftLowe
+ * @see SiftDetector2
  *
  * @author Peter Abeles
  */
-public class DetectDescribeSift2 extends SiftDetector2 {
+public class CompleteSift2 extends SiftDetector2 {
 	// estimate orientation
 	OrientationHistogramSift2 orientation;
 	// describes the keypoints
 	DescribePointSiftLowe describe;
 	// storage for found features
-	FastQueue<SurfFeature> features;
+	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
 	FastQueue<ScalePoint> locations = new FastQueue<ScalePoint>(ScalePoint.class,false);
 	GrowQueue_F64 orientations = new GrowQueue_F64();
@@ -55,27 +60,26 @@ public class DetectDescribeSift2 extends SiftDetector2 {
 	ImageFloat32 derivY = new ImageFloat32(1,1);
 
 	/**
+	 * Configures SIFT
 	 *
-	 * @see SiftDetector2
-	 *
-	 * @param scaleSpace
-	 * @param edgeR
-	 * @param extractor
-	 * @param orientation
-	 * @param describe
+	 * @param scaleSpace Scale-space that features are computed inside of
+	 * @param edgeR Edge threshold.  See {@link SiftDetector2#SiftDetector2(SiftScaleSpace2, double, NonMaxLimiter)}
+	 * @param extractor Finds minimums and maximums.  See {@link SiftDetector2#SiftDetector2(SiftScaleSpace2, double, NonMaxLimiter)}
+	 * @param orientation Estimates feature orientation(s)
+	 * @param describe Describes a SIFT feature
 	 */
-	public DetectDescribeSift2(SiftScaleSpace2 scaleSpace, double edgeR, NonMaxLimiter extractor,
-							   OrientationHistogramSift2 orientation, DescribePointSiftLowe describe) {
+	public CompleteSift2(SiftScaleSpace2 scaleSpace, double edgeR, NonMaxLimiter extractor,
+						 OrientationHistogramSift2 orientation, DescribePointSiftLowe describe) {
 		super(scaleSpace, edgeR, extractor);
 
 		this.orientation = orientation;
 		this.describe = describe;
 
 		final int dof = describe.getDescriptorLength();
-		features = new FastQueue<SurfFeature>(SurfFeature.class,true) {
+		features = new FastQueue<BrightFeature>(BrightFeature.class,true) {
 			@Override
-			protected SurfFeature createInstance() {
-				return new SurfFeature(dof);
+			protected BrightFeature createInstance() {
+				return new BrightFeature(dof);
 			}
 		};
 	}
@@ -118,8 +122,8 @@ public class DetectDescribeSift2 extends SiftDetector2 {
 		// describe each feature
 		GrowQueue_F64 angles = orientation.getOrientations();
 		for (int i = 0; i < angles.size; i++) {
-			SurfFeature feature = features.grow();
-			feature.laplacianPositive = p.white;
+			BrightFeature feature = features.grow();
+			feature.white = p.white;
 			describe.process(localX,localY,localSigma,angles.get(i),feature);
 
 			orientations.add(angles.get(i));
@@ -131,7 +135,7 @@ public class DetectDescribeSift2 extends SiftDetector2 {
 		return locations;
 	}
 
-	public FastQueue<SurfFeature> getDescriptions() {
+	public FastQueue<BrightFeature> getDescriptions() {
 		return features;
 	}
 

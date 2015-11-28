@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.feature.describe.impl.TestImplSurfDescribeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.SparseImageGradient;
 import boofcv.testing.BoofTesting;
@@ -62,13 +62,13 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void checkSubImage() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature expected = alg.createDescription();
+		BrightFeature expected = alg.createDescription();
 		alg.describe(c_x,c_y, 0, 1, expected);
 
 		II sub = BoofTesting.createSubImageOf(ii);
 
 		alg.setImage(sub);
-		SurfFeature found = alg.createDescription();
+		BrightFeature found = alg.createDescription();
 		alg.describe(c_x,c_y, 0, 1, found);
 
 		assertTrue(isSimilar(expected,found));
@@ -81,8 +81,8 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void changeScale() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature a = alg.createDescription();
-		SurfFeature b = alg.createDescription();
+		BrightFeature a = alg.createDescription();
+		BrightFeature b = alg.createDescription();
 		alg.describe(c_x,c_y, 0, 1, a);
 		alg.describe(c_x,c_y, 0, 1.5, b);
 
@@ -96,16 +96,16 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 	public void changeRotation() {
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		alg.setImage(ii);
-		SurfFeature a = alg.createDescription();
-		SurfFeature b = alg.createDescription();
+		BrightFeature a = alg.createDescription();
+		BrightFeature b = alg.createDescription();
 		alg.describe(c_x,c_y, 0, 1, a);
 		alg.describe(c_x,c_y, 1, 1, b);
 
 		assertFalse(isSimilar(a,b));
 	}
 
-	private boolean isSimilar( SurfFeature a, SurfFeature b ) {
-		if( a.laplacianPositive != b.laplacianPositive )
+	private boolean isSimilar(BrightFeature a, BrightFeature b ) {
+		if( a.white != b.white)
 			return false;
 
 		for( int i = 0; i < 64; i++ ) {
@@ -143,7 +143,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 		sparse = TestImplSurfDescribeOps.createGradient(ii, 1);
 		alg.setImage(ii);
 		
-		SurfFeature feat = alg.createDescription();
+		BrightFeature feat = alg.createDescription();
 		alg.describe(20,20, 0.75, 1, feat);
 
 		for( double f : feat.value )
@@ -164,7 +164,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		SurfFeature feat = alg.createDescription();
+		BrightFeature feat = alg.createDescription();
 		alg.describe(15,15, 0, 1, feat);
 
 		for( int i = 0; i < 64; i+= 4) {
@@ -197,7 +197,7 @@ public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends 
 
 		// orient the feature along the x-axis
 		alg.setImage(ii);
-		SurfFeature feat = alg.createDescription();
+		BrightFeature feat = alg.createDescription();
 		alg.describe(25,25, 0, 1.5, feat);
 
 		for( int i = 0; i < 64; i+= 4) {

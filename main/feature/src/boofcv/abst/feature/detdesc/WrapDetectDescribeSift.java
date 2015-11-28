@@ -20,7 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.alg.feature.detdesc.DetectDescribeSift;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -29,7 +29,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,SurfFeature> {
+public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,BrightFeature> {
 
 	DetectDescribeSift alg;
 
@@ -38,18 +38,18 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 	}
 
 	@Override
-	public SurfFeature createDescription() {
-		return new SurfFeature(alg.getDescriptorLength());
+	public BrightFeature createDescription() {
+		return new BrightFeature(alg.getDescriptorLength());
 	}
 
 	@Override
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return alg.getFeatures().data[index];
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 
 	@Override

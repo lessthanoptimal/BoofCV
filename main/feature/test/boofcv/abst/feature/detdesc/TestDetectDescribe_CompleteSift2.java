@@ -16,27 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.detdesc;
 
-import org.ddogleg.struct.FastQueue;
-
+import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
- * {@link org.ddogleg.struct.FastQueue} for {@link BrightFeature}.
- *
  * @author Peter Abeles
  */
-public class SurfFeatureQueue extends FastQueue<BrightFeature> {
-
-	int numFeatures;
-
-	public SurfFeatureQueue( int descriptionLength ) {
-		this.numFeatures = descriptionLength;
-		init(10,BrightFeature.class,true);
+public class TestDetectDescribe_CompleteSift2
+		extends GenericTestsDetectDescribePoint<ImageFloat32,BrightFeature>
+{
+	public TestDetectDescribe_CompleteSift2() {
+		super(true, true, ImageType.single(ImageFloat32.class), BrightFeature.class);
 	}
 
 	@Override
-	protected BrightFeature createInstance() {
-		return new BrightFeature(numFeatures);
+	public DetectDescribePoint<ImageFloat32, BrightFeature> createDetDesc() {
+		return FactoryDetectDescribe.sift2(null,null,null,null);
 	}
 }

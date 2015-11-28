@@ -19,6 +19,9 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.descriptor.UtilFeature;
+import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import georegression.metric.UtilAngle;
@@ -32,14 +35,14 @@ import georegression.metric.UtilAngle;
  * the total descriptor will be 128 elements.</p>
  *
  * <p>When a point is sample, its orientation (-pi to pi) and magnitude sqrt(dx**2 + dy**2) are both computed.  A
- * contribution from this sample point is added to the entire descriptor and weighted using trilinear interpolation (outer
- * grid coordinate, and orientation bin), Gaussian distribution centered at key point location, and the magnitude.</p>
+ * contribution from this sample point is added to the entire descriptor and weighted using trilinear interpolation
+ * (outer grid x-y coordinate, and orientation bin), Gaussian distribution centered at key point location, and the
+ * magnitude.</p>
  *
- * <p>There are no intentional differences from the paper.  Submit a bug report if you find any areas with a detailed
- * description.   However the paper is ambiguous.</p>
+ * <p>There are no intentional differences from the paper. However the paper is ambiguous in some places.</p>
  * <ul>
  *     <li>Interpolation method for sampling image pixels isn't specified.  Nearest-neighbor is assumed and that's what
- *     VLFeat uses.</li>
+ *     VLFeat uses too.</li>
  *     <li>Size of sample region.  Oddly enough, I can't find this very important parameter specified anywhere.
  *     The suggested value comes from empirical testing.</li>
  * </ul>
@@ -74,7 +77,7 @@ public class DescribePointSiftLowe {
 	// precomputed gaussian weighting function
 	float gaussianWeight[];
 
-	// refernece to the descriptor that the results are saved into
+	// reference to user provided descriptor in which results are saved to
 	TupleDesc_F64 descriptor;
 
 	/**
@@ -108,22 +111,10 @@ public class DescribePointSiftLowe {
 	 * Creates a gaussian weighting kernel with an even number of elements along its width
 	 */
 	private static float[] createGaussianWeightKernel( double sigma , int radius ) {
-		float weights[] = new float[4*radius*radius];
-		int index = 0;
-		float maxValue = 0;
-		for( int y = -radius; y < radius; y++ ) {
-			for( int x = -radius; x < radius; x++ , index++) {
-				// make it symmetric by sampling in the center
-				double d = Math.sqrt((x+0.5)*(x+0.5) + (y+0.5)*(y+0.5));
-				weights[index] = (float)Math.exp( -0.5*d*d/(sigma*sigma));
-				maxValue = Math.max(maxValue,weights[index]);
-			}
-		}
-		// normalize for numerical stability in future calculations
-		for (int i = 0; i < weights.length; i++) {
-			weights[i] /= maxValue;
-		}
-		return weights;
+		Kernel2D_F32 ker = FactoryKernelGaussian.gaussian2D_F32(sigma,radius,false,false);
+		float maxValue = KernelMath.maxAbs(ker.data,4*radius*radius);
+		KernelMath.divide(ker,maxValue);
+		return ker.data;
 	}
 
 	/**
@@ -162,7 +153,7 @@ public class DescribePointSiftLowe {
 	 * Adjusts the descriptor.  This adds lighting invariance and reduces the affects of none-affine changes
 	 * in lighting.
 	 */
-	private void massageDescriptor() {
+	void massageDescriptor() {
 		// normalize descriptor to unit length
 		UtilFeature.normalizeL2(descriptor);
 
@@ -183,7 +174,7 @@ public class DescribePointSiftLowe {
 	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
 	 * yet.
 	 */
-	private void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation) {
+	void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation) {
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
@@ -204,6 +195,8 @@ public class DescribePointSiftLowe {
 				double x = sampleToPixels*(sampleX-sampleRadius);
 
 				// pixel coordinate in the image that is to be sampled.  Note the rounding
+				// If the pixel coordinate is -1 < x < 0 then it will round to 0 instead of -1, but the rounding
+				// method below is WAY faster than Math.round() so this is a small loss.
 				int pixelX = (int)(x*c - y*s + c_x + 0.5);
 				int pixelY = (int)(x*s + y*c + c_y + 0.5);
 
@@ -213,7 +206,10 @@ public class DescribePointSiftLowe {
 					float spacialDX = imageDerivX.unsafe_get(pixelX, pixelY);
 					float spacialDY = imageDerivY.unsafe_get(pixelX, pixelY);
 
-					double angle = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
+					double adjDX =  c*spacialDX + s*spacialDY;
+					double adjDY = -s*spacialDX + c*spacialDY;
+
+					double angle = UtilAngle.domain2PI(Math.atan2(adjDY,adjDX));
 
 					float weightGaussian = gaussianWeight[sampleY*sampleWidth+sampleX];
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
@@ -228,7 +224,7 @@ public class DescribePointSiftLowe {
 	/**
 	 * Applies trilinear interpolation across the descriptor
 	 */
-	private void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle )
+	void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle )
 	{
 		for (int i = 0; i < widthGrid; i++) {
 			double weightGridY = 1.0 - Math.abs(sampleY-i);
@@ -248,10 +244,16 @@ public class DescribePointSiftLowe {
 		}
 	}
 
+	/**
+	 * Number of elements in the descriptor.
+	 */
 	public int getDescriptorLength() {
 		return widthGrid*widthGrid*numHistogramBins;
 	}
 
+	/**
+	 * Radius of descriptor in pixels.  Width is radius*2
+	 */
 	public int getCanonicalRadius() {
 		return widthGrid*widthSubregion/2;
 	}

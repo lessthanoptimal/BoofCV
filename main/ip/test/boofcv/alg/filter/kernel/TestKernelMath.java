@@ -20,6 +20,7 @@ package boofcv.alg.filter.kernel;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -69,6 +70,58 @@ public class TestKernelMath {
 
 		for( int i = 0; i < a.width; i++ ) {
 			assertEquals(expected.data[i],a.data[i],1e-4);
+		}
+	}
+
+	@Test
+	public void divide_1D_F32() {
+		Kernel1D_F32 a = FactoryKernel.random1D_F32(11,5,-10f,10f,rand);
+		Kernel1D_F32 b = a.copy();
+
+		float value = 2.1f;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i], BoofDefaults.TEST_FLOAT_TOL);
+		}
+	}
+
+	@Test
+	public void divide_1D_F64() {
+		Kernel1D_F64 a = FactoryKernel.random1D_F64(11,5,-10f,10f,rand);
+		Kernel1D_F64 b = a.copy();
+
+		double value = 2.1;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i],BoofDefaults.TEST_DOUBLE_TOL);
+		}
+	}
+
+	@Test
+	public void divide_2D_F32() {
+		Kernel2D_F32 a = FactoryKernel.random2D_F32(11,5,-10f,10f,rand);
+		Kernel2D_F32 b = a.copy();
+
+		float value = 2.1f;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i], BoofDefaults.TEST_FLOAT_TOL);
+		}
+	}
+
+	@Test
+	public void divide_2D_F64() {
+		Kernel2D_F64 a = FactoryKernel.random2D_F64(11,5,-10f,10f,rand);
+		Kernel2D_F64 b = a.copy();
+
+		double value = 2.1;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i],BoofDefaults.TEST_DOUBLE_TOL);
 		}
 	}
 

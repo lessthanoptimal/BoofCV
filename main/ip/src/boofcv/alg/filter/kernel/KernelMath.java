@@ -41,6 +41,32 @@ public class KernelMath {
 		}
 	}
 
+	public static void divide( Kernel1D_F32 kernel , float value ) {
+		for( int i = 0; i < kernel.width; i++ ) {
+			kernel.data[i] /= value;
+		}
+	}
+
+	public static void divide( Kernel1D_F64 kernel , double value ) {
+		for( int i = 0; i < kernel.width; i++ ) {
+			kernel.data[i] /= value;
+		}
+	}
+
+	public static void divide( Kernel2D_F32 kernel , float value ) {
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= value;
+		}
+	}
+
+	public static void divide( Kernel2D_F64 kernel , double value ) {
+		int N = kernel.width*kernel.width;
+		for( int i = 0; i < N; i++ ) {
+			kernel.data[i] /= value;
+		}
+	}
+
 	public static void fill( Kernel2D_F32 kernel , float value ) {
 		int N = kernel.width*kernel.width;
 		for( int i = 0; i < N; i++ ) {

@@ -22,7 +22,7 @@ import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
@@ -36,7 +36,7 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class SurfMultiSpectral_to_DetectDescribePoint <T extends ImageSingleBand, II extends ImageSingleBand>
-		implements DetectDescribePoint<MultiSpectral<T>,SurfFeature>
+		implements DetectDescribePoint<MultiSpectral<T>,BrightFeature>
 {
 	DetectDescribeSurfMultiSpectral<II> alg;
 
@@ -79,18 +79,18 @@ public class SurfMultiSpectral_to_DetectDescribePoint <T extends ImageSingleBand
 	}
 
 	@Override
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return alg.getDescription(index);
 	}
 
 	@Override
-	public SurfFeature createDescription() {
+	public BrightFeature createDescription() {
 		return alg.createDescription();
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 
 	@Override

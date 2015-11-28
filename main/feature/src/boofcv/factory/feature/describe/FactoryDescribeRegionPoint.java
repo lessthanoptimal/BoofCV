@@ -28,8 +28,8 @@ import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.*;
@@ -58,7 +58,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -78,7 +78,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageMultiBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfColorFast( ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorFast(ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -108,7 +108,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -127,7 +127,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -157,8 +157,8 @@ public class FactoryDescribeRegionPoint {
 	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
 	 * @return SIFT descriptor
 	 */
-	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( ConfigSiftScaleSpace configSS,
-																	  ConfigSiftDescribe configDescribe) {
+	public static DescribeRegionPoint<ImageFloat32,BrightFeature> sift(ConfigSiftScaleSpace configSS,
+																	   ConfigSiftDescribe configDescribe) {
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
 		configSS.checkValidity();

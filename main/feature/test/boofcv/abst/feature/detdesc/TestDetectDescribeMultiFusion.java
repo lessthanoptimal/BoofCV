@@ -26,7 +26,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -78,10 +78,10 @@ public class TestDetectDescribeMultiFusion {
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
 		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,5, ImageFloat32.class);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribeMulti(ImageFloat32.class,SurfFeature.class) {
+		new GenericTestsDetectDescribeMulti(ImageFloat32.class,BrightFeature.class) {
 			@Override
 			public DetectDescribeMulti createDetDesc() {
 				DetectDescribePoint ddp = new DetectDescribeFusion(detector,ori,desc);
@@ -93,10 +93,10 @@ public class TestDetectDescribeMultiFusion {
 	@Test
 	public void checkWithoutOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribeMulti(ImageFloat32.class,SurfFeature.class) {
+		new GenericTestsDetectDescribeMulti(ImageFloat32.class,BrightFeature.class) {
 
 			@Override
 			public DetectDescribeMulti createDetDesc() {

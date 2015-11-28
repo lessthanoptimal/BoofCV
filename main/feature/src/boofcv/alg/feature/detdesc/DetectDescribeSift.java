@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -105,13 +105,13 @@ public class DetectDescribeSift {
 			double pixelScale = orientation.getPixelScale();
 
 			for( int j = 0; j < angles.size; j++ ) {
-				SurfFeature desc = features.grow();
+				BrightFeature desc = features.grow();
 
 				double yaw = angles.data[j];
 
 				describe.process(sp.x,sp.y,sp.scale,yaw,imageIndex,pixelScale,desc);
 
-				desc.laplacianPositive = sp.white;
+				desc.white = sp.white;
 				featureScales.push(sp.scale);
 				featureAngles.push(yaw);
 				location.grow().set(sp.x,sp.y);

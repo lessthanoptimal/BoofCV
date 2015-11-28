@@ -22,8 +22,8 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -108,8 +108,8 @@ public class TestCombinedTrackerScalePoint {
 	public void associateAllToDetected() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
-		alg.detectedDesc = new FastQueue(10,SurfFeature.class,false);
-		alg.knownDesc = new FastQueue(10,SurfFeature.class,false);
+		alg.detectedDesc = new FastQueue(10,BrightFeature.class,false);
+		alg.knownDesc = new FastQueue(10,BrightFeature.class,false);
 		alg.associate = new DummyAssoc(15);
 		alg.detector = new DummyDetector(20);
 		alg.trackerKlt = new DummyKlt();

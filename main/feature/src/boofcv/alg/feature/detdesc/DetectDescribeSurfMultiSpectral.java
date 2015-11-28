@@ -21,8 +21,8 @@ package boofcv.alg.feature.detdesc;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -70,11 +70,11 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 		descriptions = new SurfFeatureQueue(describe.getDescriptorLength());
 	}
 
-	public SurfFeature createDescription() {
+	public BrightFeature createDescription() {
 		return describe.createDescription();
 	}
 
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return descriptions.get(index);
 	}
 

@@ -23,8 +23,8 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.BoofDefaults;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class WrapDetectDescribeSurf
 		<T extends ImageSingleBand, II extends ImageSingleBand>
-	implements DetectDescribePoint<T,SurfFeature>
+	implements DetectDescribePoint<T,BrightFeature>
 {
 	// SURF algorithms
 	private FastHessianFeatureDetector<II> detector;
@@ -75,18 +75,18 @@ public class WrapDetectDescribeSurf
 	}
 
 	@Override
-	public SurfFeature createDescription() {
+	public BrightFeature createDescription() {
 		return describe.createDescription();
 	}
 
 	@Override
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return features.get(index);
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 
 	@Override

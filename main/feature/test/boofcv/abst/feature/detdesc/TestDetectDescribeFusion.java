@@ -24,7 +24,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -68,10 +68,10 @@ public class TestDetectDescribeFusion {
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
 		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,ImageFloat32.class);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribePoint(true,true, ImageType.single(ImageFloat32.class),SurfFeature.class) {
+		new GenericTestsDetectDescribePoint(true,true, ImageType.single(ImageFloat32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
@@ -83,10 +83,10 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithoutOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribePoint(true,false, ImageType.single(ImageFloat32.class),SurfFeature.class) {
+		new GenericTestsDetectDescribePoint(true,false, ImageType.single(ImageFloat32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
@@ -140,7 +140,7 @@ public class TestDetectDescribeFusion {
 
 		@Override
 		public TupleDesc createDescription() {
-			return new SurfFeature(10);
+			return new BrightFeature(10);
 		}
 
 		@Override
@@ -160,7 +160,7 @@ public class TestDetectDescribeFusion {
 
 		@Override
 		public Class getDescriptionType() {
-			return SurfFeature.class;
+			return BrightFeature.class;
 		}
 
 		@Override

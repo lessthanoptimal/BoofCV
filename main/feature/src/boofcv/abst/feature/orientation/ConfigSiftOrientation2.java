@@ -16,27 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.struct.feature;
+package boofcv.abst.feature.orientation;
 
-import org.ddogleg.struct.FastQueue;
-
+import boofcv.struct.Configuration;
 
 /**
- * {@link org.ddogleg.struct.FastQueue} for {@link BrightFeature}.
+ * Configuration for {@link boofcv.alg.feature.orientation.OrientationHistogramSift2}
  *
  * @author Peter Abeles
  */
-public class SurfFeatureQueue extends FastQueue<BrightFeature> {
+public class ConfigSiftOrientation2 implements Configuration {
 
-	int numFeatures;
-
-	public SurfFeatureQueue( int descriptionLength ) {
-		this.numFeatures = descriptionLength;
-		init(10,BrightFeature.class,true);
-	}
+	/**
+	 * Number of elements in the histogram.  Standard is 36
+	 */
+	public int histogramSize = 36;
+	/**
+	 * How much the scale is enlarged by.  Standard is 1.5
+	 */
+	public double sigmaEnlarge = 1.5;
 
 	@Override
-	protected BrightFeature createInstance() {
-		return new BrightFeature(numFeatures);
+	public void checkValidity() {
+
 	}
 }

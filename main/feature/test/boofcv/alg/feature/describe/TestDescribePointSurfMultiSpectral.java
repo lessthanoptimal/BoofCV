@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
 import org.junit.Test;
@@ -63,14 +63,14 @@ public class TestDescribePointSurfMultiSpectral {
 			double angle = rand.nextDouble()*Math.PI*2;
 			double scale = rand.nextDouble()*10+0.9;
 
-			SurfFeature found = alg.createDescription();
+			BrightFeature found = alg.createDescription();
 			alg.describe(x,y,angle,scale,found);
 
 			desc.setImage(gray);
 			boolean expectedLaplace = desc.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);
-			assertEquals(expectedLaplace,found.laplacianPositive);
+			assertEquals(expectedLaplace,found.white);
 
-			SurfFeature expected = desc.createDescription();
+			BrightFeature expected = desc.createDescription();
 
 			for( int b = 0; b < 3; b++ ) {
 				desc.setImage(input.getBand(b));

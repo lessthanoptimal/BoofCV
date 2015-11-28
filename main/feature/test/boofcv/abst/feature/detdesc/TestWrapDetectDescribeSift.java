@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,21 +20,21 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>{
+public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,BrightFeature>{
 
 	public TestWrapDetectDescribeSift() {
-		super(true, true, ImageType.single(ImageFloat32.class), SurfFeature.class);
+		super(true, true, ImageType.single(ImageFloat32.class), BrightFeature.class);
 	}
 
 	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
+	public DetectDescribePoint<ImageFloat32, BrightFeature> createDetDesc() {
 		return FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,500,5),null,null);
 	}
 }

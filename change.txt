@@ -4,7 +4,16 @@ Date Format: year/month/day
 
 - WebcamTrackFiducial renamed to FiducialDetection
   * Can now take in more inputs types.  still images, videos, and webcams
+- Renamed SurfFeature to BrightFeature
+  * Used by SURF and SIFT, so the name was made more generic
+- Complete rewrite of SIFT
+  * Very similar to original paper by Lowe
+  * Most of current difference are in the use of quadratic interpolation instead of the overly complex thing that
+    Lowe proposed
 
+TODO SIFT
+ - Make all of SIFT image type generic
+ -
 TODO CameraCalibration should handle video sequences and disable still images
 
 ---------------------------------------------

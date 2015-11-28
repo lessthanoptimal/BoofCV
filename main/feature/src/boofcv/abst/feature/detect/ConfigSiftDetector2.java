@@ -16,18 +16,39 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detdesc;
+package boofcv.abst.feature.detect;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.struct.Configuration;
 
 /**
+ * Configuration for {@link boofcv.alg.feature.detect.interest.SiftDetector2}
+ *
  * @author Peter Abeles
  */
-public class TestDetectDescribeSift2 {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class ConfigSiftDetector2 implements Configuration {
+
+	/**
+	 * Configures non-maximum feature detector across the image
+	 */
+	public ConfigExtract extract = new ConfigExtract(2,0,1,true,true,true);
+
+	/**
+	 * The maximum number of features it can detect in a single space
+	 */
+	public int maxFeaturesPerScale = 0;
+
+	/**
+	 * Threshold used to remove edge responses.  Try 10
+	 */
+	public double edgeR = 10;
+
+	{
+		extract.ignoreBorder = 1;
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 }

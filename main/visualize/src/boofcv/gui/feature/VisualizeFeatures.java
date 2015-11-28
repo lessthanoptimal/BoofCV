@@ -110,9 +110,9 @@ public class VisualizeFeatures {
 
 		for( ScalePoint p : points ) {
 			if( p.white ) {
-				g2.setColor(Color.RED);
-			} else {
 				g2.setColor(Color.BLUE);
+			} else {
+				g2.setColor(Color.RED);
 			}
 			int r = (int)(p.scale*scaleToRadius +0.5);
 			int w = r*2+1;

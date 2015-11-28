@@ -34,8 +34,8 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -57,7 +57,7 @@ public class ExampleFeatureSurf {
 	 */
 	public static void easy( ImageFloat32 image ) {
 		// create the detector and descriptors
-		DetectDescribePoint<ImageFloat32,SurfFeature> surf = FactoryDetectDescribe.
+		DetectDescribePoint<ImageFloat32,BrightFeature> surf = FactoryDetectDescribe.
 				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,ImageFloat32.class);
 
 		 // specify the image to process
@@ -103,7 +103,7 @@ public class ExampleFeatureSurf {
 
 		List<ScalePoint> points = detector.getFoundPoints();
 
-		List<SurfFeature> descriptions = new ArrayList<SurfFeature>();
+		List<BrightFeature> descriptions = new ArrayList<BrightFeature>();
 
 		for( ScalePoint p : points ) {
 			// estimate orientation
@@ -111,7 +111,7 @@ public class ExampleFeatureSurf {
 			double angle = orientation.compute(p.x,p.y);
 			
 			// extract the SURF description for this region
-			SurfFeature desc = descriptor.createDescription();
+			BrightFeature desc = descriptor.createDescription();
 			descriptor.describe(p.x,p.y,angle,p.scale,desc);
 
 			// save everything for processing later on

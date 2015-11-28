@@ -18,37 +18,37 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.alg.feature.detdesc.DetectDescribeSift2;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.alg.feature.detdesc.CompleteSift2;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Wrapper around {@link DetectDescribeSift2} for {@link DetectDescribePoint}.
+ * Wrapper around {@link CompleteSift2} for {@link DetectDescribePoint}.
  *
  * @author Peter Abeles
  */
-public class WrapDetectDescribeSift2 implements DetectDescribePoint<ImageFloat32,SurfFeature> {
+public class DetectDescribe_CompleteSift2 implements DetectDescribePoint<ImageFloat32,BrightFeature> {
 
-	DetectDescribeSift2 alg;
+	CompleteSift2 alg;
 
-	public WrapDetectDescribeSift2(DetectDescribeSift2 alg) {
+	public DetectDescribe_CompleteSift2(CompleteSift2 alg) {
 		this.alg = alg;
 	}
 
 	@Override
-	public SurfFeature createDescription() {
-		return new SurfFeature(alg.getDescriptorLength());
+	public BrightFeature createDescription() {
+		return new BrightFeature(alg.getDescriptorLength());
 	}
 
 	@Override
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return alg.getDescriptions().data[index];
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 
 	@Override

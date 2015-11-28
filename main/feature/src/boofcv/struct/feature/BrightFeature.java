@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,31 +19,34 @@
 package boofcv.struct.feature;
 
 /**
- * Description of a SURF interest point.  It is composed of a set of image features computed from sub-regions
- * around the interest point as well as the sign of the Laplacian at the interest point.
+ * Extends {@link TupleDesc_F64} by adding a boolean which indicates of the object it came
+ * from is white or dark.  SURF and SIFT generate these kind of descriptors.  Association
+ * can be improve by only trying to match white or dark features exclusively to each other.
  *
  * @author Peter Abeles
  */
-public class SurfFeature extends TupleDesc_F64 {
-	// is the feature light or dark. Can be used to improve lookup performance.
-	public boolean laplacianPositive;
+public class BrightFeature extends TupleDesc_F64 {
+	/**
+	 *  true if the feature was white or false if it was dark
+	 */
+	public boolean white;
 
-	public SurfFeature( int numFeatures ) {
+	public BrightFeature(int numFeatures ) {
 		super(numFeatures);
 	}
 
-	protected SurfFeature(){}
+	protected BrightFeature(){}
 
 	@Override
 	public void setTo(TupleDesc_F64 source) {
-		SurfFeature f = (SurfFeature)source;
-		laplacianPositive = f.laplacianPositive;
+		BrightFeature f = (BrightFeature)source;
+		white = f.white;
 		System.arraycopy(f.value,0,value,0,value.length);
 	}
 
 	@Override
-	public SurfFeature copy() {
-		SurfFeature ret = new SurfFeature( value.length );
+	public BrightFeature copy() {
+		BrightFeature ret = new BrightFeature( value.length );
 		ret.setTo(this);
 		return ret;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -55,11 +55,11 @@ public class AssociateSurfBasic {
 		this.assoc = assoc;
 	}
 
-	public void setSrc( FastQueue<SurfFeature> src ) {
+	public void setSrc( FastQueue<BrightFeature> src ) {
 		sort(src,srcPositive,srcNegative);
 	}
 
-	public void setDst( FastQueue<SurfFeature> dst ) {
+	public void setDst( FastQueue<BrightFeature> dst ) {
 		sort(dst,dstPositive,dstNegative);
 	}
 
@@ -129,14 +129,14 @@ public class AssociateSurfBasic {
 	 * Keep track of the feature's index in the original input list.  This is
 	 * the index that needs to be returned.
 	 */
-	private void sort(FastQueue<SurfFeature> input ,
+	private void sort(FastQueue<BrightFeature> input ,
 					  FastQueue<Helper> pos , FastQueue<Helper> neg ) {
 		pos.reset();
 		neg.reset();
 
 		for( int i = 0; i < input.size; i++ ) {
-			SurfFeature f = input.get(i);
-			if( f.laplacianPositive ) {
+			BrightFeature f = input.get(i);
+			if( f.white) {
 				pos.grow().wrap(f,i);
 			} else {
 				neg.grow().wrap(f,i);
