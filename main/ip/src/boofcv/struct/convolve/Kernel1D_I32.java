@@ -85,6 +85,12 @@ public class Kernel1D_I32 extends Kernel1D {
 		return data[index];
 	}
 
+	@Override
+	public void setD(int index, double value) {
+		data[index] = (int)value;
+	}
+
+
 	/**
 	 * Creates a kernel whose elements are the specified data array and has
 	 * the specified width.

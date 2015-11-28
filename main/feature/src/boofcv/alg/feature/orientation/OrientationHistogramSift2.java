@@ -19,11 +19,13 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.CircularIndex;
 import boofcv.numerics.InterpolateArray;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -55,7 +57,8 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class OrientationHistogramSift2 {
+public class OrientationHistogramSift2<Deriv extends ImageSingleBand>
+{
 
 	// How much does it inflate the scale by
 	private double sigmaEnlarge;
@@ -80,7 +83,7 @@ public class OrientationHistogramSift2 {
 
 
 	// spacial image gradient of closest image in scale-space
-	private ImageFloat32 derivX,derivY;
+	private GImageSingleBand derivX,derivY;
 
 	InterpolateArray approximateGauss;
 	double approximateStep = 0.1;
@@ -92,7 +95,8 @@ public class OrientationHistogramSift2 {
 	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
 	 */
 	public OrientationHistogramSift2(int histogramSize ,
-									 double sigmaEnlarge )
+									 double sigmaEnlarge ,
+									 Class<Deriv> derivType )
 	{
 		this.histogramMag = new double[ histogramSize ];
 		this.histogramX = new double[ histogramSize ];
@@ -109,14 +113,17 @@ public class OrientationHistogramSift2 {
 			samples[i] = Math.exp(-0.5*dx2 );
 		}
 		approximateGauss = new InterpolateArray(samples);
+
+		this.derivX = FactoryGImageSingleBand.create(derivType);
+		this.derivY = FactoryGImageSingleBand.create(derivType);
 	}
 
 	/**
 	 * Specify the input image
 	 */
-	public void setImageGradient(ImageFloat32 derivX, ImageFloat32 derivY ) {
-		this.derivX = derivX;
-		this.derivY = derivY;
+	public void setImageGradient(Deriv derivX, Deriv derivY ) {
+		this.derivX.wrap(derivX);
+		this.derivY.wrap(derivY);
 	}
 
 	/**
@@ -155,8 +162,11 @@ public class OrientationHistogramSift2 {
 		bound.x1 = c_x + r + 1;
 		bound.y1 = c_y + r + 1;
 
+		ImageSingleBand rawDX = derivX.getImage();
+		ImageSingleBand rawDY = derivY.getImage();
+
 		// make sure it is contained in the image bounds
-		BoofMiscOps.boundRectangleInside(derivX,bound);
+		BoofMiscOps.boundRectangleInside(rawDX,bound);
 
 		// clear the histogram
 		Arrays.fill(histogramMag,0);
@@ -166,12 +176,12 @@ public class OrientationHistogramSift2 {
 		// construct the histogram
 		for( int y = bound.y0; y < bound.y1; y++ ) {
 			// iterate through the raw array for speed
-			int indexDX = derivX.startIndex + y*derivX.stride + bound.x0;
-			int indexDY = derivY.startIndex + y*derivY.stride + bound.x0;
+			int indexDX = rawDX.startIndex + y*rawDX.stride + bound.x0;
+			int indexDY = rawDY.startIndex + y*rawDY.stride + bound.x0;
 
 			for( int x = bound.x0; x < bound.x1; x++ ) {
-				float dx = derivX.data[indexDX++];
-				float dy = derivY.data[indexDY++];
+				float dx = derivX.getF(indexDX++);
+				float dy = derivY.getF(indexDY++);
 
 				// edge intensity and angle
 				double magnitude = Math.sqrt(dx*dx + dy*dy);

@@ -19,8 +19,10 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.alg.feature.detdesc.CompleteSift2;
+import boofcv.core.image.GConvertImage;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -28,9 +30,11 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribe_CompleteSift2 implements DetectDescribePoint<ImageFloat32,BrightFeature> {
+public class DetectDescribe_CompleteSift2<In extends ImageSingleBand>
+		implements DetectDescribePoint<In,BrightFeature> {
 
 	CompleteSift2 alg;
+	ImageFloat32 imageFloat = new ImageFloat32(1,1);
 
 	public DetectDescribe_CompleteSift2(CompleteSift2 alg) {
 		this.alg = alg;
@@ -52,8 +56,14 @@ public class DetectDescribe_CompleteSift2 implements DetectDescribePoint<ImageFl
 	}
 
 	@Override
-	public void detect(ImageFloat32 input) {
-		alg.process(input);
+	public void detect(In input) {
+		if( input instanceof ImageFloat32 )
+			alg.process((ImageFloat32)input);
+		else {
+			imageFloat.reshape(input.width,input.height);
+			GConvertImage.convert(input,imageFloat);
+			alg.process(imageFloat);
+		}
 	}
 
 	@Override

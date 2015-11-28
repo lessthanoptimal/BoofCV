@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
+import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -171,7 +172,7 @@ public class SiftScaleSpace2 {
 		currentOctave = firstOctave;
 
 		if( firstOctave < 0 ) {
-			scaleImageUp(input,tempImage1,-2*firstOctave);
+			PyramidOps.scaleImageUp(input,tempImage1,-2*firstOctave,interp);
 			tempImage0.reshape(tempImage1.width, tempImage1.height);
 			applyGaussian(tempImage1, tempImage0, kernelSigma0);
 		} else {
@@ -183,49 +184,13 @@ public class SiftScaleSpace2 {
 				// first image in the next octave will have 2x the blur as the first image in the prior octave
 				applyGaussian(tempImage0, tempImage1, kernelSigma0);
 				// next octave has half the spacial resolution
-				scaleDown2(tempImage1, tempImage0);
+				PyramidOps.scaleDown2(tempImage1, tempImage0);
 			}
 		}
 
 		computeOctaveScales();
 	}
 
-	/**
-	 * Scales an image up using interpolation
-	 */
-	void scaleImageUp(ImageFloat32 input , ImageFloat32 output , int scale ) {
-		output.reshape(input.width*scale,input.height*scale);
-
-		float fdiv = 1.0f/scale;
-		interp.setImage(input);
-
-		for (int y = 0; y < output.height; y++) {
-			float inputY = y*fdiv;
-			int indexOutput = output.getIndex(0,y);
-
-			for (int x = 0; x < output.width; x++) {
-				float inputX = x*fdiv;
-
-				output.data[indexOutput++] = interp.get(inputX,inputY);
-			}
-		}
-	}
-
-	/**
-	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
-	 */
-	static void scaleDown2( ImageFloat32 input , ImageFloat32 output ) {
-		
-		output.reshape(input.width / 2, input.height / 2);
-
-		for (int y = 0; y < output.height; y++) {
-			int indexInput = 2*y*input.stride;
-			int indexOutput = y*output.stride;
-			for (int x = 0; x < output.width; x++,indexInput+=2) {
-				output.data[indexOutput++] = input.data[indexInput];
-			}
-		}
-	}
 
 	/**
 	 * Computes the next octave.  If the last octave has already been computed false is returned.
@@ -237,8 +202,11 @@ public class SiftScaleSpace2 {
 			return false;
 		}
 
+		if( octaveImages[numScales].width <= 5 || octaveImages[numScales].height <= 5)
+			return false;
+
 		// the 2nd image from the top of the stack has 2x the sigma as the first
-		scaleDown2(octaveImages[numScales], tempImage0);
+		PyramidOps.scaleDown2(octaveImages[numScales], tempImage0);
 		computeOctaveScales();
 		return true;
 	}

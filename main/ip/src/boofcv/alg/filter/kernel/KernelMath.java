@@ -103,7 +103,43 @@ public class KernelMath {
 		return b;
 	}
 
-	public static Kernel1D_F32 convolve1D( Kernel1D_F32 a , Kernel1D_F32 b ) {
+	public static Kernel1D convolve1D( Kernel1D a , Kernel1D b ) {
+		if( a instanceof Kernel1D_I32 ) {
+			return convolve1D_I32((Kernel1D_I32)a,(Kernel1D_I32)b);
+		} else if( a instanceof Kernel1D_F32 ) {
+			return convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
+	}
+
+	public static Kernel1D_I32 convolve1D_I32(Kernel1D_I32 a , Kernel1D_I32 b ) {
+		int w = a.width+b.width-1;
+
+		Kernel1D_I32 ret = new Kernel1D_I32(w);
+
+		int end = w-(b.getWidth()-1);
+		int N = b.width-1;
+
+		int index = 0;
+		for( int j = -(b.getWidth()-1); j < end; j++ ) {
+
+			int sum = 0;
+			for( int k = 0; k < b.getWidth(); k++ ) {
+				if( j+k >= 0 && j+k < a.getWidth() ) {
+					int valB = b.data[N-k];
+					int valA = a.data[j+k];
+					sum += valB*valA;
+				}
+			}
+
+			ret.data[index++] = sum;
+		}
+
+		return ret;
+	}
+
+	public static Kernel1D_F32 convolve1D_F32(Kernel1D_F32 a , Kernel1D_F32 b ) {
 		int w = a.width+b.width-1;
 
 		Kernel1D_F32 ret = new Kernel1D_F32(w);
@@ -129,7 +165,59 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_F32 convolve2D( Kernel2D_F32 a , Kernel2D_F32 b ) {
+	public static Kernel2D convolve2D( Kernel2D a , Kernel2D b ) {
+		if( a instanceof Kernel2D_I32 ) {
+			return convolve2D((Kernel2D_I32)a,(Kernel2D_I32)b);
+		} else if( a instanceof Kernel2D_F32 ) {
+			return convolve2D((Kernel2D_F32)a,(Kernel2D_F32)b);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
+	}
+
+	public static Kernel2D_I32 convolve2D( Kernel2D_I32 a , Kernel2D_I32 b ) {
+		int w = a.width+b.width-1;
+		int r = w/2;
+
+		Kernel2D_I32 ret = new Kernel2D_I32(w);
+
+		int aR = a.width/2;
+		int bR = b.width/2;
+
+		for( int y = -r; y <= r; y++ ) {
+			for( int x = -r; x <= r; x++ ) {
+
+				int sum = 0;
+
+				// go through kernel A
+				for( int y0 = -aR; y0 <= aR; y0++ ) {
+					// convert to kernel coordinates
+					int ay = -y0 + aR;
+					int by = y + y0 + bR;
+
+					if( by < 0 || by >= b.width )
+						continue;
+
+					for( int x0 = -aR; x0 <= aR; x0++ ) {
+
+						// convert to kernel coordinates
+						int ax = -x0 + aR;
+						int bx = x + x0 + bR;
+
+						if( bx < 0 || bx >= b.width )
+							continue;
+
+						sum += a.get(ax,ay) * b.get(bx,by);
+					}
+				}
+				ret.set(x+r,y+r,sum);
+			}
+		}
+
+		return ret;
+	}
+
+	public static Kernel2D_F32 convolve2D(Kernel2D_F32 a , Kernel2D_F32 b ) {
 		int w = a.width+b.width-1;
 		int r = w/2;
 
@@ -171,6 +259,24 @@ public class KernelMath {
 		return ret;
 	}
 
+	/**
+	 * Convolve two 1D kernels together to form a 2D kernel.
+	 *
+	 * @param a Input vertical 1D kernel
+	 * @param b Input horizontal 1D kernel
+	 * @return Resulting 2D kernel
+	 */
+	public static Kernel2D convolve2D(Kernel1D a, Kernel1D b) {
+		if( a instanceof Kernel1D_I32 ) {
+			return convolve2D((Kernel1D_I32)a,(Kernel1D_I32)b);
+		} else if( a instanceof Kernel1D_F32 ) {
+			return convolve2D((Kernel1D_F32)a,(Kernel1D_F32)b);
+		} else if( a instanceof Kernel1D_F64 ) {
+			return convolve2D((Kernel1D_F64)a,(Kernel1D_F64)b);
+		} else {
+			throw new RuntimeException("Unknown kernel type");
+		}
+	}
 	/**
 	 * Convolve two 1D kernels together to form a 2D kernel.
 	 *

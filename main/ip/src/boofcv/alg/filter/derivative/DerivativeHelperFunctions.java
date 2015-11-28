@@ -26,6 +26,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -42,6 +43,23 @@ public class DerivativeHelperFunctions {
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
+
+		origSub = orig.subimage(0,0,orig.width,2, null);
+		derivSub = deriv.subimage(0,0,orig.width,2, null);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
+		origSub = orig.subimage(0,orig.height-2,orig.width,orig.height, null);
+		derivSub = deriv.subimage(0,orig.height-2,orig.width,orig.height, null);
+		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
+	}
+
+	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt32 deriv ,
+												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
+	{
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
+
+		ImageUInt8 origSub;
+		ImageSInt32 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
@@ -76,6 +94,23 @@ public class DerivativeHelperFunctions {
 
 		ImageUInt8 origSub;
 		ImageSInt16 derivSub;
+
+		origSub = orig.subimage(0,0,2,orig.height, null);
+		derivSub = deriv.subimage(0,0,2,orig.height, null);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
+		origSub = orig.subimage(orig.width-2,0,orig.width,orig.height, null);
+		derivSub = deriv.subimage(orig.width-2,0,orig.width,orig.height, null);
+		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
+	}
+
+	public static void processBorderVertical( ImageUInt8 orig , ImageSInt32 deriv ,
+											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
+	{
+		borderType.setImage(orig);
+		ConvolveJustBorder_General.vertical(kernel,borderType,deriv);
+
+		ImageUInt8 origSub;
+		ImageSInt32 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
@@ -39,7 +40,7 @@ public class TestGradientThree_Standard {
 	int height = 25;
 
 	@Test
-	public void compareToConvolve_I8() throws NoSuchMethodException {
+	public void compareToConvolve_I8_S16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientThree_Standard.class.getMethod("process",
 				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class ));
@@ -51,6 +52,23 @@ public class TestGradientThree_Standard {
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageSInt16 derivX = new ImageSInt16(width,height);
 		ImageSInt16 derivY = new ImageSInt16(width,height);
+
+		validator.compare(false,input,derivX,derivY);
+	}
+
+	@Test
+	public void compareToConvolve_I8_S32() throws NoSuchMethodException {
+		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
+		validator.setTarget(GradientThree_Standard.class.getMethod("process",
+				ImageUInt8.class, ImageSInt32.class, ImageSInt32.class ));
+
+		validator.setKernel(0, GradientThree.kernelDeriv_I32,true);
+		validator.setKernel(1, GradientThree.kernelDeriv_I32,false);
+
+		ImageUInt8 input = new ImageUInt8(width,height);
+		ImageMiscOps.fillUniform(input, rand, 0, 10);
+		ImageSInt32 derivX = new ImageSInt32(width,height);
+		ImageSInt32 derivY = new ImageSInt32(width,height);
 
 		validator.compare(false,input,derivX,derivY);
 	}

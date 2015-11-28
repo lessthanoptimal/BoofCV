@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,12 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.lang.reflect.Array;
@@ -139,6 +143,38 @@ public class PyramidOps {
 	{
 		for( int i = 0; i < derivX.length; i++ ) {
 			hessian.process(derivX[i],derivY[i],derivXX[i],derivYY[i],derivXY[i]);
+		}
+	}
+
+	/**
+	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
+	 */
+	public static <T extends ImageSingleBand>
+	void scaleDown2(T input , T output ) {
+		if( input instanceof ImageFloat32 ) {
+			ImplPyramidOps.scaleDown2((ImageFloat32)input,(ImageFloat32)output);
+		} else if( input instanceof ImageUInt8 ) {
+			ImplPyramidOps.scaleDown2((ImageUInt8)input,(ImageUInt8)output);
+		} else {
+			throw new IllegalArgumentException("Image type not yet supported");
+		}
+	}
+
+	/**
+	 * Scales an image up using interpolation
+	 *
+	 * @param scale How much larger the output image will be.
+	 */
+	public static <T extends ImageSingleBand>
+	void scaleImageUp(T input , T output , int scale, InterpolatePixelS<T> interp ) {
+		if( scale <= 1 )
+			throw new IllegalArgumentException("Scale must be >= 2");
+		if( input instanceof ImageFloat32 ) {
+			ImplPyramidOps.scaleImageUp((ImageFloat32)input,(ImageFloat32)output,scale,(InterpolatePixelS)interp);
+		} else if( input instanceof ImageUInt8 ) {
+			ImplPyramidOps.scaleImageUp((ImageUInt8)input,(ImageUInt8)output,scale,(InterpolatePixelS)interp);
+		} else {
+			throw new IllegalArgumentException("Image type not yet supported");
 		}
 	}
 }

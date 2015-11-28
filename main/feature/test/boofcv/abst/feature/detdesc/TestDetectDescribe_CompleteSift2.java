@@ -18,23 +18,33 @@
 
 package boofcv.abst.feature.detdesc;
 
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("ALL")
 public class TestDetectDescribe_CompleteSift2
-		extends GenericTestsDetectDescribePoint<ImageFloat32,BrightFeature>
 {
-	public TestDetectDescribe_CompleteSift2() {
-		super(true, true, ImageType.single(ImageFloat32.class), BrightFeature.class);
-	}
+	Class types[] = new Class[]{ImageFloat32.class,ImageUInt8.class};
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, BrightFeature> createDetDesc() {
-		return FactoryDetectDescribe.sift2(null,null,null,null);
+	@Test
+	public void allTypes() {
+		for( final Class type : types ) {
+			final Class derivType = GImageDerivativeOps.getDerivativeType(type);
+			new GenericTestsDetectDescribePoint(true,true,ImageType.single(type),BrightFeature.class) {
+
+				@Override
+				public DetectDescribePoint createDetDesc() {
+					return FactoryDetectDescribe.sift2(null,null,null,null);
+				}
+			}.allTests();
+		}
 	}
 }

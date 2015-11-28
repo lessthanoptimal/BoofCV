@@ -79,6 +79,12 @@ public class GImageSingleBandDistorted<T extends ImageSingleBand> implements GIm
 	}
 
 	@Override
+	public float unsafe_getF(int x, int y) {
+		transform.compute(x,y);
+		return interpolate.get(transform.distX, transform.distY);
+	}
+
+	@Override
 	public void set(int index, float value) {
 		throw new IllegalArgumentException("set is not supported");
 	}

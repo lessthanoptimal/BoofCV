@@ -86,6 +86,9 @@ public class TestImplInterpolatePixelConvolution_U8
 		}
 
 		@Override
+		public void setD(int index, double value) {}
+
+		@Override
 		public boolean isInteger() {
 			return false;
 		}

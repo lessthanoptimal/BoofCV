@@ -143,7 +143,7 @@ public class SiftDetector2 {
 	private void createSparseDerivatives() {
 		Kernel1D_F32 kernelD = new Kernel1D_F32(new float[]{-1,0,1},3);
 
-		Kernel1D_F32 kernelDD = KernelMath.convolve1D(kernelD, kernelD);
+		Kernel1D_F32 kernelDD = KernelMath.convolve1D_F32(kernelD, kernelD);
 		Kernel2D_F32 kernelXY = KernelMath.convolve2D(kernelD, kernelD);
 
 		derivXX = FactoryConvolveSparse.horizontal1D(ImageFloat32.class, kernelDD);

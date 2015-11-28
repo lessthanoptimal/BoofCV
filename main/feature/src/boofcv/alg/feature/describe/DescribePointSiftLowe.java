@@ -20,10 +20,12 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 
 /**
@@ -54,10 +56,10 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class DescribePointSiftLowe {
+public class DescribePointSiftLowe<Deriv extends ImageSingleBand> {
 
 	// spacial derivatives of input image
-	ImageFloat32 imageDerivX, imageDerivY;
+	GImageSingleBand imageDerivX, imageDerivY;
 
 	// width of a subregion, in samples
 	int widthSubregion;
@@ -92,7 +94,7 @@ public class DescribePointSiftLowe {
 	 */
 	public DescribePointSiftLowe(int widthSubregion, int widthGrid, int numHistogramBins,
 								 double sigmaToPixels, double weightingSigmaFraction,
-								 double maxDescriptorElementValue ) {
+								 double maxDescriptorElementValue , Class<Deriv> derivType ) {
 		this.widthSubregion = widthSubregion;
 		this.widthGrid = widthGrid;
 		this.numHistogramBins = numHistogramBins;
@@ -105,6 +107,9 @@ public class DescribePointSiftLowe {
 		int descriptorWindow = widthSubregion*widthGrid;
 		double weightSigma = descriptorWindow*weightingSigmaFraction;
 		gaussianWeight = createGaussianWeightKernel(weightSigma,descriptorWindow/2);
+
+		imageDerivX = FactoryGImageSingleBand.create(derivType);
+		imageDerivY = FactoryGImageSingleBand.create(derivType);
 	}
 
 	/**
@@ -124,9 +129,9 @@ public class DescribePointSiftLowe {
 	 * @param derivX x-derivative of input image
 	 * @param derivY y-derivative of input image
 	 */
-	public void setImageGradient(ImageFloat32 derivX , ImageFloat32 derivY ) {
-		this.imageDerivX = derivX;
-		this.imageDerivY = derivY;
+	public void setImageGradient(Deriv derivX , Deriv derivY ) {
+		this.imageDerivX.wrap(derivX);
+		this.imageDerivY.wrap(derivY);
 	}
 
 	/**
@@ -184,6 +189,8 @@ public class DescribePointSiftLowe {
 
 		double sampleToPixels = sigma*sigmaToPixels;
 
+		Deriv image = (Deriv)imageDerivX.getImage();
+
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
 			float subY = sampleY/widthSubregion;
 			double y = sampleToPixels*(sampleY-sampleRadius);
@@ -201,10 +208,10 @@ public class DescribePointSiftLowe {
 				int pixelY = (int)(x*s + y*c + c_y + 0.5);
 
 				// skip pixels outside of the image
-				if( imageDerivX.isInBounds(pixelX,pixelY) ) {
+				if( image.isInBounds(pixelX,pixelY) ) {
 					// spacial image derivative at this point
-					float spacialDX = imageDerivX.unsafe_get(pixelX, pixelY);
-					float spacialDY = imageDerivY.unsafe_get(pixelX, pixelY);
+					float spacialDX = imageDerivX.unsafe_getF(pixelX, pixelY);
+					float spacialDY = imageDerivY.unsafe_getF(pixelX, pixelY);
 
 					double adjDX =  c*spacialDX + s*spacialDY;
 					double adjDY = -s*spacialDX + c*spacialDY;

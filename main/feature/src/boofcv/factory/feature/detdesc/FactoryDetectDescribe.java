@@ -99,11 +99,12 @@ public class FactoryDetectDescribe {
 	 * @param configDesc Configuration for descriptor. Pass in null for default options.
 	 * @return SIFT
 	 */
-	public static DetectDescribePoint<ImageFloat32,BrightFeature>
+	public static <T extends ImageSingleBand>
+	DetectDescribePoint<T,BrightFeature>
 	sift2( ConfigSiftScaleSpace2 configSS ,
 		   ConfigSiftDetector2 configDetector ,
 		   ConfigSiftOrientation2 configOri ,
-		   ConfigSiftDescribe2 configDesc ) {
+		   ConfigSiftDescribe2 configDesc) {
 
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace2();
@@ -116,17 +117,17 @@ public class FactoryDetectDescribe {
 
 		SiftScaleSpace2 scaleSpace = new SiftScaleSpace2(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		OrientationHistogramSift2 orientation = new OrientationHistogramSift2(
-				configOri.histogramSize,configOri.sigmaEnlarge);
-		DescribePointSiftLowe describe = new DescribePointSiftLowe(
+		OrientationHistogramSift2<ImageFloat32> orientation = new OrientationHistogramSift2<ImageFloat32>(
+				configOri.histogramSize,configOri.sigmaEnlarge,ImageFloat32.class);
+		DescribePointSiftLowe<ImageFloat32> describe = new DescribePointSiftLowe<ImageFloat32>(
 				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
-				configDesc.maxDescriptorElementValue);
+				configDesc.maxDescriptorElementValue,ImageFloat32.class);
 
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
 		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
 		CompleteSift2 dds = new CompleteSift2(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
-		return new DetectDescribe_CompleteSift2(dds);
+		return new DetectDescribe_CompleteSift2<T>(dds);
 	}
 
 	/**

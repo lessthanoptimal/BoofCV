@@ -74,6 +74,26 @@ public class FactoryKernel {
 		throw new IllegalArgumentException("Unsupported specifications. DOF = "+DOF+" float = "+isFloat+" bits = "+numBits);
 	}
 
+	public static Kernel1D createKernel1D( int offset , int data[] , Class kernelType ) {
+		Kernel1D out;
+
+		if( kernelType == Kernel1D_F32.class ) {
+			out = new Kernel1D_F32(data.length,offset);
+		} else if( kernelType == Kernel1D_F64.class ) {
+			out = new Kernel1D_F64(data.length,offset);
+		} else if( kernelType == Kernel1D_I32.class ) {
+			out = new Kernel1D_I32(data.length,offset);
+		} else {
+			throw new RuntimeException("Unknown kernel type "+kernelType.getSimpleName());
+		}
+
+		for (int i = 0; i < data.length; i++) {
+			out.setD(i,data[i]);
+		}
+
+		return out;
+	}
+
 	/**
 	 * <p>
 	 * Create an integer table convolution kernel.  All the elements are equal to one.

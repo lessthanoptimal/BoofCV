@@ -56,7 +56,8 @@ public class TestOrientationHistogramSift2 {
 		GImageMiscOps.fillRectangle(derivX,(float) Math.cos(theta1),20,0,30,60);
 		GImageMiscOps.fillRectangle(derivY,(float) Math.sin(theta1),20,0,30,60);
 
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36, 1.5);
+		OrientationHistogramSift2<ImageFloat32> alg =
+				new OrientationHistogramSift2<ImageFloat32>(36, 1.5,ImageFloat32.class);
 		alg.setImageGradient(derivX, derivY);
 
 		alg.process(20,25,4);
@@ -77,7 +78,7 @@ public class TestOrientationHistogramSift2 {
 		ImageFloat32 derivX = new ImageFloat32(width, height);
 		ImageFloat32 derivY = new ImageFloat32(width, height);
 		int N = 36;
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(N, 1.5);
+		OrientationHistogramSift2<ImageFloat32> alg = new OrientationHistogramSift2<ImageFloat32>(N, 1.5,ImageFloat32.class);
 		alg.setImageGradient(derivX, derivY);
 
 		for (int degrees = 5; degrees < 360; degrees+=10) {
@@ -112,7 +113,8 @@ public class TestOrientationHistogramSift2 {
 
 	@Test
 	public void findHistogramPeaks() {
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,1.5);
+		OrientationHistogramSift2<ImageFloat32> alg =
+				new OrientationHistogramSift2<ImageFloat32>(36,1.5,ImageFloat32.class);
 
 		int N = alg.histogramX.length;
 
@@ -151,7 +153,8 @@ public class TestOrientationHistogramSift2 {
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
 
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,1.5);
+		OrientationHistogramSift2<ImageFloat32> alg =
+				new OrientationHistogramSift2<ImageFloat32>(36,1.5,ImageFloat32.class);
 
 		// repeat this test all the way around the histogram to ensure wrapping is handled correctly.
 		int N = alg.histogramX.length;
@@ -184,7 +187,8 @@ public class TestOrientationHistogramSift2 {
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
 
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,1.5);
+		OrientationHistogramSift2<ImageFloat32> alg =
+				new OrientationHistogramSift2<ImageFloat32>(36,1.5,ImageFloat32.class);
 
 		alg.histogramX[2] = dx0; alg.histogramY[2] = dy0;
 		alg.histogramX[3] = dx1; alg.histogramY[3] = dy1;
@@ -200,7 +204,7 @@ public class TestOrientationHistogramSift2 {
 	@Test
 	public void computeWeight() {
 
-		OrientationHistogramSift2 alg = new OrientationHistogramSift2(36,1.5);
+		OrientationHistogramSift2<ImageFloat32> alg = new OrientationHistogramSift2<ImageFloat32>(36,1.5,ImageFloat32.class);
 
 		double sigma = 2;
 

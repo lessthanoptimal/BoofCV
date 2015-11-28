@@ -47,6 +47,13 @@ public class ConfigSiftDetector2 implements Configuration {
 		extract.ignoreBorder = 1;
 	}
 
+	public ConfigSiftDetector2() {
+	}
+
+	public ConfigSiftDetector2(int maxFeaturesPerScale) {
+		this.maxFeaturesPerScale = maxFeaturesPerScale;
+	}
+
 	@Override
 	public void checkValidity() {
 

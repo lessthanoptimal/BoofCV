@@ -41,11 +41,12 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
-public class CompleteSift2 extends SiftDetector2 {
+public class CompleteSift2 extends SiftDetector2
+{
 	// estimate orientation
-	OrientationHistogramSift2 orientation;
+	OrientationHistogramSift2<ImageFloat32> orientation;
 	// describes the keypoints
-	DescribePointSiftLowe describe;
+	DescribePointSiftLowe<ImageFloat32> describe;
 	// storage for found features
 	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
@@ -69,7 +70,7 @@ public class CompleteSift2 extends SiftDetector2 {
 	 * @param describe Describes a SIFT feature
 	 */
 	public CompleteSift2(SiftScaleSpace2 scaleSpace, double edgeR, NonMaxLimiter extractor,
-						 OrientationHistogramSift2 orientation, DescribePointSiftLowe describe) {
+						 OrientationHistogramSift2<ImageFloat32> orientation, DescribePointSiftLowe<ImageFloat32> describe) {
 		super(scaleSpace, edgeR, extractor);
 
 		this.orientation = orientation;

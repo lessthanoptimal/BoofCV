@@ -180,13 +180,13 @@ public class TestKernelMath {
 
 		// computed using conv() in octave
 		Kernel1D_F32 expected = new Kernel1D_F32(new float[]{6,19,40,61,82,67,40},7);
-		Kernel1D_F32 c = KernelMath.convolve1D(k1,k2);
+		Kernel1D_F32 c = KernelMath.convolve1D_F32(k1,k2);
 
 		for( int i = 0; i < 7; i++ ) {
 			assertEquals(expected.data[i],c.data[i],1e-4);
 		}
 
-		c = KernelMath.convolve1D(k2,k1);
+		c = KernelMath.convolve1D_F32(k2,k1);
 		for( int i = 0; i < 7; i++ ) {
 			assertEquals(expected.data[i],c.data[i],1e-4);
 		}

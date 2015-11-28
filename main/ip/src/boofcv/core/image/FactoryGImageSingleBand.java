@@ -137,6 +137,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
 		public void set(int index, float value) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
@@ -165,6 +170,11 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public double unsafe_getD(int x, int y) {
+			return image.get(x,y);
+		}
+
+		@Override
+		public float unsafe_getF(int x, int y) {
 			return image.get(x,y);
 		}
 
@@ -206,6 +216,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return (float)image.get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
@@ -243,6 +258,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int index, float value) {
 			image.data[index] = (byte)value;
 		}
@@ -268,6 +288,12 @@ public class FactoryGImageSingleBand {
 		public double unsafe_getD(int x, int y) {
 			return image.unsafe_get(x,y);
 		}
+
+		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
 
 		@Override
 		public void set(int x, int y, Number num) {
@@ -298,6 +324,11 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
+		public float unsafe_getF(int x, int y) {
 			return image.unsafe_get(x,y);
 		}
 
@@ -334,6 +365,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
 		}
@@ -366,6 +402,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.intValue());
 		}
@@ -394,6 +435,11 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public double unsafe_getD(int x, int y) {
+			return image.unsafe_get(x,y);
+		}
+
+		@Override
+		public float unsafe_getF(int x, int y) {
 			return image.unsafe_get(x,y);
 		}
 
@@ -435,6 +481,11 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
+		public float unsafe_getF(int x, int y) {
+			return image.data[image.getIndex(x,y)];
+		}
+
+		@Override
 		public void set(int x, int y, Number num) {
 			image.set(x,y,num.floatValue());
 		}
@@ -468,7 +519,12 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public double unsafe_getD(int x, int y) {
-			return image.unsafe_get(x,y);
+			return image.data[image.getIndex(x, y)];
+		}
+
+		@Override
+		public float unsafe_getF(int x, int y) {
+			return (float)image.unsafe_get(x,y);
 		}
 
 		@Override

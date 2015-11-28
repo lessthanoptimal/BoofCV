@@ -45,7 +45,7 @@ public class GKernelMath {
 		if( a.isInteger() ) {
 			throw new IllegalArgumentException("Add support");
 		} else {
-			return KernelMath.convolve1D((Kernel1D_F32)a,(Kernel1D_F32)b);
+			return KernelMath.convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
 		}
 	}
 

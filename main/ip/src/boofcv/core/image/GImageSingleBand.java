@@ -53,6 +53,8 @@ public interface GImageSingleBand {
 	 */
 	double unsafe_getD(int x, int y);
 
+	float unsafe_getF(int x, int y );
+
 	/**
 	 * Sets pixel based on pixel value in data array
 	 */
