@@ -46,8 +46,8 @@ public class DebugSiftDetector2App {
 
 
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(3,1,1,true,true,true));
-		NonMaxLimiter extractor = new NonMaxLimiter(nonmax,100);
-		SiftScaleSpace2 imageSS = new SiftScaleSpace2(-1,5,3,1.6);
+		NonMaxLimiter extractor = new NonMaxLimiter(nonmax,400);
+		SiftScaleSpace2 imageSS = new SiftScaleSpace2(-1,5,3,2.75);
 		SiftDetector2 alg = new SiftDetector2(imageSS,10,extractor);
 
 

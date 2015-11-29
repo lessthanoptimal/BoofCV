@@ -21,6 +21,7 @@ package boofcv.examples.features;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -118,13 +119,13 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleD
 	public static void main( String args[] ) {
 
 		Class imageType = ImageFloat32.class;
+//		Class imageType = ImageUInt8.class;
 
 		// select which algorithms to use
-//		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-//				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-
-		DetectDescribePoint detDesc = FactoryDetectDescribe.sift2();
-//		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,null,null,null);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.
+				surfStable(new ConfigFastHessian(1, 2, 300, 1, 9, 4, 4), null,null, imageType);
+//				sift2(new ConfigCompleteSift(-1,5,400));
+//				sift(null,null,null,null);
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);

@@ -42,7 +42,7 @@ public class TestDetectDescribe_CompleteSift2
 
 				@Override
 				public DetectDescribePoint createDetDesc() {
-					return FactoryDetectDescribe.sift2(null,null,null,null);
+					return FactoryDetectDescribe.sift2(null);
 				}
 			}.allTests();
 		}

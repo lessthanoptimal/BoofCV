@@ -31,7 +31,7 @@ public class ConfigSiftScaleSpace2 implements Configuration {
 	/**
 	 * Amount of blur at the first level in the image pyramid.  Recommend 1.6
 	 */
-	public float sigma0 = 1.6f;
+	public float sigma0 = 2.75f;
 
 	/**
 	 * Number of scales in each octave.  The amount of Gaussian blur will double this number of images in the
@@ -45,6 +45,18 @@ public class ConfigSiftScaleSpace2 implements Configuration {
 	 * than the input image.  The overall size of an octave relative to the input image is pow(2,-octave)
 	 */
 	public int firstOctave = -1, lastOctave = 5;
+
+	/**
+	 * Creates a configuration similar to how it was originally described in the paper
+	 */
+	public static ConfigSiftScaleSpace2 createPaper() {
+		ConfigSiftScaleSpace2 config = new ConfigSiftScaleSpace2();
+		config.sigma0 = 1.6f;
+		config.numScales = 3;
+		config.firstOctave = -1;
+		config.lastOctave = 5;
+		return config;
+	}
 
 	@Override
 	public void checkValidity() {

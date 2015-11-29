@@ -113,7 +113,7 @@ public class SiftDetector2 {
 	 * Configures SIFT detector
 	 *
 	 * @param scaleSpace Provides the scale space
-	 * @param edgeR Threshold used to remove edge responses.  Try 10
+	 * @param edgeR Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
 	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
 	public SiftDetector2( SiftScaleSpace2 scaleSpace ,
@@ -317,13 +317,15 @@ public class SiftDetector2 {
 		double Tr = xx + yy;
 		double det = xx*yy - xy*xy;
 
-		// The SIFT paper does not show absolute value here nor have I put enough thought into it
-		// to determine if this makes any sense.  However, it does seem to improve performance
-		// quite a bit.
-
-		// In paper this is:
-		// Tr**2/Det < (r+1)**2/r
-		return( Math.abs(Tr*Tr) >= Math.abs(edgeThreshold*det));
+		// Paper quite "In the unlikely event that the determinant is negative, the curvatures have different signs
+		// so the point is discarded as not being an extremum"
+		if( det <= 0)
+			return true;
+		else {
+			// In paper this is:
+			// Tr**2/Det < (r+1)**2/r
+			return( Tr*Tr >= edgeThreshold*det);
+		}
 	}
 
 	public FastQueue<ScalePoint> getDetections() {

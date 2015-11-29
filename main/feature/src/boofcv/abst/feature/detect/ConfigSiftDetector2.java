@@ -39,12 +39,24 @@ public class ConfigSiftDetector2 implements Configuration {
 	public int maxFeaturesPerScale = 0;
 
 	/**
-	 * Threshold used to remove edge responses.  Try 10
+	 * Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
 	 */
 	public double edgeR = 10;
 
 	{
 		extract.ignoreBorder = 1;
+	}
+
+	/**
+	 * Creates a configuration similar to how it was originally described in the paper
+	 */
+	public static ConfigSiftDetector2 createPaper() {
+		ConfigSiftDetector2 config = new ConfigSiftDetector2();
+		config.extract = new ConfigExtract(1,0,1,true,true,true);
+		config.extract.ignoreBorder = 1;
+		config.maxFeaturesPerScale = 0;
+		config.edgeR = 10;
+		return config;
 	}
 
 	public ConfigSiftDetector2() {

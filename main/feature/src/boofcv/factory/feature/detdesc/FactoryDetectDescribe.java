@@ -93,27 +93,20 @@ public class FactoryDetectDescribe {
 	 *
 	 * @see CompleteSift2
 	 *
-	 * @param configSS Configuration for scale-space.  Pass in null for default options.
-	 * @param configDetector Configuration for detector.  Pass in null for default options.
-	 * @param configOri Configuration for region orientation.  Pass in null for default options.
-	 * @param configDesc Configuration for descriptor. Pass in null for default options.
+	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
 	 */
 	public static <T extends ImageSingleBand>
 	DetectDescribePoint<T,BrightFeature>
-	sift2( ConfigSiftScaleSpace2 configSS ,
-		   ConfigSiftDetector2 configDetector ,
-		   ConfigSiftOrientation2 configOri ,
-		   ConfigSiftDescribe2 configDesc) {
+	sift2( ConfigCompleteSift config ) {
 
-		if( configSS == null )
-			configSS = new ConfigSiftScaleSpace2();
-		if( configOri == null )
-			configOri = new ConfigSiftOrientation2();
-		if( configDesc == null )
-			configDesc = new ConfigSiftDescribe2();
-		if( configDetector == null )
-			configDetector = new ConfigSiftDetector2();
+		if( config == null )
+			config = new ConfigCompleteSift();
+
+		ConfigSiftScaleSpace2 configSS = config.scaleSpace;
+		ConfigSiftDetector2 configDetector = config.detector;
+		ConfigSiftOrientation2 configOri = config.orientation;
+		ConfigSiftDescribe2 configDesc = config.describe;
 
 		SiftScaleSpace2 scaleSpace = new SiftScaleSpace2(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);

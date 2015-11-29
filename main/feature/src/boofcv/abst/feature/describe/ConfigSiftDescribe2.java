@@ -37,8 +37,8 @@ public class ConfigSiftDescribe2 implements Configuration {
 	/** numHistogramBins Number of bins in histogram.  Try 8 */
 	public int numHistogramBins=8;
 
-	/** sigmaToPixels Conversion of sigma to pixels.  Used to scale the descriptor region.  Try 1.5 ??????  */
-	public double sigmaToPixels=1.5;
+	/** sigmaToPixels Conversion of sigma to pixels.  Used to scale the descriptor region.  Try 1.0  */
+	public double sigmaToPixels=1.0;
 
 	/** weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5  */
 	public double weightingSigmaFraction=0.5;

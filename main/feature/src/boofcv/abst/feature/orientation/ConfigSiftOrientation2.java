@@ -32,9 +32,20 @@ public class ConfigSiftOrientation2 implements Configuration {
 	 */
 	public int histogramSize = 36;
 	/**
-	 * How much the scale is enlarged by.  Standard is 1.5
+	 * How much the scale is enlarged by.  Standard is 2.0
 	 */
-	public double sigmaEnlarge = 1.5;
+	public double sigmaEnlarge = 2.0;
+
+	/**
+	 * Creates a configuration similar to how it was originally described in the paper
+	 */
+	public static ConfigSiftOrientation2 createPaper() {
+		ConfigSiftOrientation2 config = new ConfigSiftOrientation2();
+		config.histogramSize = 36;
+		config.sigmaEnlarge = 1.5;
+
+		return config;
+	}
 
 	@Override
 	public void checkValidity() {
