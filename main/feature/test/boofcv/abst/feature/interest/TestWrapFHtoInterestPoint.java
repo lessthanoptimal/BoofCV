@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class TestWrapFHtoInterestPoint {
 	// some reasonable input algorithms
 	NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true));
 	FastHessianFeatureDetector detector = new FastHessianFeatureDetector(extractor,150,
-			1,9, 4,4);
+			1,9, 4,4, 6);
 
 	@Test
 	public void standard() {

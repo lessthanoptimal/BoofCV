@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 @SuppressWarnings("ALL")
-public class TestDetectDescribe_CompleteSift2
+public class TestDetectDescribe_CompleteSift
 {
 	Class types[] = new Class[]{ImageFloat32.class,ImageUInt8.class};
 
@@ -42,7 +42,7 @@ public class TestDetectDescribe_CompleteSift2
 
 				@Override
 				public DetectDescribePoint createDetDesc() {
-					return FactoryDetectDescribe.sift2(null);
+					return FactoryDetectDescribe.sift(null);
 				}
 			}.allTests();
 		}

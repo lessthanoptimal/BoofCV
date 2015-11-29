@@ -83,7 +83,7 @@ public class ExampleFeatureSurf {
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 0, 5, true));
 		FastHessianFeatureDetector<II> detector = 
-				new FastHessianFeatureDetector<II>(extractor,200,2, 9,4,4);
+				new FastHessianFeatureDetector<II>(extractor,200,2, 9,4,4,6);
 
 		// estimate orientation
 		OrientationIntegral<II> orientation = 

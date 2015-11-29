@@ -66,7 +66,7 @@ public class FactoryDetectDescribe {
 	 * @return SIFT
 	 */
 	public static <T extends ImageSingleBand>
-	DetectDescribePoint<T,BrightFeature> sift2( ConfigCompleteSift config )
+	DetectDescribePoint<T,BrightFeature> sift(ConfigCompleteSift config )
 	{
 		if( config == null )
 			config = new ConfigCompleteSift();

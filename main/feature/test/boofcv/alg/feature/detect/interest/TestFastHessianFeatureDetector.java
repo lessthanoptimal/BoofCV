@@ -37,7 +37,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
-		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4);
+		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4, 6);
 	}
 
 	@SuppressWarnings({"unchecked"})

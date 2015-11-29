@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,6 +55,12 @@ public class ConfigFastHessian implements Configuration {
 	 * Typically 4.
 	 */
 	public int numberOfOctaves = 4;
+
+	/**
+	 * Increment between kernel sizes as it goes up in scale.  In some data sets, increasing this value beyound
+	 * the default value results in an improvement in stability.  Default 6
+	 */
+	public int scaleStepSize = 6;
 
 	public ConfigFastHessian(float detectThreshold,
 							 int extractRadius,

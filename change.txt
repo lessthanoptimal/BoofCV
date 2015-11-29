@@ -10,8 +10,10 @@ Version : Alpha 0.21
   * getScale() has been replaced with getRadius(), which refers to the radius of the detected object
 - SURF
   * Fixed a bug dealing with gradient calculation and improve stability for very small objects
+  * Exposed an inner parameter.  You can now change the kernel size increment between scales
 - WebcamTrackFiducial renamed to FiducialDetection
   * Can now process more inputs sources;  still images, videos, and webcams.
+  * Output to a file is a possibility
 - Renamed SurfFeature to BrightFeature
   * Used by SURF and SIFT, so the name was made more generic
 - Complete rewrite of SIFT

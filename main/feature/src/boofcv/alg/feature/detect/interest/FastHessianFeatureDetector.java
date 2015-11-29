@@ -101,6 +101,8 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 
 	// size of detected feature at the smallest scale
 	private int initialSize;
+	// increment between kernel sizes as it goes up in scale
+	private int scaleStepSize;
 	// the number of octaves it examines
 	private int numberOfOctaves;
 
@@ -120,19 +122,19 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 * Configuration for FH-15: initialSampleSize=1, initialSize=15, numberScalesPerOctave=5, numberOfOctaves=4<br>
 	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
-	 *
-	 * @param extractor Feature extractor used to find local maximums in 2D image.
+	 *  @param extractor Feature extractor used to find local maximums in 2D image.
 	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set <= 0 then the all potential
 	 * features will be returned, which is how it is in the original paper.
 	 * @param initialSampleRate How often pixels are sampled in the first octave.
 	 * @param initialSize Size/width of the smallest feature/kernel in the lowest octave.
 	 * @param numberScalesPerOctave How many different feature sizes are considered in a single octave
 	 * @param numberOfOctaves How many different octaves are considered.
+	 * @param scaleStepSize Increment between kernel sizes as it goes up in scale.  Try 6
 	 */
 	public FastHessianFeatureDetector(NonMaxSuppression extractor, int maxFeaturesPerScale,
 									  int initialSampleRate, int initialSize,
 									  int numberScalesPerOctave,
-									  int numberOfOctaves) {
+									  int numberOfOctaves, int scaleStepSize) {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			this.maxFeaturesPerScale = maxFeaturesPerScale;
@@ -141,6 +143,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
 		this.numberOfOctaves = numberOfOctaves;
+		this.scaleStepSize = scaleStepSize;
 
 		sizes = new int[ numberScalesPerOctave ];
 	}
@@ -162,7 +165,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		// computes feature intensity every 'skip' pixels
 		int skip = initialSampleRate;
 		// increment between kernel sizes
-		int sizeStep = 6;
+		int sizeStep = scaleStepSize;
 		// initial size of the kernel in the first octave
 		int octaveSize = initialSize;
 		for( int octave = 0; octave < numberOfOctaves; octave++ ) {

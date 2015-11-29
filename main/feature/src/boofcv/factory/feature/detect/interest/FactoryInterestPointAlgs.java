@@ -175,6 +175,7 @@ public class FactoryInterestPointAlgs {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(config.extractRadius, config.detectThreshold, 5, true));
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
-				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave, config.numberOfOctaves);
+				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave,
+				config.numberOfOctaves, config.scaleStepSize);
 	}
 }

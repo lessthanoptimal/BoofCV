@@ -105,7 +105,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 
 		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
 		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
-		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift2(null,null,imageType));
+		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null,imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(1, "BRIEFSO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));

@@ -95,7 +95,7 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift2(null,null, imageType));
+		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));

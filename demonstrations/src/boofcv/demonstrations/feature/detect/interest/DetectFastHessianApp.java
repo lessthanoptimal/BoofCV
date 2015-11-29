@@ -57,7 +57,7 @@ public class DetectFastHessianApp {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract( 5 , 1 , 5, true) );
-		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4);
+		FastHessianFeatureDetector<T> det = new FastHessianFeatureDetector<T>(extractor,NUM_FEATURES, 2, 9,4,4, 6);
 
 		T integral = GIntegralImageOps.transform(workImage,null);
 		det.detect(integral);

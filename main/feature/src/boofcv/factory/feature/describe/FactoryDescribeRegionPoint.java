@@ -147,7 +147,7 @@ public class FactoryDescribeRegionPoint {
 	 *
 	 * <p>
 	 * NOTE: If detecting and describing SIFT features then it is more efficient to use
-	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift2} instead
+	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift} instead
 	 * </p>
 	 *
 	 * @param configSS SIFT scale-space configuration. Pass in null for default options.
@@ -155,7 +155,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SIFT descriptor
 	 */
 	public static <T extends ImageSingleBand>
-	DescribeRegionPoint<T,TupleDesc_F64> sift2(
+	DescribeRegionPoint<T,TupleDesc_F64> sift(
 			ConfigSiftScaleSpace configSS, ConfigSiftDescribe configDescribe, Class<T> imageType)
 	{
 		if( configSS == null )
@@ -165,7 +165,7 @@ public class FactoryDescribeRegionPoint {
 		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales,
 				configSS.sigma0);
 
-		DescribePointSift<ImageFloat32> alg = FactoryDescribePointAlgs.sift2(configDescribe,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg = FactoryDescribePointAlgs.sift(configDescribe,ImageFloat32.class);
 
 		return new DescribeRegionPoint_SIFT<T>(ss,alg,imageType);
 	}

@@ -72,7 +72,7 @@ public class OrientationSiftToImage<T extends ImageSingleBand>
 
 	@Override
 	public void setObjectRadius(double radius) {
-		sigma = radius/ BoofDefaults.SIFT2_SCALE_TO_RADIUS;
+		sigma = radius/ BoofDefaults.SIFT_SCALE_TO_RADIUS;
 		this.image = scaleSpace.lookup(sigma);
 	}
 

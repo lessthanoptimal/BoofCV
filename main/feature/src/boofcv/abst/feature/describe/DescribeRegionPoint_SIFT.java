@@ -74,7 +74,7 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 
 		System.out.println("orientation = "+orientation);
 		// get the blur sigma for the radius
-		double sigma = radius/ BoofDefaults.SIFT2_SCALE_TO_RADIUS;
+		double sigma = radius/ BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 		// find the image which the blur factor closest to this sigma
 		UnrollSiftScaleSpaceGradient.ImageScale image = scaleSpace.lookup(sigma);

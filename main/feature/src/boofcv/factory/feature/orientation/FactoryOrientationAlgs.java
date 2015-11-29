@@ -182,7 +182,7 @@ public class FactoryOrientationAlgs {
 	 *
 	 * @param config Configuration for algorithm.  If null defaults will be used.
 	 * @param derivType Type of derivative image it takes as input
-	 * @return OrientationHistogramSift2
+	 * @return OrientationHistogramSift
 	 */
 	public static <D extends ImageSingleBand>
 	OrientationHistogramSift<D> sift(ConfigSiftOrientation config , Class<D> derivType ) {

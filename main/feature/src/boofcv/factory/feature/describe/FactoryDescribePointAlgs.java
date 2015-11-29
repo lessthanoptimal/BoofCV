@@ -96,7 +96,7 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageSingleBand>
-	DescribePointSift<T> sift2(ConfigSiftDescribe config , Class<T> derivType ) {
+	DescribePointSift<T> sift(ConfigSiftDescribe config , Class<T> derivType ) {
 		if( config == null )
 			config = new ConfigSiftDescribe();
 
