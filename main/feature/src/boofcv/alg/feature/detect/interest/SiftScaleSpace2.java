@@ -257,7 +257,7 @@ public class SiftScaleSpace2 {
 	}
 
 	public int getTotalOctaves() {
-		return lastOctave-firstOctave;
+		return lastOctave-firstOctave+1;
 	}
 
 	/**

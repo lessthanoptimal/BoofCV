@@ -21,17 +21,16 @@ package boofcv.factory.feature.describe;
 import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.describe.DescribePointSiftLowe;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.*;
 import boofcv.struct.image.*;
 
 import java.util.Random;
@@ -169,6 +168,36 @@ public class FactoryDescribeRegionPoint {
 		DescribePointSift alg = FactoryDescribePointAlgs.sift(configDescribe);
 
 		return new WrapDescribeSift(alg,ss);
+	}
+
+	/**
+	 * <p>
+	 * Creates a SIFT region descriptor.
+	 * </p>
+	 *
+	 * <p>
+	 * NOTE: If detecting and describing SIFT features then it is more efficient to use
+	 * {@link boofcv.factory.feature.detdesc.FactoryDetectDescribe#sift2} instead
+	 * </p>
+	 *
+	 * @param configSS SIFT scale-space configuration. Pass in null for default options.
+	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
+	 * @return SIFT descriptor
+	 */
+	public static <T extends ImageSingleBand>
+	DescribeRegionPoint<T,TupleDesc_F64> sift2(
+			ConfigSiftScaleSpace2 configSS, ConfigSiftDescribe2 configDescribe, Class<T> imageType)
+	{
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace2();
+		configSS.checkValidity();
+
+		SiftScaleSpace2 ss = new SiftScaleSpace2(configSS.firstOctave, configSS.lastOctave, configSS.numScales,
+				configSS.sigma0);
+
+		DescribePointSiftLowe<ImageFloat32> alg = FactoryDescribePointAlgs.sift2(configDescribe,ImageFloat32.class);
+
+		return new DescribeRegionPoint_SIFT<T>(ss,alg,imageType);
 	}
 
 	/**

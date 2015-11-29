@@ -19,6 +19,7 @@
 package boofcv.factory.feature.describe;
 
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
+import boofcv.abst.feature.describe.ConfigSiftDescribe2;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.*;
@@ -103,6 +104,15 @@ public class FactoryDescribePointAlgs {
 
 		return new DescribePointSift(config.gridWidth,config.numSamples,config.numHistBins
 				,config.weightSigma, config.sigmaToRadius);
+	}
+
+	public static <T extends ImageSingleBand>
+	DescribePointSiftLowe<T> sift2( ConfigSiftDescribe2 config , Class<T> derivType ) {
+		if( config == null )
+			config = new ConfigSiftDescribe2();
+
+		return new DescribePointSiftLowe(config.widthSubregion,config.widthGrid,config.numHistogramBins
+				,config.sigmaToPixels, config.weightingSigmaFraction,config.maxDescriptorElementValue,derivType);
 	}
 
 	public static <T extends ImageSingleBand, D extends TupleDesc>
