@@ -21,6 +21,7 @@ package boofcv.alg.shapes.corner;
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageSingleBand;
+import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -171,13 +172,21 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 
 		for (int iteration = 0; iteration < maxIterations; iteration++) {
 
+			// snapping to edge can fail when its along the image border.  However, the corner can still
+			// be optimized as long as one of the edges isn't along the image border
+			boolean failedAlready = false;
 			snapToEdge.setLineSamples(samplesLeft);
-			if( !optimize(refined, _endLeft, lineLeft) )
-				return false;
+			if( !optimize(refined, _endLeft, lineLeft) ) {
+				UtilLine2D_F64.convert(refined,_endLeft,lineLeft);
+				failedAlready = true;
+			}
 
 			snapToEdge.setLineSamples(samplesRight);
-			if( !optimize(refined,_endRight, lineRight) )
-				return false;
+			if( !optimize(refined,_endRight, lineRight) ) {
+				if( failedAlready )
+					return false;
+				UtilLine2D_F64.convert(refined,_endRight,lineRight);
+			}
 
 			// intersect the two lines to fine the new corner
 			if( null == Intersection2D_F64.intersection(lineLeft,lineRight,refined) )

@@ -21,7 +21,6 @@ package boofcv.alg.shapes.polygon;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.shapes.ShapeFittingOps;
-import boofcv.misc.CircularIndex;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageUInt8;
@@ -124,48 +123,6 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		}
 	}
 
-	private List<Point2D_I32> createContour(int w ) {
-		ArrayList<Point2D_I32> contour = new ArrayList<Point2D_I32>();
-
-		for (int i = 0; i < w; i++) {
-			contour.add( new Point2D_I32(i,w));
-		}
-		for (int i = 0; i < w; i++) {
-			contour.add( new Point2D_I32(w,w-i));
-		}
-		for (int i = 0; i < w; i++) {
-			contour.add( new Point2D_I32(w-i,0));
-		}
-		for (int i = 0; i < w; i++) {
-			contour.add( new Point2D_I32(0,i));
-		}
-
-		return contour;
-	}
-
-	private List<Point2D_I32> flip( List<Point2D_I32> input ) {
-		List<Point2D_I32> flipped = new ArrayList<Point2D_I32>();
-
-		for (int i = 0; i < input.size(); i++) {
-			int index = CircularIndex.addOffset(0, -i, input.size());
-			flipped.add(input.get(index));
-		}
-
-		return flipped;
-	}
-
-	private GrowQueue_I32 flip( GrowQueue_I32 input ) {
-		GrowQueue_I32 flipped = new GrowQueue_I32();
-
-		for (int i = 0; i < input.size(); i++) {
-			int index = CircularIndex.addOffset(0, -i, input.size());
-			flipped.add(input.get(index));
-		}
-
-		return flipped;
-	}
-
-
 	@Test
 	public void pickEndIndex() {
 		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(ImageUInt8.class);
@@ -207,5 +164,44 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		for (int i = 0; i < corners.size(); i++) {
 			split.add(corners.get(i).index);
 		}
+	}
+
+	/**
+	 * Reproduces a bug that was found in the wild where the same index was returned in both directions.  It was
+	 * caused by the distance being incorrectly computed.
+	 */
+	@Test
+	public void pickEndIndex_bug0() {
+		RefinePolygonCornersToImage<ImageUInt8> alg = new RefinePolygonCornersToImage<ImageUInt8>(ImageUInt8.class);
+		alg.setPixelsAway(6);
+		alg.contour = new ArrayList<Point2D_I32>();
+		alg.splits = new GrowQueue_I32();
+
+		for (int i = 0; i < 100; i++) {
+			alg.contour.add(new Point2D_I32(1,1));
+		}
+		alg.splits.add(80);
+		alg.splits.add(95);
+		alg.splits.add(3);
+		alg.splits.add(20);
+
+		int found0 = alg.pickEndIndex(0,-1);
+		int found1 = alg.pickEndIndex(0,1);
+
+		assertTrue(found0!=found1);
+
+		// quick test in the other direction
+		alg.splits.reset();
+		alg.splits.add(20);
+		alg.splits.add(3);
+		alg.splits.add(95);
+		alg.splits.add(80);
+
+		int foundA = alg.pickEndIndex(3,1);
+		int foundB = alg.pickEndIndex(3,-1);
+
+		assertTrue(foundA!=foundB);
+		assertEquals(foundA,found0);
+		assertEquals(foundB,found1);
 	}
 }

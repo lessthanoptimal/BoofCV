@@ -46,10 +46,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-// todo minimum contour size
-// todo video support
-// todo webcam support
-
 /**
  * Application which lets you configure the black polygon detector in real-time
  *
@@ -229,6 +225,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add("shapes/shapes01.png");
 		examples.add("shapes/shapes02.png");
 		examples.add("shapes/concave01.jpg");
+		examples.add("shapes/polygons_border_01.jpg");
 		examples.add("fiducial/binary/image0000.jpg");
 		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
 		examples.add("fiducial/square_grid/movie.mp4");

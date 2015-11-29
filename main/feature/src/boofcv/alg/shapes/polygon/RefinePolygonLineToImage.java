@@ -222,7 +222,7 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> implements Refi
 					}
 				}
 
-				// The line fit went south.  Revert it
+				// The line fit failed.  Probably because its along the image border.  Revert it
 				if( failed ) {
 					general[i].set(before);
 				} else {

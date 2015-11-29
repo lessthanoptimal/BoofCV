@@ -153,17 +153,26 @@ public class RefinePolygonCornersToImage<T extends ImageSingleBand> implements R
 	protected int pickEndIndex(int cornerS, int dir)
 	{
 		int cornerIndex = splits.get(cornerS);
-		int endIndex = splits.get(CircularIndex.addOffset(cornerS, dir, splits.size));
+		int endIndex0 = splits.get(CircularIndex.addOffset(cornerS, dir, splits.size));
+		int endIndex1 = splits.get(CircularIndex.addOffset(cornerS, -dir, splits.size));
 
-		int distance = CircularIndex.subtract(cornerIndex, endIndex, contour.size());
+		// splits being in increasing or decreasing order isn't specified.  This make sure the correct
+		// point is selected
+		int dist0 = CircularIndex.distanceP(cornerIndex, endIndex0, contour.size());
+		int dist1 = CircularIndex.distanceP(cornerIndex, endIndex1, contour.size());
 
-		if( distance > 0 ) {
+		if( dir == 1 != dist1 > dist0 )
+			dir = -dir;
+
+		if( dir < 0 ) {
+			int distance = CircularIndex.distanceP(endIndex0, cornerIndex, contour.size());
 			distance = Math.min(distance,pixelsAway);
+			return CircularIndex.addOffset(cornerIndex, -distance, contour.size());
 		} else {
-			distance = Math.max(distance,-pixelsAway);
+			int distance = CircularIndex.distanceP(cornerIndex, endIndex0, contour.size());
+			distance = Math.min(distance,pixelsAway);
+			return CircularIndex.addOffset(cornerIndex, distance, contour.size());
 		}
-
-		return CircularIndex.addOffset(cornerIndex, distance, contour.size());
 	}
 
 	public int getPixelsAway() {

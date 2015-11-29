@@ -11,6 +11,9 @@ TODO CameraCalibration should handle video sequences and disable still images
 Date    :
 Version : Alpha 0.21
 
+- black polygon detector
+  * can now handle features along image border
+  * fixed a couple of bugs inside refine function too
 
 - TODO Polygon handle shapes which touch the image border
 - TODO         side optimization needs to handle this case too
