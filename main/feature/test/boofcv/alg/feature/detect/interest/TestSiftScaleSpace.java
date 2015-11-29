@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestSiftScaleSpace2 {
+public class TestSiftScaleSpace {
 
 	Random rand = new Random(234);
 
@@ -50,7 +50,7 @@ public class TestSiftScaleSpace2 {
 		int lastOctave = 5;
 		for (int firstOctave = -1; firstOctave < 2; firstOctave++) {
 
-			SiftScaleSpace2 alg = new SiftScaleSpace2(firstOctave,lastOctave,2,sigma0);
+			SiftScaleSpace alg = new SiftScaleSpace(firstOctave,lastOctave,2,sigma0);
 
 			alg.initialize(original);
 
@@ -78,7 +78,7 @@ public class TestSiftScaleSpace2 {
 		ImageFloat32 expected = new ImageFloat32(300,340);
 
 		float sigma0 = 1.6f;
-		SiftScaleSpace2 alg = new SiftScaleSpace2(0,3,2,sigma0);
+		SiftScaleSpace alg = new SiftScaleSpace(0,3,2,sigma0);
 
 		alg.initialize(original);
 		assertEquals(5,alg.getNumScaleImages());
@@ -96,7 +96,7 @@ public class TestSiftScaleSpace2 {
 
 	@Test
 	public void computeSigmaScale() {
-		SiftScaleSpace2 alg = new SiftScaleSpace2(-1,4,3,1.6);
+		SiftScaleSpace alg = new SiftScaleSpace(-1,4,3,1.6);
 		alg.initialize(new ImageFloat32(60,50));
 
 		double k = Math.pow(2.0,1.0/3.0);
@@ -151,7 +151,7 @@ public class TestSiftScaleSpace2 {
 	 */
 	@Test
 	public void checkImageTooSmallForOctaves() {
-		SiftScaleSpace2 alg = new SiftScaleSpace2(0,5,3,1.6);
+		SiftScaleSpace alg = new SiftScaleSpace(0,5,3,1.6);
 
 		alg.initialize(new ImageFloat32(20,20));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,51 +18,36 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.struct.Configuration;
 
 /**
- * Configures the SIFT feature descriptor.
- *
- * @see boofcv.alg.feature.describe.DescribePointSift
- *
+ * Configuration for {@link DescribePointSift}
+ * 
  * @author Peter Abeles
  */
 public class ConfigSiftDescribe implements Configuration {
 
-	/**
-	 * Number of grid elements along a side.  Typically 4
-	 */
-	public int gridWidth = 4;
-	/**
-	 * Number of samples along a grid. Typically 8
-	 */
-	public int numSamples = 8;
-	/**
-	 * Number of bins in the orientation histogram.  Typically 8
-	 */
-	public int numHistBins = 8;
-	/**
-	 * Adjusts descriptor element's weighting from center.  Typically 0.5
-	 */
-	public double weightSigma = 0.5;
-	/**
-	 * Conversation from scale space to pixels.  Typically 3
-	 */
-	public double sigmaToRadius = 3;
+	/** widthSubregion Width of sub-region in samples.  Try 4 */
+	public int widthSubregion=4;
 
-	public ConfigSiftDescribe(int gridWidth, int numSamples,
-							  int numHistBins, double weightSigma, double sigmaToRadius) {
-		this.gridWidth = gridWidth;
-		this.numSamples = numSamples;
-		this.numHistBins = numHistBins;
-		this.weightSigma = weightSigma;
-		this.sigmaToRadius = sigmaToRadius;
-	}
+	/** widthGrid Width of grid in subregions.  Try 4. */
+	public int widthGrid=4;
 
-	public ConfigSiftDescribe() {
-	}
+	/** numHistogramBins Number of bins in histogram.  Try 8 */
+	public int numHistogramBins=8;
+
+	/** sigmaToPixels Conversion of sigma to pixels.  Used to scale the descriptor region.  Try 1.0  */
+	public double sigmaToPixels=1.0;
+
+	/** weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5  */
+	public double weightingSigmaFraction=0.5;
+
+	/** maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2  */
+	public double maxDescriptorElementValue=0.2;
 
 	@Override
 	public void checkValidity() {
+		
 	}
 }

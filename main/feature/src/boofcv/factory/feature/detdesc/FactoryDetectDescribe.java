@@ -18,25 +18,26 @@
 
 package boofcv.factory.feature.detdesc;
 
-import boofcv.abst.feature.describe.*;
+import boofcv.abst.feature.describe.ConfigSiftDescribe;
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.*;
-import boofcv.abst.feature.detect.ConfigSiftDetector2;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.*;
-import boofcv.alg.feature.describe.*;
-import boofcv.alg.feature.detdesc.CompleteSift2;
-import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.feature.describe.DescribePointSurfMod;
+import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
+import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.detect.interest.SiftDetector;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
-import boofcv.alg.feature.orientation.OrientationHistogramSift2;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -59,68 +60,35 @@ public class FactoryDetectDescribe {
 	/**
 	 * Creates a new SIFT feature detector and describer.
 	 *
-	 * @param configSS Configuration for scale-space.  Pass in null for default options.
-	 * @param configDetector Configuration for detector.  Pass in null for default options.
-	 * @param configOri Configuration for region orientation.  Pass in null for default options.
-	 * @param configDesc Configuration for descriptor. Pass in null for default options.
-	 * @return SIFT
-	 */
-	public static DetectDescribePoint<ImageFloat32,BrightFeature>
-	sift( ConfigSiftScaleSpace configSS,
-		  ConfigSiftDetector configDetector ,
-		  ConfigSiftOrientation configOri ,
-		  ConfigSiftDescribe configDesc) {
-
-		if( configSS == null )
-			configSS = new ConfigSiftScaleSpace();
-		configSS.checkValidity();
-
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
-				configSS.doubleInputImage);
-
-		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(configDetector);
-
-		OrientationHistogramSift orientation = FactoryOrientationAlgs.sift(configOri);
-		DescribePointSift describe = FactoryDescribePointAlgs.sift(configDesc);
-
-		DetectDescribeSift combined = new DetectDescribeSift(ss,detector,orientation,describe);
-
-		return new WrapDetectDescribeSift(combined);
-	}
-
-	/**
-	 * Creates a new SIFT feature detector and describer.
-	 *
-	 * @see CompleteSift2
+	 * @see CompleteSift
 	 *
 	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
 	 */
 	public static <T extends ImageSingleBand>
-	DetectDescribePoint<T,BrightFeature>
-	sift2( ConfigCompleteSift config ) {
-
+	DetectDescribePoint<T,BrightFeature> sift2( ConfigCompleteSift config )
+	{
 		if( config == null )
 			config = new ConfigCompleteSift();
 
-		ConfigSiftScaleSpace2 configSS = config.scaleSpace;
-		ConfigSiftDetector2 configDetector = config.detector;
-		ConfigSiftOrientation2 configOri = config.orientation;
-		ConfigSiftDescribe2 configDesc = config.describe;
+		ConfigSiftScaleSpace configSS = config.scaleSpace;
+		ConfigSiftDetector configDetector = config.detector;
+		ConfigSiftOrientation configOri = config.orientation;
+		ConfigSiftDescribe configDesc = config.describe;
 
-		SiftScaleSpace2 scaleSpace = new SiftScaleSpace2(
+		SiftScaleSpace scaleSpace = new SiftScaleSpace(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		OrientationHistogramSift2<ImageFloat32> orientation = new OrientationHistogramSift2<ImageFloat32>(
+		OrientationHistogramSift<ImageFloat32> orientation = new OrientationHistogramSift<ImageFloat32>(
 				configOri.histogramSize,configOri.sigmaEnlarge,ImageFloat32.class);
-		DescribePointSiftLowe<ImageFloat32> describe = new DescribePointSiftLowe<ImageFloat32>(
+		DescribePointSift<ImageFloat32> describe = new DescribePointSift<ImageFloat32>(
 				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
 				configDesc.maxDescriptorElementValue,ImageFloat32.class);
 
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
 		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
-		CompleteSift2 dds = new CompleteSift2(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
-		return new DetectDescribe_CompleteSift2<T>(dds);
+		CompleteSift dds = new CompleteSift(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
+		return new DetectDescribe_CompleteSift<T>(dds);
 	}
 
 	/**

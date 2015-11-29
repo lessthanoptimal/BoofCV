@@ -181,13 +181,15 @@ public class FactoryOrientationAlgs {
 	 * Estimates multiple orientations as specified in SIFT paper.
 	 *
 	 * @param config Configuration for algorithm.  If null defaults will be used.
-	 * @return OrientationHistogramSift
+	 * @param derivType Type of derivative image it takes as input
+	 * @return OrientationHistogramSift2
 	 */
-	public static OrientationHistogramSift sift( ConfigSiftOrientation config ) {
+	public static <D extends ImageSingleBand>
+	OrientationHistogramSift<D> sift(ConfigSiftOrientation config , Class<D> derivType ) {
 		if( config == null )
 			config = new ConfigSiftOrientation();
 		config.checkValidity();
 
-		return new OrientationHistogramSift(config.histogramSize,config.sigmaToRadius,config.sigmaEnlarge);
+		return new OrientationHistogramSift(config.histogramSize,config.sigmaEnlarge,derivType);
 	}
 }

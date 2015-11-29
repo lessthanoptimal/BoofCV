@@ -21,8 +21,8 @@ package boofcv.demonstrations.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.feature.detect.interest.SiftDetector2;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
+import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -47,8 +47,8 @@ public class DebugSiftDetector2App {
 
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(3,1,1,true,true,true));
 		NonMaxLimiter extractor = new NonMaxLimiter(nonmax,400);
-		SiftScaleSpace2 imageSS = new SiftScaleSpace2(-1,5,3,2.75);
-		SiftDetector2 alg = new SiftDetector2(imageSS,10,extractor);
+		SiftScaleSpace imageSS = new SiftScaleSpace(-1,5,3,2.75);
+		SiftDetector alg = new SiftDetector(imageSS,10,extractor);
 
 
 		alg.process(gray);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,39 +18,38 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.struct.Configuration;
 
 /**
- * Configures the SIFT feature orientation estimator.
- *
- * @see boofcv.alg.feature.orientation.OrientationHistogramSift
+ * Configuration for {@link OrientationHistogramSift}
  *
  * @author Peter Abeles
  */
 public class ConfigSiftOrientation implements Configuration {
+
 	/**
 	 * Number of elements in the histogram.  Standard is 36
 	 */
 	public int histogramSize = 36;
 	/**
-	 * Convert a sigma to region radius.  Try 2.5
+	 * How much the scale is enlarged by.  Standard is 2.0
 	 */
-	public double sigmaToRadius = 2.5;
+	public double sigmaEnlarge = 2.0;
+
 	/**
-	 * How much the scale is enlarged by.  Standard is 1.5
+	 * Creates a configuration similar to how it was originally described in the paper
 	 */
-	public double sigmaEnlarge = 1.5;
+	public static ConfigSiftOrientation createPaper() {
+		ConfigSiftOrientation config = new ConfigSiftOrientation();
+		config.histogramSize = 36;
+		config.sigmaEnlarge = 1.5;
 
-	public ConfigSiftOrientation(int histogramSize, double sigmaToRadius, double sigmaEnlarge) {
-		this.histogramSize = histogramSize;
-		this.sigmaToRadius = sigmaToRadius;
-		this.sigmaEnlarge = sigmaEnlarge;
-	}
-
-	public ConfigSiftOrientation() {
+		return config;
 	}
 
 	@Override
 	public void checkValidity() {
+
 	}
 }

@@ -20,10 +20,10 @@ package boofcv.alg.feature.detdesc;
 
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.describe.DescribePointSiftLowe;
-import boofcv.alg.feature.detect.interest.SiftDetector2;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
-import boofcv.alg.feature.orientation.OrientationHistogramSift2;
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
@@ -35,18 +35,18 @@ import org.ddogleg.struct.GrowQueue_F64;
  * SIFT combined together to simultaneously detect and describe the key points it finds.  Memory is conserved by
  * only having one octave of the scale-space in memory at any given time.
  *
- * @see OrientationHistogramSift2
- * @see DescribePointSiftLowe
- * @see SiftDetector2
+ * @see OrientationHistogramSift
+ * @see DescribePointSift
+ * @see SiftDetector
  *
  * @author Peter Abeles
  */
-public class CompleteSift2 extends SiftDetector2
+public class CompleteSift extends SiftDetector
 {
 	// estimate orientation
-	OrientationHistogramSift2<ImageFloat32> orientation;
+	OrientationHistogramSift<ImageFloat32> orientation;
 	// describes the keypoints
-	DescribePointSiftLowe<ImageFloat32> describe;
+	DescribePointSift<ImageFloat32> describe;
 	// storage for found features
 	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
@@ -64,13 +64,14 @@ public class CompleteSift2 extends SiftDetector2
 	 * Configures SIFT
 	 *
 	 * @param scaleSpace Scale-space that features are computed inside of
-	 * @param edgeR Edge threshold.  See {@link SiftDetector2#SiftDetector2(SiftScaleSpace2, double, NonMaxLimiter)}
-	 * @param extractor Finds minimums and maximums.  See {@link SiftDetector2#SiftDetector2(SiftScaleSpace2, double, NonMaxLimiter)}
+	 * @param edgeR Edge threshold.  See {@link SiftDetector#SiftDetector(SiftScaleSpace, double, NonMaxLimiter)}
+	 * @param extractor Finds minimums and maximums.  See {@link SiftDetector#SiftDetector(SiftScaleSpace, double, NonMaxLimiter)}
 	 * @param orientation Estimates feature orientation(s)
 	 * @param describe Describes a SIFT feature
 	 */
-	public CompleteSift2(SiftScaleSpace2 scaleSpace, double edgeR, NonMaxLimiter extractor,
-						 OrientationHistogramSift2<ImageFloat32> orientation, DescribePointSiftLowe<ImageFloat32> describe) {
+	public CompleteSift(SiftScaleSpace scaleSpace, double edgeR, NonMaxLimiter extractor,
+						OrientationHistogramSift<ImageFloat32> orientation,
+						DescribePointSift<ImageFloat32> describe) {
 		super(scaleSpace, edgeR, extractor);
 
 		this.orientation = orientation;

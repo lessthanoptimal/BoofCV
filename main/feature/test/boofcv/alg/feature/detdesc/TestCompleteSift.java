@@ -21,9 +21,9 @@ package boofcv.alg.feature.detdesc;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.feature.describe.DescribePointSiftLowe;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
-import boofcv.alg.feature.orientation.OrientationHistogramSift2;
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.feature.BrightFeature;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class TestCompleteSift2 {
+public class TestCompleteSift {
 
 	Random rand = new Random(234);
 
@@ -55,7 +55,7 @@ public class TestCompleteSift2 {
 		ImageFloat32 image = new ImageFloat32(300,290);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 
-		CompleteSift2 alg = createAlg();
+		CompleteSift alg = createAlg();
 
 		alg.process(image);
 
@@ -70,17 +70,17 @@ public class TestCompleteSift2 {
 		assertEquals(orientations.size,descriptions.size);
 	}
 
-	private CompleteSift2 createAlg() {
+	private CompleteSift createAlg() {
 
-		SiftScaleSpace2 ss = new SiftScaleSpace2(-1,4,3,1.6);
+		SiftScaleSpace ss = new SiftScaleSpace(-1,4,3,1.6);
 
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
 		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,300);
-		OrientationHistogramSift2<ImageFloat32> ori =
-				new OrientationHistogramSift2<ImageFloat32>(36,1.5,ImageFloat32.class);
-		DescribePointSiftLowe<ImageFloat32> describe =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		OrientationHistogramSift<ImageFloat32> ori =
+				new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> describe =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 
-		return new CompleteSift2(ss,10,limiter,ori,describe);
+		return new CompleteSift(ss,10,limiter,ori,describe);
 	}
 }

@@ -18,23 +18,24 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.abst.feature.describe.ConfigSiftDescribe2;
-import boofcv.abst.feature.describe.ConfigSiftScaleSpace2;
-import boofcv.abst.feature.detect.ConfigSiftDetector2;
-import boofcv.abst.feature.orientation.ConfigSiftOrientation2;
+import boofcv.abst.feature.describe.ConfigSiftDescribe;
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
+import boofcv.abst.feature.orientation.ConfigSiftOrientation;
+import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.alg.feature.detdesc.CompleteSift2}.
+ * Configuration for {@link CompleteSift}.
  *
  * @author Peter Abeles
  */
 public class ConfigCompleteSift implements Configuration{
 
-	public ConfigSiftScaleSpace2 scaleSpace = new ConfigSiftScaleSpace2();
-	public ConfigSiftDetector2 detector = new ConfigSiftDetector2();
-	public ConfigSiftOrientation2 orientation = new ConfigSiftOrientation2();
-	public ConfigSiftDescribe2 describe = new ConfigSiftDescribe2();
+	public ConfigSiftScaleSpace scaleSpace = new ConfigSiftScaleSpace();
+	public ConfigSiftDetector detector = new ConfigSiftDetector();
+	public ConfigSiftOrientation orientation = new ConfigSiftOrientation();
+	public ConfigSiftDescribe describe = new ConfigSiftDescribe();
 
 	/**
 	 * Creates a configuration similar to how it was originally described in the paper
@@ -42,9 +43,9 @@ public class ConfigCompleteSift implements Configuration{
 	public static ConfigCompleteSift createPaper() {
 		ConfigCompleteSift config = new ConfigCompleteSift();
 
-		config.scaleSpace = ConfigSiftScaleSpace2.createPaper();
-		config.detector = ConfigSiftDetector2.createPaper();
-		config.orientation = ConfigSiftOrientation2.createPaper();
+		config.scaleSpace = ConfigSiftScaleSpace.createPaper();
+		config.detector = ConfigSiftDetector.createPaper();
+		config.orientation = ConfigSiftOrientation.createPaper();
 
 		return config;
 	}

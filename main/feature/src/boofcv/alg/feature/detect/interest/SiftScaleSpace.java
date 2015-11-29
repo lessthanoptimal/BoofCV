@@ -48,7 +48,7 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class SiftScaleSpace2 {
+public class SiftScaleSpace {
 	// all the scale images across an octave
 	ImageFloat32 octaveImages[];
 	// images which are the difference between the scales
@@ -99,9 +99,9 @@ public class SiftScaleSpace2 {
 	 * @param numScales Number of scales in each octave.  Recommend 3.
 	 * @param sigma0 Amount of blur at the first level in the image pyramid.  Recommend 1.6
 	 */
-	public SiftScaleSpace2( int firstOctave , int lastOctave ,
-							int numScales ,
-							double sigma0  )
+	public SiftScaleSpace(int firstOctave , int lastOctave ,
+						  int numScales ,
+						  double sigma0  )
 	{
 		if( lastOctave <= firstOctave )
 			throw new IllegalArgumentException("Last octave must be more than the first octave");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,14 @@
 
 package boofcv.factory.feature.orientation;
 
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -52,5 +56,14 @@ public class FactoryOrientation {
 		} else {
 			throw new IllegalArgumentException("Unknown orientation algorithm type");
 		}
+	}
+
+	public static <T extends ImageSingleBand>
+	OrientationImage<T> sift(ConfigSiftScaleSpace configSS , ConfigSiftOrientation configOri, Class<T> imageType ) {
+		OrientationHistogramSift<ImageFloat32> ori = FactoryOrientationAlgs.sift(configOri,ImageFloat32.class);
+
+		SiftScaleSpace ss = new SiftScaleSpace(
+				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		return new OrientationSiftToImage<T>(ori,ss,imageType);
 	}
 }

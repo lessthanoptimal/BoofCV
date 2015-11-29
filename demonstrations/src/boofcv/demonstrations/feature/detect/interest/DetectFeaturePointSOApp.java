@@ -77,8 +77,7 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true,imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
 				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(null,new ConfigSiftDetector(2,10,maxScaleFeatures,5)));
+		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(2*maxScaleFeatures),imageType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();

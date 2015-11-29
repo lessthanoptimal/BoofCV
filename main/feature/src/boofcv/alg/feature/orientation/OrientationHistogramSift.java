@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,25 +18,37 @@
 
 package boofcv.alg.feature.orientation;
 
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.CircularIndex;
 import boofcv.numerics.InterpolateArray;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.metric.UtilAngle;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.Arrays;
+
 /**
  * <p>
- * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper.  A
- * histogram of gradients is computed and the largest peaks are returned as the region's direction.  The
- * gradient is weighted using a Gaussian distribution.
+ * Computes the orientation of a region around a point in scale-space as specified in the SIFT [1] paper.  A histogram
+ * of angles is computed using a weighted sum of image derivatives.  The size of the region is specified by the
+ * scale function parameter.  Every pixel inside the sample region is read and contributes to the angle estimation.
+ * If the image border is encountered the sample return is truncated.
  * </p>
  *
  * <p>
- * INTERPOLATION: Instead of fitting a curve to adjacent bins, the solution is computed by summing
- * up dx and dy independently in each bin.  Then when a bin is selected the angle is set to the atan() of dx,dy sums.
+ * To get the orientation for the largest peak invoke {@link #getPeakOrientation()}.  Other
  * </p>
+ *
+ * Differences from paper:
+ * <ul>
+ * <li>The angle in each bin is set to the atan2(y,x) of the weighted sum of image derivative</li>
+ * <li>Interpolation is done using a 2nd degree polynomial instead of a parabola.</li>
+ * </ul>
  *
  * <p>
  * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
@@ -45,18 +57,15 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class OrientationHistogramSift {
-
-	// Converts a distribution's sigma into a region radius to sample
-	private double sigmaToRadius;
-
+public class OrientationHistogramSift<Deriv extends ImageSingleBand>
+{
 	// How much does it inflate the scale by
 	private double sigmaEnlarge;
 	// Storage for orientation histogram. Each bin is for angles from i*histAngleBin to (i+1)*histAngleBin
-	private double histogram[];
+	double histogramMag[];
 	// histograms containing the sum of each derivative
-	private double histogramX[];
-	private double histogramY[];
+	double histogramX[];
+	double histogramY[];
 	// Number of radians each bin corresponds to.  histAngleBin = 2*PI/histogram.length
 	private double histAngleBin;
 
@@ -71,18 +80,9 @@ public class OrientationHistogramSift {
 	// local region from which the orientation is computed
 	private ImageRectangle bound = new ImageRectangle();
 
-	// which image in the scale space is being processed
-	private int imageIndex;
-	// the pixel scale of the image being processed
-	private double pixelScale;
 
-	// Image scale space
-	private SiftImageScaleSpace ss;
-
-	// local scale space from which the orientation is computed from
-	private ImageFloat32 image;
-	private ImageFloat32 derivX;
-	private ImageFloat32 derivY;
+	// spacial image gradient of closest image in scale-space
+	private GImageSingleBand derivX,derivY;
 
 	InterpolateArray approximateGauss;
 	double approximateStep = 0.1;
@@ -91,17 +91,16 @@ public class OrientationHistogramSift {
 	 * Configures orientation estimation
 	 *
 	 * @param histogramSize Number of elements in the histogram.  Standard is 36
-	 * @param sigmaToRadius Convert a sigma to region radius.  Try 2.5
 	 * @param sigmaEnlarge How much the scale is enlarged by.  Standard is 1.5
 	 */
-	public OrientationHistogramSift( int histogramSize ,
-									 double sigmaToRadius,
-									 double sigmaEnlarge) {
-		this.histogram = new double[ histogramSize ];
+	public OrientationHistogramSift(int histogramSize ,
+									double sigmaEnlarge ,
+									Class<Deriv> derivType )
+	{
+		this.histogramMag = new double[ histogramSize ];
 		this.histogramX = new double[ histogramSize ];
 		this.histogramY = new double[ histogramSize ];
 
-		this.sigmaToRadius = sigmaToRadius;
 		this.sigmaEnlarge = sigmaEnlarge;
 
 		this.histAngleBin = 2.0*Math.PI/histogramSize;
@@ -113,15 +112,17 @@ public class OrientationHistogramSift {
 			samples[i] = Math.exp(-0.5*dx2 );
 		}
 		approximateGauss = new InterpolateArray(samples);
+
+		this.derivX = FactoryGImageSingleBand.create(derivType);
+		this.derivY = FactoryGImageSingleBand.create(derivType);
 	}
 
 	/**
-	 * Specify the input
-	 *
-	 * @param ss Scale space representation of input image
+	 * Specify the input image
 	 */
-	public void setScaleSpace( SiftImageScaleSpace ss ) {
-		this.ss = ss;
+	public void setImageGradient(Deriv derivX, Deriv derivY ) {
+		this.derivX.wrap(derivX);
+		this.derivY.wrap(derivY);
 	}
 
 	/**
@@ -129,28 +130,19 @@ public class OrientationHistogramSift {
 	 *
 	 * @param c_x Location x-axis
 	 * @param c_y Location y-axis
-	 * @param scale Scale (blur standard deviations)
+	 * @param sigma blur standard deviations of detected feature.  Also referred to as scale.
 	 */
-	public void process( double c_x , double c_y , double scale )
+	public void process( double c_x , double c_y , double sigma )
 	{
-		// determine where this feature lies inside the scale-space
-		imageIndex = ss.scaleToImageIndex( scale );
-		pixelScale = ss.imageIndexToPixelScale( imageIndex );
-
-		image = ss.getPyramidLayer(imageIndex);
-		derivX = ss.getDerivativeX(imageIndex);
-		derivY = ss.getDerivativeY(imageIndex);
-
 		// convert to image coordinates
-		int x = (int)(c_x/pixelScale + 0.5);
-		int y = (int)(c_y/pixelScale + 0.5);
-		double adjustedScale = scale/pixelScale;
+		int x = (int)(c_x + 0.5);
+		int y = (int)(c_y + 0.5);
 
 		// Estimate its orientation(s)
-		computeHistogram(x, y, adjustedScale);
+		computeHistogram(x, y, sigma );
 
 		// compute the descriptor
-		computeOrientations();
+		findHistogramPeaks();
 	}
 
 	/**
@@ -158,11 +150,10 @@ public class OrientationHistogramSift {
 	 *
 	 * @param c_x Center x-axis
 	 * @param c_y Center y-axis
-	 * @param scale Scale of feature, adjusted for local octave
+	 * @param sigma Scale of feature, adjusted for local octave
 	 */
-	private void computeHistogram(int c_x, int c_y, double scale) {
-		double localSigma = scale*sigmaEnlarge;
-		int r = (int)Math.ceil(localSigma * sigmaToRadius);
+	void computeHistogram(int c_x, int c_y, double sigma) {
+		int r = (int)Math.ceil(sigma * sigmaEnlarge);
 
 		// specify the area being sampled
 		bound.x0 = c_x - r;
@@ -170,65 +161,68 @@ public class OrientationHistogramSift {
 		bound.x1 = c_x + r + 1;
 		bound.y1 = c_y + r + 1;
 
+		ImageSingleBand rawDX = derivX.getImage();
+		ImageSingleBand rawDY = derivY.getImage();
+
 		// make sure it is contained in the image bounds
-		BoofMiscOps.boundRectangleInside(image,bound);
+		BoofMiscOps.boundRectangleInside(rawDX,bound);
 
 		// clear the histogram
-		for( int i = 0; i < histogram.length; i++ ) {
-			histogram[i] = 0;
-			histogramX[i] = 0;
-			histogramY[i] = 0;
-		}
+		Arrays.fill(histogramMag,0);
+		Arrays.fill(histogramX,0);
+		Arrays.fill(histogramY,0);
 
 		// construct the histogram
 		for( int y = bound.y0; y < bound.y1; y++ ) {
 			// iterate through the raw array for speed
-			int indexDX = derivX.startIndex + y*derivX.stride + bound.x0;
-			int indexDY = derivY.startIndex + y*derivY.stride + bound.x0;
+			int indexDX = rawDX.startIndex + y*rawDX.stride + bound.x0;
+			int indexDY = rawDY.startIndex + y*rawDY.stride + bound.x0;
 
 			for( int x = bound.x0; x < bound.x1; x++ ) {
-				float dx = derivX.data[indexDX++];
-				float dy = derivY.data[indexDY++];
+				float dx = derivX.getF(indexDX++);
+				float dy = derivY.getF(indexDY++);
 
 				// edge intensity and angle
-				double m = Math.sqrt(dx*dx + dy*dy);
-				double theta = Math.atan2(dy,dx) + Math.PI;
-				// weight
-				double w = computeWeight( x-c_x, y-c_y , localSigma );
+				double magnitude = Math.sqrt(dx*dx + dy*dy);
+				double theta = UtilAngle.domain2PI(Math.atan2(dy,dx));
+
+				// weight from gaussian
+				double weight = computeWeight( x-c_x, y-c_y , sigma );
 
 				// histogram index
-				int h = (int)(theta / histAngleBin);
-
-				// pathological case
-				if( h == histogram.length )
-					h = 0;
+				int h = (int)(theta / histAngleBin) % histogramMag.length;
 
 				// update the histogram
-				histogram[h] += m*w;
-				histogramX[h] += dx;
-				histogramY[h] += dy;
+				histogramMag[h] += magnitude*weight;
+				histogramX[h] += dx*weight;
+				histogramY[h] += dy*weight;
 			}
 		}
 	}
 
 	/**
-	 * Finds peaks in histogram and selects orientations.  Location of peaks is interpolated.
+	 * Finds local peaks in histogram and selects orientations.  Location of peaks is interpolated.
 	 */
-	private void computeOrientations() {
-		// identify peaks an find the highest peak
+	void findHistogramPeaks() {
+		// reset data structures
 		peaks.reset();
+		angles.reset();
+		peakAngle = 0;
+
+		// identify peaks and find the highest peak
 		double largest = 0;
 		int largestIndex = -1;
-		double before = histogram[ histogram.length-1 ];
-		double current = histogram[ 0 ];
-		for( int i = 0; i < histogram.length; i++ ) {
-			double after = histogram[ (i + 1) % histogram.length ];
+		double before = histogramMag[ histogramMag.length-2 ];
+		double current = histogramMag[ histogramMag.length-1 ];
+		for(int i = 0; i < histogramMag.length; i++ ) {
+			double after = histogramMag[ i ];
 
 			if( current > before && current > after ) {
-				peaks.push(i);
+				int currentIndex = CircularIndex.addOffset(i,-1,histogramMag.length);
+				peaks.push(currentIndex);
 				if( current > largest ) {
 					largest = current;
-					largestIndex = i;
+					largestIndex = currentIndex;
 				}
 			}
 			before = current;
@@ -239,13 +233,12 @@ public class OrientationHistogramSift {
 			return;
 
 		// see if any of the other peaks are within 80% of the max peak
-		angles.reset();
+		double threshold = largest*0.8;
 		for( int i = 0; i < peaks.size; i++ ) {
 			int index = peaks.data[i];
-			current = histogram[index];
-			if( largest*0.8 <= current ) {
-
-				double angle = Math.atan2(histogramY[index],histogramX[index]);
+			current = histogramMag[index];
+			if( current >= threshold) {
+				double angle = computeAngle(index);
 
 				angles.push( angle );
 
@@ -256,9 +249,53 @@ public class OrientationHistogramSift {
 	}
 
 	/**
-	 * Computes the weigthing using a Gaussian shaped function.  Interpolation is used to speed up the process
+	 * Compute the angle.  The angle for each neighbor bin is found using the weighted sum
+	 * of the derivative.  Then the peak index is found by 2nd order polygon interpolation.  These two bits of
+	 * information are combined and used to return the final angle output.
+	 *
+	 * @param index1 Histogram index of the peak
+	 * @return angle of the peak. -pi to pi
 	 */
-	private double computeWeight( double deltaX , double deltaY , double sigma ) {
+	double computeAngle( int index1 ) {
+
+		int index0 = CircularIndex.addOffset(index1,-1, histogramMag.length);
+		int index2 = CircularIndex.addOffset(index1, 1, histogramMag.length);
+
+		// compute the peak location using a second order polygon
+		double v0 = histogramMag[index0];
+		double v1 = histogramMag[index1];
+		double v2 = histogramMag[index2];
+
+		double offset = FastHessianFeatureDetector.polyPeak(v0,v1,v2);
+
+		// interpolate using the index offset and angle of its neighbor
+		return interpolateAngle(index0, index1, index2, offset);
+	}
+
+	/**
+	 * Given the interpolated index, compute the angle from the 3 indexes.  The angle for each index
+	 * is computed from the weighted gradients.
+	 * @param offset Interpolated index offset relative to index0.  range -1 to 1
+	 * @return Interpolated angle.
+	 */
+	double interpolateAngle(int index0, int index1, int index2, double offset) {
+		double angle1 = Math.atan2(histogramY[index1],histogramX[index1]);
+		double deltaAngle;
+		if( offset < 0 ) {
+			double angle0 = Math.atan2(histogramY[index0],histogramX[index0]);
+			deltaAngle = UtilAngle.dist(angle0,angle1);
+
+		} else {
+			double angle2 = Math.atan2(histogramY[index2], histogramX[index2]);
+			deltaAngle = UtilAngle.dist(angle2,angle1);
+		}
+		return UtilAngle.bound(angle1 + deltaAngle*offset);
+	}
+
+	/**
+	 * Computes the weight based on a centered Gaussian shaped function.  Interpolation is used to speed up the process
+	 */
+	double computeWeight( double deltaX , double deltaY , double sigma ) {
 		// the exact equation
 //		return Math.exp(-0.5 * ((deltaX * deltaX + deltaY * deltaY) / (sigma * sigma)));
 
@@ -269,21 +306,6 @@ public class OrientationHistogramSift {
 			return approximateGauss.value;
 		} else
 			return 0;
-	}
-
-
-	/**
-	 * Which image in the scale space is being used.
-	 */
-	public int getImageIndex() {
-		return imageIndex;
-	}
-
-	/**
-	 * The ratio of pixels in the octave to original image
-	 */
-	public double getPixelScale() {
-		return pixelScale;
 	}
 
 	/**

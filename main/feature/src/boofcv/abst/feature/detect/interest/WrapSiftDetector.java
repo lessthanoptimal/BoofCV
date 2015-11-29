@@ -19,7 +19,8 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.SiftDetector;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.core.image.GConvertImage;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -28,42 +29,50 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class WrapSiftDetector implements InterestPointDetector<ImageFloat32> {
+public class WrapSiftDetector<T extends ImageBase>
+		implements InterestPointDetector<T>
+{
 
-	public static final double SCALE_TO_RADUS = 1.5;
 
-	SiftImageScaleSpace ss;
 	SiftDetector detector;
 
-	public WrapSiftDetector( SiftDetector detector ,
-							 SiftImageScaleSpace ss ) {
+	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+
+	Class<T> inputType;
+
+	public WrapSiftDetector(SiftDetector detector, Class<T> inputType ) {
 		this.detector = detector;
-		this.ss = ss;
+		this.inputType = inputType;
 	}
 
 	@Override
-	public void detect(ImageFloat32 input) {
+	public void detect(T image) {
 
-		// compute initial octave's scale-space
-		ss.constructPyramid(input);
-		ss.computeFeatureIntensity();
+		ImageFloat32 input;
+		if( image instanceof ImageFloat32 ) {
+			input = (ImageFloat32)image;
+		} else {
+			imageFloat.reshape(image.width,image.height);
+			GConvertImage.convert(image,imageFloat);
+			input = imageFloat;
+		}
 
-		detector.process(ss);
+		detector.process(input);
 	}
 
 	@Override
 	public int getNumberOfFeatures() {
-		return detector.getFoundPoints().size();
+		return detector.getDetections().size();
 	}
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return detector.getFoundPoints().get(featureIndex);
+		return detector.getDetections().get(featureIndex);
 	}
 
 	@Override
 	public double getRadius(int featureIndex) {
-		return detector.getFoundPoints().get(featureIndex).scale*SCALE_TO_RADUS;
+		return detector.getDetections().get(featureIndex).scale;
 	}
 
 	@Override

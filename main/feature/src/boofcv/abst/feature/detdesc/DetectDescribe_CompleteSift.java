@@ -18,22 +18,25 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.alg.feature.detdesc.DetectDescribeSift;
-import boofcv.struct.BoofDefaults;
+import boofcv.alg.feature.detdesc.CompleteSift;
+import boofcv.core.image.GConvertImage;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Wrapper around {@link DetectDescribeSift} for {@link DetectDescribePoint}.
+ * Wrapper around {@link CompleteSift} for {@link DetectDescribePoint}.
  *
  * @author Peter Abeles
  */
-public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,BrightFeature> {
+public class DetectDescribe_CompleteSift<In extends ImageSingleBand>
+		implements DetectDescribePoint<In,BrightFeature> {
 
-	DetectDescribeSift alg;
+	CompleteSift alg;
+	ImageFloat32 imageFloat = new ImageFloat32(1,1);
 
-	public WrapDetectDescribeSift(DetectDescribeSift alg) {
+	public DetectDescribe_CompleteSift(CompleteSift alg) {
 		this.alg = alg;
 	}
 
@@ -44,7 +47,7 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 
 	@Override
 	public BrightFeature getDescription(int index) {
-		return alg.getFeatures().data[index];
+		return alg.getDescriptions().data[index];
 	}
 
 	@Override
@@ -53,28 +56,34 @@ public class WrapDetectDescribeSift implements DetectDescribePoint<ImageFloat32,
 	}
 
 	@Override
-	public void detect(ImageFloat32 input) {
-		alg.process(input);
+	public void detect(In input) {
+		if( input instanceof ImageFloat32 )
+			alg.process((ImageFloat32)input);
+		else {
+			imageFloat.reshape(input.width,input.height);
+			GConvertImage.convert(input,imageFloat);
+			alg.process(imageFloat);
+		}
 	}
 
 	@Override
 	public int getNumberOfFeatures() {
-		return alg.getFeatures().size;
+		return alg.getDescriptions().size;
 	}
 
 	@Override
 	public Point2D_F64 getLocation(int featureIndex) {
-		return alg.getLocation().get(featureIndex);
+		return alg.getLocations().get(featureIndex);
 	}
 
 	@Override
 	public double getRadius(int featureIndex) {
-		return alg.getFeatureScales().get(featureIndex)*BoofDefaults.SIFT_SCALE_TO_RADIUS;
+		return alg.getLocations().get(featureIndex).scale;
 	}
 
 	@Override
 	public double getOrientation(int featureIndex) {
-		return alg.getFeatureAngles().get(featureIndex);
+		return alg.getOrientations().get(featureIndex);
 	}
 
 	@Override

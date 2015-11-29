@@ -16,25 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detdesc;
+package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageType;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,BrightFeature>{
-
-	public TestWrapDetectDescribeSift() {
-		super(true, true, ImageType.single(ImageFloat32.class), BrightFeature.class);
-	}
-
-	@Override
-	public DetectDescribePoint<ImageFloat32, BrightFeature> createDetDesc() {
-		return FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,500,5),null,null);
+public class TestUnrollSiftScaleSpaceGradient {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 }

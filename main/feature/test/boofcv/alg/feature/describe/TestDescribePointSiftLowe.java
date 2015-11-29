@@ -52,8 +52,8 @@ public class TestDescribePointSiftLowe {
 		GImageMiscOps.fillUniform(derivX,rand,-100,100);
 		GImageMiscOps.fillUniform(derivY,rand,-100,100);
 
-		DescribePointSiftLowe<ImageFloat32> alg =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		List<Point2D_I32> testPoints = new ArrayList<Point2D_I32>();
@@ -76,8 +76,8 @@ public class TestDescribePointSiftLowe {
 		descriptor.value[20] = 120;
 		descriptor.value[60] = 20;
 
-		DescribePointSiftLowe<ImageFloat32> alg =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 		alg.descriptor = descriptor;
 		alg.massageDescriptor();
 
@@ -104,8 +104,8 @@ public class TestDescribePointSiftLowe {
 		ImageFloat32 derivX = new ImageFloat32(200,200);
 		ImageFloat32 derivY = new ImageFloat32(200,200);
 
-		DescribePointSiftLowe<ImageFloat32> alg =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 		int r = alg.getCanonicalRadius();
 		ImageMiscOps.fillRectangle(derivX,5.0f,60,60,2*r,2*r);
 
@@ -123,7 +123,7 @@ public class TestDescribePointSiftLowe {
 
 	}
 
-	private int computeInside(DescribePointSiftLowe alg) {
+	private int computeInside(DescribePointSift alg) {
 		int numHit = 0;
 		for (int j = 0; j < 128; j++) {
 			if (j % 8 == 0) {
@@ -147,8 +147,8 @@ public class TestDescribePointSiftLowe {
 
 		ImageMiscOps.fill(derivX,5.0f);
 		
-		DescribePointSiftLowe<ImageFloat32> alg =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		for( int i = 0; i < 8; i++ ) {
@@ -174,8 +174,8 @@ public class TestDescribePointSiftLowe {
 	 */
 	@Test
 	public void trilinearInterpolation() {
-		DescribePointSiftLowe<ImageFloat32> alg =
-				new DescribePointSiftLowe<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> alg =
+				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
 
 		alg.descriptor = new TupleDesc_F64(128);
 

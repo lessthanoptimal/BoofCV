@@ -18,19 +18,15 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.describe.DescribePointSiftLowe;
-import boofcv.alg.feature.detect.interest.SiftScaleSpace2;
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.detect.interest.UnrollSiftScaleSpaceGradient;
 import boofcv.core.image.GConvertImage;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Allows you to use SIFT features independent of the SIFT detector.  A SIFT scale-space is computed with all octaves
@@ -45,28 +41,16 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 
 	ImageType<T> imageType;
 
-	SiftScaleSpace2 scaleSpace;
-	DescribePointSiftLowe<ImageFloat32> describe;
+	UnrollSiftScaleSpaceGradient scaleSpace;
+	DescribePointSift<ImageFloat32> describe;
 
 	ImageFloat32 imageFloat = new ImageFloat32(1,1);
 
-	List<ImageScale> usedScales = new ArrayList<ImageScale>();
-	List<ImageScale> allScales = new ArrayList<ImageScale>();
-
-	ImageGradient<ImageFloat32,ImageFloat32> gradient =
-			FactoryDerivative.three_F32();
-
-	public DescribeRegionPoint_SIFT(SiftScaleSpace2 scaleSpace,
-									DescribePointSiftLowe<ImageFloat32> describe,
+	public DescribeRegionPoint_SIFT(SiftScaleSpace scaleSpace,
+									DescribePointSift<ImageFloat32> describe,
 									Class<T> imageType ) {
-		this.scaleSpace = scaleSpace;
+		this.scaleSpace = new UnrollSiftScaleSpaceGradient(scaleSpace);
 		this.describe = describe;
-
-		// create one image for each scale to minimize memory being created/destroyed
-		int numScales = scaleSpace.getNumScales()*scaleSpace.getTotalOctaves();
-		for (int i = 0; i < numScales; i++) {
-			allScales.add( new ImageScale());
-		}
 
 		this.imageType = ImageType.single(imageType);
 	}
@@ -82,40 +66,18 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 			input = imageFloat;
 		}
 
-		// "unroll" the scale space so that features can be looked up quickly
-		scaleSpace.initialize(input);
-
-		usedScales.clear();
-		System.out.println("total scales "+allScales.size());
-		do {
-			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
-				ImageFloat32 scaleImage = scaleSpace.getImageScale(i);
-				double sigma = scaleSpace.computeSigmaScale(i);
-				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput();
-
-				ImageScale scale = allScales.get(usedScales.size());
-				scale.derivX.reshape(scaleImage.width,scaleImage.height);
-				scale.derivY.reshape(scaleImage.width,scaleImage.height);
-
-				gradient.process(scaleImage,scale.derivX,scale.derivY);
-				scale.imageToInput = pixelCurrentToInput;
-				scale.sigma = sigma;
-
-				usedScales.add(scale);
-
-				System.out.printf("Sigma = %6.2f c2i = % 6.2f\n",sigma,pixelCurrentToInput);
-			}
-		} while( scaleSpace.computeNextOctave() );
+		scaleSpace.setImage(input);
 	}
 
 	@Override
 	public boolean process(double x, double y, double orientation, double radius, TupleDesc_F64 description) {
 
+		System.out.println("orientation = "+orientation);
 		// get the blur sigma for the radius
 		double sigma = radius/ BoofDefaults.SIFT2_SCALE_TO_RADIUS;
 
 		// find the image which the blur factor closest to this sigma
-		ImageScale image = lookup(sigma);
+		UnrollSiftScaleSpaceGradient.ImageScale image = scaleSpace.lookup(sigma);
 
 		// compute the descriptor
 		describe.setImageGradient(image.derivX,image.derivY);
@@ -123,24 +85,6 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 				orientation,description);
 
 		return true;
-	}
-
-	/**
-	 * Looks up the image which is closest specified sigma
-	 */
-	private ImageScale lookup( double sigma ) {
-		ImageScale best = null;
-		double bestValue = Double.MAX_VALUE;
-
-		for (int i = 0; i < usedScales.size(); i++) {
-			ImageScale image = usedScales.get(i);
-			double difference = Math.abs(sigma-image.sigma);
-			if( difference < bestValue ) {
-				bestValue = difference;
-				best = image;
-			}
-		}
-		return best;
 	}
 
 	@Override
@@ -171,13 +115,5 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 	@Override
 	public Class<TupleDesc_F64> getDescriptionType() {
 		return TupleDesc_F64.class;
-	}
-
-	private static class ImageScale {
-		ImageFloat32 derivX = new ImageFloat32(1,1);
-		ImageFloat32 derivY = new ImageFloat32(1,1);
-		double imageToInput;
-		double sigma;
-
 	}
 }

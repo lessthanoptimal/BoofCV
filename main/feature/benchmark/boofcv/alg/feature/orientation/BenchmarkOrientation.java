@@ -20,11 +20,10 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.*;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
@@ -175,18 +174,13 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		OrientationHistogramSift sift = FactoryOrientationAlgs.sift(null);
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
-		OrientationSiftToImage siftWrapped = new OrientationSiftToImage(sift,ss);
-
 
 		ConfigAverageIntegral confAverageIIW = new ConfigAverageIntegral();
 		confAverageIIW.weightSigma = -1;
 		ConfigSlidingIntegral confSlidingIIW = new ConfigSlidingIntegral();
 		confSlidingIIW.weightSigma = -1;
 
-
-		ProfileOperation.printOpsPerSec(new Image("SIFT", siftWrapped), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Image("SIFT", FactoryOrientation.sift(null,null,imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Image("No Gradient", nogradient(OBJECt_TO_SCALE,RADIUS,imageType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average", average(OBJECt_TO_SCALE,RADIUS,false,derivType)), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Gradient("Average W", average(OBJECt_TO_SCALE,RADIUS, true, derivType)), TEST_TIME);

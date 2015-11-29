@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.orientation;
 
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -36,10 +36,11 @@ public class TestOrientationSiftToImage {
 	 */
 	@Test
 	public void generic() {
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f,5,4,false);
-		OrientationHistogramSift orig = FactoryOrientationAlgs.sift(null);
+		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
+		OrientationHistogramSift<ImageFloat32> orig = FactoryOrientationAlgs.sift(null,ImageFloat32.class);
 
-		OrientationSiftToImage alg = new OrientationSiftToImage(orig,ss);
+		OrientationSiftToImage<ImageFloat32> alg =
+				new OrientationSiftToImage<ImageFloat32>(orig,ss,ImageFloat32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
 		tests.setup(angleTol, (int)(2*2.5*1.5), alg, ImageFloat32.class);
