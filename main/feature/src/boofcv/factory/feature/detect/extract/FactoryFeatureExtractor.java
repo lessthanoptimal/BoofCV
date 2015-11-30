@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,7 @@
 
 package boofcv.factory.feature.detect.extract;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.extract.WrapperNonMaxCandidate;
-import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
+import boofcv.abst.feature.detect.extract.*;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -121,6 +118,17 @@ public class FactoryFeatureExtractor {
 		ret.setThresholdMaximum(config.threshold);
 
 		return ret;
+	}
+
+	/**
+	 * Creates a non-maximum limiter using the specified configuration
+	 * @param config non-maxumum settings
+	 * @param maxFeatures maximum allowed features
+	 * @return The NonMaxLimiter
+	 */
+	public static NonMaxLimiter nonmaxLimiter( ConfigExtract config , int maxFeatures ) {
+		NonMaxSuppression nonmax = nonmax(config);
+		return new NonMaxLimiter(nonmax,maxFeatures);
 	}
 
 }

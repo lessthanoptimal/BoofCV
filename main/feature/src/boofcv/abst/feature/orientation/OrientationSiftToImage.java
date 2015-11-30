@@ -36,9 +36,9 @@ public class OrientationSiftToImage<T extends ImageSingleBand>
 		implements OrientationImage<T>
 {
 	UnrollSiftScaleSpaceGradient scaleSpace;
-	OrientationHistogramSift alg;
+	OrientationHistogramSift<ImageFloat32> alg;
 	UnrollSiftScaleSpaceGradient.ImageScale image;
-	double sigma;
+	double sigma = 1.0/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 	Class<T> imageType;
 	ImageFloat32 imageFloat = new ImageFloat32(1,1);
@@ -63,6 +63,7 @@ public class OrientationSiftToImage<T extends ImageSingleBand>
 		}
 
 		scaleSpace.setImage(input);
+		setObjectRadius(sigma*BoofDefaults.SIFT_SCALE_TO_RADIUS);
 	}
 
 	@Override
@@ -72,13 +73,16 @@ public class OrientationSiftToImage<T extends ImageSingleBand>
 
 	@Override
 	public void setObjectRadius(double radius) {
-		sigma = radius/ BoofDefaults.SIFT_SCALE_TO_RADIUS;
+		sigma = radius / BoofDefaults.SIFT_SCALE_TO_RADIUS;
 		this.image = scaleSpace.lookup(sigma);
 	}
 
 	@Override
 	public double compute(double c_x, double c_y) {
-		alg.process(c_x*image.imageToInput,c_y*image.imageToInput, sigma*image.imageToInput);
+		alg.setImageGradient(image.derivX,image.derivY);
+
+		double imageToInput = image.imageToInput;
+		alg.process(c_x/imageToInput,c_y/imageToInput, sigma/imageToInput);
 
 		return alg.getPeakOrientation();
 	}

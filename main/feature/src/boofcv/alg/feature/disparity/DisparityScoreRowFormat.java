@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  * </p>
  *
  * <p>
- * Score Format:  The index of the score for column i >= radiusX + minDisparity at disparity d is: <br>
+ * Score Format:  The index of the score for column i &ge; radiusX + minDisparity at disparity d is: <br>
  * index = imgWidth*(d-minDisparity-radiusX) + i - minDisparity-radiusX<br>
  * Format Comment:<br>
  * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
@@ -59,8 +59,8 @@ public abstract class DisparityScoreRowFormat
 	/**
 	 * Configures disparity calculation.
 	 *
-	 * @param minDisparity Minimum disparity that it will check. Must be >= 0 and < maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param minDisparity Minimum disparity that it will check. Must be &ge; 0 and < maxDisparity
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 */

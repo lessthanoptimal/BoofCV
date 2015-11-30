@@ -104,8 +104,8 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * NOTE: Input and output can be the same instance, if the image type allows it.
 	 * </p>
 	 * @param input Input image. Not modified.
-	 * @param threshLow Lower threshold. >= 0.
-	 * @param threshHigh Upper threshold. >= 0.
+	 * @param threshLow Lower threshold. &ge; 0.
+	 * @param threshHigh Upper threshold. &ge; 0.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
 	public void process(T input , float threshLow, float threshHigh , ImageUInt8 output ) {

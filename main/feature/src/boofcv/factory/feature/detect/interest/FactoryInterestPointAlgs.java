@@ -18,20 +18,20 @@
 
 package boofcv.factory.feature.detect.interest;
 
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
-import boofcv.alg.feature.detect.interest.FeaturePyramid;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.feature.detect.interest.*;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -177,5 +177,23 @@ public class FactoryInterestPointAlgs {
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
 				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave,
 				config.numberOfOctaves, config.scaleStepSize);
+	}
+
+	/**
+	 * Creates a SIFT detector
+	 */
+	public static SiftDetector sift(ConfigSiftScaleSpace configSS , ConfigSiftDetector configDetector ) {
+
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace();
+
+		if( configDetector == null )
+			configDetector = new ConfigSiftDetector();
+
+		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
+				configDetector.extract,configDetector.maxFeaturesPerScale);
+		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,
+				configSS.numScales,configSS.sigma0);
+		return new SiftDetector(ss,configDetector.edgeR,nonmax);
 	}
 }

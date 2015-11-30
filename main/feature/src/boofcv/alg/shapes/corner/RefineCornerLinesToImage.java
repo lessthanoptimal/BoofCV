@@ -96,7 +96,7 @@ public class RefineCornerLinesToImage<T extends ImageSingleBand> {
 	 *
 	 * @param cornerOffset pixels this close to the corner will be ignored. Try 2
 	 * @param maxLineSamples Number of points along the line which will be sampled.  try 10
-	 * @param sampleRadius How far away from the line will it sample pixels.  >= 1
+	 * @param sampleRadius How far away from the line will it sample pixels.  &ge; 1
 	 * @param maxIterations Maximum number of iterations it will perform.  Try 10
 	 * @param convergeTolPixels When the corner changes less than this amount it will stop iterating. Try 1e-5
 	 * @param maxCornerChange maximum change in corner location allowed from previous iteration in pixels.  Try 2.0

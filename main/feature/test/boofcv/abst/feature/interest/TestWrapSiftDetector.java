@@ -18,16 +18,27 @@
 
 package boofcv.abst.feature.interest;
 
+import boofcv.abst.feature.detect.interest.WrapSiftDetector;
+import boofcv.alg.feature.detect.interest.SiftDetector;
+import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestWrapSiftDetector {
+
+	Class types[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void testAllImageTypes() {
+		for( Class type : types ) {
+			SiftDetector detector = FactoryInterestPointAlgs.sift(null,null);
+			WrapSiftDetector alg = new WrapSiftDetector(detector,type);
+
+			new GeneralInterestPointDetectorChecks(alg,false,true,type){}.performAllTests();
+		}
 	}
 }

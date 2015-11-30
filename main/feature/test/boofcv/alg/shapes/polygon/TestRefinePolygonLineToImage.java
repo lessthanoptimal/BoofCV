@@ -33,8 +33,7 @@ import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static java.lang.Math.max;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -323,6 +322,14 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		}
 
 		return a;
+	}
+
+	/**
+	 * See if it handles lines along the image border correctly
+	 */
+	@Test
+	public void imageBorder() {
+		fail("implement");
 	}
 
 }

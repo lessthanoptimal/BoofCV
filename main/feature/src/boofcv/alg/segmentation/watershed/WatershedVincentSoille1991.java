@@ -32,13 +32,13 @@ import org.ddogleg.struct.GrowQueue_I32;
  * of water flow down from each pixel the location the droplets cluster in defines a region.  Two different
  * methods are provided for processing the image, a new region is created at each local minima or the user
  * provides an initial seed for each region for it to grow from.  The output will be a segmented image
- * with watersheds being assign a value of 0 and each region a value > 0.  Watersheds are assigned to pixels
+ * with watersheds being assign a value of 0 and each region a value &gt; 0.  Watersheds are assigned to pixels
  * which are exactly the same distance from multiple regions, thus it is ambiguous which one it is a member of.
  * </p>
  *
  * <p>
  * If the image is processed with {@link #process(boofcv.struct.image.ImageUInt8)} then a new region is
- * created at each local minima and assigned a unique ID > 0. The total number of regions found is returned
+ * created at each local minima and assigned a unique ID &gt; 0. The total number of regions found is returned
  * by {@link #getTotalRegions()}.  This technique will lead to over segmentation on many images.
  * </p>
  *
@@ -192,7 +192,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * <p>
 	 * Segments the image using initial seeds for each region.  This is often done to avoid
 	 * over segmentation but requires additional preprocessing and/or knowledge on the image structure.  Initial
-	 * seeds are specified in the input image 'seeds'.  A seed is any pixel with a value > 0.  New new regions
+	 * seeds are specified in the input image 'seeds'.  A seed is any pixel with a value &gt; 0.  New new regions
 	 * will be created beyond those seeds.  The final segmented image is provided by {@link #getOutput()}.
 	 * </p>
 	 *
@@ -201,7 +201,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * </p>
 	 *
 	 * @param input (Input) Input image
-	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value > 0 and have a
+	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value &gt; 0 and have a
 	 *              value &le; numRegions.
 	 */
 	public void process( ImageUInt8 input , ImageSInt32 seeds ) {
@@ -277,7 +277,7 @@ public abstract class WatershedVincentSoille1991 {
 	}
 
 	/**
-	 * See if a neighbor has a label ( > 0 ) or has been assigned WSHED ( == 0 ).  If so
+	 * See if a neighbor has a label ( &gt; 0 ) or has been assigned WSHED ( == 0 ).  If so
 	 * set distance of pixel index to 1 and add it to fifo.
 	 *
 	 * @param index Pixel whose neighbors are being examined

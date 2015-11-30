@@ -38,12 +38,17 @@ import boofcv.struct.image.ImageType;
 public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 	implements DescribeRegionPoint<T,TupleDesc_F64>
 {
-
+	// expected type of input image.  All image types are converted to floats since that's what
+	// the scale-space requires
 	ImageType<T> imageType;
 
+	// precomputes the entire scale-space gradient for faster lookup later
 	UnrollSiftScaleSpaceGradient scaleSpace;
+
+	// computes the feature description
 	DescribePointSift<ImageFloat32> describe;
 
+	// used as temporary storage for the input image if it needs to be converted
 	ImageFloat32 imageFloat = new ImageFloat32(1,1);
 
 	public DescribeRegionPoint_SIFT(SiftScaleSpace scaleSpace,
@@ -72,9 +77,8 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 	@Override
 	public boolean process(double x, double y, double orientation, double radius, TupleDesc_F64 description) {
 
-		System.out.println("orientation = "+orientation);
 		// get the blur sigma for the radius
-		double sigma = radius/ BoofDefaults.SIFT_SCALE_TO_RADIUS;
+		double sigma = radius / BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 		// find the image which the blur factor closest to this sigma
 		UnrollSiftScaleSpaceGradient.ImageScale image = scaleSpace.lookup(sigma);

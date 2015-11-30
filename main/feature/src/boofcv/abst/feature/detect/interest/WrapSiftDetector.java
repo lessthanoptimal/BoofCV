@@ -32,8 +32,6 @@ import georegression.struct.point.Point2D_F64;
 public class WrapSiftDetector<T extends ImageBase>
 		implements InterestPointDetector<T>
 {
-
-
 	SiftDetector detector;
 
 	ImageFloat32 imageFloat = new ImageFloat32(1,1);

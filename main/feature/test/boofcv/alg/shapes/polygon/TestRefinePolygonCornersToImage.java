@@ -36,8 +36,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -203,5 +202,13 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		assertTrue(foundA!=foundB);
 		assertEquals(foundA,found0);
 		assertEquals(foundB,found1);
+	}
+
+	/**
+	 * See if it handles lines along the image border correctly
+	 */
+	@Test
+	public void imageBorder() {
+		fail("implement");
 	}
 }

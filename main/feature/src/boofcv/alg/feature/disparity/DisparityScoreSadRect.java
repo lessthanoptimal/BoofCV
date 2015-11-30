@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSingleBand;
  * </p>
  *
  * <p>
- * Score Format:  The index of the score for column i >= radiusX + minDisparity at disparity d is: <br>
+ * Score Format:  The index of the score for column i &ge; radiusX + minDisparity at disparity d is: <br>
  * index = imgWidth*(d-minDisparity-radiusX) + i - minDisparity-radiusX<br>
  * Format Comment:<br>
  * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class FactoryAssociation {
 
 	/**
 	 * Approximate association using multiple random K-D trees (random forest) for descriptors with a high degree of
-	 * freedom, e.g. > 20
+	 * freedom, e.g. &gt; 20
 	 *
 	 * @see AssociateNearestNeighbor
 	 * @see org.ddogleg.nn.wrap.KdForestBbfSearch

@@ -206,7 +206,7 @@ public class GThresholdImageOps {
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return binary image.
 	 */
 	public static <T extends ImageSingleBand>
@@ -235,7 +235,7 @@ public class GThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) &gt; T(x,y) * scale ? 0 : 1
 	 * </p>
 	 *
 	 * <p>
@@ -272,7 +272,7 @@ public class GThresholdImageOps {
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
 	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
-	 * b(x,y) = I(x,y) > T(x,y) * scale ? 0 : 1
+	 * b(x,y) = I(x,y) &gt; T(x,y) * scale ? 0 : 1
 	 * </p>
 	 *
 	 * <p>

@@ -18,31 +18,75 @@
 
 package boofcv.abst.feature.describe;
 
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestDescribeRegionPoint_SIFT {
-	@Test
-	public void stuff() {
-		fail("Implement");
-	}
+
+	Random rand = new Random(234);
 
 	@Test
 	public void flags() {
-		fail("Implement");
+		DescribeRegionPoint_SIFT<ImageFloat32> alg = declare();
+
+		assertTrue(alg.requiresOrientation());
+		assertTrue(alg.requiresRadius());
+
+		TupleDesc_F64 desc = alg.createDescription();
+		assertEquals(128,desc.size());
+
+		assertEquals(2*alg.describe.getCanonicalRadius(),alg.getCanonicalWidth(),1e-8);
 	}
 
 	@Test
-	public void setImage() {
-		fail("Implement");
+	public void process() {
+
+		ImageFloat32 image = new ImageFloat32(640,480);
+		GImageMiscOps.fillUniform(image,rand,0,200);
+
+		DescribeRegionPoint_SIFT<ImageFloat32> alg = declare();
+		alg.setImage(image);
+
+		TupleDesc_F64 desc0 = alg.createDescription();
+		TupleDesc_F64 desc1 = alg.createDescription();
+		TupleDesc_F64 desc2 = alg.createDescription();
+
+		// same location, but different orientations and scales
+		assertTrue(alg.process(100,120,0.5,10,desc0));
+		assertTrue(alg.process(100,50,-1.1,10,desc1));
+		assertTrue(alg.process(100,50,0.5,7,desc2));
+
+		// should be 3 different descriptions
+		assertNotEquals(desc0.getDouble(0),desc1.getDouble(0),1e-6);
+		assertNotEquals(desc0.getDouble(0),desc2.getDouble(0),1e-6);
+		assertNotEquals(desc1.getDouble(0),desc2.getDouble(0),1e-6);
+
+		// see if it blows up along the image border
+		assertTrue(alg.process(0,120,0.5,10,desc0));
+		assertTrue(alg.process(100,0,0.5,10,desc0));
+		assertTrue(alg.process(639,120,0.5,10,desc0));
+		assertTrue(alg.process(100,479,0.5,10,desc0));
 	}
 
-	@Test
-	public void lookup() {
-		fail("Implement");
+	private DescribeRegionPoint_SIFT<ImageFloat32> declare() {
+
+		SiftScaleSpace ss = new SiftScaleSpace(0,4,3,1.6);
+		DescribePointSift<ImageFloat32> desc = FactoryDescribePointAlgs.sift(null,ImageFloat32.class);
+
+		return new DescribeRegionPoint_SIFT<ImageFloat32>(ss,desc,ImageFloat32.class);
 	}
 }

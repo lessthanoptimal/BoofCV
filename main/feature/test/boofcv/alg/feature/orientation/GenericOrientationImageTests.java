@@ -133,7 +133,7 @@ public class GenericOrientationImageTests<T extends ImageSingleBand> {
 
 		T sub = (T)image.subimage(0,0,regionSize,regionSize, null);
 
-		alg.setObjectRadius(regionSize/3);
+		alg.setObjectRadius(regionSize/3.0);
 		alg.setImage(sub);
 
 		double found = UtilAngle.bound(alg.compute(sub.width/2,sub.height/2));

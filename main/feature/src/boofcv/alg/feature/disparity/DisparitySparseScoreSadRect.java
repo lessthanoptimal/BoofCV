@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	/**
 	 * Configures disparity calculation.
 	 *
-	 * @param minDisparity Minimum disparity that it will consider.  Must be >= 0 && < maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be > 0
+	 * @param minDisparity Minimum disparity that it will consider.  Must be &ge; 0 && < maxDisparity
+	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
 	 * @param radiusX Radius of the rectangular region along x-axis.
 	 * @param radiusY Radius of the rectangular region along y-axis.
 	 */

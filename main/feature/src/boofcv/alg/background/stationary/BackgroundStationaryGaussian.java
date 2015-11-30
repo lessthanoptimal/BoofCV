@@ -57,7 +57,7 @@ public abstract class BackgroundStationaryGaussian<T extends ImageBase>
 	/**
 	 * See class documentation for parameters definitions.
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
-	 * @param threshold Threshold for background.  >= 0.  Try 10
+	 * @param threshold Threshold for background.  &ge; 0.  Try 10
 	 * @param imageType Type of input image
 	 */
 	public BackgroundStationaryGaussian(float learnRate, float threshold,ImageType<T> imageType) {

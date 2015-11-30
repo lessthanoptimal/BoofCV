@@ -99,7 +99,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Computes the variance inside the specified rectangle.  x0 and y0 must be > 0.
+	 * Computes the variance inside the specified rectangle.  x0 and y0 must be &gt; 0.
 	 *
 	 * @return variance
 	 */

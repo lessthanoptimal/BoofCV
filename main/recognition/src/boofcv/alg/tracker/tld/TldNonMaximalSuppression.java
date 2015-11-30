@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TldNonMaximalSuppression {
 	/**
 	 * Configures non-maximum suppression
 	 *
-	 * @param connectionThreshold Two regions are considered connected of their overlap is >= to this value.
+	 * @param connectionThreshold Two regions are considered connected of their overlap is &ge; to this value.
 	 *                               0 to 1.0. A value of 0.5 is recommended
 	 */
 	public TldNonMaximalSuppression(double connectionThreshold) {

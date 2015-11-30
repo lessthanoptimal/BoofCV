@@ -58,7 +58,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion exten
 	/**
 	 * See class documentation for parameters definitions.
 	 * @param learnRate Specifies how quickly the background is updated Try 0.05
-	 * @param threshold Threshold for background.  >= 0.  Try 10
+	 * @param threshold Threshold for background.  &ge; 0.  Try 10
 	 * @param transform Used to convert pixel coordinates
 	 * @param imageType Type of input image
 	 */

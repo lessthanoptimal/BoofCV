@@ -36,7 +36,7 @@ public class UtilDenseOpticalFlow {
 	/**
 	 * <p>
 	 * Create a standard image pyramid used by dense optical flow parameters.  The first layer is the size
-	 * of the input image and the last layer is >= the minSize.  The sigma for each layer is computed
+	 * of the input image and the last layer is &ge; the minSize.  The sigma for each layer is computed
 	 * using the following formula:<br>
 	 * <br>
 	 * sigmaLayer = sigma*sqrt( scale^-2 - 1 )

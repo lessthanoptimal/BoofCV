@@ -78,7 +78,7 @@ public class SnapToEdge<T extends ImageSingleBand>extends BaseIntegralEdge<T> {
 	 * Configures the algorithm.
 	 *
 	 * @param lineSamples Number of times it will sample along the line's axis. Try 19
-	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be >= 1.  Try 2.
+	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be &ge; 1.  Try 2.
 	 * @param imageType Type of image it's going to process
 	 */
 	public SnapToEdge(int lineSamples, int tangentialSamples,  Class<T> imageType) {

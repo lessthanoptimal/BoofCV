@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
@@ -36,6 +37,10 @@ public class TestOrientationSiftToImage {
 	 */
 	@Test
 	public void generic() {
+
+		ConfigSiftOrientation config = new ConfigSiftOrientation();
+		double pixelRadiusAtRadius1 = config.sigmaEnlarge/BoofDefaults.SIFT_SCALE_TO_RADIUS;
+
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
 		OrientationHistogramSift<ImageFloat32> orig = FactoryOrientationAlgs.sift(null,ImageFloat32.class);
 
@@ -43,7 +48,7 @@ public class TestOrientationSiftToImage {
 				new OrientationSiftToImage<ImageFloat32>(orig,ss,ImageFloat32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol, (int)(2*2.5*1.5), alg, ImageFloat32.class);
+		tests.setup(angleTol, (int)(pixelRadiusAtRadius1+0.5), alg, ImageFloat32.class);
 		tests.performAll();
 	}
 }

@@ -111,7 +111,7 @@ public class TestAssociateStereo2D {
 	}
 
 	/**
-	 * Makes the observation in the left image > right image along x-axis
+	 * Makes the observation in the left image &gt; right image along x-axis
 	 */
 	@Test
 	public void constraintX() {

@@ -33,8 +33,8 @@ public interface InterpolatePixelS<T extends ImageSingleBand> extends Interpolat
 	 * border conditions apply.  If the requested pixel is outside the image border it will attempt
 	 * to process it using or throw a null pointer exception of a border handler has not been specified.
 	 *
-	 * @param x Point's x-coordinate. x >= 0 && x < image.width or all values if border specified
-	 * @param y Point's y-coordinate. y >= 0 && y < image.height or all values if border specified
+	 * @param x Point's x-coordinate. x &ge; 0 && x < image.width or all values if border specified
+	 * @param y Point's y-coordinate. y &ge; 0 && y < image.height or all values if border specified
 	 * @return Interpolated intensity value or NaN if it can't be interpolated.
 	 */
 	public float get(float x, float y);
