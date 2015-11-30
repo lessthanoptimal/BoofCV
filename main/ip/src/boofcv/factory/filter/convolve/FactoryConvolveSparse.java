@@ -23,9 +23,7 @@ import boofcv.alg.filter.convolve.ConvolveWithBorderSparse;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSingleBand;
@@ -39,26 +37,35 @@ import boofcv.struct.image.ImageSingleBand;
 public class FactoryConvolveSparse {
 
 	public static <T extends ImageSingleBand, K extends Kernel2D>
-	ImageConvolveSparse<T,K> create( Class<T> imageType , K kernel ) {
+	ImageConvolveSparse<T,K> convolve2D(Class<T> imageType, K kernel) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Convolve_F32((Kernel2D_F32)kernel);
+			return (ImageConvolveSparse<T,K>)new Convolve2D_F32((Kernel2D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Convolve_I((Kernel2D_I32)kernel);
+			return (ImageConvolveSparse<T,K>)new Convolve2D_I32((Kernel2D_I32)kernel);
 		}
 	}
 
-	public static <T extends ImageSingleBand, K extends Kernel2D>
-	ImageConvolveSparse<T,K> create( Class<T> imageType ) {
+	public static <T extends ImageSingleBand, K extends Kernel1D>
+	ImageConvolveSparse<T,K> vertical1D(Class<T> imageType, K kernel) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			return (ImageConvolveSparse<T,K>)new Convolve_F32(null);
+			return (ImageConvolveSparse<T,K>)new Vertical1D_F32((Kernel1D_F32)kernel);
 		} else {
-			return (ImageConvolveSparse<T,K>)new Convolve_I(null);
+			return (ImageConvolveSparse<T,K>)new Vertical1D_I32((Kernel1D_I32)kernel);
 		}
 	}
 
-	public static class Convolve_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
+	public static <T extends ImageSingleBand, K extends Kernel1D>
+	ImageConvolveSparse<T,K> horizontal1D(Class<T> imageType, K kernel) {
+		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
+			return (ImageConvolveSparse<T,K>)new Horizontal1D_F32((Kernel1D_F32)kernel);
+		} else {
+			return (ImageConvolveSparse<T,K>)new Horizontal1D_I32((Kernel1D_I32)kernel);
+		}
+	}
 
-		public Convolve_F32(Kernel2D_F32 kernel) {
+	public static class Convolve2D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
+
+		public Convolve2D_F32(Kernel2D_F32 kernel) {
 			super(kernel);
 		}
 
@@ -68,15 +75,63 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Convolve_I extends ImageConvolveSparse<ImageInteger, Kernel2D_I32> {
+	public static class Convolve2D_I32 extends ImageConvolveSparse<ImageInteger, Kernel2D_I32> {
 
-		public Convolve_I(Kernel2D_I32 kernel) {
+		public Convolve2D_I32(Kernel2D_I32 kernel) {
 			super(kernel);
 		}
 
 		@Override
 		public double compute(int x, int y) {
 			return ConvolveWithBorderSparse.convolve(kernel,(ImageBorder_S32)image,x,y);
+		}
+	}
+
+	public static class Horizontal1D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_F32> {
+
+		public Horizontal1D_F32(Kernel1D_F32 kernel) {
+			super(kernel);
+		}
+
+		@Override
+		public double compute(int x, int y) {
+			return ConvolveWithBorderSparse.horizontal(kernel, (ImageBorder_F32) image, x, y);
+		}
+	}
+
+	public static class Horizontal1D_I32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_I32> {
+
+		public Horizontal1D_I32(Kernel1D_I32 kernel) {
+			super(kernel);
+		}
+
+		@Override
+		public double compute(int x, int y) {
+			return ConvolveWithBorderSparse.horizontal(kernel, (ImageBorder_S32) image, x, y);
+		}
+	}
+
+	public static class Vertical1D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_F32> {
+
+		public Vertical1D_F32(Kernel1D_F32 kernel) {
+			super(kernel);
+		}
+
+		@Override
+		public double compute(int x, int y) {
+			return ConvolveWithBorderSparse.vertical(kernel, (ImageBorder_F32) image, x, y);
+		}
+	}
+
+	public static class Vertical1D_I32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_I32> {
+
+		public Vertical1D_I32(Kernel1D_I32 kernel) {
+			super(kernel);
+		}
+
+		@Override
+		public double compute(int x, int y) {
+			return ConvolveWithBorderSparse.vertical(kernel,(ImageBorder_S32)image,x,y);
 		}
 	}
 }

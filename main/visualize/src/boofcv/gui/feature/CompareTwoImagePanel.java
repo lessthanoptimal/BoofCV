@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.gui.feature;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -187,11 +188,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			int x = (int)(e.getX()/scaleLeft);
 			int y = (int)(e.getY()/scaleLeft);
 
-			int bestIndex = findBestPoint(x, y, leftPts );
-
-			if( bestIndex != -1 ) {
-				selected.add( bestIndex );
-			}
+			findBestPoints(x, y, leftPts , selected );
 
 		} else if( e.getX() >= rightBeginX ) {
 			selectedIsLeft = false;
@@ -199,32 +196,37 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 			int x = (int)((e.getX()-rightBeginX)/scaleRight);
 			int y = (int)(e.getY()/scaleRight);
 
-			int bestIndex = findBestPoint(x, y, rightPts );
-
-			if( bestIndex != -1 ) {
-				selected.add( bestIndex );
-			}
-
+			findBestPoints(x, y, rightPts , selected );
 		}
 //		System.out.println("selected index "+selectedIndex);
 		repaint();
 	}
 
-	private int findBestPoint(int x, int y,  List<Point2D_F64> pts ) {
-		double bestDist = clickDistance;
-		int bestIndex = -1;
+	private void findBestPoints(int x, int y,  List<Point2D_F64> pts , List<Integer> selected ) {
+		double bestDist = clickDistance*clickDistance;
+		GrowQueue_I32 bestIndexes = new GrowQueue_I32(20);
 		for( int i = 0; i < pts.size(); i++ ) {
 			if( !isValidPoint(i) )
 				continue;
 
 			Point2D_F64 p = pts.get(i);
-			double d = UtilPoint2D_F64.distance(p.x, p.y, x, y);
+			double d = UtilPoint2D_F64.distanceSq(p.x, p.y, x, y);
 			if( d < bestDist ) {
 				bestDist = d;
-				bestIndex = i;
+				bestIndexes.reset();
+				bestIndexes.add(i);
+			} else if( Math.abs(d - bestDist) < 0.01 ) {
+				bestIndexes.add(i);
 			}
 		}
-		return bestIndex;
+
+		if( bestIndexes.size() > 0 ) {
+			int indexRight = bestIndexes.get(0);
+		}
+
+		for (int i = 0; i < bestIndexes.size(); i++) {
+			selected.add(bestIndexes.get(i));
+		}
 	}
 
 	protected abstract boolean isValidPoint( int index );

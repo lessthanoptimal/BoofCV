@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,31 +34,31 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
 public class FactorySparseIntegralFilters {
 
 	public static <T extends ImageSingleBand>
-	SparseScaleSample_F64<T> sample( int radius , Class<T> imageType ) {
+	SparseScaleSample_F64<T> sample( Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseScaleSample_F64<T>)new SparseIntegralSample_F32(radius);
+			return (SparseScaleSample_F64<T>)new SparseIntegralSample_F32();
 		else if( imageType == ImageSInt32.class )
-			return (SparseScaleSample_F64<T>)new SparseIntegralSample_I32(radius);
+			return (SparseScaleSample_F64<T>)new SparseIntegralSample_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
 	public static <T extends ImageSingleBand>
-	SparseScaleGradient<T,?> gradient( int radius , Class<T> imageType ) {
+	SparseScaleGradient<T,?> gradient( Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_F32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_F32();
 		else if( imageType == ImageSInt32.class )
-			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_I32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
 	public static <T extends ImageSingleBand>
-	SparseScaleGradient<T,?> haar( int radius , Class<T> imageType ) {
+	SparseScaleGradient<T,?> haar( Class<T> imageType ) {
 		if( imageType == ImageFloat32.class )
-			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_F32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_F32();
 		else if( imageType == ImageSInt32.class )
-			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_I32(radius);
+			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}

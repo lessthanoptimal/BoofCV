@@ -82,4 +82,9 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 	public double getDouble(int index) {
 		throw new RuntimeException("Well this function really shouldn't be required to be implemented");
 	}
+
+	@Override
+	public void setD(int index, double value) {
+		throw new RuntimeException("Well this function really shouldn't be required to be implemented");
+	}
 }

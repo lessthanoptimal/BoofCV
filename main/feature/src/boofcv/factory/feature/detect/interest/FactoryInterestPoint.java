@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
@@ -26,7 +28,6 @@ import boofcv.alg.feature.detect.interest.*;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -126,32 +127,24 @@ public class FactoryInterestPoint {
 	 */
 	public static <T extends ImageSingleBand>
 	InterestPointDetector<T> fastHessian( ConfigFastHessian config ) {
-
 		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config));
 	}
 
-	/**
-	 * Creates a SIFT feature detector.
-	 *
-	 * @see SiftDetector
-	 * @see SiftImageScaleSpace
-	 *
-	 * @param configSS Configuration for scale-space.  Pass in null for default options.
-	 * @param configDetector Configuration for detector.  Pass in null for default options.
-	 */
-	public static InterestPointDetector<ImageFloat32> siftDetector( ConfigSiftScaleSpace configSS,
-																	ConfigSiftDetector configDetector )
-	{
+	public static <T extends ImageSingleBand>
+	InterestPointDetector<T> sift(ConfigSiftScaleSpace configSS ,
+								  ConfigSiftDetector configDet , Class<T> imageType ) {
+
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
-		configSS.checkValidity();
+		if( configDet == null )
+			configDet = new ConfigSiftDetector();
 
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(configDetector);
+		SiftScaleSpace scaleSpace =
+				new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(configDet.extract);
+		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,configDet.maxFeaturesPerScale);
+		SiftDetector detector = new SiftDetector(scaleSpace,configDet.edgeR,limiter);
 
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
-				configSS.doubleInputImage);
-
-		return new WrapSiftDetector(alg,ss);
+		return new WrapSiftDetector<T>(detector,imageType);
 	}
-
 }

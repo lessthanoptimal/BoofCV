@@ -90,14 +90,12 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 		GeneralFeatureDetector<T, D> alg;
 
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4)));
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(null,new ConfigSiftDetector(2,1,500,10)));
+		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(500),imageType));
 		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null));
+		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
@@ -221,21 +219,21 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 				double yaw = 0;
 
 				Point2D_F64 pt = detector.getLocation(i);
-				double scale = detector.getScale(i);
+				double radius = detector.getRadius(i);
 				if (describe.requiresOrientation()) {
-					orientation.setScale(scale);
+					orientation.setObjectRadius(radius);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
 				TupleDesc d = describe.createDescription();
-				if ( describe.process(pt.x, pt.y, yaw, scale, d) ) {
+				if ( describe.process(pt.x, pt.y, yaw, radius, d) ) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}
 			}
 		} else {
-			// just set the scale to one in this case
-			orientation.setScale(1);
+			// just set the radius to one in this case
+			orientation.setObjectRadius(1);
 			for (int i = 0; i < detector.getNumberOfFeatures(); i++) {
 				double yaw = 0;
 

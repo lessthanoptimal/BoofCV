@@ -25,13 +25,10 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.feature.NccFeature;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.feature.TupleDesc_B;
+import boofcv.struct.feature.*;
 import boofcv.struct.image.*;
 
 import java.util.Random;
@@ -58,7 +55,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed config , Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -78,7 +75,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageMultiBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfColorFast( ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorFast(ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -108,7 +105,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -127,7 +124,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageBase, II extends ImageSingleBand>
-	DescribeRegionPoint<T,SurfFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -145,7 +142,7 @@ public class FactoryDescribeRegionPoint {
 
 	/**
 	 * <p>
-	 * Creates a standard SIFT region descriptor.
+	 * Creates a SIFT region descriptor.
 	 * </p>
 	 *
 	 * <p>
@@ -157,18 +154,20 @@ public class FactoryDescribeRegionPoint {
 	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
 	 * @return SIFT descriptor
 	 */
-	public static DescribeRegionPoint<ImageFloat32,SurfFeature> sift( ConfigSiftScaleSpace configSS,
-																	  ConfigSiftDescribe configDescribe) {
+	public static <T extends ImageSingleBand>
+	DescribeRegionPoint<T,TupleDesc_F64> sift(
+			ConfigSiftScaleSpace configSS, ConfigSiftDescribe configDescribe, Class<T> imageType)
+	{
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
 		configSS.checkValidity();
 
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
-				configSS.doubleInputImage);
+		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales,
+				configSS.sigma0);
 
-		DescribePointSift alg = FactoryDescribePointAlgs.sift(configDescribe);
+		DescribePointSift<ImageFloat32> alg = FactoryDescribePointAlgs.sift(configDescribe,ImageFloat32.class);
 
-		return new WrapDescribeSift(alg,ss);
+		return new DescribeRegionPoint_SIFT<T>(ss,alg,imageType);
 	}
 
 	/**

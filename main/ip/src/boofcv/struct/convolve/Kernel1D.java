@@ -43,4 +43,6 @@ public abstract class Kernel1D extends KernelBase {
 	}
 
 	public abstract double getDouble( int index );
+
+	public abstract void setD( int index , double value );
 }

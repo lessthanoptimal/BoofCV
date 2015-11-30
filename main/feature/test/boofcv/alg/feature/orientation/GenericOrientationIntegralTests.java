@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class GenericOrientationIntegralTests<T extends ImageSingleBand> {
 	 * Tests involving the image border
 	 */
 	public void checkBorderExplode() {
-		alg.setScale(1);
+		alg.setObjectRadius(10);
 
 		createOrientedImage(0);
 		alg.setImage(ii);
@@ -93,7 +93,7 @@ public class GenericOrientationIntegralTests<T extends ImageSingleBand> {
 	 */
 	public void performEasyTests() {
 
-		alg.setScale(1);
+		alg.setObjectRadius(10);
 
 		int N = 2*(int)(Math.PI/angleTolerance);
 
@@ -124,16 +124,16 @@ public class GenericOrientationIntegralTests<T extends ImageSingleBand> {
 		createOrientedImage(angle);
 
 		alg.setImage(ii);
-		alg.setScale(1);
+		alg.setObjectRadius(10);
 
 		double found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 
-		alg.setScale(1.5);
+		alg.setObjectRadius(15);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 
-		alg.setScale(0.75);
+		alg.setObjectRadius(7.5);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}
@@ -156,7 +156,7 @@ public class GenericOrientationIntegralTests<T extends ImageSingleBand> {
 		T sub = (T)ii.subimage(0,0,regionSize,regionSize, null);
 
 		alg.setImage(sub);
-		alg.setScale(1);
+		alg.setObjectRadius(regionSize/2);
 
 		double found = UtilAngle.bound(alg.compute(sub.width/2,sub.height/2));
 		assertTrue( angle+" "+found,UtilAngle.dist(angle,found) < angleTolerance );

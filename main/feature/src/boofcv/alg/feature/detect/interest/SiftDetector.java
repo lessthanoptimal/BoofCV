@@ -18,270 +18,228 @@
 
 package boofcv.alg.feature.detect.interest;
 
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
-import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
-import boofcv.struct.QueueCorner;
+import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 
 /**
- * <p>
- * Feature detector described in the Scale Invariant Feature Transform (SIFT) paper [1].  Location and scale of
- * blob like features are detected using a Difference of Gaussian (DOG) across scale-space.  Note the algorithmic
- * changes below.
- * </p>
+ * <p>Implementation of SIFT [1] feature detector. Feature detection is first done by creating the first octave in
+ * a {@link SiftScaleSpace scale space}.  Then the Difference-of-Gaussian (DoG) is computed from sequential
+ * scales inside the scale-space.  From the DoG images, pixels which are maximums and minimums spatially and with
+ * in scale are found.  Edges of objects can cause false positives so those are suppressed.  The remaining
+ * features are interpolated spatially and across scale.</p>
+ *
+ * <p>This class is designed so that it can operate as a stand alone feature detector or so that it can be
+ * extended to compute feature descriptors too.  The advantage of the former is that the scale-space only
+ * needs to be constructed once.</p>
+ *
+ * <h2>Processing Steps</h2>
+ * <ol>
+ * <li>Construct first octave of DoG images using {@link SiftScaleSpace}</li>
+ * <li>For DoG images 1 to N+1, detect features</li>
+ * <li>Use {@link NonMaxLimiter} to detect features spatially.</li>
+ * <li>Check to see if detected features are minimums or maximums in DoG scale space by checking the equivalent 3x3
+ * regions in the DoG images above and below it. {@link #isScaleSpaceExtremum}
+ * <li>Detect false positive edges using trace and determinant from Hessian of DoG image</li>
+ * <li>Interpolate feature's (x,y,sigma) coordinate using the peak of a 2nd order polynomial (quadratic).
+ * {@link #processFeatureCandidate}</li>
+ * </ol>
+ * <p>Where N is the number of scale parameters.  There are N+3 scale images and N+2 DoG images in an octave.
+ *
+ * <h2>Edge Detection</h2>
+ * <p>Edges can also cause local extremes (false positives) in the DoG image.  To remove those false positives an
+ * edge detector is proposed by Lowe.  The edge detector is turned with the parameter 'r' and a point is considered
+ * an edge if the following is true:<br>
+ * Tr<sup>2</sup>/Det < (r+1)<sup>2</sup>/r<br>
+ * where Tr and Det are the trace an determinant of a 2x2 hessian matrix computed from the DoG hessian at that point,
+ * [dXX,dXY;dYX,dYY]</p>
+ *
+ * <h2>Deviations from standard SIFT</h2>
+ * <ol>
+ * <li>Spatial maximums are not limited to a 3x3 region like they are in the paper.  User configurable.</li>
+ * <li>Quadratic interpolation is used independently on x,y, and scale axis.</li>
+ * <li>What the scale of a DoG image is isn't specified in the paper.  Assumed to be the same as the lower indexed
+ * scale image it was computed from.</li>
+ * </ol>
  *
  * <p>
- * INTERPOLATION: Location and scale interpolation is done using a second order polynomial.  This avoids taking
- * the second order derivative numerically, which is very sensitive to noise.  Plus I disagree with his statement
- * that peaks outside the local region are valid and require iteration.
- * </p>
- *
- * <p>
- * LOW CONTRAST REJECTION: Try adjusting detection radius to reduce the number of low contrast returns
- * instead.  The technique proposed in the paper was not tested.
- * </p>
- *
- * <p>
- * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
- * International Journal of Computer Vision, 60, 2 (2004), pp.91--110.
+ * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".  International Journal of
+ * Computer Vision, 60, 2 (2004), pp.91--110.
  * </p>
  *
  * @author Peter Abeles
  */
 public class SiftDetector {
 
-	// Contains the image's  scale space representation
-	protected SiftImageScaleSpace ss;
+	// image pyramid that it processes
+	protected SiftScaleSpace scaleSpace;
 
-	// finds features from 2D intensity image
-	private NonMaxSuppression extractor;
-	// helps select features with the largest intensity
-	private SelectNBestFeatures sortBest;
+	// conversion factor to go from pixel coordinate in current octave to input image
+	protected double pixelScaleToInput;
 
-	// target number of features for the extractor
-	private int maxFeatures;
-	// storage for found features
-	private QueueCorner foundPositive = new QueueCorner(10);
-	private QueueCorner foundNegative = new QueueCorner(10);
+	// edge detector threshold
+	// In the paper this is (r+1)**2/r
+	double edgeThreshold;
 
-	// List of found feature points
-	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
-
-	// correcting for how images are subsampled
-	private double octavePixelOffset;
-	// Amount of blur applied to the current image being considered
-	private double currentSigma;
-	// Pixel scale factor for the current image being considered
-	private double currentPixelScale;
+	// all the found detections in a single octave
+	protected FastQueue<ScalePoint> detections = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 	// Computes image derivatives. used in edge rejection
-	private ImageConvolveSparse<ImageFloat32,?> derivXX;
-	private ImageConvolveSparse<ImageFloat32,?> derivXY;
-	private ImageConvolveSparse<ImageFloat32,?> derivYY;
+	ImageConvolveSparse<ImageFloat32,?> derivXX;
+	ImageConvolveSparse<ImageFloat32,?> derivXY;
+	ImageConvolveSparse<ImageFloat32,?> derivYY;
 
-	// Threshold for filtering out edges.
-	private double edgeThreshold;
+	// local scale space around the current scale image being processed
+	ImageFloat32 dogLower;  // DoG image in lower scale
+	ImageFloat32 dogTarget; // DoG image in target scale
+	ImageFloat32 dogUpper;  // DoG image in upper scale
+	double sigmaLower, sigmaTarget, sigmaUpper;
+
+	// finds features from 2D intensity image
+	private NonMaxLimiter extractor;
 
 	/**
-	 * Configures SIFT
+	 * Configures SIFT detector
 	 *
-	 * @param extractor Extracts local maximums from each scale.
-	 * @param maxFeaturesPerScale Max detected features per scale.  Disable with < 0.  Try 500
-	 * @param edgeThreshold Threshold for edge filtering.  Disable with a value <= 0.  Try 5
+	 * @param scaleSpace Provides the scale space
+	 * @param edgeR Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
+	 * @param extractor Spatial feature detector that can be configured to limit the number of detected features in each scale.
 	 */
-	public SiftDetector(NonMaxSuppression extractor,
-						int maxFeaturesPerScale,
-						double edgeThreshold ) {
-		if( !extractor.canDetectMaximums() || !extractor.canDetectMinimums() )
+	public SiftDetector(SiftScaleSpace scaleSpace ,
+						double edgeR ,
+						NonMaxLimiter extractor ) {
+		if( !extractor.getNonmax().canDetectMaximums() || !extractor.getNonmax().canDetectMinimums() )
 			throw new IllegalArgumentException("The extractor must be able to detect maximums and minimums");
-
-		this.extractor = extractor;
-		if( maxFeaturesPerScale > 0 ) {
-			// Each scale has detection run twice on it
-			this.maxFeatures = maxFeaturesPerScale;
-			sortBest = new SelectNBestFeatures(maxFeatures);
+		if( edgeR < 1 ) {
+			throw new IllegalArgumentException("R must be >= 1");
 		}
 
-		createDerivatives();
+		if( extractor.getNonmax().getIgnoreBorder() != 1 ) {
+			throw new RuntimeException("Non-max should have an ignore border of 1");
+		}
 
-		this.edgeThreshold = edgeThreshold;
+		this.scaleSpace = scaleSpace;
+		this.extractor = extractor;
+
+		this.edgeThreshold = (edgeR+1)*(edgeR+1)/edgeR;
+
+		createSparseDerivatives();
 	}
 
 	/**
 	 * Define sparse image derivative operators.
 	 */
-	private void createDerivatives() {
-		// TODO optimize usign a sparse kernel?
-		Kernel2D_F32 kerX = new Kernel2D_F32(3,new float[]{
-				 0,0,0,
-				-1,0,1,
-				 0,0,0});
-		Kernel2D_F32 kerY = new Kernel2D_F32(3,new float[]{
-				0,-1,0,
-				0, 0,0,
-				0, 1,0});
-		Kernel2D_F32 kerXX = KernelMath.convolve2D(kerX, kerX);
-		Kernel2D_F32 kerXY = KernelMath.convolve2D(kerX,kerY);
-		Kernel2D_F32 kerYY = KernelMath.convolve2D(kerY,kerY);
+	private void createSparseDerivatives() {
+		Kernel1D_F32 kernelD = new Kernel1D_F32(new float[]{-1,0,1},3);
 
-		derivXX = FactoryConvolveSparse.create(ImageFloat32.class,kerXX);
-		derivXY = FactoryConvolveSparse.create(ImageFloat32.class,kerXY);
-		derivYY = FactoryConvolveSparse.create(ImageFloat32.class,kerYY);
+		Kernel1D_F32 kernelDD = KernelMath.convolve1D_F32(kernelD, kernelD);
+		Kernel2D_F32 kernelXY = KernelMath.convolve2D(kernelD, kernelD);
 
-		// treat pixels outside the image border as having a value of zero
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.singleValue(ImageFloat32.class, 0);
+		derivXX = FactoryConvolveSparse.horizontal1D(ImageFloat32.class, kernelDD);
+		derivXY = FactoryConvolveSparse.convolve2D(ImageFloat32.class, kernelXY);
+		derivYY = FactoryConvolveSparse.vertical1D(ImageFloat32.class, kernelDD);
+
+		ImageBorder<ImageFloat32> border = FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED);
 
 		derivXX.setImageBorder(border);
 		derivXY.setImageBorder(border);
 		derivYY.setImageBorder(border);
 	}
 
-	public void process( SiftImageScaleSpace ss ) {
-		// set up data structures
-		foundPoints.reset();
-		this.ss = ss;
-		octavePixelOffset = 0;
-
-		// extract features in each octave
-		for( int octave = 0; octave < ss.actualOctaves; octave++ ) {
-			// start processing at the second DOG since it needs the scales above and below
-			int indexDOG = octave*(ss.numScales-1)+1;
-			int indexScale = octave*ss.numScales+1;
-
-			currentPixelScale = ss.pixelScale[octave];
-
-			ss.storage.reshape( ss.scale[indexScale].width , ss.scale[indexScale].height );
-
-			for( int scale = 1; scale < ss.numScales-2; scale++ , indexScale++,indexDOG++ ) {
-
-				// use the scale-space image as input for derivatives
-				derivXX.setImage(ss.scale[indexScale]);
-				derivXY.setImage(ss.scale[indexScale]);
-				derivYY.setImage(ss.scale[indexScale]);
-
-				// the current scale factor being considered
-				currentSigma = ss.computeScaleSigma(octave,scale);
-
-				detectFeatures(indexDOG);
-			}
-
-			// when the images are sub-sampled between octaves the sampling starts at pixel 1 in (x,y)
-			octavePixelOffset += currentPixelScale;
-		}
-	}
-
 	/**
-	 * Detect features inside the specified scale.
-	 */
-	private void detectFeatures( int indexDOG ) {
-		// set up data structures
-		foundNegative.reset();
-		foundPositive.reset();
-
-		// Local scale-space neighborhood
-		ImageFloat32 scale0 = ss.dog[indexDOG-1];
-		ImageFloat32 scale1 = ss.dog[indexDOG];
-		ImageFloat32 scale2 = ss.dog[indexDOG+1];
-
-		extractor.process(scale1,null,null,foundNegative,foundPositive);
-
-		addFoundFeatures(scale0,scale1,scale2,foundNegative,false);
-		addFoundFeatures(scale0,scale1,scale2,foundPositive,true);
-	}
-
-	private void addFoundFeatures( ImageFloat32 scale0, ImageFloat32 scale1, ImageFloat32 scale2,
-								   QueueCorner found , boolean positive ) {
-
-		// if configured to do so, only select the features with the highest intensity
-		QueueCorner features;
-		if( sortBest != null ) {
-			sortBest.process(scale1,found,positive);
-			features = sortBest.getBestCorners();
-		} else {
-			features = found;
-		}
-
-		float signAdj = positive ? 1 : -1;
-
-		// precompute border for insignificant speed boost
-		int ignoreRadius = extractor.getIgnoreBorder();
-		int borderX = scale1.width-ignoreRadius-1;
-		int borderY = scale1.height-ignoreRadius-1;
-
-		// see if they are a local max in scale space
-		for( int i = 0; i < features.size; i++ ) {
-			Point2D_I16 p = features.data[i];
-
-			// discard points up against the image border since how it should be interpolated is undefined.  plus
-			// this makes it easier to write faster code
-			if( p.x <= ignoreRadius || p.y <= ignoreRadius || p.x >= borderX || p.y >= borderY )
-				continue;
-
-			float value = scale1.unsafe_get(p.x, p.y);
-			if( isScaleSpaceMax(scale0,scale2,p.x,p.y,value,signAdj)
-					&& !isEdge(p.x,p.y) ) {
-				addPoint(scale0,scale1,scale2,p.x,p.y,value,signAdj,positive);
-			}
-		}
-	}
-
-	/**
-	 * Adds the detected feature to the list.  Interpolates the feature's location in the image and scale
-	 * using 2nd order polynomial instead.  This is a change from the paper.
-	 */
-	private void addPoint(ImageFloat32 scale0 , ImageFloat32 scale1, ImageFloat32 scale2,
-						  short x, short y, float value, float signAdj, boolean white ) {
-		value *= signAdj;
-		float x0 =  scale1.unsafe_get(x - 1, y)*signAdj;
-		float x2 =  scale1.unsafe_get(x + 1, y)*signAdj;
-		float y0 =  scale1.unsafe_get(x , y - 1)*signAdj;
-		float y2 =  scale1.unsafe_get(x , y + 1)*signAdj;
-
-		float s0 =  scale0.unsafe_get(x , y )*signAdj;
-		float s2 =  scale2.unsafe_get(x , y )*signAdj;
-
-		ScalePoint p = foundPoints.grow();
-
-		// when the image is down sampled it is sampled at pixel + 1
-		p.x = currentPixelScale*(x + polyPeak(x0, value, x2)) + octavePixelOffset;
-		p.y = currentPixelScale*(y + polyPeak(y0, value, y2)) + octavePixelOffset;
-
-		p.scale = currentSigma + currentPixelScale*ss.sigma*polyPeak(s0, value, s2);
-		p.white = white;
-	}
-
-	/**
-	 * See if the point is a local maximum in scale-space above and below.
+	 * Detects SIFT features inside the input image
 	 *
-	 * @param c_x x-coordinate of maximum
-	 * @param c_y y-coordinate of maximum
+	 * @param input Input image.  Not modified.
+	 */
+	public void process( ImageFloat32 input ) {
+
+		scaleSpace.initialize(input);
+		detections.reset();
+
+		do {
+			// scale from octave to input image
+			pixelScaleToInput = scaleSpace.pixelScaleCurrentToInput();
+
+			// detect features in the image
+			for (int j = 1; j < scaleSpace.getNumScales()+1; j++) {
+
+				// not really sure how to compute the scale for features found at a particular DoG image
+				// using the average resulted in less visually appealing circles in a test image
+				sigmaLower  = scaleSpace.computeSigmaScale( j - 1);
+				sigmaTarget = scaleSpace.computeSigmaScale( j    );
+				sigmaUpper  = scaleSpace.computeSigmaScale( j + 1);
+
+				// grab the local DoG scale space images
+				dogLower  = scaleSpace.getDifferenceOfGaussian(j-1);
+				dogTarget = scaleSpace.getDifferenceOfGaussian(j  );
+				dogUpper  = scaleSpace.getDifferenceOfGaussian(j+1);
+
+				detectFeatures(j);
+			}
+		} while( scaleSpace.computeNextOctave() );
+	}
+
+	/**
+	 * Detect features inside the Difference-of-Gaussian image at the current scale
+	 *
+	 * @param scaleIndex Which scale in the octave is it detecting features inside up.
+	 *              Primarily provided here for use in child classes.
+	 */
+	protected void detectFeatures( int scaleIndex ) {
+		extractor.process(dogTarget);
+		FastQueue<NonMaxLimiter.LocalExtreme> found = extractor.getLocalExtreme();
+
+		derivXX.setImage(dogTarget);
+		derivXY.setImage(dogTarget);
+		derivYY.setImage(dogTarget);
+
+		for (int i = 0; i < found.size; i++) {
+			NonMaxLimiter.LocalExtreme e = found.get(i);
+
+			if( e.max ) {
+				if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), 1f)) {
+					processFeatureCandidate(e.location.x,e.location.y,e.getValue(),e.max);
+				}
+			} else if( isScaleSpaceExtremum(e.location.x, e.location.y, e.getValue(), -1f)) {
+				processFeatureCandidate(e.location.x,e.location.y,e.getValue(),e.max);
+			}
+		}
+	}
+
+	/**
+	 * See if the point is a local extremum in scale-space above and below.
+	 *
+	 * @param c_x x-coordinate of extremum
+	 * @param c_y y-coordinate of extremum
 	 * @param value The maximum value it is checking
 	 * @param signAdj Adjust the sign so that it can check for maximums
-	 * @return
+	 * @return true if its a local extremum
 	 */
-	private boolean isScaleSpaceMax( ImageFloat32 scale0 , ImageFloat32 scale2,
-									 int c_x , int c_y , float value , float signAdj ) {
+	boolean isScaleSpaceExtremum(int c_x, int c_y, float value, float signAdj) {
+		if( c_x <= 1 || c_y <= 1 || c_x >= dogLower.width-1 || c_y >= dogLower.height-1)
+			return false;
+
 		float v;
 
 		value *= signAdj;
 
 		for( int y = -1; y <= 1; y++ ) {
 			for( int x = -1; x <= 1; x++ ) {
-			    v = scale0.unsafe_get(c_x+x,c_y+y);
+			    v = dogLower.unsafe_get(c_x+x,c_y+y);
 				if( v*signAdj >= value )
 					return false;
-				v = scale2.unsafe_get(c_x+x,c_y+y);
+				v = dogUpper.unsafe_get(c_x+x,c_y+y);
 				if( v*signAdj >= value )
 					return false;
 			}
@@ -291,9 +249,64 @@ public class SiftDetector {
 	}
 
 	/**
+	 * Examines a local spatial extremum and interpolates its coordinates using a quadratic function.  Very first
+	 * thing it does is check to see if the feature is really an edge/false positive.  After that interpolates
+	 * the coordinate independently using a quadratic function along each axis.  Resulting coordinate will be
+	 * in the image image's coordinate system.
+	 *
+	 * @param x x-coordinate of extremum
+	 * @param y y-coordinate of extremum
+	 * @param value value of the extremum
+	 * @param maximum true if it was a maximum
+	 */
+	protected void processFeatureCandidate( int x , int y , float value ,boolean maximum ) {
+		// suppress response along edges
+		if( isEdge(x,y) )
+			return;
+
+		// Estimate the scale and 2D point by fitting 2nd order polynomials
+		// This is different from the original paper
+		float signAdj = maximum ? 1 : -1;
+
+		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
+		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
+		float y0 = dogTarget.unsafe_get(x , y - 1)*signAdj;
+		float y2 = dogTarget.unsafe_get(x , y + 1)*signAdj;
+
+		float s0 = dogLower.unsafe_get(x , y )*signAdj;
+		float s2 = dogUpper.unsafe_get(x , y )*signAdj;
+
+		ScalePoint p = detections.grow();
+
+		// Compute the interpolated coordinate of the point in the original image coordinates
+		p.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
+		p.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
+
+		// find the peak then do bilinear interpolate between the two appropriate sigmas
+		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
+		if( sigmaInterp < 0 ) {
+			p.scale = sigmaLower*(-sigmaInterp) + (1+sigmaInterp)*sigmaTarget;
+		} else {
+			p.scale = sigmaUpper*sigmaInterp + (1-sigmaInterp)*sigmaTarget;
+		}
+
+		// a maximum corresponds to a dark object and a minimum to a whiter object
+		p.white = !maximum;
+
+		handleDetection(p);
+	}
+
+	/**
+	 * Function for handling a detected point.  Does nothing here, but can be used by a child class
+	 * to process detections
+	 * @param p Detected point in scale-space.
+	 */
+	protected void handleDetection( ScalePoint p ){}
+
+	/**
 	 * Performs an edge test to remove false positives.  See 4.1 in [1].
 	 */
-	private boolean isEdge( int x , int y ) {
+	boolean isEdge( int x , int y ) {
 		if( edgeThreshold <= 0 )
 			return false;
 
@@ -303,24 +316,19 @@ public class SiftDetector {
 
 		double Tr = xx + yy;
 		double det = xx*yy - xy*xy;
-		double value = Tr*Tr/det;
 
-		double threshold = edgeThreshold+2+1/edgeThreshold;
-
-		// The SIFT paper does not show absolute value here nor have I put enough thought into it
-		// to determine if this makes any sense.  However, it does seem to improve performance
-		// quite a bit.
-		return( Math.abs(value) > threshold);
+		// Paper quite "In the unlikely event that the determinant is negative, the curvatures have different signs
+		// so the point is discarded as not being an extremum"
+		if( det <= 0)
+			return true;
+		else {
+			// In paper this is:
+			// Tr**2/Det < (r+1)**2/r
+			return( Tr*Tr >= edgeThreshold*det);
+		}
 	}
 
-	/**
-	 * Returns all the found points
-	 */
-	public FastQueue<ScalePoint> getFoundPoints() {
-		return foundPoints;
-	}
-
-	public SiftImageScaleSpace getScaleSpace() {
-		return ss;
+	public FastQueue<ScalePoint> getDetections() {
+		return detections;
 	}
 }

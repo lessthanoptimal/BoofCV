@@ -20,6 +20,7 @@ package boofcv.alg.filter.kernel;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
@@ -69,6 +70,58 @@ public class TestKernelMath {
 
 		for( int i = 0; i < a.width; i++ ) {
 			assertEquals(expected.data[i],a.data[i],1e-4);
+		}
+	}
+
+	@Test
+	public void divide_1D_F32() {
+		Kernel1D_F32 a = FactoryKernel.random1D_F32(11,5,-10f,10f,rand);
+		Kernel1D_F32 b = a.copy();
+
+		float value = 2.1f;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i], BoofDefaults.TEST_FLOAT_TOL);
+		}
+	}
+
+	@Test
+	public void divide_1D_F64() {
+		Kernel1D_F64 a = FactoryKernel.random1D_F64(11,5,-10f,10f,rand);
+		Kernel1D_F64 b = a.copy();
+
+		double value = 2.1;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i],BoofDefaults.TEST_DOUBLE_TOL);
+		}
+	}
+
+	@Test
+	public void divide_2D_F32() {
+		Kernel2D_F32 a = FactoryKernel.random2D_F32(11,5,-10f,10f,rand);
+		Kernel2D_F32 b = a.copy();
+
+		float value = 2.1f;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i], BoofDefaults.TEST_FLOAT_TOL);
+		}
+	}
+
+	@Test
+	public void divide_2D_F64() {
+		Kernel2D_F64 a = FactoryKernel.random2D_F64(11,5,-10f,10f,rand);
+		Kernel2D_F64 b = a.copy();
+
+		double value = 2.1;
+		KernelMath.divide(a,value);
+
+		for (int i = 0; i < a.data.length; i++) {
+			assertEquals(b.data[i]/value,a.data[i],BoofDefaults.TEST_DOUBLE_TOL);
 		}
 	}
 
@@ -127,27 +180,29 @@ public class TestKernelMath {
 
 		// computed using conv() in octave
 		Kernel1D_F32 expected = new Kernel1D_F32(new float[]{6,19,40,61,82,67,40},7);
-		Kernel1D_F32 c = KernelMath.convolve1D(k1,k2);
+		Kernel1D_F32 c = KernelMath.convolve1D_F32(k1,k2);
 
 		for( int i = 0; i < 7; i++ ) {
 			assertEquals(expected.data[i],c.data[i],1e-4);
 		}
 
-		c = KernelMath.convolve1D(k2,k1);
+		c = KernelMath.convolve1D_F32(k2,k1);
 		for( int i = 0; i < 7; i++ ) {
 			assertEquals(expected.data[i],c.data[i],1e-4);
 		}
 	}
 
 	@Test
-	public void convolve_1D_F32() {
-		Kernel1D_F32 k1 = FactoryKernel.random1D_F32(5,2,-1,1,rand);
-		Kernel1D_F32 k2 = FactoryKernel.random1D_F32(5,2,-1,1,rand);
+	public void convolve2D_1D_F32() {
+		Kernel1D_F32 k1 = new Kernel1D_F32(new float[]{4,3,2},3,1);
+		Kernel1D_F32 k2 = new Kernel1D_F32(new float[]{9,5,1},3,1);
 
-		Kernel2D_F32 c = KernelMath.convolve(k1,k2);
+		Kernel2D_F32 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1, c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
 				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
 			}
 		}
@@ -155,28 +210,32 @@ public class TestKernelMath {
 
 	@Test
 	public void convolve_1D_F64() {
-		Kernel1D_F64 k1 = FactoryKernel.random1D_F64(5,2,-1,1,rand);
-		Kernel1D_F64 k2 = FactoryKernel.random1D_F64(5,2,-1,1,rand);
+		Kernel1D_F64 k1 = new Kernel1D_F64(new double[]{4,3,2},3,1);
+		Kernel1D_F64 k2 = new Kernel1D_F64(new double[]{9,5,1},3,1);
 
-		Kernel2D_F64 c = KernelMath.convolve(k1,k2);
+		Kernel2D_F64 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1,c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
-				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-8);
 			}
 		}
 	}
 
 	@Test
 	public void convolve_1D_I32() {
-		Kernel1D_I32 k1 = FactoryKernel.random1D_I32(5,2,-1,1,rand);
-		Kernel1D_I32 k2 = FactoryKernel.random1D_I32(5,2,-1,1,rand);
+		Kernel1D_I32 k1 = new Kernel1D_I32(new int[]{4,3,2},3,1);
+		Kernel1D_I32 k2 = new Kernel1D_I32(new int[]{9,5,1},3,1);
 
-		Kernel2D_I32 c = KernelMath.convolve(k1,k2);
+		Kernel2D_I32 c = KernelMath.convolve2D(k1, k2);
+		assertEquals(3,c.width);
+		assertEquals(1,c.offset);
 
-		for( int i = 0; i < 5; i++ ) {
-			for( int j = 0; j < 5; j++ ) {
-				assertEquals(k1.data[i]*k2.data[j],c.get(j,i),1e-4);
+		for( int i = 0; i < 3; i++ ) {
+			for( int j = 0; j < 3; j++ ) {
+				assertEquals(k1.data[i]*k2.data[j],c.get(j,i));
 			}
 		}
 	}

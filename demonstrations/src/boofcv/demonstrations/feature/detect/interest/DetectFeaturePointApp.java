@@ -32,7 +32,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -148,8 +147,6 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 
 		final EasyGeneralFeatureDetector<T,D> det = (EasyGeneralFeatureDetector<T,D>) cookie;
 		det.detect(corruptImage,null);
-
-		double detectorRadius = BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
 
 		render.reset();
 		if( det.getDetector().isDetectMinimums() ) {

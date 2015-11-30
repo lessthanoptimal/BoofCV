@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,8 @@ public class TestSparseIntegralGradient_NoBorder_I32
 	public TestSparseIntegralGradient_NoBorder_I32() {
 		super(ImageSInt32.class, ImageSInt32.class,-radius-1,-radius-1,radius,radius);
 
-		alg = new SparseIntegralGradient_NoBorder_I32(size/2);
+		alg = new SparseIntegralGradient_NoBorder_I32();
+		((SparseIntegralGradient_NoBorder_I32)alg).setWidth(size);
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 		setKernels(kernelX,kernelY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,8 +79,9 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 		interp.setImage(blur);
 	}
 
-	public void process( float c_x , float c_y , float orientation , float scale , TupleDesc_B feature )
+	public void process( float c_x , float c_y , float orientation , float radius , TupleDesc_B feature )
 	{
+		float scale = radius/definition.radius;
 		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
 		// other than bilinear interpolation
 		boolean isInside =

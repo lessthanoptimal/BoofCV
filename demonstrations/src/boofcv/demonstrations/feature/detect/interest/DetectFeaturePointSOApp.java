@@ -32,7 +32,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -54,7 +53,7 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 	static int maxFeatures = 400;
 	static int maxScaleFeatures = maxFeatures / 3;
 
-	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 12};
+	public double[] scales = new double[]{1, 1.5, 2, 3, 4, 6, 8, 10,12,14,16,18};
 	int radius = 2;
 	float thresh = 1;
 	T grayImage;
@@ -78,8 +77,7 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 		addAlgorithm(0, "Hess Lap P", FactoryInterestPoint.wrapDetector(flp, scales, true,imageType));
 		addAlgorithm(0, "FastHessian", FactoryInterestPoint.<T>fastHessian(
 				new ConfigFastHessian(thresh, 2, maxScaleFeatures, 2, 9, 4, 4)));
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(0, "SIFT", FactoryInterestPoint.siftDetector(null,new ConfigSiftDetector(2,10,maxScaleFeatures,5)));
+		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(2*maxScaleFeatures),imageType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -129,12 +127,10 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 		final InterestPointDetector<T> det = (InterestPointDetector<T>) cookie;
 		det.detect(corruptImage);
 
-		double detectorRadius = BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
-
 		render.reset();
 		for (int i = 0; i < det.getNumberOfFeatures(); i++) {
 			Point2D_F64 p = det.getLocation(i);
-			int radius = (int) Math.ceil(det.getScale(i) * detectorRadius);
+			int radius = (int) Math.ceil(det.getRadius(i));
 			render.addCircle((int) p.x, (int) p.y, radius);
 		}
 
@@ -185,6 +181,6 @@ public class DetectFeaturePointSOApp<T extends ImageSingleBand, D extends ImageS
 			Thread.yield();
 		}
 
-		ShowImages.showWindow(app, "Point Feature");
+		ShowImages.showWindow(app, "Point Feature", true);
 	}
 }

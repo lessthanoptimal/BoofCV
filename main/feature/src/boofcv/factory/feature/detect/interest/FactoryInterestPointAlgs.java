@@ -24,12 +24,14 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.*;
+import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
+import boofcv.alg.feature.detect.interest.FeaturePyramid;
+import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -173,26 +175,7 @@ public class FactoryInterestPointAlgs {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(config.extractRadius, config.detectThreshold, 5, true));
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
-				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave, config.numberOfOctaves);
+				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave,
+				config.numberOfOctaves, config.scaleStepSize);
 	}
-
-	/**
-	 * Creates a SIFT feature detector.
-	 *
-	 * @see SiftDetector
-	 * @see SiftImageScaleSpace
-	 *
-	 * @param config Configuration for detector. Pass in null for default options.
-	 */
-	public static SiftDetector siftDetector( ConfigSiftDetector config )
-	{
-		if( config == null )
-			config = new ConfigSiftDetector();
-		config.checkValidity();
-
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(config.extractRadius, config.detectThreshold, 2, true, true, true));
-		return new SiftDetector(extractor,config.maxFeaturesPerScale,config.edgeThreshold);
-	}
-
 }

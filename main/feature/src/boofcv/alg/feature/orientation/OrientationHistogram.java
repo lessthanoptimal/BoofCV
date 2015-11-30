@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public abstract class OrientationHistogram <D extends ImageSingleBand>
 		implements OrientationGradient<D>
 {
 	// the region's radius
-	protected int radius;
+	protected double objectToSample;
 	// the radius at the set scale
 	protected int radiusScale;
 
@@ -72,10 +72,12 @@ public abstract class OrientationHistogram <D extends ImageSingleBand>
 	/**
 	 * Constructor. Specify region size and if it is weighted or not.
 	 *
+	 * @param objectToSample Converts the size of the object to the sample region size
 	 * @param numAngles Number of discrete angles that the orientation is estimated inside of
 	 */
-	public OrientationHistogram( int numAngles , boolean isWeighted ) {
+	public OrientationHistogram( double objectToSample, int numAngles , boolean isWeighted ) {
 		this.numAngles = numAngles;
+		this.objectToSample = objectToSample;
 		sumDerivX = new double[ numAngles ];
 		sumDerivY = new double[ numAngles ];
 
@@ -84,18 +86,18 @@ public abstract class OrientationHistogram <D extends ImageSingleBand>
 		this.isWeighted = isWeighted;
 	}
 
-	public int getRadius() {
-		return radius;
+	public double getObjectToSample() {
+		return objectToSample;
 	}
 
 	/**
 	 * Specify the size of the region that is considered.
 	 *
-	 * @param radius
+	 * @param objectToSample
 	 */
-	public void setRadius(int radius) {
-		this.radius = radius;
-		setScale(1);
+	public void setObjectToSample(int objectToSample) {
+		this.objectToSample = objectToSample;
+		setObjectRadius(objectToSample);
 	}
 
 	public Kernel2D_F32 getWeights() {
@@ -103,8 +105,8 @@ public abstract class OrientationHistogram <D extends ImageSingleBand>
 	}
 
 	@Override
-	public void setScale(double scale) {
-		radiusScale = (int)Math.ceil(scale*radius);
+	public void setObjectRadius(double objectRadius) {
+		radiusScale = (int)Math.ceil(objectRadius*objectToSample);
 		if( isWeighted ) {
 			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1,radiusScale);
 		}

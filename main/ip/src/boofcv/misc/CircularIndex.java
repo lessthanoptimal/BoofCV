@@ -88,6 +88,28 @@ public class CircularIndex {
 	}
 
 	/**
+	 * Returns the smallest distance you would need to travel (positive or negative) to go from index0 to index1.
+	 *
+	 * @param index0 element in circular buffer
+	 * @param index1 element in circular buffer
+	 * @param size size of the circular buffer
+	 * @return smallest distance
+	 */
+	public static int distance(int index0, int index1, int size) {
+		if( index0 > index1 ) {
+			int tmp = index0;
+			index0 = index1;
+			index1 = tmp;
+		}
+		int distance0 = index1-index0;
+		int distance1 = index0 + size-index1;
+		if( distance0 < distance1)
+			return distance0;
+		else
+			return distance1;
+	}
+
+	/**
 	 * Subtracts index1 from index0. positive number if its closer in the positive
 	 * direction or negative if closer in the negative direction.  if equal distance then
 	 * it will return a negative number.

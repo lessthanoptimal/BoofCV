@@ -119,10 +119,12 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleD
 	public static void main( String args[] ) {
 
 		Class imageType = ImageFloat32.class;
+//		Class imageType = ImageUInt8.class;
 
 		// select which algorithms to use
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
+		DetectDescribePoint detDesc = FactoryDetectDescribe.
+				surfStable(new ConfigFastHessian(1, 2, 300, 1, 9, 4, 4), null,null, imageType);
+//				sift(new ConfigCompleteSift(0,5,600));
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);

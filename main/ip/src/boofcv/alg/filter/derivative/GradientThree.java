@@ -27,6 +27,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -71,6 +72,26 @@ public class GradientThree {
 	public static void process(ImageUInt8 orig,
 							   ImageSInt16 derivX,
 							   ImageSInt16 derivY, ImageBorder_S32 border ) {
+		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		GradientThree_Standard.process(orig, derivX, derivY);
+
+		if( border != null ) {
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_I32, border);
+		}
+	}
+
+	/**
+	 * Computes the derivative of an {@link boofcv.struct.image.ImageUInt8} along the x and y axes.
+	 *
+	 * @param orig   Which which is to be differentiated. Not Modified.
+	 * @param derivX Derivative along the x-axis. Modified.
+	 * @param derivY Derivative along the y-axis. Modified.
+	 * @param border Specifies how the image border is handled. If null the border is not processed.
+	 */
+	public static void process(ImageUInt8 orig,
+							   ImageSInt32 derivX,
+							   ImageSInt32 derivY, ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientThree_Standard.process(orig, derivX, derivY);
 

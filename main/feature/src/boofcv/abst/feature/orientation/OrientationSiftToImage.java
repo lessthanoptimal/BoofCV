@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,13 @@
 
 package boofcv.abst.feature.orientation;
 
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
+import boofcv.alg.feature.detect.interest.UnrollSiftScaleSpaceGradient;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
+import boofcv.core.image.GConvertImage;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 
 /**
  * Wrapper around {@link OrientationHistogramSift} for {@link OrientationImage}.  Selects
@@ -28,37 +32,53 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class OrientationSiftToImage implements OrientationImage<ImageFloat32>
+public class OrientationSiftToImage<T extends ImageSingleBand>
+		implements OrientationImage<T>
 {
-	SiftImageScaleSpace ss;
+	UnrollSiftScaleSpaceGradient scaleSpace;
 	OrientationHistogramSift alg;
-	double scale;
+	UnrollSiftScaleSpaceGradient.ImageScale image;
+	double sigma;
 
-	public OrientationSiftToImage(OrientationHistogramSift alg, SiftImageScaleSpace ss) {
+	Class<T> imageType;
+	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+
+	public OrientationSiftToImage(OrientationHistogramSift<ImageFloat32> alg,
+								  SiftScaleSpace ss, Class<T> imageType ) {
 		this.alg = alg;
-		this.ss = ss;
+		this.scaleSpace = new UnrollSiftScaleSpaceGradient(ss);
+		this.imageType = imageType;
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image) {
-		ss.constructPyramid(image);
-		ss.computeDerivatives();
-		alg.setScaleSpace(ss);
+	public void setImage(T image) {
+
+		ImageFloat32 input;
+		if( image instanceof ImageFloat32 ) {
+			input = (ImageFloat32)image;
+		} else {
+			imageFloat.reshape(image.width,image.height);
+			GConvertImage.convert(image,imageFloat);
+			input = imageFloat;
+		}
+
+		scaleSpace.setImage(input);
 	}
 
 	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
+	public Class<T> getImageType() {
+		return imageType;
 	}
 
 	@Override
-	public void setScale(double scale) {
-		this.scale = scale;
+	public void setObjectRadius(double radius) {
+		sigma = radius/ BoofDefaults.SIFT_SCALE_TO_RADIUS;
+		this.image = scaleSpace.lookup(sigma);
 	}
 
 	@Override
 	public double compute(double c_x, double c_y) {
-		alg.process(c_x,c_y,scale);
+		alg.process(c_x*image.imageToInput,c_y*image.imageToInput, sigma*image.imageToInput);
 
 		return alg.getPeakOrientation();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,10 @@ import org.ddogleg.stats.UtilGaussian;
 /**
  * @author Peter Abeles
  */
+// TODO don't use radius use width so that even and odd width kernels are supported
+	//  Maybe do the transition by adding a boolean parameter for one release?
+	//  Just rename...
+// TODO remove ability to normalize with a flag.  Use kernel math instead.  More explicit, easier testing
 // todo add size heuristic for derivative that is different from regular kernel
 public class FactoryKernelGaussian {
 	// when converting to integer kernels what is the minimum size of the an element relative to the maximum
@@ -109,12 +113,12 @@ public class FactoryKernelGaussian {
 
 		if( DOF == 2 ) {
 			if( numBits == 32 ) {
-				Kernel2D_F32 k = gaussian2D_F32(sigma,radius, isFloat);
+				Kernel2D_F32 k = gaussian2D_F32(sigma,radius, true, isFloat);
 				if( isFloat )
 					return (T)k;
 				return (T) KernelMath.convert(k,MIN_FRAC);
 			} else if( numBits == 64 ) {
-				Kernel2D_F64 k = gaussian2D_F64(sigma,radius, isFloat);
+				Kernel2D_F64 k = gaussian2D_F64(sigma,radius, true, isFloat);
 				if( isFloat )
 					return (T)k;
 				else
@@ -124,12 +128,12 @@ public class FactoryKernelGaussian {
 			}
 		} else if( DOF == 1 ) {
 			if( numBits == 32 ) {
-				Kernel1D_F32 k = gaussian1D_F32(sigma,radius, isFloat);
+				Kernel1D_F32 k = gaussian1D_F32(sigma,radius, true, isFloat);
 				if( isFloat )
 					return (T)k;
 				return (T)KernelMath.convert(k,MIN_FRAC);
 			} else if( numBits == 64 ) {
-				Kernel1D_F64 k = gaussian1D_F64(sigma, radius, isFloat);
+				Kernel1D_F64 k = gaussian1D_F64(sigma, radius, true, isFloat);
 				if( isFloat )
 					return (T)k;
 				return (T)KernelMath.convert(k,MIN_FRACD);
@@ -193,20 +197,26 @@ public class FactoryKernelGaussian {
 	 * Creates a floating point Gaussian kernel with the sigma and radius.
 	 * If normalized is set to true then the elements in the kernel will sum up to one.
 	 * </p>
-	 *
-	 * @param sigma	 Distributions standard deviation.
-	 * @param radius	Kernel's radius.
+	 * @param sigma     Distributions standard deviation.
+	 * @param radius    Kernel's radius.
+	 * @param odd Does the kernel have an even or add width
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	protected static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean normalize) {
-		Kernel1D_F32 ret = new Kernel1D_F32(radius * 2 + 1);
-		float[] gaussian = ret.data;
-		int index = 0;
-
-		for (int i = radius; i >= -radius; i--) {
-			gaussian[index++] = (float) UtilGaussian.computePDF(0, sigma, i);
+	protected static Kernel1D_F32 gaussian1D_F32(double sigma, int radius, boolean odd, boolean normalize) {
+		Kernel1D_F32 ret;
+		if( odd ) {
+			ret = new Kernel1D_F32(radius * 2 + 1);
+			int index = 0;
+			for (int i = radius; i >= -radius; i--) {
+				ret.data[index++] = (float) UtilGaussian.computePDF(0, sigma, i);
+			}
+		} else {
+			ret = new Kernel1D_F32(radius * 2);
+			int index = 0;
+			for (int i = radius; i > -radius; i--) {
+				ret.data[index++] = (float) UtilGaussian.computePDF(0, sigma, i-0.5);
+			}
 		}
-
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
 		}
@@ -214,15 +224,21 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	protected static Kernel1D_F64 gaussian1D_F64(double sigma, int radius, boolean normalize) {
-		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
-		double[] gaussian = ret.data;
-		int index = 0;
-
-		for (int i = radius; i >= -radius; i--) {
-			gaussian[index++] = UtilGaussian.computePDF(0, sigma, i);
+	protected static Kernel1D_F64 gaussian1D_F64(double sigma, int radius, boolean odd, boolean normalize) {
+		Kernel1D_F64 ret;
+		if( odd ) {
+			ret = new Kernel1D_F64(radius * 2 + 1);
+			int index = 0;
+			for (int i = radius; i >= -radius; i--) {
+				ret.data[index++] = UtilGaussian.computePDF(0, sigma, i);
+			}
+		} else {
+			ret = new Kernel1D_F64(radius * 2);
+			int index = 0;
+			for (int i = radius; i > -radius; i--) {
+				ret.data[index++] = UtilGaussian.computePDF(0, sigma, i-0.5);
+			}
 		}
-
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
 		}
@@ -232,14 +248,14 @@ public class FactoryKernelGaussian {
 
 	/**
 	 * Creates a kernel for a 2D convolution.  This should only be used for validation purposes.
-	 *
-	 * @param sigma	 Distributions standard deviation.
-	 * @param radius	Kernel's radius.
+	 * @param sigma Distributions standard deviation.
+	 * @param radius Kernel's radius.
+	 * @param odd Does the kernel have an even or add width
 	 * @param normalize If the kernel should be normalized to one or not.
 	 */
-	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean normalize) {
-		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius,false);
-		Kernel2D_F32 ret = KernelMath.convolve(kernel1D,kernel1D);
+	public static Kernel2D_F32 gaussian2D_F32(double sigma, int radius, boolean odd, boolean normalize) {
+		Kernel1D_F32 kernel1D = gaussian1D_F32(sigma,radius, odd, false);
+		Kernel2D_F32 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
@@ -248,9 +264,9 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
-	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean normalize) {
-		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius,false);
-		Kernel2D_F64 ret = KernelMath.convolve(kernel1D,kernel1D);
+	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean odd, boolean normalize) {
+		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius, odd, false);
+		Kernel2D_F64 ret = KernelMath.convolve2D(kernel1D, kernel1D);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);
@@ -382,7 +398,7 @@ public class FactoryKernelGaussian {
 
 			return ret;
 		} else {
-			return gaussian2D_F64(sigma,width/2,true);
+			return gaussian2D_F64(sigma,width/2, true, true);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,33 +41,25 @@ public class GeneralToInterestPoint<T extends ImageSingleBand, D extends ImageSi
 		implements InterestPointDetector<T>
 {
 
-	double scale = 1;
+	double radius;
 
 	// list of points it found
 	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
-								  double scale,
+								  double radius,
 								  Class<T> imageType, Class<D> derivType) {
 		super(detector,imageType,derivType);
-		this.scale = scale;
+		this.radius = radius;
 	}
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
 								  ImageGradient<T, D> gradient,
 								  ImageHessian<D> hessian,
-								  double scale,
+								  double radius,
 								  Class<D> derivType) {
 		super(detector, gradient, hessian, derivType);
-		this.scale = scale;
-	}
-
-	public void setScale(double scale) {
-		this.scale = scale;
-	}
-
-	public double getScale() {
-		return scale;
+		this.radius = radius;
 	}
 
 	@Override
@@ -106,8 +98,8 @@ public class GeneralToInterestPoint<T extends ImageSingleBand, D extends ImageSi
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return scale;
+	public double getRadius(int featureIndex) {
+		return radius;
 	}
 
 	@Override

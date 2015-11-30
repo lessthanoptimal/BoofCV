@@ -63,11 +63,11 @@ public class TestDescribeMultiSpectral {
 
 		scale = true;
 		ori = false;
-		assertTrue(alg.requiresScale());
+		assertTrue(alg.requiresRadius());
 		assertFalse(alg.requiresOrientation());
 		scale = false;
 		ori = true;
-		assertFalse(alg.requiresScale());
+		assertFalse(alg.requiresRadius());
 		assertTrue(alg.requiresOrientation());
 	}
 
@@ -124,13 +124,13 @@ public class TestDescribeMultiSpectral {
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double scale, TupleDesc description) {
+		public boolean process(double x, double y, double orientation, double radius, TupleDesc description) {
 			numProcess++;
 			return true;
 		}
 
 		@Override
-		public boolean requiresScale() {
+		public boolean requiresRadius() {
 			return scale;
 		}
 

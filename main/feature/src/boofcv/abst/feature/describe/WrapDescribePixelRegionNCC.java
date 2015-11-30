@@ -51,7 +51,7 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, NccFeature storage )
+	public boolean process(double x, double y, double orientation, double radius, NccFeature storage )
 	{
 		if( storage == null )
 			storage = createDescription();
@@ -65,7 +65,7 @@ public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return false;
 	}
 

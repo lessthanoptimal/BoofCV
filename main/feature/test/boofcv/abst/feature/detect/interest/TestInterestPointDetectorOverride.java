@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public class TestInterestPointDetectorOverride {
 		assertTrue(o.setImage);
 
 		alg.getOrientation(0);
-		assertTrue(o.setScale);
+		assertTrue(o.setRadius);
 	}
 
 	private static class DummyPoint implements InterestPointDetector {
@@ -111,7 +111,7 @@ public class TestInterestPointDetectorOverride {
 		public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64();}
 
 		@Override
-		public double getScale(int featureIndex) {return 1;}
+		public double getRadius(int featureIndex) {return 1;}
 
 		@Override
 		public double getOrientation(int featureIndex) {return 2;}
@@ -126,7 +126,7 @@ public class TestInterestPointDetectorOverride {
 	private static class DummyOrientation implements OrientationImage {
 
 		boolean setImage = false;
-		boolean setScale = false;
+		boolean setRadius = false;
 
 		@Override
 		public void setImage(ImageSingleBand image) { setImage =true;}
@@ -135,7 +135,7 @@ public class TestInterestPointDetectorOverride {
 		public Class getImageType() {return null;}
 
 		@Override
-		public void setScale(double scale) {setScale=true;}
+		public void setObjectRadius(double radius) {setRadius =true;}
 
 		@Override
 		public double compute(double c_x, double c_y) {return 3;}

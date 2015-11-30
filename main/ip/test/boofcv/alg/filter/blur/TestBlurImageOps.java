@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,7 +142,7 @@ public class TestBlurImageOps {
 
 			// make sure the kernels are equivalent
 			Kernel1D_I32 ker1 = FactoryKernelGaussian.gaussian(1, false, 32, -1, radius);
-			Kernel2D_I32 kernel = KernelMath.convolve(ker1, ker1);
+			Kernel2D_I32 kernel = KernelMath.convolve2D(ker1, ker1);
 			ConvolveNormalizedNaive.convolve(kernel, input, expected);
 
 			BlurImageOps.gaussian(input,found,-1,radius,null);

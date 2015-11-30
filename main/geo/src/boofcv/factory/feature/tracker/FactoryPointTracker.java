@@ -166,15 +166,15 @@ public class FactoryPointTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
-		AssociateDescription2D<SurfFeature> generalAssoc =
-				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription2D<BrightFeature> generalAssoc =
+				new AssociateDescTo2D<BrightFeature>(new WrapAssociateSurfBasic(assoc));
 
-		DetectDescribePoint<I,SurfFeature> fused =
+		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
+		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<I,BrightFeature>(fused);
 
-		return new DetectDescribeAssociate<I,SurfFeature>(manager, generalAssoc,false);
+		return new DetectDescribeAssociate<I,BrightFeature>(manager, generalAssoc,false);
 	}
 
 	/**
@@ -201,15 +201,15 @@ public class FactoryPointTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
-		AssociateDescription2D<SurfFeature> generalAssoc =
-				new AssociateDescTo2D<SurfFeature>(new WrapAssociateSurfBasic(assoc));
+		AssociateDescription2D<BrightFeature> generalAssoc =
+				new AssociateDescTo2D<BrightFeature>(new WrapAssociateSurfBasic(assoc));
 
-		DetectDescribePoint<I,SurfFeature> fused =
+		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,SurfFeature> manager = new DdaManagerDetectDescribePoint<I,SurfFeature>(fused);
+		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<I,BrightFeature>(fused);
 
-		return new DetectDescribeAssociate<I,SurfFeature>(manager, generalAssoc,false);
+		return new DetectDescribeAssociate<I,BrightFeature>(manager, generalAssoc,false);
 	}
 
 	/**
@@ -393,9 +393,9 @@ public class FactoryPointTracker {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
 
-		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
-		DetectDescribePoint<I,SurfFeature> fused =
+		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation,imageType);
 
 		return combined(fused,generalAssoc, kltConfig,reactivateThreshold, imageType);
@@ -432,13 +432,13 @@ public class FactoryPointTracker {
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
-		DescribeRegionPoint<I,SurfFeature> regionDesc
+		DescribeRegionPoint<I,BrightFeature> regionDesc
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
 
-		AssociateDescription<SurfFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
+		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
 		OrientationImage<I> orientation = null;
 

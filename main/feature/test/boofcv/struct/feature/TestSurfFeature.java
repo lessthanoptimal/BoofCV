@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,12 +35,12 @@ public class TestSurfFeature {
 	@Test
 	public void setTo() {
 
-		SurfFeature a = new SurfFeature(10);
-		a.laplacianPositive = true;
+		BrightFeature a = new BrightFeature(10);
+		a.white = true;
 		for( int i = 0; i < a.value.length; i++ )
 			a.value[i] = rand.nextDouble();
 
-		SurfFeature b = new SurfFeature(10);
+		BrightFeature b = new BrightFeature(10);
 
 		b.setTo(a);
 
@@ -49,18 +49,18 @@ public class TestSurfFeature {
 
 	@Test
 	public void copy() {
-		SurfFeature a = new SurfFeature(10);
-		a.laplacianPositive = true;
+		BrightFeature a = new BrightFeature(10);
+		a.white = true;
 		for( int i = 0; i < a.value.length; i++ )
 			a.value[i] = rand.nextDouble();
 
-		SurfFeature b = a.copy();
+		BrightFeature b = a.copy();
 
 		checkIdentical(a, b);
 	}
 
-	private void checkIdentical(SurfFeature a, SurfFeature b) {
-		assertTrue(a.laplacianPositive==b.laplacianPositive);
+	private void checkIdentical(BrightFeature a, BrightFeature b) {
+		assertTrue(a.white ==b.white);
 		assertEquals(a.value.length,b.value.length);
 		for( int i = 0; i < a.value.length; i++ ) {
 			assertTrue(a.value[i] == b.value[i]);

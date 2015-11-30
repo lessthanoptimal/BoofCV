@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.struct.BoofDefaults;
+
 /**
  * Configuration for {@link boofcv.alg.feature.orientation.impl.ImplOrientationSlidingWindowIntegral}.
  *
@@ -25,6 +27,11 @@ package boofcv.abst.feature.orientation;
  */
 public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 
+	/**
+	 * How to convert the radius to the internal canonical scale.  Can be used to adjust how
+	 * big or small the region is.
+	 */
+	public double objectRadiusToScale = 1.0/BoofDefaults.SURF_SCALE_TO_RADIUS;
 	/**
 	 * How often the image is sampled.  This number is scaled.  Typically 0.65.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
@@ -33,7 +34,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSingleBand> implements InterestPointDetector<T> {
-
 
 	// detects the feature's location and scale
 	FastHessianFeatureDetector<II> detector;
@@ -68,8 +68,8 @@ public class WrapFHtoInterestPoint<T extends ImageSingleBand, II extends ImageSi
 	}
 
 	@Override
-	public double getScale(int featureIndex) {
-		return location.get(featureIndex).scale;
+	public double getRadius(int featureIndex) {
+		return location.get(featureIndex).scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
 	}
 
 	@Override

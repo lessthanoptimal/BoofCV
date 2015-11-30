@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
+public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests {
 
 	public TestFastHessianFeatureDetector() {
 		this.scaleTolerance = 0.3;
@@ -37,7 +37,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetector {
 	@Override
 	protected Object createDetector( int maxFeatures ) {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
-		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4);
+		return new FastHessianFeatureDetector(extractor,maxFeatures, 1, 9,4,4, 6);
 	}
 
 	@SuppressWarnings({"unchecked"})

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,33 @@
 
 package boofcv.abst.feature.detdesc;
 
-import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
+import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapDetectDescribeSift extends GenericTestsDetectDescribePoint<ImageFloat32,SurfFeature>{
+@SuppressWarnings("ALL")
+public class TestDetectDescribe_CompleteSift
+{
+	Class types[] = new Class[]{ImageFloat32.class,ImageUInt8.class};
 
-	public TestWrapDetectDescribeSift() {
-		super(true, true, ImageType.single(ImageFloat32.class), SurfFeature.class);
-	}
+	@Test
+	public void allTypes() {
+		for( final Class type : types ) {
+			final Class derivType = GImageDerivativeOps.getDerivativeType(type);
+			new GenericTestsDetectDescribePoint(true,true,ImageType.single(type),BrightFeature.class) {
 
-	@Override
-	public DetectDescribePoint<ImageFloat32, SurfFeature> createDetDesc() {
-		return FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,500,5),null,null);
+				@Override
+				public DetectDescribePoint createDetDesc() {
+					return FactoryDetectDescribe.sift(null);
+				}
+			}.allTests();
+		}
 	}
 }

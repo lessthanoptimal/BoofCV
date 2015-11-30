@@ -29,7 +29,6 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -74,8 +73,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
 		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
-		if( imageType == ImageFloat32.class )
-			addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null));
+		addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
 		addAlgorithm(0,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
@@ -164,10 +162,8 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 	 */
 	private void updateTargetDescription() {
 		if( targetPt != null ) {
-			double scale = targetRadius/ BoofDefaults.SCALE_SPACE_CANONICAL_RADIUS;
-
 			TupleDesc feature = describe.createDescription();
-			describe.process(targetPt.x,targetPt.y,targetOrientation,scale,feature);
+			describe.process(targetPt.x,targetPt.y,targetOrientation,targetRadius,feature);
 			tuplePanel.setDescription(feature);
 		} else {
 			tuplePanel.setDescription(null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,8 @@ public class TestSparseIntegralHaar_NoBorder_F32
 	public TestSparseIntegralHaar_NoBorder_F32() {
 		super(ImageFloat32.class, ImageFloat32.class,-radius,-radius,radius,radius);
 
-		alg = new SparseIntegralHaar_NoBorder_F32(radius);
+		alg = new SparseIntegralHaar_NoBorder_F32();
+		((SparseIntegralHaar_NoBorder_F32)alg).setWidth(size);
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelHaarX(radius,null);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelHaarY(radius,null);
 		setKernels(kernelX,kernelY);

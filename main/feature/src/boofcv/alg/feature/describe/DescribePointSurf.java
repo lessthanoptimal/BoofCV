@@ -24,7 +24,7 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sparse.GradientValue;
@@ -124,8 +124,8 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		// each sub-region provides 4 features
 		featureDOF = widthLargeGrid*widthLargeGrid*4;
 
-		// create the function that the gradient is sampled with
-		gradient = SurfDescribeOps.createGradient(useHaar,widthSample, inputType);
+		// create the function that the gradient is sampled with=
+		gradient = SurfDescribeOps.createGradient(useHaar, inputType);
 		gradientSafe = new SparseGradientSafe(this.gradient);
 
 		radiusDescriptor = (widthLargeGrid*widthSubRegion)/2;
@@ -138,8 +138,8 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		this(4,5,3, 4.5 , false,inputType);
 	}
 
-	public SurfFeature createDescription() {
-		return new SurfFeature(featureDOF);
+	public BrightFeature createDescription() {
+		return new BrightFeature(featureDOF);
 	}
 
 	public void setImage( II integralImage ) {
@@ -159,7 +159,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 	 * @param scale Scale of the interest point. Null is returned if the feature goes outside the image border.
 	 * @param ret storage for the feature. Must have 64 values.
 	 */
-	public void describe(double x, double y, double angle, double scale, SurfFeature ret)
+	public void describe(double x, double y, double angle, double scale, BrightFeature ret)
 	{
 		describe(x, y, angle, scale, (TupleDesc_F64) ret);
 
@@ -168,7 +168,7 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 		UtilFeature.normalizeL2(ret);
 
 		// Laplacian's sign
-		ret.laplacianPositive = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
+		ret.white = computeLaplaceSign((int)(x+0.5),(int)(y+0.5), scale);
 	}
 
 	/**
@@ -191,12 +191,12 @@ public class DescribePointSurf<II extends ImageSingleBand> {
 
 		// declare the feature if needed
 		if( ret == null )
-			ret = new SurfFeature(featureDOF);
+			ret = new BrightFeature(featureDOF);
 		else if( ret.value.length != featureDOF )
 			throw new IllegalArgumentException("Provided feature must have "+featureDOF+" values");
 
 		gradient.setImage(ii);
-		gradient.setScale(scale);
+		gradient.setWidth(widthSample*scale);
 
 		// use a safe method if its along the image border
 		SparseImageGradient gradient = isInBounds ? this.gradient : this.gradientSafe;

@@ -68,13 +68,15 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(radius, imageType));
-		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(radius, false, derivType));
-		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(radius, true, derivType));
-		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(10, radius, false, derivType));
-		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(10, radius, true, derivType));
-		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, false, derivType));
-		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(20, Math.PI / 3.0, radius, true, derivType));
+		double objectToScale = 1.0/2.0;
+
+		addAlgorithm(0, "Pixel", FactoryOrientationAlgs.nogradient(objectToScale,radius, imageType));
+		addAlgorithm(0, "Gradient Average", FactoryOrientationAlgs.average(objectToScale,radius, false, derivType));
+		addAlgorithm(0, "Gradient Average Weighted", FactoryOrientationAlgs.average(objectToScale,radius, true, derivType));
+		addAlgorithm(0, "Gradient Histogram 10", FactoryOrientationAlgs.histogram(objectToScale,10, radius, false, derivType));
+		addAlgorithm(0, "Gradient Histogram 10 Weighted", FactoryOrientationAlgs.histogram(objectToScale,10, radius, true, derivType));
+		addAlgorithm(0, "Gradient Sliding", FactoryOrientationAlgs.sliding(objectToScale,20, Math.PI / 3.0, radius, false, derivType));
+		addAlgorithm(0, "Gradient Sliding Weighted", FactoryOrientationAlgs.sliding(objectToScale,20, Math.PI / 3.0, radius, true, derivType));
 		addAlgorithm(0, "Integral Average", FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius, 1, 4, 0), imageType));
 		addAlgorithm(0, "Integral Average Weighted", FactoryOrientationAlgs.average_ii(new ConfigAverageIntegral(radius, 1, 4, -1), imageType));
 		addAlgorithm(0, "Integral Sliding", FactoryOrientationAlgs.sliding_ii(
@@ -116,6 +118,7 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 			return;
 
 		RegionOrientation orientation = (RegionOrientation) cookie;
+		orientation.setObjectRadius(10);
 
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);

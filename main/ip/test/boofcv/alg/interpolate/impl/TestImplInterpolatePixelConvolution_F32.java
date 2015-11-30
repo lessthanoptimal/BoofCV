@@ -85,6 +85,9 @@ public class TestImplInterpolatePixelConvolution_F32 extends GeneralChecksInterp
 		}
 
 		@Override
+		public void setD(int index, double value) {}
+
+		@Override
 		public boolean isInteger() {
 			return false;
 		}

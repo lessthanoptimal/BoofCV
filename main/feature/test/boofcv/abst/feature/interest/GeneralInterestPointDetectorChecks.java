@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,13 +98,13 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageSingleBa
 
 		for( int i = 0; i < detector.getNumberOfFeatures(); i++ ) {
 			Point2D_F64 p = detector.getLocation(i);
-			double scale = detector.getScale(i);
+			double radius = detector.getRadius(i);
 			double yaw = detector.getOrientation(i);
 
 			if( p.x != 0 && p.y != 0 )
 				numPoint++;
 
-			if( scale != 1 )
+			if( radius != 1 )
 				numScale++;
 
 			if( yaw != 0 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,8 @@ public abstract class OrientationAverage<D extends ImageSingleBand> implements O
 	// this makes it easy to avoid going outside the image
 	protected ImageRectangle rect = new ImageRectangle();
 
-	protected int radius;
+	protected double objectToSample;
+	protected int sampleRadius;
 	// the radius at this scale
 	protected int radiusScale;
 
@@ -53,17 +54,18 @@ public abstract class OrientationAverage<D extends ImageSingleBand> implements O
 	// optional weights
 	protected Kernel2D_F32 weights;
 
-	protected OrientationAverage(boolean weighted) {
+	protected OrientationAverage(double objectRadiusToScale, boolean weighted) {
+		this.objectToSample = objectRadiusToScale;
 		isWeighted = weighted;
 	}
 
-	public int getRadius() {
-		return radius;
+	public int getSampleRadius() {
+		return sampleRadius;
 	}
 
-	public void setRadius(int radius) {
-		this.radius = radius;
-		setScale(1);
+	public void setSampleRadius(int sampleRadius) {
+		this.sampleRadius = sampleRadius;
+		setObjectRadius(sampleRadius);
 	}
 
 	public Kernel2D_F32 getWeights() {
@@ -71,8 +73,8 @@ public abstract class OrientationAverage<D extends ImageSingleBand> implements O
 	}
 
 	@Override
-	public void setScale(double scale) {
-		radiusScale = (int)Math.ceil(scale*radius);
+	public void setObjectRadius(double radius) {
+		radiusScale = (int)Math.ceil(radius*objectToSample);
 		if( isWeighted ) {
 			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1,radiusScale);
 		}

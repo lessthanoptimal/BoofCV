@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,8 @@ public class TestDescribePointBriefSO {
 	int height = 40;
 	Class<ImageFloat32> imageType = ImageFloat32.class;
 
-	BinaryCompareDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, 5, 20);
+	int briefRadius = 5;
+	BinaryCompareDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, briefRadius, 20);
 	BlurFilter<ImageFloat32> filterBlur;
 
 	public TestDescribePointBriefSO() {
@@ -76,8 +77,8 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc2 = alg.createFeature();
 
 		alg.setImage(input);
-		alg.process(input.width/2,input.height/2,0,1,desc1);
-		alg.process(input.width/2,input.height/2,1,1,desc2);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc1);
+		alg.process(input.width/2,input.height/2,1,briefRadius,desc2);
 
 		boolean identical = true;
 		for( int i = 0; i < desc1.data.length; i++ ) {
@@ -100,8 +101,8 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc2 = alg.createFeature();
 
 		alg.setImage(input);
-		alg.process(input.width/2,input.height/2,0,1,desc1);
-		alg.process(input.width/2,input.height/2,0,2,desc2);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc1);
+		alg.process(input.width/2,input.height/2,0,2*briefRadius,desc2);
 
 		boolean identical = true;
 		for( int i = 0; i < desc1.data.length; i++ ) {
@@ -125,12 +126,12 @@ public class TestDescribePointBriefSO {
 
 		// resize the image and see if it computes the same output
 		alg.setImage(input);
-		alg.process(input.width/2,input.height/2,0,1,desc1);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc1);
 
 		ImageFloat32 sub = BoofTesting.createSubImageOf(input);
 
 		alg.setImage(sub);
-		alg.process(input.width/2,input.height/2,0,1,desc2);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc2);
 
 		for( int i = 0; i < desc1.data.length; i++ ) {
 			assertEquals(desc1.data[i],desc2.data[i]);
@@ -149,11 +150,11 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc = alg.createFeature();
 
 		alg.setImage(inputA);
-		alg.process(inputA.width/2,inputA.height/2,0,1,desc);
+		alg.process(inputA.width/2,inputA.height/2,0,briefRadius,desc);
 
 		// just see if it blows up or not
 		alg.setImage(inputB);
-		alg.process(inputA.width/2,inputA.height/2,0,1,desc);
+		alg.process(inputA.width/2,inputA.height/2,0,briefRadius,desc);
 	}
 
 	/**
@@ -173,10 +174,10 @@ public class TestDescribePointBriefSO {
 
 		// compute the image from the same image but different intensities
 		alg.setImage(input);
-		alg.process(input.width/2,input.height/2,0,1,desc1);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc1);
 
 		alg.setImage(mod);
-		alg.process(input.width/2,input.height/2,0,1,desc2);
+		alg.process(input.width/2,input.height/2,0,briefRadius,desc2);
 
 		// compare the descriptions
 		int count = 0;
@@ -206,7 +207,7 @@ public class TestDescribePointBriefSO {
 		int c_y = input.height/2;
 
 		TupleDesc_B desc = alg.createFeature();
-		alg.process(c_x,c_y,0,1,desc);
+		alg.process(c_x,c_y,0,briefRadius,desc);
 
 		for( int i = 0; i < def.compare.length; i++ ) {
 			Point2D_I32 c = def.compare[i];
@@ -236,8 +237,8 @@ public class TestDescribePointBriefSO {
 		assertTrue(desc.data[0] == 0 );
 
 		// just see if it blows up for now.  a more rigorous test would be better
-		alg.process(0, 0, 0.1f , 1.2f,desc);
-		alg.process(width - 1, height - 1, 0.1f, 1.2f, desc);
+		alg.process(0, 0, 0.1f , briefRadius*1.2f,desc);
+		alg.process(width - 1, height - 1, 0.1f, briefRadius*1.2f, desc);
 
 		// sanity check.  the description should not be zero
 		assertTrue(desc.data[0] != 0 );

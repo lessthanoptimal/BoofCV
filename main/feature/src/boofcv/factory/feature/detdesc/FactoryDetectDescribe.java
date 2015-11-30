@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.*;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
@@ -31,17 +33,17 @@ import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.DescribePointSurfMod;
 import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
-import boofcv.alg.feature.detdesc.DetectDescribeSift;
+import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.detect.interest.SiftDetector;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageMultiBand;
@@ -58,33 +60,35 @@ public class FactoryDetectDescribe {
 	/**
 	 * Creates a new SIFT feature detector and describer.
 	 *
-	 * @param configSS Configuration for scale-space.  Pass in null for default options.
-	 * @param configDetector Configuration for detector.  Pass in null for default options.
-	 * @param configOri Configuration for region orientation.  Pass in null for default options.
-	 * @param configDesc Configuration for descriptor. Pass in null for default options.
+	 * @see CompleteSift
+	 *
+	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
 	 */
-	public static DetectDescribePoint<ImageFloat32,SurfFeature>
-	sift( ConfigSiftScaleSpace configSS,
-		  ConfigSiftDetector configDetector ,
-		  ConfigSiftOrientation configOri ,
-		  ConfigSiftDescribe configDesc) {
+	public static <T extends ImageSingleBand>
+	DetectDescribePoint<T,BrightFeature> sift(ConfigCompleteSift config )
+	{
+		if( config == null )
+			config = new ConfigCompleteSift();
 
-		if( configSS == null )
-			configSS = new ConfigSiftScaleSpace();
-		configSS.checkValidity();
+		ConfigSiftScaleSpace configSS = config.scaleSpace;
+		ConfigSiftDetector configDetector = config.detector;
+		ConfigSiftOrientation configOri = config.orientation;
+		ConfigSiftDescribe configDesc = config.describe;
 
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(configSS.blurSigma, configSS.numScales, configSS.numOctaves,
-				configSS.doubleInputImage);
+		SiftScaleSpace scaleSpace = new SiftScaleSpace(
+				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		OrientationHistogramSift<ImageFloat32> orientation = new OrientationHistogramSift<ImageFloat32>(
+				configOri.histogramSize,configOri.sigmaEnlarge,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> describe = new DescribePointSift<ImageFloat32>(
+				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
+				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
+				configDesc.maxDescriptorElementValue,ImageFloat32.class);
 
-		SiftDetector detector = FactoryInterestPointAlgs.siftDetector(configDetector);
-
-		OrientationHistogramSift orientation = FactoryOrientationAlgs.sift(configOri);
-		DescribePointSift describe = FactoryDescribePointAlgs.sift(configDesc);
-
-		DetectDescribeSift combined = new DetectDescribeSift(ss,detector,orientation,describe);
-
-		return new WrapDetectDescribeSift(combined);
+		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
+		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
+		CompleteSift dds = new CompleteSift(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
+		return new DetectDescribe_CompleteSift<T>(dds);
 	}
 
 	/**
@@ -108,10 +112,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DetectDescribePoint<T,SurfFeature> surfFast( ConfigFastHessian configDetector ,
-												 ConfigSurfDescribe.Speed configDesc,
-												 ConfigAverageIntegral configOrientation,
-												 Class<T> imageType) {
+	DetectDescribePoint<T,BrightFeature> surfFast(ConfigFastHessian configDetector ,
+												  ConfigSurfDescribe.Speed configDesc,
+												  ConfigAverageIntegral configOrientation,
+												  Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -139,10 +143,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DetectDescribePoint<T,SurfFeature> surfColorFast( ConfigFastHessian configDetector ,
-													  ConfigSurfDescribe.Speed configDesc,
-													  ConfigAverageIntegral configOrientation,
-													  ImageType<T> imageType) {
+	DetectDescribePoint<T,BrightFeature> surfColorFast(ConfigFastHessian configDetector ,
+													   ConfigSurfDescribe.Speed configDesc,
+													   ConfigAverageIntegral configOrientation,
+													   ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -186,10 +190,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DetectDescribePoint<T,SurfFeature> surfStable( ConfigFastHessian configDetector,
-												   ConfigSurfDescribe.Stability configDescribe,
-												   ConfigSlidingIntegral configOrientation,
-												   Class<T> imageType ) {
+	DetectDescribePoint<T,BrightFeature> surfStable(ConfigFastHessian configDetector,
+													ConfigSurfDescribe.Stability configDescribe,
+													ConfigSlidingIntegral configOrientation,
+													Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -218,10 +222,10 @@ public class FactoryDetectDescribe {
 	 * @return SURF detector and descriptor
 	 */
 	public static <T extends ImageMultiBand, II extends ImageSingleBand>
-	DetectDescribePoint<T,SurfFeature> surfColorStable( ConfigFastHessian configDetector,
-														ConfigSurfDescribe.Stability configDescribe,
-														ConfigSlidingIntegral configOrientation,
-														ImageType<T> imageType ) {
+	DetectDescribePoint<T,BrightFeature> surfColorStable(ConfigFastHessian configDetector,
+														 ConfigSurfDescribe.Stability configDescribe,
+														 ConfigSlidingIntegral configOrientation,
+														 ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

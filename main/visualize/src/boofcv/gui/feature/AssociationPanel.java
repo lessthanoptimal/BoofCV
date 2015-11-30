@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,21 +50,38 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 
 	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
 											 FastQueue<AssociatedIndex> matches ) {
-		setLocation(leftPts,rightPts);
 
-		assocLeft = new int[ leftPts.size() ];
-		assocRight = new int[ rightPts.size() ];
+		List<Point2D_F64> allLeft = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> allRight = new ArrayList<Point2D_F64>();
 
-		for( int i = 0; i < assocLeft.length; i++ )
-			assocLeft[i] = -1;
-		for( int i = 0; i < assocRight.length; i++ )
-			assocRight[i] = -1;
+		assocLeft = new int[ matches.size() ];
+		assocRight = new int[ matches.size() ];
 
-		for( int i = 0; i < matches.size; i++ ) {
+		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex a = matches.get(i);
-			assocLeft[a.src] = a.dst;
-			assocRight[a.dst] = a.src;
+
+			allLeft.add( leftPts.get(a.src));
+			allRight.add( rightPts.get(a.dst));
+
+			assocLeft[i] = i;
+			assocRight[i] = i;
 		}
+
+		setLocation(allLeft,allRight);
+
+//		assocLeft = new int[ leftPts.size() ];
+//		assocRight = new int[ rightPts.size() ];
+//
+//		for( int i = 0; i < assocLeft.length; i++ )
+//			assocLeft[i] = -1;
+//		for( int i = 0; i < assocRight.length; i++ )
+//			assocRight[i] = -1;
+//
+//		for( int i = 0; i < matches.size; i++ ) {
+//			AssociatedIndex a = matches.get(i);
+//			assocLeft[a.src] = a.dst;
+//			assocRight[a.dst] = a.src;
+//		}
 
 		Random rand = new Random(234);
 		colors = new Color[ leftPts.size() ];

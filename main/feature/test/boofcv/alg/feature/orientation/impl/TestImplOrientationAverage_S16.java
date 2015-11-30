@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ public class TestImplOrientationAverage_S16 {
 	public void standardUnweighted() {
 		GenericOrientationGradientTests<ImageSInt16> tests = new GenericOrientationGradientTests<ImageSInt16>();
 
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(false);
-		alg.setRadius(r);
+		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(1.0/2.0,false);
+		alg.setSampleRadius(r);
 
 		tests.setup(angleTol, r*2+1 , alg);
 		tests.performAll();
@@ -46,8 +46,8 @@ public class TestImplOrientationAverage_S16 {
 	public void standardWeighted() {
 		GenericOrientationGradientTests<ImageSInt16> tests = new GenericOrientationGradientTests<ImageSInt16>();
 
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(true);
-		alg.setRadius(r);
+		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(1.0/2.0,true);
+		alg.setSampleRadius(r);
 
 		tests.setup(angleTol, r*2+1 ,alg);
 		tests.performAll();

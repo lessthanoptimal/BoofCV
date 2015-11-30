@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,48 +18,57 @@
 
 package boofcv.abst.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.struct.Configuration;
 
 /**
- * Configures the SIFT feature detector.
- *
- * @see boofcv.alg.feature.detect.interest.SiftDetector
+ * Configuration for {@link SiftDetector}
  *
  * @author Peter Abeles
  */
 public class ConfigSiftDetector implements Configuration {
 
 	/**
-	 * Size of the feature used to detect the corners. Try 2
+	 * Configures non-maximum feature detector across the image
 	 */
-	public int extractRadius = 2;
-	/**
-	 * Minimum corner intensity required.  Set to -Float.MAX_VALUE to detect every possible feature.  Try 1.
-	 *
-	 * Feature intensity is computed using a Difference-of-Gaussian operation, which can have negative values.
-	 */
-	public float detectThreshold = 1;
-	/**
-	 * Max detected features per scale.  Disable with < 0. Tune, image dependent.
-	 */
-	public int maxFeaturesPerScale = -1;
-	/**
-	 * Threshold for edge filtering.  Disable with a value <= 0.  Try 5
-	 */
-	public double edgeThreshold = 5;
+	public ConfigExtract extract = new ConfigExtract(2,0,1,true,true,true);
 
-	public ConfigSiftDetector(int extractRadius, float detectThreshold,
-							  int maxFeaturesPerScale, double edgeThreshold) {
-		this.extractRadius = extractRadius;
-		this.detectThreshold = detectThreshold;
-		this.maxFeaturesPerScale = maxFeaturesPerScale;
-		this.edgeThreshold = edgeThreshold;
+	/**
+	 * The maximum number of features it can detect in a single space
+	 */
+	public int maxFeaturesPerScale = 0;
+
+	/**
+	 * Threshold used to remove edge responses.  Larger values means its less strict.  Try 10
+	 */
+	public double edgeR = 10;
+
+	{
+		extract.ignoreBorder = 1;
+	}
+
+	/**
+	 * Creates a configuration similar to how it was originally described in the paper
+	 */
+	public static ConfigSiftDetector createPaper() {
+		ConfigSiftDetector config = new ConfigSiftDetector();
+		config.extract = new ConfigExtract(1,0,1,true,true,true);
+		config.extract.ignoreBorder = 1;
+		config.maxFeaturesPerScale = 0;
+		config.edgeR = 10;
+		return config;
 	}
 
 	public ConfigSiftDetector() {
 	}
 
+	public ConfigSiftDetector(int maxFeaturesPerScale) {
+		this.maxFeaturesPerScale = maxFeaturesPerScale;
+	}
+
 	@Override
 	public void checkValidity() {
+
 	}
 }

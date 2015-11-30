@@ -87,7 +87,7 @@ public class TestGenericDenseDescribeImage {
 	public static class DummyFeature implements DescribeRegionPoint {
 
 		ImageType type = ImageType.single(ImageUInt8.class);
-		double inputScale;
+		double inputRadius;
 		ImageBase image;
 		FastQueue<Point2D_I32> points = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 		int count = 0;
@@ -98,18 +98,18 @@ public class TestGenericDenseDescribeImage {
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double scale, TupleDesc description) {
+		public boolean process(double x, double y, double orientation, double radius, TupleDesc description) {
 			assertTrue(description!=null);
 			if( ++count != 20 ) {
 				points.grow().set((int) x, (int) y);
-				inputScale = scale;
+				inputRadius = radius;
 				return true;
 			} else {
 				return false;
 			}
 		}
 
-		@Override public boolean requiresScale() {return false;}
+		@Override public boolean requiresRadius() {return false;}
 
 		@Override public boolean requiresOrientation() {return false;}
 

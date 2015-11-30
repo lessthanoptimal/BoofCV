@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 public class GeneralSparseSampleTests <T extends ImageSingleBand>
 	extends GeneralSparseOperatorTests<T>
 {
-	SparseImageSample_F64<T> alg;
+	protected SparseImageSample_F64<T> alg;
 
 	protected GeneralSparseSampleTests(Class<T> inputType,
 									   SparseImageSample_F64<T> alg ,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,11 @@ public abstract class SparseScaleSample_F64<T extends ImageSingleBand>
 	// defines the kernel's bounds
 	protected int x0,y0,x1,y1;
 
-	public abstract void setScale( double scale );
+	/**
+	 * Width of the sampled region in pixels
+	 * @param width pixels
+	 */
+	public abstract void setWidth( double width );
 
 	@Override
 	public void setImage(T input ) {

@@ -34,7 +34,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
@@ -77,16 +77,16 @@ public class ExampleMultiviewSceneReconstruction {
 	double inlierTol = 1.5;
 
 	// Detects and describes image interest points
-	DetectDescribePoint<ImageFloat32, SurfFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, ImageFloat32.class);
+	DetectDescribePoint<ImageFloat32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, ImageFloat32.class);
 	// score ans association algorithm
-	ScoreAssociation<SurfFeature> scorer = FactoryAssociation.scoreEuclidean(SurfFeature.class, true);
-	AssociateDescription<SurfFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
+	ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class, true);
+	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
 
 	// Triangulates the 3D coordinate of a point from two observations
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 	// List of visual features (e.g. SURF) descriptions in each image
-	List<FastQueue<SurfFeature>> imageVisualFeatures = new ArrayList<FastQueue<SurfFeature>>();
+	List<FastQueue<BrightFeature>> imageVisualFeatures = new ArrayList<FastQueue<BrightFeature>>();
 	// List of visual feature locations as normalized image coordinates in each image
 	List<FastQueue<Point2D_F64>> imagePixels = new ArrayList<FastQueue<Point2D_F64>>();
 	// Color of the pixel at each feature location
@@ -211,7 +211,7 @@ public class ExampleMultiviewSceneReconstruction {
 		for (int i = 0; i < colorImages.size(); i++) {
 			System.out.print("*");
 			BufferedImage colorImage = colorImages.get(i);
-			FastQueue<SurfFeature> features = new SurfFeatureQueue(64);
+			FastQueue<BrightFeature> features = new SurfFeatureQueue(64);
 			FastQueue<Point2D_F64> pixels = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
 			GrowQueue_I32 colors = new GrowQueue_I32();
 			detectFeatures(colorImage, features, pixels, colors);
@@ -264,7 +264,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Detects image features.  Saves their location, description, and pixel color
 	 */
 	private void detectFeatures(BufferedImage colorImage,
-								FastQueue<SurfFeature> features, FastQueue<Point2D_F64> pixels,
+								FastQueue<BrightFeature> features, FastQueue<Point2D_F64> pixels,
 								GrowQueue_I32 colors ) {
 
 		ImageFloat32 image = ConvertBufferedImage.convertFrom(colorImage, (ImageFloat32) null);

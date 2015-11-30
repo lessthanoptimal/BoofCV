@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 	 */
 	public void performEasyTests() {
 
-		alg.setScale(1);
+		alg.setObjectRadius(1);
 
 		int N = 2*(int)(Math.PI/angleTolerance);
 
@@ -138,16 +138,16 @@ public class GenericOrientationGradientTests<D extends ImageSingleBand> {
 		GImageMiscOps.fill(derivY,s*100);
 
 		alg.setImage(derivX,derivY);
-		alg.setScale(1);
+		alg.setObjectRadius(10);
 
 		double found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 
-		alg.setScale(1.5);
+		alg.setObjectRadius(15);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 
-		alg.setScale(0.5);
+		alg.setObjectRadius(5);
 		found = UtilAngle.bound(alg.compute(x,y));
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}

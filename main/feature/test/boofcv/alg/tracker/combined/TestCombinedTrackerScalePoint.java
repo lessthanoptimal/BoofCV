@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
@@ -108,8 +108,8 @@ public class TestCombinedTrackerScalePoint {
 	public void associateAllToDetected() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
-		alg.detectedDesc = new FastQueue(10,SurfFeature.class,false);
-		alg.knownDesc = new FastQueue(10,SurfFeature.class,false);
+		alg.detectedDesc = new FastQueue(10,BrightFeature.class,false);
+		alg.knownDesc = new FastQueue(10,BrightFeature.class,false);
 		alg.associate = new DummyAssoc(15);
 		alg.detector = new DummyDetector(20);
 		alg.trackerKlt = new DummyKlt();
@@ -251,7 +251,7 @@ public class TestCombinedTrackerScalePoint {
 		public Point2D_F64 getLocation(int featureIndex) {return new Point2D_F64(2,2);}
 
 		@Override
-		public double getScale(int featureIndex) {return 0;}
+		public double getRadius(int featureIndex) {return 0;}
 
 		@Override
 		public double getOrientation(int featureIndex) {return 0;}

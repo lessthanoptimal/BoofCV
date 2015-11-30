@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class GKernelMath {
 		if( a.isInteger() ) {
 			throw new IllegalArgumentException("Add support");
 		} else {
-			return KernelMath.convolve1D((Kernel1D_F32)a,(Kernel1D_F32)b);
+			return KernelMath.convolve1D_F32((Kernel1D_F32)a,(Kernel1D_F32)b);
 		}
 	}
 
@@ -54,9 +54,9 @@ public class GKernelMath {
 			throw new IllegalArgumentException("But input kernels must be of the same type.");
 
 		if( a.isInteger() ) {
-			return KernelMath.convolve((Kernel1D_I32)a,(Kernel1D_I32)b);
+			return KernelMath.convolve2D((Kernel1D_I32) a, (Kernel1D_I32) b);
 		} else {
-			return KernelMath.convolve((Kernel1D_F32)a,(Kernel1D_F32)b);
+			return KernelMath.convolve2D((Kernel1D_F32) a, (Kernel1D_F32) b);
 		}
 	}
 

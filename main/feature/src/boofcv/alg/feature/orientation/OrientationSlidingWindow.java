@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,10 +44,11 @@ import boofcv.struct.image.ImageSingleBand;
 public abstract class OrientationSlidingWindow<D extends ImageSingleBand>
 		implements OrientationGradient<D>
 {
-	// the region's radius
-	protected int radius;
-	// the radius at the set scale
-	protected int radiusScale;
+	// The actual radius being sampled in pixels
+	protected int pixelRadius;
+
+	// used to adjust the size of the sample region
+	protected double objectRadiusToScale;
 
 	// image x and y derivatives
 	protected D derivX;
@@ -72,28 +73,16 @@ public abstract class OrientationSlidingWindow<D extends ImageSingleBand>
 	/**
 	 * Configures orientation estimating algorithm.
 	 *
+	 * @param objectRadiusToScale Convert object radius into scale factor
 	 * @param numAngles Number of discrete points in which the sliding window will be centered around.
 	 * @param windowSize Number of radians in the window being considered.
 	 * @param isWeighted Should points be weighted using a Gaussian kernel.
 	 */
-	public OrientationSlidingWindow( int numAngles , double windowSize , boolean isWeighted ) {
+	public OrientationSlidingWindow( double objectRadiusToScale, int numAngles , double windowSize , boolean isWeighted ) {
+		this.objectRadiusToScale = objectRadiusToScale;
 		this.numAngles = numAngles;
 		this.windowSize = windowSize;
 		this.isWeighted = isWeighted;
-	}
-
-	public int getRadius() {
-		return radius;
-	}
-
-	/**
-	 * Specify the size of the region that is considered.
-	 *
-	 * @param radius
-	 */
-	public void setRadius(int radius) {
-		this.radius = radius;
-		setScale(1);
 	}
 
 	public Kernel2D_F32 getWeights() {
@@ -101,12 +90,12 @@ public abstract class OrientationSlidingWindow<D extends ImageSingleBand>
 	}
 
 	@Override
-	public void setScale(double scale) {
-		radiusScale = (int)Math.ceil(scale*radius);
+	public void setObjectRadius(double objRadius) {
+		pixelRadius = (int)Math.ceil(objRadius*objectRadiusToScale);
 		if( isWeighted ) {
-			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1,radiusScale);
+			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1, pixelRadius);
 		}
-		int w = radiusScale*2+1;
+		int w = pixelRadius*2+1;
 		angles = new double[ w*w ];
 	}
 
@@ -126,10 +115,10 @@ public abstract class OrientationSlidingWindow<D extends ImageSingleBand>
 
 		// compute the visible region while taking in account
 		// the image borders
-		rect.x0 = c_x-radiusScale;
-		rect.y0 = c_y-radiusScale;
-		rect.x1 = c_x+radiusScale+1;
-		rect.y1 = c_y+radiusScale+1;
+		rect.x0 = c_x- pixelRadius;
+		rect.y0 = c_y- pixelRadius;
+		rect.x1 = c_x+ pixelRadius +1;
+		rect.y1 = c_y+ pixelRadius +1;
 
 		BoofMiscOps.boundRectangleInside(derivX,rect);
 

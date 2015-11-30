@@ -2,15 +2,24 @@ Change Log
 
 Date Format: year/month/day
 
-- WebcamTrackFiducial renamed to FiducialDetection
-  * Can now take in more inputs types.  still images, videos, and webcams
-
-TODO CameraCalibration should handle video sequences and disable still images
-
 ---------------------------------------------
 Date    :
 Version : Alpha 0.21
 
+- Scale-Space Features
+  * getScale() has been replaced with getRadius(), which refers to the radius of the detected object
+- SURF
+  * Fixed a bug dealing with gradient calculation and improve stability for very small objects
+  * Exposed an inner parameter.  You can now change the kernel size increment between scales
+- WebcamTrackFiducial renamed to FiducialDetection
+  * Can now process more inputs sources;  still images, videos, and webcams.
+  * Output to a file is a possibility
+- Renamed SurfFeature to BrightFeature
+  * Used by SURF and SIFT, so the name was made more generic
+- Complete rewrite of SIFT
+  * Very similar to original paper by Lowe
+  * Most difference from the paper are in the use of quadratic interpolation instead of the overly complex thing that
+    Lowe proposed
 - black polygon detector
   * can now handle features along image border
   * fixed a couple of bugs inside refine function too
@@ -26,6 +35,7 @@ Version : Alpha 0.21
 - TODO Assisted Calibration - remove images after collected
 - TODO                      - change calibration settings and recompute
 - TODO Submit bug report to gradle for javadoc header/footer bug
+- TODO CameraCalibration should handle video sequences and disable still images
 
 ---------------------------------------------
 Date    : 2015/11/09

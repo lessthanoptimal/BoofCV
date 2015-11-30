@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -66,16 +66,16 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 		descriptorLength = describe.getDescriptionLength()*numBands;
 	}
 
-	public SurfFeature createDescription() {
-		return new SurfFeature(descriptorLength);
+	public BrightFeature createDescription() {
+		return new BrightFeature(descriptorLength);
 	}
 
 	public int getDescriptorLength() {
 		return descriptorLength;
 	}
 
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 
 	public void setImage( II grayII , MultiSpectral<II> integralImage ) {
@@ -83,7 +83,7 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 		ii = integralImage;
 	}
 
-	public void describe(double x, double y, double angle, double scale, SurfFeature desc)
+	public void describe(double x, double y, double angle, double scale, BrightFeature desc)
 	{
 		int featureIndex = 0;
 		for( int band = 0; band < ii.getNumBands(); band++ ) {
@@ -96,7 +96,7 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 		UtilFeature.normalizeL2(desc);
 
 		describe.setImage(grayII);
-		desc.laplacianPositive = describe.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);
+		desc.white = describe.computeLaplaceSign((int)(x+0.5),(int)(y+0.5),scale);
 	}
 
 	public DescribePointSurf<II> getDescribe() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,8 @@ public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<Image
 	private static int baseR = 2;
 
 	public TestSparseIntegralSample_I32() {
-		super(ImageSInt32.class, new SparseIntegralSample_I32(baseR),-baseR-1,-baseR-1,baseR,baseR);
+		super(ImageSInt32.class, new SparseIntegralSample_I32(),-baseR-1,-baseR-1,baseR,baseR);
+		((SparseIntegralSample_I32)alg).setWidth(baseR*2+1);
 	}
 
 	@Test

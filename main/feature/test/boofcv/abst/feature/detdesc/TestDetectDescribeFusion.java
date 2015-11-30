@@ -24,7 +24,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
@@ -57,7 +57,7 @@ public class TestDetectDescribeFusion {
 		assertEquals(9, alg.getNumberOfFeatures());
 
 		for( int i = 0; i < 9; i++ ) {
-			assertEquals(2,alg.getScale(i),1e-8);
+			assertEquals(2,alg.getRadius(i),1e-8);
 			assertEquals(1,alg.getOrientation(i),1e-8);
 			assertTrue(alg.getDescription(i) != null);
 			assertTrue(alg.getLocation(i) != null);
@@ -67,11 +67,11 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(5,ImageFloat32.class);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,ImageFloat32.class);
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribePoint(true,true, ImageType.single(ImageFloat32.class),SurfFeature.class) {
+		new GenericTestsDetectDescribePoint(true,true, ImageType.single(ImageFloat32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
@@ -83,10 +83,10 @@ public class TestDetectDescribeFusion {
 	@Test
 	public void checkWithoutOrientation() {
 		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final DescribeRegionPoint<ImageFloat32,SurfFeature> desc =
+		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
 				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
 
-		new GenericTestsDetectDescribePoint(true,false, ImageType.single(ImageFloat32.class),SurfFeature.class) {
+		new GenericTestsDetectDescribePoint(true,false, ImageType.single(ImageFloat32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
@@ -111,7 +111,7 @@ public class TestDetectDescribeFusion {
 		}
 
 		@Override
-		public double getScale(int featureIndex) {
+		public double getRadius(int featureIndex) {
 			return 2;
 		}
 
@@ -140,16 +140,16 @@ public class TestDetectDescribeFusion {
 
 		@Override
 		public TupleDesc createDescription() {
-			return new SurfFeature(10);
+			return new BrightFeature(10);
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double scale, TupleDesc ret) {
+		public boolean process(double x, double y, double orientation, double radius, TupleDesc ret) {
 			return calls++ != 5;
 		}
 
 		@Override
-		public boolean requiresScale() {
+		public boolean requiresRadius() {
 			return false;
 		}
 
@@ -160,7 +160,7 @@ public class TestDetectDescribeFusion {
 
 		@Override
 		public Class getDescriptionType() {
-			return SurfFeature.class;
+			return BrightFeature.class;
 		}
 
 		@Override

@@ -24,7 +24,7 @@ import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -48,16 +48,16 @@ public class FactoryDescribeImageDense {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,SurfFeature> surfFast( ConfigSurfDescribe.Speed configSurf ,
-												ConfigDenseSample configSample ,
-												Class<T> imageType)
+	DescribeImageDense<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed configSurf ,
+												 ConfigDenseSample configSample ,
+												 Class<T> imageType)
 	{
 		configSample.checkValidity();
-		DescribeRegionPoint<T,SurfFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
+		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
 
 		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
 
-		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , configSample.scale , width ,
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
 				configSample.periodX, configSample.periodY );
 	}
 
@@ -76,16 +76,16 @@ public class FactoryDescribeImageDense {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,SurfFeature> surfStable(ConfigSurfDescribe.Stability configSurf,
-												 ConfigDenseSample configSample ,
-												 Class<T> imageType) {
+	DescribeImageDense<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability configSurf,
+												   ConfigDenseSample configSample ,
+												   Class<T> imageType) {
 
 		configSample.checkValidity();
-		DescribeRegionPoint<T,SurfFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
+		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
 
 		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
 
-		return new GenericDenseDescribeImageDense<T,SurfFeature>( surf , configSample.scale , width ,
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
 				configSample.periodX, configSample.periodY );
 	}
 }

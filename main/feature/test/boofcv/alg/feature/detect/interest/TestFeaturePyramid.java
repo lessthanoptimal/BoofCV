@@ -28,7 +28,7 @@ import boofcv.struct.pyramid.PyramidFloat;
 /**
  * @author Peter Abeles
  */
-public class TestFeaturePyramid extends GenericFeatureScaleDetector {
+public class TestFeaturePyramid extends GenericFeatureScaleDetectorTests {
 
 	@Override
 	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {

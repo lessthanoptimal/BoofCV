@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,7 +110,9 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 
 	public class BriefSO512 extends PerformerBase {
 
-		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.briefso(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+		int briefRadius = 16;
+		DescribePointBriefSO<I> alg = FactoryDescribePointAlgs.
+				briefso(FactoryBriefDefinition.gaussian2(new Random(123), briefRadius, 512),
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		@Override
@@ -119,7 +121,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 			TupleDesc_B f = alg.createFeature();
 			for( int i = 0; i < pts.length; i++ ) {
 				Point2D_I32 p = pts[i];
-				alg.process(p.x,p.y,(float)yaws[i],(float)scales[i],f);
+				alg.process(p.x,p.y,(float)yaws[i],(float)(briefRadius*scales[i]),f);
 			}
 		}
 	}

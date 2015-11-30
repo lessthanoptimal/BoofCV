@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,22 +18,36 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.alg.descriptor.UtilFeature;
+import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GImageSingleBand;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageSingleBand;
+import georegression.metric.UtilAngle;
 
 /**
- * <p>
- * Detects SIFT features inside the provided SIFT scale-space.  SIFT features work by sampling the image in a grid.
- * For each grid element, a histogram of the gradient's orientation is computed.  From this histogram the descriptor
- * is computed.  See [1] for the details and below for algorithmic changes.
- * </p>
+ * <p>A faithful implementation of the SIFT descriptor.</p>
+ * <p>The descriptor is computed inside of a square grid which is scaled and rotated.  Each grid cell is composed
+ * of a square sub-region.  If the sub-region is 4x4 and the outer grid is 5x5 then a total area of size 20x20
+ * is sampled.  For each sub-region a histogram with N bins of orientations is computed. Orientation from each
+ * sample point comes from the image's spacial derivative.  If the outer grid is 4x4 and the histogram N=8, then
+ * the total descriptor will be 128 elements.</p>
  *
- * <p>
- * DESCRIPTOR INTERPOLATION: Instead of using trilinear interpolation a Gaussian weight is used instead.
- * Both methods were tried and Gaussian weight produced slightly better results.  Same results had been
- * found by others with regard to SURF descriptors.
- * </p>
+ * <p>When a point is sample, its orientation (-pi to pi) and magnitude sqrt(dx**2 + dy**2) are both computed.  A
+ * contribution from this sample point is added to the entire descriptor and weighted using trilinear interpolation
+ * (outer grid x-y coordinate, and orientation bin), Gaussian distribution centered at key point location, and the
+ * magnitude.</p>
+ *
+ * <p>There are no intentional differences from the paper. However the paper is ambiguous in some places.</p>
+ * <ul>
+ *     <li>Interpolation method for sampling image pixels isn't specified.  Nearest-neighbor is assumed and that's what
+ *     VLFeat uses too.</li>
+ *     <li>Size of sample region.  Oddly enough, I can't find this very important parameter specified anywhere.
+ *     The suggested value comes from empirical testing.</li>
+ * </ul>
  *
  * <p>
  * [1] Lowe, D. "Distinctive image features from scale-invariant keypoints".
@@ -42,245 +56,212 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DescribePointSift {
+public class DescribePointSift<Deriv extends ImageSingleBand> {
 
-	// Image scale space
-	private SiftImageScaleSpace ss;
+	// spacial derivatives of input image
+	GImageSingleBand imageDerivX, imageDerivY;
 
-	// Converts a distribution's sigma into a region radius to sample
-	private double sigmaToRadius;
+	// width of a subregion, in samples
+	int widthSubregion;
+	// width of the outer grid, in sub-regions
+	int widthGrid;
 
-	// number of elements along the side of the descriptor grid
-	private int gridWidth;
-	// number of samples along a grid element's side
-	// each grid is samples the square of this number and the histogram computed
-	// from these samples
-	private int numSamples;
+	// number of bins in the orientation histogram
+	int numHistogramBins;
+	double histogramBinWidth;
 
-	private int numHistBins;
-	private double angleStep;
+	// conversion from scale-space sigma to image pixels
+	double sigmaToPixels;
 
-	// image and gradient of octave being processed
-	private ImageFloat32 image;
-	private ImageFloat32 derivX;
-	private ImageFloat32 derivY;
+	// maximum value of an element in the descriptor
+	double maxDescriptorElementValue;
 
-	// storage for histogram
-	private double[][] histograms;
-	private double[] gridWeights;
+	// precomputed gaussian weighting function
+	float gaussianWeight[];
+
+	// reference to user provided descriptor in which results are saved to
+	TupleDesc_F64 descriptor;
 
 	/**
-	 * Configures detector
+	 * Configures the descriptor.
 	 *
-	 * @param gridWidth Number of grid elements along a side.  Typically 4
-	 * @param numSamples Number of samples along a grid. Typically 8
-	 * @param numHistBins Number of bins in the orientation histogram.  Typically 8
-	 * @param weightSigma Adjusts descriptor element's weighting from center.  Typically 0.5
-	 * @param sigmaToRadius Conversation from scale space to pixels.  Typically 2.5
+	 * @param widthSubregion Width of sub-region in samples.  Try 4
+	 * @param widthGrid Width of grid in subregions.  Try 4.
+	 * @param numHistogramBins Number of bins in histogram.  Try 8
+	 * @param sigmaToPixels Conversion of sigma to pixels.  Used to scale the descriptor region.  Try 1.5 ??????
+	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
+	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
 	 */
-	public DescribePointSift( int gridWidth , int numSamples , int numHistBins ,
-							  double weightSigma , double sigmaToRadius ) {
-		this.gridWidth = gridWidth;
-		this.numSamples = numSamples;
-		this.numHistBins = numHistBins;
-		this.sigmaToRadius = sigmaToRadius;
+	public DescribePointSift(int widthSubregion, int widthGrid, int numHistogramBins,
+							 double sigmaToPixels, double weightingSigmaFraction,
+							 double maxDescriptorElementValue , Class<Deriv> derivType ) {
+		this.widthSubregion = widthSubregion;
+		this.widthGrid = widthGrid;
+		this.numHistogramBins = numHistogramBins;
+		this.sigmaToPixels = sigmaToPixels;
+		this.maxDescriptorElementValue = maxDescriptorElementValue;
 
-		angleStep = 2.0*Math.PI/numHistBins;
+		this.histogramBinWidth = 2.0*Math.PI/numHistogramBins;
 
-		histograms = new double[gridWidth*gridWidth][numHistBins];
+		// number of samples wide the descriptor window is
+		int descriptorWindow = widthSubregion*widthGrid;
+		double weightSigma = descriptorWindow*weightingSigmaFraction;
+		gaussianWeight = createGaussianWeightKernel(weightSigma,descriptorWindow/2);
 
-		int gridSampleLength = numSamples*gridWidth;
-		gridWeights = new double[gridSampleLength*gridSampleLength];
+		imageDerivX = FactoryGImageSingleBand.create(derivType);
+		imageDerivY = FactoryGImageSingleBand.create(derivType);
+	}
 
-		// make the weighting relative to descriptor length
-		weightSigma *= gridSampleLength;
+	/**
+	 * Creates a gaussian weighting kernel with an even number of elements along its width
+	 */
+	private static float[] createGaussianWeightKernel( double sigma , int radius ) {
+		Kernel2D_F32 ker = FactoryKernelGaussian.gaussian2D_F32(sigma,radius,false,false);
+		float maxValue = KernelMath.maxAbs(ker.data,4*radius*radius);
+		KernelMath.divide(ker,maxValue);
+		return ker.data;
+	}
 
-		int index = 0;
-		for( int y = -gridSampleLength/2; y < gridSampleLength/2; y++ ) {
-			for( int x = -gridSampleLength/2; x < gridSampleLength/2; x++ ) {
-				// make it symmetric by sampling in the center
-				double d = Math.sqrt((x+0.5)*(x+0.5) + (y+0.5)*(y+0.5));
-				gridWeights[index++] = Math.exp( -0.5*d*d/(weightSigma*weightSigma));
+	/**
+	 * Sets the image spacial derivatives.  These should be computed from an image at the appropriate scale
+	 * in scale-space.
+	 *
+	 * @param derivX x-derivative of input image
+	 * @param derivY y-derivative of input image
+	 */
+	public void setImageGradient(Deriv derivX , Deriv derivY ) {
+		this.imageDerivX.wrap(derivX);
+		this.imageDerivY.wrap(derivY);
+	}
+
+	/**
+	 * Computes the SIFT descriptor for the specified key point
+	 *
+	 * @param c_x center of key point.  x-axis
+	 * @param c_y center of key point.  y-axis
+	 * @param sigma Computed sigma in scale-space for this point
+	 * @param orientation Orientation of keypoint in radians
+	 * @param descriptor (output) Storage for computed descriptor.  Make sure it's the appropriate length first
+	 */
+	public void process( double c_x , double c_y , double sigma , double orientation , TupleDesc_F64 descriptor )
+	{
+		this.descriptor = descriptor;
+		descriptor.fill(0);
+
+		computeRawDescriptor(c_x, c_y, sigma, orientation);
+
+		massageDescriptor();
+	}
+
+
+	/**
+	 * Adjusts the descriptor.  This adds lighting invariance and reduces the affects of none-affine changes
+	 * in lighting.
+	 */
+	void massageDescriptor() {
+		// normalize descriptor to unit length
+		UtilFeature.normalizeL2(descriptor);
+
+		// clip the values
+		for (int i = 0; i < descriptor.size(); i++) {
+			double value = descriptor.value[i];
+			if( value > maxDescriptorElementValue ) {
+				descriptor.value[i] = maxDescriptorElementValue;
 			}
 		}
+
+		// normalize again
+		UtilFeature.normalizeL2(descriptor);
 	}
 
-
-	public void setScaleSpace( SiftImageScaleSpace ss ) {
-		this.ss = ss;
-	}
-
-	public void process(double c_x , double c_y , double scale , double orientation ,
-						SurfFeature desc ) {
-		// determine where this feature lies inside the scale-space
-		int imageIndex = ss.scaleToImageIndex( scale );
-		double pixelScale = ss.imageIndexToPixelScale( imageIndex );
-
-		process(c_x,c_y,scale,orientation,imageIndex,pixelScale,desc);
-	}
 
 	/**
-	 * Compute the descriptor with information on which level in the scale-space to use.
-	 *
-	 * @param c_x Location of feature in input image
-	 * @param c_y Location of feature in input image
-	 * @param scale Size of the feature in the input image
-	 * @param orientation Orientation of the feature
-	 * @param imageIndex Which octave contains the feature
-	 * @param pixelScale The scale of a pixel in the octave
-	 * @param desc (Output) storage for the descriptor
+	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
+	 * yet.
 	 */
-	public void process( double c_x , double c_y , double scale , double orientation ,
-						 int imageIndex ,
-						 double pixelScale ,
-						 SurfFeature desc )
-	{
-		image = ss.getPyramidLayer(imageIndex);
-		derivX = ss.getDerivativeX(imageIndex);
-		derivY = ss.getDerivativeY(imageIndex);
-
-		for( int i = 0; i < desc.value.length; i++ )
-			desc.value[i] = 0;
-		for( int i = 0; i < histograms.length; i++ )
-			for( int j = 0; j < histograms[i].length; j++ )
-				histograms[i][j] = 0;
-
-		// account for the scale of the image in each octave
-		constructHistograms(c_x/pixelScale , c_y/pixelScale, scale/pixelScale, orientation );
-
-		computeDescriptor(desc);
-	}
-
-	private void constructHistograms( double c_x , double c_y , double scale, double orientation ) {
+	void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation) {
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
-		int gridRadius = gridWidth/2;
+		int sampleWidth = widthGrid*widthSubregion;
+		// compute radius and ensure its symmetric for even and odd cases
+		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
 
-		// This is the distance between samples
-		// The size is computed by finding the width of one block in the grid, then dividing by the
-		// number of samples along that side
-		double sampleUnit = (2.0*scale*sigmaToRadius)/numSamples;
-		// how wide a grid cell is in pixels
-		double gridCellLength = numSamples*sampleUnit;
-		int gridCellLengthI = (int)(gridCellLength+0.5); // round to int
+		double sampleToPixels = sigma*sigmaToPixels;
 
-//		System.out.println("-----------------------------------------");
-//		System.out.println("  cell length "+gridCellLength);
-//		System.out.println("  sampleUnit "+sampleUnit);
+		Deriv image = (Deriv)imageDerivX.getImage();
 
-		int allSampleIndex = 0;
-		for( int gy = 0; gy < gridWidth; gy++ ) {
-			double gridY = (gy-gridRadius)*gridCellLength;
-			for( int gx = 0; gx < gridWidth; gx++ ) {
-				// top left coordinate of grid in pixels
-				double gridX = (gx-gridRadius)*gridCellLength;
+		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
+			float subY = sampleY/widthSubregion;
+			double y = sampleToPixels*(sampleY-sampleRadius);
 
-				// TODO Sample all pixels here
-				for( int sy = 0; sy < numSamples; sy++ ) {
-					double y = sy*sampleUnit + gridY;
-					for( int sx = 0; sx < numSamples; sx++ , allSampleIndex++ ) {
-						// Sample point in pixels in grid coordinate system
-						double x = sx*sampleUnit + gridX;
+			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
+				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
+				float subX = sampleX/widthSubregion;
+				// recentered local pixel sample coordinate
+				double x = sampleToPixels*(sampleX-sampleRadius);
 
-						// Rotate and translate into image pixel coordinates, then round
-						int px = (int)(x*c - y*s + c_x + 0.5);
-						int py = (int)(x*s + y*c + c_y + 0.5);
+				// pixel coordinate in the image that is to be sampled.  Note the rounding
+				// If the pixel coordinate is -1 < x < 0 then it will round to 0 instead of -1, but the rounding
+				// method below is WAY faster than Math.round() so this is a small loss.
+				int pixelX = (int)(x*c - y*s + c_x + 0.5);
+				int pixelY = (int)(x*s + y*c + c_y + 0.5);
 
-						if( image.isInBounds(px,py) ) {
-							double dx = derivX.unsafe_get(px,py);
-							double dy = derivY.unsafe_get(px,py);
+				// skip pixels outside of the image
+				if( image.isInBounds(pixelX,pixelY) ) {
+					// spacial image derivative at this point
+					float spacialDX = imageDerivX.unsafe_getF(pixelX, pixelY);
+					float spacialDY = imageDerivY.unsafe_getF(pixelX, pixelY);
 
-							// Gaussian weighting applied to whole sample area
-							double w = gridWeights[allSampleIndex];
+					double adjDX =  c*spacialDX + s*spacialDY;
+					double adjDY = -s*spacialDX + c*spacialDY;
 
-							// rotate derivative into grid coordinate system
-							double adjX = ( dx*c + dy*s)*w;
-							double adjY = (-dx*s + dy*c)*w;
+					double angle = UtilAngle.domain2PI(Math.atan2(adjDY,adjDX));
 
-							addToHistograms( gx-gridRadius , gy-gridRadius , x/gridCellLength , y/gridCellLength, adjX, adjY );
-						}
-					}
+					float weightGaussian = gaussianWeight[sampleY*sampleWidth+sampleX];
+					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
+
+					// trilinear interpolation intro descriptor
+					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle);
 				}
 			}
 		}
 	}
 
-	private void addToHistograms(int gridX, int gridY, double locX, double locY, double gradX, double gradY) {
+	/**
+	 * Applies trilinear interpolation across the descriptor
+	 */
+	void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle )
+	{
+		for (int i = 0; i < widthGrid; i++) {
+			double weightGridY = 1.0 - Math.abs(sampleY-i);
+			if( weightGridY <= 0) continue;
+			for (int j = 0; j < widthGrid; j++) {
+				double weightGridX = 1.0 - Math.abs(sampleX-j);
+				if( weightGridX <= 0 ) continue;
+				for (int k = 0; k < numHistogramBins; k++) {
+					double angleBin = k*histogramBinWidth;
+					double weightHistogram = 1.0 - UtilAngle.dist(angle,angleBin)/histogramBinWidth;
+					if( weightHistogram <= 0 ) continue;
 
-		// compute the angle and magnitude of the gradient
-		int angleBin = (int)((Math.atan2(gradY,gradX)+Math.PI)/angleStep);
-		if( angleBin >= numHistBins )
-			angleBin = numHistBins-1;
-
-		double gradMag = Math.sqrt(gradX*gradX + gradY*gradY);
-
-		int gridRadius = gridWidth/2;
-
-		int startY = gridY > -gridRadius ? -1 : 0;
-		int endY = gridY < gridRadius-1 ? 1 : 0;
-		int startX = gridX > -gridRadius ? -1 : 0;
-		int endX = gridX < gridRadius-1 ? 1 : 0;
-
-		// distribute into neighboring bins
-		for( int offY = startY; offY <= endY; offY++ ) {
-			for( int offX = startX; offX <= endX; offX++ ) {
-				int binIndex = (gridY+gridRadius+offY)*gridWidth + gridX+gridRadius+offX;
-
-				// Use an alternative weighting scheme.  You can view this as a very crude approximation
-				// of a Gaussian.  exp() function is very expensive
-
-				if( offX == 0 && offY == 0 ) {
-					histograms[binIndex][angleBin] += gradMag;
-				} else {
-					// compute distance from center of grid element
-					double distX = Math.abs(locX-(gridX+offX+0.5));
-					double distY = Math.abs(locY-(gridY+offY+0.5));
-
-					if( distX < 1 && distY < 1 ) {
-						double w = (1-distX)*(1-distY);
-						histograms[binIndex][angleBin] += w * gradMag;
-					}
+					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
+					descriptor.value[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
 				}
 			}
 		}
 	}
 
-	private void computeDescriptor( SurfFeature desc ) {
-		int index = 0;
-		int indexGrid = 0;
-		double sumSq = 0;
-
-		for( int gy = 0; gy < gridWidth; gy++ ) {
-			for( int gx = 0; gx < gridWidth; gx++ , indexGrid++ ) {
-				for( int hist = 0; hist < numHistBins; hist++ ) {
-					double v = desc.value[index++] = histograms[indexGrid][hist];
-					sumSq += v*v;
-				}
-			}
-		}
-
-//		System.out.println("descriptor");
-		double norm = Math.sqrt(sumSq);
-		for( int i = 0; i < desc.size() ; i++ )  {
-			desc.value[i] /= norm;
-		}
-
-		// cap values at 0.2 and re-normalize
-		sumSq = 0;
-		for( int i = 0; i < desc.size(); i++ ) {
-			double v = desc.value[i];
-			if( v > 0.2 )
-				v = desc.value[i] = 0.2;
-			sumSq += v*v;
-		}
-		norm = Math.sqrt(sumSq);
-		for( int i = 0; i < desc.size() ; i++ )  {
-			desc.value[i] /= norm;
-		}
-	}
-
+	/**
+	 * Number of elements in the descriptor.
+	 */
 	public int getDescriptorLength() {
-		return gridWidth*gridWidth*numHistBins;
+		return widthGrid*widthGrid*numHistogramBins;
+	}
+
+	/**
+	 * Radius of descriptor in pixels.  Width is radius*2
+	 */
+	public int getCanonicalRadius() {
+		return widthGrid*widthSubregion/2;
 	}
 }

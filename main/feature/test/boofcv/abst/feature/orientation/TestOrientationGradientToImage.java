@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestOrientationGradientToImage {
 	 */
 	@Test
 	public void generic() {
-		OrientationGradient<ImageFloat32> orig = FactoryOrientationAlgs.average(r,false, ImageFloat32.class);
+		OrientationGradient<ImageFloat32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, ImageFloat32.class);
 
 		ImageGradient<ImageFloat32,ImageFloat32> gradient =
 				FactoryDerivative.sobel_F32();

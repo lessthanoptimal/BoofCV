@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.feature.associate;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
-import boofcv.struct.feature.SurfFeature;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -31,7 +31,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature> {
+public class WrapAssociateSurfBasic implements AssociateDescription<BrightFeature> {
 
 	AssociateSurfBasic alg;
 
@@ -43,12 +43,12 @@ public class WrapAssociateSurfBasic implements AssociateDescription<SurfFeature>
 	}
 
 	@Override
-	public void setSource(FastQueue<SurfFeature> listSrc) {
+	public void setSource(FastQueue<BrightFeature> listSrc) {
 		alg.setSrc(listSrc);
 	}
 
 	@Override
-	public void setDestination(FastQueue<SurfFeature> listDst) {
+	public void setDestination(FastQueue<BrightFeature> listDst) {
 		alg.setDst(listDst);
 	}
 

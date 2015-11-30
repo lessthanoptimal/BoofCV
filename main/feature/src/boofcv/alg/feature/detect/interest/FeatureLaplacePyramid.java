@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,15 @@ import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
 
 /**
  * <p>
@@ -60,7 +63,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	private float baseThreshold;
 	// location of recently computed features in layers
 	protected int spaceIndex = 0;
-	protected List<Point2D_I16> maximums[];
+	protected List<Point2D_I16> maximums = new ArrayList<Point2D_I16>();
 
 	// List of found feature points
 	protected List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
@@ -98,28 +101,28 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	@Override
 	public void detect(PyramidFloat<T> ss) {
 		spaceIndex = 0;
-		if (maximums == null) {
-			maximums = new List[3];
-			maximums[0] = new ArrayList<Point2D_I16>();
-			maximums[1] = new ArrayList<Point2D_I16>();
-			maximums[2] = new ArrayList<Point2D_I16>();
-		}
 		foundPoints.clear();
 
 		// compute feature intensity in each level
-		for (int i = 0; i < ss.getNumLayers(); i++) {
+		for (int i = 1; i < ss.getNumLayers()-1; i++) {
 			// detect features in 2D space.  Don't need to compute features at the tail ends of scale-space
-			if (i > 0 && i < ss.getNumLayers() - 1)
-				detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
+//			if (i > 0 && i < ss.getNumLayers() - 1)
+//				detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
 
-			spaceIndex++;
-			if (spaceIndex >= 3)
-				spaceIndex = 0;
+			spaceIndex = i;
+			detectCandidateFeatures(ss.getLayer(i), ss.getSigma(i));
+			// find maximum in 3xNx3 (local image and scale space) region
+			findLocalScaleSpaceMax(ss, i);
 
-			// find maximum in NxNx3 (local image and scale space) region
-			if (i >= 2) {
-				findLocalScaleSpaceMax(ss, i - 1);
-			}
+//			spaceIndex++;
+//			if (spaceIndex >= 3)
+//				spaceIndex = 0;
+//
+//			// find maximum in 3x3x3 (local image and scale space) region
+//			if (i >= 2) {
+//				detectCandidateFeatures(ss.getLayer(i-i), ss.getSigma(i-1));
+//				findLocalScaleSpaceMax(ss, i - 1);
+//			}
 		}
 	}
 
@@ -149,7 +152,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 
 		detector.process(image, derivX, derivY, derivXX, derivYY, derivXY);
 
-		List<Point2D_I16> m = maximums[spaceIndex];
+		List<Point2D_I16> m = maximums;
 		m.clear();
 		if( detector.isDetectMaximums() ) {
 			QueueCorner q = detector.getMaximums();
@@ -169,9 +172,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 	 * See if each feature is a maximum in its local scale-space.
 	 */
 	protected void findLocalScaleSpaceMax(PyramidFloat<T> ss, int layerID) {
-		int index1 = (spaceIndex + 1) % 3;
-
-		List<Point2D_I16> candidates = maximums[index1];
+		List<Point2D_I16> candidates = maximums;
 
 		float scale0 = (float) ss.scale[layerID - 1];
 		float scale1 = (float) ss.scale[layerID];
@@ -187,22 +188,52 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 		float ss2 = (float) (Math.pow(sigma2, 2.0 * 0.75)/scale2);
 
 		for (Point2D_I16 c : candidates) {
+
+			ImageFloat32 intensity = detector.getIntensity();
+
+			float target = intensity.unsafe_get(c.x,c.y);
+			float fx,fy;
+			{
+				float x0 = intensity.unsafe_get(c.x - 1, c.y);
+				float x2 = intensity.unsafe_get(c.x + 1, c.y);
+				float y0 = intensity.unsafe_get(c.x, c.y - 1);
+				float y2 = intensity.unsafe_get(c.x, c.y + 1);
+
+				fx = c.x + polyPeak(x0, target, x2);
+				fy = c.y + polyPeak(y0, target, y2);
+			}
+//			fx=c.x;fy=c.y;
+
 			sparseLaplace.setImage(ss.getLayer(layerID));
-			float val = ss1 * (float) sparseLaplace.compute(c.x, c.y);
+			float val = ss1 * (float) sparseLaplace.compute(c.x,c.y);
 			// search for local maximum or local minimum
 			float adj = Math.signum(val);
 			val *= adj;
 
-			// find pixel location in each image's local coordinate
-			int x0 = (int) (c.x * scale1 / scale0);
-			int y0 = (int) (c.y * scale1 / scale0);
 
-			int x2 = (int) (c.x * scale1 / scale2);
-			int y2 = (int) (c.y * scale1 / scale2);
+			// find pixel location in each image's local coordinate
+			int x0 = (int) (fx * scale1 / scale0 + 0.5);
+			int y0 = (int) (fy * scale1 / scale0 + 0.5);
+
+			int x2 = (int) (fx * scale1 / scale2 + 0.5);
+			int y2 = (int) (fy * scale1 / scale2 + 0.5);
 
 			if (checkMax(ss.getLayer(layerID - 1), adj*ss0,val, x0, y0) && checkMax(ss.getLayer(layerID + 1), adj*ss2,val, x2, y2)) {
+				sparseLaplace.setImage(ss.getLayer(layerID-1));
+				float s0 = ss0 * (float) sparseLaplace.compute(x0,y0)*adj;
+				sparseLaplace.setImage(ss.getLayer(layerID+1));
+				float s2 = ss2 * (float) sparseLaplace.compute(x2,y2)*adj;
+
+				double adjSigma;
+				double sigmaInterp = polyPeak(s0, val, s2); // scaled from -1 to 1
+				if( sigmaInterp < 0 ) {
+					adjSigma = sigma0*(-sigmaInterp) + (1+sigmaInterp)*sigma1;
+				} else {
+					adjSigma = sigma2*sigmaInterp + (1-sigmaInterp)*sigma1;
+				}
+
 				// put features into the scale of the upper image
-				foundPoints.add(new ScalePoint(c.x * scale1, c.y * scale1, sigma1));
+				foundPoints.add(new ScalePoint(fx * scale1, fy * scale1, adjSigma));
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloat32> {
 
-	public ImplOrientationHistogram_F32(int numAngles , boolean isWeighted ) {
-		super(numAngles,isWeighted);
+	public ImplOrientationHistogram_F32(double objectToSample,int numAngles , boolean isWeighted ) {
+		super(objectToSample,numAngles,isWeighted);
 	}
 
 	@Override

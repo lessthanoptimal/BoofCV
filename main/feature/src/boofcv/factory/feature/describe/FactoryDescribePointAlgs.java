@@ -95,14 +95,13 @@ public class FactoryDescribePointAlgs {
 		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
 	}
 
-	public static DescribePointSift sift( ConfigSiftDescribe config )
-	{
-	    if( config == null )
+	public static <T extends ImageSingleBand>
+	DescribePointSift<T> sift(ConfigSiftDescribe config , Class<T> derivType ) {
+		if( config == null )
 			config = new ConfigSiftDescribe();
-		config.checkValidity();
 
-		return new DescribePointSift(config.gridWidth,config.numSamples,config.numHistBins
-				,config.weightSigma, config.sigmaToRadius);
+		return new DescribePointSift(config.widthSubregion,config.widthGrid,config.numHistogramBins
+				,config.sigmaToPixels, config.weightingSigmaFraction,config.maxDescriptorElementValue,derivType);
 	}
 
 	public static <T extends ImageSingleBand, D extends TupleDesc>

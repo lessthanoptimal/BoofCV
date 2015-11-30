@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -44,8 +44,8 @@ public class TestAssociateSurfBasic {
 	 */
 	@Test
 	public void checkAssociateByIntensity() {
-		FastQueue<SurfFeature> src = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
-		FastQueue<SurfFeature> dst = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
 
 		src.add( createDesc(true,10));
 		dst.add( createDesc(true,0));
@@ -63,8 +63,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void basicAssociation() {
-		FastQueue<SurfFeature> src = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
-		FastQueue<SurfFeature> dst = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
 
 		// create a list where some should be matched and others not
 		src.add( createDesc(true,10));
@@ -116,10 +116,10 @@ public class TestAssociateSurfBasic {
 		return new AssociateSurfBasic(assoc);
 	}
 
-	private SurfFeature createDesc( boolean laplace , double value ) {
-		SurfFeature ret = new SurfFeature(64);
+	private BrightFeature createDesc(boolean laplace , double value ) {
+		BrightFeature ret = new BrightFeature(64);
 
-		ret.laplacianPositive = laplace;
+		ret.white = laplace;
 		ret.value[0] = value;
 
 		return ret;
@@ -127,8 +127,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void checkUnassociated() {
-		FastQueue<SurfFeature> src = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
-		FastQueue<SurfFeature> dst = new FastQueue<SurfFeature>(10,SurfFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
 
 		src.add( createDesc(true,10));
 		src.add( createDesc(true,12));

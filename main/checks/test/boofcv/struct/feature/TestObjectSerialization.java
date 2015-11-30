@@ -70,17 +70,17 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testSurfFeature() {
-		SurfFeature orig = new SurfFeature(20);
-		orig.laplacianPositive = true;
+		BrightFeature orig = new BrightFeature(20);
+		orig.white = true;
 		for( int i = 0; i < orig.value.length; i++ ) {
 			orig.value[i] = i;
 		}
 
 		UtilIO.saveXML(orig, "temp.txt");
 
-		SurfFeature found = UtilIO.loadXML("temp.txt");
+		BrightFeature found = UtilIO.loadXML("temp.txt");
 
-		assertEquals(orig.laplacianPositive,found.laplacianPositive);
+		assertEquals(orig.white,found.white);
 		for( int i = 0; i < orig.value.length; i++ ) {
 			assertEquals(orig.value[i],found.value[i],1e-8);
 		}

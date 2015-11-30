@@ -51,7 +51,7 @@ public class TestDescribeRegionPointConvert {
 		assertEquals(5,found.value[0]);
 
 		assertTrue(alg.requiresOrientation()==original.requiresOrientation());
-		assertTrue(alg.requiresScale()==original.requiresScale());
+		assertTrue(alg.requiresRadius()==original.requiresRadius());
 		assertTrue(alg.getDescriptionType()==TupleDesc_S8.class);
 
 	}
@@ -90,13 +90,13 @@ public class TestDescribeRegionPointConvert {
 		}
 
 		@Override
-		public boolean process(double x, double y, double orientation, double scale, TupleDesc_F64 ret) {
+		public boolean process(double x, double y, double orientation, double radius, TupleDesc_F64 ret) {
 			ret.value[0] = 1;
 			return true;
 		}
 
 		@Override
-		public boolean requiresScale() {
+		public boolean requiresRadius() {
 			return false;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detdesc;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
@@ -70,11 +70,11 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 		descriptions = new SurfFeatureQueue(describe.getDescriptorLength());
 	}
 
-	public SurfFeature createDescription() {
+	public BrightFeature createDescription() {
 		return describe.createDescription();
 	}
 
-	public SurfFeature getDescription(int index) {
+	public BrightFeature getDescription(int index) {
 		return descriptions.get(index);
 	}
 
@@ -100,7 +100,7 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
-			orientation.setScale(p.scale);
+			orientation.setObjectRadius(p.scale);
 			double angle = orientation.compute(p.x,p.y);
 
 			describe.describe(p.x, p.y, angle, p.scale, descriptions.grow());
@@ -121,7 +121,7 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 		return foundPoints.get(featureIndex);
 	}
 
-	public double getScale(int featureIndex) {
+	public double getRadius(int featureIndex) {
 		return foundPoints.get(featureIndex).scale;
 	}
 

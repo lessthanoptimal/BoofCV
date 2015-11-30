@@ -56,7 +56,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, D storage)
+	public boolean process(double x, double y, double orientation, double radius, D storage)
 	{
 		alg.process((int) x, (int) y, storage);
 
@@ -64,7 +64,7 @@ public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleD
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return false;
 	}
 

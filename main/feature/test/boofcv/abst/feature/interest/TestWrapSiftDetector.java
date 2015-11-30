@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,34 +18,16 @@
 
 package boofcv.abst.feature.interest;
 
-import boofcv.abst.feature.detect.interest.WrapSiftDetector;
-import boofcv.alg.feature.detect.interest.SiftDetector;
-import boofcv.alg.feature.detect.interest.SiftImageScaleSpace;
-import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestWrapSiftDetector {
-
 	@Test
-	public void standard() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(null);
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, false);
-
-		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
-
-		new GeneralInterestPointDetectorChecks<ImageFloat32>(wrapper,false,true,ImageFloat32.class){}.performAllTests();
-	}
-
-	@Test
-	public void doubleInput() {
-		SiftDetector alg = FactoryInterestPointAlgs.siftDetector(null);
-		SiftImageScaleSpace ss = new SiftImageScaleSpace(1.6f, 5, 4, true);
-		WrapSiftDetector wrapper = new WrapSiftDetector(alg,ss);
-
-		new GeneralInterestPointDetectorChecks<ImageFloat32>(wrapper,false,true,ImageFloat32.class){}.performAllTests();
+	public void stuff() {
+		fail("Implement");
 	}
 }

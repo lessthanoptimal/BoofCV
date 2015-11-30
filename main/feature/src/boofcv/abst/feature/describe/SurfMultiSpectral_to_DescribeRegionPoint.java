@@ -22,7 +22,8 @@ import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.BoofDefaults;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
@@ -36,7 +37,7 @@ import boofcv.struct.image.MultiSpectral;
  * @author Peter Abeles
  */
 public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand, II extends ImageSingleBand>
-	implements DescribeRegionPoint<MultiSpectral<T>,SurfFeature>
+	implements DescribeRegionPoint<MultiSpectral<T>,BrightFeature>
 {
 	DescribePointSurfMultiSpectral<II> alg;
 
@@ -72,15 +73,15 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double scale, SurfFeature description) {
+	public boolean process(double x, double y, double orientation, double radius, BrightFeature description) {
 
-		alg.describe(x,y,orientation,scale,description);
+		alg.describe(x,y,orientation, radius/ BoofDefaults.SURF_SCALE_TO_RADIUS,description);
 
 		return true;
 	}
 
 	@Override
-	public boolean requiresScale() {
+	public boolean requiresRadius() {
 		return true;
 	}
 
@@ -100,12 +101,12 @@ public class SurfMultiSpectral_to_DescribeRegionPoint<T extends ImageSingleBand,
 	}
 
 	@Override
-	public SurfFeature createDescription() {
+	public BrightFeature createDescription() {
 		return alg.createDescription();
 	}
 
 	@Override
-	public Class<SurfFeature> getDescriptionType() {
-		return SurfFeature.class;
+	public Class<BrightFeature> getDescriptionType() {
+		return BrightFeature.class;
 	}
 }

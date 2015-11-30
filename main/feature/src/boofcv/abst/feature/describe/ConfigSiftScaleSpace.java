@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,45 +18,49 @@
 
 package boofcv.abst.feature.describe;
 
+
+import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.struct.Configuration;
 
 /**
- * Configures the scale-space used by SIFT feature detector/descriptor.
- *
- * @see boofcv.alg.feature.detect.interest.SiftImageScaleSpace
+ * Configuration for {@link SiftScaleSpace}
  *
  * @author Peter Abeles
  */
 public class ConfigSiftScaleSpace implements Configuration {
 
 	/**
-	 * Amount of blur applied to each scale inside an octaves.  Try 1.6
+	 * Amount of blur at the first level in the image pyramid.  Recommend 1.6
 	 */
-	public float blurSigma = 1.6f;
-	/**
-	 * Number of scales per octaves.  Try 5.  Must be >= 3
-	 */
-	public int numScales = 5;
-	/**
-	 * Number of octaves to detect.  Try 4
-	 */
-	public int numOctaves = 4;
-	/**
-	 * Should the input image be doubled? Try false.
-	 */
-	public boolean doubleInputImage = false;
+	public float sigma0 = 2.75f;
 
-	public ConfigSiftScaleSpace(float blurSigma, int numScales, int numOctaves, boolean doubleInputImage) {
-		this.blurSigma = blurSigma;
-		this.numScales = numScales;
-		this.numOctaves = numOctaves;
-		this.doubleInputImage = doubleInputImage;
-	}
+	/**
+	 * Number of scales in each octave.  The amount of Gaussian blur will double this number of images in the
+	 * octave.  However, the number of actual images computed will be numScales + 3 and the number of difference
+	 * of Guassian images will be numScales + 2.
+	 */
+	public int numScales = 3;
 
-	public ConfigSiftScaleSpace() {
+	/**
+	 * Specified the first and last octaves.  Each octave is a factor of 2 smaller or larger
+	 * than the input image.  The overall size of an octave relative to the input image is pow(2,-octave)
+	 */
+	public int firstOctave = -1, lastOctave = 5;
+
+	/**
+	 * Creates a configuration similar to how it was originally described in the paper
+	 */
+	public static ConfigSiftScaleSpace createPaper() {
+		ConfigSiftScaleSpace config = new ConfigSiftScaleSpace();
+		config.sigma0 = 1.6f;
+		config.numScales = 3;
+		config.firstOctave = -1;
+		config.lastOctave = 5;
+		return config;
 	}
 
 	@Override
 	public void checkValidity() {
+
 	}
 }

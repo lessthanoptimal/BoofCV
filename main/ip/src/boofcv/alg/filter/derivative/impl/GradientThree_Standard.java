@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.derivative.impl;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 
@@ -78,6 +79,31 @@ public class GradientThree_Standard {
 			for (; indexSrc < endX; indexSrc++) {
 				imgX[indexX++] = (short) ((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
 				imgY[indexY++] = (short) ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
+			}
+		}
+	}
+
+	/**
+	 * Computes the derivative along the x and y axes
+	 */
+	public static void process(ImageUInt8 orig, ImageSInt32 derivX, ImageSInt32 derivY) {
+		final byte[] data = orig.data;
+		final int[] imgX = derivX.data;
+		final int[] imgY = derivY.data;
+
+		final int width = orig.getWidth();
+		final int height = orig.getHeight() - 1;
+		final int stride = orig.stride;
+
+		for (int y = 1; y < height; y++) {
+			int indexX = derivX.startIndex + derivX.stride * y + 1;
+			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexSrc = orig.startIndex + stride * y + 1;
+			final int endX = indexSrc + width - 2;
+
+			for (; indexSrc < endX; indexSrc++) {
+				imgX[indexX++] = ((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
+				imgY[indexY++] = ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
 			}
 		}
 	}

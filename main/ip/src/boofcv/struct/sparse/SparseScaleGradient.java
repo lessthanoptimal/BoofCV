@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,12 @@ public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends Gr
 	
 	// defines the kernel's bounds
 	protected int x0,y0,x1,y1;
-	
-	public abstract void setScale( double scale );
+
+	/**
+	 * Sets how wide the gradient operator is in pixels
+	 * @param width width in pixels
+	 */
+	public abstract void setWidth( double width );
 
 	@Override
 	public void setImage(T input ) {
