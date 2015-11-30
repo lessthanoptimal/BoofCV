@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 * Configures magic numbers and estimation algorithms.
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
-	 *                     a value <= 0 to add features every frame.
+	 *                     a value &le; 0 to add features every frame.
 	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
 	 * @param doublePass Associate image features a second time using the estimated model from the first
 	 *                   try to improve results

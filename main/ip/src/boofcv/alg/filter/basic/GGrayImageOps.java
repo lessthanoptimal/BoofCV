@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class GGrayImageOps {
 	/**
 	 * <p>
 	 * Stretches the image's intensity:<br>
-	 * O<sub>x,y</sub> = I<sub>x,y</sub>&gamma + beta<br>
+	 * O<sub>x,y</sub> = I<sub>x,y</sub>&gamma; + beta<br>
 	 * </p>
 	 * <p>
 	 * The image's intensity is clamped at 0 and max;

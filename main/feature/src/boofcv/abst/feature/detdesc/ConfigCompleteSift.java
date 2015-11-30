@@ -62,7 +62,7 @@ public class ConfigCompleteSift implements Configuration{
 	 *
 	 * @param firstOctave The first octaveo.  Try -1
 	 * @param lastOctave The last octave.  Try 5
-	 * @param maxFeaturesPerScale Maximum number of features it will detect per scale.   <= 0 will mean all features
+	 * @param maxFeaturesPerScale Maximum number of features it will detect per scale.   &le; 0 will mean all features
 	 */
 	public ConfigCompleteSift( int firstOctave , int lastOctave , int maxFeaturesPerScale){
 		scaleSpace.firstOctave = firstOctave;

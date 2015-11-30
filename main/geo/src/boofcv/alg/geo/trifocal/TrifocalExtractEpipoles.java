@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,21 +33,17 @@ import org.ejml.ops.SingularOps;
  * noise and epipoles will have a norm of one..
  * </p>
  *
- * <p>
- * Properties:
+ * <p>Properties:</p>
  * <ul>
  *     <li> e2<sup>T</sup>*F12 = 0
  *     <li> e3<sup>T</sup>*F13 = 0
  * </ul>
- * where F1i is a fundamental matrix from image 1 to i.
- * </p>
+ * <p>where F1i is a fundamental matrix from image 1 to i.</p>
  *
- * <p>
- * References:
+ * <p>References:</p>
  * <ul>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </ul>
- * </p>
  *
  * @author Peter Abeles
  */

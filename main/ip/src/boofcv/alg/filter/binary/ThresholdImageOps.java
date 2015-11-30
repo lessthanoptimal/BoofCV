@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
@@ -35,14 +36,14 @@ import boofcv.struct.image.*;
 public class ThresholdImageOps {
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat32 input , ImageUInt8 output ,
@@ -84,14 +85,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageFloat64 input , ImageUInt8 output ,
@@ -133,14 +134,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt8 input , ImageUInt8 output ,
@@ -182,14 +183,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt16 input , ImageUInt8 output ,
@@ -231,14 +232,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageUInt16 input , ImageUInt8 output ,
@@ -280,14 +281,14 @@ public class ThresholdImageOps {
 	}
 
 	/**
-	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values <=
+	 * Applies a global threshold across the whole image.  If 'down' is true, then pixels with values &le;
 	 * to 'threshold' are set to 1 and the others set to 0.  If 'down' is false, then pixels with values >
 	 * to 'threshold' are set to 1 and the others set to 0.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output (Optional) Binary output image. If null a new image will be declared. Modified.
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then > is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then > is used.
 	 * @return Output image.
 	 */
 	public static ImageUInt8 threshold( ImageSInt32 input , ImageUInt8 output ,
@@ -331,7 +332,7 @@ public class ThresholdImageOps {
 	/**
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
 	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
@@ -398,7 +399,7 @@ public class ThresholdImageOps {
 	/**
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
 	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
@@ -464,7 +465,7 @@ public class ThresholdImageOps {
 	/**
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
 	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.
@@ -530,7 +531,7 @@ public class ThresholdImageOps {
 	/**
 	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
 	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
-	 * If down is true then b(x,y) = I(x,y) <= T(x,y) * scale ? 1 : 0.  Otherwise
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
 	 * b(x,y) = I(x,y) * scale > T(x,y) ? 0 : 1
 	 *
 	 * @param input Input image.

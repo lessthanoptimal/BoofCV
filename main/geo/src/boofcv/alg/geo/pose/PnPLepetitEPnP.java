@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ import java.util.List;
 
 /**
  * <p>
- * Implementation of the EPnP algorithm from [1] for solving the PnP problem when N >= 5 for the general case
- * and N >= 4 for planar data (see note below).  Given a calibrated camera, n pairs of 2D point observations and the known 3D
+ * Implementation of the EPnP algorithm from [1] for solving the PnP problem when N &ge; 5 for the general case
+ * and N &ge; 4 for planar data (see note below).  Given a calibrated camera, n pairs of 2D point observations and the known 3D
  * world coordinates, it solves the for camera's pose.. This solution is non-iterative and claims to be much
  * faster and more accurate than the alternatives.  Works for both planar and non-planar configurations.
  * </p>

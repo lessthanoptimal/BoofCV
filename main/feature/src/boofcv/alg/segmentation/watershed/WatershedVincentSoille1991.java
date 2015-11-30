@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -202,7 +202,7 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param input (Input) Input image
 	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value > 0 and have a
-	 *              value <= numRegions.
+	 *              value &le; numRegions.
 	 */
 	public void process( ImageUInt8 input , ImageSInt32 seeds ) {
 		InputSanityCheck.checkSameShape(input,seeds);

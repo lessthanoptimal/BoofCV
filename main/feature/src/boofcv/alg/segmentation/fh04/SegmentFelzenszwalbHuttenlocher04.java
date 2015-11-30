@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,7 +185,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 
 	/**
 	 * Follows the merge procedure output in [1].  Two regions are merged together if the edge linking them
-	 * has a weight which is <= the minimum of the heaviest edges in the two regions.
+	 * has a weight which is &le; the minimum of the heaviest edges in the two regions.
 	 */
 	protected void mergeRegions() {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,14 +29,14 @@ import georegression.transform.se.SePointOps_F64;
 import java.util.List;
 
 /**
- * <p>
- * Computes the reprojection error squared for a given motion and {@link boofcv.struct.geo.Point2D3D}.  If the intrinsic
- * parameters are provided then the error will be computed in pixels.   Observations are assumed to be
- * in normalized image coordinates.
+ * <p>Computes the reprojection error squared for a given motion and {@link boofcv.struct.geo.Point2D3D}.
+ * If the intrinsic parameters are provided then the error will be computed in pixels.   Observations are
+ * assumed to be in normalized image coordinates.</p>
+ *
  * <center>error = (x'-x)^2 + (y' - y)^2</center>
- * where (x,y) is the observed point location and (x',y') is the reprojected point from the 3D coordinate and coordinate
- * transformation.
- * </p>
+ *
+ * <p>where (x,y) is the observed point location and (x',y') is the reprojected point from the 3D coordinate
+ * and coordinate transformation.</p>
  *
  * @author Peter Abeles
  */

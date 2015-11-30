@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,12 +36,10 @@ import java.util.List;
  * The solution will enforce all the constraints and be geometrically valid. See page 395 in [1].
  * </p>
  *
- * <p>
- * References:
+ * <p>References:</p>
  * <ul>
  * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
  * </ul>
- * </p>
  *
  * @author Peter Abeles
  */

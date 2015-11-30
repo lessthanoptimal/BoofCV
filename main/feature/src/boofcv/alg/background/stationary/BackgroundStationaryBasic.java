@@ -49,7 +49,7 @@ public abstract class BackgroundStationaryBasic<T extends ImageBase>
 	 * Configures background model
 	 *
 	 * @param learnRate learning rate, 0 to 1.  0 = fastest and 1 = slowest.
-	 * @param threshold Euclidean distance threshold.  Background is <= this value
+	 * @param threshold Euclidean distance threshold.  Background is &le; this value
 	 * @param imageType Type of input image
 	 */
 	public BackgroundStationaryBasic(float learnRate, float threshold, ImageType<T> imageType) {

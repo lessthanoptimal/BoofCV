@@ -123,7 +123,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
 	 *  @param extractor Feature extractor used to find local maximums in 2D image.
-	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set <= 0 then the all potential
+	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set &le; 0 then the all potential
 	 * features will be returned, which is how it is in the original paper.
 	 * @param initialSampleRate How often pixels are sampled in the first octave.
 	 * @param initialSize Size/width of the smallest feature/kernel in the lowest octave.

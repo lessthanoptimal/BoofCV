@@ -49,8 +49,8 @@ public class UtilDenseOpticalFlow {
 	 *
 	 * @param width Width of input image.
 	 * @param height Height of input image.
-	 * @param scale Scale between layers.  0 <= scale <= 1.  Try 0.7
-	 * @param sigma Adjusts the amount of blur applied to each layer.  If sigma <= 0 then no blur is applied.
+	 * @param scale Scale between layers.  0 &le; scale &le; 1.  Try 0.7
+	 * @param sigma Adjusts the amount of blur applied to each layer.  If sigma &le; 0 then no blur is applied.
 	 * @param minSize The minimum desired image size in the pyramid
 	 * @param maxLayers The maximum number of layers in the pyramid.
 	 * @param imageType Type of image for each layer

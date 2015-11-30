@@ -171,7 +171,7 @@ public class FactoryVisualOdometry {
 	 * @see VisOdomPixelDepthPnP
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
-	 *                     a value <= 0 to add features every frame.
+	 *                     a value &le; 0 to add features every frame.
 	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
 	 * @param sparseDisparity Estimates the 3D location of features
 	 * @param imageType Type of image being processed.
@@ -223,7 +223,7 @@ public class FactoryVisualOdometry {
 	 * @see VisOdomPixelDepthPnP
 	 *
 	 * @param thresholdAdd Add new tracks when less than this number are in the inlier set.  Tracker dependent. Set to
-	 *                     a value <= 0 to add features every frame.
+	 *                     a value &le; 0 to add features every frame.
 	 * @param thresholdRetire Discard a track if it is not in the inlier set after this many updates.  Try 2
 	 * @param sparseDepth Extracts depth of pixels from a depth sensor.
 	 * @param visualType Type of visual image being processed.

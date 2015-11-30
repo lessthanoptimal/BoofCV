@@ -36,7 +36,7 @@ public class ConfigFastHessian implements Configuration {
 	 */
 	public int extractRadius = 2;
 	/**
-	 * Number of features it will find or if <= 0 it will return all features it finds.
+	 * Number of features it will find or if &le; 0 it will return all features it finds.
 	 */
 	public int maxFeaturesPerScale = -1;
 	/**

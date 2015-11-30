@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,16 +36,15 @@ import java.util.List;
 /**
  * <p>
  * Estimates the camera motion using linear algebra given a set of N associated point observations and the
- * depth (z-coordinate) of each object, where N >= 6.  Note this is similar to, but not exactly the PnP problem.
+ * depth (z-coordinate) of each object, where N &ge; 6.  Note this is similar to, but not exactly the PnP problem.
  * </p>
  *
  * <p>
  * Output from this class is a rotation and translation that converts a point from the first to second
- * camera's reference frame:<br>
- * X' = R*X+T<br>
+ * camera's reference frame:</p>
+ * {@code X' = R*X+T}<br>
  * where R is a rotation matrix, T is a translation matrix, X is a coordinate in 1st reference frame, and X'
  * in the second.
- * </p>
  *
  * <p>
  * This approach is a modified version of the approach discussed in [1].  It is derived by using

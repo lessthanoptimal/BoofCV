@@ -105,7 +105,7 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 	 * @param resolutionRange Resolution of line range in pixels.  Try 2
 	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
 	 * @param thresholdEdge Edge detection threshold. Try 50.
-	 * @param maxLines Maximum number of lines to return. If <= 0 it will return them all.
+	 * @param maxLines Maximum number of lines to return. If &le; 0 it will return them all.
 	 * @param gradient Algorithm for computing image gradient.
 	 */
 	public DetectLineHoughPolar(int localMaxRadius,

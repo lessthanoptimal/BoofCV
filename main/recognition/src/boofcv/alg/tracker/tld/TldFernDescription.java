@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import java.util.Random;
 public class TldFernDescription {
 
 	/**
-	 * Pairs used to compute fern.  Must be <= 32 to fit inside an integer
+	 * Pairs used to compute fern.  Must be &le; 32 to fit inside an integer
 	 */
 	SamplePair pairs[];
 

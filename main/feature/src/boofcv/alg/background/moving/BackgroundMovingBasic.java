@@ -51,7 +51,7 @@ public abstract class BackgroundMovingBasic<T extends ImageBase, Motion extends 
 	 * Configures background model
 	 *
 	 * @param learnRate learning rate, 0 to 1.  0 = fastest and 1 = slowest.
-	 * @param threshold Euclidean distance threshold.  Background is <= this value
+	 * @param threshold Euclidean distance threshold.  Background is &le; this value
 	 * @param transform Point transform
 	 * @param imageType Type of input image
 	 */

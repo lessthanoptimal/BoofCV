@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class TldParameters {
 	public int numFerns = 10;
 
 	/**
-	 * Number of sample points pairs.  0 < N <= 32.  A value of 10 is recommended.
+	 * Number of sample points pairs.  0 &lt; N &le; 32.  A value of 10 is recommended.
 	 */
 	public int fernSize = 10;
 

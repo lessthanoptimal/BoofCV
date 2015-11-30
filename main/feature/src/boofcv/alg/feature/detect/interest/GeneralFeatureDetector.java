@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * <p>
  * If a maximum number of features is specified then the N most intense features are returned.  By default all
- * found features are returned.  Set to a value <= 0 to detect all features.
+ * found features are returned.  Set to a value &le; 0 to detect all features.
  * </p>
  *
  * @param <I> Input image type.

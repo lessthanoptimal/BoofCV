@@ -18,7 +18,7 @@ Version : Alpha 0.21
   * Used by SURF and SIFT, so the name was made more generic
 - Complete rewrite of SIFT
   * Very similar to original paper by Lowe
-  * Most difference from the paper are in the use of quadratic interpolation instead of the overly complex thing that
+  * One common difference is the use of quadratic interpolation instead of the overly complex thing that
     Lowe proposed
 - black polygon detector
   * can now handle features along image border

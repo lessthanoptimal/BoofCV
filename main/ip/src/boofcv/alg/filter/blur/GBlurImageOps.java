@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,8 +79,8 @@ public class GBlurImageOps {
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
-	 * @param sigma Gaussian distribution's sigma.  If <= 0 then will be selected based on radius.
-	 * @param radius Radius of the Gaussian blur function. If <= 0 then radius will be determined by sigma.
+	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.

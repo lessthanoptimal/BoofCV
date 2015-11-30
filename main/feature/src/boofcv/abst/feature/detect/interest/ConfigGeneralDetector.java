@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class ConfigGeneralDetector extends ConfigExtract {
 
 	/**
 	 * Specifies the maximum number of features it will detect.  If a value is specified then the 'maxFeature' most
-	 * intense features are returned.  Set to a value <= 0 to return all selected features.  Default is -1.
+	 * intense features are returned.  Set to a value &le; 0 to return all selected features.  Default is -1.
 	 */
 	public int maxFeatures = -1;
 

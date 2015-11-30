@@ -32,9 +32,8 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.PyramidFloat;
 
 /**
- * Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
- * interface
- * <p/>
+ * <p>Factory for creating interest point detectors which conform to the {@link InterestPointDetector}
+ * interface </p>
  * <p>
  * NOTE: Higher level interface than {@link GeneralFeatureDetector}.  This will automatically
  * compute image derivatives across scale space as needed, unlike GeneralFeatureDetector which

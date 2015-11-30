@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ConfigBroxWarping implements Configuration {
 	 */
 	public double pyrScale = 0.75;
 	/**
-	 * Amount of gaussian blur applied to each layer in the pyramid.  If sigma <= 0 then no blur is applied.
+	 * Amount of gaussian blur applied to each layer in the pyramid.  If sigma &le; 0 then no blur is applied.
 	 */
 	public double pyrSigma = 0.5;
 	/**

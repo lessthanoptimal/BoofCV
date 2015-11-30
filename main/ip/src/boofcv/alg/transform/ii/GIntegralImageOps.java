@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,7 +149,7 @@ public class GIntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image and treats pixels outside of the
-	 * image as zero.  The block is defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * image as zero.  The block is defined as follows: x0 < x &le; x1 and y0 < y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.
@@ -178,7 +178,7 @@ public class GIntegralImageOps {
 	/**
 	 * <p>
 	 * Computes the value of a block inside an integral image without bounds checking.  The block is
-	 * defined as follows: x0 < x <= x1 and y0 < y <= y1.
+	 * defined as follows: x0 < x &le; x1 and y0 < y &le; y1.
 	 * </p>
 	 *
 	 * @param integral Integral image.

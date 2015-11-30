@@ -35,11 +35,11 @@ public interface InterpolatePixelMB<T extends ImageBase> extends InterpolatePixe
 	 * the image border. Bounds checking is done to ensure that the coordinate is inside the image
 	 * and to see if the interpolation technique needs to be adjusted for the image border.
 	 *
-	 * @param x Point's x-coordinate. x >= 0 && x < image.width
-	 * @param y Point's y-coordinate. y >= 0 && y < image.height
+	 * @param x Point's x-coordinate. x &ge; 0 && x &lt; image.width
+	 * @param y Point's y-coordinate. y &ge; 0 && y &lt; image.height
 	 * @param values Interpolated value across all bands.
 	 */
-	public void get(float x, float y, float []values );
+	void get(float x, float y, float []values );
 
 	/**
 	 * Returns the interpolated pixel values at the specified location while assuming it is inside
@@ -49,6 +49,6 @@ public interface InterpolatePixelMB<T extends ImageBase> extends InterpolatePixe
 	 * @param y Point's y-coordinate.
 	 * @param values Interpolated value across all bands.
 	 */
-	public void get_fast(float x, float y, float []values );
+	void get_fast(float x, float y, float []values );
 
 }

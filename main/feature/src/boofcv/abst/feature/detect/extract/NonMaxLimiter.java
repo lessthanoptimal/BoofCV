@@ -44,7 +44,7 @@ public class NonMaxLimiter {
 	/**
 	 * Configures the limiter
 	 * @param nonmax Non-maximum suppression algorithm
-	 * @param maxTotalFeatures The total number of allowed features it can return.  Set to a value <= 0 to disable.
+	 * @param maxTotalFeatures The total number of allowed features it can return.  Set to a value &le; 0 to disable.
 	 */
 	public NonMaxLimiter(NonMaxSuppression nonmax, int maxTotalFeatures) {
 		this.nonmax = nonmax;

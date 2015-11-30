@@ -89,7 +89,7 @@ public class FactoryThresholdBinary {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#threshold
 	 *
 	 * @param threshold threshold value.
-	 * @param down If true then the inequality <= is used, otherwise if false then >= is used.
+	 * @param down If true then the inequality &le; is used, otherwise if false then >= is used.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */

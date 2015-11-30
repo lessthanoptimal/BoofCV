@@ -371,7 +371,7 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min <= X < max.
+	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X < max.
 	 *
 	 * @param input Image which is to be filled.  Modified,
 	 * @param rand Random number generator
@@ -483,7 +483,7 @@ public class GImageMiscOps {
 	}
 
 	/**
-	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min <= X < max.
+	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
 	 */
 	public static void addUniform( ImageBase input, Random rand , double min , double max  ) {
 		if( input instanceof ImageSingleBand ) {

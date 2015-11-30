@@ -191,8 +191,8 @@ public abstract class BaseFiducialSquare {
 	 *
 	 * @param fiducialWidthUnit Width of the fiducial
 	 * @param whiteBorderUnit Thickness of the border around the fiducial
-	 * @param pageWidthUnit Width of the document. If <= 0 the width will be automatically selected
-	 * @param pageHeightUnit Height of the document. If <= 0 the height will be automatically selected
+	 * @param pageWidthUnit Width of the document. If &le; 0 the width will be automatically selected
+	 * @param pageHeightUnit Height of the document. If &le; 0 the height will be automatically selected
 	 * @throws IOException
 	 */
 	private void generate(double fiducialWidthUnit, double whiteBorderUnit,

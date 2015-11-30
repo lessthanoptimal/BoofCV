@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  * <b>right To Left</b> validates the disparity by seeing if the matched region on the right has the same region on
  * the left as its optimal solution, within tolerance.<br>
  * <b>texture</b> Tolerance for how similar the best region is to the second best. Lower values indicate greater
- * tolerance.  Reject if textureTol <= (C2-C1)/C1, where C2 = second best region score and C1 = best region score
+ * tolerance.  Reject if textureTol &le; (C2-C1)/C1, where C2 = second best region score and C1 = best region score
  * </p>
  *
  * <p>
@@ -73,7 +73,7 @@ public abstract class SelectRectStandard <Array , T extends ImageSingleBand>
 	 * @param maxError The maximum allowed error.  Note this is sum error and not per pixel error.
 	 *                 Try (region width*height)*30.
 	 * @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be.  Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value <= 0.
+	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value &le; 0.
 	 *                Closer to zero is more tolerant. Try 0.1
 	 */
 	public SelectRectStandard(int maxError, int rightToLeftTolerance, double texture) {
