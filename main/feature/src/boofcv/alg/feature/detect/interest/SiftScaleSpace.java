@@ -159,7 +159,7 @@ public class SiftScaleSpace {
 	/**
 	 * Returns the blur at the given octave and scale
 	 */
-	private double computeSigmaScale(int octave, int scale) {
+	public double computeSigmaScale(int octave, int scale) {
 		return sigma0*Math.pow(2,octave+scale/(double)numScales);
 	}
 

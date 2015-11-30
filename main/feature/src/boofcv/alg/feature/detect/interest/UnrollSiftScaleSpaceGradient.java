@@ -26,17 +26,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Precomputes the gradient for all scales in the scale-space and saves them in a list.
+ * Precomputes the gradient for all scales in the scale-space and saves them in a list.  Since it saves the entire
+ * scale space it can take up a bit of memory, but allows quick random look up of images.
  *
  * @author Peter Abeles
  */
 public class UnrollSiftScaleSpaceGradient {
 
+	// input scale space
 	SiftScaleSpace scaleSpace;
 
+	// scale images that are using
 	List<ImageScale> usedScales = new ArrayList<ImageScale>();
+	// storage for all possible scales
 	List<ImageScale> allScales = new ArrayList<ImageScale>();
 
+	// used to compute the image gradient
 	ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.three_F32();
 
 	public UnrollSiftScaleSpaceGradient(SiftScaleSpace scaleSpace) {
@@ -49,12 +54,15 @@ public class UnrollSiftScaleSpaceGradient {
 		}
 	}
 
+	/**
+	 * Sets the input image.  Scale-space is computed and unrolled from this image
+	 * @param image
+	 */
 	public void setImage(ImageFloat32 image) {
 
 		scaleSpace.initialize(image);
 
 		usedScales.clear();
-//		System.out.println("total scales "+allScales.size());
 		do {
 			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
 				ImageFloat32 scaleImage = scaleSpace.getImageScale(i);
@@ -70,8 +78,6 @@ public class UnrollSiftScaleSpaceGradient {
 				scale.sigma = sigma;
 
 				usedScales.add(scale);
-
-//				System.out.printf("Sigma = %6.2f c2i = % 6.2f\n",sigma,pixelCurrentToInput);
 			}
 		} while( scaleSpace.computeNextOctave() );
 	}
