@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
+import org.junit.Before;
 
 import java.util.Random;
 
@@ -53,6 +54,22 @@ public class BaseFitPolygon {
 
 	Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
 
+	@Before
+	public void resetSettings() {
+		width = 400; height = 500;
+
+		x0 = 200; y0 = 160;
+		x1 = 260; y1 = 400;
+
+		white = 200;
+	}
+
+	/**
+	 *
+	 * @param affine affine transform to apply.  can be null for none
+	 * @param black true = black rectangle and white background.  false = reverse
+	 * @param imageType Type of image
+	 */
 	protected void setup( Affine2D_F64 affine, boolean black , Class imageType ) {
 		work = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		image = GeneralizedImageOps.createSingleBand(imageType,width,height);

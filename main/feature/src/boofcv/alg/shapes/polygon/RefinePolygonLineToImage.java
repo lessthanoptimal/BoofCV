@@ -44,6 +44,11 @@ import java.util.List;
  * found polygon will also be 1,2 and 12,15.
  * </p>
  *
+ * <p>
+ * If a line lies entirely along the image border it is not modified.  If part of it lies along the image then only
+ * points not near the border are used to optimize its location.
+ * </p>
+ *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
  * and invoke {@link SnapToEdge#setTransform(PixelTransform_F32)}.</p>
  *

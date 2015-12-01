@@ -33,7 +33,8 @@ import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static java.lang.Math.max;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -120,6 +121,33 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 	}
 
 	/**
+	 * See if it handles lines along the image border correctly
+	 */
+	@Test
+	public void fitWithEdgeOnBorder() {
+		for (Class imageType : imageTypes) {
+			x0 = 0; x1 = 100;
+			y0 = 100; y1 = 200;
+			setup(null, true, imageType);
+
+			RefinePolygonLineToImage alg = createAlg(4,imageType);
+
+			Polygon2D_F64 input = createFromSquare(null);
+
+			input.get(0).set(x0,y0+1.1);
+			input.get(1).set(x0,y1-1.1);
+
+			Polygon2D_F64 found = new Polygon2D_F64(4);
+
+			alg.setImage(image);
+			assertTrue(alg.refine(input,null,null,found));
+
+			Polygon2D_F64 expected = createFromSquare(null);
+			assertTrue(expected.isIdentical(found, 0.01));
+		}
+	}
+
+	/**
 	 * Perfect initial guess.
 	 */
 	@Test
@@ -144,11 +172,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
-		Polygon2D_F64 input = new Polygon2D_F64(4);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y1),input.get(1));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y1),input.get(2));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
+		Polygon2D_F64 input = createFromSquare(affine);
 
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
@@ -193,11 +217,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
-		Polygon2D_F64 input = new Polygon2D_F64(4);
-		input.get(0).set(x0,y0);
-		input.get(1).set(x0,y1);
-		input.get(2).set(x1,y1);
-		input.get(3).set(x1,y0);
+		Polygon2D_F64 input = createFromSquare(null);
 
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
@@ -242,11 +262,7 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 
 		RefinePolygonLineToImage alg = createAlg(4,imageType);
 
-		Polygon2D_F64 input = new Polygon2D_F64(4);
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0),input.get(0));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y1),input.get(1));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y1),input.get(2));
-		AffinePointOps_F64.transform(affine,new Point2D_F64(x1,y0),input.get(3));
+		Polygon2D_F64 input = createFromSquare(affine);
 
 		Polygon2D_F64 expected = input.copy();
 		Polygon2D_F64 found = new Polygon2D_F64(4);
@@ -324,12 +340,20 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		return a;
 	}
 
-	/**
-	 * See if it handles lines along the image border correctly
-	 */
-	@Test
-	public void imageBorder() {
-		fail("implement");
+	private Polygon2D_F64 createFromSquare( Affine2D_F64 affine ) {
+		Polygon2D_F64 input = new Polygon2D_F64(4);
+		if( affine != null ) {
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y0), input.get(0));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y1), input.get(1));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y1), input.get(2));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y0), input.get(3));
+		} else {
+			input.get(0).set(new Point2D_F64(x0, y0));
+			input.get(1).set(new Point2D_F64(x0, y1));
+			input.get(2).set(new Point2D_F64(x1, y1));
+			input.get(3).set(new Point2D_F64(x1, y0));
+		}
+		return input;
 	}
 
 }

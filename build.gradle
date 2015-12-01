@@ -218,13 +218,12 @@ task alljavadoc(type: Javadoc) {
 
     destinationDir = file("${buildDir}/docs/javadoc")
     configure(options) {
+        failOnError = false
         docTitle = "BoofCV JavaDoc ($project.version)"
         links = [ 'http://docs.oracle.com/javase/7/docs/api/',
                   'http://ejml.org/javadoc/',
                   'http://georegression.org/javadoc/',
                   'http://ddogleg.org/javadoc/']
-//        header = file('misc/header.txt').text
-        // TODO still has issues with quotes
 //        bottom = file('misc/bottom.txt').text
     }
 }
