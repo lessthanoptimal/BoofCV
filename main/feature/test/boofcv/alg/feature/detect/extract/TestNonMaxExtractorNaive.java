@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class TestNonMaxExtractorNaive {
 	}
 
 	private void standardTests( boolean strict ) {
-		new GenericNonMaxTests(strict,false,true) {
+		new GenericNonMaxAlgorithmTests(strict,false,true) {
 
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,

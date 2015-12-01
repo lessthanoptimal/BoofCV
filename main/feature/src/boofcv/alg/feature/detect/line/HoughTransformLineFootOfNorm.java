@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,9 +78,6 @@ public class HoughTransformLineFootOfNorm {
 	 */
 	public HoughTransformLineFootOfNorm(NonMaxSuppression extractor,
 										int minDistanceFromOrigin) {
-		if( !extractor.canDetectBorder() ) {
-			throw new IllegalArgumentException("The extractor must also process the image border");
-		}
 		this.extractor = extractor;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;
 	}

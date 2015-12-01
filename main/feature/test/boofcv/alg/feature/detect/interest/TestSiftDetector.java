@@ -147,7 +147,7 @@ public class TestSiftDetector {
 			upper.set(x, y, sign*80);
 			lower.set(x, y, sign*90);
 
-			alg.processFeatureCandidate(15, 16, 100, sign > 0);
+			alg.processFeatureCandidate(15, 16, sign*100, sign > 0);
 
 			ScalePoint p = alg.getDetections().get(0);
 			// make sure it is close
@@ -165,7 +165,7 @@ public class TestSiftDetector {
 			lower.set(x, y, sign*80);
 
 			alg.detections.reset();
-			alg.processFeatureCandidate(15, 16, 100, sign > 0);
+			alg.processFeatureCandidate(15, 16, sign*100, sign > 0);
 			assertTrue(Math.abs(5 - p.scale) < 2);
 			assertTrue( 5 < p.scale );
 

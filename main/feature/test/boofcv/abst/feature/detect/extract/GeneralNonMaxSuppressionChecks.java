@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,8 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -53,10 +54,9 @@ public abstract class GeneralNonMaxSuppressionChecks {
 	public void testAll() {
 		getUsesCandidates();
 		setIgnoreBorder_basic();
-		setIgnoreBorder_harder();
+		setIgnoreBorder_conflict();
 		setThreshold();
 		setSearchRadius();
-		canDetectBorder();
 		ignoreMAX_VALUE();
 		checkSubImage();
 	}
@@ -114,6 +114,46 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		// since it got two different answers that were dependent on the candidate list it passes the test
 	}
 
+	/**
+	 * Makes sure that the border just defines the region in which an exteme can be found.  If a pixel is within
+	 * the exclusion zone and larger magnitude than a near by pixel inside, the inside pixel can't be an exteme
+	 */
+	@Test
+	public void setIgnoreBorder_conflict() {
+		if( alg.canDetectMaximums() )
+			setIgnoreBorder_conflict(true);
+		if( alg.canDetectMinimums() )
+			setIgnoreBorder_conflict(false);
+	}
+
+	private void setIgnoreBorder_conflict( boolean checkMax ) {
+		init();
+		alg.setSearchRadius(1);
+
+		float sign = checkMax ? 1 : -1;
+
+		setPixel(0, 1, checkMax , sign*90);
+		setPixel(1, 1, checkMax , sign*30);
+
+		// with no border (0,1) should be a peak
+		foundMin.reset();foundMax.reset();
+		alg.process(image,candidatesMin, candidatesMax,foundMin,foundMax);
+		if( checkMax ) {
+			assertEquals(0, foundMin.size);
+			assertEquals(1, foundMax.size);
+		} else {
+			assertEquals(1, foundMin.size);
+			assertEquals(0, foundMax.size);
+		}
+
+		// now with a border there should be no maximum.  30 gets knocked out because 90 is next to it
+		foundMin.reset();foundMax.reset();
+		alg.setIgnoreBorder(1);
+		alg.process(image,candidatesMin, candidatesMax,foundMin,foundMax);
+		assertEquals(0, foundMin.size);
+		assertEquals(0, foundMax.size);
+	}
+
 	@Test
 	public void setIgnoreBorder_basic() {
 		setIgnoreBorder_basic( true );
@@ -124,11 +164,10 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		init();
 
 		float a = checkMax ? 1 : -1;
-		int r = alg.canDetectBorder() ? 0 : alg.getSearchRadius();
 
 		// place features inside the image at the border of where they can be processed
-		setPixel(r,r, checkMax, 10*a);
-		setPixel(width-r-1,height-r-1, checkMax, 10*a);
+		setPixel(0,0, checkMax, 10*a);
+		setPixel(width-1,height-1, checkMax, 10*a);
 
 		// should find both of them
 		foundMin.reset();foundMax.reset();
@@ -145,39 +184,6 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		alg.process(image, candidatesMin, candidatesMax, foundMin, foundMax);
 		assertEquals(0, foundMin.size);
 		assertEquals(0, foundMax.size);
-	}
-
-	@Test
-	public void setIgnoreBorder_harder() {
-		setIgnoreBorder_harder(true);
-		setIgnoreBorder_harder(false);
-	}
-
-	public void setIgnoreBorder_harder( boolean checkMax ) {
-		init();
-
-		float a = checkMax ? 1 : -1;
-		int r = alg.canDetectBorder() ? 1 : alg.getSearchRadius()+1;
-
-		// place features inside the image at the border of where they can be processed
-		setPixel(r,r, checkMax, 10*a);
-		setPixel(width-r-1,height-r-1, checkMax, 10*a);
-		// then even more intense features right next to them outside of where they should be processed
-		setPixel(r-1,r, checkMax, 15*a);
-		setPixel(r,r-1, checkMax, 15*a);
-		setPixel(width-r,height-r-1, checkMax, 15*a);
-		setPixel(width-r-1,height-r, checkMax, 15*a);
-
-		// If it doesn't find both of those features then its actually looking outside the ignore border
-		foundMin.reset(); foundMax.reset();
-		alg.setIgnoreBorder(1);
-		alg.process(image, candidatesMin, candidatesMax, foundMin, foundMax);
-		if( checkMax ) {
-			checkDetectedSize(0,2);
-		} else {
-			checkDetectedSize(2,0);
-		}
-
 	}
 
 	@Test
@@ -219,41 +225,6 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		foundMin.reset(); foundMax.reset();
 		alg.process(image, candidatesMin, candidatesMax, foundMin, foundMax);
 		checkDetectedSize(1, 1);
-	}
-
-	@Test
-	public void canDetectBorder() {
-		canDetectBorder(false);
-		canDetectBorder(true);
-	}
-
-	public void canDetectBorder(boolean checkMax) {
-		init();
-
-		float a = checkMax ? 1 : -1;
-
-		// place two features along the image border
-		setPixel(0,0, checkMax, 10*a);
-		setPixel(width-1,height-1, checkMax, 10*a);
-
-		// the solution should depend on its capabilities
-		foundMin.reset(); foundMax.reset();
-		alg.process(image, candidatesMin, candidatesMax, foundMin, foundMax);
-		if( foundMin.size == 2 || foundMax.size == 2 )
-			assertTrue(alg.canDetectBorder());
-		else if( alg.canDetectMinimums() ) {
-			if( !checkMax )
-				if( foundMin.size == 0 )
-					assertTrue(!alg.canDetectBorder());
-				else
-					fail("Unexpected number of found");
-		} else if( alg.canDetectMaximums() ) {
-			if( checkMax )
-				if( foundMax.size == 0 )
-					assertTrue(!alg.canDetectBorder());
-				else
-					fail("Unexpected number of found");
-		}
 	}
 
 	@Test

@@ -268,6 +268,8 @@ public class SiftDetector {
 		// This is different from the original paper
 		float signAdj = maximum ? 1 : -1;
 
+		value *= signAdj;
+
 		float x0 = dogTarget.unsafe_get(x - 1, y)*signAdj;
 		float x2 = dogTarget.unsafe_get(x + 1, y)*signAdj;
 		float y0 = dogTarget.unsafe_get(x , y - 1)*signAdj;
@@ -281,6 +283,14 @@ public class SiftDetector {
 		// Compute the interpolated coordinate of the point in the original image coordinates
 		p.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
 		p.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
+
+		if( p.y > 120 ) {
+			System.out.println("x*scale "+(x*pixelScaleToInput));
+			System.out.println("y*scale "+(y*pixelScaleToInput));
+			System.out.println("y interp "+polyPeak(y0, value, y2));
+
+			System.out.println("Egads");
+		}
 
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1

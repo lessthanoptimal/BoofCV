@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
+public abstract class GenericNonMaxCandidateTests extends GenericNonMaxAlgorithmTests {
 
 	QueueCorner candidatesMin = new QueueCorner();
 	QueueCorner candidatesMax  = new QueueCorner();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,9 @@ import boofcv.struct.image.ImageFloat32;
  * Each block check is independent of all the others and no information is exchanged.  This
  * algorithm could be paralyzed easily and has no memory overhead.
  * </p>
+ *
+ * <p>See {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} for a definition of parameters
+ * not described in this document</p>
  *
  * <p>
  * [1] Neubeck, A. and Van Gool, L. "Efficient non-maximum suppression" ICPR 2006

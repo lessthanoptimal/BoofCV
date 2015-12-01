@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericNonMaxTests {
+public abstract class GenericNonMaxAlgorithmTests {
 
 	Random rand = new Random(2134);
 
@@ -54,7 +54,7 @@ public abstract class GenericNonMaxTests {
 
 	boolean strict;
 
-	protected GenericNonMaxTests(boolean strict, boolean canDetectMin, boolean canDetectMax ) {
+	protected GenericNonMaxAlgorithmTests(boolean strict, boolean canDetectMin, boolean canDetectMax ) {
 		this.strict = strict;
 		this.canDetectMin = canDetectMin;
 		this.canDetectMax = canDetectMax;
@@ -78,6 +78,69 @@ public abstract class GenericNonMaxTests {
 	public void allStandard() {
 		checkDetectionRule();
 		compareToNaive();
+		checkBorderMaximum();
+	}
+
+	/**
+	 * Makes sure that the border just defines the region in which an exteme can be found.  If a pixel is within
+	 * the exclusion zone and larger magnitude than a near by pixel inside, the inside pixel can't be an exteme
+	 */
+	@Test
+	public void checkBorderMaximum() {
+		if (canDetectMax)
+			checkBorderMaximum(1);
+		if( canDetectMin)
+			checkBorderMaximum(-1);
+	}
+
+	private void checkBorderMaximum( float sign ) {
+		reset();
+		intensity.set(0, 1, sign*90);
+		intensity.set(1, 1, sign*30);
+
+		// with no border (0,1) should be a peak
+		findLocalPeaks(intensity, 5, 1, 0);
+		if( sign > 0 ) {
+			assertEquals(0, foundMinimum.size);
+			assertEquals(1, foundMaximum.size);
+		} else {
+			assertEquals(1, foundMinimum.size);
+			assertEquals(0, foundMaximum.size);
+		}
+
+		// now with a border there should be no maximum.  30 gets knocked out because 90 is next to it
+		findLocalPeaks(intensity, 5, 1, 1);
+		assertEquals(0, foundMinimum.size);
+		assertEquals(0, foundMaximum.size);
+	}
+
+	/**
+	 * Makes sure that features along the image border can be detected as an extreme
+	 */
+	@Test
+	public void checkCanDetectAlongImageBorder() {
+		if (canDetectMax)
+			checkCanDetectAlongImageBorder(1);
+		if( canDetectMin)
+			checkCanDetectAlongImageBorder(-1);
+	}
+
+	public void checkCanDetectAlongImageBorder( float sign ) {
+		reset();
+		intensity.set(width/2, 0, sign*90);
+		intensity.set(width/2, height-1, sign*90);
+		intensity.set(0, height/2, sign*90);
+		intensity.set(width-1, height/2, sign*90);
+
+		findLocalPeaks(intensity, 5, 2, 0);
+
+		if( sign > 0 ) {
+			assertEquals(0, foundMinimum.size);
+			assertEquals(4, foundMaximum.size);
+		} else {
+			assertEquals(4, foundMinimum.size);
+			assertEquals(0, foundMaximum.size);
+		}
 	}
 
 	@Test

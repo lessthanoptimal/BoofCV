@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,9 @@ public abstract class NonMaxCandidate {
 
 	protected ImageFloat32 input;
 
-	// upper bound on image
-	int endX,endY;
+	// upper bound on detectable extremes in the image
+	int endBorderX, endBorderY;
+
 	// local area that's examined and cropped for the image border
 	int x0,y0,x1,y1;
 
@@ -59,8 +60,8 @@ public abstract class NonMaxCandidate {
 		this.input = intensityImage;
 
 		// pixels indexes larger than these should not be examined
-		endX = intensityImage.width-ignoreBorder;
-		endY = intensityImage.height-ignoreBorder;
+		endBorderX = intensityImage.width-ignoreBorder;
+		endBorderY = intensityImage.height-ignoreBorder;
 
 		if( candidatesMin != null )
 			examineMinimum(intensityImage,candidatesMin,foundMin);
@@ -76,7 +77,7 @@ public abstract class NonMaxCandidate {
 		for (int iter = 0; iter < candidates.size; iter++) {
 			Point2D_I16 pt = candidates.data[iter];
 
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endX || pt.y >= endY )
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
@@ -84,10 +85,10 @@ public abstract class NonMaxCandidate {
 			float val = inten[center];
 			if (val > thresholdMin || val == -Float.MAX_VALUE ) continue;
 
-			x0 = Math.max(ignoreBorder,pt.x - radius);
-			y0 = Math.max(ignoreBorder,pt.y - radius);
-			x1 = Math.min(endX, pt.x + radius + 1);
-			y1 = Math.min(endY, pt.y + radius + 1);
+			x0 = Math.max(0,pt.x - radius);
+			y0 = Math.max(0,pt.y - radius);
+			x1 = Math.min(intensityImage.width, pt.x + radius + 1);
+			y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if( searchMin(center,val) )
 				found.add(pt.x,pt.y);
@@ -101,7 +102,7 @@ public abstract class NonMaxCandidate {
 		for (int iter = 0; iter < candidates.size; iter++) {
 			Point2D_I16 pt = candidates.data[iter];
 
-			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endX || pt.y >= endY )
+			if( pt.x < ignoreBorder || pt.y < ignoreBorder || pt.x >= endBorderX || pt.y >= endBorderY)
 				continue;
 
 			int center = intensityImage.startIndex + pt.y * stride + pt.x;
@@ -109,10 +110,10 @@ public abstract class NonMaxCandidate {
 			float val = inten[center];
 			if (val < thresholdMax || val == Float.MAX_VALUE ) continue;
 
-			x0 = Math.max(ignoreBorder,pt.x - radius);
-			y0 = Math.max(ignoreBorder,pt.y - radius);
-			x1 = Math.min(endX, pt.x + radius + 1);
-			y1 = Math.min(endY, pt.y + radius + 1);
+			x0 = Math.max(0,pt.x - radius);
+			y0 = Math.max(0,pt.y - radius);
+			x1 = Math.min(intensityImage.width, pt.x + radius + 1);
+			y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if( searchMax(center,val) )
 				found.add(pt.x,pt.y);

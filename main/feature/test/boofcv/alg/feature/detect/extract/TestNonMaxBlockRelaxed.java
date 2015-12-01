@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class TestNonMaxBlockRelaxed {
 
 	@Test
 	public void checkMax() {
-		GenericNonMaxTests checks = new GenericNonMaxTests(false,false,true) {
+		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,false,true) {
 
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
@@ -48,7 +48,7 @@ public class TestNonMaxBlockRelaxed {
 
 	@Test
 	public void checkMin() {
-		GenericNonMaxTests checks = new GenericNonMaxTests(false,true,false) {
+		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,true,false) {
 
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
@@ -67,7 +67,7 @@ public class TestNonMaxBlockRelaxed {
 
 	@Test
 	public void checkMinMax() {
-		GenericNonMaxTests checks = new GenericNonMaxTests(false,true,true) {
+		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,true,true) {
 
 			@Override
 			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,

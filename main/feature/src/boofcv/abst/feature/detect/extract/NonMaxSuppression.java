@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,10 +44,9 @@ import boofcv.struct.image.ImageFloat32;
  * </p>
  *
  * <p>
- * The processing border is defined as the image minus the ignore border.  Some algorithms cannot detect features
- * which are within the search radius of this border.  If that is the case it would be possible to have a feature
- * at the image border.  To determine if this is the case call {@link #canDetectBorder()}.
- * <p>
+ * A border can be specified around the outside of the image in which extemes can't be detected.  This is
+ * specified by the border parameter and the valid region is defined as follows:<br>
+ * border &le; x &lt; width-border AND border &le; y &lt; height-border</p>
  *
  * @author Peter Abeles
  */
@@ -105,27 +104,19 @@ public interface NonMaxSuppression {
 	public void setThresholdMaximum(float threshold);
 
 	/**
-	 * Pixels which are within 'border' of the image border will not be considered.
+	 * Defines the region inside the image in which a pixel can be an extreme.
+	 * valid region is: border &le; x &lt; width-border AND border &le; y &lt; height-border
 	 *
 	 * @param border Border size in pixels.
 	 */
 	public void setIgnoreBorder(int border);
 
 	/**
-	 * Returns the size of the image border which is not processed.
+	 * Returns the size of the image border.
 	 *
 	 * @return border size
 	 */
 	public int getIgnoreBorder();
-
-	/**
-	 * Can it detect features which are inside the image border.  For example if a feature
-	 * has a radius of 5, but there is a local max at 2, should that be returned?  Can
-	 * the output handle feature descriptors which are partially inside the image?
-	 *
-	 * @return If it can detect features inside the image border.
-	 */
-	public boolean canDetectBorder();
 
 	/**
 	 * Species the search radius for the feature

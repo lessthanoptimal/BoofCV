@@ -23,6 +23,10 @@ Version : Alpha 0.21
 - black polygon detector
   * can now handle features along image border
   * fixed a couple of bugs inside refine function too
+- Change / Clarified behavior of non-maximum suppression classes
+  * Border refers to the border around the image in which extremes cannot be found
+  * A pixel inside the border can have a value larger than one inside and prevent it from being considered
+    an extreme
 
 - TODO Polygon handle shapes which touch the image border
 - TODO         side optimization needs to handle this case too

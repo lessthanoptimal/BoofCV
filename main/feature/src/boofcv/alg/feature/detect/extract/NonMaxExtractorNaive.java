@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,10 +98,10 @@ public class NonMaxExtractorNaive {
 				int y0 = y - radius;
 				int y1 = y + radius;
 
-				if (x0 < border) x0 = border;
-				if (y0 < border) y0 = border;
-				if (x1 >= imgWidth-border) x1 = imgWidth - border - 1;
-				if (y1 >= imgHeight-border) y1 = imgHeight - border - 1;
+				if (x0 < 0) x0 = 0;
+				if (y0 < 0) y0 = 0;
+				if (x1 >= imgWidth) x1 = imgWidth - 1;
+				if (y1 >= imgHeight) y1 = imgHeight - 1;
 
 				escape:
 				for (int i = y0; i <= y1; i++) {
@@ -146,10 +146,10 @@ public class NonMaxExtractorNaive {
 				int y0 = y - radius;
 				int y1 = y + radius;
 
-				if (x0 < border) x0 = border;
-				if (y0 < border) y0 = border;
-				if (x1 >= imgWidth-border) x1 = imgWidth - border - 1;
-				if (y1 >= imgHeight-border) y1 = imgHeight - border - 1;
+				if (x0 < 0) x0 = 0;
+				if (y0 < 0) y0 = 0;
+				if (x1 >= imgWidth) x1 = imgWidth - 1;
+				if (y1 >= imgHeight) y1 = imgHeight - 1;
 
 				escape:
 				for (int i = y0; i <= y1; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,11 +74,6 @@ public class WrapperNonMaximumNaive implements NonMaxSuppression {
 	@Override
 	public void setThresholdMaximum(float threshold) {
 		alg.setThreshold(threshold);
-	}
-
-	@Override
-	public boolean canDetectBorder() {
-		return true;
 	}
 
 	@Override
