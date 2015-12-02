@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Before;
@@ -107,5 +108,21 @@ public class BaseFitPolygon {
 		}
 
 		return out;
+	}
+
+	protected Polygon2D_F64 createFromSquare( Affine2D_F64 affine ) {
+		Polygon2D_F64 input = new Polygon2D_F64(4);
+		if( affine != null ) {
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y0), input.get(0));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y1), input.get(1));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y1), input.get(2));
+			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y0), input.get(3));
+		} else {
+			input.get(0).set(new Point2D_F64(x0, y0));
+			input.get(1).set(new Point2D_F64(x0, y1));
+			input.get(2).set(new Point2D_F64(x1, y1));
+			input.get(3).set(new Point2D_F64(x1, y0));
+		}
+		return input;
 	}
 }

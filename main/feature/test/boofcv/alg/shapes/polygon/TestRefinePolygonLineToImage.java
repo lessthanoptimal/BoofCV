@@ -29,7 +29,6 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.ConvertTransform_F64;
-import georegression.transform.affine.AffinePointOps_F64;
 import org.junit.Test;
 
 import static java.lang.Math.max;
@@ -40,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestRefinePolygonLineToImage extends BaseFitPolygon{
+public class TestRefinePolygonLineToImage extends BaseFitPolygon {
 
 	/**
 	 * Give it a shape which is too small and see if it fails
@@ -338,22 +337,6 @@ public class TestRefinePolygonLineToImage extends BaseFitPolygon{
 		}
 
 		return a;
-	}
-
-	private Polygon2D_F64 createFromSquare( Affine2D_F64 affine ) {
-		Polygon2D_F64 input = new Polygon2D_F64(4);
-		if( affine != null ) {
-			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y0), input.get(0));
-			AffinePointOps_F64.transform(affine, new Point2D_F64(x0, y1), input.get(1));
-			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y1), input.get(2));
-			AffinePointOps_F64.transform(affine, new Point2D_F64(x1, y0), input.get(3));
-		} else {
-			input.get(0).set(new Point2D_F64(x0, y0));
-			input.get(1).set(new Point2D_F64(x0, y1));
-			input.get(2).set(new Point2D_F64(x1, y1));
-			input.get(3).set(new Point2D_F64(x1, y0));
-		}
-		return input;
 	}
 
 }

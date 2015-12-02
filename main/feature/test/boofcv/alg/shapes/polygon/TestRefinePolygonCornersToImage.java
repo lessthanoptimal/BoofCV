@@ -36,7 +36,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -88,6 +89,31 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 
 				assertTrue(expected.isEquivalent(found, 0.01));
 			}
+		}
+	}
+
+	/**
+	 * See if it handles lines along the image border correctly
+	 */
+	@Test
+	public void fitWithEdgeOnBorder() {
+		for (Class imageType : imageTypes) {
+			x0 = 0; x1 = 100;
+			y0 = 100; y1 = 200;
+			setup(null, true, imageType);
+
+			RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(imageType);
+
+			findContour(true);
+
+			Polygon2D_F64 found = new Polygon2D_F64(4);
+
+			alg.setImage(image);
+			assertTrue(alg.refine(null, contour, split,found));
+
+			Polygon2D_F64 expected = createFromSquare(null);
+			expected.flip();
+			assertTrue(expected.isEquivalent(found, 0.01));
 		}
 	}
 
@@ -202,13 +228,5 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 		assertTrue(foundA!=foundB);
 		assertEquals(foundA,found0);
 		assertEquals(foundB,found1);
-	}
-
-	/**
-	 * See if it handles lines along the image border correctly
-	 */
-	@Test
-	public void imageBorder() {
-		fail("implement");
 	}
 }
