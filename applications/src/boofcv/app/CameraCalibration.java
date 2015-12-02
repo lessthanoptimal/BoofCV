@@ -25,7 +25,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -169,7 +169,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigChessboard config = new ConfigChessboard(numColumns,numRows,1);
 
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+		detector = FactoryCalibrationTarget.detectorChessboard(config);
 	}
 
 	void parseSquareGrid( int index , String []args ) {
@@ -210,7 +210,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigSquareGrid config = new ConfigSquareGrid(numColumns,numRows,square,space);
 
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		detector = FactoryCalibrationTarget.detectorSquareGrid(config);
 	}
 
 	public void process() {

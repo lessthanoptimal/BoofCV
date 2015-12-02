@@ -21,7 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -56,7 +56,7 @@ public class ExampleDetectCalibrationPoints {
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard( new ConfigChessboard(5,7,30));
+		detector = FactoryCalibrationTarget.detectorChessboard( new ConfigChessboard(5,7,30));
 
 		// process the image and check for failure condition
 		if( !detector.process(input) )

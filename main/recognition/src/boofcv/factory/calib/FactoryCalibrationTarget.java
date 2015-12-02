@@ -26,7 +26,7 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
  *
  * @author Peter Abeles
  */
-public class FactoryPlanarCalibrationTarget {
+public class FactoryCalibrationTarget {
 
 	/**
 	 * Creates a calibration target detector for square grid targets.
@@ -62,8 +62,8 @@ public class FactoryPlanarCalibrationTarget {
 	 *
 	 * @see CalibrationDetectorSquareFiducialGrid
 	 *
-	 * @param config
-	 * @return
+	 * @param config Configuration of binary target
+	 * @return Detector for binary grid target
 	 */
 	public static CalibrationDetectorSquareFiducialGrid detectorBinaryGrid( ConfigSquareGridBinary config ) {
 		config.checkValidity();

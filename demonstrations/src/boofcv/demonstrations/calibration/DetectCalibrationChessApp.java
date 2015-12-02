@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -59,7 +59,7 @@ public class DetectCalibrationChessApp
 		} else {
 			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
 		}
-		alg = FactoryPlanarCalibrationTarget.detectorChessboard(config).getAlgorithm();
+		alg = FactoryCalibrationTarget.detectorChessboard(config).getAlgorithm();
 		return alg.process(image);
 	}
 

@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
@@ -42,7 +42,7 @@ public class BenchmarkCalibrationDetectors {
 	public static ImageFloat32 imageSquare;
 
 	public static class Chessboard extends PerformerBase {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.
+		CalibrationDetector detector = FactoryCalibrationTarget.
 				detectorChessboard(new ConfigChessboard(5,7,30));
 
 		@Override
@@ -53,7 +53,7 @@ public class BenchmarkCalibrationDetectors {
 	}
 
 	public static class Square extends PerformerBase {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.
+		CalibrationDetector detector = FactoryCalibrationTarget.
 				detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 		@Override

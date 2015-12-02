@@ -27,7 +27,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
@@ -84,7 +84,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+		CalibrationDetector detector = FactoryCalibrationTarget.detectorChessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
@@ -98,7 +98,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		CalibrationDetector detector = FactoryCalibrationTarget.detectorSquareGrid(config);
 		int squareCols = config.numCols/2+1;
 		int squareRows = config.numRows/2+1;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
@@ -114,7 +114,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorBinaryGrid(config);
+		CalibrationDetector detector = FactoryCalibrationTarget.detectorBinaryGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;

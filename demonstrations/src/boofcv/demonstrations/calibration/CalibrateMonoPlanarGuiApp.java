@@ -21,7 +21,7 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.io.MediaManager;
@@ -200,7 +200,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		CalibrationDetector detector =
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5,7,30,30));
-				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
+				FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7,30));
 
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square");
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");

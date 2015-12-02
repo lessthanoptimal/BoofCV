@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -68,7 +68,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		} else {
 			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
 		}
-		alg = FactoryPlanarCalibrationTarget.detectorSquareGrid(config).getAlgorithm();
+		alg = FactoryCalibrationTarget.detectorSquareGrid(config).getAlgorithm();
 		return alg.process(image);
 	}
 

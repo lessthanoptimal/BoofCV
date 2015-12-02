@@ -24,7 +24,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
@@ -241,7 +241,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		CalibrationDetector detector =
-				FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
+				FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
 //				FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 

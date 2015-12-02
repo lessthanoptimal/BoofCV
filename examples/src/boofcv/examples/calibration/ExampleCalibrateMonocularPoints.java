@@ -23,7 +23,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -100,7 +100,7 @@ public class ExampleCalibrateMonocularPoints {
 	}
 
 	public static void main( String args[] ) {
-		CalibrationDetector detector = FactoryPlanarCalibrationTarget.
+		CalibrationDetector detector = FactoryCalibrationTarget.
 				detectorChessboard(new ConfigChessboard(5, 7, 30));
 
 		List<CalibrationObservation> calibPts = loadObservations(detector);

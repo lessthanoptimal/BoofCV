@@ -21,7 +21,7 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -93,6 +93,6 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 
 	@Override
 	public CalibrationDetector createDetector() {
-		return FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+		return FactoryCalibrationTarget.detectorSquareGrid(config);
 	}
 }

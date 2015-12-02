@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -65,7 +65,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeSquare() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
+		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -78,7 +78,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeChess() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryPlanarCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
+		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
