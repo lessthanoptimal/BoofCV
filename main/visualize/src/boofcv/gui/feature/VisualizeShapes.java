@@ -40,20 +40,27 @@ public class VisualizeShapes {
 
 
 	public static void draw( Quadrilateral_F64 quad , Graphics2D g2 ) {
-		draw(quad.a,quad.b,g2);
-		draw(quad.b,quad.c,g2);
-		draw(quad.c,quad.d,g2);
-		draw(quad.d,quad.a,g2);
+		Line2D.Double line = new Line2D.Double();
+
+		drawSubPixel(quad.a,quad.b,line,g2);
+		drawSubPixel(quad.b,quad.c,line,g2);
+		drawSubPixel(quad.c,quad.d,line,g2);
+		drawSubPixel(quad.d,quad.a,line,g2);
 	}
 
 	public static void draw( Point2D_F64 p0 , Point2D_F64 p1 , Graphics2D g2 ) {
 		g2.drawLine((int) (p0.x + 0.5), (int) (p0.y + 0.5), (int) (p1.x + 0.5), (int) (p1.y + 0.5));
 	}
 
+	public static void drawSubPixel( Point2D_F64 p0 , Point2D_F64 p1 , Line2D.Double line, Graphics2D g2 ) {
+		line.setLine(p0.x,p0.y,p1.x,p1.y);
+		g2.draw(line);
+	}
+
 	public static void drawArrow( Quadrilateral_F64 quad , Graphics2D g2 ) {
 		drawArrow(quad.a, quad.b, g2);
-		drawArrow(quad.b, quad.c,g2);
-		drawArrow(quad.c, quad.d,g2);
+		drawArrow(quad.b, quad.c, g2);
+		drawArrow(quad.c, quad.d, g2);
 		drawArrow(quad.d, quad.a, g2);
 	}
 

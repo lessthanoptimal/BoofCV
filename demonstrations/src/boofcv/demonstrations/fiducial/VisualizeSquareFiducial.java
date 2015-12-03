@@ -25,7 +25,9 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
@@ -55,24 +57,30 @@ import java.util.List;
  */
 public class VisualizeSquareFiducial {
 
-//	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,256, true,ImageFloat32.class);
-	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(6, 1.0, true, ImageFloat32.class);
+	static ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6);
+
+	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, ImageFloat32.class);
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
+		IntrinsicParameters intrinsic = nameIntrinsic == null ? null : (IntrinsicParameters)UtilIO.loadXML(nameIntrinsic);
 		ImageFloat32 input = UtilImageIO.loadImage(nameImage, ImageFloat32.class);
 		ImageFloat32 undistorted = new ImageFloat32(input.width,input.height);
 
-		IntrinsicParameters paramUndist = new IntrinsicParameters();
-		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.imageRemoveDistortion(
-				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
-				ImageType.single(ImageFloat32.class));
-
 		Detector detector = new Detector();
-		detector.configure(paramUndist,false);
 
-		undistorter.apply(input,undistorted);
+		if( intrinsic != null ) {
+			IntrinsicParameters paramUndist = new IntrinsicParameters();
+			ImageDistort<ImageFloat32, ImageFloat32> undistorter = LensDistortionOps.imageRemoveDistortion(
+					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
+					ImageType.single(ImageFloat32.class));
+
+			detector.configure(paramUndist,false);
+			undistorter.apply(input,undistorted);
+		} else {
+			undistorted.setTo(input);
+		}
+
 		detector.process(undistorted);
 
 		System.out.println("Total Found: "+detector.squares.size());
@@ -91,23 +99,24 @@ public class VisualizeSquareFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 
-		PointTransform_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
+		if( intrinsic != null ) {
+			PointTransform_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
+			Se3_F64 targetToWorld = new Se3_F64();
 
-		Se3_F64 targetToWorld = new Se3_F64();
+			for (int i = 0; i < N; i++) {
+				// add back in lens distortion
+				Quadrilateral_F64 q = fiducials.get(i).location;
 
-		for (int i = 0; i < N; i++) {
-			// add back in lens distortion
-			Quadrilateral_F64 q = fiducials.get(i).location;
+				detector.computeTargetToWorld(q, 0.1, targetToWorld);
+				VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, 3, g2);
 
-			detector.computeTargetToWorld(q,0.1,targetToWorld);
-			VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, 3, g2);
+				apply(add_p_to_p, q.a, q.a);
+				apply(add_p_to_p, q.b, q.b);
+				apply(add_p_to_p, q.c, q.c);
+				apply(add_p_to_p, q.d, q.d);
 
-			apply(add_p_to_p,q.a,q.a);
-			apply(add_p_to_p,q.b,q.b);
-			apply(add_p_to_p,q.c,q.c);
-			apply(add_p_to_p,q.d,q.d);
-
-			VisualizeShapes.draw(q,g2);
+				VisualizeShapes.draw(q, g2);
+			}
 		}
 
 		BufferedImage outputGray = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
@@ -116,10 +125,11 @@ public class VisualizeSquareFiducial {
 		for (int i = 0; i < N; i++) {
 			// add back in lens distortion
 			Quadrilateral_F64 q = fiducials.get(i).location;
+//			g2.setStroke(new BasicStroke(2));
+//			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 			g2.setColor(Color.RED);
-			g2.setStroke(new BasicStroke(2));
+			g2.setStroke(new BasicStroke(3));
 			VisualizeShapes.drawArrow(q,g2);
-			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 		}
 
 		ShowImages.showWindow(output,"Binary");
@@ -156,6 +166,7 @@ public class VisualizeSquareFiducial {
 
 //		app.process(directory+"/image0000.jpg",directory+"/intrinsic.xml");
 //		app.process(directory+"/image0001.jpg",directory+"/intrinsic.xml");
-		app.process(directory+"/image0002.jpg",directory+"/intrinsic.xml");
+//		app.process(directory+"/image0002.jpg",directory+"/intrinsic.xml");
+		app.process("/home/pabeles/Downloads/image00003.png",null);
 	}
 }
