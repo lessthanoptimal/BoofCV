@@ -68,6 +68,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO create unit test for bright object
+	// TODO create a way to check to see if the black border is black
 public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// Storage for the found fiducials
@@ -113,6 +115,9 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// verbose debugging output
 	private boolean verbose = false;
+
+	// Samples around the found quadrilateral and compares pixel values inside and out
+	protected SampleAroundQuadrilateral<T> sampleAround;
 
 	/**
 	 * Configures the detector.
@@ -163,6 +168,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// if no camera parameters is specified default to this
 		pointUndistToDist = new DoNothingTransform_F64();
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
+
+		this.sampleAround = new SampleAroundQuadrilateral<T>(1.5f,1.5f,10,inputType);
 	}
 
 	/**
@@ -224,6 +231,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	public void process( T gray ) {
 
 		binary.reshape(gray.width,gray.height);
+		sampleAround.setImage(gray);
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
@@ -282,6 +290,13 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
+
+			sampleAround.process(q);
+
+			if( sampleAround.getMeanOutside() < sampleAround.getMeanInside() ) {
+				if( verbose ) System.out.println("rejected brighter inside");
+				continue;
+			}
 
 //			square.printInt();
 			if( processSquare(square,result)) {

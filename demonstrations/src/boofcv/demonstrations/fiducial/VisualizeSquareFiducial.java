@@ -122,14 +122,13 @@ public class VisualizeSquareFiducial {
 		BufferedImage outputGray = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(undistorted,outputGray);
 		g2 = outputGray.createGraphics();
+		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		for (int i = 0; i < N; i++) {
 			// add back in lens distortion
 			Quadrilateral_F64 q = fiducials.get(i).location;
 //			g2.setStroke(new BasicStroke(2));
 //			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
-			g2.setColor(Color.RED);
-			g2.setStroke(new BasicStroke(3));
-			VisualizeShapes.drawArrow(q,g2);
+			VisualizeShapes.drawArrowSubPixel(q,3,g2);
 		}
 
 		ShowImages.showWindow(output,"Binary");

@@ -28,7 +28,6 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -68,7 +67,6 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	private final static int DESC_LENGTH = squareLength*squareLength/16;
 
 	// converts the input image into a binary one
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,false,ImageFloat32.class);
 	private ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
 
 	// list of all known targets
@@ -181,7 +179,9 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 
 //		grayNoBorder.printInt();
 
-		threshold.process(grayNoBorder,binary);
+		// compute a global threshold from the difference between the outside and inside perimeter pixel values
+		float threshold = (sampleAround.getMeanInside()+sampleAround.getMeanOutside())/2.0f;
+		GThresholdImageOps.threshold(grayNoBorder,binary,threshold,false);
 
 //		binary.printBinary();
 		binaryToDef(binary, squareDef);

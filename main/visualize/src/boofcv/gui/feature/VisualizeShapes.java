@@ -57,6 +57,50 @@ public class VisualizeShapes {
 		g2.draw(line);
 	}
 
+	public static void drawArrowSubPixel( Quadrilateral_F64 quad , double strokeSize , Graphics2D g2 ) {
+		Line2D.Double line = new Line2D.Double();
+
+		Color colors[] = new Color[]{Color.RED,Color.ORANGE,Color.CYAN,Color.BLUE};
+
+		Point2D_F64 end = new Point2D_F64();
+		for (int i = 0; i < 4; i++ ) {
+			int j = (i+1)%4;
+
+			Point2D_F64 a = quad.get(i);
+			Point2D_F64 b = quad.get(j);
+
+			double length = a.distance(b);
+			double dx = (b.x-a.x)/length;
+			double dy = (b.y-a.y)/length;
+
+			length -= strokeSize*2;
+
+			end.x = length*dx + a.x;
+			end.y = length*dy + a.y;
+
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke((float)strokeSize*2.0f));
+			drawArrowSubPixel(quad.get(i), end, line, g2);
+			g2.setColor(colors[i]);
+			g2.setStroke(new BasicStroke((float)strokeSize));
+			drawArrowSubPixel(quad.get(i), end, line, g2);
+		}
+	}
+
+	public static void drawArrowSubPixel( Point2D_F64 p0 , Point2D_F64 p1 , Line2D.Double line, Graphics2D g2 ) {
+		drawSubPixel(p0,p1,line,g2);
+
+		double x2 = p0.x+(p1.x-p0.x)*0.9;
+		double y2 = p0.y+(p1.y-p0.y)*0.9;
+
+		double tanX = (p1.y-y2);
+		double tanY = (x2-p1.x);
+
+		drawSubPixel(new Point2D_F64(x2 + tanX, y2 + tanY), p1, line, g2);
+		drawSubPixel(new Point2D_F64(x2 - tanX, y2 - tanY), p1, line, g2);
+	}
+
+
 	public static void drawArrow( Quadrilateral_F64 quad , Graphics2D g2 ) {
 		drawArrow(quad.a, quad.b, g2);
 		drawArrow(quad.b, quad.c, g2);
