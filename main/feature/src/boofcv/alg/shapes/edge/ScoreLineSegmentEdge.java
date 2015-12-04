@@ -39,6 +39,10 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 	// how many points along the line it will sample
 	int numSamples;
 
+	// sums above and below the line
+	double averageUp;
+	double averageDown;
+
 	/**
 	 * Constructor which configures scoring.
 	 *
@@ -84,8 +88,8 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 	 * @return average derivative
 	 */
 	public double computeAverageDerivative(Point2D_F64 a, Point2D_F64 b, double tanX, double tanY) {
-		double total = 0;
 		int samplesInside = 0;
+		averageUp = averageDown = 0;
 
 		for (int i = 0; i < numSamples; i++) {
 			double x = (b.x-a.x)*i/(numSamples-1) + a.x;
@@ -108,12 +112,16 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 
 			// don't take the abs here and require that a high score involves it being entirely black or white around
 			// the edge.  Otherwise a random image would score high
-			total += up-down;
+			averageUp += up;
+			averageDown += down;
 		}
 
 		if( samplesInside == 0 )
 			return 0;
-		return total/samplesInside;
+		averageUp /= samplesInside;
+		averageDown /= samplesInside;
+
+		return averageUp-averageDown;
 	}
 
 	public int getNumSamples() {
@@ -122,5 +130,13 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 
 	public void setNumSamples(int numSamples) {
 		this.numSamples = numSamples;
+	}
+
+	public double getAverageUp() {
+		return averageUp;
+	}
+
+	public double getAverageDown() {
+		return averageDown;
 	}
 }

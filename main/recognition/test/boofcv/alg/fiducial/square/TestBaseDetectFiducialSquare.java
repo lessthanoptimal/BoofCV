@@ -411,7 +411,7 @@ public class TestBaseDetectFiducialSquare {
 		}
 
 		@Override
-		public boolean processSquare(ImageFloat32 square, Result result) {
+		public boolean processSquare(ImageFloat32 square, Result result, double a , double b) {
 			detected.add(square.clone());
 			return true;
 		}
@@ -427,7 +427,7 @@ public class TestBaseDetectFiducialSquare {
 		}
 
 		@Override
-		public boolean processSquare(ImageFloat32 square, Result result) {
+		public boolean processSquare(ImageFloat32 square, Result result, double a , double b) {
 
 //			square.printInt();
 

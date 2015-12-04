@@ -22,6 +22,7 @@ import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
@@ -197,7 +198,7 @@ public class TestBinaryPolygonDetector {
 		}
 	}
 
-	private BinaryPolygonDetector createDetector(Class imageType, boolean useLines, int minSides, int maxSides) {
+	private <T extends ImageSingleBand> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
 		ConfigPolygonDetector config = new ConfigPolygonDetector(minSides,maxSides);
 
 		if( useLines ) {
@@ -490,5 +491,29 @@ public class TestBinaryPolygonDetector {
 			alg.setLensDistortion(width, height, tranFrom, tranTo);
 			fail("didn't blow up");
 		} catch( IllegalArgumentException ignore ){}
+	}
+
+	/**
+	 * When an adaptive threshold is used, the area around a bright light gets marked as "dark" then when
+	 * the polygon is fit to it it can snap around the white object
+	 */
+	@Test
+	public void snapToBrightObject() {
+		ImageUInt8 gray = new ImageUInt8(200,200);
+		ImageUInt8 binary = new ImageUInt8(200,200);
+
+		ImageMiscOps.fillRectangle(gray,200,40,40,40,40);
+		ImageMiscOps.fillRectangle(binary,1,38,38,44,44);
+		ImageMiscOps.fillRectangle(binary,0,40,40,40,40);
+
+		BinaryPolygonDetector<ImageUInt8> alg = createDetector(ImageUInt8.class, true, 4,4);
+
+		// edge threshold test will only fail now if the sign is reversed
+		alg.edgeThreshold = 0;
+
+		alg.process(gray,binary);
+
+		assertEquals(0,alg.getFoundPolygons().size);
+
 	}
 }

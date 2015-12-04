@@ -115,7 +115,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result) {
+	protected boolean processSquare(ImageFloat32 gray, Result result, double edgeInside, double edgeOutside) {
 		int off = (gray.width - binaryInner.width) / 2;
 		gray.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 

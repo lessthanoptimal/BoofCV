@@ -30,22 +30,20 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class PolygonEdgeScore<T extends ImageSingleBand>  {
+public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
 
 	// distance away from corner that sampling will start and end
 	private double cornerOffset;
-	// distnace away from line in tangent direction it will sample
+	// distance away from line in tangent direction it will sample
 	private double tangentDistance;
-
-	// the minimum acceptable score/average pixel difference
-	private double thresholdScore;
 
 	// storage for points offset from corner
 	private Point2D_F64 offsetA = new Point2D_F64();
 	private Point2D_F64 offsetB = new Point2D_F64();
 
-	// the compute score
-	private double averageEdgeIntensity;
+	// average pixel intensity inside and outside the polygon's edge
+	private double averageInside;
+	private double averageOutside;
 
 	ScoreLineSegmentEdge<T> scorer;
 
@@ -55,17 +53,14 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 	 * @param cornerOffset Number of pixels away from corner it will start sampling
 	 * @param tangentDistance How far from the line it will sample tangentially
 	 * @param numSamples Number of points it will sample along an edge
-	 * @param thresholdScore Minimum edge score.
 	 * @param imageType Type of image it will process
 	 */
-	public PolygonEdgeScore( double cornerOffset ,
-							 double tangentDistance,
-							 int numSamples,
-							 double thresholdScore,
-							 Class<T> imageType ) {
+	public PolygonEdgeIntensity(double cornerOffset ,
+								double tangentDistance,
+								int numSamples,
+								Class<T> imageType ) {
 		this.cornerOffset = cornerOffset;
 		this.tangentDistance = tangentDistance;
-		this.thresholdScore = thresholdScore;
 
 		scorer = new ScoreLineSegmentEdge<T>(numSamples,imageType);
 	}
@@ -93,15 +88,16 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 	 * Checks to see if its a valid polygon or a false positive by looking at edge intensity
 	 *
 	 * @param polygon The polygon being tested
-	 * @return true for valid or false for invalid
+	 * @param ccw True if the polygon is counter clockwise
+	 * @return true if it could compute the edge intensity, otherwise false
 	 */
-	public boolean validate( Polygon2D_F64 polygon ) {
+	public boolean computeEdge(Polygon2D_F64 polygon , boolean ccw ) {
+		averageInside = 0;
+		averageOutside = 0;
 
-		double total = 0;
+		double tagentSign = ccw ? 1 : -1;
 
-		for (int i = 0; i < polygon.size(); i++) {
-			int j = i+1;
-			if( j == polygon.size() ) j = 0;
+		for (int i = polygon.size()-1,j=0; j < polygon.size(); i=j,j++) {
 
 			Point2D_F64 a = polygon.get(i);
 			Point2D_F64 b = polygon.get(j);
@@ -122,12 +118,36 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 			offsetB.x = b.x - cornerOffset*dx;
 			offsetB.y = b.y - cornerOffset*dy;
 
-			total += scorer.computeAverageDerivative(offsetA, offsetB, -dy, dx);
+			double tanX = -dy*tangentDistance*tagentSign;
+			double tanY =  dx*tangentDistance*tagentSign;
+
+			scorer.computeAverageDerivative(offsetA, offsetB, tanX,tanY);
+
+			averageInside += scorer.getAverageUp()/tangentDistance;
+			averageOutside += scorer.getAverageDown()/tangentDistance;
 		}
 
-		averageEdgeIntensity = Math.abs(total) / polygon.size();
+		averageInside /= polygon.size();
+		averageOutside /= polygon.size();
 
-		return averageEdgeIntensity >= thresholdScore;
+		return true;
+	}
+
+	/**
+	 * Checks the edge intensity against a threshold.
+	 *
+	 * dark: outside-inside &ge; threshold
+	 * light: inside-outside &ge; threshold
+	 *
+	 * @param insideDark is the inside of the polygon supposed to be dark or light?
+	 * @param threshold threshold for average difference
+	 * @return true if the edge intensity is significant enough
+	 */
+	public boolean checkIntensity( boolean insideDark , double threshold ) {
+		if( insideDark )
+			return averageOutside-averageInside >= threshold;
+		else
+			return averageInside-averageOutside >= threshold;
 	}
 
 	public double getCornerOffset() {
@@ -146,15 +166,11 @@ public class PolygonEdgeScore<T extends ImageSingleBand>  {
 		this.tangentDistance = tangentDistance;
 	}
 
-	public double getThresholdScore() {
-		return thresholdScore;
+	public double getAverageInside() {
+		return averageInside;
 	}
 
-	public void setThresholdScore(double thresholdScore) {
-		this.thresholdScore = thresholdScore;
-	}
-
-	public double getAverageEdgeIntensity() {
-		return averageEdgeIntensity;
+	public double getAverageOutside() {
+		return averageOutside;
 	}
 }

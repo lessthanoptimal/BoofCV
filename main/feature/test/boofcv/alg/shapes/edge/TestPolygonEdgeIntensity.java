@@ -30,28 +30,48 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestPolygonEdgeScore {
+public class TestPolygonEdgeIntensity {
 	@Test
-	public void basic() {
+	public void computeEdge() {
 		ImageUInt8 image = new ImageUInt8(400,500);
 
 		int value = 200;
 		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
 
-		PolygonEdgeScore<ImageUInt8> alg = new PolygonEdgeScore<ImageUInt8>(2,2,10,value*0.9,ImageUInt8.class);
+		PolygonEdgeIntensity<ImageUInt8> alg = new PolygonEdgeIntensity<ImageUInt8>(2,2,10,ImageUInt8.class);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 
 		UtilPolygons2D_F64.convert(new Rectangle2D_F64(20,30,60,70),polygon);
 
 		alg.setImage(image);
-		assertTrue(alg.validate(polygon));
-		assertEquals(value, alg.getAverageEdgeIntensity(), 1e-8);
+		assertTrue(alg.computeEdge(polygon,polygon.isCCW()));
+		// should be average pixel intensity inside and outside
+		assertEquals(200,alg.getAverageInside(),1e-8);
+		assertEquals(0,alg.getAverageOutside(),1e-8);
 
-		UtilPolygons2D_F64.convert(new Rectangle2D_F64(24, 30, 60, 70), polygon);
+		// see what happens if the incorrect orientation is passed in
+		assertTrue(alg.computeEdge(polygon,!polygon.isCCW()));
+		assertEquals(0,alg.getAverageInside(),1e-8);
+		assertEquals(200,alg.getAverageOutside(),1e-8);
+	}
 
-		// test a negative case
-		assertFalse(alg.validate(polygon));
-		assertEquals(value*3.0/4.0, alg.getAverageEdgeIntensity(), 1e-8);
+	@Test
+	public void checkIntensity() {
+		ImageUInt8 image = new ImageUInt8(400,500);
+
+		int value = 200;
+		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
+
+		PolygonEdgeIntensity<ImageUInt8> alg = new PolygonEdgeIntensity<ImageUInt8>(2,2,10,ImageUInt8.class);
+
+		Polygon2D_F64 polygon = new Polygon2D_F64(4);
+		UtilPolygons2D_F64.convert(new Rectangle2D_F64(20,30,60,70),polygon);
+
+		alg.setImage(image);
+		assertTrue(alg.computeEdge(polygon,polygon.isCCW()));
+
+		assertTrue(alg.checkIntensity(false,50));
+		assertFalse(alg.checkIntensity(true,50));
 	}
 }

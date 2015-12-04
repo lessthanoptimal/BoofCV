@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.edge.PolygonEdgeScore;
+import boofcv.alg.shapes.edge.PolygonEdgeIntensity;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
@@ -120,7 +120,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	boolean verbose = false;
 
 	// used to remove false positives
-	PolygonEdgeScore differenceScore;
+	PolygonEdgeIntensity<T> edgeIntensity;
+	double edgeThreshold;
 	// should it check the edge score before?  With a chessboard pattern the initial guess is known to be very poor
 	// so it should only check the edge after.  Otherwise its good to filter before optimization.
 	boolean checkEdgeBefore = true;
@@ -133,35 +134,35 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 *  @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
-	 * @param differenceScore Used to remove false positives by computing the difference along the polygon's edges
-	 *                        If null then this test is skipped.
 	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
 	 * @param minContourFraction Size of minimum contour as a fraction of the input image's width.  Try 0.23
 	 * @param outputClockwise If true then the order of the output polygons will be in clockwise order
 	 * @param convex If true it will only return convex shapes
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param splitPenalty Penalty given to a line segment while splitting.  See {@link MinimizeEnergyPrune}
+	 * @param edgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
 	public BinaryPolygonDetector(int minSides, int maxSides,
 								 SplitMergeLineFitLoop contourToPolygon,
-								 PolygonEdgeScore differenceScore,
 								 RefineBinaryPolygon<T> refinePolygon,
 								 double minContourFraction,
 								 boolean outputClockwise,
 								 boolean convex,
 								 boolean touchBorder, double splitPenalty,
+								 double edgeThreshold,
 								 Class<T> inputType) {
 
 		setNumberOfSides(minSides,maxSides);
 		this.refinePolygon = refinePolygon;
-		this.differenceScore = differenceScore;
+		this.edgeIntensity = new PolygonEdgeIntensity<T>(1,1.0,15,inputType);
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
 		this.outputClockwise = outputClockwise;
 		this.convex = convex;
 		this.canTouchBorder = touchBorder;
+		this.edgeThreshold = edgeThreshold;
 
 		pruner = new MinimizeEnergyPrune(splitPenalty);
 
@@ -203,9 +204,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 			refinePolygon.setLensDistortion(width, height, toUndistorted, toDistorted);
 		}
 
-		if( differenceScore != null ) {
-			differenceScore.setTransform(toDistorted);
-		}
+		edgeIntensity.setTransform(toDistorted);
 	}
 
 	/**
@@ -224,9 +223,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		foundContours.clear();
 		foundInfo.reset();
 
-		if( differenceScore != null ) {
-			differenceScore.setImage(gray);
-		}
+		edgeIntensity.setImage(gray);
 
 		findCandidateShapes(gray, binary);
 		if( verbose ) System.out.println("EXIT  BinaryPolygonDetector.process()");
@@ -343,8 +340,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				// Test the edge quality and prune before performing an expensive optimization
-				if( checkEdgeBefore && differenceScore != null && !differenceScore.validate(workPoly)) {
-					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
+				if( checkEdgeBefore && !checkPolygonEdge(workPoly,workPoly.isCCW())) {
+					if( verbose ) System.out.println("Rejected edge score before");
 					continue;
 				}
 
@@ -361,17 +358,19 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					success = true;
 				}
 
-				// test it again with the full threshold
-				if( !checkEdgeBefore && differenceScore != null && !differenceScore.validate(refined)) {
-					if( verbose ) System.out.println("Rejected edge score, after: "+differenceScore.getAverageEdgeIntensity());
-					continue;
-				}
+				boolean refinedCCW = refined.isCCW();
 
-				if( outputClockwise == refined.isCCW() )
-					refined.flip();
+				// test it again with the full threshold
+				if( !checkPolygonEdge(refined,refinedCCW)) {
+					if( verbose ) System.out.println("Rejected edge score, after");
+					success = false;
+				}
 
 				// refine the polygon and add it to the found list
 				if( success ) {
+					if( outputClockwise == refinedCCW )
+						refined.flip();
+
 //					System.out.println("SUCCESS!!!\n");
 					c.id = found.size();
 					foundContours.add(c);
@@ -379,11 +378,34 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					Info info = foundInfo.grow();
 					info.external = true;
 					info.touchingBorder = touchesBorder;
+					info.edgeInside = edgeIntensity.getAverageInside();
+					info.edgeOutside = edgeIntensity.getAverageOutside();
 				} else {
 					found.removeTail();
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks to see if the edge is intense enough or if it should be discarded as noise
+	 * @return true if the edge is strong enough
+	 */
+	private boolean checkPolygonEdge( Polygon2D_F64 polygon , boolean ccw ) {
+		if(!edgeIntensity.computeEdge(polygon,ccw)) {
+			if( verbose ) System.out.println("Can't compute polygon edge intensity");
+			return false;
+		}
+
+		if(!edgeIntensity.checkIntensity(true,edgeThreshold)) {
+			if( verbose ) {
+				double inside = edgeIntensity.getAverageInside();
+				double outside = edgeIntensity.getAverageInside();
+				System.out.println("Rejected edge score inside: " + inside+" "+outside);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -492,6 +514,21 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		this.refinePolygon = refinePolygon;
 	}
 
+	public double getEdgeThreshold() {
+		return edgeThreshold;
+	}
+
+	public void setEdgeThreshold(double edgeThreshold) {
+		this.edgeThreshold = edgeThreshold;
+	}
+
+	/**
+	 * Returns additional information on the polygon
+	 */
+	public Info getPolygonInfo( int which ) {
+		return foundInfo.get(which);
+	}
+
 	/**
 	 * If set to true it will prune using polygons using their edge intensity before sub-pixel optimization.
 	 * This should only be set to false if the initial edge is known to be off by a bit, like with a chessboard.
@@ -507,9 +544,15 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		 * Was the shape touching the image border?
 		 */
 		public boolean touchingBorder;
+
 		/**
 		 * Was it created from an external or internal contour
 		 */
 		public boolean external;
+
+		/**
+		 * Average pixel intensity score along the polygon's edge inside and outside
+		 */
+		public double edgeInside,edgeOutside;
 	}
 }

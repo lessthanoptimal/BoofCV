@@ -128,20 +128,20 @@ public class TestDetectFiducialSquareImage {
 
 		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertTrue(alg.processSquare(input, result));
+		assertTrue(alg.processSquare(input, result,0,0));
 		assertEquals(0,result.which);
 		assertEquals(0,result.rotation);
 		ImageFloat32 input2 = new ImageFloat32(input.width,input.height);
 		ImageMiscOps.rotateCCW(input,input2);
-		assertTrue(alg.processSquare(input2, result));
+		assertTrue(alg.processSquare(input2, result,0,0));
 		assertEquals(0,result.which);
 		assertEquals(1,result.rotation);
 		ImageMiscOps.rotateCCW(input2,input);
-		assertTrue(alg.processSquare(input, result));
+		assertTrue(alg.processSquare(input, result,0,0));
 		assertEquals(0,result.which);
 		assertEquals(2,result.rotation);
 		ImageMiscOps.rotateCCW(input,input2);
-		assertTrue(alg.processSquare(input2, result));
+		assertTrue(alg.processSquare(input2, result,0,0));
 		assertEquals(0,result.which);
 		assertEquals(3,result.rotation);
 
@@ -150,7 +150,7 @@ public class TestDetectFiducialSquareImage {
 		PixelMath.multiply(pattern, 255, pattern);
 		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
 		ConvertImage.convert(border,input);
-		assertFalse(alg.processSquare(input, result));
+		assertFalse(alg.processSquare(input, result,0,0));
 	}
 
 	@Test
@@ -263,7 +263,7 @@ public class TestDetectFiducialSquareImage {
 			DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,border,0.1,ImageFloat32.class);
 			alg.addPattern(threshold(pattern, 125), 1.0);
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-			assertTrue(alg.processSquare(input, result));
+			assertTrue(alg.processSquare(input, result,0,0));
 		}
 	}
 

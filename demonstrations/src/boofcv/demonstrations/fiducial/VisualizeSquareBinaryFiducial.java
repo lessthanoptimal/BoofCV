@@ -107,8 +107,8 @@ public class VisualizeSquareBinaryFiducial {
 		}
 
 		@Override
-		protected boolean processSquare(ImageFloat32 square, Result result) {
-			if( super.processSquare(square,result)) {
+		protected boolean processSquare(ImageFloat32 square, Result result, double a ,double b) {
+			if( super.processSquare(square,result,a,b)) {
 				squares.add(super.getBinaryInner().clone());
 				squaresGray.add(super.getGrayNoBorder().clone());
 				return true;

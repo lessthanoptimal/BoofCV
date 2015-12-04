@@ -116,9 +116,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	// verbose debugging output
 	private boolean verbose = false;
 
-	// Samples around the found quadrilateral and compares pixel values inside and out
-	protected SampleAroundQuadrilateral<T> sampleAround;
-
 	/**
 	 * Configures the detector.
 	 *
@@ -168,8 +165,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// if no camera parameters is specified default to this
 		pointUndistToDist = new DoNothingTransform_F64();
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
-
-		this.sampleAround = new SampleAroundQuadrilateral<T>(1.5f,1.5f,10,inputType);
 	}
 
 	/**
@@ -229,9 +224,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param gray Undistorted input image
 	 */
 	public void process( T gray ) {
-
 		binary.reshape(gray.width,gray.height);
-		sampleAround.setImage(gray);
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
@@ -284,22 +277,17 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			// pass the found homography onto the image transform
 			UtilHomography.convert(H_refined, transformHomography.getModel());
 
-			// TODO how perspective is removed is introducing artifacts.  If the "square" is larger
+			// TODO Improve how perspective is removed
+			// The current method introduces artifacts.  If the "square" is larger
 			// than the detected region and bilinear interpolation is used then pixels outside will// influence the
 			// value of pixels inside and shift things over.  this is all bad
 
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
 
-			sampleAround.process(q);
+			BinaryPolygonDetector.Info info = squareDetector.getPolygonInfo(i);
 
-			if( sampleAround.getMeanOutside() < sampleAround.getMeanInside() ) {
-				if( verbose ) System.out.println("rejected brighter inside");
-				continue;
-			}
-
-//			square.printInt();
-			if( processSquare(square,result)) {
+			if( processSquare(square,result,info.edgeInside,info.edgeOutside)) {
 				prepareForOutput(q,result);
 
 				if( verbose ) System.out.println("accepted!");
@@ -387,9 +375,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 *
 	 * @param square Image of the undistorted square
 	 * @param result Which target and its orientation was found
+	 * @param edgeInside Average pixel value along edge inside
+	 * @param edgeOutside Average pixel value along edge outside
 	 * @return true if the square matches a known target.
 	 */
-	protected abstract boolean processSquare( ImageFloat32 square , Result result );
+	protected abstract boolean processSquare( ImageFloat32 square , Result result , double edgeInside , double edgeOutside  );
 
 	/**
 	 * Used to toggle on/off verbose debugging information

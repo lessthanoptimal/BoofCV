@@ -18,7 +18,6 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.edge.PolygonEdgeScore;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
@@ -63,16 +62,10 @@ public class FactoryShapeDetector {
 			}
 		}
 
-		PolygonEdgeScore<T> scorer = null;
-		if( config.minimumEdgeIntensity > 0 ) {
-			double cornerOffset = 1;
-			int numSamples = 15;
-			scorer = new PolygonEdgeScore<T>(cornerOffset,1.0,numSamples,config.minimumEdgeIntensity,imageType);
-		}
-
 		return new BinaryPolygonDetector<T>(config.minimumSides,config.maximumSides,contourToPolygon,
-				scorer, refinePolygon,config.minContourImageWidthFraction,
-				config.clockwise,config.convex, config.canTouchBorder, config.splitPenalty,imageType);
+				refinePolygon,config.minContourImageWidthFraction,
+				config.clockwise,config.convex, config.canTouchBorder, config.splitPenalty,
+				config.minimumEdgeIntensity,imageType);
 	}
 
 	public static <T extends ImageSingleBand>

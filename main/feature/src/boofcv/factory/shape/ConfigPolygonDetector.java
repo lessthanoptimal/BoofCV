@@ -18,6 +18,7 @@
 
 package boofcv.factory.shape;
 
+import boofcv.alg.shapes.edge.PolygonEdgeIntensity;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.struct.Configuration;
@@ -75,7 +76,7 @@ public class ConfigPolygonDetector implements Configuration {
 	 *
 	 * <p>Set to zero to disable.</p>
 	 *
-	 * @see boofcv.alg.shapes.edge.PolygonEdgeScore
+	 * @see PolygonEdgeIntensity
 	 */
 	public double minimumEdgeIntensity = 6.0;
 

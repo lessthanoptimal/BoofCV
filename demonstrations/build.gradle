@@ -31,8 +31,8 @@ idea {
 }
 
 // Runs an application from the examples directory
-// gradle demonstration -Pwhich=boofcv.alg.fiducial.FiducialTrackerApp
-task demonstration(dependsOn: 'classes' )<< {
+// gradle demonstrationRun -Pwhich=boofcv.demonstrations.fiducial.FiducialTrackerApp
+task demonstrationRun(dependsOn: 'classes' )<< {
     if (project.hasProperty('which')) {
         javaexec {
             main = "$which"

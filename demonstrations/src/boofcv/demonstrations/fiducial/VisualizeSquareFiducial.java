@@ -150,7 +150,7 @@ public class VisualizeSquareFiducial {
 		}
 
 		@Override
-		protected boolean processSquare(ImageFloat32 square, Result result) {
+		protected boolean processSquare(ImageFloat32 square, Result result, double a, double b) {
 			squares.add(square.clone());
 			return true;
 		}

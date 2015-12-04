@@ -116,7 +116,7 @@ public class TestDetectFiducialSquareBinary {
 					new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-			assertTrue(alg.processSquare(input, result));
+			assertTrue(alg.processSquare(input, result,0,0));
 
 			assertEquals(314, result.which);
 			assertEquals(Math.max(0,i-1), result.rotation);
@@ -135,7 +135,7 @@ public class TestDetectFiducialSquareBinary {
 				new DetectFiducialSquareBinary(gridWidth,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertFalse(alg.processSquare(input, result));
+		assertFalse(alg.processSquare(input, result,0,0));
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class TestDetectFiducialSquareBinary {
 				new DetectFiducialSquareBinary(3,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertTrue(alg.processSquare(input, result));
+		assertTrue(alg.processSquare(input, result,0,0));
 
 		assertEquals(number, result.which);
 	}
@@ -181,7 +181,7 @@ public class TestDetectFiducialSquareBinary {
 				new DetectFiducialSquareBinary(5,borderWidth,inputToBinary,squareDetector,ImageUInt8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-		assertTrue(alg.processSquare(input, result));
+		assertTrue(alg.processSquare(input, result,0,0));
 
 		assertEquals(number, result.which);
 	}
@@ -203,7 +203,7 @@ public class TestDetectFiducialSquareBinary {
 					new DetectFiducialSquareBinary(gridWidth,border,inputToBinary,squareDetector,ImageUInt8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
-			assertTrue(alg.processSquare(input, result));
+			assertTrue(alg.processSquare(input, result,0,0));
 
 			assertEquals(number, result.which);
 		}

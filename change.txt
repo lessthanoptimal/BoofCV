@@ -23,6 +23,7 @@ Version : Alpha 0.21
 - Black polygon detector
   * can now handle features along image border
   * fixed a couple of bugs inside refine function too
+  * improved false positive rejection
 - Change / Clarified behavior of non-maximum suppression classes
   * Border refers to the border around the image in which extremes cannot be found
   * A pixel inside the border can have a value larger than one inside and prevent it from being considered

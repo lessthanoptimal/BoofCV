@@ -172,7 +172,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result) {
+	protected boolean processSquare(ImageFloat32 gray, Result result, double edgeInside, double edgeOutside) {
 
 		int off = (gray.width-binary.width)/2;
 		gray.subimage(off,off,off+binary.width,off+binary.width,grayNoBorder);
@@ -180,7 +180,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 //		grayNoBorder.printInt();
 
 		// compute a global threshold from the difference between the outside and inside perimeter pixel values
-		float threshold = (sampleAround.getMeanInside()+sampleAround.getMeanOutside())/2.0f;
+		float threshold = (float)((edgeInside+edgeOutside)/2.0);
 		GThresholdImageOps.threshold(grayNoBorder,binary,threshold,false);
 
 //		binary.printBinary();

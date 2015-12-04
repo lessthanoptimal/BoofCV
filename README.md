@@ -140,7 +140,7 @@ Eclipse has a Gradle plugin available which allow it to open a Gradle project di
 Most of the modules in the integration package should automatically with everything else.  Some require you to manually download and place files in certain locations.  Until you do so Gradle will ignore those modules.
 Specific instructions are contained in the readme file in each of the module directories.
 
-# Running Example Code
+# Running Example and Demonstration Code
 -----------------------------------------
 
 The example code can be easily run from your favorite IDE.  You might need to change the workspace directory so that
@@ -148,10 +148,12 @@ it can find the boofcv/data directory.
 
 Examples can also be run using gradle.
 
-* _exampleRun_ : Ruins an example from boofcv/examples
+* _exampleRun_ : Runs an example from boofcv/examples
   * gradle exampleRun -Pwhich=boofcv.examples.imageprocessing.ExampleBinaryOps
 * _webcamRun_ : Run an example from boofcv/integration/WebcamCapture
   * gradle webcamRun -Pwhich=boofcv.examples.ExampleTrackingKlt
+* _demonstrationRun_ : Runs a demonstration from boofcv/demonstrations
+  * gradle demonstrationRun -Pwhich=boofcv.demonstrations.fiducial.FiducialTrackerApp
 
 
 # Dependencies
