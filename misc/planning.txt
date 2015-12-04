@@ -8,7 +8,7 @@ Alpha 0.21
     - Should supress noisy regions?
 
 - Fiducial Square
-  * Have base class compute threshold, binarize, and have adjustable black rectangle width
+  * Have base class binarize, and have adjustable black rectangle width
   * Change how the grid is specified
 
 - Chessboard
