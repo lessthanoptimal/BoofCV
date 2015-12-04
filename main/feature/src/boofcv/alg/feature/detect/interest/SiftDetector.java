@@ -284,14 +284,6 @@ public class SiftDetector {
 		p.x = pixelScaleToInput*(x + polyPeak(x0, value, x2));
 		p.y = pixelScaleToInput*(y + polyPeak(y0, value, y2));
 
-		if( p.y > 120 ) {
-			System.out.println("x*scale "+(x*pixelScaleToInput));
-			System.out.println("y*scale "+(y*pixelScaleToInput));
-			System.out.println("y interp "+polyPeak(y0, value, y2));
-
-			System.out.println("Egads");
-		}
-
 		// find the peak then do bilinear interpolate between the two appropriate sigmas
 		double sigmaInterp = polyPeak(s0, value, s2); // scaled from -1 to 1
 		if( sigmaInterp < 0 ) {

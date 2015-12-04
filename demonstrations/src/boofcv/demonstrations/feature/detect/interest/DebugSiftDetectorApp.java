@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class DebugSiftDetector2App {
+public class DebugSiftDetectorApp {
 
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
