@@ -19,8 +19,8 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -65,7 +65,6 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	int[] counts, classified, tmp;
 
 	// converts the input image into a binary one
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0, 255, true, ImageFloat32.class);
 	private ImageUInt8 binaryInner = new ImageUInt8(1,1);
 	// storage for no border sub-image
 	private ImageFloat32 grayNoBorder = new ImageFloat32();
@@ -120,7 +119,8 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 		gray.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 
 		// convert input image into binary number
-		findBitCounts(grayNoBorder);
+		double threshold = (edgeInside+edgeOutside)/2;
+		findBitCounts(grayNoBorder,threshold);
 
 		if (thresholdBinaryNumber())
 			return false;
@@ -240,9 +240,9 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	/**
 	 * Converts the gray scale image into a binary number
 	 */
-	protected void findBitCounts(ImageFloat32 gray) {
+	protected void findBitCounts(ImageFloat32 gray , double threshold ) {
 		// compute binary image using an adaptive algorithm to handle shadows
-		threshold.process(gray, binaryInner);
+		ThresholdImageOps.threshold(gray,binaryInner,(float)threshold,true);
 
 		Arrays.fill(counts, 0);
 		for (int row = 0; row < gridWidth; row++) {
