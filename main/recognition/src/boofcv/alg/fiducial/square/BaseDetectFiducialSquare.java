@@ -97,6 +97,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	// How wide the border is relative to the fiducial's total width
 	private double borderWidthFraction;
+	// the minimum fraction of border pixels which must be black for it to be considered a fiducial
+	private double minimumBorderBlackFraction;
 
 	// used to compute 3D pose of target
 	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
@@ -122,6 +124,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param inputToBinary Converts input image into a binary image
 	 * @param squareDetector Detects the quadrilaterals in the image
 	 * @param borderWidthFraction Fraction of the fiducial's width that the border occupies. 0.25 is recommended.
+	 * @param minimumBorderBlackFraction Minimum fraction of pixels inside the border which must be black.  Try 0.65
 	 * @param squarePixels  Number of pixels wide the undistorted square image of the fiducial's interior is.
 	 *                      This will include the black border.
 	 * @param inputType Type of input image it's processing
@@ -129,6 +132,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	protected BaseDetectFiducialSquare(InputToBinary<T> inputToBinary,
 									   BinaryPolygonDetector<T> squareDetector,
 									   double borderWidthFraction ,
+									   double minimumBorderBlackFraction ,
 									   int squarePixels,
 									   Class<T> inputType) {
 
@@ -287,6 +291,15 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 			BinaryPolygonDetector.Info info = squareDetector.getPolygonInfo(i);
 
+			// see if the black border is actually black
+			if( minimumBorderBlackFraction > 0 ) {
+				double pixelThreshold = (info.edgeInside + info.edgeOutside) / 2;
+				double foundFraction = computeFractionBoundary((float) pixelThreshold);
+				if( foundFraction < minimumBorderBlackFraction ) {
+					if( verbose ) System.out.println("rejected black border fraction "+foundFraction);
+					continue;
+				}
+			}
 			if( processSquare(square,result,info.edgeInside,info.edgeOutside)) {
 				prepareForOutput(q,result);
 
@@ -295,6 +308,44 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 				if( verbose ) System.out.println("rejected process square");
 			}
 		}
+	}
+
+	/**
+	 * Computes the fraction of pixels inside the image border which are black
+	 * @param pixelThreshould  Pixel's less than this value are considered black
+	 * @return fraction of border that's black
+	 */
+	private double computeFractionBoundary( float pixelThreshould ) {
+		int radius = (int) (square.width * borderWidthFraction);
+
+		int innerWidth = square.width-2*radius;
+		int total = square.width*square.width - innerWidth*innerWidth;
+		int count = 0;
+		for (int y = 0; y < radius; y++) {
+			int indexTop = y*square.width;
+			int indexBottom = (square.width-y-radius)*square.width;
+
+			for (int x = 0; x < square.width; x++) {
+				if( square.data[indexTop++] < pixelThreshould )
+					count++;
+				if( square.data[indexBottom++] < pixelThreshould )
+					count++;
+			}
+		}
+
+		for (int y = radius; y < square.width-radius; y++) {
+			int indexLeft = y * square.width;
+			int indexRight = y * square.width + square.width-radius;
+
+			for (int x = 0; x < radius; x++) {
+				if( square.data[indexLeft++] < pixelThreshould )
+					count++;
+				if( square.data[indexRight++] < pixelThreshould )
+					count++;
+			}
+		}
+
+		return count/(double)total;
 	}
 
 	/**

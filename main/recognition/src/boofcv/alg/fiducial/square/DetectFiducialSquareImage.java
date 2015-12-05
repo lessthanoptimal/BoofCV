@@ -92,8 +92,10 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	public DetectFiducialSquareImage(InputToBinary<T> inputToBinary,
 									 BinaryPolygonDetector<T> quadDetector,
 									 double borderWidthFraction ,
+									 double minimumBlackBorderFraction ,
 									 double matchThreshold, Class<T> inputType) {
-		super(inputToBinary,quadDetector,borderWidthFraction, (int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType);
+		super(inputToBinary,quadDetector,borderWidthFraction, minimumBlackBorderFraction,
+				(int)Math.round(squareLength/(1-2.0*borderWidthFraction)), inputType);
 
 		hammingThreshold = (int)(squareLength*squareLength*matchThreshold);
 

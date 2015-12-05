@@ -102,7 +102,7 @@ public class VisualizeSquareBinaryFiducial {
 		public List<ImageFloat32> squaresGray = new ArrayList<ImageFloat32>();
 
 		protected Detector( int gridWidth, double borderWidth , InputToBinary<ImageFloat32> inputToBinary ) {
-			super(gridWidth,borderWidth,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class)
+			super(gridWidth,borderWidth,0.65,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class)
 					,ImageFloat32.class);
 		}
 

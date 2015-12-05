@@ -70,7 +70,9 @@ public class FactoryFiducial {
 				polygon(configFiducial.squareDetector,imageType);
 
 		final DetectFiducialSquareBinary<T> alg =
-				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth, configFiducial.borderWidthFraction, binary,squareDetector,imageType);
+				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth,
+						configFiducial.borderWidthFraction, configFiducial.minimumBlackBorderFraction,
+						binary,squareDetector,imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
 		return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
 	}
@@ -103,7 +105,8 @@ public class FactoryFiducial {
 		BinaryPolygonDetector<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector, imageType);
 		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
-				squareDetector,configFiducial.borderWidthFraction,configFiducial.maxErrorFraction,imageType);
+				squareDetector,configFiducial.borderWidthFraction,configFiducial.minimumBlackBorderFraction,
+				configFiducial.maxErrorFraction,imageType);
 
 		return new SquareImage_to_FiducialDetector<T>(alg);
 	}

@@ -46,6 +46,11 @@ public class ConfigFiducialImage implements Configuration {
 	public double borderWidthFraction = 0.25;
 
 	/**
+	 * Fraction of border pixels which must be black.
+	 */
+	public double minimumBlackBorderFraction = 0.65;
+
+	/**
 	 * Configuration for square detector
 	 */
 	public ConfigPolygonDetector squareDetector = new ConfigPolygonDetector(4,4);

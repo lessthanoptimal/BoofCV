@@ -265,6 +265,11 @@ public class TestBaseDetectFiducialSquare {
 		// The check to see if square is correctly undistorted is inside the processing function itself
 	}
 
+	@Test
+	public void computeFractionBoundary() {
+		fail("Implement");
+	}
+
 	/**
 	 * See if it can handle the situations where intrinsic camera parameters was not set.  Should just
 	 * detect its location and
@@ -407,7 +412,7 @@ public class TestBaseDetectFiducialSquare {
 
 		protected Dummy() {
 			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,100, ImageUInt8.class);
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,0.65,100, ImageUInt8.class);
 		}
 
 		@Override
@@ -423,7 +428,7 @@ public class TestBaseDetectFiducialSquare {
 	public static class DetectCorner extends BaseDetectFiducialSquare<ImageUInt8> {
 		protected DetectCorner() {
 			super(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,100, ImageUInt8.class);
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,0.65,100, ImageUInt8.class);
 		}
 
 		@Override
