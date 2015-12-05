@@ -73,7 +73,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 		System.out.println("Input: Webcam Options:  ");
 		System.out.println();
-		System.out.println("  --Camera=<int>                     Opens the specified camera using WebcamCapture ID");
+		System.out.println("  --Camera=<int|String>              Opens the specified camera using WebcamCapture ID");
+		System.out.println("                                     or device string.");
 		System.out.println("  --Resolution=<width>:<height>      Specifies camera image resolution.");
 		System.out.println();
 		System.out.println("Calibration Parameters:");
@@ -114,6 +115,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 					splitFlag(arg);
 					if( flagName.compareToIgnoreCase("Directory") == 0 ) {
 						inputDirectory = parameters;
+						inputType = InputType.IMAGE;
 					} else if( flagName.compareToIgnoreCase("Visualize") == 0 ) {
 						visualize = Boolean.parseBoolean(parameters);
 					} else if( flagName.compareToIgnoreCase("ZeroSkew") == 0 ) {
@@ -221,22 +223,22 @@ public class CameraCalibration extends BaseStandardInputApp {
 			System.exit(0);
 		}
 
-		if( inputDirectory != null ) {
-			if( cameraId >= 0 ) {
+		switch( inputType ) {
+			case VIDEO: throw new RuntimeException("Calibration from video not supported");
+			case IMAGE:
+				handleDirectory();
+				break;
+
+			case WEBCAM:
+				handleWebcam();
+				break;
+
+			default:
 				printHelp();
 				System.out.println();
-				System.err.println("Can't tell it to read from a camera and directory!");
+				System.err.println("Input method is not specified");
 				System.exit(0);
-			} else {
-				handleDirectory();
-			}
-		} else if( cameraId >= 0 ) {
-			handleWebcam();
-		} else {
-			printHelp();
-			System.out.println();
-			System.err.println("Need to specify an input method");
-			System.exit(0);
+				break;
 		}
 	}
 	private void handleDirectory() {
@@ -308,7 +310,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 	 * Captures calibration data live using a webcam and a GUI to assist the user
 	 */
 	public void handleWebcam() {
-		Webcam webcam = Webcam.getWebcams().get(cameraId);
+		Webcam webcam = openSelectedCamera();
 		if( desiredWidth > 0 && desiredHeight > 0 )
 			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);
 

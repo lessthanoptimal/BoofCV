@@ -532,7 +532,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		BufferedImage buffered = null;
 		if( inputType == InputType.VIDEO || inputType == InputType.WEBCAM ) {
 			if( inputType == InputType.WEBCAM ) {
-				String device = ""+cameraId;
+				String device = getCameraDeviceString();
 				sequence = media.openCamera(device,desiredWidth, desiredHeight,ImageType.single(ImageUInt8.class));
 			} else {
 				// just assume 30ms is appropriate.  Should let the use specify this number
@@ -574,6 +574,12 @@ public class FiducialDetection extends BaseStandardInputApp {
 			System.out.println(e.getMessage());
 			System.exit(0);
 		}
-		app.process();
+		try {
+			app.process();
+		} catch( RuntimeException e ) {
+			System.out.println();
+			System.out.println(e.getMessage());
+			System.exit(0);
+		}
 	}
 }

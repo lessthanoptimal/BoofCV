@@ -39,10 +39,18 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 	open(String device, int width, int height, ImageType<T> imageType) {
 
 		if( device != null ) {
+			Webcam webcam;
 			try {
 				int which = Integer.parseInt(device);
-				Webcam webcam = Webcam.getWebcams().get(which);
+				webcam = Webcam.getWebcams().get(which);
+			}catch (NumberFormatException ignore) {
+				webcam = Webcam.getWebcamByName(device);
+			}
+			if( webcam == null ) {
+				throw new RuntimeException("Can't find webcam with ID or name at "+device);
+			}
 
+			try {
 				if (width >= 0 && height >= 0) {
 					UtilWebcamCapture.adjustResolution(webcam, width, height);
 				}

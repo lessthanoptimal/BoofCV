@@ -33,11 +33,9 @@ Version : Alpha 0.21
     an extreme
 - FactoryPlanarCalibrationTarget renamed to FactoryCalibrationTarget
 
-- TODO Polygon handle shapes which touch the image border
-- TODO         reject shapes if final polygon doesn't match the initial contour at all
+- TODO Polygon reject shapes if final polygon doesn't match the initial contour at all
 - TODO SIFT  dense
 - TODO Update chessboard to create grid from connecting corners of squares
-- TODO Have image fiducial threshold be computed from sampling along square border
 - TODO Have binary threshold be computed from known black/white regions?
 - TODO Assisted Calibration - remove images after collected
 - TODO                      - change calibration settings and recompute

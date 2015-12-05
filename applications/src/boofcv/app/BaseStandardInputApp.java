@@ -18,6 +18,8 @@
 
 package boofcv.app;
 
+import com.github.sarxos.webcam.Webcam;
+
 /**
  * @author Peter Abeles
  */
@@ -26,6 +28,7 @@ public class BaseStandardInputApp {
 	InputType inputType = InputType.WEBCAM;
 
 	int cameraId=0;
+	String cameraName = null;
 	int desiredWidth=-1,desiredHeight=-1;
 
 	String filePath;
@@ -36,7 +39,8 @@ public class BaseStandardInputApp {
 	protected void printInputHelp() {
 		System.out.println("Camera Input:  (default)");
 		System.out.println();
-		System.out.println("  --Camera=<int>                     Opens the specified camera using WebcamCapture ID");
+		System.out.println("  --Camera=<int|String>              Opens the specified camera using WebcamCapture ID");
+		System.out.println("                                     or a device string.");
 		System.out.println("                                     DEFAULT: Whatever WebcamCapture opens");
 		System.out.println("  --Resolution=<width>:<height>      Specifies the image resolution.");
 		System.out.println("                                     DEFAULT: Who knows or intrinsic, if specified");
@@ -54,7 +58,12 @@ public class BaseStandardInputApp {
 		splitFlag(argument);
 		if( flagName.compareToIgnoreCase("Camera") == 0 ) {
 			inputType = InputType.WEBCAM;
-			cameraId = Integer.parseInt(parameters);
+			try {
+				cameraId = Integer.parseInt(parameters);
+			} catch( NumberFormatException e ) {
+				cameraId = -1;
+				cameraName = parameters;
+			}
 			return true;
 		} else if( flagName.compareToIgnoreCase("ImageFile") == 0 ) {
 			inputType = InputType.IMAGE;
@@ -73,6 +82,27 @@ public class BaseStandardInputApp {
 		} else {
 			return false;
 		}
+	}
+
+	protected Webcam openSelectedCamera() {
+		Webcam webcam = cameraId >= 0 ? Webcam.getWebcams().get(cameraId) : Webcam.getWebcamByName(cameraName);
+
+		if( webcam == null ) {
+			if( cameraId >= 0 ) {
+				System.err.println("Can't find camera with ID "+cameraId);
+			} else {
+				System.err.println("Can't find camera with name "+cameraName);
+			}
+			System.exit(-1);
+		}
+		return webcam;
+	}
+
+	protected String getCameraDeviceString() {
+		if( cameraId >= 0 )
+			return cameraId+"";
+		else
+			return cameraName;
 	}
 
 	protected void splitFlag( String word ) {
