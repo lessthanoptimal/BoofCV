@@ -24,6 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.border.BorderType;
@@ -33,6 +34,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.gui.image.ShowImages;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
@@ -267,7 +269,17 @@ public class TestBaseDetectFiducialSquare {
 
 	@Test
 	public void computeFractionBoundary() {
-		fail("Implement");
+		Dummy alg = new Dummy();
+
+		alg.borderWidthFraction = 0.25;
+		alg.square.reshape(100, 100);
+		GImageMiscOps.fillRectangle(alg.square,200,25,25,50,50);
+		double found = alg.computeFractionBoundary(100);
+		assertEquals(1.0, found, 1e-8);
+
+		GImageMiscOps.fillRectangle(alg.square,200,0,0,100,50);
+		found = alg.computeFractionBoundary(100);
+		assertEquals(0.5, found, 1e-8);
 	}
 
 	/**

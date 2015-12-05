@@ -81,7 +81,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private BinaryPolygonDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
-	private ImageFloat32 square;
+	ImageFloat32 square;
 
 	// storage for binary image
 	ImageUInt8 binary = new ImageUInt8(1,1);
@@ -96,7 +96,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
 	// How wide the border is relative to the fiducial's total width
-	private double borderWidthFraction;
+	protected double borderWidthFraction;
 	// the minimum fraction of border pixels which must be black for it to be considered a fiducial
 	private double minimumBorderBlackFraction;
 
@@ -145,6 +145,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			throw new RuntimeException("Border width fraction must be 0 < x < 0.5");
 
 		this.borderWidthFraction = borderWidthFraction;
+		this.minimumBorderBlackFraction = minimumBorderBlackFraction;
 
 		this.inputToBinary = inputToBinary;
 		this.squareDetector = squareDetector;
@@ -312,35 +313,36 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 
 	/**
 	 * Computes the fraction of pixels inside the image border which are black
-	 * @param pixelThreshould  Pixel's less than this value are considered black
+	 * @param pixelThreshold  Pixel's less than this value are considered black
 	 * @return fraction of border that's black
 	 */
-	private double computeFractionBoundary( float pixelThreshould ) {
-		int radius = (int) (square.width * borderWidthFraction);
+	protected double computeFractionBoundary( float pixelThreshold ) {
+		final int w = square.width;
+		int radius = (int) (w * borderWidthFraction);
 
-		int innerWidth = square.width-2*radius;
-		int total = square.width*square.width - innerWidth*innerWidth;
+		int innerWidth = w-2*radius;
+		int total = w*w - innerWidth*innerWidth;
 		int count = 0;
 		for (int y = 0; y < radius; y++) {
-			int indexTop = y*square.width;
-			int indexBottom = (square.width-y-radius)*square.width;
+			int indexTop = y*w;
+			int indexBottom = (w - radius + y)*w;
 
-			for (int x = 0; x < square.width; x++) {
-				if( square.data[indexTop++] < pixelThreshould )
+			for (int x = 0; x < w; x++) {
+				if( square.data[indexTop++] < pixelThreshold )
 					count++;
-				if( square.data[indexBottom++] < pixelThreshould )
+				if( square.data[indexBottom++] < pixelThreshold )
 					count++;
 			}
 		}
 
-		for (int y = radius; y < square.width-radius; y++) {
-			int indexLeft = y * square.width;
-			int indexRight = y * square.width + square.width-radius;
+		for (int y = radius; y < w-radius; y++) {
+			int indexLeft = y*w;
+			int indexRight = y*w + w - radius;
 
 			for (int x = 0; x < radius; x++) {
-				if( square.data[indexLeft++] < pixelThreshould )
+				if( square.data[indexLeft++] < pixelThreshold )
 					count++;
-				if( square.data[indexRight++] < pixelThreshould )
+				if( square.data[indexRight++] < pixelThreshold )
 					count++;
 			}
 		}
