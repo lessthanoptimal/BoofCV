@@ -19,6 +19,8 @@
 package boofcv.alg.feature.dense;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.feature.describe.DescribeSiftCommon;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
@@ -27,35 +29,43 @@ import georegression.metric.UtilAngle;
 import org.ddogleg.struct.FastQueue;
 
 /**
+ * <p>Computes {@link DescribePointSift SIFT} features in a regular grid across an entire image at a single
+ * scale and orientation.   This is more computationally efficient than the more generic {@link DescribePointSift}
+ * algorithm because it makes strong assumptions.  If given the same center point, an orientation of 0, and
+ * sigmaToPixels is 1, they should produce the same descriptor.</p>
+ *
+ * <p>Sampling is done in regular increments in a grid pattern.  The example sampling points are computed such that
+ * entire area sampled starts and ends at the most extreme possible pixels.  This most likely will require that
+ * the sampling period be adjusted.
+ *
  * @author Peter Abeles
  */
-public class DescribeDenseSift<D extends ImageSingleBand> {
+public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCommon {
 
+	// sampling period along the image's rows an columns
 	double periodRows;
 	double periodColumns;
 
-	// width of a subregion, in samples
-	int widthSubregion;
-	// width of the outer grid, in sub-regions
-	int widthGrid;
-
-	// number of bins in the orientation histogram
-	int numHistogramBins;
-	float histogramBinWidth;
-
-	float gaussianWeight[];
 	GImageSingleBand imageDerivX,imageDerivY;
 
 	FastQueue<TupleDesc_F64> descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true);
 
-	public DescribeDenseSift(int widthSubregion, int widthGrid, int numHistogramBins, double periodRows, double periodColumns) {
-		this.widthSubregion = widthSubregion;
-		this.widthGrid = widthGrid;
-		this.numHistogramBins = numHistogramBins;
+	/**
+	 * Specifies SIFT descriptor structure and sampling frequency.
+	 * @param widthSubregion Width of sub-region in samples.  Try 4
+	 * @param widthGrid Width of grid in subregions.  Try 4.
+	 * @param numHistogramBins Number of bins in histogram.  Try 8
+	 * @param periodColumns Number of pixels between samples along x-axis
+	 * @param periodRows  Number of pixels between samples along y-axis
+	 */
+	public DescribeDenseSift(int widthSubregion, int widthGrid, int numHistogramBins,
+							 double weightingSigmaFraction , double maxDescriptorElementValue,
+							 double periodColumns, double periodRows) {
+		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
 		this.periodRows = periodRows;
 		this.periodColumns = periodColumns;
 
-		final int DOF = (widthGrid*widthGrid)*numHistogramBins;
+		final int DOF = getDescriptorLength();
 
 		descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override
@@ -65,6 +75,11 @@ public class DescribeDenseSift<D extends ImageSingleBand> {
 		};
 	}
 
+	/**
+	 * Computes SIFT descriptors across the entire image given its gradient
+	 * @param derivX image derivative x-axis
+	 * @param derivY image derivative y-axis
+	 */
 	public void process(D derivX , D derivY ) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 		if( derivX.stride != derivY.stride || derivX.startIndex != derivY.startIndex )
@@ -98,7 +113,13 @@ public class DescribeDenseSift<D extends ImageSingleBand> {
 
 	}
 
-	private void computeDescriptor( int cx , int cy , TupleDesc_F64 desc ) {
+	/**
+	 * Computes the descriptor centered at the specified coordinate
+	 * @param cx center of region x-axis
+	 * @param cy center of region y-axis
+	 * @param desc The descriptor
+	 */
+	public void computeDescriptor( int cx , int cy , TupleDesc_F64 desc ) {
 
 		desc.fill(0);
 
@@ -129,23 +150,4 @@ public class DescribeDenseSift<D extends ImageSingleBand> {
 		}
 	}
 
-	void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle , TupleDesc_F64 descriptor )
-	{
-		for (int i = 0; i < widthGrid; i++) {
-			double weightGridY = 1.0 - Math.abs(sampleY-i);
-			if( weightGridY <= 0) continue;
-			for (int j = 0; j < widthGrid; j++) {
-				double weightGridX = 1.0 - Math.abs(sampleX-j);
-				if( weightGridX <= 0 ) continue;
-				for (int k = 0; k < numHistogramBins; k++) {
-					double angleBin = k*histogramBinWidth;
-					double weightHistogram = 1.0 - UtilAngle.dist(angle,angleBin)/histogramBinWidth;
-					if( weightHistogram <= 0 ) continue;
-
-					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
-					descriptor.value[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
-				}
-			}
-		}
-	}
 }

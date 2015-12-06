@@ -16,22 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.describe;
+package boofcv.alg.feature.dense;
 
-import boofcv.struct.image.ImageFloat32;
+import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurf extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32>{
-
-	public TestDescribePointSurf() {
-		super(ImageFloat32.class,ImageFloat32.class);
+public class TestDescribeDenseSift {
+	/**
+	 * Checks the adjustment done to the sample period and to see if the descriptions are computed
+	 * at the correct coordainte
+	 */
+	@Test
+	public void process() {
+		fail("Implement");
 	}
 
-	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurf<ImageFloat32>(ImageFloat32.class);
+	/**
+	 * Compute to the general descriptor algorithm.  They should produce the same results
+	 */
+	@Test
+	public void computeDescriptor() {
+		fail("Implement");
 	}
 }
