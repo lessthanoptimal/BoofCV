@@ -18,21 +18,106 @@
 
 package boofcv.alg.feature.dense;
 
+import boofcv.alg.feature.describe.DescribePointSift;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.testing.BoofTesting;
+import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestDescribeDenseSift {
+
+	Random rand = new Random(234);
+	int width = 50, height = 40;
+
 	/**
 	 * Checks the adjustment done to the sample period and to see if the descriptions are computed
-	 * at the correct coordainte
+	 * at the correct coordinate
 	 */
 	@Test
 	public void process() {
-		fail("Implement");
+		ImageFloat32 derivX = new ImageFloat32(100,102);
+		ImageFloat32 derivY = new ImageFloat32(100,102);
+
+		GImageMiscOps.fillUniform(derivX,rand,0,200);
+		GImageMiscOps.fillUniform(derivY,rand,0,200);
+
+		process(derivX, derivY);
+		BoofTesting.checkSubImage(this,"process",true,derivX,derivY);
+	}
+
+	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
+		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+
+		alg.setImageGradient(derivX,derivY);
+
+		alg.process();
+
+		List<TupleDesc_F64> list = alg.getDescriptors().toList();
+
+		int r = alg.getCanonicalRadius();
+
+		int cols = (100-2*r)/10;
+		int rows = (102-2*r)/10;
+
+		assertEquals(cols*rows,list.size());
+
+		int w = derivX.width-2*r;
+		int h = derivX.height-2*r;
+
+		TupleDesc_F64 expected = new TupleDesc_F64(128);
+
+		int i = 0;
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++, i++) {
+				int x = col*w/(cols-1) + r;
+				int y = row*h/(rows-1) + r;
+
+				TupleDesc_F64 found = list.get(i);
+				alg.computeDescriptor(x,y,expected);
+
+				for (int j = 0; j < 128; j++) {
+					assertEquals(expected.value[j],found.value[j],1e-8);
+				}
+			}
+		}
+	}
+
+	@Test
+	public void precomputeAngles() {
+		ImageFloat32 derivX = new ImageFloat32(width,height);
+		ImageFloat32 derivY = new ImageFloat32(width,height);
+
+		GImageMiscOps.fillUniform(derivX,rand,0,200);
+		GImageMiscOps.fillUniform(derivY,rand,0,200);
+
+		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+
+		alg.setImageGradient(derivX,derivY);
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				float dx = derivX.get(x,y);
+				float dy = derivY.get(x,y);
+
+				double expectedAngle = UtilAngle.domain2PI(Math.atan2(dy,dx));
+				float expectedMagnitude = (float)Math.sqrt(dx*dx + dy*dy);
+
+				assertEquals(expectedAngle,alg.savedAngle.get(x,y),1e-8);
+				assertEquals(expectedMagnitude,alg.savedMagnitude.get(x,y),1e-4f);
+			}
+		}
 	}
 
 	/**
@@ -40,6 +125,35 @@ public class TestDescribeDenseSift {
 	 */
 	@Test
 	public void computeDescriptor() {
-		fail("Implement");
+		ImageFloat32 derivX = new ImageFloat32(100,102);
+		ImageFloat32 derivY = new ImageFloat32(100,102);
+
+		GImageMiscOps.fillUniform(derivX,rand,0,200);
+		GImageMiscOps.fillUniform(derivY,rand,0,200);
+
+		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+		DescribePointSift<ImageFloat32> algTest = new DescribePointSift<ImageFloat32>(4,4,8,1,0.5,0.2,ImageFloat32.class);
+
+		alg.setImageGradient(derivX,derivY);
+		algTest.setImageGradient(derivX,derivY);
+
+		List<Point2D_I32> samplePoints = new ArrayList<Point2D_I32>();
+		samplePoints.add( new Point2D_I32(30,35));
+		samplePoints.add( new Point2D_I32(45,10));
+		samplePoints.add( new Point2D_I32(60,12));
+		samplePoints.add( new Point2D_I32(50,50));
+
+		TupleDesc_F64 found = new TupleDesc_F64(128);
+		TupleDesc_F64 expected = new TupleDesc_F64(128);
+
+		for( Point2D_I32 p : samplePoints ) {
+			alg.computeDescriptor(p.x,p.y,found);
+			algTest.process(p.x,p.y,1,0,expected);
+
+			for (int i = 0; i < 128; i++) {
+				assertEquals(expected.value[i],found.value[i],1e-8);
+			}
+		}
+
 	}
 }

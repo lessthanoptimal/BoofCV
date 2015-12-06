@@ -122,21 +122,21 @@ public class DescribePointSift<Deriv extends ImageSingleBand> extends DescribeSi
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
+		float fwidthSubregion = widthSubregion;
 		int sampleWidth = widthGrid*widthSubregion;
-		// compute radius and ensure its symmetric for even and odd cases
-		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
+		double sampleRadius = sampleWidth/2;
 
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		Deriv image = (Deriv)imageDerivX.getImage();
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
-			float subY = sampleY/widthSubregion;
+			float subY = sampleY/fwidthSubregion;
 			double y = sampleToPixels*(sampleY-sampleRadius);
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
 				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
-				float subX = sampleX/widthSubregion;
+				float subX = sampleX/fwidthSubregion;
 				// recentered local pixel sample coordinate
 				double x = sampleToPixels*(sampleX-sampleRadius);
 

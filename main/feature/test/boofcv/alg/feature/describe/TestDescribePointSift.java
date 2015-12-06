@@ -93,7 +93,8 @@ public class TestDescribePointSift {
 		alg.descriptor = new TupleDesc_F64(128);
 		alg.computeRawDescriptor(60+r, 60+r, 2, 0);
 		numHit = computeInside(alg);
-		assertEquals(2*2,numHit);
+		// would be 2x2 if there was no interpolation
+		assertEquals(3*3,numHit);
 
 	}
 

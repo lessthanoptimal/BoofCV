@@ -21,9 +21,11 @@ package boofcv.alg.feature.dense;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
+import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
 import org.ddogleg.struct.FastQueue;
@@ -36,7 +38,8 @@ import org.ddogleg.struct.FastQueue;
  *
  * <p>Sampling is done in regular increments in a grid pattern.  The example sampling points are computed such that
  * entire area sampled starts and ends at the most extreme possible pixels.  This most likely will require that
- * the sampling period be adjusted.
+ * the sampling period be adjusted.  Multiple descriptors can overlap the same area, so pixel orientation and
+ * magnitude is just computed once and saved.</p>
  *
  * @author Peter Abeles
  */
@@ -46,26 +49,38 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 	double periodRows;
 	double periodColumns;
 
+	// wrapper around gradient images so that multiple types are supported
 	GImageSingleBand imageDerivX,imageDerivY;
 
-	FastQueue<TupleDesc_F64> descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true);
+	// storage for descriptors
+	FastQueue<TupleDesc_F64> descriptors;
+
+	// storage for precomputed angle
+	ImageFloat64 savedAngle = new ImageFloat64(1,1);
+	ImageFloat32 savedMagnitude = new ImageFloat32(1,1);
 
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.
 	 * @param widthSubregion Width of sub-region in samples.  Try 4
 	 * @param widthGrid Width of grid in subregions.  Try 4.
 	 * @param numHistogramBins Number of bins in histogram.  Try 8
+	 * @param weightingSigmaFraction Sigma for Gaussian weighting function is set to this value * region width.  Try 0.5
+	 * @param maxDescriptorElementValue Helps with non-affine changes in lighting. See paper.  Try 0.2
 	 * @param periodColumns Number of pixels between samples along x-axis
 	 * @param periodRows  Number of pixels between samples along y-axis
+	 * @param derivType Type of input derivative image
 	 */
 	public DescribeDenseSift(int widthSubregion, int widthGrid, int numHistogramBins,
 							 double weightingSigmaFraction , double maxDescriptorElementValue,
-							 double periodColumns, double periodRows) {
+							 double periodColumns, double periodRows , Class<D> derivType ) {
 		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
 		this.periodRows = periodRows;
 		this.periodColumns = periodColumns;
 
 		final int DOF = getDescriptorLength();
+
+		imageDerivX = FactoryGImageSingleBand.create(derivType);
+		imageDerivY = FactoryGImageSingleBand.create(derivType);
 
 		descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override
@@ -76,26 +91,38 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 	}
 
 	/**
-	 * Computes SIFT descriptors across the entire image given its gradient
+	 * Sets the gradient and precomputes pixel orientation and magnitude
+	 *
 	 * @param derivX image derivative x-axis
 	 * @param derivY image derivative y-axis
 	 */
-	public void process(D derivX , D derivY ) {
+	public void setImageGradient(D derivX , D derivY ) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 		if( derivX.stride != derivY.stride || derivX.startIndex != derivY.startIndex )
 			throw new IllegalArgumentException("stride and start index must be the same");
 
-		int width = widthSubregion*widthGrid;
-		int radius = width/2;
-
-		int X0 = radius,X1 = derivX.width-radius;
-		int Y0 = radius,Y1 = derivX.height-radius;
-
-		int numX = (int)((X1-X0)/periodColumns);
-		int numY = (int)((Y1-Y0)/periodRows);
+		savedAngle.reshape(derivX.width,derivX.height);
+		savedMagnitude.reshape(derivX.width,derivX.height);
 
 		imageDerivX.wrap(derivX);
 		imageDerivY.wrap(derivY);
+
+		precomputeAngles(derivX);
+	}
+
+	/**
+	 * Computes SIFT descriptors across the entire image
+	 */
+	public void process() {
+
+		int width = widthSubregion*widthGrid;
+		int radius = width/2;
+
+		int X0 = radius,X1 = savedAngle.width-radius;
+		int Y0 = radius,Y1 = savedAngle.height-radius;
+
+		int numX = (int)((X1-X0)/periodColumns);
+		int numY = (int)((Y1-Y0)/periodRows);
 
 		descriptors.reset();
 
@@ -103,14 +130,31 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 			int y = (Y1-Y0)*i/(numY-1) + Y0;
 
 			for (int j = 0; j < numX; j++) {
-				int x = (X1-X0)*i/(numX-1) + X0;
+				int x = (X1-X0)*j/(numX-1) + X0;
 
 				TupleDesc_F64 desc = descriptors.grow();
 
 				computeDescriptor(x,y,desc);
 			}
 		}
+	}
 
+	/**
+	 * Computes the angle of each pixel and its gradient magnitude
+	 */
+	void precomputeAngles(D image) {
+		int savecIndex = 0;
+		for (int y = 0; y < image.height; y++) {
+			int pixelIndex = y*image.stride + image.startIndex;
+
+			for (int x = 0; x < image.width; x++, pixelIndex++, savecIndex++ ) {
+				float spacialDX = imageDerivX.getF(pixelIndex);
+				float spacialDY = imageDerivY.getF(pixelIndex);
+
+				savedAngle.data[savecIndex] = UtilAngle.domain2PI(Math.atan2(spacialDY,spacialDX));
+				savedMagnitude.data[savecIndex] = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
+			}
+		}
 	}
 
 	/**
@@ -119,35 +163,35 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 	 * @param cy center of region y-axis
 	 * @param desc The descriptor
 	 */
-	public void computeDescriptor( int cx , int cy , TupleDesc_F64 desc ) {
+	public void computeDescriptor( int cx , int cy , TupleDesc_F64 desc  ) {
 
 		desc.fill(0);
 
 		int widthPixels = widthSubregion*widthGrid;
 		int radius = widthPixels/2;
 
-		ImageFloat32 image = null;
-
 		for (int i = 0; i < widthPixels; i++) {
-			int pixelIndex = (cy-radius+i)*image.stride + (cx-radius);
+			int angleIndex = (cy-radius+i)*savedAngle.width + (cx-radius);
 
 			float subY = i/(float)widthSubregion;
 
-			for (int j = 0; j < widthPixels; j++, pixelIndex++ ) {
+			for (int j = 0; j < widthPixels; j++, angleIndex++ ) {
 				float subX = j/(float)widthSubregion;
 
-				float spacialDX = imageDerivX.getF(pixelIndex);
-				float spacialDY = imageDerivY.getF(pixelIndex);
-
-				double angle = UtilAngle.domain2PI(Math.atan2(spacialDX,spacialDY));
+				double angle = savedAngle.data[angleIndex];
 
 				float weightGaussian = gaussianWeight[i*widthPixels+j];
-				float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
+				float weightGradient = savedMagnitude.data[angleIndex];
 
 				// trilinear interpolation intro descriptor
 				trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle,desc);
 			}
 		}
+
+		massageDescriptor(desc);
 	}
 
+	public FastQueue<TupleDesc_F64> getDescriptors() {
+		return descriptors;
+	}
 }
