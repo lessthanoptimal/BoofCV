@@ -24,6 +24,8 @@ subprojects {
 
         maven {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
             url = "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
         }
     }
