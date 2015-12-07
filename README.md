@@ -159,17 +159,24 @@ Examples can also be run using gradle.
 # Dependencies
 -----------------------------------------
 
-The main BoofCV modules depends on the following libraries:
+The main BoofCV modules depends on the following libraries
 
 - [ EJML          ]  ( http://code.google.com/p/efficient-java-matrix-library )
 - [ GeoRegression ]  ( http://georegression.org                               )
 - [ DDogleg       ]  ( http://ddogleg.org                                     )
 
-The following are required for running unit tests
+The following is required for unit tests
 
 - [ JUnit   ]       ( http://junit.sourceforge.net/                           )
 
+Code from the following libraries has been integrated into BoofCV
+
+- [General Purpose FFT by Takuya Ooura] (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
+  * Java port by Piotr Wendykier with modifications by Peter Abeles to recycle memory.
+  
 The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
+
+
 
 # Contact
 ------------------------------------
