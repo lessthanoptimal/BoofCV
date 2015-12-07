@@ -43,22 +43,15 @@ public class FactoryDescribeImageDense {
 	 * @see DescribePointSurf
 	 *
 	 * @param configSurf SURF configuration. Pass in null for default options.
-	 * @param configSample Describes how it should be sampled across the image
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed configSurf ,
-												 ConfigDenseSample configSample ,
-												 Class<T> imageType)
+	DescribeImageDense<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed configSurf , Class<T> imageType)
 	{
-		configSample.checkValidity();
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
 
-		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
-
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
-				configSample.periodX, configSample.periodY );
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf );
 	}
 
 	/**
@@ -71,21 +64,15 @@ public class FactoryDescribeImageDense {
 	 * @see DescribePointSurf
 	 *
 	 * @param configSurf SURF configuration. Pass in null for default options.
-	 * @param configSample Describes how it should be sampled across the image
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DescribeImageDense<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability configSurf,
-												   ConfigDenseSample configSample ,
 												   Class<T> imageType) {
 
-		configSample.checkValidity();
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
 
-		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
-
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
-				configSample.periodX, configSample.periodY );
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf );
 	}
 }

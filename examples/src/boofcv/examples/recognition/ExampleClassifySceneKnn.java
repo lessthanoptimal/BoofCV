@@ -24,7 +24,6 @@ import boofcv.alg.bow.LearnSceneFromFiles;
 import boofcv.alg.scene.ClassifierKNearestNeighborsBow;
 import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
-import boofcv.factory.feature.dense.ConfigDenseSample;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.learning.ConfusionMatrixPanel;
@@ -38,7 +37,6 @@ import org.ddogleg.clustering.ComputeClusters;
 import org.ddogleg.clustering.FactoryClustering;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.struct.FastQueue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -94,24 +92,12 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64> classifier;
 
-	// Storage for detected features
-	FastQueue<TupleDesc_F64> features;
-
 	public ExampleClassifySceneKnn(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
 								   ComputeClusters<double[]> clusterer,
 								   NearestNeighbor<HistogramScene> nn) {
 		this.describeImage = describeImage;
 		this.cluster = new ClusterVisualWords(clusterer, describeImage.createDescription().size(),0xFEEDBEEF);
 		this.nn = nn;
-
-		// This list can be dynamically grown.  However TupleDesc doesn't have a no argument constructor so
-		// you must to it how to cosntruct the data
-		features = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return describeImage.createDescription();
-			}
-		};
 	}
 
 	/**
@@ -149,18 +135,23 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		System.out.println("Image Features");
 
 		// computes features in the training image set
-		features.reset();
+		List<TupleDesc_F64> features = new ArrayList<TupleDesc_F64>();
 		for( String scene : train.keySet() ) {
 			List<String> imagePaths = train.get(scene);
 			System.out.println("   " + scene);
 
 			for( String path : imagePaths ) {
 				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
-				describeImage.process(image,features,null);
+				describeImage.process(image);
+
+				// the descriptions will get recycled on the next call, so create a copy
+				for( TupleDesc_F64 d : describeImage.getDescriptions() ) {
+					features.add( d.copy() );
+				}
 			}
 		}
 		// add the features to the overall list which the clusters will be found inside of
-		for (int i = 0; i < features.size; i++) {
+		for (int i = 0; i < features.size(); i++) {
 			cluster.addReference(features.get(i));
 		}
 
@@ -210,10 +201,9 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 				// reset before processing a new image
 				featuresToHistogram.reset();
-				features.reset();
-				describeImage.process(image, features,null);
-				for (int i = 0; i < features.size; i++) {
-					featuresToHistogram.addFeature(features.get(i));
+				describeImage.process(image);
+				for ( TupleDesc_F64 d : describeImage.getDescriptions() ) {
+					featuresToHistogram.addFeature(d);
 				}
 				featuresToHistogram.process();
 
@@ -242,8 +232,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	public static void main(String[] args) {
 
 		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
-				FactoryDescribeImageDense.surfFast(null,
-						new ConfigDenseSample(DESC_SCALE, DESC_SKIP, DESC_SKIP), ImageUInt8.class);
+				FactoryDescribeImageDense.surfFast(null, ImageUInt8.class);
+		desc.configure(DESC_SCALE, DESC_SKIP, DESC_SKIP);
 
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);

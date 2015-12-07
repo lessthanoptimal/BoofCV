@@ -18,36 +18,16 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.abst.feature.describe.ConfigSurfDescribe;
-import boofcv.struct.Configuration;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Configuration for dense surf computation.
- *
  * @author Peter Abeles
  */
-public class ConfigDenseSurf implements Configuration {
-
-	/**
-	 * Standard configuration for SURF
-	 */
-	ConfigSurfDescribe surf;
-
-	/**
-	 * Space between the center of each descriptor region along the image's rows.
-	 */
-	int periodRows = 20;
-	/**
-	 * Space between the center of each descriptor region along the image's columns.
-	 */
-	int periodColumns = 20;
-	/**
-	 * The scale at which each feature is to be computed at
-	 */
-	double scale = 1;
-
-	@Override
-	public void checkValidity() {
-
+public class TestDescribeImageDenseSift {
+	@Test
+	public void foo() {
+		fail("implement");
 	}
 }

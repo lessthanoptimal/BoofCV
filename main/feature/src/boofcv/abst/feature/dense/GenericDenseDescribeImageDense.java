@@ -25,6 +25,8 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.List;
+
 /**
  * Dense feature computation which uses {@link boofcv.abst.feature.describe.DescribeRegionPoint} internally.
  *
@@ -33,7 +35,7 @@ import org.ddogleg.struct.FastQueue;
 public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends TupleDesc>
 	implements DescribeImageDense<T,Desc>
 {
-	// Computes the iamge feature
+	// Computes the image feature
 	DescribeRegionPoint<T,Desc> alg;
 
 	// the scale all the features will be sampled at
@@ -44,25 +46,37 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	int periodX;
 	int periodY;
 
+	FastQueue<Desc> descriptions;
+	FastQueue<Point2D_I32> locations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+
 	/**
 	 * Configures dense description.
 	 * @param alg Sparse feature sampler.
-	 * @param scale The scale at which the features should be sampled
-	 * @param featureWidth Tells it how wide a feature is so that it can avoid sampling outside the image
-	 * @param periodX  sample rate along the x-axis
-	 * @param periodY  sample rate along the y-axis
 	 */
-	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg, double scale,
-										  int featureWidth, int periodX, int periodY) {
+	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg) {
 		this.alg = alg;
-		this.scale = scale;
-		this.featureWidth = featureWidth;
-		this.periodX = periodX;
-		this.periodY = periodY;
 	}
 
 	@Override
-	public void process(T input, FastQueue<Desc> descriptions, FastQueue<Point2D_I32> locations ) {
+	public void configure( double scale , double periodX, double periodY) {
+		this.scale = scale;
+		this.periodX = (int)(periodX+0.5);
+		this.periodY = (int)(periodY+0.5);
+		this.featureWidth = (int)(alg.getCanonicalWidth()*scale + 0.5);
+
+		descriptions = new FastQueue<Desc>(alg.getDescriptionType(),true) {
+			@Override
+			protected Desc createInstance() {
+				return alg.createDescription();
+			}
+		};
+	}
+
+	@Override
+	public void process(T input ) {
+		if( periodX <= 0 || periodY <= 0 )
+			throw new IllegalArgumentException("Must call configure(0 first");
+
 		alg.setImage(input);
 
 		int x0 = featureWidth/2;
@@ -70,17 +84,30 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 		int y0 = featureWidth/2;
 		int y1 = input.getHeight()-featureWidth/2;
 
+		descriptions.reset();
+		locations.reset();
+
 		for (int y = y0; y < y1; y += periodY ) {
 			for (int x = x0; x < x1; x += periodX ) {
 				Desc d = descriptions.grow();
 
 				if( !alg.process(x,y,0,scale,d) ) {
 					descriptions.removeTail();
-				} else if( locations != null ) {
+				} else {
 					locations.grow().set(x,y);
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<Desc> getDescriptions() {
+		return descriptions.toList();
+	}
+
+	@Override
+	public List<Point2D_I32> getLocations() {
+		return locations.toList();
 	}
 
 	@Override

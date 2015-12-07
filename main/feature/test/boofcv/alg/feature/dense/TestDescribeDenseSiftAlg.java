@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDescribeDenseSift {
+public class TestDescribeDenseSiftAlg {
 
 	Random rand = new Random(234);
 	int width = 50, height = 40;
@@ -58,7 +58,7 @@ public class TestDescribeDenseSift {
 	}
 
 	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
-		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -102,7 +102,7 @@ public class TestDescribeDenseSift {
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -131,7 +131,7 @@ public class TestDescribeDenseSift {
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSift<ImageFloat32> alg = new DescribeDenseSift<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
 		DescribePointSift<ImageFloat32> algTest = new DescribePointSift<ImageFloat32>(4,4,8,1,0.5,0.2,ImageFloat32.class);
 
 		alg.setImageGradient(derivX,derivY);

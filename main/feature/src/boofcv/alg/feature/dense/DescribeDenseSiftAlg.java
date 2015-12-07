@@ -43,7 +43,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCommon {
+public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSiftCommon {
 
 	// sampling period along the image's rows an columns
 	double periodRows;
@@ -70,9 +70,9 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 	 * @param periodRows  Number of pixels between samples along y-axis
 	 * @param derivType Type of input derivative image
 	 */
-	public DescribeDenseSift(int widthSubregion, int widthGrid, int numHistogramBins,
-							 double weightingSigmaFraction , double maxDescriptorElementValue,
-							 double periodColumns, double periodRows , Class<D> derivType ) {
+	public DescribeDenseSiftAlg(int widthSubregion, int widthGrid, int numHistogramBins,
+								double weightingSigmaFraction , double maxDescriptorElementValue,
+								double periodColumns, double periodRows , Class<D> derivType ) {
 		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
 		this.periodRows = periodRows;
 		this.periodColumns = periodColumns;
@@ -191,7 +191,27 @@ public class DescribeDenseSift<D extends ImageSingleBand> extends DescribeSiftCo
 		massageDescriptor(desc);
 	}
 
+	public double getPeriodRows() {
+		return periodRows;
+	}
+
+	public void setPeriodRows(double periodRows) {
+		this.periodRows = periodRows;
+	}
+
+	public double getPeriodColumns() {
+		return periodColumns;
+	}
+
+	public void setPeriodColumns(double periodColumns) {
+		this.periodColumns = periodColumns;
+	}
+
 	public FastQueue<TupleDesc_F64> getDescriptors() {
 		return descriptors;
+	}
+
+	public Class<D> getDerivType () {
+		return (Class)(imageDerivX.getImage().getClass());
 	}
 }

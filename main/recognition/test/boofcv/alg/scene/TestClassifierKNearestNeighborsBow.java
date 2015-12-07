@@ -24,6 +24,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
@@ -113,11 +114,29 @@ public class TestClassifierKNearestNeighborsBow {
 
 	protected class DummyDense implements DescribeImageDense {
 
+		List<TupleDesc> descriptions = new ArrayList<TupleDesc>();
+
 		@Override
-		public void process(ImageBase input, FastQueue descriptions, FastQueue locations) {
+		public void configure(double descriptorScale, double periodX, double periodY) {
+
+		}
+
+		@Override
+		public void process(ImageBase input) {
+			descriptions.clear();
 			for (int i = 0; i < FEATURES_IN_IMAGE; i++) {
-				descriptions.grow();
+				descriptions.add(createDescription());
 			}
+		}
+
+		@Override
+		public List getDescriptions() {
+			return descriptions;
+		}
+
+		@Override
+		public List<Point2D_I32> getLocations() {
+			return null;
 		}
 
 		@Override
