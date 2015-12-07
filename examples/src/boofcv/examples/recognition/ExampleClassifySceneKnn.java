@@ -245,7 +245,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
 		if( !trainingDir.exists() || !testingDir.exists() ) {
-			System.err.println("Please follow instructions in data/applet/learning/scene and download the");
+			String path = UtilIO.pathExample("learning/scene/");
+			System.err.println("Please follow instructions in "+path+" and download the");
 			System.err.println("required files");
 			System.exit(1);
 		}
