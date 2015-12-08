@@ -24,6 +24,7 @@ import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -51,7 +52,7 @@ public class FactoryDescribeImageDense {
 	{
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
 
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf );
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS );
 	}
 
 	/**
@@ -73,6 +74,6 @@ public class FactoryDescribeImageDense {
 
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
 
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf );
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS);
 	}
 }

@@ -45,7 +45,7 @@ public class TestGenericDenseDescribeImage {
 	public void process() {
 		DummyFeature sparse = new DummyFeature();
 
-		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse);
+		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1);
 		alg.configure(1.5,3,4);
 
 		ImageUInt8 image = new ImageUInt8(100,110);

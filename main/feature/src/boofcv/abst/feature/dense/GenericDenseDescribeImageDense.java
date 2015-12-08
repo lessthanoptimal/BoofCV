@@ -38,8 +38,10 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	// Computes the image feature
 	DescribeRegionPoint<T,Desc> alg;
 
-	// the scale all the features will be sampled at
-	double scale;
+	// conversion from scale to feature radius
+	double scaleToRadius;
+	// Radius of the "detected" feature
+	double radius;
 	// The width of the area the feature will sample
 	int featureWidth;
 	// the period at which it will be sampled inside the image
@@ -53,13 +55,14 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	 * Configures dense description.
 	 * @param alg Sparse feature sampler.
 	 */
-	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg) {
+	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg,double scaleToRadius) {
+		this.scaleToRadius = scaleToRadius;
 		this.alg = alg;
 	}
 
 	@Override
 	public void configure( double scale , double periodX, double periodY) {
-		this.scale = scale;
+		this.radius = scale*scaleToRadius;
 		this.periodX = (int)(periodX+0.5);
 		this.periodY = (int)(periodY+0.5);
 		this.featureWidth = (int)(alg.getCanonicalWidth()*scale + 0.5);
@@ -91,7 +94,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 			for (int x = x0; x < x1; x += periodX ) {
 				Desc d = descriptions.grow();
 
-				if( !alg.process(x,y,0,scale,d) ) {
+				if( !alg.process(x,y,0,radius,d) ) {
 					descriptions.removeTail();
 				} else {
 					locations.grow().set(x,y);
