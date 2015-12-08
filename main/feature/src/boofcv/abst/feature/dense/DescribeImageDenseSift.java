@@ -22,6 +22,7 @@ import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -44,13 +45,16 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 
 	ImageGradient<T,D> gradient;
 
+	// used to upscale the image
 	FDistort scaleUp;
 
+	// relative size of descriptor region
 	double scale;
 	// period in pixels at scale of 1
 	double periodX;
 	double periodY;
 
+	// storage for the rescaled input image and its derivatives
 	T imageScaled;
 	D derivX;
 	D derivY;
@@ -65,6 +69,7 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 		derivY = GeneralizedImageOps.createSingleBand(gradientType,1,1);
 
 		scaleUp = new FDistort(ImageType.single(inputType));
+		scaleUp.interp(TypeInterpolate.BILINEAR);
 	}
 
 	@Override
@@ -90,9 +95,11 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 			derivY.reshape(width,height);
 
 			if( width < input.width ) {
+				// average down sample is slower but doesn't introduce nearly as many artifacts as other
+				// methods
 				AverageDownSampleOps.down(input,imageScaled);
 			} else {
-				new FDistort().init(input,imageScaled).scaleExt().apply();
+				scaleUp.setRefs(input,imageScaled).scaleExt().apply();
 			}
 			input = imageScaled;
 
@@ -132,5 +139,9 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 	@Override
 	public Class<TupleDesc_F64> getDescriptionType() {
 		return TupleDesc_F64.class;
+	}
+
+	public DescribeDenseSiftAlg<D> getAlg() {
+		return alg;
 	}
 }

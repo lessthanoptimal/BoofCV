@@ -18,14 +18,18 @@
 
 package boofcv.abst.distort;
 
+import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
 
@@ -128,5 +132,67 @@ public class TestFDistort {
 		}
 	}
 
+	/**
+	 * Makes sure that setRefs doesn't cause it to blow up
+	 */
+	@Test
+	public void setRefs() {
+		ImageMiscOps.fillUniform(input, rand, 0, 200);
+		FDistort alg = new FDistort();
+		alg.setRefs(input,output).interp(TypeInterpolate.BILINEAR).scaleExt().apply();
+
+		ImageDistort distorter = alg.distorter;
+		InterpolatePixel interp = alg.interp;;
+		PixelTransform_F32 outputToInput = alg.outputToInput;
+
+		// a new image shouldn't cause new memory to be declared bad stuff to happen
+		ImageUInt8 found = new ImageUInt8(width/2,height/2);
+		ImageUInt8 expected = new ImageUInt8(width/2,height/2);
+		alg.setRefs(input,found).scale().apply();
+
+		assertTrue(distorter==alg.distorter);
+		assertTrue(interp==alg.interp);
+		assertTrue(outputToInput==alg.outputToInput);
+
+		new FDistort(input,expected).scaleExt().apply();
+
+		BoofTesting.assertEquals(expected,found,1e-4);
+	}
+
+	/**
+	 * Makes sure that border recycling doesn't mess things up
+	 */
+	@Test
+	public void setBorderChange() {
+		ImageMiscOps.fillUniform(input, rand, 0, 200);
+		ImageUInt8 found = new ImageUInt8(width/2,height/2);
+		ImageUInt8 expected = new ImageUInt8(width/2,height/2);
+
+		FDistort alg = new FDistort();
+
+		alg.init(input,found).scaleExt().apply();
+
+		ImageDistort distorter = alg.distorter;
+		InterpolatePixel interp = alg.interp;;
+		PixelTransform_F32 outputToInput = alg.outputToInput;
+
+		// Set it to the default border, nothing should change
+		expected.setTo(found);
+		alg.border(BorderType.EXTENDED).apply();
+		assertTrue(distorter==alg.distorter);
+		assertTrue(interp==alg.interp);
+		assertTrue(outputToInput==alg.outputToInput);
+		BoofTesting.assertEquals(expected,found,1e-4);
+
+		// change border now a fixed value
+		alg.border(10).apply();
+		new FDistort(input,expected).scale().border(10).apply();
+		BoofTesting.assertEquals(expected,found,1e-4);
+
+		// change value
+		alg.border(1).apply();
+		new FDistort(input,expected).scale().border(1).apply();
+		BoofTesting.assertEquals(expected,found,1e-4);
+	}
 
 }

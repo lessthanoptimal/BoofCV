@@ -103,7 +103,7 @@ If you checked out the code from Github then you don't have a stable build and l
 
 ## IntelliJ
 
-You will need to import the Gradle project into IntelliJ.  Verified to work in IntelliJ IDEA 13.1.x.
+You will need to import the Gradle project into IntelliJ.  Verified to work in IntelliJ IDEA 13 and beyond.
 
 ### Install IntelliJ Gradle Plug-In
 1. File -> Settings -> Plugins

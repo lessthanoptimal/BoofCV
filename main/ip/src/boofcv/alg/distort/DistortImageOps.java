@@ -209,7 +209,7 @@ public class DistortImageOps {
 	public static <T extends ImageBase>
 	void scale(T input, T output, BorderType borderType, TypeInterpolate interpType) {
 
-		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input);
+		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input, null);
 
 		if( input instanceof ImageSingleBand ) {
 			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, interpType, borderType);

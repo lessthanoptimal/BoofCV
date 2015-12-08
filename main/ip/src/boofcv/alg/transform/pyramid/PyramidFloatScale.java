@@ -57,7 +57,7 @@ public class PyramidFloatScale< T extends ImageSingleBand>
 			T prev = i == 0 ? input : getLayer(i-1);
 			T layer = getLayer(i);
 
-			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev);
+			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev, null);
 			DistortImageOps.distortSingle(prev,layer, true, model,interpolate);
 		}
 	}

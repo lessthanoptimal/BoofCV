@@ -111,7 +111,7 @@ public class PyramidFloatGaussianScale< T extends ImageSingleBand> extends Pyram
 			if( scale[i] == 1 ) {
 				layer.setTo(tempImage);
 			} else {
-				PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage);
+				PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage, null);
 				DistortImageOps.distortSingle(tempImage,layer, true, model,interpolate);
 			}
 		}

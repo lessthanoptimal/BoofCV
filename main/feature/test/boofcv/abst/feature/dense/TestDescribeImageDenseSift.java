@@ -26,8 +26,18 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestDescribeImageDenseSift {
+
 	@Test
-	public void foo() {
+	public void checkDescriptorScale() {
 		fail("implement");
+	}
+
+	@Test
+	public void checkSampleLocations() {
+		fail("implement");
+	}
+
+	private int getWidthScaleOfOne() {
+		return 0;
 	}
 }
