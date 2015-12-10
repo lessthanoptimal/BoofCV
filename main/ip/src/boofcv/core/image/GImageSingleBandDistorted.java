@@ -98,4 +98,9 @@ public class GImageSingleBandDistorted<T extends ImageSingleBand> implements GIm
 	public ImageSingleBand getImage() {
 		throw new IllegalArgumentException("getImage() is not supported");
 	}
+
+	@Override
+	public Class getImageType() {
+		throw new IllegalArgumentException("getImageType() is not supported");
+	}
 }

@@ -122,7 +122,7 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 
 	@Override
 	public List<Point2D_I32> getLocations() {
-		return null;
+		return alg.getLocations().toList();
 	}
 
 

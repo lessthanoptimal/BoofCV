@@ -28,6 +28,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -58,6 +59,9 @@ public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSif
 	// storage for precomputed angle
 	ImageFloat64 savedAngle = new ImageFloat64(1,1);
 	ImageFloat32 savedMagnitude = new ImageFloat32(1,1);
+
+	// saved location of where in the image it sampled
+	FastQueue<Point2D_I32> sampleLocations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.
@@ -125,6 +129,7 @@ public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSif
 		int numY = (int)((Y1-Y0)/periodRows);
 
 		descriptors.reset();
+		sampleLocations.reset();
 
 		for (int i = 0; i < numY; i++) {
 			int y = (Y1-Y0)*i/(numY-1) + Y0;
@@ -135,6 +140,7 @@ public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSif
 				TupleDesc_F64 desc = descriptors.grow();
 
 				computeDescriptor(x,y,desc);
+				sampleLocations.grow().set(x,y);
 			}
 		}
 	}
@@ -211,7 +217,14 @@ public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSif
 		return descriptors;
 	}
 
+	/**
+	 * Returns where in the image it sampled the features
+	 */
+	public FastQueue<Point2D_I32> getLocations() {
+		return sampleLocations;
+	}
+
 	public Class<D> getDerivType () {
-		return (Class)(imageDerivX.getImage().getClass());
+		return (Class)(imageDerivX.getImageType());
 	}
 }
