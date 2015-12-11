@@ -8,7 +8,6 @@ Alpha 0.21
     - Should supress noisy regions?
 
 - Fiducial Square
-  * Have base class binarize, and have adjustable black rectangle width
   * Change how the grid is specified
 
 - Chessboard
@@ -22,6 +21,12 @@ Alpha 0.21
   * Ability to remove images and recompute
 
 Future
+
+- Dense Features
+  * See if pruning low contrast regions improve scoring
+    - Prune X fraction per image or global threshold across all images
+    - Print debugging info to help with tuning?
+  * See if different image sampling methods can improve scene recognition
 
 - Fiducial Square
   * Regression tests that can determine if orientation is consistent

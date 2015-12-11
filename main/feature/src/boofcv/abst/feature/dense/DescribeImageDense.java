@@ -26,6 +26,9 @@ import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
 
+// TODO provide way for selecting sampling method  REGULAR_GRID, MAX_SPREAD
+// TODO easy way to know coordinate for grid image
+
 /**
  * Computes feature descriptors across the whole image.  No feature detection is performed.  Descriptions are typically
  * computed at regular intervals.  Scale, orientation, and other local geometric information is typically not computed

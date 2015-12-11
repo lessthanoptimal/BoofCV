@@ -78,8 +78,6 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	public static boolean HISTOGRAM_HARD = true;
 	public static int NUM_NEIGHBORS = 10;
 	public static int MAX_KNN_ITERATIONS = 100;
-	public static double DESC_SCALE = 1.0;
-	public static int DESC_SKIP = 8;
 
 	// Files intermediate results are stored in
 	public static final String CLUSTER_FILE_NAME = "clusters.obj";
@@ -233,7 +231,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
 				FactoryDescribeImageDense.surfFast(null, ImageUInt8.class);
-		desc.configure(DESC_SCALE, DESC_SKIP, DESC_SKIP);
+//				FactoryDescribeImageDense.surfStable(null, ImageUInt8.class);
+		desc.configure(1, 8, 8);
+
+//				FactoryDescribeImageDense.sift(null, ImageUInt8.class);
+//		desc.configure(1, 6, 6);
 
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
@@ -266,10 +268,11 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// Not the best coloration scheme...  perfect = red diagonal and blue elsewhere.
 		ShowImages.showWindow(new ConfusionMatrixPanel(confusion.getMatrix(), 400, true), "Confusion Matrix", true);
 
+		// For SIFT descriptor the accuracy is          54.0%
 		// For  "fast"  SURF descriptor the accuracy is 52.2%
 		// For "stable" SURF descriptor the accuracy is 49.4%
 
-		// This is interesting. When matching images "stable" is significantly better than "fast"
+		// SURF results are interesting. "Stable" is significantly better than "fast"!
 		// One explanation is that the descriptor for "fast" samples a smaller region than "stable", by a
 		// couple of pixels at scale of 1.  Thus there is less overlap between the features.
 

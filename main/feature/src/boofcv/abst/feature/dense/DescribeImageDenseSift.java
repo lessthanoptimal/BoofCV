@@ -88,7 +88,7 @@ public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSi
 			// scale the image up or down to effectively change the descriptor size
 			// also adjust the sample period
 			int width = (int)(input.width/scale+0.5);
-			int height = (int)(input.width/scale+0.5);
+			int height = (int)(input.height/scale+0.5);
 
 			imageScaled.reshape(width,height);
 			derivX.reshape(width,height);

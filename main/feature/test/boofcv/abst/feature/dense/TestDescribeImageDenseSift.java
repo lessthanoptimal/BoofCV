@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDescribeImageDenseSift {
 
-	int width = 100;
+	int width = 120;
 	int height = 90;
 
 	Random rand = new Random(234);
@@ -71,9 +71,14 @@ public class TestDescribeImageDenseSift {
 
 			alg.configure(0.75, 8, 9);
 			alg.process(image);
-			int found07 = alg.getDescriptions().size();
+			int found07a = alg.getDescriptions().size();
 
-			assertTrue(found07 > found10);
+			alg.configure(0.75, 8*0.75, 9*0.75);
+			alg.process(image);
+			int found07b = alg.getDescriptions().size();
+
+			assertTrue(found07a == found10);
+			assertTrue(found07b > found10);
 			assertTrue(found10 > found15);
 		}
 	}
