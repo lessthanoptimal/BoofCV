@@ -19,11 +19,16 @@
 package boofcv.factory.feature.dense;
 
 import boofcv.abst.feature.dense.DescribeImageDense;
+import boofcv.abst.feature.dense.DescribeImageDenseSift;
 import boofcv.abst.feature.dense.GenericDenseDescribeImageDense;
+import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
 import boofcv.alg.feature.describe.DescribePointSurf;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageSingleBand;
 
@@ -43,22 +48,15 @@ public class FactoryDescribeImageDense {
 	 * @see DescribePointSurf
 	 *
 	 * @param configSurf SURF configuration. Pass in null for default options.
-	 * @param configSample Describes how it should be sampled across the image
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed configSurf ,
-												 ConfigDenseSample configSample ,
-												 Class<T> imageType)
+	DescribeImageDense<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed configSurf , Class<T> imageType)
 	{
-		configSample.checkValidity();
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfFast(configSurf, imageType);
 
-		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
-
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
-				configSample.periodX, configSample.periodY );
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS );
 	}
 
 	/**
@@ -71,21 +69,35 @@ public class FactoryDescribeImageDense {
 	 * @see DescribePointSurf
 	 *
 	 * @param configSurf SURF configuration. Pass in null for default options.
-	 * @param configSample Describes how it should be sampled across the image
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
 	DescribeImageDense<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability configSurf,
-												   ConfigDenseSample configSample ,
 												   Class<T> imageType) {
 
-		configSample.checkValidity();
 		DescribeRegionPoint<T,BrightFeature> surf = FactoryDescribeRegionPoint.surfStable(configSurf, imageType);
 
-		int width = (int)(surf.getCanonicalWidth()*configSample.scale+0.5);
+		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS);
+	}
 
-		return new GenericDenseDescribeImageDense<T,BrightFeature>( surf , configSample.scale , width ,
-				configSample.periodX, configSample.periodY );
+	/**
+	 * Creates a dense SIFT descriptor.
+	 *
+	 * @param config Configuration for SIFT descriptor.  All parameters are used but sigmaToPixels.  null for defaults.
+	 * @param imageType Type of input image
+	 * @return Dense SIFT
+	 */
+	public static <T extends ImageSingleBand>
+	DescribeImageDense<T,BrightFeature> sift( ConfigSiftDescribe config , Class<T> imageType ) {
+		if( config == null )
+			config = new ConfigSiftDescribe();
+
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		DescribeDenseSiftAlg alg = new DescribeDenseSiftAlg(config.widthSubregion,config.widthGrid,
+				config.numHistogramBins,config.weightingSigmaFraction,config.maxDescriptorElementValue,1,1,derivType);
+
+		return new DescribeImageDenseSift(alg,imageType);
 	}
 }

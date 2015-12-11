@@ -63,4 +63,6 @@ public interface GImageSingleBand {
 	float getF( int index );
 
 	ImageSingleBand getImage();
+
+	Class getImageType();
 }

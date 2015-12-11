@@ -39,8 +39,14 @@ import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 
 /**
- * High level interface for rendering a distorted image into another one.  Uses a flow style interface to remove
- * much of the drugery.
+ * <p>High level interface for rendering a distorted image into another one.  Uses a flow style interface to remove
+ * much of the drugery.</p>
+ *
+ * <p>If you are changing the input images and avoiding declaring new memory then you need to be careful
+ * how this class is used.  For example, call {@link #setRefs(ImageBase, ImageBase)} instead of
+ * {@link #init(ImageBase, ImageBase)}.  Init() will discard the previous settings while with setRefs() it's possible
+ * to update only what has changed.  Make sure you follow the instructions in setRefs() and browsing the code in this
+ * class might help you understand what's going on.</p>
  *
  * @author Peter Abeles
  */
@@ -56,8 +62,11 @@ public class FDistort
 	InterpolatePixel interp;
 	PixelTransform_F32 outputToInput;
 
+	// type of border being used
+	BorderType borderType;
+
 	// if the transform should be cached or not.
-	boolean cached;
+	boolean cached = false;
 
 	/**
 	 * Constructor in which input and output images are specified.  Equivalent to calling
@@ -82,7 +91,7 @@ public class FDistort
 	}
 
 	/**
-	 * Specifies the input and output image.
+	 * Specifies the input and output image and sets interpolation to BILINEAR, black image border, cache is off.
 	 */
 	public FDistort init(ImageBase input, ImageBase output) {
 		this.input = input;
@@ -96,8 +105,30 @@ public class FDistort
 		distorter = null;
 		outputToInput = null;
 
+		return this;
+	}
 
+	/**
+	 * All this does is set the references to the images.  Nothing else is changed and its up to the
+	 * user to correctly update everything else.
+	 *
+	 * If called the first time you need to do the following
+	 * <pre>
+	 * 1) specify the interpolation method
+	 * 2) specify the transform
+	 * 3) specify the border
+	 * </pre>
+	 *
+	 * If called again and the image shape has changed you need to do the following:
+	 * <pre>
+	 * 1) Update the transform
+	 * </pre>
+	 */
+	public FDistort setRefs( ImageBase input, ImageBase output ) {
+		this.input = input;
+		this.output = output;
 
+		inputType = input.getImageType();
 		return this;
 	}
 
@@ -130,7 +161,6 @@ public class FDistort
 	 * Sets how the interpolation handles borders.
 	 */
 	public FDistort border( ImageBorder border ) {
-		distorter = null;
 		interp.setBorder(border);
 		return this;
 	}
@@ -139,6 +169,9 @@ public class FDistort
 	 * Sets the border by type.
 	 */
 	public FDistort border( BorderType type ) {
+		if( borderType == type )
+			return this;
+		borderType = type;
 		return border(FactoryImageBorder.generic(type, inputType));
 	}
 
@@ -146,11 +179,15 @@ public class FDistort
 	 * Sets the border to a fixed gray-scale value
 	 */
 	public FDistort border( double value ) {
+		// to recycle here the value also needs to be saved
+//		if( borderType == BorderType.VALUE )
+//			return this;
+		borderType = BorderType.VALUE;
 		return border(FactoryImageBorder.genericValue(value, inputType));
 	}
 
 	/**
-	 * Sets the border to EXTEND
+	 * <p>Sets the border to EXTEND.</p>
 	 */
 	public FDistort borderExt() {
 		return border(BorderType.EXTENDED);
@@ -159,6 +196,11 @@ public class FDistort
 
 	/**
 	 * used to provide a custom interpolation algorithm
+	 *
+	 * <p>
+	 * NOTE: This will force the distorter to be declared again, even if nothing has changed.  This only matters if
+	 * you are being very careful about your memory management.
+	 * </p>
 	 */
 	public FDistort interp(InterpolatePixelS interpolation) {
 		distorter = null;
@@ -172,7 +214,7 @@ public class FDistort
 	public FDistort interp(TypeInterpolate type) {
 		distorter = null;
 		this.interp = FactoryInterpolation.createPixel(0, 255, type, BorderType.EXTENDED, inputType);
-		;
+
 		return this;
 	}
 
@@ -211,9 +253,18 @@ public class FDistort
 	 * Affine transform from input to output
 	 */
 	public FDistort affine(double a11, double a12, double a21, double a22,
-						  double dx, double dy) {
+						   double dx, double dy) {
+
+		PixelTransformAffine_F32 transform;
+
+		if( outputToInput != null && outputToInput instanceof PixelTransformAffine_F32 ) {
+			transform = (PixelTransformAffine_F32)outputToInput;
+		} else {
+			transform = new PixelTransformAffine_F32();
+		}
 
 		Affine2D_F32 m = new Affine2D_F32();
+
 		m.a11 = (float)a11;
 		m.a12 = (float)a12;
 		m.a21 = (float)a21;
@@ -221,9 +272,9 @@ public class FDistort
 		m.tx = (float)dx;
 		m.ty = (float)dy;
 
-		m = m.invert(null);
+		m.invert(transform.getModel());
 
-		return transform(new PixelTransformAffine_F32(m));
+		return transform(transform);
 	}
 
 	public FDistort affine( Affine2D_F64 affine ) {
@@ -231,12 +282,21 @@ public class FDistort
 	}
 
 	/**
-	 * Applies a distortion which will rescale the input image into the output image.  You
-	 * might want to consider using {@link #scaleExt()} instead since it sets the border behavior to extended, which
-	 * is probably what you want to do.
+	 * <p>Applies a distortion which will rescale the input image into the output image.  You
+	 * might want to consider using {@link #scaleExt()} instead since it sets the border behavior
+	 * to extended, which is probably what you want to do.</p>
+	 *
+	 * NOTE: Checks to see if it can recycle the previous transform and update it with a new affine model
+	 * to avoid declaring new memory.
 	 */
 	public FDistort scale() {
-		return transform(DistortSupport.transformScale(output, input));
+		if( outputToInput != null && outputToInput instanceof PixelTransformAffine_F32 ) {
+			PixelTransformAffine_F32 affine = (PixelTransformAffine_F32)outputToInput;
+			DistortSupport.transformScale(output, input, affine);
+			return this;
+		} else {
+			return transform(DistortSupport.transformScale(output, input, null));
+		}
 	}
 
 	/**

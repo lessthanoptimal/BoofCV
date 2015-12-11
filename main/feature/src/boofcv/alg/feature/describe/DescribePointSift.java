@@ -18,12 +18,8 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.alg.descriptor.UtilFeature;
-import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.metric.UtilAngle;
@@ -56,28 +52,13 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class DescribePointSift<Deriv extends ImageSingleBand> {
+public class DescribePointSift<Deriv extends ImageSingleBand> extends DescribeSiftCommon {
 
 	// spacial derivatives of input image
 	GImageSingleBand imageDerivX, imageDerivY;
 
-	// width of a subregion, in samples
-	int widthSubregion;
-	// width of the outer grid, in sub-regions
-	int widthGrid;
-
-	// number of bins in the orientation histogram
-	int numHistogramBins;
-	double histogramBinWidth;
-
 	// conversion from scale-space sigma to image pixels
 	double sigmaToPixels;
-
-	// maximum value of an element in the descriptor
-	double maxDescriptorElementValue;
-
-	// precomputed gaussian weighting function
-	float gaussianWeight[];
 
 	// reference to user provided descriptor in which results are saved to
 	TupleDesc_F64 descriptor;
@@ -95,31 +76,11 @@ public class DescribePointSift<Deriv extends ImageSingleBand> {
 	public DescribePointSift(int widthSubregion, int widthGrid, int numHistogramBins,
 							 double sigmaToPixels, double weightingSigmaFraction,
 							 double maxDescriptorElementValue , Class<Deriv> derivType ) {
-		this.widthSubregion = widthSubregion;
-		this.widthGrid = widthGrid;
-		this.numHistogramBins = numHistogramBins;
+		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
 		this.sigmaToPixels = sigmaToPixels;
-		this.maxDescriptorElementValue = maxDescriptorElementValue;
-
-		this.histogramBinWidth = 2.0*Math.PI/numHistogramBins;
-
-		// number of samples wide the descriptor window is
-		int descriptorWindow = widthSubregion*widthGrid;
-		double weightSigma = descriptorWindow*weightingSigmaFraction;
-		gaussianWeight = createGaussianWeightKernel(weightSigma,descriptorWindow/2);
 
 		imageDerivX = FactoryGImageSingleBand.create(derivType);
 		imageDerivY = FactoryGImageSingleBand.create(derivType);
-	}
-
-	/**
-	 * Creates a gaussian weighting kernel with an even number of elements along its width
-	 */
-	private static float[] createGaussianWeightKernel( double sigma , int radius ) {
-		Kernel2D_F32 ker = FactoryKernelGaussian.gaussian2D_F32(sigma,radius,false,false);
-		float maxValue = KernelMath.maxAbs(ker.data,4*radius*radius);
-		KernelMath.divide(ker,maxValue);
-		return ker.data;
 	}
 
 	/**
@@ -150,30 +111,8 @@ public class DescribePointSift<Deriv extends ImageSingleBand> {
 
 		computeRawDescriptor(c_x, c_y, sigma, orientation);
 
-		massageDescriptor();
+		massageDescriptor(descriptor);
 	}
-
-
-	/**
-	 * Adjusts the descriptor.  This adds lighting invariance and reduces the affects of none-affine changes
-	 * in lighting.
-	 */
-	void massageDescriptor() {
-		// normalize descriptor to unit length
-		UtilFeature.normalizeL2(descriptor);
-
-		// clip the values
-		for (int i = 0; i < descriptor.size(); i++) {
-			double value = descriptor.value[i];
-			if( value > maxDescriptorElementValue ) {
-				descriptor.value[i] = maxDescriptorElementValue;
-			}
-		}
-
-		// normalize again
-		UtilFeature.normalizeL2(descriptor);
-	}
-
 
 	/**
 	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
@@ -183,21 +122,21 @@ public class DescribePointSift<Deriv extends ImageSingleBand> {
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
+		float fwidthSubregion = widthSubregion;
 		int sampleWidth = widthGrid*widthSubregion;
-		// compute radius and ensure its symmetric for even and odd cases
-		double sampleRadius = sampleWidth/2-(1-(sampleWidth%2))/2.0;
+		double sampleRadius = sampleWidth/2;
 
 		double sampleToPixels = sigma*sigmaToPixels;
 
 		Deriv image = (Deriv)imageDerivX.getImage();
 
 		for (int sampleY = 0; sampleY < sampleWidth; sampleY++) {
-			float subY = sampleY/widthSubregion;
+			float subY = sampleY/fwidthSubregion;
 			double y = sampleToPixels*(sampleY-sampleRadius);
 
 			for (int sampleX = 0; sampleX < sampleWidth; sampleX++) {
 				// coordinate of samples in terms of sub-region.  Center of sample point, hence + 0.5f
-				float subX = sampleX/widthSubregion;
+				float subX = sampleX/fwidthSubregion;
 				// recentered local pixel sample coordinate
 				double x = sampleToPixels*(sampleX-sampleRadius);
 
@@ -222,46 +161,9 @@ public class DescribePointSift<Deriv extends ImageSingleBand> {
 					float weightGradient = (float)Math.sqrt(spacialDX*spacialDX + spacialDY*spacialDY);
 
 					// trilinear interpolation intro descriptor
-					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle);
+					trilinearInterpolation(weightGaussian*weightGradient,subX,subY,angle, descriptor);
 				}
 			}
 		}
-	}
-
-	/**
-	 * Applies trilinear interpolation across the descriptor
-	 */
-	void trilinearInterpolation( float weight , float sampleX , float sampleY , double angle )
-	{
-		for (int i = 0; i < widthGrid; i++) {
-			double weightGridY = 1.0 - Math.abs(sampleY-i);
-			if( weightGridY <= 0) continue;
-			for (int j = 0; j < widthGrid; j++) {
-				double weightGridX = 1.0 - Math.abs(sampleX-j);
-				if( weightGridX <= 0 ) continue;
-				for (int k = 0; k < numHistogramBins; k++) {
-					double angleBin = k*histogramBinWidth;
-					double weightHistogram = 1.0 - UtilAngle.dist(angle,angleBin)/histogramBinWidth;
-					if( weightHistogram <= 0 ) continue;
-
-					int descriptorIndex = (i*widthGrid + j)*numHistogramBins + k;
-					descriptor.value[descriptorIndex] += weight*weightGridX*weightGridY*weightHistogram;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Number of elements in the descriptor.
-	 */
-	public int getDescriptorLength() {
-		return widthGrid*widthGrid*numHistogramBins;
-	}
-
-	/**
-	 * Radius of descriptor in pixels.  Width is radius*2
-	 */
-	public int getCanonicalRadius() {
-		return widthGrid*widthSubregion/2;
 	}
 }

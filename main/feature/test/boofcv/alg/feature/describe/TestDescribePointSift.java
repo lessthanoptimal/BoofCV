@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSiftLowe {
+public class TestDescribePointSift {
 
 	Random rand = new Random(234);
 
@@ -69,32 +69,6 @@ public class TestDescribePointSiftLowe {
 		}
 	}
 
-	@Test
-	public void massageDescriptor() {
-		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
-		descriptor.value[5] = 100;
-		descriptor.value[20] = 120;
-		descriptor.value[60] = 20;
-
-		DescribePointSift<ImageFloat32> alg =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
-		alg.descriptor = descriptor;
-		alg.massageDescriptor();
-
-		assertEquals(1,normL2(alg.descriptor),1e-8);
-
-		// cropping should make 5 and 20 the same
-		assertEquals(descriptor.value[5],descriptor.value[20],1e-8);
-	}
-
-	private double normL2( TupleDesc_F64 desc ) {
-		double total = 0;
-		for( double d : desc.value) {
-			total += d*d;
-		}
-		return Math.sqrt(total);
-	}
-
 	/**
 	 * Only put gradient inside a small area that fills the descriptor.  Then double the scale and see if
 	 * only a 1/4 of the original image is inside
@@ -119,7 +93,8 @@ public class TestDescribePointSiftLowe {
 		alg.descriptor = new TupleDesc_F64(128);
 		alg.computeRawDescriptor(60+r, 60+r, 2, 0);
 		numHit = computeInside(alg);
-		assertEquals(2*2,numHit);
+		// would be 2x2 if there was no interpolation
+		assertEquals(3*3,numHit);
 
 	}
 
@@ -166,54 +141,6 @@ public class TestDescribePointSiftLowe {
 			}
 		}
 		
-	}
-
-	/**
-	 * Tests trilinear interpolation by checking out some of its properties instead of its value
-	 * exactly
-	 */
-	@Test
-	public void trilinearInterpolation() {
-		DescribePointSift<ImageFloat32> alg =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
-
-		alg.descriptor = new TupleDesc_F64(128);
-
-		// in the middle of the feature, the total amount added to the descriptor should equal the input weight
-		// upper edges will have a value less than the input weight
-		alg.trilinearInterpolation(2.0f,1.25f,2.0f,0.5);
-
-		double sum = 0;
-		int count = 0;
-		for (int i = 0; i < alg.descriptor.size(); i++) {
-			sum += alg.descriptor.value[i];
-			if( alg.descriptor.value[i] != 0 )
-				count++;
-		}
-		assertEquals(2.0,sum,1e-6);
-		assertTrue(count>1);
-
-		// try an edge case
-		sum = 0;
-		alg.descriptor.fill(0);
-		alg.trilinearInterpolation(2.0f,3.25f,3.25f,0.5);
-		for (int i = 0; i < alg.descriptor.size(); i++) {
-			sum += alg.descriptor.value[i];
-		}
-		assertEquals( 2.0*0.75*0.75*1.0, sum, 1e-8 );
-
-		// now have something exactly at the start of a bin.  all the weight should be in one location
-		alg.descriptor.fill(0);
-		alg.trilinearInterpolation(2.0f,3f,3f,2*Math.PI/8);
-		count = 0;
-		for (int i = 0; i < alg.descriptor.size(); i++) {
-			double weight = alg.descriptor.value[i];
-			if( weight > 0 ) {
-				assertEquals(2.0,weight,1e-8);
-				count++;
-			}
-		}
-		assertEquals(1,count);
 	}
 
 }

@@ -43,14 +43,17 @@ public class DistortSupport {
 	 * directly from the size of the two input images and independently scales
 	 * the x and y axises.
 	 */
-	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to)
+	public static PixelTransformAffine_F32 transformScale(ImageBase from, ImageBase to,
+														  PixelTransformAffine_F32 distort)
 	{
+		if( distort == null )
+			distort = new PixelTransformAffine_F32();
+
 		float scaleX = (float)(to.width)/(float)(from.width);
 		float scaleY = (float)(to.height)/(float)(from.height);
 
-		Affine2D_F32 affine = new Affine2D_F32(scaleX,0,0,scaleY,0,0);
-		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
-		distort.set(affine);
+		Affine2D_F32 affine = distort.getModel();
+		affine.set(scaleX,0,0,scaleY,0,0);
 
 		return distort;
 	}

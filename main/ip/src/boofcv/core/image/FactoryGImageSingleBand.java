@@ -150,6 +150,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
+
+		@Override
+		public Class getImageType() {
+			return getImage().getImageType().getImageClass();
+		}
 	}
 
 	public static class Border_F32 extends GSingleBorder<ImageBorder_F32>
@@ -191,6 +196,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public float getF(int index) {
 			throw new RuntimeException("Operation not supported by inner data type");
+		}
+
+		@Override
+		public Class getImageType() {
+			return ImageFloat32.class;
 		}
 	}
 
@@ -234,6 +244,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			throw new RuntimeException("Operation not supported by inner data type");
 		}
+
+		@Override
+		public Class getImageType() {
+			return ImageFloat64.class;
+		}
 	}
 
 	public static class GSingle_U8 extends GSingleBaseInt<ImageUInt8>
@@ -270,6 +285,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public float getF(int index) {
 			return image.data[index] & 0xFF;
+		}
+
+		@Override
+		public Class getImageType() {
+			return ImageUInt8.class;
 		}
 	}
 
@@ -309,6 +329,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			return image.data[index];
 		}
+
+		@Override
+		public Class getImageType() {
+			return ImageSInt8.class;
+		}
 	}
 
 	public static class GSingle_U16 extends GSingleBaseInt<ImageUInt16>
@@ -345,6 +370,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public float getF(int index) {
 			return image.data[index] & 0xFFFF;
+		}
+
+		@Override
+		public Class getImageType() {
+			return ImageUInt16.class;
 		}
 	}
 
@@ -383,6 +413,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			return image.data[index];
 		}
+
+		@Override
+		public Class getImageType() {
+			return ImageSInt16.class;
+		}
 	}
 
 	public static class GSingle_S32 extends GSingleBaseInt<ImageSInt32>
@@ -420,6 +455,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			return image.data[index];
 		}
+
+		@Override
+		public Class getImageType() {
+			return ImageSInt32.class;
+		}
 	}
 
 	public static class GSingle_I64 extends GSingleBaseInt<ImageSInt64>
@@ -456,6 +496,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public float getF(int index) {
 			return image.data[index];
+		}
+
+		@Override
+		public Class getImageType() {
+			return ImageSInt64.class;
 		}
 	}
 
@@ -499,6 +544,11 @@ public class FactoryGImageSingleBand {
 		public float getF(int index) {
 			return image.data[index];
 		}
+
+		@Override
+		public Class getImageType() {
+			return ImageFloat32.class;
+		}
 	}
 
 	public static class GSingle_F64 extends GSingleBase<ImageFloat64>
@@ -540,6 +590,11 @@ public class FactoryGImageSingleBand {
 		@Override
 		public float getF(int index) {
 			return (float)image.data[index];
+		}
+
+		@Override
+		public Class getImageType() {
+			return ImageFloat64.class;
 		}
 	}
 

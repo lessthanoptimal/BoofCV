@@ -59,9 +59,6 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 	// storage for NN results
 	private FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData.class,true);
 
-	// storage for image features
-	private FastQueue<Desc> imageFeatures;
-
 	// number of neighbors it will consider
 	private int numNeighbors;
 
@@ -81,13 +78,6 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 		this.nn = nn;
 		this.describe = describe;
 		this.featureToHistogram = featureToHistogram;
-
-		imageFeatures = new FastQueue<Desc>(describe.getDescriptionType(),true) {
-			@Override
-			protected Desc createInstance() {
-				return describe.createDescription();
-			}
-		};
 	}
 
 	/**
@@ -126,12 +116,12 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 			throw new IllegalArgumentException("Must specify number of neighbors!");
 
 		// compute all the features inside the image
-		imageFeatures.reset();
-		describe.process(image, imageFeatures, null);
+		describe.process(image);
 
 		// find which word the feature matches and construct a frequency histogram
 		featureToHistogram.reset();
-		for (int i = 0; i < imageFeatures.size; i++) {
+		List<Desc> imageFeatures = describe.getDescriptions();
+		for (int i = 0; i < imageFeatures.size(); i++) {
 			Desc d = imageFeatures.get(i);
 			featureToHistogram.addFeature(d);
 		}

@@ -34,7 +34,7 @@ public class TestDistortSupport {
 		ImageFloat32 a = new ImageFloat32(25,30);
 		ImageFloat32 b = new ImageFloat32(15,25);
 
-		PixelTransform_F32 tran = DistortSupport.transformScale(a, b);
+		PixelTransform_F32 tran = DistortSupport.transformScale(a, b, null);
 
 		// check edge cases at the image border
 		tran.compute(0,0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageFloat32;
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurf  extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32>{
+public class TestDescribePointSurf extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32>{
 
 	public TestDescribePointSurf() {
 		super(ImageFloat32.class,ImageFloat32.class);
