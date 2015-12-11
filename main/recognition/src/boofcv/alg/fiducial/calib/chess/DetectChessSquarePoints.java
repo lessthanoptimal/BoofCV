@@ -44,8 +44,8 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 	BinaryPolygonDetector<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
-	SquaresIntoClusters s2c;
-	ClustersIntoGrids c2g;
+	SquaresIntoRegularClusters s2c;
+	RegularClustersIntoGrids c2g;
 
 	// size of square grids
 	private int outerRows,outerCols;
@@ -95,8 +95,8 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(1.0,Integer.MAX_VALUE, 1.35);
-		c2g = new ClustersIntoGrids(innerCols*innerRows);
+		s2c = new SquaresIntoRegularClusters(1.0,Integer.MAX_VALUE, 1.35);
+		c2g = new RegularClustersIntoGrids(innerCols*innerRows);
 	}
 
 	/**
@@ -493,11 +493,11 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		return clusters;
 	}
 
-	public SquaresIntoClusters getShapeToClusters() {
+	public SquaresIntoRegularClusters getShapeToClusters() {
 		return s2c;
 	}
 
-	public ClustersIntoGrids getGrids() {
+	public RegularClustersIntoGrids getGrids() {
 		return c2g;
 	}
 

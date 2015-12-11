@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.calib.grid;
 
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareGridTools;
-import boofcv.alg.fiducial.calib.squares.TestClustersIntoGrids;
+import boofcv.alg.fiducial.calib.squares.TestRegularClustersIntoGrids;
 import boofcv.alg.fiducial.calib.squares.TestSquareGridTools;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class TestDetectSquareGridFiducial {
 
 		assertEquals(4 * 3 * 4, list.size());
 
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		double x0 = -w/2;
 		double y0 = -w/2;

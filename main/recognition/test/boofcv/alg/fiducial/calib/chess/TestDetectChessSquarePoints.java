@@ -317,7 +317,7 @@ public class TestDetectChessSquarePoints {
 	}
 
 	private void checkCornerOrder( SquareGrid grid ) {
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		for (int row = 0; row < grid.rows; row++) {
 			for (int col = 0; col < grid.columns; col++) {
@@ -339,7 +339,7 @@ public class TestDetectChessSquarePoints {
 
 	@Test
 	public void orderCorner() {
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		SquareGrid uber = createUber(5, 5);
 
@@ -383,7 +383,7 @@ public class TestDetectChessSquarePoints {
 
 		DetectChessSquarePoints<ImageUInt8> alg = new DetectChessSquarePoints<ImageUInt8>(2,2,0.01,null);
 
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
@@ -416,7 +416,7 @@ public class TestDetectChessSquarePoints {
 		uber.columns = cols;
 		uber.rows = rows;
 
-		double w = TestClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				if( row%2 == 0 ) {

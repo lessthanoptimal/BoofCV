@@ -61,8 +61,8 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	BinaryPolygonDetector<T> detectorSquare;
 
 	// Converts detected squares into a graph and into grids
-	SquaresIntoClusters s2c;
-	ClustersIntoGrids c2g;
+	SquaresIntoRegularClusters s2c;
+	RegularClustersIntoGrids c2g;
 
 	// output results.  Grid of calibration points in row-major order
 	List<Point2D_F64> calibrationPoints = new ArrayList<Point2D_F64>();
@@ -93,8 +93,8 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		this.inputToBinary = inputToBinary;
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
-		c2g = new ClustersIntoGrids(numCols*numRows);
+		s2c = new SquaresIntoRegularClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
+		c2g = new RegularClustersIntoGrids(numCols*numRows);
 
 		calibRows = numRows*2;
 		calibCols = numCols*2;
@@ -198,11 +198,11 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		return clusters;
 	}
 
-	public SquaresIntoClusters getSquaresIntoClusters() {
+	public SquaresIntoRegularClusters getSquaresIntoClusters() {
 		return s2c;
 	}
 
-	public ClustersIntoGrids getGrids() {
+	public RegularClustersIntoGrids getGrids() {
 		return c2g;
 	}
 

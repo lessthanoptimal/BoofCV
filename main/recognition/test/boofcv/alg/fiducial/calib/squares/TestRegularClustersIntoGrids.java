@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestClustersIntoGrids {
+public class TestRegularClustersIntoGrids {
 
 	public static double DEFAULT_WIDTH = 1.2;
 	Random rand = new Random(23423);
@@ -44,7 +44,7 @@ public class TestClustersIntoGrids {
 			clusters.add(createGrid(length, length));
 		}
 
-		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 
 		alg.process(clusters);
 		assertEquals(4,alg.getGrids().size());
@@ -56,7 +56,7 @@ public class TestClustersIntoGrids {
 
 	@Test
 	public void checkNumberOfConnections_positive() {
-		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 
 		for (int numRows = 1; numRows <= 4; numRows++) {
 			for (int numCols = 1; numCols <= 4; numCols++) {
@@ -76,7 +76,7 @@ public class TestClustersIntoGrids {
 		List<SquareNode> nodes = createGrid(1, 2);
 		nodes.addAll( createGrid(2,3));
 
-		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 		assertEquals(0, alg.checkNumberOfConnections(nodes));
 	}
 
@@ -98,7 +98,7 @@ public class TestClustersIntoGrids {
 
 				Collections.shuffle(nodes, rand);
 
-				ClustersIntoGrids alg = new ClustersIntoGrids(1);
+				RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 				alg.orderIntoLine(nodes);
 				SquareGrid found = alg.valid.getTail();
 
@@ -122,7 +122,7 @@ public class TestClustersIntoGrids {
 
 				Collections.shuffle(nodes,rand);
 
-				ClustersIntoGrids alg = new ClustersIntoGrids(1);
+				RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 				alg.orderIntoGrid(nodes);
 				SquareGrid found = alg.valid.getTail();
 
@@ -149,7 +149,7 @@ public class TestClustersIntoGrids {
 		}
 
 		List<SquareNode> found = new ArrayList<SquareNode>();
-		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 
 		assertFalse(alg.addRowsToGrid(column, found));
 
@@ -165,7 +165,7 @@ public class TestClustersIntoGrids {
 		int numCols = 4;
 		List<SquareNode> nodes = createGrid(numRows, numCols);
 
-		ClustersIntoGrids alg = new ClustersIntoGrids(1);
+		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
 
 		List<SquareNode> row = new ArrayList<SquareNode>();
 		List<SquareNode> col = new ArrayList<SquareNode>();
@@ -188,10 +188,10 @@ public class TestClustersIntoGrids {
 
 	}
 
-	void checkAddLineToGrid(ClustersIntoGrids alg,SquareNode a, SquareNode b, List<SquareNode> list) {
+	void checkAddLineToGrid(RegularClustersIntoGrids alg, SquareNode a, SquareNode b, List<SquareNode> list) {
 		list.clear();
-		a.graph = ClustersIntoGrids.SEARCHED;
-		b.graph = ClustersIntoGrids.SEARCHED;
+		a.graph = RegularClustersIntoGrids.SEARCHED;
+		b.graph = RegularClustersIntoGrids.SEARCHED;
 		alg.addLineToGrid(a,b,list);
 	}
 
@@ -204,8 +204,8 @@ public class TestClustersIntoGrids {
 		connect(a, 0, b, 0);
 		connect(a, 1, c, 0);
 
-		assertTrue(c == ClustersIntoGrids.pickNot(a, b));
-		assertTrue(b == ClustersIntoGrids.pickNot(a, c));
+		assertTrue(c == RegularClustersIntoGrids.pickNot(a, b));
+		assertTrue(b == RegularClustersIntoGrids.pickNot(a, c));
 	}
 
 	@Test
@@ -219,9 +219,9 @@ public class TestClustersIntoGrids {
 		connect(a,1,c,0);
 		connect(a,2,d,0);
 
-		assertTrue(d == ClustersIntoGrids.pickNot(a, b, c));
-		assertTrue(b == ClustersIntoGrids.pickNot(a, c, d));
-		assertTrue(c == ClustersIntoGrids.pickNot(a, d, b));
+		assertTrue(d == RegularClustersIntoGrids.pickNot(a, b, c));
+		assertTrue(b == RegularClustersIntoGrids.pickNot(a, c, d));
+		assertTrue(c == RegularClustersIntoGrids.pickNot(a, d, b));
 	}
 
 	public static List<SquareNode> createGrid(int numRows, int numCols) {

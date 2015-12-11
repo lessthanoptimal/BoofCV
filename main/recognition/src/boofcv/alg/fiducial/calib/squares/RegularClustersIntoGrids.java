@@ -26,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Takes as input a set of unordered clusters and converts them into ordered grids with known numbers
+ * Takes as input a set of unordered regular connected clusters and converts them into ordered grids with known numbers
  * of rows and columns.
  *
  * @author Peter Abeles
  */
-public class ClustersIntoGrids {
+public class RegularClustersIntoGrids {
 
 	// Value of a node which has been searched already
 	static final int SEARCHED = 1;
@@ -48,7 +48,7 @@ public class ClustersIntoGrids {
 	 * Configures class
 	 * @param minimumElements The minimum number of elements which must be in a cluster for it to be accepted
 	 */
-	public ClustersIntoGrids( int minimumElements) {
+	public RegularClustersIntoGrids(int minimumElements) {
 		this.minimumElements = minimumElements;
 	}
 
