@@ -18,6 +18,8 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.misc.CircularIndex;
+
 import java.util.List;
 
 /**
@@ -49,7 +51,34 @@ public class CrossClustersIntoGrids {
 	}
 
 	protected void processCluster( List<SquareNode> cluster ) {
+		SquareNode seed = null;
 
+		for (int i = 0; i < cluster.size(); i++) {
+
+		}
+	}
+
+	/**
+	 * Trace along the edge until it can't move any more in that direction.  Returns the number of nodes
+	 * it traverses, excluding the seed.
+	 */
+	private int findLength( SquareNode n , int corner , int sign ) {
+		int length = 0;
+
+		SquareEdge e;
+		while( (e = n.edges[corner]) != null ) {
+			if( e.a == n ) {
+				n = e.b;
+				corner = e.sideB;
+			} else {
+				n = e.a;
+				corner = e.sideA;
+			}
+			sign *= -1;
+			corner = CircularIndex.addOffset(corner,sign,4);
+		}
+
+		return length;
 	}
 
 }
