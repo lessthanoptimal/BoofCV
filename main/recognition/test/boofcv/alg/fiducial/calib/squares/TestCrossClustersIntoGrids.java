@@ -30,4 +30,29 @@ public class TestCrossClustersIntoGrids {
 	public void stuff() {
 		fail("implement");
 	}
+
+	@Test
+	public void addNextRow() {
+		fail("implement");
+	}
+
+	@Test
+	public void lowerEdgeIndex() {
+		fail("implement");
+	}
+
+	@Test
+	public void isOpenEdge() {
+		fail("implement");
+	}
+
+	@Test
+	public void addToRow() {
+		fail("implement");
+	}
+
+	@Test
+	public void findSeedNode() {
+		fail("implement");
+	}
 }
