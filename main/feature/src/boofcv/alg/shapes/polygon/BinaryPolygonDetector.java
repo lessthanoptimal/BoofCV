@@ -60,7 +60,7 @@ import java.util.List;
  * <p>
  * The returned polygons will encompass the entire black polygon.  Here is a simple example in 1D. If all pixels are
  * white, but pixels ranging from 5 to 10, inclusive, then the returned boundaries would be 5.0 to 11.0.  This
- * means that coordinates 5.0 &le; x < 11.0 are all black.  11.0 is included, but note that the entire pixel 11 is white.
+ * means that coordinates 5.0 &le; x &lt; 11.0 are all black.  11.0 is included, but note that the entire pixel 11 is white.
  * </p>
  *
  * @author Peter Abeles
@@ -117,7 +117,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform_F32 toUndistorted, toDistorted;
 
-	boolean verbose = false;
+	boolean verbose = true;
 
 	// used to remove false positives
 	PolygonEdgeIntensity<T> edgeIntensity;
@@ -400,7 +400,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		if(!edgeIntensity.checkIntensity(true,edgeThreshold)) {
 			if( verbose ) {
 				double inside = edgeIntensity.getAverageInside();
-				double outside = edgeIntensity.getAverageInside();
+				double outside = edgeIntensity.getAverageOutside();
 				System.out.println("Rejected edge score inside: " + inside+" "+outside);
 			}
 			return false;
