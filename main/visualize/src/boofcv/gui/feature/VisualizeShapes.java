@@ -146,6 +146,24 @@ public class VisualizeShapes {
 		}
 	}
 
+	public static<T extends Point2D_I32> void drawPolygon( List<T> vertexes, boolean loop,double scale,  Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Line2D.Double l = new Line2D.Double();
+
+		for( int i = 0; i < vertexes.size()-1; i++ ) {
+			Point2D_I32 p0 = vertexes.get(i);
+			Point2D_I32 p1 = vertexes.get(i+1);
+			drawLine(g2, l, scale*(p0.x+0.5),  scale*(p0.y+0.5),  scale*(p1.x+0.5),  scale*(p1.y+0.5));
+		}
+		if( loop && vertexes.size() > 0) {
+			Point2D_I32 p0 = vertexes.get(0);
+			Point2D_I32 p1 = vertexes.get(vertexes.size()-1);
+			drawLine(g2, l, scale*(p0.x+0.5), scale*(p0.y+0.5), scale*(p1.x+0.5),scale*(p1.y+0.5));
+		}
+	}
+
 	/**
 	 * Draws a polygon
 	 *
@@ -242,6 +260,21 @@ public class VisualizeShapes {
 
 		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
 		shape = AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y).createTransformedShape(shape);
+
+		g2.draw(shape);
+	}
+
+	public static void drawEllipse( EllipseRotated_F64 ellipse , double scale , Graphics2D g2 ) {
+
+		AffineTransform rotate = new AffineTransform();
+		rotate.rotate(ellipse.phi);
+
+		double w = scale*ellipse.a*2;
+		double h = scale*ellipse.b*2;
+
+
+		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
+		shape = AffineTransform.getTranslateInstance(scale*ellipse.center.x,scale*ellipse.center.y).createTransformedShape(shape);
 
 		g2.draw(shape);
 	}

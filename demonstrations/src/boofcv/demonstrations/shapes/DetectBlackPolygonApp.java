@@ -225,6 +225,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add("shapes/shapes01.png");
 		examples.add("shapes/shapes02.png");
 		examples.add("shapes/concave01.jpg");
+		examples.add("shapes/line_text_test_image.png");
 		examples.add("shapes/polygons_border_01.jpg");
 		examples.add("fiducial/binary/image0000.jpg");
 		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");

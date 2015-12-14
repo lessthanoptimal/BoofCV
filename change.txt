@@ -32,6 +32,7 @@ Version : Alpha 0.21
   * A pixel inside the border can have a value larger than one inside and prevent it from being considered
     an extreme
 - FactoryPlanarCalibrationTarget renamed to FactoryCalibrationTarget
+- Improved visualization in ShapeFitContourApp
 
 - TODO Polygon reject shapes if final polygon doesn't match the initial contour at all
 - TODO SIFT  dense

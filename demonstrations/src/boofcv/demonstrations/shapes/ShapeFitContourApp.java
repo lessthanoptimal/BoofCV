@@ -18,33 +18,31 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
-import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.PathLabel;
-import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,189 +52,101 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ShapeFitContourApp
-		extends SelectAlgorithmAndInputPanel implements ChangeListener
+		extends DemonstrationBase<ImageUInt8>
+		implements ThresholdControlPanel.Listener
 {
 	// displays intensity image
-	ImagePanel gui;
+	VisualizePanel gui = new VisualizePanel();
 
 	// converted input image
-	ImageUInt8 input = new ImageUInt8(1,1);
+	ImageUInt8 inputPrev = new ImageUInt8(1,1);
 	ImageUInt8 binary = new ImageUInt8(1,1);
 	ImageUInt8 filtered = new ImageUInt8(1,1);
 	// if it has processed an image or not
 	boolean processImage = false;
 
-	// rendered output image
-	BufferedImage output;
+	InputToBinary<ImageUInt8> inputToBinary;
 
 	// Found contours
 	List<Contour> contours;
 
-	// parameters for polygon fitting
-	double minimumSplitFraction = 0.01;
-	double splitFraction = 0.05;
+	BufferedImage original;
+	BufferedImage work = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 
-	boolean cornersVisible = false;
+	ShapeFitContourPanel controlPanel;
 
-	JPanel leftArea;
-	StandardAlgConfigPanel controlPolygon = new StandardAlgConfigPanel();
+	public ShapeFitContourApp(List<String> examples ) {
+		super(examples, ImageType.single(ImageUInt8.class));
 
-	JSpinner selectMinimumSideFraction;
-	JSpinner selectSplitFraction;
-	JCheckBox showCorners;
+		controlPanel = new ShapeFitContourPanel(this);
 
-	int previousActive=-1;
+		add(BorderLayout.WEST, controlPanel);
+		add(BorderLayout.CENTER, gui);
 
-	public ShapeFitContourApp() {
-		super(1);
-
-		addAlgorithm(0, "Polygon", 0);
-		addAlgorithm(0, "Ellipse", 1);
-
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BorderLayout());
-
-		leftArea = new JPanel();
-		leftArea.setLayout(new BorderLayout());
-		leftArea.setPreferredSize(new Dimension(150, 20));
-
-		selectMinimumSideFraction = new JSpinner(new SpinnerNumberModel(minimumSplitFraction,0,0.999,0.0025));
-		selectMinimumSideFraction.setEditor(new JSpinner.NumberEditor(selectMinimumSideFraction, "#,####0.0000;(#,####0.0000)"));
-		selectMinimumSideFraction.addChangeListener(this);
-		selectMinimumSideFraction.setMaximumSize(selectMinimumSideFraction.getPreferredSize());
-		selectSplitFraction = new JSpinner(new SpinnerNumberModel(splitFraction,0,1.0,0.01));
-		selectSplitFraction.setEditor(new JSpinner.NumberEditor(selectSplitFraction, "#,##0.00;(#,##0.00)"));
-//		JComponent editor = selectSplitFraction.getEditor();
-//		JFormattedTextField ftf = ((JSpinner.DefaultEditor) editor).getTextField();
-//		ftf.setColumns(3);
-		showCorners = new JCheckBox();
-		showCorners.setSelected(cornersVisible);
-		showCorners.addChangeListener(this);
-
-		selectSplitFraction.addChangeListener(this);
-		selectSplitFraction.setMaximumSize(selectSplitFraction.getPreferredSize());
-
-		controlPolygon.addLabeled(selectMinimumSideFraction, "Min Side", controlPolygon);
-		controlPolygon.addLabeled(selectSplitFraction, "Split", controlPolygon);
-		controlPolygon.addLabeled(showCorners, "Corners", controlPolygon);
-		controlPolygon.addVerticalGlue(controlPolygon);
-
-		gui = new ImagePanel();
-
-		mainPanel.add(BorderLayout.WEST,leftArea);
-		mainPanel.add(BorderLayout.CENTER,gui);
-		setMainGUI(mainPanel);
+		ConfigThreshold config = controlPanel.getThreshold().config;
+		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( contours == null )
-			return;
+	public synchronized void processImage(final BufferedImage buffered, ImageUInt8 input ) {
+		if( buffered != null ) {
+			original = conditionalDeclare(buffered,original);
+			work = conditionalDeclare(buffered,work);
 
-		// display original image
-		if( originalCheck.isSelected() ) {
+			this.original.createGraphics().drawImage(buffered,0,0,null);
+
+			binary.reshape(input.getWidth(), input.getHeight());
+			filtered.reshape(input.getWidth(),input.getHeight());
+			inputPrev.setTo(input);
+
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					gui.setBufferedImage(inputImage);
-					gui.repaint();
-					gui.requestFocusInWindow();
-				}
-			});
-			return;
-		}
-
-		// display fit results
-		Graphics2D g2 = output.createGraphics();
-		g2.drawImage(inputImage,0,0,null);
-		g2.setStroke(new BasicStroke(3));
-
-		final int active = (Integer)cookie;
-		if( active == 0 ) {
-
-			for( Contour c : contours ) {
-				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true, splitFraction, minimumSplitFraction, 100);
-
-				g2.setColor(Color.RED);
-				VisualizeShapes.drawPolygon(vertexes, true, g2);
-
-				if( cornersVisible ) {
-					drawCorners(g2, vertexes);
-				}
-
-				for (List<Point2D_I32> internal : c.internal) {
-					g2.setColor(Color.BLUE);
-					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplitFraction, 100);
-					VisualizeShapes.drawPolygon(vertexes, true, g2);
-
-					if( cornersVisible ) {
-						drawCorners(g2, vertexes);
+					Dimension d = gui.getPreferredSize();
+					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+						gui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
 					}
-				}
-			}
-		} else if( active == 1 ) {
-
-			// Filter small contours since they can generate really wacky ellipses
-			for( Contour c : contours ) {
-				if( c.external.size() > 10) {
-					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external,0,false,null);
-
-					g2.setColor(Color.RED);
-					VisualizeShapes.drawEllipse(ellipse.shape, g2);
-				}
-
-				g2.setColor(Color.BLUE);
-				for( List<Point2D_I32> internal : c.internal ) {
-					if( internal.size() < 10)
-						continue;
-					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(internal, 0, false, null);
-					VisualizeShapes.drawEllipse(ellipse.shape, g2);
-				}
-			}
+				}});
+		} else {
+			input = inputPrev;
 		}
 
-		if( previousActive != active ) {
-			if( active == 0 ) {
-				leftArea.add(controlPolygon);
-			} else {
-				leftArea.remove(controlPolygon);
-			}
-			leftArea.revalidate();
-			leftArea.repaint();
-			previousActive = active;
+		process(input);
+	}
+
+	public synchronized void viewUpdated() {
+		if( contours == null )
+			return;
+
+		int view = controlPanel.getSelectedView();
+
+		Graphics2D g2 = work.createGraphics();
+
+		if( view == 0 ) {
+			g2.drawImage(original, 0, 0, null);
+		} else if( view == 1 ){
+			VisualizeBinaryData.renderBinary(binary,false,work);
+		} else {
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0,0,work.getWidth(),work.getHeight());
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				gui.setBufferedImage(output);
+				gui.setBufferedImage(work);
+				gui.setScale(controlPanel.getZoom());
 				gui.repaint();
 				gui.requestFocusInWindow();
 			}
 		});
 	}
 
-	private void drawCorners(Graphics2D g2, List<PointIndex_I32> vertexes) {
-		for (int i = 0; i < vertexes.size(); i++) {
-			Point2D_I32 p = vertexes.get(i);
-			VisualizeFeatures.drawPoint(g2, p.x, p.y, 3, Color.GREEN, false);
-			VisualizeFeatures.drawPoint(g2, p.x, p.y, 2, Color.BLACK, false);
-		}
-	}
 
-	public void process( final BufferedImage input ) {
-		setInputImage(input);
-		this.input.reshape(input.getWidth(),input.getHeight());
-		ConvertBufferedImage.convertFromSingle(input, this.input, ImageUInt8.class);
-		this.binary.reshape(input.getWidth(), input.getHeight());
-		this.filtered.reshape(input.getWidth(),input.getHeight());
-		this.output = new BufferedImage( input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
+	public void process( final ImageUInt8 input ) {
 
-		// the mean pixel value is often a reasonable threshold when creating a binary image
-		double mean = ImageStatistics.mean(this.input);
-
-		// create a binary image by thresholding
-		GThresholdImageOps.threshold(this.input, binary, mean, true);
+		// threshold the input image
+		inputToBinary.process(input,binary);
 
 		// reduce noise with some filtering
 		BinaryImageOps.erode8(binary, 1, filtered);
@@ -244,74 +154,102 @@ public class ShapeFitContourApp
 
 		// Find the contour around the shapes
 		contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT,null);
+		processImage = true;
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
-				processImage = true;
-			}});
-		doRefreshAll();
+		viewUpdated();
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+	public void imageThresholdUpdated() {
+		ConfigThreshold config = controlPanel.getThreshold().config;
+		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
+		processImageThread(null,null);
 	}
 
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
+	protected void renderVisuals( Graphics2D g2 , double scale ) {
 
-		if( image != null ) {
-			process(image);
+		int activeAlg = controlPanel.getSelectedAlgorithm();
+
+
+		g2.setStroke(new BasicStroke(3));
+
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		if( controlPanel.contoursVisible ) {
+			g2.setStroke(new BasicStroke(1));
+			g2.setColor(new Color(0, 100, 0));
+			VisualizeBinaryData.renderExternal(contours, scale, g2);
+		}
+
+		if( activeAlg == 0 ) {
+
+			double splitFraction = controlPanel.getSplitFraction();
+			double minimumSplitFraction = controlPanel.getMinimumSplitFraction();
+
+			for( Contour c : contours ) {
+				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(
+						c.external, true, splitFraction, minimumSplitFraction, 100);
+
+				g2.setColor(Color.RED);
+				g2.setStroke(new BasicStroke(2));
+				VisualizeShapes.drawPolygon(vertexes, true,scale, g2);
+
+				if( controlPanel.isCornersVisible() ) {
+					g2.setColor(Color.BLUE);
+					g2.setStroke(new BasicStroke(2f));
+					for (PointIndex_I32 p : vertexes) {
+						VisualizeFeatures.drawCircle(g2, scale * (p.x+0.5), scale * (p.y+0.5), 5);
+					}
+				}
+			}
+		} else if( activeAlg == 1 ) {
+			// Filter small contours since they can generate really wacky ellipses
+			for( Contour c : contours ) {
+				if( c.external.size() > 10) {
+					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external,0,false,null);
+
+					g2.setColor(Color.RED);
+					g2.setStroke(new BasicStroke(2.5f));
+					VisualizeShapes.drawEllipse(ellipse.shape,scale, g2);
+				}
+
+				for( List<Point2D_I32> internal : c.internal ) {
+					if( internal.size() <= 10 )
+						continue;
+					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(internal,0,false,null);
+
+					g2.setColor(Color.GREEN);
+					g2.setStroke(new BasicStroke(2.5f));
+					VisualizeShapes.drawEllipse(ellipse.shape,scale, g2);
+				}
+			}
 		}
 	}
 
-	@Override
-	public boolean getHasProcessedImage() {
-		return processImage;
-	}
+	class VisualizePanel extends ImageZoomPanel {
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			synchronized ( ShapeFitContourApp.this ) {
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// hijack the show original image event and handle it inside this class
-		if( e.getSource() != originalCheck  ) {
-			super.actionPerformed(e);
-		} else {
-			doRefreshAll();
+				renderVisuals(g2,scale);
+			}
 		}
 	}
 
 	public static void main( String args[] ) {
 
-		ShapeFitContourApp app = new ShapeFitContourApp();
+		List<String> examples = new ArrayList<String>();
+		examples.add("particles01.jpg");
+		examples.add("shapes/shapes02.png");
+		examples.add("shapes/line_text_test_image.png");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		ShapeFitContourApp app = new ShapeFitContourApp(examples);
 
-		inputs.add(new PathLabel("Particles", UtilIO.pathExample("particles01.jpg")));
-		inputs.add(new PathLabel("Shapes",UtilIO.pathExample("shapes/shapes02.png")));
-		app.setInputList(inputs);
+		app.openFile(new File(examples.get(0)));
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
+		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app,"Shape Fitting", true);
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectMinimumSideFraction) {
-			minimumSplitFraction = (Double) selectMinimumSideFraction.getValue();
-		} else if( e.getSource() == selectSplitFraction) {
-			splitFraction = (Double) selectSplitFraction.getValue();
-		} else if( e.getSource() == showCorners ) {
-			cornersVisible = showCorners.isSelected();
-		}
-		doRefreshAll();
+		ShowImages.showWindow(app,"Contour Shape Fitting",true);
 	}
 }

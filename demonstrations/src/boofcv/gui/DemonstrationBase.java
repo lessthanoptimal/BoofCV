@@ -172,9 +172,14 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		if( output == null ||
 				output.getWidth() != template.getWidth() ||
 				output.getHeight() != template.getHeight() ) {
-			int type = template.getType();
-			if( type == 0 ) {
-				type = BufferedImage.TYPE_INT_RGB;
+			int type;
+			if( output == null ) {
+				type = template.getType();
+				if (type == 0) {
+					type = BufferedImage.TYPE_INT_RGB;
+				}
+			} else {
+				type = output.getType();
 			}
 			output = new BufferedImage(template.getWidth(),template.getHeight(),type);
 		}
