@@ -134,10 +134,8 @@ public class ShapeFitContourApp
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				gui.setBufferedImage(work);
 				gui.setScale(controlPanel.getZoom());
-				gui.repaint();
-				gui.requestFocusInWindow();
+				gui.setBufferedImage(work);
 			}
 		});
 	}
@@ -192,15 +190,13 @@ public class ShapeFitContourApp
 						c.external, true, splitFraction, minimumSplitFraction, 100);
 
 				g2.setColor(Color.RED);
-				g2.setStroke(new BasicStroke(2));
-				VisualizeShapes.drawPolygon(vertexes, true,scale, g2);
+				visualizePolygon(g2, scale, vertexes);
 
-				if( controlPanel.isCornersVisible() ) {
-					g2.setColor(Color.BLUE);
-					g2.setStroke(new BasicStroke(2f));
-					for (PointIndex_I32 p : vertexes) {
-						VisualizeFeatures.drawCircle(g2, scale * (p.x+0.5), scale * (p.y+0.5), 5);
-					}
+				for( List<Point2D_I32> internal : c.internal ) {
+					vertexes = ShapeFittingOps.fitPolygon(internal, true, splitFraction, minimumSplitFraction, 100);
+
+					g2.setColor(Color.GREEN);
+					visualizePolygon(g2, scale, vertexes);
 				}
 			}
 		} else if( activeAlg == 1 ) {
@@ -223,6 +219,19 @@ public class ShapeFitContourApp
 					g2.setStroke(new BasicStroke(2.5f));
 					VisualizeShapes.drawEllipse(ellipse.shape,scale, g2);
 				}
+			}
+		}
+	}
+
+	private void visualizePolygon(Graphics2D g2, double scale, List<PointIndex_I32> vertexes) {
+		g2.setStroke(new BasicStroke(2));
+		VisualizeShapes.drawPolygon(vertexes, true,scale, g2);
+
+		if( controlPanel.isCornersVisible() ) {
+			g2.setColor(Color.BLUE);
+			g2.setStroke(new BasicStroke(2f));
+			for (PointIndex_I32 p : vertexes) {
+				VisualizeFeatures.drawCircle(g2, scale * (p.x+0.5), scale * (p.y+0.5), 5);
 			}
 		}
 	}

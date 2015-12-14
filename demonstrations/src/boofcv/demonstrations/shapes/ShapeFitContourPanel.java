@@ -101,10 +101,11 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 		selectSplitFraction.addChangeListener(this);
 		selectSplitFraction.setMaximumSize(selectSplitFraction.getPreferredSize());
 
-		addLabeled(algorithmCombo, "Type: ", this);
-		addLabeled(imageView, "View: ", this);
+		addLabeled(algorithmCombo, "Type of Shape", this);
+		addSeparator(200);
+		addLabeled(imageView, "Background", this);
 		addLabeled(selectZoom,"Zoom",this);
-		add(threshold);
+		addAlignCenter(threshold,this);
 		addLabeled(selectMinimumSideFraction, "Min Side Fraction", this);
 		addLabeled(selectSplitFraction, "Split Fraction",this);
 		addAlignLeft(showCorners, this);
