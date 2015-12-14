@@ -16,10 +16,13 @@ Version : Alpha 0.21
   * Output to a file is a possibility
 - Renamed SurfFeature to BrightFeature
   * Used by SURF and SIFT, so the name was made more generic
-- Complete rewrite of SIFT
+- SIFT
+  * Complete rewrite of detector and descriptor
   * Very similar to original paper by Lowe
   * One common difference is the use of quadratic interpolation instead of the overly complex thing that
     Lowe proposed
+- Dense SIFT
+  * Optimized code for computing dense descriptors at a fixed scale in a grid across the entire image
 - Black polygon detector
   * can now handle features along image border
   * fixed a couple of bugs inside refine function too
@@ -35,13 +38,12 @@ Version : Alpha 0.21
 - Improved visualization in ShapeFitContourApp
 
 - TODO Polygon reject shapes if final polygon doesn't match the initial contour at all
-- TODO SIFT  dense
 - TODO Update chessboard to create grid from connecting corners of squares
-- TODO Have binary threshold be computed from known black/white regions?
 - TODO Assisted Calibration - remove images after collected
 - TODO                      - change calibration settings and recompute
 - TODO CameraCalibration should handle video sequences and disable still images
-
+- TODO See if contour can be improved by splitting line then applying the rule to each half
+- TODO             create a few more unit tests which highlight this issue
 ---------------------------------------------
 Date    : 2015/11/09
 Version : Alpha 0.20

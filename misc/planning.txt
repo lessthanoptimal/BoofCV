@@ -20,6 +20,10 @@ Alpha 0.21
   * Ability to change calibration model and recompute
   * Ability to remove images and recompute
 
+Alpha 0.21
+
+- HOG
+
 Future
 
 - Dense Features
@@ -45,9 +49,6 @@ Future
   * GMM model
   * Shadow removal
   * remove support for MultiSpectral once Interleaved is supported enough
-
-- Dense SIFT
-  * Fix SIFT
 
 - Unit test for getScaleAtRadius
   * Implement universally

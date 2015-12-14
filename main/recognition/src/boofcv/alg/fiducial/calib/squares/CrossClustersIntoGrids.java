@@ -152,7 +152,7 @@ public class CrossClustersIntoGrids {
 	/**
 	 * Returns the index which comes first.  Assuming that there are two options
 	 */
-	private int lowerEdgeIndex( SquareNode node ) {
+	static int lowerEdgeIndex( SquareNode node ) {
 		if( isOpenEdge(node,0) ) {
 			if( isOpenEdge(node,1)) {
 				return 0;
@@ -175,7 +175,7 @@ public class CrossClustersIntoGrids {
 	 * Is the edge open and can be traversed to?  Can't be null and can't have
 	 * the marker modified.
 	 */
-	private boolean isOpenEdge( SquareNode node , int index ) {
+	static boolean isOpenEdge( SquareNode node , int index ) {
 		if( node.edges[index] == null )
 			return false;
 		int marker = node.edges[index].destination(node).graph;
@@ -183,7 +183,7 @@ public class CrossClustersIntoGrids {
 	}
 
 	/**
-	 * Given a node and the corner to the next node, add to the list every other node until
+	 * Given a node and the corner to the next node down the line, add to the list every other node until
 	 * it hits the end of the row.
 	 * @param n Initial node
 	 * @param corner Which corner points to the next node
@@ -191,7 +191,7 @@ public class CrossClustersIntoGrids {
 	 * @param skip true = start adding nodes at second, false = start first.
 	 * @param row List that the nodes are placed into
 	 */
-	private void addToRow( SquareNode n , int corner , int sign , boolean skip ,
+	static void addToRow( SquareNode n , int corner , int sign , boolean skip ,
 						   List<SquareNode> row ) {
 		SquareEdge e;
 		while( (e = n.edges[corner]) != null ) {
@@ -214,7 +214,7 @@ public class CrossClustersIntoGrids {
 	/**
 	 * Finds a seed with 1 or 2 edges.
 	 */
-	private SquareNode findSeedNode(List<SquareNode> cluster) {
+	static SquareNode findSeedNode(List<SquareNode> cluster) {
 		SquareNode seed = null;
 
 		for (int i = 0; i < cluster.size(); i++) {
