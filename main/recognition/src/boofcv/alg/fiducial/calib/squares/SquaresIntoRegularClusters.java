@@ -34,7 +34,6 @@ import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.RecycleManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,7 +57,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	// ratio of the length of a square to the distance separating the square
 	private double spaceToSquareRatio;
 
-	FastQueue<SquareNode> nodes = new FastQueue<SquareNode>(SquareNode.class,true);
 	protected RecycleManager<SquareEdge> edges = new RecycleManager<SquareEdge>(SquareEdge.class);
 
 	// Storage for line segments used to calculate center
@@ -73,11 +71,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	private FastQueue<double[]> searchPoints;
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
-	// storage for found clusters
-	private FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList.class,true);
-
-	// storage for open list when clustering points
-	List<SquareNode> open = new ArrayList<SquareNode>();
 
 	/**
 	 * Declares data structures and configures algorithm
