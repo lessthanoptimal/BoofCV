@@ -113,25 +113,42 @@ public class CrossClustersIntoGrids {
 
 		addToRow(seed,indexLower,-1,true,listDown);
 
-		for (int i = listDown.size()-1; i >= 0; i--) {
-			list.add(listDown.get(i));
-		}
+		flipAdd(listDown, list);
 		list.add(seed);
 		addToRow(seed,indexUpper,1,true,list);
 
 		return list;
 	}
 
-	private boolean addNextRow( SquareNode seed , List<List<SquareNode>> grid ) {
+	/**
+	 * Given a node, add all the squares in the row directly below it.  They will be ordered from "left" to "right".  The
+	 * seed node can be anywhere in the row, e.g. middle, start, end.
+	 */
+	boolean addNextRow( SquareNode seed , List<List<SquareNode>> grid ) {
 		List<SquareNode> row = new ArrayList<SquareNode>();
+		List<SquareNode> tmp = new ArrayList<SquareNode>();
 
 		int numConnections = seed.getNumberOfConnections();
 		if( numConnections == 0 ) {
-			return true;
+			row.add(seed);
 		} else if( numConnections == 1 ) {
 			for (int i = 0; i < 4; i++) {
-				if( isOpenEdge(seed,i)) {
-					addToRow(seed,i,-1,false,row);
+				SquareEdge edge = seed.edges[i];
+				if( edge != null ) {
+					int corner = edge.destinationSide(seed);
+					int l = addOffset(corner,-1,4);
+					int u = addOffset(corner, 1,4);
+
+					// determine which direction to traverse along
+					SquareNode dst = edge.destination(seed);
+					if( dst.edges[l] != null ) {
+						addToRow(seed,i, 1,false,tmp);
+						flipAdd(tmp, row);
+					} else if( dst.edges[u] != null ){
+						addToRow(seed,i, -1,false,row);
+					} else {
+						row.add(dst);
+					}
 					break;
 				}
 			}
@@ -139,14 +156,21 @@ public class CrossClustersIntoGrids {
 			int indexLower = lowerEdgeIndex(seed);
 			int indexUpper = addOffset(indexLower,1,4);
 
-			row.add( seed.edges[indexLower].destination(seed) );
-			addToRow(seed,indexUpper,-1,false,row);
+			addToRow(seed,indexUpper, 1,false,tmp);
+			flipAdd(tmp, row);
+			addToRow(seed,indexLower,-1,false,row);
 		} else {
 			failed = true;
 			return false;
 		}
 		grid.add(row);
 		return true;
+	}
+
+	private void flipAdd(List<SquareNode> tmp, List<SquareNode> row) {
+		for (int i = tmp.size()-1;i>=0; i--) {
+			row.add( tmp.get(i));
+		}
 	}
 
 	/**
@@ -173,7 +197,7 @@ public class CrossClustersIntoGrids {
 
 	/**
 	 * Is the edge open and can be traversed to?  Can't be null and can't have
-	 * the marker modified.
+	 * the marker set to a none RESET_GRAPH value.
 	 */
 	static boolean isOpenEdge( SquareNode node , int index ) {
 		if( node.edges[index] == null )

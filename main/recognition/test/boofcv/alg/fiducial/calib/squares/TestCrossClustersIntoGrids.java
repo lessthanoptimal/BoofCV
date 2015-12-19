@@ -24,31 +24,89 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestCrossClustersIntoGrids {
 	@Test
-	public void stuff() {
+	public void processCluster() {
 		fail("implement");
 	}
 
 	@Test
 	public void addNextRow() {
-		fail("implement");
+
+		// X X X X X
+		//  X X X X
+		checkAddNextRow(false,5,4);
+
+		//  X X X X
+		// X X X X X
+		checkAddNextRow(true,4,5);
+
+		// X
+		//  x
+		checkAddNextRow(false,1,1);
+
+		//  X
+		// x
+		checkAddNextRow(true,1,1);
 	}
+
+	private void checkAddNextRow( boolean skip , int top , int bottom  )
+	{
+		List<SquareNode> cluster = createGraph(skip,top,bottom);
+		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+		List<List<SquareNode>> ordered = new ArrayList<List<SquareNode>>();
+		for (int i = 0; i < top; i++) {
+			alg.addNextRow(cluster.get(i),ordered);
+
+			List<SquareNode> found = ordered.remove( ordered.size()-1);
+			assertEquals(bottom,found.size());
+
+			for (int j = 0; j < bottom; j++) {
+				assertTrue(j+"",cluster.get(top+j)==found.get(j));
+			}
+		}
+	}
+
 
 	@Test
 	public void lowerEdgeIndex() {
-		fail("implement");
+		for (int first = 0; first < 4; first++) {
+			int second = (first+1)%4;
+
+			SquareNode node = new SquareNode();
+			connect(node,first,new SquareNode(),0);
+			node.edges[first].b.graph = SquareNode.RESET_GRAPH;
+
+			connect(node,second,new SquareNode(),0);
+			node.edges[second].b.graph = SquareNode.RESET_GRAPH;
+
+			assertEquals(first,CrossClustersIntoGrids.lowerEdgeIndex(node));
+		}
 	}
 
 	@Test
 	public void isOpenEdge() {
-		fail("implement");
+		SquareNode node = new SquareNode();
+
+		for (int i = 0; i < 4; i++) {
+			assertFalse(CrossClustersIntoGrids.isOpenEdge(node,i));
+		}
+		for (int i = 0; i < 4; i++) {
+			connect(node,i,new SquareNode(),i);
+		}
+		for (int i = 0; i < 4; i++) {
+			assertFalse(CrossClustersIntoGrids.isOpenEdge(node,i));
+		}
+		for (int i = 0; i < 4; i++) {
+			node.edges[i].b.graph = SquareNode.RESET_GRAPH;
+			assertTrue(CrossClustersIntoGrids.isOpenEdge(node,i));
+			node.edges[i].b.graph = 0;
+		}
 	}
 
 	@Test
@@ -121,6 +179,7 @@ public class TestCrossClustersIntoGrids {
 		List<SquareNode> out = new ArrayList<SquareNode>();
 		for (int i = 0; i < top + bottom; i++) {
 			out.add( new SquareNode());
+			out.get(i).graph = SquareNode.RESET_GRAPH;
 		}
 
 		for (int i = 0; i < top; i++) {

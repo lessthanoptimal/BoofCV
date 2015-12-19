@@ -47,6 +47,15 @@ public class SquareEdge {
 			throw new IllegalArgumentException("BUG! src is not a or b");
 	}
 
+	public int destinationSide(SquareNode src) {
+		if( a == src )
+			return sideB;
+		else if( b == src )
+			return sideA;
+		else
+			throw new IllegalArgumentException("BUG! src is not a or b");
+	}
+
 	/**
 	 * Discards previous settings.
 	 */
