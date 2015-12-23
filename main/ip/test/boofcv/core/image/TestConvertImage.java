@@ -32,6 +32,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class TestConvertImage {
 
 	Random rand = new Random(34);
@@ -68,14 +69,19 @@ public class TestConvertImage {
 			count++;
 		}
 
-		assertEquals(8*7 + 8*7+8+8,count);
+		assertEquals(8*7 + 8*7 +8+8+8+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
 		if( ImageSingleBand.class.isAssignableFrom(inputType) ) {
-			checkConvertSingle(m,inputType,outputType);
+			checkConvertSingle(m, inputType, outputType);
+		} else if( ImageInterleaved.class.isAssignableFrom(inputType)) {
+			if( ImageInterleaved.class.isAssignableFrom(outputType) )
+				checkConvertInterleaved(m, inputType, outputType);
+			else
+				checkConvertInterleavedToMulti(m, inputType, outputType);
 		} else {
-			checkConvertInterleaved(m, inputType, outputType);
+			checkConvertMultiToInterleaved(m,inputType,outputType);
 		}
 
 	}
@@ -146,6 +152,84 @@ public class TestConvertImage {
 	public void checkConvertInterleaved( Method m , ImageInterleaved<?> input , ImageInterleaved<?> output ) {
 		try {
 			double tol = selectTolerance(input,output);
+
+			// check it with a non-null output
+			ImageInterleaved<?> ret = (ImageInterleaved<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
+
+			// check it with a null output
+			ret = (ImageInterleaved<?>)m.invoke(null,input,null);
+			BoofTesting.assertEquals(input, ret, tol);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkConvertInterleavedToMulti( Method m , Class inputType , Class outputType ) {
+		ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType, imgWidth, imgHeight,2);
+
+		Class bandType = ImageDataType.typeToSingleClass(input.getDataType());
+		MultiSpectral output = new MultiSpectral(bandType,imgWidth, imgHeight, 2);
+
+		boolean inputSigned = true;
+
+		if( input.getImageType().getDataType().isInteger() )
+			inputSigned = input.getDataType().isSigned();
+
+		// only provide signed numbers of both data types can handle them
+		if( inputSigned ) {
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		}
+
+		BoofTesting.checkSubImage(this, "checkConvertInterleavedToMulti", true, m, input, output);
+	}
+
+	public void checkConvertInterleavedToMulti( Method m , ImageInterleaved<?> input , MultiSpectral<?> output ) {
+		try {
+			double tol = 1e-4;
+
+			// check it with a non-null output
+			MultiSpectral<?> ret = (MultiSpectral<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
+
+			// check it with a null output
+			ret = (MultiSpectral<?>)m.invoke(null,input,null);
+			BoofTesting.assertEquals(input, ret, tol);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void checkConvertMultiToInterleaved( Method m , Class inputType , Class outputType ) {
+		ImageInterleaved output = GeneralizedImageOps.createInterleaved(outputType, imgWidth, imgHeight,2);
+
+		Class bandType = ImageDataType.typeToSingleClass(output.getDataType());
+		MultiSpectral input = new MultiSpectral(bandType,imgWidth, imgHeight, 2);
+
+		boolean signed = true;
+
+		if( input.getImageType().getDataType().isInteger() )
+			signed = output.getDataType().isSigned();
+
+		// only provide signed numbers of both data types can handle them
+		if( signed ) {
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		}
+
+		BoofTesting.checkSubImage(this, "checkConvertMultiToInterleaved", true, m, input, output);
+	}
+
+	public void checkConvertMultiToInterleaved( Method m , MultiSpectral<?> input , ImageInterleaved<?> output ) {
+		try {
+			double tol = 1e-4;
 
 			// check it with a non-null output
 			ImageInterleaved<?> ret = (ImageInterleaved<?>)m.invoke(null,input,output);

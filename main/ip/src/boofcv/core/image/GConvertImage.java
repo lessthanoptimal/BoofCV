@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class GConvertImage {
 
 	/**
@@ -101,7 +102,12 @@ public class GConvertImage {
 				average(mi,so);
 			}
 		} else if( input instanceof MultiSpectral && output instanceof ImageInterleaved )  {
-			throw new RuntimeException("Now would be a good time to code this conversion");
+			try {
+				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+				m.invoke(null, input, output);
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Unknown conversion");
+			}
 		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral ) {
 			MultiSpectral mi = (MultiSpectral) input;
 			MultiSpectral mo = (MultiSpectral) output;
@@ -114,7 +120,12 @@ public class GConvertImage {
 				}
 			}
 		} else if( input instanceof ImageInterleaved && output instanceof MultiSpectral )  {
-			throw new RuntimeException("Now would be a good time to code this conversion");
+			try {
+				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
+				m.invoke(null, input, output);
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Unknown conversion");
+			}
 		} else if( input instanceof ImageInterleaved && output instanceof ImageSingleBand )  {
 			ImageInterleaved mb = (ImageInterleaved)input;
 			ImageSingleBand so = (ImageSingleBand)output;

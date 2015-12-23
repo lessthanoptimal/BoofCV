@@ -460,7 +460,7 @@ public class BoofTesting {
 						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
 				}
 			}
-		} else if( imgA instanceof MultiSpectral ){
+		} else if( imgA instanceof MultiSpectral && imgB instanceof MultiSpectral ){
 			MultiSpectral a = (MultiSpectral)imgA;
 			MultiSpectral b = (MultiSpectral)imgB;
 
@@ -470,9 +470,9 @@ public class BoofTesting {
 			for( int band = 0; band < a.getNumBands(); band++ ) {
 				assertEquals(a.getBand(band), b.getBand(band), tol);
 			}
-		} else if( imgA instanceof ImageInterleaved ) {
-			ImageInterleaved a = (ImageInterleaved)imgA;
-			ImageInterleaved b = (ImageInterleaved)imgB;
+		} else if( imgA instanceof ImageMultiBand && imgB instanceof ImageMultiBand) {
+			ImageMultiBand a = (ImageMultiBand)imgA;
+			ImageMultiBand b = (ImageMultiBand)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -482,8 +482,8 @@ public class BoofTesting {
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
 					for( int band = 0; band < numBands; band++ ) {
-						double valA = GeneralizedImageOps.get(a,x,y,band);
-						double valB = GeneralizedImageOps.get(b, x, y, band);
+						double valA = GeneralizedImageOps.get( a, x, y, band);
+						double valB = GeneralizedImageOps.get( b, x, y, band);
 
 						double difference = valA - valB;
 						if( Math.abs(difference) > tol )
