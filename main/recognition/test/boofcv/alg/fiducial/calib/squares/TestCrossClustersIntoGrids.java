@@ -31,7 +31,12 @@ import static org.junit.Assert.*;
  */
 public class TestCrossClustersIntoGrids {
 	@Test
-	public void processCluster() {
+	public void processCluster_positive() {
+		fail("implement");
+	}
+
+	@Test
+	public void processCluster_negative() {
 		fail("implement");
 	}
 

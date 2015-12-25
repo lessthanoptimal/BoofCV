@@ -37,7 +37,7 @@ public class TestSquaresIntoCrossClusters {
 	 */
 	@Test
 	public void process_simple() {
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,0.5, -1);
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05,0.5, -1);
 
 		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
 		squares.add( createSquare(7,8));
@@ -96,6 +96,7 @@ public class TestSquaresIntoCrossClusters {
 	@Test
 	public void getCornerIndex() {
 		SquareNode node = new SquareNode();
+		node.corners = new Polygon2D_F64(4);
 		node.corners.get(0).set(5,6);
 		node.corners.get(1).set(6,7);
 		node.corners.get(2).set(7,8);

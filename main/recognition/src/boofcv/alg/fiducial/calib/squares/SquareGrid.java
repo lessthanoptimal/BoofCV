@@ -36,11 +36,19 @@ public class SquareGrid {
 	 * Looks up the node based on its coordinate.  negative values wrap
 	 */
 	public SquareNode get( int row , int col ) {
+		return nodes.get( indexOf(row,col) );
+	}
+
+	public void set( int row , int col , SquareNode node  ) {
+		nodes.set( indexOf(row,col) , node );
+	}
+
+	public int indexOf( int row , int col ) {
 		if( row < 0 )
 			row = rows + row;
 		if( col < 0 )
 			col = columns + col;
-		return nodes.get( row*columns + col );
+		return row*columns + col;
 	}
 
 	/**

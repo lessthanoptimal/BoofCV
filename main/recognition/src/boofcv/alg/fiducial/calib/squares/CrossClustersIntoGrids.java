@@ -39,25 +39,36 @@ public class CrossClustersIntoGrids {
 	private boolean verbose = false;
 
 
-	FastQueue<SquareGrid> grid = new FastQueue<SquareGrid>(SquareGrid.class,true);
+	FastQueue<SquareGrid> grids = new FastQueue<SquareGrid>(SquareGrid.class,true);
 
-	boolean failed;
-
+	/**
+	 * Converts all the found clusters into grids, if they are valid.
+	 *
+	 * @param clusters List of clusters
+	 */
 	public void process( List<List<SquareNode>> clusters ) {
-
+		for (int i = 0; i < clusters.size(); i++) {
+			processCluster(clusters.get(i));
+		}
 	}
 
+	/**
+	 * Converts the cluster into a grid data structure.  If its not a grid then
+	 * nothing happens
+	 */
 	protected void processCluster( List<SquareNode> cluster ) {
 		// handle a special case
 		if( cluster.size() == 1 ) {
 			SquareNode n = cluster.get(0);
 			if( n.getNumberOfConnections() == 0 ) {
-				// TODO create grid
+				SquareGrid grid = grids.grow();
+				grid.columns = grid.rows = 1;
+				grid.nodes.clear();
+				grid.nodes.add(n);
+				return;
 			}
-			return;
 		}
 
-		failed = false;
 		for (int i = 0; i < cluster.size(); i++) {
 			cluster.get(i).graph = SquareNode.RESET_GRAPH;
 		}
@@ -77,20 +88,92 @@ public class CrossClustersIntoGrids {
 			throw new RuntimeException("BUG");
 		}
 
-		// now add each row below it
-		List<List<SquareNode>> grid = new ArrayList<List<SquareNode>>();
-		grid.add(firstRow);
-		while(!failed) {
-			List<SquareNode> previous = grid.get( grid.size()-1);
-			if( !addNextRow(previous.get(0),grid))
+		// Add the next rows to the list, one after another
+		List<List<SquareNode>> listRows = new ArrayList<List<SquareNode>>();// TODO remove memory declaration here
+		listRows.add(firstRow);
+		while(true ) {
+			List<SquareNode> previous = listRows.get(listRows.size()-1);
+			if( !addNextRow(previous.get(0),listRows)) {
 				break;
+			}
 		}
 
-		// check to see if it's valid
-		// TODO do that
+		// re-organize into a grid data structure
+		SquareGrid grid = assembleGrid(firstRow, listRows);
 
-		// todo convert into a grid
+		// check the grids connectivity
+		if( !checkEdgeCount(grid) ) {
+			grids.removeTail();
+		}
+	}
 
+	private SquareGrid assembleGrid(List<SquareNode> firstRow, List<List<SquareNode>> listRows) {
+		SquareGrid grid = grids.grow();
+
+		// is the first column empty or not
+		int offset = firstRow.get(0).getNumberOfConnections() == 1 ? 0 : 1;
+
+		// If an end node has 2 edges that means there is another edge to its left or right
+		grid.columns = firstRow.size() + offset;
+		if( firstRow.get(firstRow.size()-1).getNumberOfConnections() != 1 )
+			grid.columns++;
+		grid.rows = listRows.size();
+
+		// initialize grid to null
+		grid.nodes.clear();
+		for (int i = 0; i < grid.columns * grid.rows; i++) {
+			grid.nodes.add(null);
+		}
+
+		// fill in the grid
+		for (int row = 0; row < listRows.size(); row++) {
+			List<SquareNode> list = listRows.get(row);
+			int startCol = offset - row%2 != 0 ? 0 : 1;
+			for (int col = startCol; col < grid.columns; col += 2) {
+				grid.set(col,row,list.get(col/2));
+			}
+		}
+		return grid;
+	}
+
+	/**
+	 * Looks at the edge count in each node and sees if it has the expected number
+	 */
+	private boolean checkEdgeCount( SquareGrid grid ) {
+
+		int left = 0, right = grid.columns-1;
+		int top = 0, bottom = grid.rows-1;
+
+
+		for (int row = 0; row < grid.rows; row++) {
+			boolean skip = grid.get(row,0) == null;
+
+			for (int col = 0; col < grid.columns; col++) {
+				SquareNode n = grid.get(row,col);
+				if( skip ) {
+					if ( n != null )
+						return false;
+				} else {
+					boolean horizontalEdge =  col == left || col == right;
+					boolean verticalEdge =  row == top || row == bottom;
+
+					boolean outer = horizontalEdge || verticalEdge;
+					int connections = n.getNumberOfConnections();
+
+					if( outer ) {
+						if( horizontalEdge && verticalEdge ) {
+							if( connections != 1 )
+								return false;
+						} else if( connections != 2 )
+							return false;
+					} else {
+						if( connections != 4 )
+							return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private List<SquareNode> firstRow1( SquareNode seed ) {
@@ -160,7 +243,6 @@ public class CrossClustersIntoGrids {
 			flipAdd(tmp, row);
 			addToRow(seed,indexLower,-1,false,row);
 		} else {
-			failed = true;
 			return false;
 		}
 		grid.add(row);
@@ -252,5 +334,11 @@ public class CrossClustersIntoGrids {
 		return seed;
 	}
 
+	public FastQueue<SquareGrid> getGrids() {
+		return grids;
+	}
 
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
 }
