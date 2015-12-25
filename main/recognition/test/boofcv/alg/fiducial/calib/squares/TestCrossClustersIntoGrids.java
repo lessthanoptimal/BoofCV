@@ -32,11 +32,55 @@ import static org.junit.Assert.*;
 public class TestCrossClustersIntoGrids {
 	@Test
 	public void processCluster_positive() {
-		fail("implement");
+		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+
+		for (int rows = 2; rows <= 4; rows++) {
+			for (int cols = 2; cols <= 4; cols++) {
+				System.out.println(rows+" "+cols);
+
+				// todo add skip first column
+				int[] levels = createLevels(rows, cols);
+				List<SquareNode> nodes = createCluster(false,levels);
+
+				alg.grids.reset();
+				alg.processCluster(nodes);
+
+				assertEquals(1,alg.grids.size());
+				SquareGrid grid = alg.grids.get(0);
+				assertEquals(rows,grid.rows);
+				assertEquals(cols,grid.columns);
+				for (int i = 0; i < rows; i++) {
+					boolean expected = i%2 == 0;
+					for (int j = 0; j < cols; j++) {
+						assertEquals(expected , (grid.get(i,j) != null));
+					}
+				}
+
+			}
+		}
+
+	}
+
+	private int[] createLevels(int rows, int cols) {
+		int levels[] = new int[rows];
+		for (int i = 0; i < rows; i++) {
+			levels[i] = cols/2 + (i%2==0 ? cols%2 : 0);
+		}
+		return levels;
 	}
 
 	@Test
 	public void processCluster_negative() {
+		fail("implement");
+	}
+
+	@Test
+	public void firstRow1() {
+		fail("implement");
+	}
+
+	@Test
+	public void firstRow2() {
 		fail("implement");
 	}
 
@@ -62,11 +106,11 @@ public class TestCrossClustersIntoGrids {
 
 	private void checkAddNextRow( boolean skip , int top , int bottom  )
 	{
-		List<SquareNode> cluster = createGraph(skip,top,bottom);
+		List<SquareNode> cluster = createCluster(skip,top,bottom);
 		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
 		List<List<SquareNode>> ordered = new ArrayList<List<SquareNode>>();
 		for (int i = 0; i < top; i++) {
-			alg.addNextRow(cluster.get(i),ordered);
+			assertTrue(alg.addNextRow(cluster.get(i),ordered));
 
 			List<SquareNode> found = ordered.remove( ordered.size()-1);
 			assertEquals(bottom,found.size());
@@ -75,8 +119,10 @@ public class TestCrossClustersIntoGrids {
 				assertTrue(j+"",cluster.get(top+j)==found.get(j));
 			}
 		}
-	}
 
+		fail("test honor explored");
+		fail("make sure it doesn't add a row when at the bottom");
+	}
 
 	@Test
 	public void lowerEdgeIndex() {
@@ -120,31 +166,31 @@ public class TestCrossClustersIntoGrids {
 
 		// X
 		//  X
-		cluster = createGraph(false,1,1);
+		cluster = createCluster(false,1,1);
 		checkAdd(cluster,0,2,-1,true,new int[]{});
 		checkAdd(cluster,0,2,-1,false,new int[]{1});
 
 		// X X
 		//  X
-		cluster = createGraph(false,2,1);
+		cluster = createCluster(false,2,1);
 		checkAdd(cluster,0,2,-1,true,new int[]{1});
 		checkAdd(cluster,0,2,-1,false,new int[]{2});
 
 		// X X
 		//  X X
-		cluster = createGraph(false,2,2);
+		cluster = createCluster(false,2,2);
 		checkAdd(cluster,0,2,-1,true,new int[]{1});
 		checkAdd(cluster,0,2,-1,false,new int[]{2,3});
 
 		//  X
 		// X
-		cluster = createGraph(true,1,1);
+		cluster = createCluster(true,1,1);
 		checkAdd(cluster,0,3,1,true,new int[]{});
 		checkAdd(cluster,0,3,1,false,new int[]{1});
 
 		//  X
 		// X X
-		cluster = createGraph(true,1,2);
+		cluster = createCluster(true,1,2);
 		checkAdd(cluster,0,2,-1,true,new int[]{});
 		checkAdd(cluster,0,2,-1,false,new int[]{2});
 		checkAdd(cluster,0,3,1,true,new int[]{});
@@ -152,7 +198,7 @@ public class TestCrossClustersIntoGrids {
 
 		//  X X
 		// X X
-		cluster = createGraph(true,2,2);
+		cluster = createCluster(true,2,2);
 		checkAdd(cluster,0,2,-1,true,new int[]{1});
 		checkAdd(cluster,0,2,-1,false,new int[]{3});
 		checkAdd(cluster,0,3,1,true,new int[]{});
@@ -174,31 +220,50 @@ public class TestCrossClustersIntoGrids {
 			SquareNode found = row.get(i);
 			assertTrue(e==found);
 		}
+
+		fail("add test to see if its explored already");
+	}
+
+	@Test
+	public void numberOfOpenEdges() {
+		fail("implement");
 	}
 
 	/**
 	 * Creates a new two row graph.  Skip indicates if the first row skips the first column or not.  The
 	 * other two parameters specify how many nodes in each row
 	 */
-	private List<SquareNode> createGraph( boolean skip, int top , int bottom ) {
+	private List<SquareNode> createCluster(boolean skip, int ...levels ) {
+
+		int total = 0;
+		for (int i = 0; i < levels.length; i++) {
+			total += levels[i];
+		}
+
 		List<SquareNode> out = new ArrayList<SquareNode>();
-		for (int i = 0; i < top + bottom; i++) {
+		for (int i = 0; i < total; i++) {
 			out.add( new SquareNode());
 			out.get(i).graph = SquareNode.RESET_GRAPH;
 		}
 
-		for (int i = 0; i < top; i++) {
+		int previous = 0;
+		for (int i = 0; i < levels.length-1; i++) {
+			int current = previous + levels[i];
+			int next = current + levels[i + 1];
+			for (int a = 0; a < levels[i]; a++) {
+				SquareNode n = out.get(previous + a);
 
-			SquareNode n = out.get(i);
+				int right = skip ? current + a + 1 : current + a;
+				int left = right - 1;
 
-			int right = skip ? top + i + 1: top + i;
-			int left = right - 1;
+				if (right < next)
+					connect(n, 2, out.get(right), 0);
+				if (left >= current) {
+					connect(n, 3, out.get(left), 1);
+				}
 
-			if( right < top+bottom)
-				connect(n,2,out.get(right),0);
-			if( left >= top ) {
-				connect(n,3,out.get(left),1);
 			}
+			previous = current;
 		}
 
 		return out;

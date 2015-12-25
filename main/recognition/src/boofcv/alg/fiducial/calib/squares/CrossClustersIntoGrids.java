@@ -38,7 +38,6 @@ public class CrossClustersIntoGrids {
 	// verbose debug output
 	private boolean verbose = false;
 
-
 	FastQueue<SquareGrid> grids = new FastQueue<SquareGrid>(SquareGrid.class,true);
 
 	/**
@@ -111,11 +110,11 @@ public class CrossClustersIntoGrids {
 		SquareGrid grid = grids.grow();
 
 		// is the first column empty or not
-		int offset = firstRow.get(0).getNumberOfConnections() == 1 ? 0 : 1;
+		int offset = numberOfOpenEdges(firstRow.get(0)) == 1 ? 0 : 1;
 
 		// If an end node has 2 edges that means there is another edge to its left or right
 		grid.columns = firstRow.size() + offset;
-		if( firstRow.get(firstRow.size()-1).getNumberOfConnections() != 1 )
+		if( numberOfOpenEdges(firstRow.get(firstRow.size()-1)) != 1 )
 			grid.columns++;
 		grid.rows = listRows.size();
 
@@ -180,6 +179,8 @@ public class CrossClustersIntoGrids {
 		for (int i = 0; i < 4; i++) {
 			if( isOpenEdge(seed,i) ) {
 				List<SquareNode> list = new ArrayList<SquareNode>();
+				list.add(seed);
+				seed.graph = 0;
 				addToRow(seed,i,1,true,list);
 				return list;
 			}
@@ -195,9 +196,9 @@ public class CrossClustersIntoGrids {
 		List<SquareNode> list = new ArrayList<SquareNode>();
 
 		addToRow(seed,indexLower,-1,true,listDown);
-
 		flipAdd(listDown, list);
 		list.add(seed);
+		seed.graph = 0;
 		addToRow(seed,indexUpper,1,true,list);
 
 		return list;
@@ -206,24 +207,30 @@ public class CrossClustersIntoGrids {
 	/**
 	 * Given a node, add all the squares in the row directly below it.  They will be ordered from "left" to "right".  The
 	 * seed node can be anywhere in the row, e.g. middle, start, end.
+	 *
+	 * @return true if a row was added to grid and false if not
 	 */
 	boolean addNextRow( SquareNode seed , List<List<SquareNode>> grid ) {
 		List<SquareNode> row = new ArrayList<SquareNode>();
 		List<SquareNode> tmp = new ArrayList<SquareNode>();
 
-		int numConnections = seed.getNumberOfConnections();
+		int numConnections = numberOfOpenEdges(seed);
 		if( numConnections == 0 ) {
-			row.add(seed);
+			return false;
 		} else if( numConnections == 1 ) {
 			for (int i = 0; i < 4; i++) {
 				SquareEdge edge = seed.edges[i];
 				if( edge != null ) {
+					// see if the edge is one of the open ones
+					SquareNode dst = edge.destination(seed);
+					if( dst.graph != SquareNode.RESET_GRAPH)
+						continue;
+
+					// determine which direction to traverse along
 					int corner = edge.destinationSide(seed);
 					int l = addOffset(corner,-1,4);
 					int u = addOffset(corner, 1,4);
 
-					// determine which direction to traverse along
-					SquareNode dst = edge.destination(seed);
 					if( dst.edges[l] != null ) {
 						addToRow(seed,i, 1,false,tmp);
 						flipAdd(tmp, row);
@@ -277,6 +284,15 @@ public class CrossClustersIntoGrids {
 		throw new RuntimeException("BUG!");
 	}
 
+	static int numberOfOpenEdges( SquareNode node ) {
+		int total = 0;
+		for (int i = 0; i < 4; i++) {
+			if( isOpenEdge(node,i) )
+				total++;
+		}
+		return total;
+	}
+
 	/**
 	 * Is the edge open and can be traversed to?  Can't be null and can't have
 	 * the marker set to a none RESET_GRAPH value.
@@ -309,6 +325,9 @@ public class CrossClustersIntoGrids {
 				corner = e.sideA;
 			}
 			if( !skip ) {
+				if( n.graph != SquareNode.RESET_GRAPH)
+					throw new RuntimeException("BUG!");
+				n.graph = 0;
 				row.add(n);
 			}
 			skip = !skip;
