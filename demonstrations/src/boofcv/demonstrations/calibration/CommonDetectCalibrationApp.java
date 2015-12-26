@@ -256,11 +256,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 
 	private void renderOrder(Graphics2D g2, double scale ) {
 		java.util.List<SquareGrid> grids = getGrids();
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));
+
+		Line2D.Double l = new Line2D.Double();
 
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
-			int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
 
 			SquareNode p0 = null;
 			for (int j = 0; j < g.nodes.size(); j++) {
@@ -269,13 +272,18 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 					continue;
 				if( p0 != null) {
 					double fraction = j / ((double) g.nodes.size() - 1);
-					fraction = fraction * 0.6 + 0.4;
+					fraction = fraction * 0.8 + 0.1;
 
-					int lineRGB = (int) (fraction * a) << 16 | (int) (fraction * (255 - a)) << 8;
+					int red   = (int)(0xFF*fraction) + (int)(0x10*(1-fraction));
+					int green = (int)(0x00*fraction) + (int)(0x00*(1-fraction));
+					int blue  = (int)(0x10*fraction) + (int)(0xff*(1-fraction));
+
+					int lineRGB = red << 16 | green << 8 | blue;
+
+					l.setLine(scale * p0.center.x , scale * p0.center.y, scale * p1.center.x, scale * p1.center.y );
 
 					g2.setColor(new Color(lineRGB));
-					g2.drawLine((int) (scale * p0.center.x + 0.5), (int) (scale * p0.center.y + 0.5),
-							(int) (scale * p1.center.x + 0.5), (int) (scale * p1.center.y + 0.5));
+					g2.draw(l);
 				}
 				p0 = p1;
 			}

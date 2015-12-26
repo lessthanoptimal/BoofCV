@@ -231,11 +231,11 @@ public class CrossClustersIntoGrids {
 		List<SquareNode> listDown = new ArrayList<SquareNode>();
 		List<SquareNode> list = new ArrayList<SquareNode>();
 
-		addToRow(seed,indexLower,-1,true,listDown);
+		addToRow(seed,indexUpper,1,true,listDown);
 		flipAdd(listDown, list);
 		list.add(seed);
 		seed.graph = 0;
-		addToRow(seed,indexUpper,1,true,list);
+		addToRow(seed,indexLower,-1,true,list);
 
 		return list;
 	}

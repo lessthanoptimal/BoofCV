@@ -111,8 +111,8 @@ public class TestCrossClustersIntoGrids {
 
 			// Check to see if the edge index ordering is as expected
 			for (int j = 0; j < top-1; j++) {
-				SquareNode a = cluster.get(j);
-				SquareNode b = cluster.get(j+1);
+				SquareNode a = list.get(j);
+				SquareNode b = list.get(j+1);
 
 				checkConnection(a,b);
 			}
