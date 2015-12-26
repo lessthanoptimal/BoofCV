@@ -112,6 +112,11 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	private void renderGraph( Graphics2D g2 , double scale ) {
 		java.util.List<java.util.List<SquareNode>> graphs = getClusters();
 
+		BasicStroke strokeWide = new BasicStroke(3);
+		BasicStroke strokeNarrow = new BasicStroke(2);
+
+		Line2D.Double l = new Line2D.Double();
+
 		g2.setStroke(new BasicStroke(3));
 		for( int i = 0; i < graphs.size(); i++ ) {
 
@@ -136,7 +141,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 				Point2D_F64 a = e.a.center;
 				Point2D_F64 b = e.b.center;
 
-				g2.drawLine((int)(a.x*scale+0.5),(int)(a.y*scale+0.5),(int)(b.x*scale+0.5),(int)(b.y*scale+0.5));
+				l.setLine(a.x*scale,a.y*scale,b.x*scale,b.y*scale);
+
+				g2.setColor(Color.CYAN);
+				g2.setStroke(strokeWide);
+				g2.draw(l);
+				g2.setColor(new Color(rgb));
+				g2.setStroke(strokeNarrow);
+				g2.draw(l);
 			}
 		}
 	}
@@ -178,6 +190,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	class VisualizePanel extends ImageZoomPanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran,Graphics2D g2 ) {
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			synchronized ( CommonDetectCalibrationApp.this ) {
 
@@ -256,8 +270,6 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 
 	private void renderOrder(Graphics2D g2, double scale ) {
 		java.util.List<SquareGrid> grids = getGrids();
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));
 
 		Line2D.Double l = new Line2D.Double();

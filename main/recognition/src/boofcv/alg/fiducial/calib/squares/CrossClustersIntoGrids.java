@@ -40,6 +40,9 @@ public class CrossClustersIntoGrids {
 
 	FastQueue<SquareGrid> grids = new FastQueue<SquareGrid>(SquareGrid.class,true);
 
+	// indicates if a fatal error was found in the grid
+	protected boolean invalid;
+
 	/**
 	 * Converts all the found clusters into grids, if they are valid.
 	 *
@@ -48,8 +51,33 @@ public class CrossClustersIntoGrids {
 	public void process( List<List<SquareNode>> clusters ) {
 		grids.reset();
 		for (int i = 0; i < clusters.size(); i++) {
-			processCluster(clusters.get(i));
+			if( checkPreconditions(clusters.get(i)))
+				processCluster(clusters.get(i));
 		}
+	}
+
+	/**
+	 * Checks basic preconditions.
+	 * 1) No node may be linked two more than once
+	 */
+	protected boolean checkPreconditions(List<SquareNode> cluster) {
+		for( int i = 0; i < cluster.size(); i++ ) {
+			SquareNode n = cluster.get(i);
+			for (int j = 0; j < 4; j++) {
+				SquareEdge e0 = n.edges[j];
+				if( e0 == null)
+					continue;
+				for (int k = j+1; k < 4; k++) {
+					SquareEdge e1 = n.edges[k];
+					if( e1 == null)
+						continue;
+					if( e0.destination(n) == e1.destination(n) ) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -57,6 +85,7 @@ public class CrossClustersIntoGrids {
 	 * nothing happens
 	 */
 	protected void processCluster( List<SquareNode> cluster ) {
+		invalid = false;
 		// handle a special case
 		if( cluster.size() == 1 ) {
 			SquareNode n = cluster.get(0);
@@ -87,6 +116,8 @@ public class CrossClustersIntoGrids {
 		} else {
 			throw new RuntimeException("BUG");
 		}
+		if( invalid || firstRow == null )
+			return;
 
 		// Add the next rows to the list, one after another
 		List<List<SquareNode>> listRows = new ArrayList<List<SquareNode>>();// TODO remove memory declaration here
@@ -97,6 +128,9 @@ public class CrossClustersIntoGrids {
 				break;
 			}
 		}
+
+		if( invalid || listRows.size() < 2)
+			return;
 
 		// re-organize into a grid data structure
 		SquareGrid grid = assembleGrid(listRows);
@@ -153,7 +187,6 @@ public class CrossClustersIntoGrids {
 		int left = 0, right = grid.columns-1;
 		int top = 0, bottom = grid.rows-1;
 
-
 		for (int row = 0; row < grid.rows; row++) {
 			boolean skip = grid.get(row,0) == null;
 
@@ -204,10 +237,10 @@ public class CrossClustersIntoGrids {
 				SquareNode dst = seed.edges[i].destination(seed);
 				if( dst.edges[u] != null ) {
 					list.add(seed);
-					addToRow(seed,i,-1,true,list);
+					if( !addToRow(seed,i,-1,true,list) ) return null;
 				} else if( dst.edges[l] != null ){
 					List<SquareNode> tmp = new ArrayList<SquareNode>();
-					addToRow(seed,i, 1,true,tmp);
+					if( !addToRow(seed,i, 1,true,tmp) ) return null;
 					flipAdd(tmp, list);
 					list.add(seed);
 				} else {
@@ -231,11 +264,11 @@ public class CrossClustersIntoGrids {
 		List<SquareNode> listDown = new ArrayList<SquareNode>();
 		List<SquareNode> list = new ArrayList<SquareNode>();
 
-		addToRow(seed,indexUpper,1,true,listDown);
+		if( !addToRow(seed,indexUpper,1,true,listDown) ) return null;
 		flipAdd(listDown, list);
 		list.add(seed);
 		seed.graph = 0;
-		addToRow(seed,indexLower,-1,true,list);
+		if( !addToRow(seed,indexLower,-1,true,list) ) return null;
 
 		return list;
 	}
@@ -270,10 +303,10 @@ public class CrossClustersIntoGrids {
 					// Nodes in the seed's row should all be marked, so any unmarked nodes
 					// are ones you don't want to traverse down
 					if( isClosedValidEdge(dst,l) ) {
-						addToRow(seed,i, 1,false,tmp);
+						if( !addToRow(seed,i, 1,false,tmp) ) return false;
 						flipAdd(tmp, row);
 					} else if( isClosedValidEdge(dst,u) ){
-						addToRow(seed,i, -1,false,row);
+						if( !addToRow(seed,i, -1,false,row) ) return false;
 					} else {
 						dst.graph = 0;
 						row.add(dst);
@@ -285,9 +318,9 @@ public class CrossClustersIntoGrids {
 			int indexLower = lowerEdgeIndex(seed);
 			int indexUpper = addOffset(indexLower,1,4);
 
-			addToRow(seed,indexUpper, 1,false,tmp);
+			if( !addToRow(seed,indexUpper, 1,false,tmp) ) return false;
 			flipAdd(tmp, row);
-			addToRow(seed,indexLower,-1,false,row);
+			if( !addToRow(seed,indexLower,-1,false,row) ) return false;
 		} else {
 			return false;
 		}
@@ -362,7 +395,7 @@ public class CrossClustersIntoGrids {
 	 * @param skip true = start adding nodes at second, false = start first.
 	 * @param row List that the nodes are placed into
 	 */
-	static void addToRow( SquareNode n , int corner , int sign , boolean skip ,
+	boolean addToRow( SquareNode n , int corner , int sign , boolean skip ,
 						   List<SquareNode> row ) {
 		SquareEdge e;
 		while( (e = n.edges[corner]) != null ) {
@@ -374,8 +407,12 @@ public class CrossClustersIntoGrids {
 				corner = e.sideA;
 			}
 			if( !skip ) {
-				if( n.graph != SquareNode.RESET_GRAPH)
-					throw new RuntimeException("BUG!");
+				if( n.graph != SquareNode.RESET_GRAPH) {
+					// This should never happen in a valid grid.  It can happen if two nodes link to each other multiple
+					// times.  Other situations as well
+					invalid = true;
+					return false;
+				}
 				n.graph = 0;
 				row.add(n);
 			}
@@ -383,6 +420,7 @@ public class CrossClustersIntoGrids {
 			sign *= -1;
 			corner = addOffset(corner,sign,4);
 		}
+		return true;
 	}
 
 	/**
