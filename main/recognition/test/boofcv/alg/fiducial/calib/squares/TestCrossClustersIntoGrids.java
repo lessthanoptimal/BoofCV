@@ -18,13 +18,16 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.misc.CircularIndex;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -34,11 +37,10 @@ public class TestCrossClustersIntoGrids {
 	public void processCluster_positive() {
 		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
 
-		for (int rows = 2; rows <= 4; rows++) {
-			for (int cols = 2; cols <= 4; cols++) {
+		for (int rows = 2; rows <= 5; rows++) {
+			for (int cols = 2; cols <= 5; cols++) {
 				System.out.println(rows+" "+cols);
 
-				// todo add skip first column
 				int[] levels = createLevels(rows, cols);
 				List<SquareNode> nodes = createCluster(false,levels);
 
@@ -47,18 +49,20 @@ public class TestCrossClustersIntoGrids {
 
 				assertEquals(1,alg.grids.size());
 				SquareGrid grid = alg.grids.get(0);
-				assertEquals(rows,grid.rows);
-				assertEquals(cols,grid.columns);
-				for (int i = 0; i < rows; i++) {
-					boolean expected = i%2 == 0;
-					for (int j = 0; j < cols; j++) {
+				assertTrue((rows==grid.rows&&cols==grid.columns)||(cols==grid.rows&&rows==grid.columns));
+
+				for (int i = 0; i < grid.rows; i++) {
+					boolean expected = grid.get(i,0) != null;
+					if( i > 0 ) {
+						assertEquals(!expected,grid.get(i-1,0) != null);
+					}
+					for (int j = 0; j < grid.columns; j++) {
 						assertEquals(expected , (grid.get(i,j) != null));
+						expected = !expected;
 					}
 				}
-
 			}
 		}
-
 	}
 
 	private int[] createLevels(int rows, int cols) {
@@ -70,18 +74,79 @@ public class TestCrossClustersIntoGrids {
 	}
 
 	@Test
-	public void processCluster_negative() {
-		fail("implement");
+	public void firstRow1and2() {
+		// X X X X X
+		//  X X X X
+		checkFirstRow1and2(false,5,4);
+
+		//  X X X X
+		// X X X X X
+		checkFirstRow1and2(true,4,5);
+
+		// X
+		//  x
+		checkFirstRow1and2(false,1,1);
+
+		//  X
+		// x
+		checkFirstRow1and2(true,1,1);
 	}
 
-	@Test
-	public void firstRow1() {
-		fail("implement");
+	private void checkFirstRow1and2( boolean skip , int top , int bottom  )
+	{
+		List<SquareNode> cluster = createCluster(skip,top,bottom);
+		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+
+		// see if any of the nodes in the first row can be the seed
+		for (int i = 0; i < top; i++) {
+			List<SquareNode> list;
+			SquareNode seed = cluster.get(i);
+			if( seed.getNumberOfConnections() == 1 ) {
+				list = alg.firstRow1(seed);
+			} else {
+				list = alg.firstRow2(seed);
+			}
+
+			assertEquals(top,list.size());
+
+			// Check to see if the edge index ordering is as expected
+			for (int j = 0; j < top-1; j++) {
+				SquareNode a = cluster.get(j);
+				SquareNode b = cluster.get(j+1);
+
+				checkConnection(a,b);
+			}
+			// check to see if the nodes are marked correctly and then reset them
+			for (int j = 0; j < top; j++) {
+				assertTrue(list.get(j).graph != SquareNode.RESET_GRAPH);
+				list.get(j).graph = SquareNode.RESET_GRAPH;
+			}
+			for (int j = 0; j < bottom; j++) {
+				assertTrue(cluster.get(top+j).graph == SquareNode.RESET_GRAPH);
+			}
+		}
 	}
 
-	@Test
-	public void firstRow2() {
-		fail("implement");
+	/**
+	 * Seeds if 'a' and 'b' are connected to each other through a common node. The out going
+	 * indexes from the common node should be 'i' to 'a' and 'i+1' to 'b'
+	 */
+	private void checkConnection( SquareNode a , SquareNode b ) {
+		for (int i = 0; i < 4; i++) {
+			SquareEdge edgeA = a.edges[i];
+			if( edgeA == null )
+				continue;
+
+			SquareNode common = edgeA.destination(a);
+			int commonToA = edgeA.destinationSide(a);
+			int commonToB = CircularIndex.addOffset(commonToA,1,4);
+
+			SquareEdge edgeB = common.edges[commonToB];
+			if( edgeB != null && edgeB.destination(common) == b ) {
+				return;
+			}
+		}
+		fail("Failed");
 	}
 
 	@Test
@@ -99,6 +164,8 @@ public class TestCrossClustersIntoGrids {
 		//  x
 		checkAddNextRow(false,1,1);
 
+
+
 		//  X
 		// x
 		checkAddNextRow(true,1,1);
@@ -109,6 +176,13 @@ public class TestCrossClustersIntoGrids {
 		List<SquareNode> cluster = createCluster(skip,top,bottom);
 		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
 		List<List<SquareNode>> ordered = new ArrayList<List<SquareNode>>();
+
+		// mark the first row as traversed, which it will be
+		for (int i = 0; i < top; i++) {
+			cluster.get(i).graph = 0;
+		}
+
+		// see if any of the nodes in the first row can be the seed
 		for (int i = 0; i < top; i++) {
 			assertTrue(alg.addNextRow(cluster.get(i),ordered));
 
@@ -117,11 +191,17 @@ public class TestCrossClustersIntoGrids {
 
 			for (int j = 0; j < bottom; j++) {
 				assertTrue(j+"",cluster.get(top+j)==found.get(j));
+
+				// try adding a row below the bottom, which should fail, from any of the bottom nodes
+				assertFalse(alg.addNextRow(found.get(j),ordered));
+				assertEquals(0,ordered.size());
+			}
+
+			// reset the markings so that in the next loop it can add them
+			for (int j = 0; j < bottom; j++) {
+				found.get(j).graph = SquareNode.RESET_GRAPH;
 			}
 		}
-
-		fail("test honor explored");
-		fail("make sure it doesn't add a row when at the bottom");
 	}
 
 	@Test
@@ -218,15 +298,20 @@ public class TestCrossClustersIntoGrids {
 		for (int i = 0; i < row.size(); i++) {
 			SquareNode e = cluster.get(expected[i]);
 			SquareNode found = row.get(i);
+			assertTrue(SquareNode.RESET_GRAPH != found.graph);
 			assertTrue(e==found);
 		}
-
-		fail("add test to see if its explored already");
 	}
 
 	@Test
 	public void numberOfOpenEdges() {
-		fail("implement");
+		SquareNode a = new SquareNode();
+
+		assertEquals(0,CrossClustersIntoGrids.numberOfOpenEdges(a));
+		connect(a,1,new SquareNode(),0);
+		assertEquals(0,CrossClustersIntoGrids.numberOfOpenEdges(a));
+		a.edges[1].b.graph = SquareNode.RESET_GRAPH;
+		assertEquals(1,CrossClustersIntoGrids.numberOfOpenEdges(a));
 	}
 
 	/**
@@ -264,6 +349,7 @@ public class TestCrossClustersIntoGrids {
 
 			}
 			previous = current;
+			skip = !skip;
 		}
 
 		return out;
