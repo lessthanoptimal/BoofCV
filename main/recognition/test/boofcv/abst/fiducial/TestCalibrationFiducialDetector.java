@@ -58,6 +58,6 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.calibChessboard(new ConfigChessboard(5,7,0.03), imageType.getImageClass());
+		return FactoryFiducial.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageType.getImageClass());
 	}
 }

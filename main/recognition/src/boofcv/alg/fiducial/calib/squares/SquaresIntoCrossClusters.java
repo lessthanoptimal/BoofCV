@@ -53,7 +53,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 	/**
 	 * Declares data structures and configures algorithm
-	 * @param maxCornerDistance Ratio of space between squares to square lengths
+	 * @param maxCornerDistance Maximum number of pixels apart two connected corners can be. UPDATE WHEN USED
 	 * @param maxNeighborLengthChange The maximum number of neighbors it will look at when connecting a node
 	 * @param maxNeighbors Max number of neighbors it will consider.  Try 4 or -1
 	 */
@@ -94,22 +94,6 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		// Find all valid graphs
 		findClusters();
 		return clusters.toList();
-	}
-
-	void computeNodeInfo( List<Polygon2D_F64> squares ) {
-
-		for (int i = 0; i < squares.size(); i++) {
-			SquareNode n = nodes.grow();
-			n.reset();
-			n.corners = squares.get(i);
-
-			for (int j = 0; j < 4; j++) {
-				int k = (j+1)%4;
-				double l = n.corners.get(j).distance(n.corners.get(k));
-				n.sideLengths[j] = l;
-				n.largestSide = Math.max(n.largestSide,l);
-			}
-		}
 	}
 
 	/**

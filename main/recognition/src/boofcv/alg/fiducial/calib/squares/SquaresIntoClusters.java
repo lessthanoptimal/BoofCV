@@ -18,6 +18,9 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.line.LineSegment2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.RecycleManager;
 
@@ -40,6 +43,9 @@ public class SquaresIntoClusters {
 	protected List<SquareNode> open = new ArrayList<SquareNode>();
 	protected RecycleManager<SquareEdge> edges = new RecycleManager<SquareEdge>(SquareEdge.class);
 
+	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
+	protected LineSegment2D_F64 lineB = new LineSegment2D_F64();
+
 	/**
 	 * Reset and recycle data structures from the previous run
 	 */
@@ -52,12 +58,44 @@ public class SquaresIntoClusters {
 				}
 			}
 		}
+		for (int i = 0; i < nodes.size(); i++) {
+			SquareNode n = nodes.get(i);
+			for (int j = 0; j < 4; j++) {
+				if( n.edges[j] != null )
+					throw new RuntimeException("BUG!");
+			}
+		}
+
 		nodes.reset();
 
 		for (int i = 0; i < clusters.size; i++) {
 			clusters.get(i).clear();
 		}
 		clusters.reset();
+	}
+
+	void computeNodeInfo( List<Polygon2D_F64> squares ) {
+
+		for (int i = 0; i < squares.size(); i++) {
+			SquareNode n = nodes.grow();
+			n.reset();
+			n.corners = squares.get(i);
+
+			// does not assume CW or CCW ordering just that it is ordered
+			lineA.a = n.corners.get(0);
+			lineA.b = n.corners.get(2);
+			lineB.a = n.corners.get(1);
+			lineB.b = n.corners.get(3);
+
+			Intersection2D_F64.intersection(lineA, lineB, n.center);
+
+			for (int j = 0; j < 4; j++) {
+				int k = (j+1)%4;
+				double l = n.corners.get(j).distance(n.corners.get(k));
+				n.sideLengths[j] = l;
+				n.largestSide = Math.max(n.largestSide,l);
+			}
+		}
 	}
 
 
@@ -118,6 +156,7 @@ public class SquaresIntoClusters {
 
 		edge.a.edges[edge.sideA] = null;
 		edge.b.edges[edge.sideB] = null;
+		edge.distance = 0;
 
 		edges.recycleInstance(edge);
 	}

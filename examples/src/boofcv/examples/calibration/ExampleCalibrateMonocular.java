@@ -76,7 +76,7 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupBumbleBee() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(5, 7, 30));
+		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		// load image list
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");

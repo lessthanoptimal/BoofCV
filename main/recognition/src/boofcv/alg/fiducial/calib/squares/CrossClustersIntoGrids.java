@@ -46,6 +46,7 @@ public class CrossClustersIntoGrids {
 	 * @param clusters List of clusters
 	 */
 	public void process( List<List<SquareNode>> clusters ) {
+		grids.reset();
 		for (int i = 0; i < clusters.size(); i++) {
 			processCluster(clusters.get(i));
 		}

@@ -19,7 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial2;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -45,7 +45,7 @@ public class DetectCalibrationChessApp
 		extends CommonDetectCalibrationApp
 
 {
-	DetectChessboardFiducial<ImageFloat32> alg;
+	DetectChessboardFiducial2<ImageFloat32> alg;
 	ConfigChessboard config;
 
 	public DetectCalibrationChessApp(List<String> exampleInputs) {
@@ -90,11 +90,11 @@ public class DetectCalibrationChessApp
 
 	@Override
 	protected List<SquareGrid> getGrids() {
-		return alg.getFindSeeds().getGrids().getGrids();
+		return alg.getFindSeeds().getGrids().getGrids().toList();
 	}
 
-	public void configure( int numCols , int numRows , boolean forCalibration ) {
-		config = new ConfigChessboard(numCols,numRows,1);
+	public void configure(int numRows, int numCols, boolean forCalibration) {
+		config = new ConfigChessboard(numRows, numCols, 1);
 
 		config.refineWithCorners = forCalibration;
 	}
@@ -109,7 +109,7 @@ public class DetectCalibrationChessApp
 
 		DetectCalibrationChessApp app = new DetectCalibrationChessApp(examples);
 
-		app.configure(5,7,false);
+		app.configure(7, 5, false);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

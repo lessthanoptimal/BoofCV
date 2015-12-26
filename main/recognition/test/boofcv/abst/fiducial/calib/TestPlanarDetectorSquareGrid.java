@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 5, 30,30);
+	private final static ConfigSquareGrid config = new ConfigSquareGrid(5, 3, 30,30);
 
 
 	@Test

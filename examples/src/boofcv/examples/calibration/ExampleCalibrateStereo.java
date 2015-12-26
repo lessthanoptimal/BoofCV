@@ -65,7 +65,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeSquare() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
+		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(7, 5, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -78,7 +78,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeChess() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(5,7, 30));
+		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 

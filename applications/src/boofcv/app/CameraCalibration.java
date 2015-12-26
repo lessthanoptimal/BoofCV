@@ -169,7 +169,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		System.out.println("chessboard: "+numRows+" x "+numColumns);
 
-		ConfigChessboard config = new ConfigChessboard(numColumns,numRows,1);
+		ConfigChessboard config = new ConfigChessboard(numRows, numColumns, 1);
 
 		detector = FactoryCalibrationTarget.detectorChessboard(config);
 	}
@@ -210,7 +210,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		System.out.println("squaregrid: "+numRows+" x "+numColumns+" square/space = "+(square/space));
 
-		ConfigSquareGrid config = new ConfigSquareGrid(numColumns,numRows,square,space);
+		ConfigSquareGrid config = new ConfigSquareGrid(numRows, numColumns, square,space);
 
 		detector = FactoryCalibrationTarget.detectorSquareGrid(config);
 	}

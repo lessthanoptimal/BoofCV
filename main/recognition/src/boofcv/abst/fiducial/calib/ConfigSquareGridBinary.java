@@ -44,14 +44,14 @@ public class ConfigSquareGridBinary implements Configuration {
 	public long ids[];
 
 	/**
-	 * Number of squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
-
-	/**
 	 * Number of squares tall the grid is. Target dependent.
 	 */
 	public int numRows = -1;
+
+	/**
+	 * Number of squares wide the grid is. Target dependent.
+	 */
+	public int numCols = -1;
 
 	/**
 	 * Physical width of the square.

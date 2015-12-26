@@ -117,7 +117,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform_F32 toUndistorted, toDistorted;
 
-	boolean verbose = true;
+	boolean verbose = false;
 
 	// used to remove false positives
 	PolygonEdgeIntensity<T> edgeIntensity;

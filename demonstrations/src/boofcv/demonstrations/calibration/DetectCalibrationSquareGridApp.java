@@ -52,9 +52,9 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	}
 
 
-	public void configure( int numCols , int numRows , double squareWidth, double spaceWidth,
-						   boolean forCalibration ) {
-		config = new ConfigSquareGrid(numCols,numRows,squareWidth,spaceWidth);
+	public void configure(int numRows, int numCols, double squareWidth, double spaceWidth,
+						  boolean forCalibration) {
+		config = new ConfigSquareGrid(numRows, numCols, squareWidth,spaceWidth);
 
 		config.refineWithCorners = forCalibration;
 
@@ -112,7 +112,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(examples);
 
-		app.configure(5,7,1,1,false);
+		app.configure(7, 5, 1,1,false);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

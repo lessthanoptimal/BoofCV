@@ -241,6 +241,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 						Color color = new Color(rgb);
 						for (int j = 0; j < g.nodes.size(); j++) {
 							SquareNode n = g.nodes.get(j);
+							if( n == null )
+								continue;
 							g2.setColor(color);
 							VisualizeShapes.drawPolygon(n.corners, true, scale, g2);
 
@@ -260,17 +262,22 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 			SquareGrid g = grids.get(i);
 			int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
 
-			for (int j = 0; j < g.nodes.size() - 1; j++) {
-				double fraction = j / ((double) g.nodes.size() - 1);
-				fraction = fraction * 0.6 + 0.4;
+			SquareNode p0 = null;
+			for (int j = 0; j < g.nodes.size(); j++) {
+				SquareNode p1 = g.nodes.get(j);
+				if( p1 == null)
+					continue;
+				if( p0 != null) {
+					double fraction = j / ((double) g.nodes.size() - 1);
+					fraction = fraction * 0.6 + 0.4;
 
-				int lineRGB = (int) (fraction * a) << 16 | (int) (fraction * (255 - a)) << 8;
+					int lineRGB = (int) (fraction * a) << 16 | (int) (fraction * (255 - a)) << 8;
 
-				g2.setColor(new Color(lineRGB));
-				SquareNode p0 = g.nodes.get(j);
-				SquareNode p1 = g.nodes.get(j + 1);
-				g2.drawLine((int)(scale*p0.center.x+0.5), (int) (scale*p0.center.y+0.5),
-						(int)(scale*p1.center.x+0.5), (int)(scale*p1.center.y+0.5));
+					g2.setColor(new Color(lineRGB));
+					g2.drawLine((int) (scale * p0.center.x + 0.5), (int) (scale * p0.center.y + 0.5),
+							(int) (scale * p1.center.x + 0.5), (int) (scale * p1.center.y + 0.5));
+				}
+				p0 = p1;
 			}
 		}
 	}
@@ -300,7 +307,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
 			for (int j = 0; j < g.nodes.size(); j++) {
-				if( g.nodes.get(j).corners == p )
+				if( g.nodes.get(j) != null && g.nodes.get(j).corners == p )
 					return true;
 			}
 		}

@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestPlanarDetectorChessboard extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigChessboard config = new ConfigChessboard(4,5,30);
+	private final static ConfigChessboard config = new ConfigChessboard(5, 4, 30);
 
 	@Test
 	public void createLayout() {

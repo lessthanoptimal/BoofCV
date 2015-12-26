@@ -34,14 +34,16 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigChessboard implements Configuration {
-	/**
-	 * Number of squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
+
 	/**
 	 * Number of squares tall the grid is. Target dependent.
 	 */
 	public int numRows = -1;
+
+	/**
+	 * Number of squares wide the grid is. Target dependent.
+	 */
+	public int numCols = -1;
 
 	/**
 	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
@@ -100,9 +102,9 @@ public class ConfigChessboard implements Configuration {
 		configRefineLines.maxIterations = 5;
 	}
 
-	public ConfigChessboard(int numCols, int numRows, double squareWidth ) {
-		this.numCols = numCols;
+	public ConfigChessboard(int numRows, int numCols, double squareWidth) {
 		this.numRows = numRows;
+		this.numCols = numCols;
 		this.squareWidth = squareWidth;
 	}
 

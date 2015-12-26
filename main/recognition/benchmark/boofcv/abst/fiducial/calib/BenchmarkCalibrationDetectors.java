@@ -43,7 +43,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Chessboard extends PerformerBase {
 		CalibrationDetector detector = FactoryCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(5,7,30));
+				detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		@Override
 		public void process() {
@@ -54,7 +54,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class Square extends PerformerBase {
 		CalibrationDetector detector = FactoryCalibrationTarget.
-				detectorSquareGrid(new ConfigSquareGrid(5, 7, 30, 30));
+				detectorSquareGrid(new ConfigSquareGrid(7, 5, 30, 30));
 
 		@Override
 		public void process() {

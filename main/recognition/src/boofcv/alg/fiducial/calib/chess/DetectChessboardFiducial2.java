@@ -44,20 +44,21 @@ import java.util.List;
  * <center>
  * <img src="doc-files/chessboard.jpg"/>
  * </center>
- * Example of a 7 by 5 grid; row, column.
+ * Example of a 5 by 7 grid; column, row.
  *
  * @author Peter Abeles
  */
-public class DetectChessboardFiducial<T extends ImageSingleBand> {
+public class DetectChessboardFiducial2<T extends ImageSingleBand> {
 
-	// detects the chess board 
-	private DetectChessSquarePoints<T> findSeeds;
+	// detects the chess board
+	private DetectChessSquarePoints2<T> findSeeds;
 	// binary images used to detect chess board
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
 	private ImageUInt8 eroded = new ImageUInt8(1, 1);
 
 	// description of the grid its detecting
 	private int numRows,numCols;
+
 
 	InputToBinary<T> inputToBinary;
 
@@ -67,18 +68,18 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 	 * @param numCols Number of columns in the grid.  Target dependent.
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
-	public DetectChessboardFiducial(int numRows, int numCols, double maxCornerDistance,
-									BinaryPolygonDetector<T> detectorSquare,
-									RefineBinaryPolygon<T> refineLine,
-									RefineBinaryPolygon<T> refineCorner,
-									InputToBinary<T> inputToBinary)
+	public DetectChessboardFiducial2(int numRows, int numCols, double maxCornerDistance,
+									 BinaryPolygonDetector<T> detectorSquare,
+									 RefineBinaryPolygon<T> refineLine,
+									 RefineBinaryPolygon<T> refineCorner,
+									 InputToBinary<T> inputToBinary)
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;
 
 		this.inputToBinary = inputToBinary;
 
-		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,maxCornerDistance, detectorSquare);
+		findSeeds = new DetectChessSquarePoints2<T>(numRows,numCols,maxCornerDistance, detectorSquare);
 
 		detectorSquare.setHelper(new ChessboardPolygonHelper<T>(detectorSquare,refineLine,refineCorner));
 
@@ -103,7 +104,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 		return findSeeds.process(gray, eroded);
 	}
 
-	public DetectChessSquarePoints getFindSeeds() {
+	public DetectChessSquarePoints2 getFindSeeds() {
 		return findSeeds;
 	}
 

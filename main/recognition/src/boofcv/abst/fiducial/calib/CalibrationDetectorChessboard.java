@@ -21,6 +21,7 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial2;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
@@ -39,7 +40,7 @@ import java.util.List;
  */
 public class CalibrationDetectorChessboard implements CalibrationDetector {
 
-	DetectChessboardFiducial<ImageFloat32> alg;
+	DetectChessboardFiducial2<ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -59,11 +60,11 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 		InputToBinary<ImageFloat32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
 
-		alg = new DetectChessboardFiducial<ImageFloat32>(
-				config.numCols,config.numRows,config.maximumCornerDistance,detectorSquare,
+		alg = new DetectChessboardFiducial2<ImageFloat32>(
+				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,
 				refineLine,refineCorner,inputToBinary);
 
-		layoutPoints = gridChess(config.numCols,config.numRows,config.squareWidth);
+		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);
 	}
 
 	@Override
@@ -107,7 +108,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	}
 
 
-	public DetectChessboardFiducial<ImageFloat32> getAlgorithm() {
+	public DetectChessboardFiducial2<ImageFloat32> getAlgorithm() {
 		return alg;
 	}
 
@@ -116,12 +117,12 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	 * touches an adjacent square, but the sides are separated.  Only interior square corners provide
 	 * calibration points.
 	 *
-	 * @param numCols Number of grid columns in the calibration target
 	 * @param numRows Number of grid rows in the calibration target
+	 * @param numCols Number of grid columns in the calibration target
 	 * @param squareWidth How wide each square is.  Units are target dependent.
 	 * @return Target description
 	 */
-	public static List<Point2D_F64> gridChess( int numCols , int numRows , double squareWidth )
+	public static List<Point2D_F64> gridChess(int numRows, int numCols, double squareWidth)
 	{
 		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
 

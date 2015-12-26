@@ -318,7 +318,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			throw new RuntimeException("Must specify number of rows and columns");
 
 		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
-		ConfigChessboard config = new ConfigChessboard(cols,rows,width);
+		ConfigChessboard config = new ConfigChessboard(rows, cols, width);
 
 		detector = FactoryFiducial.calibChessboard(config, ImageUInt8.class);
 	}
@@ -355,7 +355,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			space = width;
 
 		System.out.println("square grid: rows = "+rows+" columns = "+cols+"  square width "+width+"  space "+space);
-		ConfigSquareGrid config = new ConfigSquareGrid(cols,rows,width,space);
+		ConfigSquareGrid config = new ConfigSquareGrid(rows, cols, width,space);
 
 		detector = FactoryFiducial.calibSquareGrid(config, ImageUInt8.class);
 	}

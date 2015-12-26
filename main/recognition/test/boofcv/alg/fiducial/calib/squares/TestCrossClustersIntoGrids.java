@@ -39,7 +39,7 @@ public class TestCrossClustersIntoGrids {
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
-				System.out.println(rows+" "+cols);
+//				System.out.println(rows+" "+cols);
 
 				int[] levels = createLevels(rows, cols);
 				List<SquareNode> nodes = createCluster(false,levels);

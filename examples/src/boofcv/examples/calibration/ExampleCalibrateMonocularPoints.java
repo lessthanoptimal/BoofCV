@@ -101,7 +101,7 @@ public class ExampleCalibrateMonocularPoints {
 
 	public static void main( String args[] ) {
 		CalibrationDetector detector = FactoryCalibrationTarget.
-				detectorChessboard(new ConfigChessboard(5, 7, 30));
+				detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		List<CalibrationObservation> calibPts = loadObservations(detector);
 

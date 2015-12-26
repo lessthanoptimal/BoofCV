@@ -72,9 +72,9 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numCols, numRows, width, space));
+			detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numRows, numCols, width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(numCols, numRows,width));
+			detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(numRows, numCols, width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);
 		}

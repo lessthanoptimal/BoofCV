@@ -33,14 +33,16 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigSquareGrid implements Configuration {
-	/**
-	 * Number of squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
+
 	/**
 	 * Number of squares tall the grid is. Target dependent.
 	 */
 	public int numRows = -1;
+
+	/**
+	 * Number of squares wide the grid is. Target dependent.
+	 */
+	public int numCols = -1;
 
 	/**
 	 * Configuration for thresholding the image
@@ -99,9 +101,9 @@ public class ConfigSquareGrid implements Configuration {
 		configRefineLines.maxIterations = 5;
 	}
 
-	public ConfigSquareGrid(int numCols, int numRows, double squareWidth, double spaceWidth) {
-		this.numCols = numCols;
+	public ConfigSquareGrid(int numRows, int numCols, double squareWidth, double spaceWidth) {
 		this.numRows = numRows;
+		this.numCols = numCols;
 		this.squareWidth = squareWidth;
 		this.spaceWidth = spaceWidth;
 	}
