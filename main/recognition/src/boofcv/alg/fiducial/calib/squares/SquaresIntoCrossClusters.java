@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.misc.CircularIndex;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -40,10 +41,10 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	public int maxNeighbors;
 
 	// tolerance for maximum distance away two corners can be to be considered neighbors
-	double maxCornerDistance = 5;
+	double maxCornerDistance;
 
-	// maximum distance two squares can be from each other relative to the size of a square
-	double maxNeighborLengthChange;
+	// when connecting two nodes the connected node's distance to other corners must be at least this much closer
+	double muchCloserFraction = 0.25;
 
 	// used to search for neighbors that which are candidates for connecting
 	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree();
@@ -53,13 +54,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 	/**
 	 * Declares data structures and configures algorithm
-	 * @param maxCornerDistance Maximum number of pixels apart two connected corners can be. UPDATE WHEN USED
-	 * @param maxNeighborLengthChange The maximum number of neighbors it will look at when connecting a node
-	 * @param maxNeighbors Max number of neighbors it will consider.  Try 4 or -1
+	 * @param maxCornerDistance Maximum distance two corners can be in pixels.
+	 * @param maxNeighbors Max number of neighbors it will consider.  Try 4 or -1 for all
 	 */
-	public SquaresIntoCrossClusters(double maxCornerDistance, double maxNeighborLengthChange, int maxNeighbors) {
+	public SquaresIntoCrossClusters(double maxCornerDistance, int maxNeighbors) {
 		this.maxCornerDistance = maxCornerDistance;
-		this.maxNeighborLengthChange = maxNeighborLengthChange;
 		this.maxNeighbors = maxNeighbors > 0 ? maxNeighbors : Integer.MAX_VALUE;
 
 		//  avoid a roll over later on in the code
@@ -123,7 +122,9 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 						continue;
 
 					int neighborCornerIndex = getCornerIndex(neighborNode,neighborData.point[0],neighborData.point[1]);
-					considerConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
+
+					if( candidateIsMuchCloser(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance))
+						considerConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
 				}
 			}
 		}
@@ -162,6 +163,27 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			}
 		}
 		search.setPoints(searchPoints.toList(),searchSquareList);
+	}
+
+	/**
+	 * Checks to see if the two corners which are to be connected are by far the two closest corners between the two
+	 * squares
+	 */
+	boolean candidateIsMuchCloser( SquareNode node0,  int corner0 ,
+								   SquareNode node1 , int corner1 ,
+								   double distance2 )
+	{
+		Point2D_F64 p = node0.corners.get(corner0);
+
+		int cornerU = CircularIndex.addOffset(corner1, 1,4);
+		int cornerL = CircularIndex.addOffset(corner1,-1,4);
+
+		double d0 = node1.corners.get(cornerU).distance2(p);
+		double d1 = node1.corners.get(cornerL).distance2(p);
+
+		if( distance2/d0 > muchCloserFraction*muchCloserFraction )
+			return false;
+		return distance2/d1 <= muchCloserFraction*muchCloserFraction;
 	}
 
 	/**

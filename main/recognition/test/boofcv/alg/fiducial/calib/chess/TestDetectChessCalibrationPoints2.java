@@ -57,7 +57,7 @@ public class TestDetectChessCalibrationPoints2 {
 	public void basicTest() {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
-				System.out.println("shape "+numCols+"  "+numRows);
+//				System.out.println("shape "+numCols+"  "+numRows);
 				basicTest(numRows, numCols);
 			}
 		}

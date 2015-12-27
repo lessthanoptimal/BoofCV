@@ -41,14 +41,14 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class DetectCalibrationChessApp
+public class DetectCalibrationChessboardApp
 		extends CommonDetectCalibrationApp
 
 {
 	DetectChessboardFiducial2<ImageFloat32> alg;
 	ConfigChessboard config;
 
-	public DetectCalibrationChessApp(List<String> exampleInputs) {
+	public DetectCalibrationChessboardApp(List<String> exampleInputs) {
 		super(exampleInputs);
 	}
 	@Override
@@ -103,11 +103,12 @@ public class DetectCalibrationChessApp
 
 		List<String> examples = new ArrayList<String>();
 
+		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distant/image00005.jpg");
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}
 
-		DetectCalibrationChessApp app = new DetectCalibrationChessApp(examples);
+		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(examples);
 
 		app.configure(7, 5, false);
 

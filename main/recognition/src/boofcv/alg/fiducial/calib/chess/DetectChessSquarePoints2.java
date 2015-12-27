@@ -22,7 +22,6 @@ import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
@@ -79,7 +78,7 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 
 		this.detectorSquare = detectorSquare;
 
-		s2c = new SquaresIntoCrossClusters(maxCornerDistance,0.5,-1);
+		s2c = new SquaresIntoCrossClusters(maxCornerDistance,-1);
 		c2g = new CrossClustersIntoGrids();
 	}
 
@@ -111,12 +110,18 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 			if( grid.rows == numRows && grid.columns == numCols ) {
 				// this detector requires that the (0,0) grid cell has a square inside of it
 				if( grid.get(0,0) == null ){
-					if( grid.get(0,grid.columns-1) != null ) {
+					if( grid.get(0,-1) != null ) {
 						tools.flipColumns(grid);
+					} else if( grid.get(-1,0) != null ) {
+						tools.flipRows(grid);
 					} else {
 						continue;
 					}
 				}
+
+				// make sure its in the expected orientation
+				if( !ensureCCW(grid) )
+					continue;
 
 				// If symmetric, ensure that the (0,0) is closest to top-left image corner
 				putIntoCanonical(grid);
@@ -130,6 +135,45 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 	}
 
 	/**
+	 * Ensures that the grid is in a CCW order
+	 */
+	boolean ensureCCW( SquareGrid grid ) {
+		if( grid.columns <= 2 && grid.rows <= 2 )
+			return true;
+
+		Point2D_F64 a,b,c;
+
+		a = grid.get(0,0).center;
+		if( numCols > 2)
+			b = grid.get(0,2).center;
+		else
+			b = grid.get(1,1).center;
+
+		if( numRows > 2)
+			c = grid.get(2,0).center;
+		else
+			c = grid.get(1,1).center;
+
+		double x0 = b.x-a.x;
+		double y0 = b.y-a.y;
+
+		double x1 = c.x-a.x;
+		double y1 = c.y-a.y;
+
+		double z = x0 * y1 - y0 * x1;
+		if( z < 0 ) {
+			// flip it along an axis which is symmetric
+			if( grid.columns%2 == 1 )
+				tools.flipColumns(grid);
+			else if( grid.rows%2 == 1 )
+				tools.flipRows(grid);
+			else
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Examines the grid and makes sure the (0,0) square is the closest one ot the top left corner.
 	 * Only flip operations are allowed along symmetric axises
 	 */
@@ -138,108 +182,36 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 		boolean rowOdd = grid.rows%2 == 1;
 		boolean colOdd = grid.columns%2 == 1;
 
-		if( colOdd ) {
-			double d0 = grid.get(0,0).center.normSq();
-			double d1 = grid.get(0,-1).center.normSq();
-			if( d1 < d0 ) {
-				tools.flipColumns(grid);
-			}
-		}
-
-		if( rowOdd ) {
-			double d0 = grid.get(0,0).center.normSq();
-			double d1 = grid.get(-1,0).center.normSq();
-			if( d1 < d0 ) {
-				tools.flipRows(grid);
-			}
-		}
-	}
-
-	/**
-	 * Adjust the corners in the square's polygon so that they are aligned along the grids overall
-	 * length
-	 *
-	 * @return true if valid grid or false if not
-	 */
-	static boolean orderUberCorners(SquareGrid grid) {
-
-		// the first pass interleaves every other row
-		for (int row = 0; row < grid.rows; row++) {
-
-			for (int col = row%2; col < grid.columns; col += 2) {
-				SquareNode n = grid.get(row,col);
-
-				boolean ordered = false;
-				for (int diag = 0; diag < 4; diag++) {
-					SquareNode d = getDiag(grid,row,col,diag);
-					if( d != null ) {
-						orderCorner(n,d.center,diag);
-						ordered = true;
+		if( colOdd == rowOdd ) {
+			// if odd and square then 4 solutions.  Otherwise just two solution that are on
+			// opposite sides on the grid
+			if( rowOdd && grid.rows == grid.columns ) {
+				int best = -1;
+				double bestDistance = Double.MAX_VALUE;
+				for (int i = 0; i < 4; i++) {
+					SquareNode n = grid.getCornerByIndex(i);
+					double d = n.center.normSq();
+					if( d < bestDistance ) {
+						best = i;
+						bestDistance = d;
 					}
 				}
 
-				if( !ordered )
-					throw new IllegalArgumentException("BUG!");
+				for (int i = 0; i < best; i++) {
+					tools.rotateCCW(grid);
+				}
+			} else {
+				double first = grid.get(0,0).center.normSq();
+				double last = grid.getCornerByIndex(2).center.normSq();
+
+				if( last < first ) {
+					tools.reverse(grid);
+				}
 			}
 		}
-
-		return true;
+		// if only one is odd then there is a unique solution.  Since uber is already in a legit
+		// configuration nothing needs ot be done
 	}
-
-	/**
-	 * Ensures that the nodes in square are in CCW order and that the closest one to 'target' has
-	 * the index 'diag'
-	 */
-	static void orderCorner( SquareNode node , Point2D_F64 target , int diag ) {
-
-		// make sure it goes CCW
-		if( !node.corners.isCCW() )
-			node.corners.flip();
-
-		// see which corner is the closest
-		double closestDistance = Double.MAX_VALUE;
-		int closest = -1;
-		for (int i = 0; i < 4; i++) {
-			double d = target.distance2(node.corners.get(i));
-			if( d < closestDistance ) {
-				closestDistance = d;
-				closest = i;
-			}
-		}
-		// rotate it until its at the specified diagonal
-		int numRotate = diag-closest;
-		if( numRotate < 0 )
-			numRotate = 4 + numRotate;
-
-		for (int i = 0; i < numRotate; i++) {
-			UtilPolygons2D_F64.shiftDown(node.corners);
-		}
-
-	}
-
-	/**
-	 * Returns the node diagonal to the specified coordinate.  If it goes outside the grid then nul
-	 * is returned
-	 */
-	static SquareNode getDiag( SquareGrid grid , int row , int col , int diag ) {
-		int dx=0,dy=0;
-		switch( diag ) {
-			case 0: dx = -1; dy = -1; break;
-			case 1: dx =  1; dy = -1; break;
-			case 2: dx =  1; dy =  1; break;
-			case 3: dx = -1; dy =  1; break;
-		}
-
-		int y = row + dy;
-		int x = col + dx;
-
-		if( y < 0 || y >= grid.rows )
-			return null;
-		if( x < 0 || x >= grid.columns )
-			return null;
-		return grid.get(y,x);
-	}
-
 
 	/**
 	 * Find inner corner points across the grid.  Start from the "top" row and work its way down.  Corners

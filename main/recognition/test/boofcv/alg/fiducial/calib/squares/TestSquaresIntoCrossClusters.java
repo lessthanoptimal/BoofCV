@@ -26,6 +26,7 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -37,7 +38,7 @@ public class TestSquaresIntoCrossClusters {
 	 */
 	@Test
 	public void process_simple() {
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05,0.5, -1);
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
 		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
 		squares.add( createSquare(7,8));
@@ -70,7 +71,7 @@ public class TestSquaresIntoCrossClusters {
 	 */
 	@Test
 	public void process_connect_threshold() {
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.2,0.5, -1);
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.2,-1);
 
 		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
 		squares.add( createSquare(5,6));
@@ -102,7 +103,7 @@ public class TestSquaresIntoCrossClusters {
 		node.corners.get(2).set(7,8);
 		node.corners.get(3).set(8,9);
 
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,0.5, -1);
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
 
 		assertEquals(0,alg.getCornerIndex(node,5,6));
 		assertEquals(1,alg.getCornerIndex(node,6,7));
@@ -111,12 +112,17 @@ public class TestSquaresIntoCrossClusters {
 	}
 
 	@Test
+	public void candidateIsMuchCloser() {
+		fail("implement");
+	}
+
+	@Test
 	public void considerConnect() {
 		SquareNode node0 = new SquareNode();
 		SquareNode node1 = new SquareNode();
 
 		// first do it with no connections
-		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,0.5, -1);
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
 
 		alg.considerConnect(node0,0,node1,0,4);
 
