@@ -21,7 +21,6 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial2;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
@@ -40,7 +39,7 @@ import java.util.List;
  */
 public class CalibrationDetectorChessboard implements CalibrationDetector {
 
-	DetectChessboardFiducial2<ImageFloat32> alg;
+	DetectChessboardFiducial<ImageFloat32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -60,7 +59,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 		InputToBinary<ImageFloat32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
 
-		alg = new DetectChessboardFiducial2<ImageFloat32>(
+		alg = new DetectChessboardFiducial<ImageFloat32>(
 				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,
 				refineLine,refineCorner,inputToBinary);
 
@@ -108,7 +107,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	}
 
 
-	public DetectChessboardFiducial2<ImageFloat32> getAlgorithm() {
+	public DetectChessboardFiducial<ImageFloat32> getAlgorithm() {
 		return alg;
 	}
 

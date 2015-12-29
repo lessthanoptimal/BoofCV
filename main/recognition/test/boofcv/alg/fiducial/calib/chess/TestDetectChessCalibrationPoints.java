@@ -57,14 +57,14 @@ public class TestDetectChessCalibrationPoints {
 	public void basicTest() {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
-//				System.out.println(numCols+"  "+numRows);
-				basicTest(numCols, numRows);
+//				System.out.println("shape "+numCols+"  "+numRows);
+				basicTest(numRows, numCols);
 			}
 		}
 	}
 
-	public void basicTest( int numCols , int numRows ) {
-		ImageFloat32 gray = renderTarget(numCols,numRows);
+	public void basicTest(int numRows, int numCols) {
+		ImageFloat32 gray = renderTarget(numRows, numCols);
 
 //		ImageUInt8 b = new ImageUInt8(w,h);
 //		ThresholdImageOps.threshold(gray,b,50,true);
@@ -85,7 +85,7 @@ public class TestDetectChessCalibrationPoints {
 		assertTrue(alg.process(gray));
 
 		List<Point2D_F64> found = alg.getCalibrationPoints();
-		List<Point2D_F64> expected = calibrationPoints(numCols,numRows);
+		List<Point2D_F64> expected = calibrationPoints(numRows, numCols);
 
 		assertEquals(expected.size(), found.size());
 
@@ -99,7 +99,7 @@ public class TestDetectChessCalibrationPoints {
 		}
 	}
 
-	public ImageFloat32 renderTarget( int numCols , int numRows ) {
+	public ImageFloat32 renderTarget(int numRows, int numCols) {
 		ImageFloat32 gray = new ImageFloat32(w,h);
 		ImageMiscOps.fill(gray,80f);
 
@@ -130,7 +130,7 @@ public class TestDetectChessCalibrationPoints {
 		return gray;
 	}
 
-	public List<Point2D_F64> calibrationPoints( int numCols , int numRows ) {
+	public List<Point2D_F64> calibrationPoints(int numRows, int numCols) {
 
 		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
 

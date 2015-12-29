@@ -19,7 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial2;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -45,7 +45,7 @@ public class DetectCalibrationChessboardApp
 		extends CommonDetectCalibrationApp
 
 {
-	DetectChessboardFiducial2<ImageFloat32> alg;
+	DetectChessboardFiducial<ImageFloat32> alg;
 	ConfigChessboard config;
 
 	public DetectCalibrationChessboardApp(List<String> exampleInputs) {

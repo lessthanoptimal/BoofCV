@@ -44,13 +44,13 @@ import java.util.List;
  * <center>
  * <img src="doc-files/chessboard.jpg"/>
  * </center>
- * Example of a 7 by 5 grid; row, column.
+ * Example of a 5 by 7 grid; column, row.
  *
  * @author Peter Abeles
  */
 public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
-	// detects the chess board 
+	// detects the chess board
 	private DetectChessSquarePoints<T> findSeeds;
 	// binary images used to detect chess board
 	private ImageUInt8 binary = new ImageUInt8(1, 1);
@@ -58,6 +58,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 	// description of the grid its detecting
 	private int numRows,numCols;
+
 
 	InputToBinary<T> inputToBinary;
 
@@ -78,7 +79,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 
 		this.inputToBinary = inputToBinary;
 
-		findSeeds = new DetectChessSquarePoints<T>(numCols, numRows,maxCornerDistance, detectorSquare);
+		findSeeds = new DetectChessSquarePoints<T>(numRows,numCols,maxCornerDistance, detectorSquare);
 
 		detectorSquare.setHelper(new ChessboardPolygonHelper<T>(detectorSquare,refineLine,refineCorner));
 
