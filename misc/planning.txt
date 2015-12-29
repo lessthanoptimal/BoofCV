@@ -6,6 +6,8 @@ Alpha 0.21
     - Only optimize sides/corners which don't touch the border
   * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of the two
     - Should supress noisy regions?
+  * Figure out a way to get it to work with smaller splits.  Like the cotour around the letter F
+    - The initial polygon fit is the weak point
 
 - Fiducial Square
   * Change how the grid is specified
@@ -19,8 +21,6 @@ Alpha 0.21
   * binary pattern grid
   * Ability to change calibration model and recompute
   * Ability to remove images and recompute
-
-Alpha 0.21
 
 - HOG
 

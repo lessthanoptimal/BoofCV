@@ -355,7 +355,7 @@ public class TestCrossClustersIntoGrids {
 		return out;
 	}
 
-	private void connect( SquareNode a , int cornerA , SquareNode b , int cornerB ) {
+	public static void connect( SquareNode a , int cornerA , SquareNode b , int cornerB ) {
 		SquareEdge edge = new SquareEdge();
 		edge.a = a;
 		edge.sideA = cornerA;

@@ -40,11 +40,11 @@ Version : Alpha 0.21
   * Interleaved to MultiSpectral
   * MultiSpectral to Interleaved
 
-- TODO Polygon reject shapes if final polygon doesn't match the initial contour at all
-- TODO Update chessboard to create grid from connecting corners of squares
-- TODO Assisted Calibration - remove images after collected
-- TODO                      - change calibration settings and recompute
-- TODO CameraCalibration should handle video sequences and disable still images
+- TODO Partial chessboard
+  * global threshold
+  * local threshold
+- Redo numbering in square grid
+- TODO change reject to corner using side length instead of distance from other corners
 - TODO See if contour can be improved by splitting line then applying the rule to each half
 - TODO             create a few more unit tests which highlight this issue
 

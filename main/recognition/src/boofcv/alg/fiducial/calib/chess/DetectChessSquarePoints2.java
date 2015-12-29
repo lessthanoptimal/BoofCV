@@ -135,7 +135,9 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Ensures that the grid is in a CCW order
+	 * Ensures that the grid is in a CCW order.  It is assumed that (0,0) is a square.
+	 *
+	 * @return true if it was able to make it CCW or false if it failed to
 	 */
 	boolean ensureCCW( SquareGrid grid ) {
 		if( grid.columns <= 2 && grid.rows <= 2 )
@@ -144,12 +146,12 @@ public class DetectChessSquarePoints2<T extends ImageSingleBand> {
 		Point2D_F64 a,b,c;
 
 		a = grid.get(0,0).center;
-		if( numCols > 2)
+		if( grid.columns > 2)
 			b = grid.get(0,2).center;
 		else
 			b = grid.get(1,1).center;
 
-		if( numRows > 2)
+		if( grid.rows > 2)
 			c = grid.get(2,0).center;
 		else
 			c = grid.get(1,1).center;

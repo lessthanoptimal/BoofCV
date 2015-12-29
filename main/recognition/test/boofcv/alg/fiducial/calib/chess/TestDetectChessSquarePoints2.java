@@ -28,6 +28,7 @@ import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageUInt8;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ejml.simple.SimpleMatrix;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
+import static boofcv.alg.fiducial.calib.squares.TestCrossClustersIntoGrids.connect;
 import static org.junit.Assert.*;
 
 /**
@@ -93,7 +95,7 @@ public class TestDetectChessSquarePoints2 {
 	}
 
 	public void basicTest(int rows, int cols) {
-		System.out.println("grid shape rows = "+ rows +" cols = "+ cols);
+//		System.out.println("grid shape rows = "+ rows +" cols = "+ cols);
 
 		ImageUInt8 binary = createTarget(rows, cols);
 
@@ -198,7 +200,7 @@ public class TestDetectChessSquarePoints2 {
 		DetectChessSquarePoints2 alg = new DetectChessSquarePoints2(2,2,10,null);
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
-				SquareGrid uber = createUber(rows, cols);
+				SquareGrid uber = createGrid(rows, cols);
 
 				alg.putIntoCanonical(uber);
 				checkCanonical(uber);
@@ -234,7 +236,76 @@ public class TestDetectChessSquarePoints2 {
 
 	@Test
 	public void ensureCCW() {
-		fail("implement");
+
+		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
+
+		DetectChessSquarePoints2<ImageUInt8> alg = new DetectChessSquarePoints2<ImageUInt8>(2,2,0.01,null);
+
+		for( int[]shape : shapes ) {
+//			System.out.println(shape[0]+" "+shape[1]);
+			SquareGrid grid = createGrid(shape[0],shape[1]);
+			assertTrue(isCCW((grid)));
+			assertTrue(alg.ensureCCW(grid));
+			assertTrue(isCCW((grid)));
+
+			if( grid.columns%2 == 1)
+				alg.tools.flipColumns(grid);
+			else if( grid.rows%2 == 1)
+				alg.tools.flipRows(grid);
+			else
+				continue;
+
+			assertFalse(isCCW((grid)));
+			assertTrue(alg.ensureCCW(grid));
+			assertTrue(isCCW((grid)));
+		}
+	}
+
+	private static boolean isCCW( SquareGrid grid ) {
+		SquareNode a,b,c;
+		a=b=c=null;
+
+		for (int i = 0; i < grid.columns; i++) {
+			if( grid.get(0,i) != null ) {
+				if( a == null )
+					a = grid.get(0, i);
+				else {
+					b = grid.get(0, i);
+					break;
+				}
+			}
+		}
+		if( b == null ) {
+			for (int i = 0; i < grid.columns; i++) {
+				if (grid.get(1, i) != null) {
+					b = grid.get(1, i);
+				}
+			}
+		}
+
+		for (int i = 0; i < grid.columns; i++) {
+			SquareNode n = grid.get(grid.rows-1,i);
+
+			if( n != null ) {
+				c = n;
+				break;
+			}
+		}
+
+		assertTrue(a!=null);
+		assertTrue(b!=null);
+		assertTrue(c!=null);
+
+		double x0 = b.center.x - a.center.x;
+		double y0 = b.center.y - a.center.y;
+
+		double x1 = c.center.x - a.center.x;
+		double y1 = c.center.y - a.center.y;
+
+		double angle0 = Math.atan2(y0,x0);
+		double angle1 = Math.atan2(y1,x1);
+
+		return UtilAngle.distanceCCW(angle0,angle1) < Math.PI;
 	}
 
 	@Test
@@ -246,9 +317,10 @@ public class TestDetectChessSquarePoints2 {
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
-				SquareGrid uber = createUber(rows, cols);
+//				System.out.println(rows+" "+cols);
+				SquareGrid grid = createGrid(rows, cols);
 
-				assertTrue(alg.computeCalibrationPoints(uber));
+				assertTrue(alg.computeCalibrationPoints(grid));
 
 				assertEquals((rows - 1) * (cols - 1), alg.calibrationPoints.size());
 
@@ -270,31 +342,47 @@ public class TestDetectChessSquarePoints2 {
 		}
 	}
 
-	public static SquareGrid createUber( int rows , int cols ) {
-		SquareGrid uber = new SquareGrid();
-		uber.columns = cols;
-		uber.rows = rows;
+	public static SquareGrid createGrid(int rows , int cols ) {
+		SquareGrid grid = new SquareGrid();
+		grid.columns = cols;
+		grid.rows = rows;
 
 		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				if( row%2 == 0 ) {
 					if( col%2 == 0 ) {
-						uber.nodes.add( createSquare(col*w,row*w,w));
+						grid.nodes.add( createSquare(col*w,row*w,w));
 					} else {
-						uber.nodes.add(null);
+						grid.nodes.add(null);
 					}
 				} else {
 					if( col%2 == 0 ) {
-						uber.nodes.add(null);
+						grid.nodes.add(null);
 					} else {
-						uber.nodes.add( createSquare(col*w,row*w,w));
+						grid.nodes.add( createSquare(col*w,row*w,w));
 					}
 				}
 			}
 		}
 
-		return uber;
+		for (int row = 0; row < rows-1; row++) {
+			for (int col = 0; col < cols; col++) {
+				SquareNode n = grid.get(row,col);
+				if( n == null )
+					continue;
+				if( col > 0 ) {
+					SquareNode a = grid.get(row+1,col-1);
+					connect(n,3,a,1);
+				}
+				if( col < cols-1 ) {
+					SquareNode a = grid.get(row+1,col+1);
+					connect(n,2,a,0);
+				}
+			}
+		}
+
+		return grid;
 	}
 
 	public static SquareNode createSquare( double x , double y , double width ) {

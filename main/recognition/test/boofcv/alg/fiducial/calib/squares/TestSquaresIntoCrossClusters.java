@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -113,7 +113,23 @@ public class TestSquaresIntoCrossClusters {
 
 	@Test
 	public void candidateIsMuchCloser() {
-		fail("implement");
+		SquareNode node0 = new SquareNode();
+		SquareNode node1 = new SquareNode();
+
+		node0.corners = createSquare(10,10);
+		node1.corners = createSquare(11,11);
+
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
+
+		// test obvious cases
+		assertTrue(alg.candidateIsMuchCloser(node0,2,node1,0,0));
+		assertFalse(alg.candidateIsMuchCloser(node0,2,node1,0,20));
+
+		double frac = alg.muchCloserFraction;
+		node1.corners = createSquare(12,10);
+		// the closest neighboring node should be 1 away
+		assertTrue(alg.candidateIsMuchCloser(node0,1,node1,1,Math.pow(frac-1e-6,2)));
+		assertFalse(alg.candidateIsMuchCloser(node0,1,node1,1,Math.pow(frac+1e-6,2)));
 	}
 
 	@Test
