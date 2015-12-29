@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import georegression.geometry.UtilPoint2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -81,16 +82,25 @@ public class SquaresIntoClusters {
 			n.reset();
 			n.corners = squares.get(i);
 
-			// does not assume CW or CCW ordering just that it is ordered
-			lineA.a = n.corners.get(0);
-			lineA.b = n.corners.get(2);
-			lineB.a = n.corners.get(1);
-			lineB.b = n.corners.get(3);
+			int numCorners = n.corners.size();
 
-			Intersection2D_F64.intersection(lineA, lineB, n.center);
+			if( numCorners == 4 ) {
+				// does not assume CW or CCW ordering just that it is ordered
+				lineA.a = n.corners.get(0);
+				lineA.b = n.corners.get(2);
+				lineB.a = n.corners.get(1);
+				lineB.b = n.corners.get(3);
 
-			for (int j = 0; j < 4; j++) {
-				int k = (j+1)%4;
+				// this will be the geometric center and invariant of perspective distortion
+				Intersection2D_F64.intersection(lineA, lineB, n.center);
+			} else {
+				// mean of the points.  It will be in the middle but not the geometric center due
+				// to perspective distortion
+				UtilPoint2D_F64.mean(n.corners.vertexes.data,0,n.corners.size(),n.center);
+			}
+
+			for (int j = 0; j < n.corners.size(); j++) {
+				int k = (j+1)%n.corners.size();
 				double l = n.corners.get(j).distance(n.corners.get(k));
 				n.sideLengths[j] = l;
 				n.largestSide = Math.max(n.largestSide,l);

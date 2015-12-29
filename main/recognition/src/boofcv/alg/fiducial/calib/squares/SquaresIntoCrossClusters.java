@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import boofcv.misc.CircularIndex;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -43,8 +42,8 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	// tolerance for maximum distance away two corners can be to be considered neighbors
 	double maxCornerDistance;
 
-	// when connecting two nodes the connected node's distance to other corners must be at least this much closer
-	double muchCloserFraction = 0.25;
+	// when connecting two nodes the connection's distance must be less than this fraction of the largest side's length
+	double tooFarFraction = 0.3;
 
 	// used to search for neighbors that which are candidates for connecting
 	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree();
@@ -123,7 +122,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 					int neighborCornerIndex = getCornerIndex(neighborNode,neighborData.point[0],neighborData.point[1]);
 
-					if( candidateIsMuchCloser(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance))
+					if( candidateIsMuchCloser(n, neighborNode, neighborData.distance))
 						considerConnect(n, indexLocal, neighborNode, neighborCornerIndex, neighborData.distance);
 				}
 			}
@@ -169,21 +168,16 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * Checks to see if the two corners which are to be connected are by far the two closest corners between the two
 	 * squares
 	 */
-	boolean candidateIsMuchCloser( SquareNode node0,  int corner0 ,
-								   SquareNode node1 , int corner1 ,
+	boolean candidateIsMuchCloser( SquareNode node0 ,
+								   SquareNode node1 ,
 								   double distance2 )
 	{
-		Point2D_F64 p = node0.corners.get(corner0);
+		double length = Math.max(node0.largestSide,node1.largestSide)*tooFarFraction;
+		length *= length;
 
-		int cornerU = CircularIndex.addOffset(corner1, 1,4);
-		int cornerL = CircularIndex.addOffset(corner1,-1,4);
-
-		double d0 = node1.corners.get(cornerU).distance2(p);
-		double d1 = node1.corners.get(cornerL).distance2(p);
-
-		if( distance2/d0 > muchCloserFraction*muchCloserFraction )
+		if( distance2 > length)
 			return false;
-		return distance2/d1 <= muchCloserFraction*muchCloserFraction;
+		return distance2 <= length;
 	}
 
 	/**

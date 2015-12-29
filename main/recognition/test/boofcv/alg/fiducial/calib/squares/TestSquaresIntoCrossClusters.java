@@ -116,20 +116,20 @@ public class TestSquaresIntoCrossClusters {
 		SquareNode node0 = new SquareNode();
 		SquareNode node1 = new SquareNode();
 
-		node0.corners = createSquare(10,10);
-		node1.corners = createSquare(11,11);
+		node0.largestSide = 2;
+		node1.largestSide = 1;
 
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(5,-1);
 
 		// test obvious cases
-		assertTrue(alg.candidateIsMuchCloser(node0,2,node1,0,0));
-		assertFalse(alg.candidateIsMuchCloser(node0,2,node1,0,20));
+		assertTrue(alg.candidateIsMuchCloser(node0,node1,0));
+		assertFalse(alg.candidateIsMuchCloser(node0,node1,20));
 
-		double frac = alg.muchCloserFraction;
+		double frac = alg.tooFarFraction;
 		node1.corners = createSquare(12,10);
 		// the closest neighboring node should be 1 away
-		assertTrue(alg.candidateIsMuchCloser(node0,1,node1,1,Math.pow(frac-1e-6,2)));
-		assertFalse(alg.candidateIsMuchCloser(node0,1,node1,1,Math.pow(frac+1e-6,2)));
+		assertTrue(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac-1e-6,2)));
+		assertFalse(alg.candidateIsMuchCloser(node0,node1,Math.pow(2*frac+1e-6,2)));
 	}
 
 	@Test

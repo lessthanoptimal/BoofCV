@@ -44,7 +44,7 @@ import java.util.List;
  * <center>
  * <img src="doc-files/chessboard.jpg"/>
  * </center>
- * Example of a 5 by 7 grid; column, row.
+ * Example of a 7 by 5 grid; row, column.
  *
  * @author Peter Abeles
  */

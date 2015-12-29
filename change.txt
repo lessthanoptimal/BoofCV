@@ -39,6 +39,9 @@ Version : Alpha 0.21
 - ConvertImage
   * Interleaved to MultiSpectral
   * MultiSpectral to Interleaved
+- Chessboard detector
+  * Links squares together using corners instead of two grids
+  * TODO Can handle squares clipped by image border
 
 - TODO Partial chessboard
   * global threshold
