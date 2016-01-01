@@ -106,7 +106,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			// search all the corners of this node for their neighbors
 			SquareNode n = nodes.get(indexNode);
 
-			for (int indexLocal = 0; indexLocal < 4; indexLocal++) {
+			for (int indexLocal = 0; indexLocal < n.corners.size(); indexLocal++) {
 				double[] point = searchPoints.get(indexCornerList++);
 				// find it's neighbors
 				searchResults.reset();
@@ -133,7 +133,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * Returns the corner index of the specified coordinate
 	 */
 	int getCornerIndex( SquareNode node , double x , double y ) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < node.corners.size(); i++) {
 			Point2D_F64 c = node.corners.get(i);
 			if( c.x == x && c.y == y )
 				return i;
@@ -152,7 +152,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
 
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < n.corners.size(); j++) {
 				Point2D_F64 c = n.corners.get(j);
 				double[] point = searchPoints.grow();
 				point[0] = c.x;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class HelperNister5 {
 	}
 
 	/**
-	 * Construct 10 by 10 coeffient matrix for the following coefficients
+	 * Construct 10 by 10 coefficient matrix for the following coefficients
 	 *
 	 * 'x^3','y^3','x^2*y','x*y^2','x^2*z','x^2','y^2*z','y^2','x*y*z','x*y'
 	 *

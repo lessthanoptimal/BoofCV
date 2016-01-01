@@ -37,9 +37,23 @@ public interface PolygonHelper {
 	void adjustBeforeOptimize( Polygon2D_F64 polygon );
 
 	/**
+	 * User defined filter to accept/reject or modify the contour of a shape.  Called at most twice. First
+	 * with distorted pixels and after distortion has been removed.
+	 *
+	 * @param contour External contour around a shape.  Can be modified
+	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
+	 * @param distorted are the pixels in distorted or undistorted coordinates
+	 * @return true to keep the contour for further processing or false to reject it
+	 */
+	boolean filterContour( List<Point2D_I32> contour , boolean touchesBorder , boolean distorted );
+
+	/**
 	 * Function which allows a custom filter function to be used on the pixel level precise polygon
 	 *
-	 * @return true to keep the polygon, false to reject
+	 * @param external External contour around a shape.  Can be modified
+	 * @param splits Indexes in the contour where the polygon has a vertex
+	 * @param touchesBorder true if the contour touches the image border or false if it doesnt
+	 * @return true to keep the contour for further processing or false to reject it
 	 */
-	boolean filterPolygon(  List<Point2D_I32> external , GrowQueue_I32 splits);
+	boolean filterPixelPolygon(List<Point2D_I32> external , GrowQueue_I32 splits, boolean touchesBorder);
 }

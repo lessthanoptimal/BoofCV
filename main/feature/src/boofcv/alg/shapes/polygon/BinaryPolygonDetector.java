@@ -274,9 +274,16 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					continue;
 				}
 
+				if( helper != null )
+					if( !helper.filterContour(c.external,touchesBorder,true) )
+						continue;
+
 				// remove lens distortion
 				if( toUndistorted != null ) {
 					removeDistortionFromContour(c.external);
+					if( helper != null )
+						if( !helper.filterContour(c.external,touchesBorder,false) )
+							continue;
 				}
 
 				if( !fitPolygon.process(c.external) ) {
@@ -308,7 +315,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				if( helper != null ) {
-					if( !helper.filterPolygon(c.external,splits) ) {
+					if( !helper.filterPixelPolygon(c.external,splits,touchesBorder) ) {
 						if( verbose ) System.out.println("rejected by helper");
 						continue;
 					}
@@ -377,7 +384,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 					Info info = foundInfo.grow();
 					info.external = true;
-					info.touchingBorder = touchesBorder;
+					info.borderCorners.reset();
+
 					info.edgeInside = edgeIntensity.getAverageInside();
 					info.edgeOutside = edgeIntensity.getAverageOutside();
 				} else {
@@ -385,6 +393,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 			}
 		}
+	}
+
+	void determineCornersOnBorder() {
+
 	}
 
 	/**
@@ -541,11 +553,6 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	public static class Info
 	{
 		/**
-		 * Was the shape touching the image border?
-		 */
-		public boolean touchingBorder;
-
-		/**
 		 * Was it created from an external or internal contour
 		 */
 		public boolean external;
@@ -554,5 +561,12 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		 * Average pixel intensity score along the polygon's edge inside and outside
 		 */
 		public double edgeInside,edgeOutside;
+
+		// Indexes of corners which touch the image border
+		public GrowQueue_I32 borderCorners = new GrowQueue_I32();
+
+		public boolean touchesBorder() {
+			return borderCorners.size()>0;
+		}
 	}
 }

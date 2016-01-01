@@ -93,7 +93,12 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 	}
 
 	@Override
-	public boolean filterPolygon(List<Point2D_I32> external, GrowQueue_I32 splits) {
+	public boolean filterContour(List<Point2D_I32> contour, boolean touchesBorder, boolean distorted) {
+		return true;
+	}
+
+	@Override
+	public boolean filterPixelPolygon(List<Point2D_I32> external, GrowQueue_I32 splits, boolean touchesBorder) {
 		return true;
 	}
 }

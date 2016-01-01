@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.util.List;
  *
  * <p>
  * THIS IMPLEMENTATION DOES NOT CONTAIN ALL THE OPTIMIZATIONS OUTLIED IN [1].  A full implementation is
- * quite involved.
+ * quite involved. Example: SVD instead of the proposed QR factorization.
  * </p>
  *
  * <p>
@@ -172,9 +172,9 @@ public class EssentialNister5 {
 		if( !svd.decompose(Q) )
 			throw new RuntimeException("SVD should never fail, probably bad input");
 
+		// While the order of the singular values isn't guaranteed in this implementation, since the system is
+		// under determined the solution is always contained in the last 4 rows of V
 		svd.getV(V,true);
-
-//		System.out.println(" DET V = "+CommonOps.det(V));
 
 		// extract the span of solutions for E from the null space
 		for( int i = 0; i < 9; i++ ) {
