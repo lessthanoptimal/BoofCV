@@ -94,7 +94,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns in the target");
 		System.out.println();
 		System.out.println("Flags for SQUAREGRID:");
-		System.out.println("  --Grid=<rows>:<columns>            Specifies number of rows and columns in the target");
+		System.out.println("  --Grid=<rows>:<columns>            Specifies number of black square rows and columns in the target");
 		System.out.println("  --SquareSpace=<square>:<space>     Specifies side of a square and space between square");
 		System.out.println("                                     Only the ratio matters.");
 		System.out.println("                                     Default: 1:1 square = 1 and space = 1");

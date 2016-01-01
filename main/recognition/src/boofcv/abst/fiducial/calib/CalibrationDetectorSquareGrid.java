@@ -60,7 +60,7 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
 
-		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows/2+1,config.numCols/2+1,
+		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows,config.numCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
 		layoutPoints = createLayout(config.numRows, config.numCols, config.squareWidth,config.spaceWidth);
@@ -94,10 +94,6 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 	public static List<Point2D_F64> createLayout(int numRows, int numCols, double squareWidth, double spaceWidth)
 	{
 		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
-
-		// modify the size so that it's just the number of black squares in the grid
-		numCols = numCols/2 + 1;
-		numRows = numRows/2 + 1;
 
 		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
 		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);

@@ -43,7 +43,7 @@ import java.util.List;
  * <center>
  * <img src="doc-files/square_grid.jpg"/>
  * </center>
- * Example of a 4 by 3 grid.  Note:  In other parts of the code this might be a 5 column by 7 row.
+ * Example of a 4 by 3 grid (row then column).
  * <p>
  *
  * @author Peter Abeles

@@ -35,12 +35,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigSquareGrid config = new ConfigSquareGrid(5, 3, 30,30);
+	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
 
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(5, 3, 0.1, 0.2);
+		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(3, 2, 0.1, 0.2);
 
 		assertEquals(4*6,l.size());
 
@@ -59,25 +59,28 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
 		ImageMiscOps.fill(original, 255);
 
-		int square = original.getWidth() / (Math.max(config.numCols, config.numRows) + 4);
+		int numRows = config.numRows*2-1;
+		int numCols = config.numCols*2-1;
 
-		int targetWidth = square * config.numCols;
-		int targetHeight = square * config.numRows;
+		int square = original.getWidth() / (Math.max(numRows,numCols) + 4);
+
+		int targetWidth = square * numCols;
+		int targetHeight = square * numRows;
 
 		int x0 = (original.width - targetWidth) / 2;
 		int y0 = (original.height - targetHeight) / 2;
 
-		for (int i = 0; i < config.numRows; i += 2) {
+		for (int i = 0; i < numRows; i += 2) {
 			int y = y0 + i * square;
 
-			for (int j = 0; j < config.numCols; j += 2) {
+			for (int j = 0; j < numCols; j += 2) {
 				int x = x0 + j * square;
 				ImageMiscOps.fillRectangle(original, 0, x, y, square, square);
 			}
 		}
 
-		int pointsRow = config.numRows+1;
-		int pointsCol = config.numCols+1;
+		int pointsRow = numRows+1;
+		int pointsCol = numCols+1;
 
 		CalibrationObservation set = new CalibrationObservation();
 		int gridIndex = 0;

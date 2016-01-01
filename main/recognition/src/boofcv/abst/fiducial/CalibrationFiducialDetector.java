@@ -99,8 +99,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
 		CalibrationDetector detector = FactoryCalibrationTarget.detectorSquareGrid(config);
-		int squareCols = config.numCols/2+1;
-		int squareRows = config.numRows/2+1;
+		int squareCols = config.numCols;
+		int squareRows = config.numRows;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
 		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
 

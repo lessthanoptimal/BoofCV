@@ -35,12 +35,12 @@ import boofcv.struct.Configuration;
 public class ConfigSquareGrid implements Configuration {
 
 	/**
-	 * Number of squares tall the grid is. Target dependent.
+	 * Number of black squares tall the grid is. Target dependent.
 	 */
 	public int numRows = -1;
 
 	/**
-	 * Number of squares wide the grid is. Target dependent.
+	 * Number of black squares wide the grid is. Target dependent.
 	 */
 	public int numCols = -1;
 

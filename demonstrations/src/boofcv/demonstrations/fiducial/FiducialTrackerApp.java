@@ -285,7 +285,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
 			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
-			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(7, 5, 0.03, 0.03), imageClass);
+			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(4, 3, 0.03, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {
 			File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
 			try {

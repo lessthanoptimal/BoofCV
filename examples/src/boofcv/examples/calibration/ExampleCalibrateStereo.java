@@ -65,7 +65,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeSquare() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(7, 5, 30, 30));
+		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 

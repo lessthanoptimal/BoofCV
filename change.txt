@@ -42,12 +42,12 @@ Version : Alpha 0.21
 - Chessboard detector
   * Links squares together using corners instead of two grids
   * TODO Can handle squares clipped by image border
+- Square Grid Detector
+  * Changed how the pattern is specified.  Based on black squares now
 
 - TODO Partial chessboard
   * global threshold
   * local threshold
-- Redo numbering in square grid
-- TODO change reject to corner using side length instead of distance from other corners
 - TODO See if contour can be improved by splitting line then applying the rule to each half
 - TODO             create a few more unit tests which highlight this issue
 

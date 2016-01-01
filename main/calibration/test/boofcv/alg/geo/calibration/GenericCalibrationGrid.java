@@ -42,11 +42,11 @@ import java.util.Random;
 public class GenericCalibrationGrid {
 
 	public static List<Point2D_F64> standardLayout() {
-		return CalibrationDetectorSquareGrid.createLayout(5, 4, 30, 30);
+		return CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 	}
 
 	public static CalibrationDetector createStandardConfig() {
-		return FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(5, 4, 30, 30));
+		return FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3, 2, 30, 30));
 	}
 
 	public static DenseMatrix64F createStandardCalibration() {

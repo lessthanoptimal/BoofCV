@@ -64,7 +64,7 @@ public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetecto
 		numPointRows = 2*numRows;
 		numPointCols = 2*numCols;
 
-		layoutPoints = CalibrationDetectorSquareGrid.createLayout(numRows * 2 - 1, numCols * 2 - 1, config.squareWidth, config.spaceWidth);
+		layoutPoints = CalibrationDetectorSquareGrid.createLayout(numRows, numCols, config.squareWidth, config.spaceWidth);
 	}
 
 	@Override

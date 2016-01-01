@@ -64,10 +64,10 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupZhang99() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(15, 15, 0.5, 7.0 / 18.0));
+		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 
 		// load image list
-		String directory = UtilIO.path("data/evaluation/calibration/mono/PULNiX_CCD_6mm_Zhang");
+		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
 		images = BoofMiscOps.directoryList(directory,"CalibIm");
 	}
 
