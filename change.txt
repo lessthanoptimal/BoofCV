@@ -44,6 +44,8 @@ Version : Alpha 0.21
   * TODO Can handle squares clipped by image border
 - Square Grid Detector
   * Changed how the pattern is specified.  Based on black squares now
+- DetectLineHoughPolar
+  * Fixed issue were a strict non-maximum was used when a non-strict was needed causing valid lines to be discarded
 
 - TODO Partial chessboard
   * global threshold
