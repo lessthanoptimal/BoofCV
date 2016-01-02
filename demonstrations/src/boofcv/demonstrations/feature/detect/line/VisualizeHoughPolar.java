@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,6 +74,21 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 
 		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
 		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), false, null);
+
+		// Draw the location of lines onto the magnitude image
+		Graphics2D g2 = renderedTran.createGraphics();
+		g2.setColor(Color.RED);
+		Point2D_F64 location = new Point2D_F64();
+		for( LineParametric2D_F32 l : lines ) {
+			alg.getTransform().lineToCoordinate(l,location);
+			int r = 6;
+			int w = r*2 + 1;
+			int x = (int)(location.x+0.5);
+			int y = (int)(location.y+0.5);
+//			System.out.println(x+" "+y+"  "+renderedTran.getWidth()+" "+renderedTran.getHeight());
+
+			g2.drawOval(x-r,y-r,w,w);
+		}
 
 		ShowImages.showWindow(renderedBinary,"Detected Edges");
 		ShowImages.showWindow(renderedTran,"Parameter Space");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,7 +124,7 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		this.resolutionRange = resolutionRange;
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
-		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, true));
+		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		derivX = gradient.getDerivativeType().createImage(1, 1);
 		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}

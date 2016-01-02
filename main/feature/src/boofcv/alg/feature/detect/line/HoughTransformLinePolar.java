@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,18 +25,32 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.CachedSineCosine_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.UtilLine2D_F32;
+import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.line.LinePolar2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 
 /**
  * <p>
- * Hough transform which uses a polar line representation.  Each pixel that is identified as a potential line
- * in the image is transformed into parameter space as a line.  Local maximals are considered to be
- * true lines in the image.  Parameter space is discretized into a set of bins.  The range can vary from
- * +- the maximum range inside the image and the angle from 0 to PI radians.  How finely discretized an image
- * is effects line detection accuracy.  If too fine lines might not be detected or it will be too noisy.
+ * Hough transform which uses a polar line representation, distance from origin and angle (0 to 180 degrees).
+ * Standard implementation of a hough transform.  1) Gradient intensity image is used to find edge pixels.
+ * 2) All possible lines passing through that point are found. 3) Line parameters are summed up in the line image,
+ * in which each pixel represents a coordinate in parameter space.
+ * 3) Local maximums are found.
+ * </p>
+ * <p> By the nature of this algorithms, lines are forced to be discretized into parameter space.  The range
+ * can vary from +- the maximum range inside the image and the angle from 0 to PI radians.  How
+ * finely discretized an image is effects line detection accuracy.  If too fine lines might not be detected
+ * or it will be too noisy.
+ * </p>
+ * <p>
+ * In the line image, the transform from line parameter coordinate to pixel coordinate is as follow:<br>
+ * x = r*cos(theta) + centerX<br>
+ * y = r*sin(theta) + centerY<br>
  * </p>
  *
  * <p>
@@ -145,9 +159,33 @@ public class HoughTransformLinePolar {
 			LineParametric2D_F32 l = lines.grow();
 			l.p.set(x0,y0);
 			l.slope.set(-s,c);
+
+			Point2D_F64 p2 = new Point2D_F64();
+			lineToCoordinate(l,p2);
 		}
 
 		return lines;
+	}
+
+	/**
+	 * Compute the parameterized coordinate for the line
+	 */
+	public void lineToCoordinate(LineParametric2D_F32 line , Point2D_F64 coordinate ) {
+		line = line.copy();
+		line.p.x -= originX;
+		line.p.y -= originY;
+		LinePolar2D_F32 polar = new LinePolar2D_F32();
+		UtilLine2D_F32.convert(line,polar);
+
+		if( polar.angle < 0 ) {
+			polar.distance = -polar.distance;
+			polar.angle = UtilAngle.toHalfCircle(polar.angle);
+		}
+
+		int w2 = transform.width/2;
+
+		coordinate.x = (int)Math.floor(polar.distance*w2/r_max) + w2;
+		coordinate.y = polar.angle*transform.height/Math.PI;
 	}
 
 	/**
@@ -161,7 +199,10 @@ public class HoughTransformLinePolar {
 
 		int w2 = transform.width/2;
 
+		// The line's slope is encoded using the tangent angle.  Those bins are along the image's y-axis
 		for( int i = 0; i < transform.height; i++ ) {
+			// distance of closest point on line from a line defined by the point (x,y) and
+			// the tangent theta=PI*i/height
 			double p = x*tableTrig.c[i] + y*tableTrig.s[i];
 
 			int col = (int)Math.floor(p * w2 / r_max) + w2;
@@ -171,7 +212,7 @@ public class HoughTransformLinePolar {
 	}
 
 	/**
-	 * Returns the Hough transform image.
+//	 * Returns the Hough transform image.
 	 *
 	 * @return Transform image.
 	 */
