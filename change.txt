@@ -48,6 +48,8 @@ Version : Alpha 0.21
   * Fixed issue were a strict non-maximum was used when a non-strict was needed causing valid lines to be discarded
 - WebcamCapture
   * Provided an easy to use function that allows you to open devices by their /dev name
+- Android
+  * Will automatically detect if image needs to be rotated 180 degrees and then does it.  Needed for the Nexus 5x
 
 
 - TODO Partial chessboard

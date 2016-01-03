@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,17 +82,21 @@ public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread 
 	// if true the input image is flipped horizontally
 	boolean flipHorizontal;
 
+	// number of degrees the camera preview needs to be rotated
+	int previewRotation;
+
 	protected VideoRenderProcessing(ImageType<T> imageType) {
 		this.imageType = imageType;
 	}
 
 	@Override
-	public void init(View view, Camera camera , Camera.CameraInfo info ) {
+	public void init(View view, Camera camera , Camera.CameraInfo info , int previewRotation ) {
 		synchronized (lockGui) {
 			this.view = view;
 
 			// Front facing cameras need to be flipped to appear correctly
 			flipHorizontal = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
+			this.previewRotation = previewRotation;
 			Camera.Size size = camera.getParameters().getPreviewSize();
 			outputWidth = size.width;
 			outputHeight = size.height;
@@ -172,7 +176,14 @@ public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread 
 				throw new RuntimeException("Unexpected image type: "+imageType);
 			}
 
-			if( flipHorizontal )
+			if( previewRotation == 180 ) {
+				if( flipHorizontal ) {
+					GImageMiscOps.flipVertical(image);
+				} else {
+					GImageMiscOps.flipVertical(image);
+					GImageMiscOps.flipHorizontal(image);
+				}
+			} else if( flipHorizontal )
 				GImageMiscOps.flipHorizontal(image);
 		}
 		// wake up the thread and tell it to do some processing

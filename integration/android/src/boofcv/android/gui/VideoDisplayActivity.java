@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.android.gui;
 
 import android.app.Activity;
@@ -7,11 +25,11 @@ import android.graphics.Paint;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
 import android.widget.LinearLayout.LayoutParams;
 
 /**
@@ -54,6 +72,9 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	LinearLayout contentView;
 	FrameLayout preview;
 
+	// number of degrees the preview image neesd to be rotated
+	protected int previewRotation;
+
 	public VideoDisplayActivity() {
 	}
 
@@ -77,7 +98,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 		this.processing = processing;
 		// if the camera is null then it will be initialized when the camera is initialized
 		if( processing != null && mCamera != null ) {
-			processing.init(mDraw,mCamera,mCameraInfo);
+			processing.init(mDraw,mCamera,mCameraInfo,previewRotation);
 		}
 	}
 
@@ -158,12 +179,13 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	private void setUpAndConfigureCamera() {
 		// Open and configure the camera
 		mCamera = openConfigureCamera(mCameraInfo);
+		setCameraDisplayOrientation(mCameraInfo,mCamera);
 
 		// Create an instance of Camera
 		mPreview.setCamera(mCamera);
 
 		if( processing != null ) {
-			processing.init(mDraw,mCamera,mCameraInfo);
+			processing.init(mDraw,mCamera,mCameraInfo,previewRotation);
 		}
 	}
 
@@ -173,6 +195,31 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 * @return camera
 	 */
 	protected abstract Camera openConfigureCamera( Camera.CameraInfo cameraInfo);
+
+	public void setCameraDisplayOrientation(Camera.CameraInfo info,
+											Camera camera) {
+
+		int rotation = this.getWindowManager().getDefaultDisplay()
+				.getRotation();
+		int degrees = 0;
+		switch (rotation) {
+			case Surface.ROTATION_0: degrees = 0; break;
+			case Surface.ROTATION_90: degrees = 90; break;
+			case Surface.ROTATION_180: degrees = 180; break;
+			case Surface.ROTATION_270: degrees = 270; break;
+		}
+
+		int result;
+		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+			result = (info.orientation + degrees) % 360;
+			result = (360 - result) % 360;  // compensate the mirror
+		} else {  // back-facing
+			result = (info.orientation - degrees + 360) % 360;
+		}
+		camera.setDisplayOrientation(result);
+
+		previewRotation = result;
+	}
 
 	@Override
 	public void onPreviewFrame(byte[] bytes, Camera camera) {
