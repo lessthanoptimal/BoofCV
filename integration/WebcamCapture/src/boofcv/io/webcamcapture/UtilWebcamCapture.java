@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.io.webcamcapture;
 import com.github.sarxos.webcam.Webcam;
 
 import java.awt.*;
+import java.util.List;
+
 
 /**
  * Utility functions related to Webcam capture
@@ -37,6 +39,33 @@ public class UtilWebcamCapture {
 		adjustResolution(webcam,desiredWidth,desiredHeight);
 		webcam.open();
 		return webcam;
+	}
+
+	/**
+	 * Searches for the first device which matches the pattern.  Webcam capture doesn't name devices
+	 * using the standard "/dev/video0" scheme, but it includes that in its name.
+	 *
+	 * @param deviceName Partial or complete name of the device you wish to pen
+	 * @return The webcam it found
+	 */
+	public static Webcam openDevice( String deviceName , int desiredWidth , int desiredHeight ) {
+		Webcam webcam = findDevice(deviceName);
+		if( webcam == null )
+			throw new IllegalArgumentException("Can't find camera "+deviceName);
+		adjustResolution(webcam,desiredWidth,desiredHeight);
+		webcam.open();
+		return webcam;
+	}
+
+	public static Webcam findDevice( String deviceName ) {
+		List<Webcam> found = Webcam.getWebcams();
+
+		for( Webcam cam : found ) {
+			if( cam.getName().contains(deviceName)) {
+				return cam;
+			}
+		}
+		return null;
 	}
 
 	public static void adjustResolution( Webcam webcam , int desiredWidth , int desiredHeight ) {

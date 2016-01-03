@@ -32,7 +32,7 @@ Version : Alpha 0.21
   * Image border is used to remove false positives
 - Change / Clarified behavior of non-maximum suppression classes
   * Border refers to the border around the image in which extremes cannot be found
-  * A pixel inside the border can have a value larger than one inside and prevent it from being considered
+  * A pixel inside the border can have a value larger than one inside the image and prevent it from being considered
     an extreme
 - FactoryPlanarCalibrationTarget renamed to FactoryCalibrationTarget
 - Improved visualization in ShapeFitContourApp
@@ -46,6 +46,9 @@ Version : Alpha 0.21
   * Changed how the pattern is specified.  Based on black squares now
 - DetectLineHoughPolar
   * Fixed issue were a strict non-maximum was used when a non-strict was needed causing valid lines to be discarded
+- WebcamCapture
+  * Provided an easy to use function that allows you to open devices by their /dev name
+
 
 - TODO Partial chessboard
   * global threshold

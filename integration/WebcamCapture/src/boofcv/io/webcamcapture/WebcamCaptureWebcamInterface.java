@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 				int which = Integer.parseInt(device);
 				webcam = Webcam.getWebcams().get(which);
 			}catch (NumberFormatException ignore) {
-				webcam = Webcam.getWebcamByName(device);
+				webcam = UtilWebcamCapture.findDevice(device);
 			}
 			if( webcam == null ) {
 				throw new RuntimeException("Can't find webcam with ID or name at "+device);
