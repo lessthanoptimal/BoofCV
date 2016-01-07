@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,12 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
@@ -115,7 +117,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private List<Contour> foundContours = new ArrayList<Contour>();
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform_F32 toUndistorted, toDistorted;
+	protected PixelTransform_F32 distToUndist, undistToDist;
 
 	boolean verbose = false;
 
@@ -180,17 +182,17 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
-	 * @param toUndistorted Transform from undistorted to distorted image.
-	 * @param toDistorted Transform from distorted to undistorted image.
+	 * @param distToUndist Transform from distorted to undistorted image.
+	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion( int width , int height ,
-								   PixelTransform_F32 toUndistorted , PixelTransform_F32 toDistorted ) {
+								   PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist ) {
 
-		this.toUndistorted = toUndistorted;
-		this.toDistorted = toDistorted;
+		this.distToUndist = distToUndist;
+		this.undistToDist = undistToDist;
 
 		// sanity check since I think many people will screw this up.
-		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, toUndistorted);
+		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, distToUndist);
 		float x1 = rect.x0 + rect.width;
 		float y1 = rect.y0 + rect.height;
 
@@ -201,10 +203,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		}
 
 		if( refinePolygon != null ) {
-			refinePolygon.setLensDistortion(width, height, toUndistorted, toDistorted);
+			refinePolygon.setLensDistortion(width, height, distToUndist, undistToDist);
 		}
 
-		edgeIntensity.setTransform(toDistorted);
+		edgeIntensity.setTransform(undistToDist);
 	}
 
 	/**
@@ -279,7 +281,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 						continue;
 
 				// remove lens distortion
-				if( toUndistorted != null ) {
+				if( distToUndist != null ) {
 					removeDistortionFromContour(c.external);
 					if( helper != null )
 						if( !helper.filterContour(c.external,touchesBorder,false) )
@@ -386,6 +388,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 					info.external = true;
 					info.borderCorners.reset();
 
+					if( touchesBorder ) {
+						// tolerance is a little bit above 0.5.pixels due to prior rounding to integer
+						determineCornersOnBorder(refined, info.borderCorners, 0.7f);
+					}
 					info.edgeInside = edgeIntensity.getAverageInside();
 					info.edgeOutside = edgeIntensity.getAverageOutside();
 				} else {
@@ -395,8 +401,37 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		}
 	}
 
-	void determineCornersOnBorder() {
+	/**
+	 * Check to see if corners are touching the image border
+	 * @param polygon Refined polygon
+	 * @param corners storage for corner indexes
+	 */
+	void determineCornersOnBorder( Polygon2D_F64 polygon , GrowQueue_B corners , float tol ) {
+		corners.reset();
+		for (int i = 0; i < polygon.size(); i++) {
+			corners.add(isUndistortedOnBorder(polygon.get(i),tol));
+		}
+	}
 
+	/**
+	 * Coverts the point into distorted image coordinates and then checks to see if it is on the image border
+	 * @param undistorted pixel in undistorted coordinates
+	 * @param tol Tolerance for a point being on the image border
+	 * @return true if on the border or false otherwise
+	 */
+	boolean isUndistortedOnBorder( Point2D_F64 undistorted , float tol ) {
+		float x,y;
+
+		if( undistToDist == null ) {
+			x = (float)undistorted.x;
+			y = (float)undistorted.y;
+		} else {
+			undistToDist.compute((int)Math.round(undistorted.x),(int)Math.round(undistorted.y));
+			x = undistToDist.distX;
+			y = undistToDist.distY;
+		}
+
+		return( x <= tol || y <= tol || x+tol >= labeled.width-1 || y+tol >= labeled.height-1 );
 	}
 
 	/**
@@ -433,10 +468,10 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private void removeDistortionFromContour(List<Point2D_I32> contour) {
 		for (int j = 0; j < contour.size(); j++) {
 			Point2D_I32 p = contour.get(j);
-			toUndistorted.compute(p.x,p.y);
+			distToUndist.compute(p.x,p.y);
 			// round to minimize error
-			p.x = Math.round(toUndistorted.distX);
-			p.y = Math.round(toUndistorted.distY);
+			p.x = Math.round(distToUndist.distX);
+			p.y = Math.round(distToUndist.distY);
 		}
 	}
 
@@ -562,11 +597,22 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		 */
 		public double edgeInside,edgeOutside;
 
-		// Indexes of corners which touch the image border
-		public GrowQueue_I32 borderCorners = new GrowQueue_I32();
+		/**
+		 * Boolean value for each corner being along the border.  If empty then non of the corners are long the border.
+		 * true means the corner is a border corner.
+		 */
+		public GrowQueue_B borderCorners = new GrowQueue_B();
 
 		public boolean touchesBorder() {
-			return borderCorners.size()>0;
+			if( borderCorners.size() == 0 )
+				return false;
+			else {
+				for (int i = 0; i < borderCorners.size(); i++) {
+					if( borderCorners.get(i))
+						return true;
+				}
+			}
+			return false;
 		}
 	}
 }

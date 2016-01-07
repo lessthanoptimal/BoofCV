@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public interface RefineBinaryPolygon<T extends ImageSingleBand> {
 	 * Specifies lens distortion
 	 */
 	void setLensDistortion( int width , int height ,
-							PixelTransform_F32 toUndistorted , PixelTransform_F32 toDistorted );
+							PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist );
 
 	/**
 	 * Refines the initial polygon

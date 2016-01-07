@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,8 +129,8 @@ public class RefinePolygonLineToImage<T extends ImageSingleBand> implements Refi
 	}
 
 	@Override
-	public void setLensDistortion(int width, int height, PixelTransform_F32 toUndistorted, PixelTransform_F32 toDistorted) {
-		this.snapToEdge.setTransform(toDistorted);
+	public void setLensDistortion(int width, int height, PixelTransform_F32 distToUndist, PixelTransform_F32 undistToDist) {
+		this.snapToEdge.setTransform(undistToDist);
 	}
 
 	/**
