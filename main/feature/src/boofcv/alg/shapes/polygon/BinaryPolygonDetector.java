@@ -114,6 +114,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private boolean outputClockwise;
 
 	// storage for the contours associated with a found target.  used for debugging
+	// All contours are in distorted pixel coordiantes
 	private List<Contour> foundContours = new ArrayList<Contour>();
 
 	// transforms which can be used to handle lens distortion
@@ -130,6 +131,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	// helper used to customize low level behaviors internally
 	private PolygonHelper helper;
+
+	// storage for contour in undistorted image pixels
+	private FastQueue<Point2D_I32> contourUndist = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
 
 	/**
 	 * Configures the detector.
@@ -281,14 +285,18 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 						continue;
 
 				// remove lens distortion
+				List<Point2D_I32> contourUndist;
 				if( distToUndist != null ) {
-					removeDistortionFromContour(c.external);
+					removeDistortionFromContour(c.external,this.contourUndist);
+					contourUndist = this.contourUndist.toList();
 					if( helper != null )
-						if( !helper.filterContour(c.external,touchesBorder,false) )
+						if( !helper.filterContour(contourUndist,touchesBorder,false) )
 							continue;
+				} else {
+					contourUndist = c.external;
 				}
 
-				if( !fitPolygon.process(c.external) ) {
+				if( !fitPolygon.process(contourUndist) ) {
 					if( verbose ) System.out.println("rejected polygon initial fit failed. contour size = "+c.external.size());
 					continue;
 				}
@@ -300,7 +308,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				// Perform a local search and improve the corner placements
-				if( !improveContour.fit(c.external,splits) ) {
+				if( !improveContour.fit(contourUndist,splits) ) {
 					if( verbose ) System.out.println("rejected improve contour. contour size = "+c.external.size());
 					continue;
 				}
@@ -317,7 +325,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				}
 
 				if( helper != null ) {
-					if( !helper.filterPixelPolygon(c.external,splits,touchesBorder) ) {
+					if( !helper.filterPixelPolygon(contourUndist,c.external,splits,touchesBorder) ) {
 						if( verbose ) System.out.println("rejected by helper");
 						continue;
 					}
@@ -326,7 +334,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				// convert the format of the initial crude polygon
 				workPoly.vertexes.resize(splits.size());
 				for (int j = 0; j < splits.size(); j++) {
-					Point2D_I32 p = c.external.get( splits.get(j));
+					Point2D_I32 p = contourUndist.get( splits.get(j));
 					workPoly.get(j).set(p.x,p.y);
 				}
 
@@ -360,7 +368,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 				boolean success;
 				if( refinePolygon != null ) {
 					refinePolygon.setImage(gray);
-					success = refinePolygon.refine(workPoly,c.external,splits,refined);
+					success = refinePolygon.refine(workPoly,contourUndist,splits,refined);
 					if( verbose && !success ) System.out.println("Rejected after refinePolygon");
 				} else {
 					refined.set(workPoly);
@@ -465,13 +473,19 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	/**
 	 * Removes lens distortion from the found contour
 	 */
-	private void removeDistortionFromContour(List<Point2D_I32> contour) {
-		for (int j = 0; j < contour.size(); j++) {
-			Point2D_I32 p = contour.get(j);
+	private void removeDistortionFromContour(List<Point2D_I32> distorted, FastQueue<Point2D_I32> undistorted ) {
+		undistorted.reset();
+		for (int j = 0; j < distorted.size(); j++) {
+			// remove distortion
+			Point2D_I32 p = distorted.get(j);
 			distToUndist.compute(p.x,p.y);
+
 			// round to minimize error
-			p.x = Math.round(distToUndist.distX);
-			p.y = Math.round(distToUndist.distY);
+			int x = Math.round(distToUndist.distX);
+			int y = Math.round(distToUndist.distY);
+
+			// save the results
+			undistorted.grow().set(x,y);
 		}
 	}
 
@@ -567,6 +581,14 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 	public void setEdgeThreshold(double edgeThreshold) {
 		this.edgeThreshold = edgeThreshold;
+	}
+
+	public PixelTransform_F32 getDistToUndist() {
+		return distToUndist;
+	}
+
+	public PixelTransform_F32 getUndistToDist() {
+		return undistToDist;
 	}
 
 	/**
