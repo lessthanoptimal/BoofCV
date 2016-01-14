@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,8 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.Point2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class TestPnPStereoEstimator extends CommonStereoMotionNPoint {
 		PnPStereoEstimator alg = new PnPStereoEstimator(pnp,distanceMono,numExtra);
 
 		Se3_F64 expected = new Se3_F64();
-		expected.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		expected.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
 		expected.getT().set(0.2,-0.1,0.01);
 
 		generateScene(alg.getMinimumPoints(),expected,false);

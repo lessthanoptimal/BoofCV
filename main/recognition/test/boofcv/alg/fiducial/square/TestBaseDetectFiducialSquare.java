@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,6 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.gui.image.ShowImages;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
@@ -42,7 +41,8 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -188,7 +188,7 @@ public class TestBaseDetectFiducialSquare {
 
 		Se3_F64 targetToWorld = new Se3_F64();
 		targetToWorld.getT().set(0.1,-0.07,1.5);
-		RotationMatrixGenerator.eulerXYZ(0.03,0.1,0,targetToWorld.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.03,0.1,0,targetToWorld.getR());
 
 		Quadrilateral_F64 quad = new Quadrilateral_F64();
 

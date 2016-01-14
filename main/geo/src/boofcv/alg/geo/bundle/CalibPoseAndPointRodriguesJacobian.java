@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -133,7 +133,7 @@ public class CalibPoseAndPointRodriguesJacobian implements FunctionNtoMxN {
 				rodrigues.setParamVector(rodX,rodY,rodZ);
 				rodJacobian.process(rodX,rodY,rodZ);
 			
-				RotationMatrixGenerator.rodriguesToMatrix(rodrigues,R);
+				ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,R);
 				ViewPointObservations obs = observations.get(i);
 				gradientViewMotionAndPoint(input, paramIndex-6, obs);
 			} else {

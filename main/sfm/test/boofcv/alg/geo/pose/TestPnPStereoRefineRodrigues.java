@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo.pose;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -64,7 +65,7 @@ public class TestPnPStereoRefineRodrigues extends CommonStereoMotionNPoint {
 
 		Se3_F64 input = worldToLeft.copy();
 		// noise up the initial guess
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1, -0.04, -0.2, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, -0.2, null);
 		CommonOps.mult(R,input.getR().copy(),input.getR());
 		input.T.x += 0.2;
 		input.T.x -= 0.05;

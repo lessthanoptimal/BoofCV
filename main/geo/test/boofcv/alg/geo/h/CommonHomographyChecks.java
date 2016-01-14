@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,9 @@
 package boofcv.alg.geo.h;
 
 import boofcv.struct.geo.AssociatedPair;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -52,7 +53,7 @@ public class CommonHomographyChecks {
 	public void createScene( int numPoints , boolean isPixels ) {
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space

@@ -19,7 +19,9 @@
 # Works with Sage Version 5.2
 
 from sage.all import *
+
 from utilsymbolic import *
+
 
 def printCoef( equation , power ):
   # Make sure negative symbols are not stripped and split into multiplicative blocks

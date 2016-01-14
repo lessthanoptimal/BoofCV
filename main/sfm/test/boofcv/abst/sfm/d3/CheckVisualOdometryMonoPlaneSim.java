@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageSingleBand;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -148,7 +149,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(cameraAngle), 0.1, 0.0, cameraToPlane.getR());
 		cameraToPlane.getT().set(0,-2,0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
@@ -162,7 +163,7 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageSingleBand>
 		for( int i = 0; i < 10; i++ ) {
 //			System.out.println("-------- Real rotY = "+angleRate*i);
 			worldToCurr.getT().z = -i*forwardRate; // move forward
-			RotationMatrixGenerator.rotY(angleRate*i,worldToCurr.getR());
+			ConvertRotation3D_F64.rotY(angleRate*i,worldToCurr.getR());
 
 			worldToCurr.concat(planeToCamera,worldToCamera);
 

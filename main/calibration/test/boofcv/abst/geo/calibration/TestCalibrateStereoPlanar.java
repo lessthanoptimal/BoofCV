@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,8 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageFloat32;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -58,11 +59,11 @@ public class TestCalibrateStereoPlanar {
 		double z = 250;
 		double w = 40;
 
-		targetToLeft.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0, 0, null), new Vector3D_F64(0, 0, z)));
-		targetToLeft.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.1, 0, 0, null), new Vector3D_F64(w, 0, z)));
-		targetToLeft.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0.1, 0, null), new Vector3D_F64(w, w, z)));
-		targetToLeft.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
-		targetToLeft.add(new Se3_F64(RotationMatrixGenerator.eulerXYZ(0.05, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
+		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, 0, null), new Vector3D_F64(0, 0, z)));
+		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 0, 0, null), new Vector3D_F64(w, 0, z)));
+		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0.1, 0, null), new Vector3D_F64(w, w, z)));
+		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
+		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
 
 		leftToRight.getT().set(100,0,0);
 	}

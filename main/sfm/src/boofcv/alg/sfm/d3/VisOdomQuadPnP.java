@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.sfm.Stereo2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -450,7 +451,7 @@ public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
 	}
 
 	private String toString( Se3_F64 motion ) {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),(double[])null);
+		double euler[] = ConvertRotation3D_F64.matrixToEuler(motion.getR(), EulerType.XYZ,(double[])null);
 		return String.format("%5e %5e %5e",euler[0],euler[1],euler[2]);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
@@ -84,7 +84,7 @@ public class TestRodriguesRotationGradient {
 			r.setParamVector(input[0],input[1],input[2]);
 			DenseMatrix64F M = DenseMatrix64F.wrap(3,3,output);
 
-			RotationMatrixGenerator.rodriguesToMatrix(r,M);
+			ConvertRotation3D_F64.rodriguesToMatrix(r,M);
 		}
 	}
 

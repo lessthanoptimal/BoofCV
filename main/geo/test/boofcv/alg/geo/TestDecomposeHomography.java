@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDecomposeHomography {
 
-	DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1, -0.04, 0.08, null);
+	DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.04, 0.08, null);
 	Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 	double d = 2;

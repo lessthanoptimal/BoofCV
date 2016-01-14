@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,8 @@ package boofcv.alg.geo.robust;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
@@ -59,7 +60,7 @@ public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homograp
 		double rotZ = rand.nextGaussian();
 
 
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ, null);
 		Vector3D_F64 T = new Vector3D_F64(0.2,-0.5,3);
 		Vector3D_F64 N = new Vector3D_F64(-0.5,1,3);
 

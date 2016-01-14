@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -112,7 +112,7 @@ public class Zhang99DecomposeHomography {
 		Se3_F64 ret = new Se3_F64();
 		// the R matrix is probably not a real rotation matrix.  So find
 		// the closest real rotation matrix
-		RotationMatrixGenerator.approximateRotationMatrix(R,ret.getR());
+		ConvertRotation3D_F64.approximateRotationMatrix(R,ret.getR());
 		ret.getT().set(t.data[0],t.data[1],t.data[2]);
 
 		return ret;

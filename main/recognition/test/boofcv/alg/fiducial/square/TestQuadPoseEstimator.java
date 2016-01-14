@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -45,7 +46,7 @@ public class TestQuadPoseEstimator {
 
 		Se3_F64 expectedW2C = new Se3_F64();
 		expectedW2C.T.set(0.1,-0.05,4);
-		RotationMatrixGenerator.eulerXYZ(0.03,0,0,expectedW2C.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.03,0,0,expectedW2C.R);
 
 		Quadrilateral_F64 quadPlane = new Quadrilateral_F64(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
 		Quadrilateral_F64 quadViewed = new Quadrilateral_F64();
@@ -78,7 +79,7 @@ public class TestQuadPoseEstimator {
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
-		RotationMatrixGenerator.eulerXYZ(0.05,0.015,0.001,fiducialToCamera.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05,0.015,0.001,fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
 		alg.setIntrinsic(intrinsic);
@@ -115,7 +116,7 @@ public class TestQuadPoseEstimator {
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
-		RotationMatrixGenerator.eulerXYZ(0.05, 0.015, 0.001, fiducialToCamera.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0.015, 0.001, fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
 		alg.setIntrinsic(intrinsic);

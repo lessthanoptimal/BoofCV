@@ -20,8 +20,6 @@
 # Works with Sage Version 5.2
 
 from numpy.core.fromnumeric import var
-from numpy.linalg.linalg import det
-
 from sage.all import *
 
 def symMatrix( numRows , numCols , letter ):

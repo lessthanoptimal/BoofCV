@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,9 @@
 package boofcv.alg.sfm.overhead;
 
 import boofcv.struct.calib.IntrinsicParameters;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
@@ -93,7 +94,7 @@ public class TestSelectOverheadParameters {
 	}
 
 	private void createExtrinsic( double y , double rotX , double rotZ ) {
-		RotationMatrixGenerator.eulerXYZ(rotX, 0, rotZ, cameraToPlane.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, 0, rotZ, cameraToPlane.getR());
 		cameraToPlane.getT().set(0,y,0);
 		planeToCamera = cameraToPlane.invert(null);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,8 @@
 package boofcv.alg.geo.triangulate;
 
 import boofcv.alg.geo.MultiViewOps;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -56,8 +57,8 @@ public class CommonTriangulationChecks {
 			// random motion from world to frame 'i'
 			Se3_F64 tranWtoI = new Se3_F64();
 			if( i > 0 ) {
-				tranWtoI.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2,
-						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1 ));
+				tranWtoI.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
+						rand.nextGaussian()*0.01, rand.nextGaussian()*0.05, rand.nextGaussian()*0.1,null ));
 				tranWtoI.getT().set(0.2+rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, rand.nextGaussian()*0.01);
 			}
 

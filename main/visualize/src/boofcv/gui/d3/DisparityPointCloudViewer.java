@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -275,7 +276,7 @@ public class DisparityPointCloudViewer extends JPanel {
 		Vector3D_F64 rotPt = new Vector3D_F64(offsetX*adjust,offsetY*adjust,z* range);
 
 		double radians = tiltAngle*Math.PI/180.0;
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(radians,0,0,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,radians,0,0,null);
 
 		Se3_F64 a = new Se3_F64(R,rotPt);
 

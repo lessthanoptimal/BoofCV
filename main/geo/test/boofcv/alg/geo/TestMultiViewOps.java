@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,9 @@ import boofcv.alg.geo.h.CommonHomographyInducedPlane;
 import boofcv.struct.Tuple2;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -74,10 +75,10 @@ public class TestMultiViewOps {
 		worldToCam2 = new Se3_F64();
 		worldToCam3 = new Se3_F64();
 
-		RotationMatrixGenerator.eulerXYZ(0.2, 0.001, -0.02, worldToCam2.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, 0.001, -0.02, worldToCam2.R);
 		worldToCam2.getT().set(0.3, 0, 0.05);
 
-		RotationMatrixGenerator.eulerXYZ(0.8, -0.02, 0.003, worldToCam3.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.8, -0.02, 0.003, worldToCam3.R);
 		worldToCam3.getT().set(0.6, 0.2, -0.02);
 
 		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
@@ -454,7 +455,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void createEssential() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.05, -0.04, 0.1, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, -0.04, 0.1, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 		T.normalize();
 
@@ -498,7 +499,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void createHomography_calibrated() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
 		double d = 2;
@@ -522,7 +523,7 @@ public class TestMultiViewOps {
 	@Test
 	public void createHomography_uncalibrated() {
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.01,0.2, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
 		double d = 2;
@@ -547,7 +548,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void extractEpipoles_stereo() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
 		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
@@ -571,7 +572,7 @@ public class TestMultiViewOps {
 	@Test
 	public void canonicalCamera() {
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(200, 250, 0, 100, 110);
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
 		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
@@ -606,7 +607,7 @@ public class TestMultiViewOps {
 	public void decomposeCameraMatrix() {
 		// compute an arbitrary projection matrix from known values
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(200, 250, 0, 100, 110);
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
 		DenseMatrix64F P = new DenseMatrix64F(3,4);
@@ -637,7 +638,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void decomposeEssential() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(1,2,-0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
 		DenseMatrix64F E = MultiViewOps.createEssential(R,T);
@@ -670,7 +671,7 @@ public class TestMultiViewOps {
 
 	@Test
 	public void decomposeHomography() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.2, -0.06, -0.05, null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.06, -0.05, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 		double d = 2.5;

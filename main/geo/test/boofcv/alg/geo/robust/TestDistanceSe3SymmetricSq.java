@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,10 @@ package boofcv.alg.geo.robust;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.ClosestPoint3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -51,7 +52,7 @@ public class TestDistanceSe3SymmetricSq {
 	@Test
 	public void testPerfect() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().set(0.1,-0.1,0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
@@ -73,7 +74,7 @@ public class TestDistanceSe3SymmetricSq {
 	@Test
 	public void testNoisy() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().set(0.1,-0.1,0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
@@ -95,7 +96,7 @@ public class TestDistanceSe3SymmetricSq {
 	@Test
 	public void testBehindCamera() {
 		Se3_F64 keyToCurr = new Se3_F64();
-		keyToCurr.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		keyToCurr.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		keyToCurr.getT().set(0.1,-0.1,0.01);
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,-3);

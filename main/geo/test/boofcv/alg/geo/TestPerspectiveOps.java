@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,11 @@ package boofcv.alg.geo;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F32;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -255,7 +256,7 @@ public class TestPerspectiveOps {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1, -0.05, 0.03, worldToCamera.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, -0.05, 0.03, worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
 		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);
@@ -302,7 +303,7 @@ public class TestPerspectiveOps {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1,-0.05,0.03,worldToCamera.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.05,0.03,worldToCamera.getR());
 		worldToCamera.getT().set(0.2,0.01,-0.03);
 
 		DenseMatrix64F K = RandomMatrices.createUpperTriangle(3, 0, -1, 1, rand);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.alg.geo;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.misc.test.GeometryUnitTest;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -43,7 +44,7 @@ public class TestDecomposeEssential {
 	 */
 	@Test
 	public void checkAgainstKnown() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 		DenseMatrix64F E = MultiViewOps.createEssential(R, T);
@@ -65,7 +66,7 @@ public class TestDecomposeEssential {
 	 */
 	@Test
 	public void multipleCalls() {
-		DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.1,-0.4,0.5,null);
+		DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
 		DenseMatrix64F E = MultiViewOps.createEssential(R, T);

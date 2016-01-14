@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.struct.calib;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -96,7 +97,7 @@ public class StereoParameters implements Serializable {
 	}
 
 	public void print() {
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rightToLeft.getR(),(double[])null);
+		double euler[] = ConvertRotation3D_F64.matrixToEuler(rightToLeft.getR(), EulerType.XYZ,(double[])null);
 		Vector3D_F64 t = rightToLeft.getT();
 		System.out.println();
 		System.out.println("Left Camera");

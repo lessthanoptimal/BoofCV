@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,9 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryCalibrationTarget;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -148,7 +149,7 @@ public class GenericCalibrationGrid {
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
 
-			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX, rotY, rotZ, null);
+			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, rotY, rotZ, null);
 
 			DenseMatrix64F H = computeHomography(K, R, T);
 			homographies.add(H);
@@ -184,8 +185,8 @@ public class GenericCalibrationGrid {
 			double rotX = (rand.nextDouble()-0.5)*0.05;
 			double rotY = (rand.nextDouble()-0.5)*0.05;
 			double rotZ = (rand.nextDouble()-0.5)*0.05;
-			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
-			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
+			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
+			ConvertRotation3D_F64.matrixToRodrigues(R,v.rotation);
 
 			double x = rand.nextGaussian()*5;
 			double y = rand.nextGaussian()*5;
@@ -223,8 +224,8 @@ public class GenericCalibrationGrid {
 			double rotX = (rand.nextDouble()-0.5)*0.1;
 			double rotY = (rand.nextDouble()-0.5)*0.1;
 			double rotZ = (rand.nextDouble()-0.5)*0.1;
-			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,null);
-			RotationMatrixGenerator.matrixToRodrigues(R,v.rotation);
+			DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,null);
+			ConvertRotation3D_F64.matrixToRodrigues(R,v.rotation);
 
 			double x = rand.nextGaussian()*5;
 			double y = rand.nextGaussian()*5;
@@ -251,7 +252,7 @@ public class GenericCalibrationGrid {
 		for( Zhang99ParamAll.View v : config.views ) {
 			CalibrationObservation set = new CalibrationObservation();
 			Se3_F64 se = new Se3_F64();
-			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
+			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
 
 			for( int i = 0; i < grid.size(); i++ ) {

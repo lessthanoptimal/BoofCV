@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -80,7 +80,7 @@ public class TestZhang99OptimizationFunction {
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();
 
-		RotationMatrixGenerator.rodriguesToMatrix(v.rotation, se.getR());
+		ConvertRotation3D_F64.rodriguesToMatrix(v.rotation, se.getR());
 		se.T = v.T;
 
 		for( int i = 0; i < grid.size(); i++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,9 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageFloat32;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class TestCreateSyntheticOverheadViewS {
 	public void checkRender() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(0), 0, 0, cameraToPlane.getR());
 		cameraToPlane.getT().set(0,-5,0);
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);

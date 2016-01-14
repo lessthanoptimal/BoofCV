@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.abst.geo;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -44,7 +45,7 @@ public abstract class GeneralTestTriangulateTwoViewsCalibrated {
 		Se3_F64 worldToA = new Se3_F64();
 		Se3_F64 worldToB = new Se3_F64();
 		worldToB.getT().set(2,0.1,-0.5);
-		RotationMatrixGenerator.eulerXYZ(0, 0.05, 0,worldToB.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0.05, 0,worldToB.getR());
 
 		Point3D_F64 pointA = SePointOps_F64.transform(worldToA,world,null);
 		Point2D_F64 viewA = new Point2D_F64();

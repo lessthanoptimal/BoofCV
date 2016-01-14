@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,8 @@ package boofcv.alg.geo.pose;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.StereoPose;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 	@Test
 	public void basicTest() {
 		Se3_F64 worldToLeft = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToLeft.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToLeft.getR());
 		worldToLeft.getT().set(-0.3, 0.4, 1);
 
 		generateScene(10,worldToLeft,false);
@@ -65,7 +66,7 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 	@Test
 	public void compareToReprojection() {
 		Se3_F64 worldToLeft = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1, 1, -0.2, worldToLeft.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToLeft.getR());
 		worldToLeft.getT().set(-0.3, 0.4, 1);
 
 		generateScene(10,worldToLeft,false);

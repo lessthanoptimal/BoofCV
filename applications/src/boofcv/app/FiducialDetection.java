@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -490,7 +490,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 			long id = detector.getId(i);
 			detector.getFiducialToCamera(i,fiducialToCamera);
 
-			RotationMatrixGenerator.matrixToQuaternion(fiducialToCamera.getR(),quat);
+			ConvertRotation3D_F64.matrixToQuaternion(fiducialToCamera.getR(),quat);
 
 			outputFile.printf(" %d %.10f %.10f %.10f %.10f %.10f %.10f %.10f",id,
 					fiducialToCamera.T.x,fiducialToCamera.T.y,fiducialToCamera.T.z,

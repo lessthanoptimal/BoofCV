@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.FactoryOptimization;
@@ -249,7 +249,7 @@ public class CalibrationPlanarGridZhang99 {
 
 			Zhang99ParamAll.View v = new Zhang99ParamAll.View();
 			v.T = m.getT();
-			RotationMatrixGenerator.matrixToRodrigues(m.getR(), v.rotation);
+			ConvertRotation3D_F64.matrixToRodrigues(m.getR(), v.rotation);
 
 			ret.views[i] = v;
 		}

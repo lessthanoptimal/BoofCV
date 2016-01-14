@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -99,7 +99,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 
 			Zhang99ParamAll.View v = param.views[indexView];
 
-			RotationMatrixGenerator.rodriguesToMatrix(v.rotation,se.getR());
+			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,se.getR());
 			se.T = v.T;
 
 			CalibrationObservation viewSet = observations.get(indexView);

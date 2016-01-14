@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,9 @@
 package boofcv.alg.geo.rectify;
 
 import boofcv.alg.geo.PerspectiveOps;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -162,7 +163,7 @@ public class TestRectifyCalibrated {
 	private Se3_F64 createPose( double rotX , double rotY , double rotZ , double x , double y , double z )
 	{
 		Se3_F64 ret = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(rotX, rotY, rotZ, ret.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX, rotY, rotZ, ret.getR());
 		ret.getT().set(x,y,z);
 		return ret;
 	}

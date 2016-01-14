@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import boofcv.struct.sfm.Stereo2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
@@ -97,7 +97,7 @@ public class PnPStereoJacobianRodrigues implements FunctionNtoMxN {
 		worldToLeft.T.y = input[4];
 		worldToLeft.T.z = input[5];
 
-		RotationMatrixGenerator.rodriguesToMatrix(rodrigues, worldToLeft.getR());
+		ConvertRotation3D_F64.rodriguesToMatrix(rodrigues, worldToLeft.getR());
 
 		// compute the gradient for each observation
 		for( int i = 0; i < observations.size(); i++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.geo.triangulate;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -39,10 +40,10 @@ public class TestPixelDepthLinear {
 	public void depthNView() {
 		// define the camera's motion
 		Se3_F64 motion1 = new Se3_F64();
-		motion1.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion1.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		motion1.getT().set(0.1, -0.1, 0.01);
 		Se3_F64 motion2 = new Se3_F64();
-		motion2.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, -0.15, -0.3, 0.08));
+		motion2.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -0.15, -0.3, 0.08, null));
 		motion2.getT().set(-0.2, -0.15, 0.2);
 
 		// compute the point's location in each camera's view
@@ -81,7 +82,7 @@ public class TestPixelDepthLinear {
 	public void depth2View() {
 		// define the camera's motion
 		Se3_F64 motion1 = new Se3_F64();
-		motion1.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion1.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02, null));
 		motion1.getT().set(0.1, -0.1, 0.01);
 
 

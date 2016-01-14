@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,9 @@ package boofcv.alg.sfm.overhead;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -52,7 +53,7 @@ public class TestCameraPlaneProjection {
 	public TestCameraPlaneProjection() {
 		// Easier to make up a plane in this direction
 		Se3_F64 cameraToPlane = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(UtilAngle.degreeToRadian(-45),0,0.1,cameraToPlane.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,UtilAngle.degreeToRadian(-45),0,0.1,cameraToPlane.getR());
 		cameraToPlane.getT().set(0,-5,0);
 
 		planeToCamera = cameraToPlane.invert(null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,8 @@ import boofcv.alg.geo.bundle.CalibPoseAndPointResiduals;
 import boofcv.alg.geo.bundle.CalibratedPoseAndPoint;
 import boofcv.alg.geo.bundle.PointIndexObservation;
 import boofcv.alg.geo.bundle.ViewPointObservations;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -118,7 +119,7 @@ public class TestBundleAdjustmentCalibratedDense {
 			double z = rand.nextGaussian()*0.0001;
 
 			Se3_F64 view = model.getWorldToCamera(i);
-			RotationMatrixGenerator.eulerXYZ(euler[0],euler[1],euler[2],view.getR());
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,euler[0],euler[1],euler[2],view.getR());
 			view.getT().set(x,y,z);
 		}
 		

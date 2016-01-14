@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,8 @@ package boofcv.alg.geo;
 
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -57,7 +58,7 @@ public class ArtificialStereoScene {
 		this.isPixels = isPixels;
 		// define the camera's motion
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.5 , -0.2, 0.15));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.5 , -0.2, 0.15,null));
 		motion.getT().set(0.1,-0.2,0.01);
 
 		// randomly generate points in space

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,8 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -50,7 +51,7 @@ public class BaseChecksPnP {
 		// the world is behind and rotated
 		worldToCamera1 = new Se3_F64();
 		worldToCamera1.getT().set(2, 5, -10);
-		RotationMatrixGenerator.eulerXYZ(0.2, -0.34, 0.7, worldToCamera1.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.34, 0.7, worldToCamera1.getR());
 	}
 
 	public List<Point2D3D> createObservations( Se3_F64 worldToCamera , int total ) {

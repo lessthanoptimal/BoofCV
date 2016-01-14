@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,8 @@ package boofcv.alg.geo;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -53,8 +54,8 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 			if( !target.process(observationPose,found) )
 				throw new RuntimeException("Not expected to fail");
 			
-			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),(double[])null);
-			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR(),(double[])null);
+			double expectedEuler[] = ConvertRotation3D_F64.matrixToEuler(motion.getR(),EulerType.XYZ,(double[])null);
+			double foundEuler[] = ConvertRotation3D_F64.matrixToEuler(found.getR(),EulerType.XYZ,(double[])null);
 
 			Vector3D_F64 expectedTran = motion.getT();
 			Vector3D_F64 foundTran = found.getT();
@@ -110,8 +111,8 @@ public class BenchmarkStabilityPnP extends ArtificialStereoScene {
 				continue;
 			}
 
-			double expectedEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(motion.getR(),(double[])null);
-			double foundEuler[] = RotationMatrixGenerator.matrixToEulerXYZ(found.getR(),(double[])null);
+			double expectedEuler[] = ConvertRotation3D_F64.matrixToEuler(motion.getR(),EulerType.XYZ,(double[])null);
+			double foundEuler[] = ConvertRotation3D_F64.matrixToEuler(found.getR(),EulerType.XYZ,(double[])null);
 
 			Vector3D_F64 expectedTran = motion.getT();
 			Vector3D_F64 foundTran = found.getT();

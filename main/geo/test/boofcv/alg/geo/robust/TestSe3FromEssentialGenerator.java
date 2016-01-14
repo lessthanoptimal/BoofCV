@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,8 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -48,7 +49,7 @@ public class TestSe3FromEssentialGenerator {
 	public void simpleTest() {
 		// define motion
 		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.1, -0.05, -0.01));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, -0.05, -0.01, null));
 		motion.getT().set(2,-0.1,0.1);
 
 		// define observations

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,8 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageUInt8;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -155,7 +156,7 @@ public class TestStereoProcessingBase {
 
 		ret.setRightToLeft(new Se3_F64());
 		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
-		RotationMatrixGenerator.eulerXYZ(0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
 		ret.left = new IntrinsicParameters().fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
 		ret.right = new IntrinsicParameters().fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);

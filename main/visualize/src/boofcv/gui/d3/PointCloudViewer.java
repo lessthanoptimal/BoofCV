@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,9 @@ package boofcv.gui.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.IntrinsicParameters;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -278,7 +279,7 @@ public class PointCloudViewer extends JPanel
 		rotX += (prevY - e.getY())*0.01;
 
 		Se3_F64 rotTran = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(rotX,rotY,rotZ,rotTran.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
 		Se3_F64 temp = worldToCamera.concat(rotTran,null);
 		worldToCamera.set(temp);
 

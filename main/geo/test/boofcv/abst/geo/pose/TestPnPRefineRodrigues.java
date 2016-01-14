@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,8 @@ package boofcv.abst.geo.pose;
 
 import boofcv.alg.geo.pose.CommonMotionNPoint;
 import boofcv.struct.geo.Point2D3D;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 	public void perfect() {
 
 		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		generateScene(10,motion,false);
@@ -57,7 +58,7 @@ public class TestPnPRefineRodrigues extends CommonMotionNPoint {
 	public void noisy() {
 
 		Se3_F64 motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerArbitrary(0, 1, 2, 0.05, -0.03, 0.02));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
 		motion.getT().set(0.1,-0.1,0.01);
 
 		generateScene(50,motion,false);

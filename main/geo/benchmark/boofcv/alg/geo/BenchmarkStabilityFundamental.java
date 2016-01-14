@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,9 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.GeoModelEstimator1;
 import boofcv.struct.geo.GeoModelEstimatorN;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -105,7 +106,7 @@ public class BenchmarkStabilityFundamental {
 
 	public void motionTransRot() {
 		motion = new Se3_F64();
-		motion.getR().set(RotationMatrixGenerator.eulerXYZ(0.01,-0.02,0.05,null));
+		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01,-0.02,0.05,null));
 		motion.getT().set(0.2,0,0);
 	}
 

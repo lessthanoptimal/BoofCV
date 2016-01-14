@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
@@ -48,7 +48,7 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 	public void decode(double[] input, Se3_F64 outputModel) {
 		rotation.setParamVector(input[0],input[1],input[2]);
 
-		RotationMatrixGenerator.rodriguesToMatrix(rotation, outputModel.getR());
+		ConvertRotation3D_F64.rodriguesToMatrix(rotation, outputModel.getR());
 
 		Vector3D_F64 T = outputModel.getT();
 		T.x = input[3];
@@ -70,7 +70,7 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 		CommonOps.multTransB(U, V, R);
 
 		// extract Rodrigues coordinates
-		RotationMatrixGenerator.matrixToRodrigues(R,rotation);
+		ConvertRotation3D_F64.matrixToRodrigues(R,rotation);
 
 		output[0] = rotation.unitAxisRotation.x*rotation.theta;
 		output[1] = rotation.unitAxisRotation.y*rotation.theta;

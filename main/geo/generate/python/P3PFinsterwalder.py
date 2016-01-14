@@ -1,6 +1,7 @@
 # One type-o was found in this section of the paper.  Validating other equations in an attempt to hunt down problems
 
 from sage.all import *
+
 from utilsymbolic import *
 
 (A,B,C,D,E,F)=var('A,B,C,D,E,F')

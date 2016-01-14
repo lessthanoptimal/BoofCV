@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,12 @@ package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles

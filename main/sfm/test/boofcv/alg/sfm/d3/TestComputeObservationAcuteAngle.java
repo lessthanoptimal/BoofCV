@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.sfm.d3;
 
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class TestComputeObservationAcuteAngle {
 
 		Se3_F64 fromAtoB = new Se3_F64();
 		fromAtoB.getT().set(-2,0,0);
-		RotationMatrixGenerator.eulerXYZ(0,-Math.PI/4.0,0,fromAtoB.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,-Math.PI/4.0,0,fromAtoB.getR());
 
 		Point2D_F64 a = new Point2D_F64(0,0);
 		Point2D_F64 b = new Point2D_F64(0,0);
