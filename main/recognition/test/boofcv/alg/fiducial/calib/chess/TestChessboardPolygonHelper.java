@@ -18,16 +18,71 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestChessboardPolygonHelper {
 	@Test
-	public void filterPixelPolygon() {
-		fail("implement");
+	public void filterPixelPolygon_noborder() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
+
+		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		GrowQueue_I32 splits = new GrowQueue_I32();
+
+		splits.add(0);
+		splits.add(10);
+		splits.add(20);
+		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
+		splits.add(30);
+		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
+		splits.add(40);
+		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,false));
+	}
+
+	@Test
+	public void filterPixelPolygon_border() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
+		alg.width = 50;
+		alg.height = 60;
+
+		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		GrowQueue_I32 splits = new GrowQueue_I32();
+
+		for (int i = 0; i < 100; i++) {
+			externalUndist.add(new Point2D_I32(10,10));
+			externalDist.add(new Point2D_I32(10,10));
+		}
+
+		// test initially with all corners inside
+		splits.add(0);
+		splits.add(10);
+		splits.add(20);
+		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+		// these should all fail because there are too many corners inside not touching the border
+		for (int i = 0; i < 4; i++) {
+			splits.add(30+i*10);
+			assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+		}
+
+		// this should pass because only 1 or 3 corners are inside
+		for (int i = 0; i < splits.size(); i++) {
+			externalDist.get(splits.get(i)).set(0,0);
+		}
+		for (int i = 0; i < 3; i++) {
+			externalDist.get(i).set(10,10);
+			assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+		}
 	}
 }

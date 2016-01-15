@@ -116,11 +116,11 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 									  GrowQueue_I32 splits, boolean touchesBorder) {
 
 		if( touchesBorder ) {
-			if( splits.size() > 7 )
+			if( splits.size() > 7 || splits.size() <= 3)
 				return false;
 			int totalRegular = 0;
 			for (int i = 0; i < splits.size(); i++) {
-				Point2D_I32 p = externalDist.get(i);
+				Point2D_I32 p = externalDist.get(splits.get(i));
 				if( !(p.x == 0 || p.y == 0 || p.x == width-1 || p.y == height-1))
 					totalRegular++;
 			}
