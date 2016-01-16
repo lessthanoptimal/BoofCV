@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,9 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 
 	// how many points along the line it will sample
 	int numSamples;
+
+	// how many points was it able to sample because they were inside the image
+	int samplesInside;
 
 	// sums above and below the line
 	double averageUp;
@@ -88,7 +91,7 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 	 * @return average derivative
 	 */
 	public double computeAverageDerivative(Point2D_F64 a, Point2D_F64 b, double tanX, double tanY) {
-		int samplesInside = 0;
+		samplesInside = 0;
 		averageUp = averageDown = 0;
 
 		for (int i = 0; i < numSamples; i++) {
@@ -122,6 +125,10 @@ public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegra
 		averageDown /= samplesInside;
 
 		return averageUp-averageDown;
+	}
+
+	public int getSamplesInside() {
+		return samplesInside;
 	}
 
 	public int getNumSamples() {

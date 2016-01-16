@@ -19,8 +19,8 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
@@ -33,69 +33,60 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
+	private static final int numRows = 3;
+	private static final int numCols = 2;
 
+	public TestCalibrationDetectorSquareFiducialGrid() {
+		width = 500;
+		height = 600;
+	}
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(3, 2, 0.1, 0.2);
+		List<Point2D_F64> l = createDetector().getLayout();
 
-		assertEquals(4*6,l.size());
+		int pointCols = numCols*2;
+		int pointRows = numRows*2;
+
+		assertEquals(pointCols*pointRows,l.size());
 
 		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(0).y - l.get(4).y ;
+		double h = l.get(0).y - l.get(pointCols).y ;
 
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
+		assertEquals(1,w,1e-8);
+		assertEquals(1,h,1e-8);
 
 		double s = l.get(2).x - l.get(1).x;
 
-		assertEquals(0.2, s, 1e-8);
+		assertEquals(1, s, 1e-8);
 	}
 
 	@Override
 	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
-		ImageMiscOps.fill(original, 255);
+		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
+		renderer.squareWidth = 50;
 
-		int numRows = config.numRows*2-1;
-		int numCols = config.numCols*2-1;
+		ImageFloat32 rendered = renderer.generate(numRows,numCols);
 
-		int square = original.getWidth() / (Math.max(numRows,numCols) + 4);
-
-		int targetWidth = square * numCols;
-		int targetHeight = square * numRows;
-
-		int x0 = (original.width - targetWidth) / 2;
-		int y0 = (original.height - targetHeight) / 2;
-
-		for (int i = 0; i < numRows; i += 2) {
-			int y = y0 + i * square;
-
-			for (int j = 0; j < numCols; j += 2) {
-				int x = x0 + j * square;
-				ImageMiscOps.fillRectangle(original, 0, x, y, square, square);
-			}
-		}
-
-		int pointsRow = numRows+1;
-		int pointsCol = numCols+1;
+		original.subimage(0,0,rendered.width,rendered.height).setTo(rendered);
 
 		CalibrationObservation set = new CalibrationObservation();
-		int gridIndex = 0;
-		for (int i = 0; i < pointsRow; i++) {
-			for (int j = 0; j < pointsCol; j++, gridIndex++) {
-				double y = y0 + i*square;
-				double x = x0 + j*square;
-				set.add(new Point2D_F64(x, y), gridIndex);
-			}
+		List<Point2D_F64> points = renderer.getOrderedExpectedPoints(numRows, numCols);
+		for (int i = 0; i < points.size(); i++) {
+			set.add( points.get(i), i);
 		}
+
 		solutions.add(set);
 	}
 
 	@Override
 	public CalibrationDetector createDetector() {
-		return FactoryCalibrationTarget.detectorSquareGrid(config);
+		ConfigSquareGridBinary config = new ConfigSquareGridBinary(numRows,numCols,1.0,1.0);
+		config.squareWidth = 1;
+		config.spaceWidth = 1;
+
+		return FactoryCalibrationTarget.detectorBinaryGrid(config);
 	}
 }

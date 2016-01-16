@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageUInt8;
 public class ImplBinaryBorderOps {
 	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
 
-		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
+		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 		
 		final int h = input.height - 1;
 		final int w = input.width - 1;

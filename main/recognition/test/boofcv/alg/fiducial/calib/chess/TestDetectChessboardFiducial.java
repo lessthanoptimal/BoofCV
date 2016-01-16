@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestDetectChessCalibrationPoints {
+public class TestDetectChessboardFiducial {
 
 	Random rand = new Random(234);
 
@@ -50,6 +51,12 @@ public class TestDetectChessCalibrationPoints {
 	int offsetX = 15;
 	int offsetY = 10;
 
+	@Before
+	public void setup() {
+		offsetX = 15;
+		offsetY = 10;
+	}
+
 	/**
 	 * Give it a simple target and see if it finds the expected number of squares
 	 */
@@ -58,27 +65,31 @@ public class TestDetectChessCalibrationPoints {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
 //				System.out.println("shape "+numCols+"  "+numRows);
-				basicTest(numRows, numCols);
+				basicTest(numRows, numCols, true);
 			}
 		}
 	}
 
-	public void basicTest(int numRows, int numCols) {
+	public void basicTest(int numRows, int numCols , boolean localThreshold ) {
 		ImageFloat32 gray = renderTarget(numRows, numCols);
-
-//		ImageUInt8 b = new ImageUInt8(w,h);
-//		ThresholdImageOps.threshold(gray,b,50,true);
-//
-//		System.out.println("-----------------------------");
-//		b.printBinary();
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
+//		ShowImages.showWindow(gray,"Rendered Image");
+//		try { Thread.sleep(5000); } catch (InterruptedException e) {}
+
 		ConfigChessboard configChess = new ConfigChessboard(5, 5, 1);
+
 		BinaryPolygonDetector<ImageFloat32> detectorSquare =
 				FactoryShapeDetector.polygon(configChess.square, ImageFloat32.class);
 //		detectorSquare.setVerbose(true);
-		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.localSquare(10,1.0,true,ImageFloat32.class);
+
+		InputToBinary<ImageFloat32> inputToBinary;
+		if( localThreshold )
+			inputToBinary = FactoryThresholdBinary.localSquare(10,1.0,true,ImageFloat32.class);
+		else
+			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,ImageFloat32.class);
+
 		DetectChessboardFiducial alg =
 				new DetectChessboardFiducial(numRows, numCols, 4,detectorSquare,null,null,inputToBinary);
 
@@ -144,5 +155,27 @@ public class TestDetectChessCalibrationPoints {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * See if it can detect targets which touch the image border when thresholded using a
+	 * global algorithm.
+	 *
+	 * This doesn't test all possible cases.
+	 */
+	@Test
+	public void touchesBorder() {
+		for (int i = 0; i < 4; i++) {
+			if( i%2 == 0 )
+				offsetX = 0;
+			else
+				offsetX = 15;
+			if( i/2 == 0 )
+				offsetY = 0;
+			else
+				offsetY = 10;
+
+			basicTest(3,4, false);
+		}
 	}
 }

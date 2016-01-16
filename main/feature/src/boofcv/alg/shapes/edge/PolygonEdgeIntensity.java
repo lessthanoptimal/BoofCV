@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,6 +97,7 @@ public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
 
 		double tagentSign = ccw ? 1 : -1;
 
+		int totalSides = 0;
 		for (int i = polygon.size()-1,j=0; j < polygon.size(); i=j,j++) {
 
 			Point2D_F64 a = polygon.get(i);
@@ -123,12 +124,20 @@ public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
 
 			scorer.computeAverageDerivative(offsetA, offsetB, tanX,tanY);
 
-			averageInside += scorer.getAverageUp()/tangentDistance;
-			averageOutside += scorer.getAverageDown()/tangentDistance;
+			if( scorer.getSamplesInside() > 0 ) {
+				totalSides++;
+				averageInside += scorer.getAverageUp() / tangentDistance;
+				averageOutside += scorer.getAverageDown() / tangentDistance;
+			}
 		}
 
-		averageInside /= polygon.size();
-		averageOutside /= polygon.size();
+		if( totalSides > 0 ) {
+			averageInside /= totalSides;
+			averageOutside /= totalSides;
+		} else {
+			averageInside = averageOutside = 0;
+			return false;
+		}
 
 		return true;
 	}

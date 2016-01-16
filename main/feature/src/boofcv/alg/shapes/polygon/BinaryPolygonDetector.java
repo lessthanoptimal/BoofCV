@@ -161,7 +161,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 		setNumberOfSides(minSides,maxSides);
 		this.refinePolygon = refinePolygon;
-		this.edgeIntensity = new PolygonEdgeIntensity<T>(1,1.0,15,inputType);
+		this.edgeIntensity = new PolygonEdgeIntensity<T>(1,1.5,15,inputType);
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;
@@ -358,7 +358,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 				// Test the edge quality and prune before performing an expensive optimization
 				if( checkEdgeBefore && !checkPolygonEdge(workPoly,workPoly.isCCW())) {
-					if( verbose ) System.out.println("Rejected edge score before");
+//					if( verbose ) System.out.println("Rejected edge score before");
 					continue;
 				}
 

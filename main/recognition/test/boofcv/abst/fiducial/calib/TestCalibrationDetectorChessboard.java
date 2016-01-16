@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,66 +28,59 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationDetectorChecks {
 
-	private final static ConfigSquareGrid config = new ConfigSquareGrid(3, 2, 30,30);
-
+	private final static ConfigChessboard config = new ConfigChessboard(5, 4, 30);
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> l = CalibrationDetectorSquareGrid.createLayout(3, 2, 0.1, 0.2);
+		List<Point2D_F64> layout = createDetector().getLayout();
 
-		assertEquals(4*6,l.size());
+		// first control points should be the top left corner then work it's way down in a
+		// grid pattern
+		assertTrue(layout.get(0).y == layout.get(2).y);
+		assertTrue(layout.get(0).x <  layout.get(2).x);
+		assertTrue(layout.get(0).y >  layout.get(3).y);
 
-		double w = l.get(1).x - l.get(0).x;
-		double h = l.get(0).y - l.get(4).y ;
-
-		assertEquals(0.1,w,1e-8);
-		assertEquals(0.1,h,1e-8);
-
-		double s = l.get(2).x - l.get(1).x;
-
-		assertEquals(0.2, s, 1e-8);
 	}
 
 	@Override
 	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
+
 		ImageMiscOps.fill(original, 255);
 
-		int numRows = config.numRows*2-1;
-		int numCols = config.numCols*2-1;
+		int square = original.getWidth()/(Math.max(config.numCols,config.numRows)+4);
 
-		int square = original.getWidth() / (Math.max(numRows,numCols) + 4);
-
-		int targetWidth = square * numCols;
-		int targetHeight = square * numRows;
+		int targetWidth  = square * config.numCols;
+		int targetHeight = square * config.numRows;
 
 		int x0 = (original.width - targetWidth) / 2;
-		int y0 = (original.height - targetHeight) / 2;
+		int y0 = (original.height- targetHeight) / 2;
 
-		for (int i = 0; i < numRows; i += 2) {
-			int y = y0 + i * square;
+		for (int i = 0; i < config.numRows; i++) {
+			int y = y0 + i*square;
 
-			for (int j = 0; j < numCols; j += 2) {
+			int startJ = i%2 == 0 ? 0 : 1;
+			for (int j = startJ; j < config.numCols; j += 2) {
 				int x = x0 + j * square;
-				ImageMiscOps.fillRectangle(original, 0, x, y, square, square);
+				ImageMiscOps.fillRectangle(original,0,x,y,square,square);
 			}
 		}
 
-		int pointsRow = numRows+1;
-		int pointsCol = numCols+1;
+		int pointsRow = 2*(config.numRows/2) - (1 - config.numRows % 2);
+		int pointsCol = 2*(config.numCols/2) - (1 - config.numCols % 2);
 
 		CalibrationObservation set = new CalibrationObservation();
 		int gridIndex = 0;
 		for (int i = 0; i < pointsRow; i++) {
-			for (int j = 0; j < pointsCol; j++, gridIndex++) {
-				double y = y0 + i*square;
-				double x = x0 + j*square;
+			for (int j = 0; j < pointsCol; j++,gridIndex++) {
+				double y = y0+(i+1)*square;
+				double x = x0+(j+1)*square;
 				set.add(new Point2D_F64(x, y), gridIndex);
 			}
 		}
@@ -96,6 +89,6 @@ public class TestPlanarDetectorSquareGrid extends GenericPlanarCalibrationDetect
 
 	@Override
 	public CalibrationDetector createDetector() {
-		return FactoryCalibrationTarget.detectorSquareGrid(config);
+		return FactoryCalibrationTarget.detectorChessboard(config);
 	}
 }

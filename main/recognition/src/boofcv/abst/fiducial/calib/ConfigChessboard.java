@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for square detector
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 4,4);
+	public ConfigPolygonDetector square = new ConfigPolygonDetector(true, 3,8);
 
 	/**
 	 * If true then it only refines the corner region.  Otherwise it will refine the entire line.
@@ -88,6 +88,7 @@ public class ConfigChessboard implements Configuration {
 		square.contour2Poly_splitFraction = 0.1;
 		square.contour2Poly_minimumSideFraction = 0.025; // teh erosion step appears to require a smaller value here
 		square.minContourImageWidthFraction = 0.0005;
+		square.canTouchBorder = true;
 
 		// good value for squares.  Set it here to make it not coupled to default values
 		configRefineCorners.cornerOffset = 1;
