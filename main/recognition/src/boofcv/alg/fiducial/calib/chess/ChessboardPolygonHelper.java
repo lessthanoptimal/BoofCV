@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
@@ -40,11 +41,11 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 	RefineBinaryPolygon<T> refineLine;
 	RefineBinaryPolygon<T> refineCorner;
 
-	Point2D_F64 center = new Point2D_F64();
-
 	double threshold = 400;
 
 	int width,height;
+
+	FastQueue<Point2D_F64> tmp = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
 	public ChessboardPolygonHelper(BinaryPolygonDetector<T> detectorSquare,
 								   RefineBinaryPolygon<T> refineLine ,
@@ -63,29 +64,43 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 	@Override
 	public void adjustBeforeOptimize(Polygon2D_F64 polygon) {
 
-		center.x = 0;
-		center.y = 0;
-		for (int j = 0; j < 4; j++) {
-			Point2D_F64 p = polygon.get(j);
-			center.x += p.x;
-			center.y += p.y;
+		int N = polygon.size();
+		tmp.resize(N);
+		for (int i = 0; i < N; i++) {
+			tmp.get(i).set(0,0);
 		}
-		center.x /= 4.0;
-		center.y /= 4.0;
 
-		for (int j = 0; j < 4; j++) {
-			Point2D_F64 p = polygon.get(j);
-			double dx = p.x-center.x;
-			double dy = p.y-center.y;
+		for (int i = N-1,j=0; j < N; i=j,j++) {
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 b = polygon.get(j);
 
-			double r = Math.sqrt(dx*dx + dy*dy);
+			double dx = b.x-a.x;
+			double dy = b.y-a.y;
 
-			// not really sure how this happens, but it is possible for the center to be exactly equal to one of the
-			// corner points
-			if( r > 0 ) {
-				p.x += 1.4 * dx / r;
-				p.y += 1.4 * dy / r;
-			}
+			double l = Math.sqrt(dx*dx + dy*dy);
+			dx *= 1.3/l;
+			dy *= 1.3/l;
+
+			Point2D_F64 _a = tmp.get(i);
+			Point2D_F64 _b = tmp.get(j);
+
+			_a.x -= dx;
+			_a.y -= dy;
+			_b.x += dx;
+			_b.y += dy;
+		}
+
+		for (int i = 0; i < N; i++) {
+			Point2D_F64 a = polygon.get(i);
+			Point2D_F64 t = tmp.get(i);
+
+			a.x += t.x;
+			a.y += t.y;
+
+			if( a.x < 0) a.x = 0;
+			else if( a.x > width-1 ) a.x = width-1;
+			if( a.y < 0) a.y = 0;
+			else if( a.y > height-1 ) a.y = height-1;
 		}
 
 		if( refineCorner != null ) {
@@ -116,7 +131,7 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 									  GrowQueue_I32 splits, boolean touchesBorder) {
 
 		if( touchesBorder ) {
-			if( splits.size() > 7 || splits.size() <= 3)
+			if( splits.size() > 7 || splits.size() < 3)
 				return false;
 			int totalRegular = 0;
 			for (int i = 0; i < splits.size(); i++) {
@@ -124,7 +139,7 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 				if( !(p.x == 0 || p.y == 0 || p.x == width-1 || p.y == height-1))
 					totalRegular++;
 			}
-			return totalRegular <= 3;
+			return totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
 		} else {
 			return splits.size() == 4;
 		}

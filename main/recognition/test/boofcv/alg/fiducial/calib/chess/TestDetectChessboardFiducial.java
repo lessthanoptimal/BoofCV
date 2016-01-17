@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
@@ -26,6 +27,8 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,10 +54,13 @@ public class TestDetectChessboardFiducial {
 	int offsetX = 15;
 	int offsetY = 10;
 
+	Se2_F64 transform;
+
 	@Before
 	public void setup() {
 		offsetX = 15;
 		offsetY = 10;
+		transform = null;
 	}
 
 	/**
@@ -76,7 +82,7 @@ public class TestDetectChessboardFiducial {
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
 //		ShowImages.showWindow(gray,"Rendered Image");
-//		try { Thread.sleep(5000); } catch (InterruptedException e) {}
+//		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
 		ConfigChessboard configChess = new ConfigChessboard(5, 5, 1);
 
@@ -104,6 +110,10 @@ public class TestDetectChessboardFiducial {
 		for( int i = 0; i < expected.size(); i++ ) {
 			Point2D_F64 e = expected.get(i);
 			Point2D_F64 f = found.get(i);
+
+			if( transform != null ) {
+				SePointOps_F64.transform(transform,e,e);
+			}
 
 			assertEquals("i = " + i,e.x,f.x,2);
 			assertEquals("i = " + i,e.y,f.y,2);
@@ -138,6 +148,14 @@ public class TestDetectChessboardFiducial {
 			}
 		}
 
+		if( transform != null ) {
+			ImageFloat32 distorted = new ImageFloat32(gray.width,gray.height);
+			FDistort f = new FDistort(gray,distorted);
+			f.border(80f).affine(transform.c,-transform.s,transform.s,transform.c,
+					transform.T.x,transform.T.y).apply();
+			gray = distorted;
+		}
+
 		return gray;
 	}
 
@@ -164,7 +182,7 @@ public class TestDetectChessboardFiducial {
 	 * This doesn't test all possible cases.
 	 */
 	@Test
-	public void touchesBorder() {
+	public void touchesBorder_translate() {
 		for (int i = 0; i < 4; i++) {
 			if( i%2 == 0 )
 				offsetX = 0;
@@ -175,6 +193,26 @@ public class TestDetectChessboardFiducial {
 			else
 				offsetY = 10;
 
+			basicTest(3,4, false);
+		}
+	}
+
+	@Test
+	public void touchedBorder_rotate() {
+		List<Se2_F64> transforms = new ArrayList<Se2_F64>();
+
+		transforms.add( new Se2_F64(0,0,0.1));
+		transforms.add( new Se2_F64(w-100,0,0.1));
+		transforms.add( new Se2_F64(w/2,-5,0.4));
+		transforms.add( new Se2_F64(w/2,h-105,0.4));
+		transforms.add( new Se2_F64(w/2,h-100,0.4));
+		transforms.add( new Se2_F64(35,40,Math.PI/4));
+
+		offsetX = 0;
+		offsetY = 0;
+
+		for(Se2_F64 t : transforms ) {
+			transform = t;
 			basicTest(3,4, false);
 		}
 	}

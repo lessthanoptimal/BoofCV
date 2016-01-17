@@ -329,7 +329,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 
 				if( helper != null ) {
 					if( !helper.filterPixelPolygon(contourUndist,c.external,splits,touchesBorder) ) {
-						if( verbose ) System.out.println("rejected by helper");
+						if( verbose ) System.out.println("rejected by helper.filterPixelPolygon()");
 						continue;
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,9 +57,9 @@ public class TestImplSurfDescribeOps {
 		float foundY[] = new float[w*w];
 
 		for( double scale = 0.2; scale <= 1.8; scale += 0.2 ) {
-			System.out.println("scale = "+scale);
+//			System.out.println("scale = "+scale);
 			ImplSurfDescribeOps.naiveGradient(ii, 8, 9, scale, w, 4 * scale, false, expectedX, expectedY);
-			System.out.println("------------------------");
+//			System.out.println("------------------------");
 			ImplSurfDescribeOps.gradientInner(ii,8,9,scale,w, 4*scale, foundX,foundY);
 
 			for( int i = 0; i < foundX.length; i++ ) {

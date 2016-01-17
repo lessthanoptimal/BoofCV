@@ -68,11 +68,14 @@ public class TestChessboardPolygonHelper {
 		// test initially with all corners inside
 		splits.add(0);
 		splits.add(10);
-		splits.add(20);
 		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+		splits.add(20);
+		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+		splits.add(30);
+		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
 		// these should all fail because there are too many corners inside not touching the border
-		for (int i = 0; i < 4; i++) {
-			splits.add(30+i*10);
+		for (int i = 0; i < 3; i++) {
+			splits.add(40+i*10);
 			assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
 		}
 
