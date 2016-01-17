@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
-import georegression.geometry.UtilPoint2D_F64;
-import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
-import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.RecycleManager;
 
@@ -74,40 +71,6 @@ public class SquaresIntoClusters {
 		}
 		clusters.reset();
 	}
-
-	void computeNodeInfo( List<Polygon2D_F64> squares ) {
-
-		for (int i = 0; i < squares.size(); i++) {
-			SquareNode n = nodes.grow();
-			n.reset();
-			n.corners = squares.get(i);
-
-			int numCorners = n.corners.size();
-
-			if( numCorners == 4 ) {
-				// does not assume CW or CCW ordering just that it is ordered
-				lineA.a = n.corners.get(0);
-				lineA.b = n.corners.get(2);
-				lineB.a = n.corners.get(1);
-				lineB.b = n.corners.get(3);
-
-				// this will be the geometric center and invariant of perspective distortion
-				Intersection2D_F64.intersection(lineA, lineB, n.center);
-			} else {
-				// mean of the points.  It will be in the middle but not the geometric center due
-				// to perspective distortion
-				UtilPoint2D_F64.mean(n.corners.vertexes.data,0,n.corners.size(),n.center);
-			}
-
-			for (int j = 0; j < n.corners.size(); j++) {
-				int k = (j+1)%n.corners.size();
-				double l = n.corners.get(j).distance(n.corners.get(k));
-				n.sideLengths[j] = l;
-				n.largestSide = Math.max(n.largestSide,l);
-			}
-		}
-	}
-
 
 	/**
 	 * Put sets of nodes into the same list if they are some how connected

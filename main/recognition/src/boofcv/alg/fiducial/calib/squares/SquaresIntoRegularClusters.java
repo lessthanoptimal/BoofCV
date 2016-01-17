@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,6 +114,35 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 		// Find all valid graphs
 		findClusters();
 		return clusters.toList();
+	}
+
+	void computeNodeInfo( List<Polygon2D_F64> squares ) {
+
+		for (int i = 0; i < squares.size(); i++) {
+			SquareNode n = nodes.grow();
+			n.reset();
+			n.corners = squares.get(i);
+
+			if( n.corners.size() != 4 )
+				throw new RuntimeException("Sqaures have four corners not "+n.corners.size());
+
+			// does not assume CW or CCW ordering just that it is ordered
+			lineA.a = n.corners.get(0);
+			lineA.b = n.corners.get(2);
+			lineB.a = n.corners.get(1);
+			lineB.b = n.corners.get(3);
+
+			// this will be the geometric center and invariant of perspective distortion
+			Intersection2D_F64.intersection(lineA, lineB, n.center);
+
+
+			for (int j = 0; j < 4; j++) {
+				int k = (j+1)%4;
+				double l = n.corners.get(j).distance(n.corners.get(k));
+				n.sideLengths[j] = l;
+				n.largestSide = Math.max(n.largestSide,l);
+			}
+		}
 	}
 
 	/**

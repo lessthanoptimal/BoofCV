@@ -249,6 +249,9 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		// adjust size based parameters based on image size
 		this.minimumContour = (int)(width*minContourFraction);
 		this.minimumArea = Math.pow(this.minimumContour /4.0,2);
+
+		if( helper != null )
+			helper.setImageShape(width,height);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -92,6 +93,24 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		// Find all valid graphs
 		findClusters();
 		return clusters.toList();
+	}
+
+	void computeNodeInfo( List<Polygon2D_F64> squares ) {
+		for (int i = 0; i < squares.size(); i++) {
+			SquareNode n = nodes.grow();
+			n.reset();
+			n.corners = squares.get(i);
+
+			// mean of the points.  It will be in the middle but not the geometric center due
+			// to perspective distortion
+			UtilPoint2D_F64.mean(n.corners.vertexes.data,0,n.corners.size(),n.center);
+
+			for (int j = 0; j < n.corners.size(); j++) {
+				int k = (j+1)%n.corners.size();
+				double l = n.corners.get(j).distance(n.corners.get(k));
+				n.largestSide = Math.max(n.largestSide,l);
+			}
+		}
 	}
 
 	/**
