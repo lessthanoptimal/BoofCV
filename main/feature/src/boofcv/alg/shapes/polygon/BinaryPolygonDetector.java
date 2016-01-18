@@ -597,8 +597,8 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	/**
 	 * Returns additional information on the polygon
 	 */
-	public Info getPolygonInfo( int which ) {
-		return foundInfo.get(which);
+	public FastQueue<Info> getPolygonInfo() {
+		return foundInfo;
 	}
 
 	/**

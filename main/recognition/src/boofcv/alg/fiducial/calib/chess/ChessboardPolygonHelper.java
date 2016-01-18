@@ -139,7 +139,7 @@ public class ChessboardPolygonHelper<T extends ImageSingleBand> implements Polyg
 				if( !(p.x == 0 || p.y == 0 || p.x == width-1 || p.y == height-1))
 					totalRegular++;
 			}
-			return totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
+			return totalRegular > 0 && totalRegular <= 4; // should be 3, but noise/imprecision in corner can make it 4
 		} else {
 			return splits.size() == 4;
 		}

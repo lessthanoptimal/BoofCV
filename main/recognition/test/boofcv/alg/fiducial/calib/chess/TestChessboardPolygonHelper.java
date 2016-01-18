@@ -88,4 +88,32 @@ public class TestChessboardPolygonHelper {
 			assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
 		}
 	}
+
+	@Test
+	public void filterPixelPolygon_AllBorder() {
+		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
+		alg.width = 50;
+		alg.height = 60;
+
+		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		GrowQueue_I32 splits = new GrowQueue_I32();
+
+		for (int i = 0; i < 100; i++) {
+			externalUndist.add(new Point2D_I32(10,10));
+			externalDist.add(new Point2D_I32(10,10));
+		}
+
+		splits.add(0);
+		splits.add(10);
+		splits.add(20);
+
+		// nothing is actually touching the border, should be valid
+		assertTrue(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+
+		for (int i = 0; i < splits.size(); i++) {
+			externalDist.get(splits.get(i)).set(0,0);
+		}
+		assertFalse(alg.filterPixelPolygon(externalUndist,externalDist,splits,true));
+	}
 }

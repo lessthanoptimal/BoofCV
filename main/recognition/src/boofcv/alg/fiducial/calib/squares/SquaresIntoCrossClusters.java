@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -81,11 +82,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	 * @param squares Set of squares
 	 * @return List of graphs.  All data structures are recycled on the next call to process().
 	 */
-	public List<List<SquareNode>> process( List<Polygon2D_F64> squares ) {
+	public List<List<SquareNode>> process(List<Polygon2D_F64> squares , List<BinaryPolygonDetector.Info> info ) {
 		recycleData();
 
 		// set up nodes
-		computeNodeInfo(squares);
+		computeNodeInfo(squares,info);
 
 		// Connect nodes to each other
 		connectNodes();
@@ -95,21 +96,41 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 		return clusters.toList();
 	}
 
-	void computeNodeInfo( List<Polygon2D_F64> squares ) {
+	void computeNodeInfo( List<Polygon2D_F64> squares , List<BinaryPolygonDetector.Info> squaresInfo ) {
 		for (int i = 0; i < squares.size(); i++) {
 			SquareNode n = nodes.grow();
 			n.reset();
-			n.corners = squares.get(i);
+
+			Polygon2D_F64 polygon = squares.get(i);
+			BinaryPolygonDetector.Info info = squaresInfo.get(i);
 
 			// mean of the points.  It will be in the middle but not the geometric center due
 			// to perspective distortion
-			UtilPoint2D_F64.mean(n.corners.vertexes.data,0,n.corners.size(),n.center);
+			UtilPoint2D_F64.mean(polygon.vertexes.data,0,polygon.size(),n.center);
 
-			for (int j = 0; j < n.corners.size(); j++) {
-				int k = (j+1)%n.corners.size();
-				double l = n.corners.get(j).distance(n.corners.get(k));
+			for (int j = 0,k = polygon.size()-1; j < polygon.size(); k=j,j++) {
+				double l = polygon.get(j).distance(polygon.get(k));
 				n.largestSide = Math.max(n.largestSide,l);
 			}
+
+			// Create a "polygon" only composed of corners which are not along the border.  This should
+			// be from 1 to 4 corners.
+			if( n.corners == null )
+				n.corners = new Polygon2D_F64();
+			else
+				n.corners.vertexes.reset();
+
+			for (int j = 0; j < polygon.size(); j++) {
+				if( !info.borderCorners.get(j) ) {
+					n.corners.vertexes.grow().set(polygon.get(j));
+				}
+			}
+
+			if( n.corners.size() == 0 ) {
+				// if there are no corners not on the image border disregard the shape
+				nodes.removeTail();
+			} else if( n.corners.size() > 4 )
+				throw new RuntimeException("BUG! too many non-border corners "+n.corners.size());
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,6 +59,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	final Object processLock = new Object();
 	BufferedImage imageCopy0;
 	BufferedImage imageCopy1;
+	T boofCopy1;
 
 	protected ImageType<T> imageType;
 	T input;
@@ -70,6 +71,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 		this.input = imageType.createImage(1,1);
 		this.imageType = imageType;
+		this.boofCopy1 = imageType.createImage(1,1);
 	}
 
 	private void createMenuBar(List<String> exampleInputs) {
@@ -122,44 +124,67 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	public abstract void processImage(final BufferedImage buffered , final T input  );
 
 	protected void processImageThread( final BufferedImage buffered , final T input ) {
+
+		// See if there is already a thread running that's processing an image.  If so copy
+		// the new image into storage for the new image that is to be processed after it finishes
+		// processing the current image
 		synchronized (processLock) {
-			if( buffered != null )
-				imageCopy1 = checkCopyBuffered(buffered, imageCopy1);
-
-			if( processRunning ) {
+			if(processRunning) {
+				if( buffered != null ) {
+					imageCopy1 = checkCopyBuffered(buffered, imageCopy1);
+					boofCopy1.setTo(input);
+				} else
+					imageCopy1 = null;
 				processRequested = true;
+				return;
 			} else {
-				processRequested = true;
 				processRunning = true;
-
-				new Thread() {
-					@Override
-					public void run() {
-						while( true ) {
-							synchronized (processLock) {
-								if( !processRequested ) {
-									break;
-								}
-								processRequested = false;
-								if( buffered != null )
-									imageCopy0 = checkCopyBuffered(imageCopy1, imageCopy0);
-							}
-							synchronized (waitingLock) {
-								waitingToOpenImage = false;
-							}
-							if( buffered != null )
-								processImage(imageCopy0,input);
-							else
-								processImage(null,null);
-						}
-
-						synchronized (processLock) {
-							processRunning = false;
-						}
-					}
-				}.start();
+				processRequested = false;
+				if( buffered != null )
+					imageCopy0 = checkCopyBuffered(buffered, imageCopy0);
+				else
+					imageCopy0 = null;
 			}
 		}
+
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						synchronized (waitingLock) {
+							waitingToOpenImage = false;
+						}
+						if (imageCopy0 != null)
+							processImage(imageCopy0, input);
+						else
+							processImage(null, null);
+
+						synchronized (processLock) {
+							if (!processRequested) {
+								processRunning = false;
+								break;
+							}
+							processRequested = false;
+							if (imageCopy1 != null) {
+								imageCopy0 = checkCopyBuffered(imageCopy1, imageCopy0);
+								input.setTo(boofCopy1);
+							} else
+								imageCopy0 = null;
+						}
+					}
+				} catch( RuntimeException e ) {
+					e.printStackTrace();
+					System.out.println(e.getMessage());
+					System.out.println("Thread crashed!  If possible, saving image to crashed_image.png");
+					if( imageCopy0 != null )
+						UtilImageIO.saveImage(imageCopy0,"crashed_image.png");
+					synchronized (processLock) {
+						processRunning = false;
+					}
+				}
+			}
+		}.start();
 	}
 
 	private BufferedImage checkCopyBuffered(BufferedImage src, BufferedImage dst) {

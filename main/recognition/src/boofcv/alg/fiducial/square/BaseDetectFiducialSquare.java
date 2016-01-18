@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -290,7 +290,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 			// remove the perspective distortion and process it
 			removePerspective.apply(gray, square);
 
-			BinaryPolygonDetector.Info info = squareDetector.getPolygonInfo(i);
+			BinaryPolygonDetector.Info info = squareDetector.getPolygonInfo().get(i);
 
 			// see if the black border is actually black
 			if( minimumBorderBlackFraction > 0 ) {

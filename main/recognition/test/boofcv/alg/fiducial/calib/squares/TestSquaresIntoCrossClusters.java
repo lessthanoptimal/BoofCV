@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.calib.squares;
 
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
@@ -47,7 +48,9 @@ public class TestSquaresIntoCrossClusters {
 		squares.add( createSquare(7,10));
 		squares.add( createSquare(9,10));
 
-		List<List<SquareNode>> clusters = alg.process(squares);
+		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
+
+		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
 
 		assertEquals(1,clusters.size());
 
@@ -65,6 +68,18 @@ public class TestSquaresIntoCrossClusters {
 		assertEquals(1,connections[4]);
 	}
 
+	private List<BinaryPolygonDetector.Info> createInfo(List<Polygon2D_F64> squares) {
+		List<BinaryPolygonDetector.Info> squareInfo = new ArrayList<BinaryPolygonDetector.Info>();
+		BinaryPolygonDetector.Info info = new BinaryPolygonDetector.Info();
+		for (int i = 0; i < 4; i++) {
+			info.borderCorners.add(false);
+		}
+		for (int i = 0; i < squares.size(); i++) {
+			squareInfo.add( info );
+		}
+		return squareInfo;
+	}
+
 	/**
 	 * Tests the corner distance threshold.  two nodes should be barely within tolerance of each other with the 3rd
 	 * barely not in tolerance
@@ -78,7 +93,9 @@ public class TestSquaresIntoCrossClusters {
 		squares.add( createSquare(6.20001,7));
 		squares.add( createSquare(6.1999999,5));
 
-		List<List<SquareNode>> clusters = alg.process(squares);
+		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
+
+		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
 
 		assertEquals(2,clusters.size());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,8 +96,9 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 		detectorSquare.process(input, binary);
 
 		FastQueue<Polygon2D_F64> found = detectorSquare.getFoundPolygons();
+		FastQueue<BinaryPolygonDetector.Info> foundInfo = detectorSquare.getPolygonInfo();
 
-		clusters = s2c.process(found.toList());
+		clusters = s2c.process(found.toList(),foundInfo.toList());
 
 		c2g.process(clusters);
 		List<SquareGrid> grids = c2g.getGrids().toList();
