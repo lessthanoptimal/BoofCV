@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,6 +72,19 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * @see LocalSquarePercentileFilter
+	 *
+	 * TODO fill in
+	 */
+	public static <T extends ImageSingleBand>
+	InputToBinary<T> localSquarePercentile(int regionWidth, boolean down,
+										   double minPixelValue, double maxPixelValue ,
+										   int histogramLength , int minimumSpread, Class<T> inputType) {
+		return new LocalSquarePercentileFilter<T>(down,regionWidth,minPixelValue,maxPixelValue,histogramLength,minimumSpread,
+				0.05,0.95,inputType);
+	}
+
+	/**
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy
 	 *
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
@@ -140,6 +153,9 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_SQUARE:
 				return localSquare(config.radius, config.scale, config.down, inputType);
+
+			case LOCAL_SQUARE_PERCENTILE:
+				return localSquarePercentile(config.radius*2+1, config.down,0,255,256,20, inputType);
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
 	}

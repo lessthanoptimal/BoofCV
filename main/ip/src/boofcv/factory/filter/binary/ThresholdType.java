@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,6 +55,9 @@ public enum ThresholdType {
 	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_SQUARE(true,false),
+
+	LOCAL_SQUARE_PERCENTILE(true,false),
+
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *

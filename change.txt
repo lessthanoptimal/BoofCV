@@ -39,6 +39,7 @@ Version : Alpha 0.21
 - ConvertImage
   * Interleaved to MultiSpectral
   * MultiSpectral to Interleaved
+  * Any single band into into ImageUInt8 with the specified pixel value range
 - Chessboard detector
   * Links squares together using corners instead of two grids
   * TODO Can handle squares clipped by image border
@@ -53,7 +54,6 @@ Version : Alpha 0.21
 
 
 - TODO Partial chessboard
-  * global threshold
   * local threshold
 - TODO See if contour can be improved by splitting line then applying the rule to each half
 - TODO             create a few more unit tests which highlight this issue

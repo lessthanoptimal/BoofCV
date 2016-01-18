@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,6 +203,47 @@ public class GConvertImage {
 			return (T)ConvertImage.average((InterleavedF32)input,(ImageFloat32)output);
 		} else if( type == ImageDataType.F64 ) {
 			return (T)ConvertImage.average((InterleavedF64)input,(ImageFloat64)output);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + type);
+		}
+	}
+
+	/**
+	 * Converts pixel values in the input image into an integer values from 0 to numValues.
+	 * @param input Input image
+	 * @param min minimum input pixel value, inclusive
+	 * @param max maximum input pixel value, inclusive
+	 * @param numValues Number of possible pixel values in output image
+	 * @param output (Optional) Storage for the output image.  Can be null.
+	 * @return The converted output image.
+	 */
+	public static ImageUInt8 convert(ImageSingleBand input , double min , double max , int numValues , ImageUInt8 output )
+	{
+		// see if it can use the faster straight forward convert
+		if( min == 0 && max == 255 && numValues == 256 ) {
+			if( output == null )
+				output = new ImageUInt8(input.width,input.height);
+			convert(input,output);
+			return output;
+		}
+
+		ImageDataType type = input.getImageType().getDataType();
+		if( type == ImageDataType.U8) {
+			return ConvertImage.convert((ImageUInt8)input,(int)min,(int)max,numValues,output);
+		} else if( type == ImageDataType.S8) {
+			return ConvertImage.convert((ImageSInt8)input,(int)min,(int)max,numValues,output);
+		} else if( type == ImageDataType.U16 ) {
+			return ConvertImage.convert((ImageUInt16)input,(int)min,(int)max,numValues,output);
+		} else if( type == ImageDataType.S16 ) {
+			return ConvertImage.convert((ImageSInt16)input,(int)min,(int)max,numValues,output);
+		} else if( type == ImageDataType.S32 ) {
+			return ConvertImage.convert((ImageSInt32)input,(int)min,(int)max,numValues,output);
+		} else if( type == ImageDataType.S64 ) {
+			return ConvertImage.convert((ImageSInt64)input,(long)min,(long)max,numValues,output);
+		} else if( type == ImageDataType.F32 ) {
+			return ConvertImage.convert((ImageFloat32)input,(float)min,(float)max,numValues,output);
+		} else if( type == ImageDataType.F64 ) {
+			return ConvertImage.convert((ImageFloat64)input,min,max,numValues,output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,11 +47,14 @@ public class TestConvertImage {
 		for (Method m : methods) {
 
 			Class[] inputTypes = m.getParameterTypes();
-			if( inputTypes.length != 2 || !ImageBase.class.isAssignableFrom(inputTypes[1]))
+			if( inputTypes.length < 2)
+				continue;
+
+			Class<?> outputType = inputTypes[inputTypes.length-1];
+			if( (inputTypes.length != 5 && inputTypes.length != 2) || !ImageBase.class.isAssignableFrom(outputType))
 				continue;
 
 			Class<?> inputType = inputTypes[0];
-			Class<?> outputType = inputTypes[1];
 
 //			System.out.println(m.getName()+" "+inputType.getSimpleName()+" "+outputType.getSimpleName()+" "+m.getReturnType());
 			
@@ -59,7 +62,11 @@ public class TestConvertImage {
 			assertTrue(outputType == m.getReturnType());
 
 			if( m.getName().contains("convert") ) {
-				checkConvert(m,inputType,outputType);
+				if( inputTypes.length == 5 ) {
+					checkConvertIntegerRange(m,inputTypes);
+				} else {
+					checkConvert(m, inputType, outputType);
+				}
 			} else {
 				if( inputType == MultiSpectral.class )
 					checkMultiAverage(m, inputType, outputType);
@@ -83,8 +90,51 @@ public class TestConvertImage {
 		} else {
 			checkConvertMultiToInterleaved(m,inputType,outputType);
 		}
-
 	}
+
+	private void checkConvertIntegerRange( Method m , Class[] types ) {
+
+		Class inputType = types[0];
+
+		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
+		ImageUInt8 output = new ImageUInt8(imgWidth,imgHeight);
+
+		boolean inputSigned = true;
+
+		if( ImageInteger.class.isAssignableFrom(inputType) )
+			inputSigned = input.getDataType().isSigned();
+
+	   // only provide signed numbers of both data types can handle them
+		if( inputSigned ) {
+			GImageMiscOps.fillUniform(input, rand, -10, 10);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+		}
+
+		BoofTesting.checkSubImage(this,"checkConvertIntegerRange",true,m,input,output);
+	}
+
+	public void checkConvertIntegerRange( Method m ,
+										  ImageSingleBand<?> input , ImageUInt8 output ) {
+		try {
+			double tol = selectTolerance(input,output);
+
+			// check it with a non-null output
+			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			assertTrue(ret == output);
+			BoofTesting.assertEquals(input, ret, tol);
+
+			// check it with a null output
+			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			BoofTesting.assertEquals(input, ret, tol);
+
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private void checkConvertSingle( Method m , Class inputType , Class outputType ) {
 		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
 		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
