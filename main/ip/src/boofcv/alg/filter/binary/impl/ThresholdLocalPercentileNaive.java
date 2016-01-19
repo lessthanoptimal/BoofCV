@@ -69,13 +69,13 @@ public class ThresholdLocalPercentileNaive {
 				computeHistogram(x,y,input);
 				findPercentiles();
 				if( upperIndex-lowerIndex <= minimumSpread ) {
-					output.set(x,y,1);
+					output.unsafe_set(x,y,1);
 				} else {
 					int threshold = (upperIndex+lowerIndex)/2;
-					if( input.get(x,y) <= threshold) {
-						output.set(x,y,1);
+					if( input.unsafe_get(x,y) <= threshold) {
+						output.unsafe_set(x,y,1);
 					} else {
-						output.set(x,y,0);
+						output.unsafe_set(x,y,0);
 					}
 				}
 			}

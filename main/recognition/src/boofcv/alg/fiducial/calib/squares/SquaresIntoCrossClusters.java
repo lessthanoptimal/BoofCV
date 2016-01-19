@@ -126,6 +126,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 				}
 			}
 
+			// TODO make it work with an arbitrary number of corners...
 			if( n.corners.size() == 0 ) {
 				// if there are no corners not on the image border disregard the shape
 				nodes.removeTail();

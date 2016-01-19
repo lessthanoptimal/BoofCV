@@ -81,7 +81,7 @@ public class FactoryThresholdBinary {
 										   double minPixelValue, double maxPixelValue ,
 										   int histogramLength , int minimumSpread, Class<T> inputType) {
 		return new LocalSquarePercentileFilter<T>(down,regionWidth,minPixelValue,maxPixelValue,histogramLength,minimumSpread,
-				0.05,0.95,inputType);
+				0.02,0.98,inputType);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class FactoryThresholdBinary {
 				return localSquare(config.radius, config.scale, config.down, inputType);
 
 			case LOCAL_SQUARE_PERCENTILE:
-				return localSquarePercentile(config.radius*2+1, config.down,0,255,256,20, inputType);
+				return localSquarePercentile(config.radius*2+1, config.down,0,255,100,20, inputType);
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
 	}

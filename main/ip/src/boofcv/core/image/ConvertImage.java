@@ -431,6 +431,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		int range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -836,6 +837,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		int range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -1241,6 +1243,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		int range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -1646,6 +1649,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		int range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -2051,6 +2055,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		int range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -2456,6 +2461,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		long range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -2861,6 +2867,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		float range = max-min;
 
 		for (int y = 0; y < input.height; y++) {
@@ -3266,6 +3273,7 @@ public class ConvertImage {
 		if( numValues < 0 || numValues > 256 )
 			throw new IllegalArgumentException("0 <= numValues <= 256");
 
+		numValues -= 1;
 		double range = max-min;
 
 		for (int y = 0; y < input.height; y++) {

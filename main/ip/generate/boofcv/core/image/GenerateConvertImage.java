@@ -255,6 +255,8 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif( numValues < 0 || numValues > 256 )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"0 <= numValues <= 256\");\n" +
 				"\n" +
+				"\t\tnumValues -= 1;" +
+				"\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
