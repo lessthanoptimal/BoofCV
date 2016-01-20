@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
+// TODO button to save images
 public class DetectCalibrationChessboardApp
 		extends CommonDetectCalibrationApp
 
@@ -48,18 +49,32 @@ public class DetectCalibrationChessboardApp
 	DetectChessboardFiducial<ImageFloat32> alg;
 	ConfigChessboard config;
 
-	public DetectCalibrationChessboardApp(List<String> exampleInputs) {
-		super(exampleInputs);
+	public DetectCalibrationChessboardApp( int numRows , int numColumns , boolean forCalibration ,
+										   List<String> exampleInputs) {
+		super(numRows,numColumns,exampleInputs);
+		config = new ConfigChessboard(numRows, numColumns, 1);
+		config.refineWithCorners = forCalibration;
+
+		declareDetector();
 	}
+
 	@Override
-	protected boolean process(ImageFloat32 image) {
+	public void declareDetector() {
 		if( controlPanel.isManual()) {
 			config.thresholding.type = ThresholdType.FIXED;
 			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
 		} else {
 			config.thresholding.type = ThresholdType.LOCAL_SQUARE_BORDER;
 		}
+
+		config.numRows = controlPanel.getGridRows();
+		config.numCols = controlPanel.getGridColumns();
+
 		alg = FactoryCalibrationTarget.detectorChessboard(config).getAlgorithm();
+	}
+
+	@Override
+	protected boolean process(ImageFloat32 image) {
 		return alg.process(image);
 	}
 
@@ -107,9 +122,7 @@ public class DetectCalibrationChessboardApp
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}
 
-		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(examples);
-
-		app.configure(7, 5, false);
+		DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(7,5,false,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

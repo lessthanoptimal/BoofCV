@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,11 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 	
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
-	
+
+	// select the calibration grid's dimensions
+	JSpinner selectRows;
+	JSpinner selectColumns;
+
 	// selects which image to view
 	JComboBox viewSelector;
 
@@ -75,13 +79,18 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 
 	double scale = 1;
 	boolean isManual = false;
+	int gridRows;
+	int gridColumns;
 
 	Listener listener;
 	
 	int selectedView = 0;
 	int thresholdLevel = 60;
 
-	public ChessboardPanel(boolean hasManualMode) {
+	public ChessboardPanel(int gridRows, int gridColumns, boolean hasManualMode) {
+		this.gridRows = gridRows;
+		this.gridColumns = gridColumns;
+
 		viewSelector = new JComboBox();
 		viewSelector.addItem("Original");
 		viewSelector.addItem("Threshold");
@@ -129,6 +138,14 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		showContour.addItemListener(this);
 		showContour.setMaximumSize(showContour.getPreferredSize());
 
+		selectRows = new JSpinner(new SpinnerNumberModel(gridRows,2, 100, 1));
+		selectRows.addChangeListener(this);
+		selectRows.setMaximumSize(selectRows.getPreferredSize());
+
+		selectColumns = new JSpinner(new SpinnerNumberModel(gridColumns,2, 100, 1));
+		selectColumns.addChangeListener(this);
+		selectColumns.setMaximumSize(selectColumns.getPreferredSize());
+
 		thresholdSpinner = new JSpinner(new SpinnerNumberModel(thresholdLevel,0, 255, 20));
 		thresholdSpinner.addChangeListener(this);
 		thresholdSpinner.setMaximumSize(thresholdSpinner.getPreferredSize());
@@ -146,6 +163,8 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		addSeparator(100);
 		addLabeled(viewSelector, "View ", this);
 		addSeparator(100);
+		addLabeled(selectRows, "Rows", this);
+		addLabeled(selectColumns, "Cols", this);
 		if( hasManualMode )
 			addAlignLeft(manualThreshold,this);
 		addLabeled(thresholdSpinner, "Threshold", this);
@@ -173,7 +192,13 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
 			// Only need to recompute
 			if( isManual )
-				listener.calibEventProcess();
+				listener.calibEventDetectorModified();
+		}  else if( e.getSource() == selectRows) {
+			gridRows = ((Number) selectRows.getValue()).intValue();
+			listener.calibEventDetectorModified();
+		}  else if( e.getSource() == selectColumns) {
+			gridColumns = ((Number) selectColumns.getValue()).intValue();
+			listener.calibEventDetectorModified();
 		} else if( e.getSource() == selectZoom ) {
 			scale = ((Number)selectZoom.getValue()).doubleValue();
 			listener.calibEventGUI();
@@ -270,7 +295,7 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 			thresholdLevel = ((Number) thresholdSpinner.getValue()).intValue();
 			// Only need to recompute
 			if( isManual )
-				listener.calibEventProcess();
+				listener.calibEventDetectorModified();
 		} else if( e.getSource() == selectZoom ) {
 			scale = ((Number)selectZoom.getValue()).doubleValue();
 			listener.calibEventGUI();
@@ -279,9 +304,17 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 				isManual = manualThreshold.isSelected();
 				thresholdSpinner.setEnabled(isManual);
 
-				listener.calibEventProcess();
+				listener.calibEventDetectorModified();
 			}
 		}
+	}
+
+	public int getGridRows() {
+		return gridRows;
+	}
+
+	public int getGridColumns() {
+		return gridColumns;
 	}
 
 	@Override
@@ -314,6 +347,6 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 	{
 		void calibEventGUI();
 
-		void calibEventProcess();
+		void calibEventDetectorModified();
 	}
 }

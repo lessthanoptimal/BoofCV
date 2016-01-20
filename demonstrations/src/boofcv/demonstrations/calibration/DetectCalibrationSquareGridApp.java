@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,28 +47,33 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	DetectSquareGridFiducial<ImageFloat32> alg;
 	ConfigSquareGrid config;
 
-	public DetectCalibrationSquareGridApp(List<String> exampleInputs) {
-		super(exampleInputs);
-	}
+	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
+										  boolean forCalibration ,
+										  List<String> exampleInputs) {
+		super(numRows,numColumns,exampleInputs);
 
-
-	public void configure(int numRows, int numCols, double squareWidth, double spaceWidth,
-						  boolean forCalibration) {
-		config = new ConfigSquareGrid(numRows, numCols, squareWidth,spaceWidth);
-
+		config = new ConfigSquareGrid(numRows, numColumns, squareWidth,spaceWidth);
 		config.refineWithCorners = forCalibration;
-
 	}
 
 	@Override
-	protected boolean process(ImageFloat32 image) {
+	public void declareDetector() {
 		if( controlPanel.isManual()) {
 			config.thresholding.type = ThresholdType.FIXED;
 			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
 		} else {
 			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
 		}
+
+		config.numRows = controlPanel.getGridRows();
+		config.numCols = controlPanel.getGridColumns();
+
 		alg = FactoryCalibrationTarget.detectorSquareGrid(config).getAlgorithm();
+	}
+
+	@Override
+	protected boolean process(ImageFloat32 image) {
+
 		return alg.process(image);
 	}
 
@@ -110,9 +115,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Square/left%02d.jpg", i)));
 		}
 
-		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(examples);
-
-		app.configure(4, 3, 1,1,false);
+		DetectCalibrationSquareGridApp app = new DetectCalibrationSquareGridApp(4, 3, 1,1,false,examples);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,15 +59,16 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 {
 	boolean success;
 
-	ChessboardPanel controlPanel = new ChessboardPanel(true);
+	ChessboardPanel controlPanel;
 
 	VisualizePanel imagePanel = new VisualizePanel();
 	BufferedImage input;
 	BufferedImage binary;
 	ImageFloat32 grayPrev = new ImageFloat32(1,1);
 
-	public CommonDetectCalibrationApp(List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp( int numRows , int numColumns , List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(ImageFloat32.class));
+		controlPanel = new ChessboardPanel(numRows,numColumns,true);
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
@@ -83,6 +84,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 
 		imagePanel.addMouseWheelListener(controlPanel);
 	}
+
+	protected abstract void declareDetector();
 
 	protected abstract boolean process( ImageFloat32 image );
 
@@ -107,7 +110,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 			grayPrev.setTo(gray);
 		}
 
-		calibEventProcess();
+		processFrame();
 	}
 
 	private void renderGraph( Graphics2D g2 , double scale ) {
@@ -169,7 +172,15 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	}
 
 	@Override
-	public void calibEventProcess() {
+	public void calibEventDetectorModified() {
+		synchronized ( this ) {
+			declareDetector();
+		}
+
+		processFrame();
+	}
+
+	public void processFrame() {
 		synchronized ( this ) {
 			success = process(grayPrev);
 			VisualizeBinaryData.renderBinary(getBinaryImage(), false, binary);
@@ -181,7 +192,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 					controlPanel.setSuccessMessage("FOUND", true);
 				else
 					controlPanel.setSuccessMessage("FAILED", false);
-				imagePanel.setPreferredSize(new Dimension(input.getWidth(), input.getHeight()));
+				imagePanel.setPreferredSize(new Dimension(input.getWidth()+5, input.getHeight()+5));
 				calibEventGUI();
 				imagePanel.repaint();
 			}
