@@ -36,6 +36,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO If number of corners != 4 will considerConnect work correctly? Especially if more than 4
+// TODO also update RegularClustersIntoGrids for non-4-corner shapes
 public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 	// maximum neighbors on nearest-neighbor search
@@ -104,8 +106,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			Polygon2D_F64 polygon = squares.get(i);
 			BinaryPolygonDetector.Info info = squaresInfo.get(i);
 
-			// mean of the points.  It will be in the middle but not the geometric center due
-			// to perspective distortion
+			// The center is used when visualizing results
 			UtilPoint2D_F64.mean(polygon.vertexes.data,0,polygon.size(),n.center);
 
 			for (int j = 0,k = polygon.size()-1; j < polygon.size(); k=j,j++) {
@@ -130,8 +131,11 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			if( n.corners.size() == 0 ) {
 				// if there are no corners not on the image border disregard the shape
 				nodes.removeTail();
-			} else if( n.corners.size() > 4 )
-				throw new RuntimeException("BUG! too many non-border corners "+n.corners.size());
+			}
+			// Due to optimizations after shapes with border corners are pruned it is possible to have
+			// more than 4 inside image corners.  The code was modified to accept this nuisance
+//			else if( n.corners.size() > 4 )
+//				throw new RuntimeException("BUG! too many non-border corners "+n.corners.size());
 		}
 	}
 

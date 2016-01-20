@@ -20,7 +20,7 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.filter.binary.ConfigThresholdSquareBorder;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonCornersToImage;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
@@ -54,7 +54,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,20);
+	public ConfigThreshold thresholding = new ConfigThresholdSquareBorder(12,10,true);
 
 	/**
 	 * Configuration for square detector

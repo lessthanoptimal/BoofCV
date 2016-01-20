@@ -72,16 +72,15 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see LocalSquarePercentileFilter
-	 *
-	 * TODO fill in
+	 * @see LocalSquareBorderBinaryFilter
 	 */
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> localSquarePercentile(int regionWidth, boolean down,
-										   double minPixelValue, double maxPixelValue ,
-										   int histogramLength , int minimumSpread, Class<T> inputType) {
-		return new LocalSquarePercentileFilter<T>(down,regionWidth,minPixelValue,maxPixelValue,histogramLength,minimumSpread,
-				0.02,0.98,inputType);
+	InputToBinary<T> localSquareBorder(int regionWidth, boolean down,
+									   double minPixelValue, double maxPixelValue ,
+									   int histogramLength , int minimumSpread,
+									   double lowerFrac , double upperFrac, Class<T> inputType) {
+		return new LocalSquareBorderBinaryFilter<T>(down,regionWidth,minPixelValue,maxPixelValue,histogramLength,minimumSpread,
+				lowerFrac,upperFrac,inputType);
 	}
 
 	/**
@@ -154,8 +153,12 @@ public class FactoryThresholdBinary {
 			case LOCAL_SQUARE:
 				return localSquare(config.radius, config.scale, config.down, inputType);
 
-			case LOCAL_SQUARE_PERCENTILE:
-				return localSquarePercentile(config.radius*2+1, config.down,0,255,100,20, inputType);
+			case LOCAL_SQUARE_BORDER: {
+				ConfigThresholdSquareBorder c = (ConfigThresholdSquareBorder)config;
+				return localSquareBorder(c.radius * 2 + 1, c.down,
+						c.minPixelValue, c.maxPixelValue,
+						c.histogramLength, c.minimumSpread, c.lowerFraction, c.upperFraction, inputType);
+			}
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
 	}

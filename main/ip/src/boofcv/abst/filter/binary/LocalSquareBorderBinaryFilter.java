@@ -19,7 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.binary.impl.ThresholdLocalPercentile;
+import boofcv.alg.filter.binary.impl.ThresholdLocalSquareBorder;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -29,9 +29,9 @@ import boofcv.struct.image.ImageUInt8;
  * TODO fill in
  * @author Peter Abeles
  */
-public class LocalSquarePercentileFilter<T extends ImageSingleBand> implements InputToBinary<T>
+public class LocalSquareBorderBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T>
 {
-	ThresholdLocalPercentile alg;
+	ThresholdLocalSquareBorder alg;
 	Class<T> imageType;
 
 	boolean skipConvert;
@@ -40,17 +40,17 @@ public class LocalSquarePercentileFilter<T extends ImageSingleBand> implements I
 	double minPixelValue;
 	double maxPixelValue;
 
-	public LocalSquarePercentileFilter(boolean thresholdDown ,
-									   int regionWidth ,
-									   double minPixelValue, double maxPixelValue ,
-									   int histogramLength , int minimumSpread,
-									   double lowerFrac , double upperFrac,
-									   Class<T> imageType )
+	public LocalSquareBorderBinaryFilter(boolean thresholdDown ,
+										 int regionWidth ,
+										 double minPixelValue, double maxPixelValue ,
+										 int histogramLength , int minimumSpread,
+										 double lowerFrac , double upperFrac,
+										 Class<T> imageType )
 	{
 		this.imageType = imageType;
 		this.minPixelValue = minPixelValue;
 		this.maxPixelValue = maxPixelValue;
-		alg = new ThresholdLocalPercentile(
+		alg = new ThresholdLocalSquareBorder(
 				thresholdDown,regionWidth,histogramLength,minimumSpread,lowerFrac,upperFrac);
 
 		skipConvert = imageType==ImageUInt8.class&&(minPixelValue==0&&maxPixelValue==255&&histogramLength==256);

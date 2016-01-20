@@ -57,7 +57,7 @@ public class DetectCalibrationChessboardApp
 			config.thresholding.type = ThresholdType.FIXED;
 			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
 		} else {
-			config.thresholding.type = ThresholdType.LOCAL_SQUARE;
+			config.thresholding.type = ThresholdType.LOCAL_SQUARE_BORDER;
 		}
 		alg = FactoryCalibrationTarget.detectorChessboard(config).getAlgorithm();
 		return alg.process(image);
@@ -103,7 +103,6 @@ public class DetectCalibrationChessboardApp
 
 		List<String> examples = new ArrayList<String>();
 
-		examples.add("/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/distant/image00005.jpg");
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}

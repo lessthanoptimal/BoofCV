@@ -1057,4 +1057,18 @@ public class BoofTesting {
 			System.out.println();
 		}
 	}
+
+	public static void printDiffBinary(ImageUInt8 imgA, ImageUInt8 imgB) {
+
+		System.out.println("------- Difference -----------");
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < imgA.getWidth(); x++) {
+				if( imgA.unsafe_get(x,y) != imgB.unsafe_get(x,y))
+					System.out.print(" x");
+				else
+					System.out.print(" .");
+			}
+			System.out.println();
+		}
+	}
 }

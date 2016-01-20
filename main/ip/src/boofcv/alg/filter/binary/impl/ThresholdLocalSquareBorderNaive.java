@@ -27,7 +27,7 @@ import java.util.Arrays;
  * @author Peter Abeles
  */
 // TODO handle case where image is smaller than regionWidth
-public class ThresholdLocalPercentileNaive {
+public class ThresholdLocalSquareBorderNaive {
 
 	int minimumSpread;
 	int regionWidth;
@@ -40,10 +40,10 @@ public class ThresholdLocalPercentileNaive {
 	// histogram index which has the integral summing to at least count
 	int lowerIndex,upperIndex;
 
-	public ThresholdLocalPercentileNaive(boolean thresholdDown,
-										 int regionWidth , int histogramLength ,
-										 int minimumSpread,
-										 double lowerFrac , double upperFrac ) {
+	public ThresholdLocalSquareBorderNaive(boolean thresholdDown,
+										   int regionWidth , int histogramLength ,
+										   int minimumSpread,
+										   double lowerFrac , double upperFrac ) {
 		this.thresholdDown = thresholdDown;
 		this.regionWidth = regionWidth;
 		this.minimumSpread = minimumSpread;
@@ -88,7 +88,7 @@ public class ThresholdLocalPercentileNaive {
 				computeHistogram(x,y,input);
 				findPercentiles();
 				if( upperIndex-lowerIndex <= minimumSpread ) {
-					output.set(x,y,0);
+					output.set(x,y,1);
 				} else {
 					int threshold = (upperIndex+lowerIndex)/2;
 					if( input.get(x,y) > threshold) {
@@ -114,12 +114,12 @@ public class ThresholdLocalPercentileNaive {
 		int x1 = x0 + regionWidth;
 		int y1 = y0 + regionWidth;
 
-		if( x1 >= input.width ) {
-			x1 = input.width-1;
+		if( x1 > input.width ) {
+			x1 = input.width;
 			x0 = x1 - regionWidth;
 		}
-		if( y1 >= input.height ) {
-			y1 = input.height-1;
+		if( y1 > input.height ) {
+			y1 = input.height;
 			y0 = y1 - regionWidth;
 		}
 
@@ -153,5 +153,15 @@ public class ThresholdLocalPercentileNaive {
 
 	public int getHistogramLength() {
 		return histogram.length;
+	}
+
+	private void printHistogram() {
+		System.out.println("NAIVE ------------------------");
+		for (int i = 0; i < histogram.length; i++) {
+			if( histogram[i] != 0 ) {
+				System.out.println("h["+i+"] = "+histogram[i]);
+			}
+		}
+		System.out.println("------------------------");
 	}
 }

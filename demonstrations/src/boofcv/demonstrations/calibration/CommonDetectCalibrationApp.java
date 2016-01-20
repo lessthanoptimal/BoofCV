@@ -31,6 +31,7 @@ import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -130,7 +131,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 			java.util.List<SquareEdge> edges = new ArrayList<SquareEdge>();
 
 			for( SquareNode n : graph ) {
-				for (int j = 0; j < 4; j++) {
+				for (int j = 0; j < n.edges.length; j++) {
 					if( n.edges[j] != null && !edges.contains(n.edges[j])) {
 						edges.add( n.edges[j]);
 					}
@@ -335,43 +336,23 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	}
 
 	private void drawCornersInside( Graphics2D g2 , double scale, Polygon2D_F64 poly ) {
-		double x0 = poly.get(0).x*scale;
-		double y0 = poly.get(0).y*scale;
+		Color colors[] = new Color[]{Color.RED,new Color(190, 0, 0),Color.GREEN,new Color(0, 190, 0)};
 
-		double x1 = poly.get(1).x*scale;
-		double y1 = poly.get(1).y*scale;
+		Point2D_F64 center = new Point2D_F64();
+		UtilPolygons2D_F64.vertexAverage(poly,center);
 
-		double x2 = poly.get(2).x*scale;
-		double y2 = poly.get(2).y*scale;
+		for (int i = 0; i < poly.size(); i++) {
+			Point2D_F64 p = poly.get(i);
+			Color c = i < 4 ? colors[i] : Color.BLUE;
 
-		double x3 = poly.get(3).x*scale;
-		double y3 = poly.get(3).y*scale;
+			double dx = p.x - center.x;
+			double dy = p.y - center.y;
 
-		double dx02 = x2-x0;
-		double dy02 = y2-y0;
+			double x = (center.x + dx*0.75)*scale;
+			double y = (center.y + dy*0.75)*scale;
 
-		double dx13 = x3-x1;
-		double dy13 = y3-y1;
-
-		double fraction = 0.2;
-
-		x0 += dx02*fraction;
-		y0 += dy02*fraction;
-
-		x2 -= dx02*fraction;
-		y2 -= dy02*fraction;
-
-		x1 += dx13*fraction;
-		y1 += dy13*fraction;
-
-		x3 -= dx13*fraction;
-		y3 -= dy13*fraction;
-
-		VisualizeFeatures.drawPoint(g2, x0, y0, 3, Color.RED, false);
-		VisualizeFeatures.drawPoint(g2, x1, y1, 3, new Color(190, 0, 0), false);
-		VisualizeFeatures.drawPoint(g2, x2, y2, 3, Color.GREEN, false);
-		VisualizeFeatures.drawPoint(g2, x3, y3, 3, new Color(0, 190, 0), false);
-
+			VisualizeFeatures.drawPoint(g2, x, y, 3, c, false);
+		}
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,

@@ -24,16 +24,28 @@ import boofcv.struct.image.ImageUInt8;
 import java.util.Arrays;
 
 /**
+ * A locally adaptive thesholding algorithm intended to ensure that shapes which touch the image border are marked
+ * as a continuous region.  Some locally adaptive algorithms (e.g. mean or gaussian) will break the object's edge
+ * when it intersects the image border.  This is caused by the lack of an observed edge and the object being
+ * textureless.  When other some locally adaptive algorithms encounter textureless regions they arbitrary classify
+ * pixels.  This algorithm will identify that its textureless and mark it as 1.
+ *
+ * <p>
+ * The algorithm has the following steps:<br>
+ * 1) Compute local histogram from square region around the current pixel.<br>
+ * 2) Compute the lower and upper intensity values from user configurable percentiles.<br>
+ * 3) See if there is sufficient difference between pixel values, if not then it is assumed to be textureless<br>
+ * 4a) If textureless mark as 1
+ * 4b) If not textureless set a threshold to be the average of the lower and upper values.<br>
+ *     If threshold down then 1 = value &le; threshold. Threshold up, 1 = value &gt; threshold.<br>
+ * </p>
  * @author Peter Abeles
  */
-// TODO handle case where image is smaller than regionWidth
-public class ThresholdLocalPercentile {
+public class ThresholdLocalSquareBorder {
 
 	int minimumSpread;
 	int regionWidth;
 	int histogram[];
-
-	boolean thresholdDown;
 
 	// histogram integral to be at lower and upper percentile
 	int lowerCount,upperCount;
@@ -45,11 +57,10 @@ public class ThresholdLocalPercentile {
 	ImageUInt8 input;
 	ImageUInt8 output;
 
-	public ThresholdLocalPercentile(boolean thresholdDown,
-									int regionWidth , int histogramLength ,
-									int minimumSpread,
-									double lowerFrac , double upperFrac ) {
-		this.thresholdDown = thresholdDown;
+	public ThresholdLocalSquareBorder(boolean thresholdDown,
+									  int regionWidth , int histogramLength ,
+									  int minimumSpread,
+									  double lowerFrac , double upperFrac ) {
 		this.regionWidth = regionWidth;
 		this.minimumSpread = minimumSpread;
 		histogram = new int[ histogramLength ];
@@ -65,16 +76,17 @@ public class ThresholdLocalPercentile {
 	}
 
 	public void process(ImageUInt8 input , ImageUInt8 output ) {
+		if( input.width < regionWidth || input.height < regionWidth )
+			throw new IllegalArgumentException("Input image is smaller than the region width");
+
 		this.input = input;
 		this.output = output;
 
 		InputSanityCheck.checkSameShape(input,output);
 
-		if( thresholdDown) {
-			processInner();
-			processCorners();
-			processSides();
-		}
+		processInner();
+		processCorners();
+		processSides();
 	}
 
 	public void processInner() {
@@ -105,10 +117,9 @@ public class ThresholdLocalPercentile {
 
 		// Border TOP
 		initializeHistogram(0,0,input);
-		int y0 = 0;
 		for (int x = r; x < x1; x++) {
-			int indexIn = input.startIndex + y0*input.stride + x; //first pixel it image top and x = region middle
-			int indexOut = output.startIndex + y0*output.stride + x;
+			int indexIn = input.startIndex + x; //first pixel it image top and x = region middle
+			int indexOut = output.startIndex + x;
 			for (int y = 0; y < r; y++) { // assign all pixels from image top to region middle
 				assign.assign(indexIn, indexOut);
 				indexIn += input.stride;
@@ -118,7 +129,7 @@ public class ThresholdLocalPercentile {
 		}
 
 		// Border Bottom
-		y0 = input.height-regionWidth;
+		int y0 = input.height-regionWidth;
 		initializeHistogram(0,y0,input);
 		for (int x = r; x < x1; x++) {
 			int indexIn = input.startIndex + y1*input.stride + x;
@@ -191,6 +202,8 @@ public class ThresholdLocalPercentile {
 				histogram[input.data[index++] & 0xFF]++;
 			}
 		}
+
+		findPercentiles();
 	}
 
 	private void updateHistogramRight(int x0 , int y0 , ImageUInt8 input ) {
@@ -201,6 +214,7 @@ public class ThresholdLocalPercentile {
 			histogram[input.data[index]&0xFF]--;
 			histogram[input.data[index+regionWidth]&0xFF]++;
 		}
+		findPercentiles();
 	}
 
 	private void updateHistogramDown(int x0 , int y0 , ImageUInt8 input ) {
@@ -213,6 +227,7 @@ public class ThresholdLocalPercentile {
 			histogram[input.data[index]&0xFF]--;
 			histogram[input.data[index+bottom]&0xFF]++;
 		}
+		findPercentiles();
 	}
 
 	private void findPercentiles() {
@@ -225,8 +240,7 @@ public class ThresholdLocalPercentile {
 			}
 		}
 
-		upperIndex = lowerIndex;
-		for (upperIndex = 0; upperIndex < histogram.length; upperIndex++) {
+		for (upperIndex = lowerIndex; upperIndex < histogram.length; upperIndex++) {
 			count += histogram[upperIndex];
 			if( count >= upperCount ) {
 				break;
@@ -245,15 +259,14 @@ public class ThresholdLocalPercentile {
 	private class AssignDown implements Assign {
 		@Override
 		public void assign(int indexIn, int indexOut) {
-			findPercentiles();
 			if( upperIndex-lowerIndex <= minimumSpread ) {
 				output.data[indexOut] = 1;
 			} else {
 				int threshold = (upperIndex+lowerIndex)/2;
 				if( (input.data[indexIn]&0xFF) <= threshold) {
-					output.data[indexIn] = 1;
+					output.data[indexOut] = 1;
 				} else {
-					output.data[indexIn] = 0;
+					output.data[indexOut] = 0;
 				}
 			}
 		}
@@ -262,15 +275,14 @@ public class ThresholdLocalPercentile {
 	private class AssignUp implements Assign {
 		@Override
 		public void assign(int indexIn, int indexOut) {
-			findPercentiles();
 			if( upperIndex-lowerIndex <= minimumSpread ) {
 				output.data[indexOut] = 1;
 			} else {
 				int threshold = (upperIndex+lowerIndex)/2;
-				if( (input.data[indexIn]&0xFF) <= threshold) {
-					output.data[indexIn] = 0;
+				if( (input.data[indexIn]&0xFF) > threshold) {
+					output.data[indexOut] = 1;
 				} else {
-					output.data[indexIn] = 1;
+					output.data[indexOut] = 0;
 				}
 			}
 		}

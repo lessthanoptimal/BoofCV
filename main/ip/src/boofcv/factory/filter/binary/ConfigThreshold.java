@@ -70,6 +70,7 @@ public class ConfigThreshold implements Configuration {
 	 */
 	public int maxPixelValue = 255;
 
+
 	public static ConfigThreshold fixed( double value ) {
 		ConfigThreshold config = new ConfigThreshold();
 		config.type = ThresholdType.FIXED;
@@ -96,10 +97,14 @@ public class ConfigThreshold implements Configuration {
 		if( type.isGlobal() )
 			throw new IllegalArgumentException("Type must be local");
 
-		ConfigThreshold config = new ConfigThreshold();
-		config.type = type;
-		config.radius = radius;
-		return config;
+		if( type == ThresholdType.LOCAL_SQUARE_BORDER) {
+			return new ConfigThresholdSquareBorder(radius,10,true);
+		} else {
+			ConfigThreshold config = new ConfigThreshold();
+			config.type = type;
+			config.radius = radius;
+			return config;
+		}
 	}
 
 	@Override

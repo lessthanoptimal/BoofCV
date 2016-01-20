@@ -19,6 +19,7 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.filter.binary.impl.ThresholdLocalSquareBorder;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -46,18 +47,21 @@ public enum ThresholdType {
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#localGaussian(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localGaussian(ImageUInt8, ImageUInt8, int, float, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_GAUSSIAN(true,false),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, int, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, float, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_SQUARE(true,false),
-
-	LOCAL_SQUARE_PERCENTILE(true,false),
-
+	/**
+	 * Locally adaptive square region designed to handle objects intersecting the image border.
+	 *
+	 * @see ThresholdLocalSquareBorder
+	 */
+	LOCAL_SQUARE_BORDER(true,false),
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *
