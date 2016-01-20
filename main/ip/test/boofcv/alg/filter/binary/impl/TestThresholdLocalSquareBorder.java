@@ -87,4 +87,12 @@ public class TestThresholdLocalSquareBorder {
 		fail("implement");
 	}
 
+	/**
+	 * Make sure it handles the case correctly when the upper and lower percentiles should be the same index value
+	 */
+	@Test
+	public void findPercentiles_sameValue() {
+		fail("implement");
+	}
+
 }

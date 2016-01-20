@@ -47,6 +47,7 @@ public class ConfigThresholdSquareBorder extends ConfigThreshold {
 	public int minimumSpread = 10;
 
 	public ConfigThresholdSquareBorder(int radius , int minimumSpread, boolean down ) {
+		this.type = ThresholdType.LOCAL_SQUARE_BORDER;
 		this.radius = radius;
 		this.minimumSpread = minimumSpread;
 		this.down = down;
