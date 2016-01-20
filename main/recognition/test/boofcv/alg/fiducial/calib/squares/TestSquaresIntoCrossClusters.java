@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -78,6 +77,23 @@ public class TestSquaresIntoCrossClusters {
 			squareInfo.add( info );
 		}
 		return squareInfo;
+	}
+
+	/**
+	 * Tests shapes with corners that touch the image border
+	 */
+	@Test
+	public void shapesOnBorder() {
+		fail("Implement");
+	}
+
+	/**
+	 * Tests shapes with corners other than 4.  This typically comes about
+	 * due to processing of shapes on the image border.
+	 */
+	@Test
+	public void shapesVariableCorners() {
+		fail("Implement");
 	}
 
 	/**

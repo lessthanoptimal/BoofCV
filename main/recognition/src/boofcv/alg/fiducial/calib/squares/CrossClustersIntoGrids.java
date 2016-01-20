@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,11 +63,11 @@ public class CrossClustersIntoGrids {
 	protected boolean checkPreconditions(List<SquareNode> cluster) {
 		for( int i = 0; i < cluster.size(); i++ ) {
 			SquareNode n = cluster.get(i);
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < n.corners.size(); j++) {
 				SquareEdge e0 = n.edges[j];
 				if( e0 == null)
 					continue;
-				for (int k = j+1; k < 4; k++) {
+				for (int k = j+1; k < n.corners.size(); k++) {
 					SquareEdge e1 = n.edges[k];
 					if( e1 == null)
 						continue;
@@ -223,7 +223,7 @@ public class CrossClustersIntoGrids {
 	 * Adds the first row to the list of rows when the seed element has only one edge
 	 */
 	List<SquareNode> firstRow1( SquareNode seed ) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < seed.corners.size(); i++) {
 			if( isOpenEdge(seed,i) ) {
 				List<SquareNode> list = new ArrayList<SquareNode>();
 				seed.graph = 0;
@@ -231,10 +231,10 @@ public class CrossClustersIntoGrids {
 				// Doesn't know which direction it can traverse along.  See figure that out
 				// by looking at the node its linked to
 				int corner = seed.edges[i].destinationSide(seed);
-				int l = addOffset(corner,-1,4);
-				int u = addOffset(corner, 1,4);
-
 				SquareNode dst = seed.edges[i].destination(seed);
+				int l = addOffset(corner,-1,dst.corners.size());
+				int u = addOffset(corner, 1,dst.corners.size());
+
 				if( dst.edges[u] != null ) {
 					list.add(seed);
 					if( !addToRow(seed,i,-1,true,list) ) return null;
@@ -259,7 +259,7 @@ public class CrossClustersIntoGrids {
 	 */
 	List<SquareNode> firstRow2(SquareNode seed ) {
 		int indexLower = lowerEdgeIndex(seed);
-		int indexUpper = addOffset(indexLower,1,4);
+		int indexUpper = addOffset(indexLower,1,seed.corners.size());
 
 		List<SquareNode> listDown = new ArrayList<SquareNode>();
 		List<SquareNode> list = new ArrayList<SquareNode>();
@@ -287,7 +287,7 @@ public class CrossClustersIntoGrids {
 		if( numConnections == 0 ) {
 			return false;
 		} else if( numConnections == 1 ) {
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < seed.corners.size(); i++) {
 				SquareEdge edge = seed.edges[i];
 				if( edge != null ) {
 					// see if the edge is one of the open ones
@@ -297,8 +297,8 @@ public class CrossClustersIntoGrids {
 
 					// determine which direction to traverse along
 					int corner = edge.destinationSide(seed);
-					int l = addOffset(corner,-1,4);
-					int u = addOffset(corner, 1,4);
+					int l = addOffset(corner,-1,dst.corners.size());
+					int u = addOffset(corner, 1,dst.corners.size());
 
 					// Nodes in the seed's row should all be marked, so any unmarked nodes
 					// are ones you don't want to traverse down
@@ -316,7 +316,7 @@ public class CrossClustersIntoGrids {
 			}
 		} else if( numConnections == 2 ) {
 			int indexLower = lowerEdgeIndex(seed);
-			int indexUpper = addOffset(indexLower,1,4);
+			int indexUpper = addOffset(indexLower,1,seed.corners.size());
 
 			if( !addToRow(seed,indexUpper, 1,false,tmp) ) return false;
 			flipAdd(tmp, row);
@@ -338,18 +338,18 @@ public class CrossClustersIntoGrids {
 	 * Returns the index which comes first.  Assuming that there are two options
 	 */
 	static int lowerEdgeIndex( SquareNode node ) {
-		if( isOpenEdge(node,0) ) {
-			if( isOpenEdge(node,1)) {
-				return 0;
-			} else {
-				return 3;
-			}
-		}
-
-		// first find the index of the two corners and sanity check them
-		for (int i = 1; i < 4; i++) {
+		for (int i = 0; i < node.corners.size(); i++) {
 			if( isOpenEdge(node,i) ) {
-				return i;
+				int next = addOffset(i,1,node.corners.size());
+				if( isOpenEdge(node,next)) {
+					return i;
+				}
+				int previous = addOffset(i,-1,node.corners.size());
+				if( isOpenEdge(node,previous)) {
+					return previous;
+				} else {
+					return i;
+				}
 			}
 		}
 
@@ -358,7 +358,7 @@ public class CrossClustersIntoGrids {
 
 	static int numberOfOpenEdges( SquareNode node ) {
 		int total = 0;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < node.corners.size(); i++) {
 			if( isOpenEdge(node,i) )
 				total++;
 		}
@@ -418,7 +418,7 @@ public class CrossClustersIntoGrids {
 			}
 			skip = !skip;
 			sign *= -1;
-			corner = addOffset(corner,sign,4);
+			corner = addOffset(corner,sign,n.corners.size());
 		}
 		return true;
 	}

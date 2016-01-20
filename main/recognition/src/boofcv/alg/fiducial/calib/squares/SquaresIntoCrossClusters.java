@@ -106,6 +106,21 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			Polygon2D_F64 polygon = squares.get(i);
 			BinaryPolygonDetector.Info info = squaresInfo.get(i);
 
+			// see if every corner touches a border
+			if( info.borderCorners.size() > 0 ) {
+				boolean allBorder = true;
+				for (int j = 0; j < info.borderCorners.size(); j++) {
+					if (!info.borderCorners.get(j)) {
+						allBorder = false;
+						break;
+					}
+				}
+				if (allBorder) {
+					nodes.removeTail();
+					continue;
+				}
+			}
+
 			// The center is used when visualizing results
 			UtilPoint2D_F64.mean(polygon.vertexes.data,0,polygon.size(),n.center);
 
@@ -114,28 +129,9 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 				n.largestSide = Math.max(n.largestSide,l);
 			}
 
-			// Create a "polygon" only composed of corners which are not along the border.  This should
-			// be from 1 to 4 corners.
-			if( n.corners == null )
-				n.corners = new Polygon2D_F64();
-			else
-				n.corners.vertexes.reset();
-
-			for (int j = 0; j < polygon.size(); j++) {
-				if( !info.borderCorners.get(j) ) {
-					n.corners.vertexes.grow().set(polygon.get(j));
-				}
-			}
-
-			// TODO make it work with an arbitrary number of corners...
-			if( n.corners.size() == 0 ) {
-				// if there are no corners not on the image border disregard the shape
-				nodes.removeTail();
-			}
-			// Due to optimizations after shapes with border corners are pruned it is possible to have
-			// more than 4 inside image corners.  The code was modified to accept this nuisance
-//			else if( n.corners.size() > 4 )
-//				throw new RuntimeException("BUG! too many non-border corners "+n.corners.size());
+			n.corners = polygon;
+			n.touch = info.borderCorners;
+			n.updateArrayLength();
 		}
 	}
 
@@ -152,6 +148,9 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(indexNode);
 
 			for (int indexLocal = 0; indexLocal < n.corners.size(); indexLocal++) {
+				if( n.touch.get(indexLocal) )
+					continue;
+
 				double[] point = searchPoints.get(indexCornerList++);
 				// find it's neighbors
 				searchResults.reset();
@@ -198,6 +197,9 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(i);
 
 			for (int j = 0; j < n.corners.size(); j++) {
+				if( n.touch.get(j) )
+					continue;
+
 				Point2D_F64 c = n.corners.get(j);
 				double[] point = searchPoints.grow();
 				point[0] = c.x;

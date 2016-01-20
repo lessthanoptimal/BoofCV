@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -384,5 +384,13 @@ public class TestCrossClustersIntoGrids {
 
 		cluster.get(1).edges[0] = new SquareEdge();
 		assertTrue(cluster.get(2)==CrossClustersIntoGrids.findSeedNode(cluster));
+	}
+
+	/**
+	 * Test with the number of corners from 3 to 5
+	 */
+	@Test
+	public void lowerEdgeIndex_weirdNumber() {
+		fail("Implement");
 	}
 }

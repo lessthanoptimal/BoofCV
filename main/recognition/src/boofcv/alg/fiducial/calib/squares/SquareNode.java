@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib.squares;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ddogleg.struct.GrowQueue_B;
 
 /**
  * Graph representation of square blobs.  Each blob can be connected to at most 4 other shapes which are directly
@@ -33,6 +34,8 @@ public class SquareNode {
 	// polygon which this node represents.
 	// cw or ccw ordering of edges doesn't matter
 	public Polygon2D_F64 corners;
+	// does a corner touch the border?
+	public GrowQueue_B touch;
 
 	// intersection of line 0 and 2  with 1 and 3.
 	public Point2D_F64 center = new Point2D_F64();
@@ -66,6 +69,7 @@ public class SquareNode {
 	 */
 	public void reset() {
 		corners = null;
+		touch = null;
 		graph = RESET_GRAPH;
 		largestSide = 0;
 		for (int i = 0; i < 4; i++) {
@@ -75,12 +79,19 @@ public class SquareNode {
 		}
 	}
 
+	public void updateArrayLength() {
+		if( edges.length < corners.size() ) {
+			edges = new SquareEdge[corners.size()];
+			sideLengths = new double[corners.size()];
+		}
+	}
+
 	/**
 	 * Computes the number of edges attached to this node
 	 */
 	public int getNumberOfConnections() {
 		int ret = 0;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < corners.size(); i++) {
 			if( edges[i] != null )
 				ret++;
 		}
@@ -89,7 +100,7 @@ public class SquareNode {
 
 	public double smallestSideLength() {
 		double smallest = Double.MAX_VALUE;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < corners.size(); i++) {
 			double length = sideLengths[i];
 			if( length < smallest ) {
 				smallest = length;
