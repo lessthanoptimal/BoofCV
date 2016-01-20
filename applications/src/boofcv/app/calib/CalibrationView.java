@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public interface CalibrationView {
 
 		@Override
 		public int getBufferWidth( double gridPixelsWide ) {
-			return (int)(gridPixelsWide/(pointCols-1)+0.5);
+			return (int)(0.15*gridPixelsWide/pointCols+0.5);
 		}
 	}
 

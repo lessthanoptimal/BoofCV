@@ -148,7 +148,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(indexNode);
 
 			for (int indexLocal = 0; indexLocal < n.corners.size(); indexLocal++) {
-				if( n.touch.get(indexLocal) )
+				if( n.touch.size > 0 && n.touch.get(indexLocal) )
 					continue;
 
 				double[] point = searchPoints.get(indexCornerList++);
@@ -197,7 +197,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			SquareNode n = nodes.get(i);
 
 			for (int j = 0; j < n.corners.size(); j++) {
-				if( n.touch.get(j) )
+				if( n.touch.size > 0 && n.touch.get(j) )
 					continue;
 
 				Point2D_F64 c = n.corners.get(j);

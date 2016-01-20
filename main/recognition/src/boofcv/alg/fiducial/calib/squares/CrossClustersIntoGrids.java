@@ -91,8 +91,8 @@ public class CrossClustersIntoGrids {
 			SquareNode n = cluster.get(0);
 			if( n.getNumberOfConnections() == 0 ) {
 				SquareGrid grid = grids.grow();
+				grid.reset();
 				grid.columns = grid.rows = 1;
-				grid.nodes.clear();
 				grid.nodes.add(n);
 				return;
 			}
@@ -147,6 +147,7 @@ public class CrossClustersIntoGrids {
 	 */
 	private SquareGrid assembleGrid( List<List<SquareNode>> listRows) {
 		SquareGrid grid = grids.grow();
+		grid.reset();
 
 		List<SquareNode> row0 = listRows.get(0);
 		List<SquareNode> row1 = listRows.get(1);
@@ -157,7 +158,6 @@ public class CrossClustersIntoGrids {
 		grid.rows = listRows.size();
 
 		// initialize grid to null
-		grid.nodes.clear();
 		for (int i = 0; i < grid.columns * grid.rows; i++) {
 			grid.nodes.add(null);
 		}

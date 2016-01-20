@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,12 @@ public class SquareGrid {
 	public List<SquareNode> nodes = new ArrayList<SquareNode>();
 	public int columns;
 	public int rows;
+
+	public void reset() {
+		nodes.clear();
+		columns = -1;
+		rows = -1;
+	}
 
 	/**
 	 * Looks up the node based on its coordinate.  negative values wrap

@@ -50,7 +50,7 @@ public class SquaresIntoClusters {
 	protected void recycleData() {
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < n.edges.length; j++) {
 				if( n.edges[j] != null ) {
 					detachEdge(n.edges[j]);
 				}
@@ -58,7 +58,7 @@ public class SquaresIntoClusters {
 		}
 		for (int i = 0; i < nodes.size(); i++) {
 			SquareNode n = nodes.get(i);
-			for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < n.edges.length; j++) {
 				if( n.edges[j] != null )
 					throw new RuntimeException("BUG!");
 			}
@@ -96,9 +96,9 @@ public class SquaresIntoClusters {
 		open.clear();
 		open.add(seed);
 		while( !open.isEmpty() ) {
-			SquareNode n = open.remove( open.size() -1 );
+			SquareNode n = open.remove( open.size() - 1 );
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < n.corners.size(); i++) {
 				SquareEdge edge = n.edges[i];
 				if( edge == null )
 					continue;

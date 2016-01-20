@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -310,11 +310,15 @@ public class CameraCalibration extends BaseStandardInputApp {
 	 * Captures calibration data live using a webcam and a GUI to assist the user
 	 */
 	public void handleWebcam() {
-		Webcam webcam = openSelectedCamera();
+		final Webcam webcam = openSelectedCamera();
 		if( desiredWidth > 0 && desiredHeight > 0 )
 			UtilWebcamCapture.adjustResolution(webcam, desiredWidth, desiredHeight);
 
 		webcam.open();
+
+		// close the webcam gracefully on exit
+		Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
+			if(webcam.isOpen()){System.out.println("Closing webcam");webcam.close();}}});
 
 		ComputeGeometryScore quality = new ComputeGeometryScore(zeroSkew,detector.getLayout());
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());

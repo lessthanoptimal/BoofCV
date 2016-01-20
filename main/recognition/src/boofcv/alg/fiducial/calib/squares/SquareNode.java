@@ -70,9 +70,10 @@ public class SquareNode {
 	public void reset() {
 		corners = null;
 		touch = null;
-		graph = RESET_GRAPH;
+		center.set(-1,-1);
 		largestSide = 0;
-		for (int i = 0; i < 4; i++) {
+		graph = RESET_GRAPH;
+		for (int i = 0; i < edges.length; i++) {
 			if ( edges[i] != null )
 				throw new RuntimeException("BUG!");
 			sideLengths[i] = 0;
