@@ -92,7 +92,7 @@ public class TestDetectChessboardFiducial {
 
 		InputToBinary<ImageFloat32> inputToBinary;
 		if( localThreshold )
-			inputToBinary = FactoryThresholdBinary.localSquare(10,1.0,true,ImageFloat32.class);
+			inputToBinary = FactoryThresholdBinary.localSquareBorder(10,true,0,255,100,10,0.02,0.98,ImageFloat32.class);
 		else
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,ImageFloat32.class);
 
@@ -208,12 +208,19 @@ public class TestDetectChessboardFiducial {
 		transforms.add( new Se2_F64(w/2,h-100,0.4));
 		transforms.add( new Se2_F64(35,40,Math.PI/4));
 
+		transforms.add( new Se2_F64(50,-5,0.05));
+		transforms.add( new Se2_F64(50,-25,0.05));
+		transforms.add( new Se2_F64(50,h-65,-0.05));
+		transforms.add( new Se2_F64(50,h-90,0.05));
+
+
 		offsetX = 0;
 		offsetY = 0;
 
 		for(Se2_F64 t : transforms ) {
 			transform = t;
 			basicTest(3,4, false);
+			basicTest(3,4, true);
 		}
 	}
 }
