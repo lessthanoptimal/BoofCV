@@ -76,7 +76,7 @@ public class TestConvertImage {
 			count++;
 		}
 
-		assertEquals(8*7 + 8*7 +8+8+8+8,count);
+		assertEquals(8*7 + 8*7 +8+8+8+8+8,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
@@ -114,25 +114,49 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this,"checkConvertIntegerRange",true,m,input,output);
 	}
 
-	public void checkConvertIntegerRange( Method m ,
-										  ImageSingleBand<?> input , ImageUInt8 output ) {
+	public void checkConvertIntegerRange( Method m , ImageSingleBand<?> input , ImageUInt8 output ) {
 		try {
+			ImageUInt8 ret;
 			double tol = selectTolerance(input,output);
 
 			// check it with a non-null output
-			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			ret = invokeConvertIntegerRange(m, input, output);
 			assertTrue(ret == output);
-			BoofTesting.assertEquals(input, ret, tol);
+			checkResultsIntegerRange(ret);
 
 			// check it with a null output
-			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
-			BoofTesting.assertEquals(input, ret, tol);
+			ret = invokeConvertIntegerRange(m, input, null);
+			checkResultsIntegerRange(ret);
 
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private ImageUInt8 invokeConvertIntegerRange(Method m, ImageSingleBand<?> input, ImageUInt8 output) throws IllegalAccessException, InvocationTargetException {
+		ImageUInt8 ret;
+		if( input.getDataType().isInteger() )
+			ret = (ImageUInt8)m.invoke(null,input,-10,20,8,output);
+		else if( input.getDataType().getNumBits() == 32 )
+			ret = (ImageUInt8)m.invoke(null,input,-10.0f,20.0f,8,output);
+		else
+			ret = (ImageUInt8)m.invoke(null,input,-10.0,20.0,8,output);
+		return ret;
+	}
+
+	private void checkResultsIntegerRange( ImageUInt8 output ) {
+		int notZero = 0;
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				int found = output.get(x,y);
+				assertTrue(found>=0 && found < 8);
+				if( found != 0 )
+					notZero++;
+			}
+		}
+		assertTrue(notZero>0);
 	}
 
 	private void checkConvertSingle( Method m , Class inputType , Class outputType ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,6 +68,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase> {
 
 		// see if the member count is correctly computed
 		GrowQueue_I32 foundCount = new GrowQueue_I32(memberCount.size);
+		foundCount.resize(memberCount.size);
 		ImageSegmentationOps.countRegionPixels(output, foundCount.size, foundCount.data);
 		for (int i = 0; i < memberCount.size; i++) {
 			assertEquals(memberCount.get(i),foundCount.get(i));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,7 @@ public class TestSquareNode {
 	@Test
 	public void getNumberOfConnections() {
 		SquareNode a = new SquareNode();
+		a.corners = new Polygon2D_F64(4);
 
 		assertEquals(0,a.getNumberOfConnections());
 		a.edges[2] = new SquareEdge();

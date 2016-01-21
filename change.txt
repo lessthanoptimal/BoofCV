@@ -41,20 +41,17 @@ Version : Alpha 0.21
   * MultiSpectral to Interleaved
   * Any single band into into ImageUInt8 with the specified pixel value range
 - Chessboard detector
-  * Links squares together using corners instead of two grids
-  * TODO Can handle squares clipped by image border
+  * Links squares together using corners instead of two independently detected grids
+  * Can now detect targets in which the outer squares have been clipped by the image's border
 - Square Grid Detector
   * Changed how the pattern is specified.  Based on black squares now
 - DetectLineHoughPolar
-  * Fixed issue were a strict non-maximum was used when a non-strict was needed causing valid lines to be discarded
+  * Fixed issue were a strict non-maximum was used when a non-strict was needed, causing valid lines to be discarded
 - WebcamCapture
   * Provided an easy to use function that allows you to open devices by their /dev name
 - Android
   * Will automatically detect if image needs to be rotated 180 degrees and then does it.  Needed for the Nexus 5x
 
-
-- TODO Partial chessboard
-  * local threshold
 - TODO See if contour can be improved by splitting line then applying the rule to each half
 - TODO             create a few more unit tests which highlight this issue
 

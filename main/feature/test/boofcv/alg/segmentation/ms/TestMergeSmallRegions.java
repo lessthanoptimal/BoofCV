@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,11 +85,11 @@ public class TestMergeSmallRegions {
 		alg.process(image, pixelToRegion, memberCount, regionColor);
 
 		// check the results.  Should only be three regions
-		assertEquals(3, memberCount.size);
+		assertEquals(3,memberCount.size);
 		assertEquals(3,regionColor.size);
 
 		GrowQueue_I32 memberExpected = new GrowQueue_I32(3);
-		memberCount.resize(3);
+		memberExpected.resize(3);
 		for( int i = 0; i < pixelToRegion.data.length; i++ ) {
 			memberExpected.data[pixelToRegion.data[i]]++;
 		}
@@ -304,7 +304,7 @@ public class TestMergeSmallRegions {
 
 		alg.segmentPruneFlag.resize(N);
 		alg.pruneGraph.reset();
-		alg.segmentToPruneID.resize(N);
+		alg.segmentToPruneID.resize(N+1);
 
 		alg.segmentPruneFlag.set(1,true);
 		alg.segmentPruneFlag.set(9,true);

@@ -136,14 +136,14 @@ public class ThresholdLocalSquareBorderNaive {
 	private void findPercentiles() {
 		int count = 0;
 		lowerIndex = 0;
-		for (lowerIndex = 0; lowerIndex < histogram.length; lowerIndex++) {
+		for (lowerIndex = 0; lowerIndex < histogram.length && count < lowerCount; lowerIndex++) {
 			count += histogram[lowerIndex];
 			if( count >= lowerCount ) {
 				break;
 			}
 		}
 
-		for (upperIndex = lowerIndex; upperIndex < histogram.length; upperIndex++) {
+		for (upperIndex = lowerIndex; upperIndex < histogram.length && count < lowerCount; upperIndex++) {
 			count += histogram[upperIndex];
 			if( count >= upperCount ) {
 				break;
