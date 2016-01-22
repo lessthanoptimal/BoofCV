@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.squares;
 
 import boofcv.misc.CircularIndex;
+import georegression.struct.shapes.Polygon2D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -206,17 +207,21 @@ public class TestCrossClustersIntoGrids {
 
 	@Test
 	public void lowerEdgeIndex() {
-		for (int first = 0; first < 4; first++) {
-			int second = (first+1)%4;
+		for( int numCorners = 3; numCorners <= 5; numCorners++ ) {
+			for (int first = 0; first < numCorners; first++) {
+				int second = (first + 1) % numCorners;
 
-			SquareNode node = new SquareNode();
-			connect(node,first,new SquareNode(),0);
-			node.edges[first].b.graph = SquareNode.RESET_GRAPH;
+				SquareNode node = new SquareNode();
+				node.corners = new Polygon2D_F64(numCorners);
+				node.updateArrayLength();
+				connect(node, first, new SquareNode(), 0);
+				node.edges[first].b.graph = SquareNode.RESET_GRAPH;
 
-			connect(node,second,new SquareNode(),0);
-			node.edges[second].b.graph = SquareNode.RESET_GRAPH;
+				connect(node, second, new SquareNode(), 0);
+				node.edges[second].b.graph = SquareNode.RESET_GRAPH;
 
-			assertEquals(first,CrossClustersIntoGrids.lowerEdgeIndex(node));
+				assertEquals(first, CrossClustersIntoGrids.lowerEdgeIndex(node));
+			}
 		}
 	}
 
@@ -306,6 +311,7 @@ public class TestCrossClustersIntoGrids {
 	@Test
 	public void numberOfOpenEdges() {
 		SquareNode a = new SquareNode();
+		a.corners = new Polygon2D_F64(4);
 
 		assertEquals(0,CrossClustersIntoGrids.numberOfOpenEdges(a));
 		connect(a,1,new SquareNode(),0);
@@ -329,6 +335,7 @@ public class TestCrossClustersIntoGrids {
 		for (int i = 0; i < total; i++) {
 			out.add( new SquareNode());
 			out.get(i).graph = SquareNode.RESET_GRAPH;
+			out.get(i).corners = new Polygon2D_F64(4);
 		}
 
 		int previous = 0;
@@ -372,6 +379,9 @@ public class TestCrossClustersIntoGrids {
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());
+		for( SquareNode n : cluster ) {
+			n.corners = new Polygon2D_F64(4);
+		}
 
 		cluster.get(1).edges[2] = new SquareEdge();
 		cluster.get(2).edges[0] = new SquareEdge();
@@ -384,13 +394,5 @@ public class TestCrossClustersIntoGrids {
 
 		cluster.get(1).edges[0] = new SquareEdge();
 		assertTrue(cluster.get(2)==CrossClustersIntoGrids.findSeedNode(cluster));
-	}
-
-	/**
-	 * Test with the number of corners from 3 to 5
-	 */
-	@Test
-	public void lowerEdgeIndex_weirdNumber() {
-		fail("Implement");
 	}
 }

@@ -335,7 +335,7 @@ public class CrossClustersIntoGrids {
 	}
 
 	/**
-	 * Returns the index which comes first.  Assuming that there are two options
+	 * Returns the open corner index which is first.  Assuming that there are two adjacent corners.
 	 */
 	static int lowerEdgeIndex( SquareNode node ) {
 		for (int i = 0; i < node.corners.size(); i++) {
@@ -344,12 +344,13 @@ public class CrossClustersIntoGrids {
 				if( isOpenEdge(node,next)) {
 					return i;
 				}
-				int previous = addOffset(i,-1,node.corners.size());
-				if( isOpenEdge(node,previous)) {
-					return previous;
-				} else {
-					return i;
+				if( i == 0 ) {
+					int previous = node.corners.size()-1;
+					if( isOpenEdge(node,previous)) {
+						return previous;
+					}
 				}
+				return i;
 			}
 		}
 

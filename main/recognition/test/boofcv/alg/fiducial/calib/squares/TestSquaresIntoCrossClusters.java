@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -69,12 +70,8 @@ public class TestSquaresIntoCrossClusters {
 
 	private List<BinaryPolygonDetector.Info> createInfo(List<Polygon2D_F64> squares) {
 		List<BinaryPolygonDetector.Info> squareInfo = new ArrayList<BinaryPolygonDetector.Info>();
-		BinaryPolygonDetector.Info info = new BinaryPolygonDetector.Info();
-		for (int i = 0; i < 4; i++) {
-			info.borderCorners.add(false);
-		}
 		for (int i = 0; i < squares.size(); i++) {
-			squareInfo.add( info );
+			squareInfo.add( new BinaryPolygonDetector.Info() );
 		}
 		return squareInfo;
 	}
@@ -84,16 +81,32 @@ public class TestSquaresIntoCrossClusters {
 	 */
 	@Test
 	public void shapesOnBorder() {
-		fail("Implement");
+		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
+
+		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		squares.add( createSquare(7,8));
+		squares.add( createSquare(9,8));
+		squares.add( createSquare(8,9));
+		squares.add( createSquare(7,10));
+		squares.add( createSquare(9,10));
+
+		List<BinaryPolygonDetector.Info> squareInfo = createInfo(squares);
+
+		markTouch(squareInfo.get(0),true,false,true,true);
+		markTouch(squareInfo.get(1),false,true,true,false);
+		markTouch(squareInfo.get(3),true,true,false,true);
+
+		List<List<SquareNode>> clusters = alg.process(squares,squareInfo);
+
+		assertEquals(1,clusters.size());
+		assertEquals(5,clusters.get(0).size());
+
 	}
 
-	/**
-	 * Tests shapes with corners other than 4.  This typically comes about
-	 * due to processing of shapes on the image border.
-	 */
-	@Test
-	public void shapesVariableCorners() {
-		fail("Implement");
+	private void markTouch( BinaryPolygonDetector.Info info , boolean ...marks ) {
+		for( boolean b : marks ) {
+			info.borderCorners.add(b);
+		}
 	}
 
 	/**
