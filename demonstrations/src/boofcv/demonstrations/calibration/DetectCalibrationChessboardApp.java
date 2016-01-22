@@ -64,7 +64,7 @@ public class DetectCalibrationChessboardApp
 			config.thresholding.type = ThresholdType.FIXED;
 			config.thresholding.fixedThreshold = controlPanel.getThresholdLevel();
 		} else {
-			config.thresholding.type = ThresholdType.LOCAL_SQUARE_BORDER;
+			config.thresholding.type = ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX;
 		}
 
 		config.numRows = controlPanel.getGridRows();

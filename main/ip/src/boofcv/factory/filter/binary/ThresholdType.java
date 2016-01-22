@@ -63,6 +63,13 @@ public enum ThresholdType {
 	 */
 	LOCAL_SQUARE_BORDER(true,false),
 	/**
+	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
+	 * each pixel using interpolated min/max values.
+	 *
+	 * @see boofcv.alg.filter.binary.ThresholdSquareBlockMinMax
+	 */
+	LOCAL_SQUARE_BLOCK_MIN_MAX(true,false),
+	/**
 	 * Locally adaptive computed using Savola's method
 	 *
 	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola

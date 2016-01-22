@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
+import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
@@ -93,15 +94,24 @@ public class BenchmarkThresholding {
 		}
 	}
 
+	public static class SquareBlockMinMax extends PerformerBase {
+		ThresholdSquareBlockMinMax_F32 alg = new ThresholdSquareBlockMinMax_F32(2*adaptiveRadius+1,20);
+		@Override
+		public void process() {
+			alg.process(inputF32,output_U8);
+		}
+	}
+
 	public static void main(String args[]) {
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
+//		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new SquareBlockMinMax(), TEST_TIME);
 	}
 }

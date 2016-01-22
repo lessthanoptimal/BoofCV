@@ -83,6 +83,12 @@ public class FactoryThresholdBinary {
 				lowerFrac,upperFrac,inputType);
 	}
 
+	public static <T extends ImageSingleBand>
+	InputToBinary<T> localSquareBlockMinMax(int regionWidth, boolean down,
+											int minimumSpread, Class<T> inputType) {
+		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,inputType);
+	}
+
 	/**
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy
 	 *
@@ -136,7 +142,7 @@ public class FactoryThresholdBinary {
 
 		switch( config.type ) {
 			case FIXED:
-				return globalFixed(config.fixedThreshold,config.down,inputType);
+				return globalFixed(config.fixedThreshold, config.down, inputType);
 
 			case GLOBAL_OTSU:
 				return globalOtsu(config.minPixelValue, config.maxPixelValue, config.down, inputType);
@@ -154,10 +160,15 @@ public class FactoryThresholdBinary {
 				return localSquare(config.radius, config.scale, config.down, inputType);
 
 			case LOCAL_SQUARE_BORDER: {
-				ConfigThresholdSquareBorder c = (ConfigThresholdSquareBorder)config;
+				ConfigThresholdSquareBorder c = (ConfigThresholdSquareBorder) config;
 				return localSquareBorder(c.radius * 2 + 1, c.down,
 						c.minPixelValue, c.maxPixelValue,
 						c.histogramLength, c.minimumSpread, c.lowerFraction, c.upperFraction, inputType);
+			}
+
+			case LOCAL_SQUARE_BLOCK_MIN_MAX: {
+				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
+				return localSquareBlockMinMax(c.radius * 2 + 1, c.down, c.minimumSpread, inputType);
 			}
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);
