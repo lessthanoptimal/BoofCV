@@ -33,7 +33,7 @@ public class ThresholdSquareBlockMinMax_U8
 	double scale;
 	boolean down;
 
-	public ThresholdSquareBlockMinMax_U8(float textureThreshold, int requestedBlockWidth, double scale , boolean down ) {
+	public ThresholdSquareBlockMinMax_U8(double textureThreshold, int requestedBlockWidth, double scale , boolean down ) {
 		super(textureThreshold,requestedBlockWidth);
 		minmax = new InterleavedU8(1,1,2);
 		this.scale = scale;

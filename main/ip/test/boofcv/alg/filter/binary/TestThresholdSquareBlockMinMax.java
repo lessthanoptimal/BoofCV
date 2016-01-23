@@ -18,16 +18,48 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestThresholdSquareBlockMinMax {
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void selectBlockSize() {
+
+		ThresholdSquareBlockMinMax alg = new Dummy(0,30);
+
+		alg.selectBlockSize(300,330);
+		assertEquals(30,alg.blockWidth);
+		assertEquals(30,alg.blockHeight);
+
+		alg.selectBlockSize(329,301);
+		assertEquals(32,alg.blockWidth);
+		assertEquals(30,alg.blockHeight);
+
+		alg.selectBlockSize(301,329);
+		assertEquals(30,alg.blockWidth);
+		assertEquals(32,alg.blockHeight);
+	}
+
+	private class Dummy extends ThresholdSquareBlockMinMax {
+
+		public Dummy(double textureThreshold, int requestedBlockWidth) {
+			super(textureThreshold, requestedBlockWidth);
+		}
+
+		@Override
+		protected void thresholdBlock(int blockX0, int blockY0, ImageSingleBand input, ImageUInt8 output) {
+
+		}
+
+		@Override
+		protected void computeMinMaxBlock(int x0, int y0, int width, int height, int indexMinMax, ImageSingleBand input) {
+
+		}
 	}
 }

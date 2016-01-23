@@ -76,8 +76,17 @@ public abstract class ThresholdSquareBlockMinMax
 		this.requestedBlockWidth = requestedBlockWidth;
 	}
 
+	/**
+	 * Converts the gray scale input image into a binary image
+	 * @param input Input image
+	 * @param output Output binary image
+	 */
 	public void process(T input , ImageUInt8 output ) {
 		InputSanityCheck.checkSameShape(input,output);
+
+		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
+			throw new IllegalArgumentException("Image is smaller than block size");
+		}
 
 		selectBlockSize(input.width,input.height);
 

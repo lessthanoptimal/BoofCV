@@ -18,16 +18,42 @@
 
 package boofcv.abst.filter.binary;
 
+import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt8;
+import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class TestLocalSquareBlockMinMaxBinaryFilter {
+	Random rand = new Random(234);
+
 	@Test
-	public void foo() {
-		fail("implement");
+	public void compare() {
+		Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+
+		for( Class type : imageTypes ) {
+
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(type, 30, 40);
+			ImageUInt8 found = new ImageUInt8(30,40);
+			ImageUInt8 expected = new ImageUInt8(30,40);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 200);
+
+			LocalSquareBlockMinMaxBinaryFilter alg =
+					new LocalSquareBlockMinMaxBinaryFilter(30,9,0.95,true, type);
+
+			alg.process(input,found);
+			GThresholdImageOps.localBlockMinMax(input, expected, 4, 0.95, true,30);
+
+			BoofTesting.assertEquals(found, expected, 0);
+		}
 	}
 }

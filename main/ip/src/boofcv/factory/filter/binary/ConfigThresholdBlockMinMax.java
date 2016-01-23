@@ -25,8 +25,8 @@ package boofcv.factory.filter.binary;
  */
 public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	/**
-	 * If the lower and upper histogram values are different by less than or equal to this ammount it is considered
-	 * a textureless region.
+	 * If the lower and upper histogram values are different by less than or equal to this amount it is considered
+	 * a textureless region.  Set to a value <= -1 to disable.
 	 */
 	public int minimumSpread = 10;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.abst.filter.binary.LocalSquareBlockMinMaxBinaryFilter;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GConvertImage;
@@ -333,6 +334,32 @@ public class GThresholdImageOps {
 			GConvertImage.convert(input, conv);
 			alg.process(conv,output);
 		}
+
+		return output;
+	}
+
+	/**
+	 * Applies a threshold to an image by computing the min and max values in a regular grid across
+	 * the input image.  See {@link ThresholdSquareBlockMinMax} for the details.
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param radius Radius of square region.
+	 * @param scale Scale factor used to adjust threshold
+	 * @param down Should it threshold up or down.
+	 * @param textureThreshold If the min and max values are within this threshold the pixel will be set to 1.
+	 * @return Binary image
+	 */
+	public static <T extends ImageSingleBand>
+	ImageUInt8 localBlockMinMax(T input, ImageUInt8 output, int radius, double scale , boolean down, double textureThreshold)
+	{
+		LocalSquareBlockMinMaxBinaryFilter<T> alg = new LocalSquareBlockMinMaxBinaryFilter<T>(textureThreshold,radius*2+1,scale,down,
+				(Class<T>)input.getClass());
+
+		if( output == null )
+			output = new ImageUInt8(input.width,input.height);
+
+		alg.process(input,output);
 
 		return output;
 	}

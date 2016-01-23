@@ -18,16 +18,24 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
+import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdSquareBlockMinMax_U8 {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestThresholdSquareBlockMinMax_U8
+		extends GenericThresholdSquareBlockMinMaxChecks<ImageUInt8>
+{
+
+	public TestThresholdSquareBlockMinMax_U8() {
+		super(ImageUInt8.class);
+	}
+
+	@Override
+	public ThresholdSquareBlockMinMax<ImageUInt8, ?>
+	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
+		return new ThresholdSquareBlockMinMax_U8(textureThreshold,requestedBlockWidth,
+				scale,down);
 	}
 }
