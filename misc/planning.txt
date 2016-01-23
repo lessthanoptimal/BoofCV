@@ -9,12 +9,6 @@ Alpha 0.21
   * Figure out a way to get it to work with smaller splits.  Like the cotour around the letter F
     - The initial polygon fit is the weak point
 
-- Fiducial Square
-  * Change how the grid is specified
-
-- Chessboard
-  * Add support for squares which go outside the image
-
 - Improve pose estimate for calibration fiducials
 
 - Assisted Calibration

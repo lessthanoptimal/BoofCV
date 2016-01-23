@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,8 +97,8 @@ public class ConfigThreshold implements Configuration {
 		if( type.isGlobal() )
 			throw new IllegalArgumentException("Type must be local");
 
-		if( type == ThresholdType.LOCAL_SQUARE_BORDER) {
-			return new ConfigThresholdSquareBorder(radius,10,true);
+		if( type == ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX) {
+			return new ConfigThresholdBlockMinMax(radius,10,true);
 		} else {
 			ConfigThreshold config = new ConfigThreshold();
 			config.type = type;

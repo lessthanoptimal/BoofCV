@@ -19,7 +19,6 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.filter.binary.impl.ThresholdLocalSquareBorder;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -56,12 +55,6 @@ public enum ThresholdType {
 	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, float, boolean, ImageUInt8, ImageUInt8)
 	 */
 	LOCAL_SQUARE(true,false),
-	/**
-	 * Locally adaptive square region designed to handle objects intersecting the image border.
-	 *
-	 * @see ThresholdLocalSquareBorder
-	 */
-	LOCAL_SQUARE_BORDER(true,false),
 	/**
 	 * Breaks the image into blocks and computes the min and max inside each block.  Then thresholds
 	 * each pixel using interpolated min/max values.

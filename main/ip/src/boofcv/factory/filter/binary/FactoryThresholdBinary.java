@@ -71,18 +71,6 @@ public class FactoryThresholdBinary {
 		return new LocalSquareBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
 	}
 
-	/**
-	 * @see LocalSquareBorderBinaryFilter
-	 */
-	public static <T extends ImageSingleBand>
-	InputToBinary<T> localSquareBorder(int regionWidth, boolean down,
-									   double minPixelValue, double maxPixelValue ,
-									   int histogramLength , int minimumSpread,
-									   double lowerFrac , double upperFrac, Class<T> inputType) {
-		return new LocalSquareBorderBinaryFilter<T>(down,regionWidth,minPixelValue,maxPixelValue,histogramLength,minimumSpread,
-				lowerFrac,upperFrac,inputType);
-	}
-
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
 											int minimumSpread, Class<T> inputType) {
@@ -158,13 +146,6 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_SQUARE:
 				return localSquare(config.radius, config.scale, config.down, inputType);
-
-			case LOCAL_SQUARE_BORDER: {
-				ConfigThresholdSquareBorder c = (ConfigThresholdSquareBorder) config;
-				return localSquareBorder(c.radius * 2 + 1, c.down,
-						c.minPixelValue, c.maxPixelValue,
-						c.histogramLength, c.minimumSpread, c.lowerFraction, c.upperFraction, inputType);
-			}
 
 			case LOCAL_SQUARE_BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;

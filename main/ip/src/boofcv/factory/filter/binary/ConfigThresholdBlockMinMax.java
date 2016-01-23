@@ -19,7 +19,7 @@
 package boofcv.factory.filter.binary;
 
 /**
- * Configuration for {@link boofcv.abst.filter.binary.LocalSquareBorderBinaryFilter}
+ * Configuration for {@link boofcv.abst.filter.binary.LocalSquareBlockMinMaxBinaryFilter}
  *
  * @author Peter Abeles
  */

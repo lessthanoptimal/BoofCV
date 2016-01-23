@@ -49,11 +49,12 @@ Version : Alpha 0.21
   * Fixed issue were a strict non-maximum was used when a non-strict was needed, causing valid lines to be discarded
 - WebcamCapture
   * Provided an easy to use function that allows you to open devices by their /dev name
+- Image Thresholding: LocalSquareBlockMinMax Added
+  * Breaks the image up into a grid and computes the min and max pixel value, which is used to compute a threshold
+  * Enabled the detection of black objects partially outside the view
+  * Is very fast
 - Android
   * Will automatically detect if image needs to be rotated 180 degrees and then does it.  Needed for the Nexus 5x
-
-- TODO See if contour can be improved by splitting line then applying the rule to each half
-- TODO             create a few more unit tests which highlight this issue
 
 ---------------------------------------------
 Date    : 2015/11/09

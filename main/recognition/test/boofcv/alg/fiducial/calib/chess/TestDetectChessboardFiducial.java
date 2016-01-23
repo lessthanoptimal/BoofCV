@@ -92,7 +92,7 @@ public class TestDetectChessboardFiducial {
 
 		InputToBinary<ImageFloat32> inputToBinary;
 		if( localThreshold )
-			inputToBinary = FactoryThresholdBinary.localSquareBorder(10,true,0,255,100,10,0.02,0.98,ImageFloat32.class);
+			inputToBinary = FactoryThresholdBinary.localSquareBlockMinMax(10,0.90,true,10,ImageFloat32.class);
 		else
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,ImageFloat32.class);
 

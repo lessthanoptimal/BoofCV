@@ -27,6 +27,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Wrapper around {@link ThresholdSquareBlockMinMax}.
+ *
  * @author Peter Abeles
  */
 public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>

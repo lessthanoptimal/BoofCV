@@ -18,13 +18,11 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
 import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -113,25 +111,17 @@ public class BenchmarkThresholding {
 		}
 	}
 
-	public static class LocalSquareBorder extends PerformerBase {
-		InputToBinary<ImageFloat32> alg = FactoryThresholdBinary.localSquareBorder(adaptiveRadius*2+1,true,0,255,100,20,0.02,0.98,ImageFloat32.class);
-		@Override
-		public void process() {
-			alg.process(inputF32,output_U8);
-		}
-	}
 
 	public static void main(String args[]) {
 
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-//		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LocalSquareBorder(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSquare(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_F32(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_U8(), TEST_TIME);
 

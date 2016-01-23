@@ -143,6 +143,13 @@ public abstract class ThresholdSquareBlockMinMax
 		}
 	}
 
+	/**
+	 * Thresholds all the pixels inside the specified block
+	 * @param blockX0 Block x-coordinate
+	 * @param blockY0 Block y-coordinate
+	 * @param input Input image
+	 * @param output Output image
+	 */
 	protected abstract void thresholdBlock(int blockX0 , int blockY0 ,
 										   T input, ImageUInt8 output );
 
