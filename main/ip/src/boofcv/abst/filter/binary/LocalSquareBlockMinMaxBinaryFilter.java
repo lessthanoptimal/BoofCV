@@ -20,6 +20,7 @@ package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
 import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
+import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
@@ -34,10 +35,12 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
 	ThresholdSquareBlockMinMax alg;
 	ImageType<T> imageType;
 
-	public LocalSquareBlockMinMaxBinaryFilter(float textureThreshold, int requestedBlockWidth,Class<T> imageType ) {
+	public LocalSquareBlockMinMaxBinaryFilter(float textureThreshold, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
 
 		if( imageType == ImageFloat32.class )
-			this.alg = new ThresholdSquareBlockMinMax_F32(textureThreshold,requestedBlockWidth);
+			this.alg = new ThresholdSquareBlockMinMax_F32(textureThreshold,requestedBlockWidth,(float)scale,down);
+		else if( imageType == ImageUInt8.class )
+			this.alg = new ThresholdSquareBlockMinMax_U8(textureThreshold,requestedBlockWidth,scale,down);
 		else
 			throw new IllegalArgumentException("Unsupported image type");
 

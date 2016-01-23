@@ -64,7 +64,34 @@ public class TestThresholdLocalSquareBorder {
 
 	@Test
 	public void subimage() {
-		fail("implement");
+		int numPixelValues = 100;
+		int regionWidths[] = new int[]{4,5,10,13};
+		int minSpread = 75;
+
+		ImageUInt8 input = new ImageUInt8(100,121);
+		ImageMiscOps.fillUniform(input,rand,0,numPixelValues);
+
+		boolean direction[] = new boolean[]{true,false};
+
+		ImageUInt8 found = new ImageUInt8(input.width,input.height);
+
+		for( boolean d : direction ) {
+			for( int regionWidth : regionWidths ) {
+				BoofTesting.checkSubImage(this,"subimage",true,d,numPixelValues, regionWidth, minSpread,input,found);
+			}
+		}
+	}
+
+	public void subimage( boolean direction, int numPixelValues, int regionWidth , int minSpread , ImageUInt8 input , ImageUInt8 found ) {
+		ThresholdLocalSquareBorder alg = new ThresholdLocalSquareBorder(direction, regionWidth, numPixelValues, minSpread, 0.05, 0.95);
+		alg.process(input, found);
+
+		ImageUInt8 expected = new ImageUInt8(input.width,input.height);
+		ThresholdLocalSquareBorderNaive naive = new ThresholdLocalSquareBorderNaive(direction, regionWidth, numPixelValues, minSpread, 0.05, 0.95);
+		naive.process(input, expected);
+
+//		BoofTesting.printDiffBinary(expected,found);
+		BoofTesting.assertEquals(expected, found, 0);
 	}
 
 	@Test

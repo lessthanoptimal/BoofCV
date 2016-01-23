@@ -84,9 +84,9 @@ public class FactoryThresholdBinary {
 	}
 
 	public static <T extends ImageSingleBand>
-	InputToBinary<T> localSquareBlockMinMax(int regionWidth, boolean down,
+	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
 											int minimumSpread, Class<T> inputType) {
-		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,inputType);
+		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,scale,down,inputType);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class FactoryThresholdBinary {
 
 			case LOCAL_SQUARE_BLOCK_MIN_MAX: {
 				ConfigThresholdBlockMinMax c = (ConfigThresholdBlockMinMax) config;
-				return localSquareBlockMinMax(c.radius * 2 + 1, c.down, c.minimumSpread, inputType);
+				return localSquareBlockMinMax(c.radius * 2 + 1, c.scale , c.down, c.minimumSpread, inputType);
 			}
 		}
 		throw new IllegalArgumentException("Unknown type "+config.type);

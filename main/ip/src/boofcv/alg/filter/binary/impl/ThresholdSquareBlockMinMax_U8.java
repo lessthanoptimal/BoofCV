@@ -19,30 +19,29 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.image.InterleavedU8;
 
 /**
- *  * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link ImageFloat32}
+ * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link ImageUInt8}
  *
  * @author Peter Abeles
  */
-public class ThresholdSquareBlockMinMax_F32
-	extends ThresholdSquareBlockMinMax<ImageFloat32,InterleavedF32>
+public class ThresholdSquareBlockMinMax_U8
+	extends ThresholdSquareBlockMinMax<ImageUInt8,InterleavedU8>
 {
-	float scale;
+	double scale;
 	boolean down;
 
-	public ThresholdSquareBlockMinMax_F32(float textureThreshold, int requestedBlockWidth, float scale , boolean down ) {
+	public ThresholdSquareBlockMinMax_U8(float textureThreshold, int requestedBlockWidth, double scale , boolean down ) {
 		super(textureThreshold,requestedBlockWidth);
-		minmax = new InterleavedF32(1,1,2);
+		minmax = new InterleavedU8(1,1,2);
 		this.scale = scale;
 		this.down = down;
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , ImageFloat32 input, ImageUInt8 output ) {
+	protected void thresholdBlock(int blockX0 , int blockY0 , ImageUInt8 input, ImageUInt8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -58,13 +57,13 @@ public class ThresholdSquareBlockMinMax_F32
 		blockY0 = Math.max(0,blockY0-1);
 
 		// find the min and max pixel values inside this block region
-		float min = Float.MAX_VALUE;
-		float max = -Float.MAX_VALUE;
+		int min = Integer.MAX_VALUE;
+		int max = -Integer.MAX_VALUE;
 
 		for (int y = blockY0; y <= blockY1; y++) {
 			for (int x = blockX0; x <= blockX1; x++) {
-				float localMin = minmax.getBand(x,y,0);
-				float localMax = minmax.getBand(x,y,1);
+				int localMin = minmax.getBand(x,y,0);
+				int localMax = minmax.getBand(x,y,1);
 
 				if( localMin < min )
 					min = localMin;
@@ -74,7 +73,7 @@ public class ThresholdSquareBlockMinMax_F32
 		}
 
 		// apply threshold
-		float textureThreshold = (float)this.textureThreshold;
+		int textureThreshold = (int)this.textureThreshold;
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;
@@ -83,8 +82,8 @@ public class ThresholdSquareBlockMinMax_F32
 				if( max-min <= textureThreshold ) {
 					output.data[indexOutput] = 1;
 				} else {
-					float average = scale*(max+min)/2.0f;
-					if( down == input.data[indexInput] <= average ) {
+					int average = (int)(scale*((max+min)/2));
+					if( down == (input.data[indexInput]&0xFF) <= average ) {
 						output.data[indexOutput] = 1;
 					} else {
 						output.data[indexOutput] = 0;
@@ -95,15 +94,15 @@ public class ThresholdSquareBlockMinMax_F32
 	}
 
 	@Override
-	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , ImageFloat32 input) {
+	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , ImageUInt8 input) {
 
-		float min,max;
+		int min,max;
 		min = max = input.unsafe_get(x0,y0);
 
 		for (int y = 0; y < height; y++) {
 			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
 			for (int x = 0; x < width; x++) {
-				float value = input.data[indexInput++];
+				int value = input.data[indexInput++] & 0xFF;
 				if( value < min )
 					min = value;
 				else if( value > max )
@@ -111,7 +110,7 @@ public class ThresholdSquareBlockMinMax_F32
 			}
 		}
 
-		minmax.data[indexMinMax]   = min;
-		minmax.data[indexMinMax+1] = max;
+		minmax.data[indexMinMax]   = (byte)min;
+		minmax.data[indexMinMax+1] = (byte)max;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -306,6 +306,8 @@ public class BoofTesting {
 				if (params[i] == a[i])
 					continue;
 				if (a[i].isPrimitive()) {
+					if (a[i] == Boolean.TYPE && params[i] == Boolean.class)
+						continue;
 					if (a[i] == Byte.TYPE && params[i] == Byte.class)
 						continue;
 					if (a[i] == Short.TYPE && params[i] == Short.class)

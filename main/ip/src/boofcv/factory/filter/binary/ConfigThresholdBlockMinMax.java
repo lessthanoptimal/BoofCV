@@ -40,6 +40,10 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	public ConfigThresholdBlockMinMax() {
 	}
 
+	{
+		scale = 0.85;
+	}
+
 	@Override
 	public void checkValidity() {
 		super.checkValidity();

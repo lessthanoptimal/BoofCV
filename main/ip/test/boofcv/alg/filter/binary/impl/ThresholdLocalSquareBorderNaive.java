@@ -69,13 +69,13 @@ public class ThresholdLocalSquareBorderNaive {
 				computeHistogram(x,y,input);
 				findPercentiles();
 				if( upperIndex-lowerIndex <= minimumSpread ) {
-					output.unsafe_set(x,y,1);
+					output.set(x,y,1);
 				} else {
 					int threshold = (upperIndex+lowerIndex)/2;
-					if( input.unsafe_get(x,y) <= threshold) {
-						output.unsafe_set(x,y,1);
+					if( input.get(x,y) <= threshold) {
+						output.set(x,y,1);
 					} else {
-						output.unsafe_set(x,y,0);
+						output.set(x,y,0);
 					}
 				}
 			}
@@ -126,9 +126,8 @@ public class ThresholdLocalSquareBorderNaive {
 		Arrays.fill(histogram,0);
 
 		for (int y = y0; y < y1; y++) {
-			int index = input.startIndex + y*input.stride + x0;
 			for( int x = x0; x < x1; x++ ) {
-				histogram[input.data[index++]&0xFF]++;
+				histogram[input.get(x,y)]++;
 			}
 		}
 	}
@@ -138,16 +137,10 @@ public class ThresholdLocalSquareBorderNaive {
 		lowerIndex = 0;
 		for (lowerIndex = 0; lowerIndex < histogram.length && count < lowerCount; lowerIndex++) {
 			count += histogram[lowerIndex];
-			if( count >= lowerCount ) {
-				break;
-			}
 		}
 
-		for (upperIndex = lowerIndex; upperIndex < histogram.length && count < lowerCount; upperIndex++) {
+		for (upperIndex = lowerIndex; upperIndex < histogram.length && count < upperCount; upperIndex++) {
 			count += histogram[upperIndex];
-			if( count >= upperCount ) {
-				break;
-			}
 		}
 	}
 
