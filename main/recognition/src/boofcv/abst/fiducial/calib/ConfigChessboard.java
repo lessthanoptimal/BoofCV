@@ -54,7 +54,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,10,true);
+	public ConfigThreshold thresholding = new ConfigThresholdBlockMinMax(10,35,true);
 
 	/**
 	 * Configuration for square detector

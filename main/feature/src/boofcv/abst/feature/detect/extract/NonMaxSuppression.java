@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,9 @@ import boofcv.struct.image.ImageFloat32;
  * </p>
  *
  * <p>
- * A border can be specified around the outside of the image in which extemes can't be detected.  This is
- * specified by the border parameter and the valid region is defined as follows:<br>
+ * A border can be specified around the outside of the image in which extremes can't be detected.  However, a pixel
+ * outside this border can influence if a pixel is a maximum inside, if the local search radius extends that far.
+ * This is specified by the border parameter and the valid region is defined as follows:<br>
  * border &le; x &lt; width-border AND border &le; y &lt; height-border</p>
  *
  * @author Peter Abeles
