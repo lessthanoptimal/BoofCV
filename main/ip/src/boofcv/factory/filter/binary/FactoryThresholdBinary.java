@@ -73,7 +73,7 @@ public class FactoryThresholdBinary {
 
 	public static <T extends ImageSingleBand>
 	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
-											int minimumSpread, Class<T> inputType) {
+											double minimumSpread, Class<T> inputType) {
 		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,scale,down,inputType);
 	}
 

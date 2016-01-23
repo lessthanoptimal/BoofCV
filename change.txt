@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    :
+Date    : 2016/01/24
 Version : Alpha 0.21
 
 - Scale-Space Features

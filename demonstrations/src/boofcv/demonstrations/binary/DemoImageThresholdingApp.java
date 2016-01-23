@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,6 +111,11 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 			case 5:
 				GThresholdImageOps.localSauvola(imageInput, imageBinary,
 						threshRadius, 0.3f, thresholdDown);
+				break;
+
+			case 6:
+				GThresholdImageOps.localBlockMinMax(imageInput, imageBinary,
+						threshRadius*2+1, threshScale, thresholdDown ,15 );
 				break;
 		}
 

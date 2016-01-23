@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,7 +83,7 @@ public class ShapeFitContourApp
 		add(BorderLayout.WEST, controlPanel);
 		add(BorderLayout.CENTER, gui);
 
-		ConfigThreshold config = controlPanel.getThreshold().config;
+		ConfigThreshold config = controlPanel.getThreshold().createConfig();
 		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
 	}
 
@@ -159,7 +159,7 @@ public class ShapeFitContourApp
 
 	@Override
 	public void imageThresholdUpdated() {
-		ConfigThreshold config = controlPanel.getThreshold().config;
+		ConfigThreshold config = controlPanel.getThreshold().createConfig();
 		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
 		processImageThread(null,null);
 	}

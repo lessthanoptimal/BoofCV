@@ -1,12 +1,10 @@
-Alpha 0.21
+Alpha 0.22
 
 - BinaryPolygonConvexDetector
   * Reject a shape if after optimization contour points are really far away from it on average
-  * Flag to return shapes which touch the image border
-    - Only optimize sides/corners which don't touch the border
   * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of the two
-    - Should supress noisy regions?
-  * Figure out a way to get it to work with smaller splits.  Like the cotour around the letter F
+    - Should suppress noisy regions?
+  * Figure out a way to get it to work with smaller splits.  Like the contour around the letter F
     - The initial polygon fit is the weak point
 
 - Improve pose estimate for calibration fiducials
@@ -38,6 +36,8 @@ Future
 - Sparse Bundle Adjustment?
 
 - Look at Sandreas's NewWarp?
+
+- Look at OpenCV's watershed example.  It's actually a useful technique!
 
 - Background Model
   * GMM model

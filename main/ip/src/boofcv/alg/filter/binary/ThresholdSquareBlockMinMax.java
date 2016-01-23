@@ -57,7 +57,7 @@ public abstract class ThresholdSquareBlockMinMax
 
 	// if the min and max value's difference is <= to this value then it is considered
 	// to be textureless and a default value is used
-	protected double textureThreshold;
+	protected double minimumSpread;
 
 	// the desired width and height of a block requested by the user
 	protected int requestedBlockWidth;
@@ -67,12 +67,12 @@ public abstract class ThresholdSquareBlockMinMax
 
 	/**
 	 * Configures the detector
-	 * @param textureThreshold If the difference between min max is less than or equal to this
+	 * @param minimumSpread If the difference between min max is less than or equal to this
 	 *                         value then it is considered textureless.  Set to <= -1 to disable.
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdSquareBlockMinMax(double textureThreshold, int requestedBlockWidth) {
-		this.textureThreshold = textureThreshold;
+	public ThresholdSquareBlockMinMax(double minimumSpread, int requestedBlockWidth) {
+		this.minimumSpread = minimumSpread;
 		this.requestedBlockWidth = requestedBlockWidth;
 	}
 

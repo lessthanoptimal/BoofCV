@@ -33,8 +33,8 @@ public class ThresholdSquareBlockMinMax_U8
 	double scale;
 	boolean down;
 
-	public ThresholdSquareBlockMinMax_U8(double textureThreshold, int requestedBlockWidth, double scale , boolean down ) {
-		super(textureThreshold,requestedBlockWidth);
+	public ThresholdSquareBlockMinMax_U8(double minimumSpread, int requestedBlockWidth, double scale , boolean down ) {
+		super(minimumSpread,requestedBlockWidth);
 		minmax = new InterleavedU8(1,1,2);
 		this.scale = scale;
 		this.down = down;
@@ -73,7 +73,7 @@ public class ThresholdSquareBlockMinMax_U8
 		}
 
 		// apply threshold
-		int textureThreshold = (int)this.textureThreshold;
+		int textureThreshold = (int)this.minimumSpread;
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;

@@ -34,8 +34,8 @@ public class ThresholdSquareBlockMinMax_F32
 	float scale;
 	boolean down;
 
-	public ThresholdSquareBlockMinMax_F32(float textureThreshold, int requestedBlockWidth, float scale , boolean down ) {
-		super(textureThreshold,requestedBlockWidth);
+	public ThresholdSquareBlockMinMax_F32(float minimumSpread, int requestedBlockWidth, float scale , boolean down ) {
+		super(minimumSpread,requestedBlockWidth);
 		minmax = new InterleavedF32(1,1,2);
 		this.scale = scale;
 		this.down = down;
@@ -74,7 +74,7 @@ public class ThresholdSquareBlockMinMax_F32
 		}
 
 		// apply threshold
-		float textureThreshold = (float)this.textureThreshold;
+		float textureThreshold = (float)this.minimumSpread;
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y*input.stride + x0;
 			int indexOutput = output.startIndex + y*output.stride + x0;

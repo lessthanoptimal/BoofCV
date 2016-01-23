@@ -53,7 +53,8 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		super(numRows,numColumns,exampleInputs);
 
 		config = new ConfigSquareGrid(numRows, numColumns, squareWidth,spaceWidth);
-		config.refineWithCorners = forCalibration;
+
+		declareDetector();
 	}
 
 	@Override
@@ -73,7 +74,6 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 
 	@Override
 	protected boolean process(ImageFloat32 image) {
-
 		return alg.process(image);
 	}
 

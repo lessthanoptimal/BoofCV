@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,8 @@ public class ExampleThresholding {
 		// Local method
 		GThresholdImageOps.localSquare(input, binary, 28, 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Square");
+		GThresholdImageOps.localBlockMinMax(input, binary, 10, 1.0, true, 15 );
+		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Block Min-Max");
 		GThresholdImageOps.localGaussian(input, binary, 42, 1.0, true, null, null);
 		gui.addImage(VisualizeBinaryData.renderBinary(binary, false, null),"Local: Gaussian");
 		GThresholdImageOps.localSauvola(input, binary, 5, 0.30f, true);

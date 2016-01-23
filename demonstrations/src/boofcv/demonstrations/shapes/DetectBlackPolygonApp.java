@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,7 +166,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	@Override
 	public synchronized void imageThresholdUpdated() {
 
-		ConfigThreshold config = controls.getThreshold().config;
+		ConfigThreshold config = controls.getThreshold().createConfig();
 
 		inputToBinary = FactoryThresholdBinary.threshold(config,imageType);
 		processImageThread(null,null);

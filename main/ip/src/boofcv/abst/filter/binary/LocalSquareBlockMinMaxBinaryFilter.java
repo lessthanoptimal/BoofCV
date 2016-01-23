@@ -37,12 +37,12 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
 	ThresholdSquareBlockMinMax alg;
 	ImageType<T> imageType;
 
-	public LocalSquareBlockMinMaxBinaryFilter(double textureThreshold, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
+	public LocalSquareBlockMinMaxBinaryFilter(double minimumSpread, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
 
 		if( imageType == ImageFloat32.class )
-			this.alg = new ThresholdSquareBlockMinMax_F32((float)textureThreshold,requestedBlockWidth,(float)scale,down);
+			this.alg = new ThresholdSquareBlockMinMax_F32((float)minimumSpread,requestedBlockWidth,(float)scale,down);
 		else if( imageType == ImageUInt8.class )
-			this.alg = new ThresholdSquareBlockMinMax_U8(textureThreshold,requestedBlockWidth,scale,down);
+			this.alg = new ThresholdSquareBlockMinMax_U8(minimumSpread,requestedBlockWidth,scale,down);
 		else
 			throw new IllegalArgumentException("Unsupported image type");
 

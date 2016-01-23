@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -48,12 +49,15 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	boolean thresholdAdaptive;
 	boolean thresholdGlobal;
 
-	ConfigThreshold config = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
-
-	{
-		config.radius = 10;
-		config.fixedThreshold = 50;
-	}
+	public ThresholdType type = ThresholdType.GLOBAL_OTSU;
+	public double fixedThreshold = 50;
+	public double scale = 0.95;
+	public boolean down = true;
+	public int radius = 10;
+	public float savolaK = 0.3f;
+	public int minPixelValue = 0;
+	public int maxPixelValue = 255;
+	public double minimumSpread = 10;
 
 	public ThresholdControlPanel(Listener listener) {
 		this.listener = listener;
@@ -64,22 +68,22 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 		}
 
 		comboType.setMaximumSize(comboType.getPreferredSize());
-		comboType.setSelectedIndex(config.type.ordinal());
+		comboType.setSelectedIndex(type.ordinal());
 
-		spinnerThreshold = new JSpinner(new SpinnerNumberModel(config.fixedThreshold,0,255,1));
+		spinnerThreshold = new JSpinner(new SpinnerNumberModel(fixedThreshold,0,255,1));
 		spinnerThreshold.setMaximumSize(spinnerThreshold.getPreferredSize());
 
-		spinnerRadius = new JSpinner(new SpinnerNumberModel(config.radius,1,50,1));
+		spinnerRadius = new JSpinner(new SpinnerNumberModel(radius,1,50,1));
 		spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
 
-		spinnerScale = new JSpinner(new SpinnerNumberModel(config.scale,0,2.0,0.05));
+		spinnerScale = new JSpinner(new SpinnerNumberModel(scale,0,2.0,0.05));
 		configureSpinnerFloat(spinnerScale);
 
 		buttonUpDown = new JButton();
 		buttonUpDown.setPreferredSize(new Dimension(100, 30));
 		buttonUpDown.setMaximumSize(buttonUpDown.getPreferredSize());
 		buttonUpDown.setMinimumSize(buttonUpDown.getPreferredSize());
-		setToggleText(config.down);
+		setToggleText(down);
 
 		comboType.addActionListener(this);
 		spinnerThreshold.addChangeListener(this);
@@ -120,18 +124,18 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == comboType ) {
-			config.type = ThresholdType.values()[comboType.getSelectedIndex()];
+			type = ThresholdType.values()[comboType.getSelectedIndex()];
 			updateEnabledByType();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == buttonUpDown ) {
-			config.down = !config.down;
-			setToggleText(config.down);
+			down = !down;
+			setToggleText(down);
 			listener.imageThresholdUpdated();
 		}
 	}
 
 	private void updateEnabledByType() {
-		switch( config.type ) {
+		switch( type ) {
 			case FIXED:
 				thresholdAdaptive = false;
 				break;
@@ -171,18 +175,40 @@ class ThresholdControlPanel extends StandardAlgConfigPanel
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerThreshold ) {
-			config.fixedThreshold = ((Number) spinnerThreshold.getValue()).intValue();
+			fixedThreshold = ((Number) spinnerThreshold.getValue()).intValue();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerRadius ) {
-			config.radius = ((Number) spinnerRadius.getValue()).intValue();
+			radius = ((Number) spinnerRadius.getValue()).intValue();
 			listener.imageThresholdUpdated();
 		} else if( e.getSource() == spinnerScale ) {
-			config.scale = ((Number) spinnerScale.getValue()).doubleValue();
+			scale = ((Number) spinnerScale.getValue()).doubleValue();
 			listener.imageThresholdUpdated();
 		}
 	}
 
 	public interface Listener {
 		void imageThresholdUpdated();
+	}
+
+	public ConfigThreshold createConfig() {
+		ConfigThreshold config;
+		if( type == ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX ) {
+			ConfigThresholdBlockMinMax _config = new ConfigThresholdBlockMinMax();
+
+			_config.minimumSpread = minimumSpread;
+			config = _config;
+		} else {
+			config = new ConfigThreshold();
+		}
+		config.type = type;
+		config.fixedThreshold = fixedThreshold;
+		config.scale = scale;
+		config.down = down;
+		config.radius = radius;
+		config.savolaK = savolaK;
+		config.minPixelValue = minPixelValue;
+		config.maxPixelValue = maxPixelValue;
+
+		return config;
 	}
 }

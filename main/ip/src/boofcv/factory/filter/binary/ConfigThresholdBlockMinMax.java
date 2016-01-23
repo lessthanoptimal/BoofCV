@@ -28,9 +28,9 @@ public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	 * If the lower and upper histogram values are different by less than or equal to this amount it is considered
 	 * a textureless region.  Set to a value <= -1 to disable.
 	 */
-	public int minimumSpread = 10;
+	public double minimumSpread = 10;
 
-	public ConfigThresholdBlockMinMax(int radius , int minimumSpread, boolean down ) {
+	public ConfigThresholdBlockMinMax(int radius , double minimumSpread, boolean down ) {
 		this.type = ThresholdType.LOCAL_SQUARE_BLOCK_MIN_MAX;
 		this.radius = radius;
 		this.minimumSpread = minimumSpread;

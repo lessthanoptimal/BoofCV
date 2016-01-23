@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,8 @@ public class DemoThresholdingPanel extends StandardAlgConfigPanel implements Act
 		this.threshRadius = radius;
 		this.scale = scale;
 
-		String[] algStrings = { "Fixed", "Global Otsu" , "Global Entropy" , "Local Square", "Local Gaussian", "Local Sauvola"};
+		String[] algStrings = { "Fixed", "Global Otsu" , "Global Entropy" ,
+				"Local Square", "Local Gaussian", "Local Sauvola", "Local Block Min-Max"};
 
 		comboSelect = new JComboBox(algStrings);
 		comboSelect.addActionListener(this);
