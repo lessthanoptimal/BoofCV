@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 * Configuration for FH-15: initialSampleSize=1, initialSize=15, numberScalesPerOctave=5, numberOfOctaves=4<br>
 	 * * Note that FH-15 requires the image to be up sampled first. See [1] for details.
 	 * </p>
-	 *  @param extractor Feature extractor used to find local maximums in 2D image.
+	 * @param extractor Feature extractor used to find local maximums in 2D image.
 	 * @param maxFeaturesPerScale Maximum number of features it can find per image scale.  If set &le; 0 then the all potential
 	 * features will be returned, which is how it is in the original paper.
 	 * @param initialSampleRate How often pixels are sampled in the first octave.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ public class BoofDefaults {
 
 	public static final double SURF_SCALE_TO_RADIUS = 2.0;
 	public static final double SIFT_SCALE_TO_RADIUS = 1.0;
+	public static final double BRIEF_SCALE_TO_RADIUS = 2.0;
 
 	/**
 	 * String specifying BoofCV's version.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_I32;
@@ -81,11 +82,10 @@ public class DescribePointBriefSO<T extends ImageSingleBand> {
 
 	public void process( float c_x , float c_y , float orientation , float radius , TupleDesc_B feature )
 	{
-		float scale = radius/definition.radius;
+		float scale = (float)(radius/BoofDefaults.BRIEF_SCALE_TO_RADIUS);
 		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
 		// other than bilinear interpolation
-		boolean isInside =
-				BoofMiscOps.checkInside(blur, c_x, c_y, definition.radius*scale);
+		boolean isInside = BoofMiscOps.checkInside(blur, c_x, c_y, definition.radius*scale);
 
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);

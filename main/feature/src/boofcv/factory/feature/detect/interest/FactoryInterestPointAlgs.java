@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,8 +172,9 @@ public class FactoryInterestPointAlgs {
 			config = new ConfigFastHessian();
 		config.checkValidity();
 
+		// ignore border is overwritten by Fast Hessian at detection time
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(config.extractRadius, config.detectThreshold, 5, true));
+				new ConfigExtract(config.extractRadius, config.detectThreshold, 0, true));
 		return new FastHessianFeatureDetector<II>(extractor, config.maxFeaturesPerScale,
 				config.initialSampleSize, config.initialSize, config.numberScalesPerOctave,
 				config.numberOfOctaves, config.scaleStepSize);
