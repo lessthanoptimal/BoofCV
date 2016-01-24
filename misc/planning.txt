@@ -47,3 +47,9 @@ Future
 - Unit test for getScaleAtRadius
   * Implement universally
   * Create unit test for it
+
+- ImplSsdCorner_S16
+  * Handle the border.  Currently is is just skipped
+  * If the image is resized that will cause problems since the border can affect the location of local
+    maximums
+  * Createa generic function for handling borders?  Give it a function and it returns a solution?

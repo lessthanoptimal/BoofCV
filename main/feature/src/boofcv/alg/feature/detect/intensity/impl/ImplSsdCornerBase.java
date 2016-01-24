@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
@@ -95,6 +96,10 @@ public abstract class ImplSsdCornerBase<D extends ImageSingleBand, D2 extends Im
 		this.derivX = derivX;
 		this.derivY = derivY;
 
+		// there is no intensity computed along the border. Make sure it's always zero
+		// In the future it might be better to fill it with meaningful data, even if it's
+		// from a partial region
+		ImageMiscOps.fillBorder(intensity,0,radius);
 		horizontal();
 		vertical(intensity);
 	}
