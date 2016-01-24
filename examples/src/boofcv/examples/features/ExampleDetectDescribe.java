@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,11 +62,7 @@ public class ExampleDetectDescribe {
 	DetectDescribePoint<T, TD> createFromPremade( Class<T> imageType ) {
 		return (DetectDescribePoint)FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-		// note that SIFT only supports ImageFloat32
-//		if( imageType == ImageFloat32.class )
-//			return (DetectDescribePoint)FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
-//		else
-//			throw new RuntimeException("Unsupported image type");
+//		return (DetectDescribePoint)FactoryDetectDescribe.sift(new ConfigCompleteSift(-1,5,300));
 	}
 
 	/**

@@ -5,6 +5,7 @@
 - Make sure all examples work
 - Make sure all applications in evaluation work
 - Update examples on website
+  * See what needs to be updated since TAG_NAME "git diff --name-status TAG_NAME path/to/examples"
 - Fresh checkout from repository then do the following
 - See if gradle 1) main 2) integration 3) examples
 - ant javadoc for website
