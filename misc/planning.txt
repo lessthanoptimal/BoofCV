@@ -1,5 +1,16 @@
 Alpha 0.22
 
+- Regression
+  * Chessboard image border to fiducial regression
+  * Support binary features in Detect/Describe regression
+  * Standardized format which is easy for human and machine to read?
+    - This should enable easy automated checks for significant change
+  * Regression for dense image features?
+
+- Unit Tests for applications
+  * compare output to expected file bit by bot
+
+
 - BinaryPolygonConvexDetector
   * Reject a shape if after optimization contour points are really far away from it on average
   * New binarization.  Run square binary twice with scale 0.9 and 1.1 .  Then output binary is the AND of the two

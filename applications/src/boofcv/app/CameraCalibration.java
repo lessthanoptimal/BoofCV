@@ -149,7 +149,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			String arg = args[index];
 
 			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for chessboard");
+				throw new  RuntimeException("Expected flags for chessboard.  Should start with '--'");
 			}
 
 			splitFlag(arg);
@@ -182,7 +182,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			String arg = args[index];
 
 			if( !arg.startsWith("--") ) {
-				throw new  RuntimeException("Expected flags for chessboard");
+				throw new  RuntimeException("Expected flags for square grid. Should start with '--'");
 			}
 
 			splitFlag(arg);
@@ -256,6 +256,12 @@ public class CameraCalibration extends BaseStandardInputApp {
 		Collections.sort(files);
 
 		final MonoPlanarPanel gui = visualize ? new MonoPlanarPanel() : null;
+
+		if( files.isEmpty() ) {
+			System.err.println("No image files found!");
+			System.err.println(inputDirectory);
+			System.exit(0);
+		}
 
 		boolean first = true;
 		for( File f : files ){

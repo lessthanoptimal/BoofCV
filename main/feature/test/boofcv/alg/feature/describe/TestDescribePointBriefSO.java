@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.testing.BoofTesting;
@@ -209,13 +210,15 @@ public class TestDescribePointBriefSO {
 		TupleDesc_B desc = alg.createFeature();
 		alg.process(c_x,c_y,0,briefRadius,desc);
 
+		double s = briefRadius/BoofDefaults.BRIEF_SCALE_TO_RADIUS;
+
 		for( int i = 0; i < def.compare.length; i++ ) {
 			Point2D_I32 c = def.compare[i];
 			Point2D_I32 p0 = def.samplePoints[c.x];
 			Point2D_I32 p1 = def.samplePoints[c.y];
 
-			boolean expected = a.get(c_x+p0.x,c_y+p0.y).doubleValue()
-					< a.get(c_x+p1.x,c_y+p1.y).doubleValue();
+			boolean expected = a.get((int)Math.round(c_x+p0.x*s),(int)Math.round(c_y+p0.y*s)).doubleValue()
+					< a.get((int)Math.round(c_x+p1.x*s),(int)Math.round(c_y+p1.y*s)).doubleValue();
 			assertTrue(expected == desc.isBitTrue(i));
 		}
 	}

@@ -19,8 +19,7 @@ Version : Alpha 0.21
 - SIFT
   * Complete rewrite of detector and descriptor
   * Very similar to original paper by Lowe
-  * One common difference is the use of quadratic interpolation instead of the overly complex thing that
-    Lowe proposed
+  * One difference is the use of quadratic interpolation instead of the overly complex thing that Lowe proposed
 - Dense SIFT
   * Optimized code for computing dense descriptors at a fixed scale in a grid across the entire image
 - Black polygon detector
