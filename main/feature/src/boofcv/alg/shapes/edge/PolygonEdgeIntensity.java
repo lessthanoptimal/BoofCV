@@ -95,7 +95,7 @@ public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
 		averageInside = 0;
 		averageOutside = 0;
 
-		double tagentSign = ccw ? 1 : -1;
+		double tangentSign = ccw ? 1 : -1;
 
 		int totalSides = 0;
 		for (int i = polygon.size()-1,j=0; j < polygon.size(); i=j,j++) {
@@ -119,8 +119,8 @@ public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
 			offsetB.x = b.x - cornerOffset*dx;
 			offsetB.y = b.y - cornerOffset*dy;
 
-			double tanX = -dy*tangentDistance*tagentSign;
-			double tanY =  dx*tangentDistance*tagentSign;
+			double tanX = -dy*tangentDistance*tangentSign;
+			double tanY =  dx*tangentDistance*tangentSign;
 
 			scorer.computeAverageDerivative(offsetA, offsetB, tanX,tanY);
 
