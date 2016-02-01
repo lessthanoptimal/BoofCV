@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.disparity;
 
 import boofcv.alg.feature.disparity.impl.*;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.GConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.ImageFloat32;
@@ -126,8 +126,8 @@ public class BenchmarkDisparityAlgs {
 
 		GImageMiscOps.fillUniform(left, rand, 0, 30);
 		GImageMiscOps.fillUniform(right, rand, 0, 30);
-		GeneralizedImageOps.convert(left, left_F32);
-		GeneralizedImageOps.convert(right,right_F32);
+		GConvertImage.convert(left, left_F32);
+		GConvertImage.convert(right,right_F32);
 
 		// the "fastest" seems to always be the first one tested
 		ProfileOperation.printOpsPerSec(new EfficientSad_U8(),TEST_TIME);

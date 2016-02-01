@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.transform.wavelet.impl;
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageInteger;
@@ -82,7 +82,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		if( original.getDataType().getDataType() == int.class ) {
 			copyInput.setTo((ImageSInt32)original);
 		} else {
-			GeneralizedImageOps.convert(original, copyInput);
+			GConvertImage.convert(original, copyInput);
 		}
 		WaveletTransformOps.transformN(desc, copyInput,transformed,temp,numLevels);
 
@@ -101,7 +101,7 @@ public class WaveletTransformInt<T extends ImageInteger> implements WaveletTrans
 		} else {
 			copyOutput.reshape(original.width,original.height);
 			WaveletTransformOps.inverseN(desc, copyInput, copyOutput,temp,numLevels,minPixelValue,maxPixelValue);
-			GeneralizedImageOps.convert(copyOutput,original);
+			GConvertImage.convert(copyOutput,original);
 		}
 	}
 

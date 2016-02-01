@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,8 @@
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.core.image.impl.ImplConvertImage;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * <p>
@@ -53,34 +49,9 @@ public class GeneralizedImageOps {
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
-		convert(src,dst);
+		GConvertImage.convert(src,dst);
 
 		return dst;
-	}
-
-	/**
-	 * Converts an image from one type to another type.
-	 *
-	 * @param src Input image. Not modified.
-	 * @param dst Converted output image. Modified.
-	 * @return Converted image.
-	 */
-	@SuppressWarnings({"unchecked"})
-	public static void convert( ImageSingleBand<?> src , ImageSingleBand<?> dst )
-	{
-		if( src.getClass() == dst.getClass()) {
-			((ImageSingleBand)dst).setTo(src);
-			return;
-		}
-
-		Method m = BoofTesting.findMethod(ImplConvertImage.class,"convert",src.getClass(),dst.getClass());
-		try {
-			m.invoke(null,src,dst);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	public static boolean isFloatingPoint(Class<?> imgType) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.blur.impl;
 
 import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageSingleBand;
@@ -58,7 +59,7 @@ public class TestImplMedianSortNaive {
 			ImageSingleBand input = GeneralizedImageOps.createSingleBand(params[0], 4, 4);
 			ImageSingleBand found = GeneralizedImageOps.createSingleBand(params[1], 4, 4);
 
-			GeneralizedImageOps.convert(templateImage,input);
+			GConvertImage.convert(templateImage,input);
 
 			BoofTesting.checkSubImage(this, "trivialTest", true, m , input, found);
 			numFound++;
