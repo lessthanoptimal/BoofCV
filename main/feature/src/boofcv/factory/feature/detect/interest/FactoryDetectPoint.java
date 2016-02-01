@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.filter.blur.MedianImageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -142,7 +142,7 @@ public class FactoryDetectPoint {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
-		MedianImageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configDetector.radius);
+		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configDetector.radius);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<T, D>(medianFilter, imageType);
 		return createGeneral(intensity, configDetector);
 	}

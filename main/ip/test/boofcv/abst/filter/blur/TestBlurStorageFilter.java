@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,16 @@
 
 package boofcv.abst.filter.blur;
 
-import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
+
+import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -30,51 +36,66 @@ public class TestBlurStorageFilter {
 
 	int width = 20;
 	int height = 25;
+	Random rand = new Random(234);
+
+	Class[] imageTypes = new Class[]{ImageUInt8.class, ImageFloat32.class};
 
 	@Test
 	public void gaussian() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
-		ImageUInt8 storage = new ImageUInt8(width,height);
+		for( Class c : imageTypes ) {
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand storage = GeneralizedImageOps.createSingleBand(c,width,height);
 
-		BlurStorageFilter<ImageUInt8> alg = new BlurStorageFilter<ImageUInt8>("gaussian",ImageUInt8.class,-1,2);
+			GImageMiscOps.fillUniform(input,rand,0,100);
 
-		BlurImageOps.gaussian(input,found,-1,2,storage);
+			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("gaussian",c,-1,2);
 
-		alg.process(input,expected);
+			GBlurImageOps.gaussian(input,found,-1,2,storage);
 
-		BoofTesting.assertEquals(expected,found,1e-4);
+			alg.process(input,expected);
+
+			BoofTesting.assertEquals(expected,found,1e-4);
+		}
 	}
 
 	@Test
 	public void mean() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
-		ImageUInt8 storage = new ImageUInt8(width,height);
+		for( Class c : imageTypes ) {
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand storage = GeneralizedImageOps.createSingleBand(c,width,height);
 
-		BlurStorageFilter<ImageUInt8> alg = new BlurStorageFilter<ImageUInt8>("mean",ImageUInt8.class,2);
+			GImageMiscOps.fillUniform(input,rand,0,100);
 
-		BlurImageOps.mean(input, found, 2, storage);
+			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("mean",c,2);
 
-		alg.process(input,expected);
+			GBlurImageOps.mean(input,found,2,storage);
 
-		BoofTesting.assertEquals(expected,found,1e-4);
+			alg.process(input,expected);
+
+			BoofTesting.assertEquals(expected,found,1e-4);
+		}
 	}
 
 	@Test
 	public void median() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		for( Class c : imageTypes ) {
+			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
 
-		BlurStorageFilter<ImageUInt8> alg = new BlurStorageFilter<ImageUInt8>("median",ImageUInt8.class,2);
+			GImageMiscOps.fillUniform(input,rand,0,100);
 
-		BlurImageOps.median(input, found, 2);
+			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("median",c,2);
 
-		alg.process(input,expected);
+			GBlurImageOps.median(input,found,2);
 
-		BoofTesting.assertEquals(expected,found,1e-4);
+			alg.process(input,expected);
+
+			BoofTesting.assertEquals(expected,found,1e-4);
+		}
 	}
 }

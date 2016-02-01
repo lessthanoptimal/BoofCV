@@ -3,6 +3,18 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2016/
+Version : Alpha 0.22
+
+- Deleted MedianImageFilter
+  * Use BlurStorageFilter instead.  Create with FactoryBlurFilter
+
+- TODO Automate fault detection from regression tests
+- TODO Regression test for dense image descriptors
+- TODO Implement HOG Dense Descriptor
+- TODO Naive implementation of DLS
+
+---------------------------------------------
 Date    : 2016/01/24
 Version : Alpha 0.21
 

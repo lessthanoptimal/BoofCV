@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.factory.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.filter.blur.MedianImageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
@@ -110,7 +110,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
-		MedianImageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
+		BlurStorageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
 		return new WrapperMedianCornerIntensity<I, D>(filter,imageType);
 	}
 

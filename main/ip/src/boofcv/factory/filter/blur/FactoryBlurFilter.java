@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.factory.filter.blur;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
-import boofcv.abst.filter.blur.MedianImageFilter;
 import boofcv.struct.image.ImageSingleBand;
 
 /**
@@ -36,8 +35,8 @@ public class FactoryBlurFilter {
 	 * @param radius Size of the filter.
 	 * @return Median image filter.
 	 */
-	public static <T extends ImageSingleBand> MedianImageFilter<T> median( Class<T> type , int radius ) {
-		return new MedianImageFilter<T>(type,radius);
+	public static <T extends ImageSingleBand> BlurStorageFilter<T> median( Class<T> type , int radius ) {
+		return new BlurStorageFilter<T>("median",type,radius);
 	}
 
 	/**

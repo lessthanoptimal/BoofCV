@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.intensity;
 
-import boofcv.abst.filter.blur.MedianImageFilter;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
@@ -37,10 +37,10 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 		extends BaseGeneralFeatureIntensity<I,D>  {
 
 	Method m;
-	MedianImageFilter<I> medianFilter;
+	BlurStorageFilter<I> medianFilter;
 	I medianImage;
 
-	public WrapperMedianCornerIntensity(MedianImageFilter<I> medianFilter ,
+	public WrapperMedianCornerIntensity(BlurStorageFilter<I> medianFilter ,
 										Class<I> imageType ) {
 		this.medianFilter = medianFilter;
 		try {

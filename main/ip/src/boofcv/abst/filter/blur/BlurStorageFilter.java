@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,11 @@
 
 package boofcv.abst.filter.blur;
 
-import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Simplified interface for using a blur filter that requires storage.  Reflections are used to look up a function inside
@@ -34,29 +32,21 @@ import java.lang.reflect.Method;
  */
 public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<T> {
 
-	// the blur function inside of BlurImageOps being invoked
-	private Method m;
+	// Wrapper around performed operation
+	private BlurOperation operation;
+
 	// the Gaussian's standard deviation
 	private double sigma;
 	// size of the blur region
 	private int radius;
 	// stores intermediate results
 	private ImageSingleBand storage;
-	// if sigma is an input or not
-	private boolean hasSigma;
 
 	// type of image it processes
 	Class<T> inputType;
 
 	public BlurStorageFilter( String functionName , Class<T> inputType, int radius) {
-		this.radius = radius;
-		this.inputType = inputType;
-
-		hasSigma = false;
-		m = findMethod(functionName, inputType);
-		Class params[] = m.getParameterTypes();
-		if( params.length == 4 )
-			storage = GeneralizedImageOps.createSingleBand((Class)m.getParameterTypes()[3],1,1);
+		this(functionName,inputType,-1,radius);
 	}
 
 	public BlurStorageFilter( String functionName , Class<T> inputType, double sigma , int radius) {
@@ -64,27 +54,18 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 		this.sigma = sigma;
 		this.inputType = inputType;
 
-		hasSigma = true;
-		m = findMethod(functionName, inputType);
-		storage = GeneralizedImageOps.createSingleBand((Class)m.getParameterTypes()[4],1,1);
-	}
-
-	private Method findMethod( String name , Class<T> inputType ) {
-		Method methods[] = BlurImageOps.class.getMethods();
-
-		for (int i = 0; i < methods.length; i++) {
-			Method m = methods[i];
-
-			if( !m.getName().equals(name) )
-				continue;
-
-			Class params[] = m.getParameterTypes();
-
-			if(params[1] == inputType )
-				return m;
+		if( functionName.equals("mean")) {
+			operation = new MeanOperation();
+			storage = GeneralizedImageOps.createSingleBand(inputType,1,1);
+		} else if( functionName.equals("gaussian")) {
+			operation = new GaussianOperation();
+			storage = GeneralizedImageOps.createSingleBand(inputType,1,1);
+		} else if( functionName.equals("median")) {
+			operation = new MedianOperator();
+		} else {
+			throw new IllegalArgumentException("Unknown function "+functionName);
 		}
 
-		throw new RuntimeException("Can't find function "+name+"  "+inputType.getSimpleName());
 	}
 
 	/**
@@ -104,21 +85,9 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 
 	@Override
 	public void process(T input, T output) {
-		try {
-			if( storage != null ) {
-				storage.reshape(output.width, output.height);
-				if (hasSigma)
-					m.invoke(null, input, output, sigma, radius, storage);
-				else
-					m.invoke(null, input, output, radius, storage);
-			} else {
-				m.invoke(null, input, output,radius);
-			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
+		if( storage != null )
+			storage.reshape(output.width, output.height);
+		operation.process(input,output);
 	}
 
 	@Override
@@ -139,5 +108,30 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 	@Override
 	public ImageType<T> getOutputType() {
 		return ImageType.single(inputType);
+	}
+
+	private interface BlurOperation {
+		public void process(ImageBase input , ImageBase output );
+	}
+
+	private class MeanOperation implements BlurOperation {
+		@Override
+		public void process(ImageBase input, ImageBase output) {
+			GBlurImageOps.mean(input,output,radius,storage);
+		}
+	}
+
+	private class GaussianOperation implements BlurOperation {
+		@Override
+		public void process(ImageBase input, ImageBase output) {
+			GBlurImageOps.gaussian(input,output,sigma,radius,storage);
+		}
+	}
+
+	private class MedianOperator implements BlurOperation {
+		@Override
+		public void process(ImageBase input, ImageBase output) {
+			GBlurImageOps.median(input,output,radius);
+		}
 	}
 }

@@ -47,6 +47,8 @@ import boofcv.struct.image.ImageUInt8;
  * <p>The size each block in the grid in pixels is adjusted depending on image size.  This is done to minimize
  * "squares" in the upper image boundaries from having many more pixels than other blocks.</p>
  *
+ * <p>The block based approach used were was inspired by a high level description found in AprilTags.</p>
+ *
  * @author Peter Abeles
  */
 public abstract class ThresholdSquareBlockMinMax

@@ -8,8 +8,7 @@ Alpha 0.22
   * Regression for dense image features?
 
 - Unit Tests for applications
-  * compare output to expected file bit by bot
-
+  * compare output to expected file bit by bit
 
 - BinaryPolygonConvexDetector
   * Reject a shape if after optimization contour points are really far away from it on average
