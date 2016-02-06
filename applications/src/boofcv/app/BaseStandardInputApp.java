@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,16 +25,16 @@ import com.github.sarxos.webcam.Webcam;
  */
 public class BaseStandardInputApp {
 
-	InputType inputType = InputType.WEBCAM;
+	protected InputType inputType = InputType.WEBCAM;
 
-	int cameraId=0;
-	String cameraName = null;
-	int desiredWidth=-1,desiredHeight=-1;
+	protected int cameraId=0;
+	protected String cameraName = null;
+	protected int desiredWidth=-1,desiredHeight=-1;
 
-	String filePath;
+	protected String filePath;
 
-	String flagName;
-	String parameters;
+	protected String flagName;
+	protected String parameters;
 
 	protected void printInputHelp() {
 		System.out.println("Camera Input:  (default)");

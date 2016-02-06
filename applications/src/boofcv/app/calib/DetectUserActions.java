@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,6 @@ public class DetectUserActions {
 		int size = Math.min(width,height);
 
 		thresholdDistance = size*0.005;
-
-		System.out.println("stationary threshold "+thresholdDistance);
 	}
 
 	public void update( boolean detected , CalibrationObservation points ) {

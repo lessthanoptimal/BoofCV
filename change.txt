@@ -8,6 +8,10 @@ Version : Alpha 0.22
 
 - Deleted MedianImageFilter
   * Use BlurStorageFilter instead.  Create with FactoryBlurFilter
+- Applications package now uploaded to Central
+- CameraCalibration
+  * Made internal data structures and function protected to make it easier to extend by an external class
+  * Fixed bug where visualization artifacts were being saved to disk
 
 - TODO Automate fault detection from regression tests
 - TODO Regression test for dense image descriptors

@@ -50,16 +50,16 @@ import java.util.List;
  */
 public class CameraCalibration extends BaseStandardInputApp {
 
-	String inputDirectory;
-	String outputFileName = "intrinsic.xml";
-	CalibrationDetector detector;
-	boolean zeroSkew = true;
-	int numRadial = 2;
-	boolean tangential = false;
+	protected String inputDirectory;
+	protected String outputFileName = "intrinsic.xml";
+	protected CalibrationDetector detector;
+	protected boolean zeroSkew = true;
+	protected int numRadial = 2;
+	protected boolean tangential = false;
 
-	boolean visualize = true;
+	protected boolean visualize = true;
 
-	void printHelp() {
+	public void printHelp() {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
@@ -101,7 +101,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println();
 	}
 
-	void parse( String []args ) {
+	public void parse( String []args ) {
 		if( args.length < 1 ) {
 			throw new RuntimeException("Must specify some arguments");
 		}
@@ -142,7 +142,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 	}
 
-	void parseChessboard( int index , String []args ) {
+	protected void parseChessboard( int index , String []args ) {
 		int numRows=0,numColumns=0;
 
 		for(; index < args.length; index++ ) {
@@ -174,7 +174,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		detector = FactoryCalibrationTarget.detectorChessboard(config);
 	}
 
-	void parseSquareGrid( int index , String []args ) {
+	protected void parseSquareGrid( int index , String []args ) {
 		int numRows=0,numColumns=0;
 		double square=1,space=1;
 
@@ -241,7 +241,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 				break;
 		}
 	}
-	private void handleDirectory() {
+
+	protected void handleDirectory() {
 		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
 
 		calibrationAlg.configure( zeroSkew, numRadial, tangential);

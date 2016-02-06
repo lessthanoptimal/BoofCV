@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderType;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -118,11 +119,10 @@ public class ImageSelectorAndSaver {
 
 	/**
 	 * Computes the sharpness score for the current image, if better than the current best image it's then saved.
-	 * @param original original image.  A copy is potentially created for saving to disk later on.
 	 * @param image Gray scale input image for detector
 	 * @param sides Location of 4 corners on fiducial
 	 */
-	public synchronized void process(BufferedImage original , ImageFloat32 image, List<Point2D_F64> sides) {
+	public synchronized void process( ImageFloat32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
 
@@ -131,13 +131,9 @@ public class ImageSelectorAndSaver {
 		if( currentScore < bestScore ) {
 			bestScore = currentScore;
 			if( bestImage == null ) {
-				int imageType = original.getType();
-				if( imageType == 0 ) {
-					imageType = BufferedImage.TYPE_INT_RGB;
-				}
-				bestImage = new BufferedImage(original.getWidth(), original.getHeight(),imageType);
+				bestImage = new BufferedImage(image.getWidth(), image.getHeight(),BufferedImage.TYPE_INT_RGB);
 			}
-			bestImage.createGraphics().drawImage(original,0,0,null);
+			ConvertBufferedImage.convertTo(image,bestImage);
 		}
 	}
 

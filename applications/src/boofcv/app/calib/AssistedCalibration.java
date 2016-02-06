@@ -93,7 +93,6 @@ public class AssistedCalibration {
 
 	// input image
 	ImageFloat32 input;
-	BufferedImage inputBuffered;
 
 	// detects the calibration target
 	CalibrationDetector detector;
@@ -159,7 +158,6 @@ public class AssistedCalibration {
 	public void process( ImageFloat32 gray , BufferedImage image ) {
 
 		this.input = gray;
-		this.inputBuffered = image;
 		imageWidth = gray.width;
 		imageHeight = gray.height;
 		imageSize = Math.min(gray.width, gray.height);
@@ -326,7 +324,7 @@ public class AssistedCalibration {
 				saver.clearHistory();
 				saver.updateScore(input, sides);
 			} else {
-				saver.process(inputBuffered, input, sides);
+				saver.process( input, sides);
 			}
 
 			drawPadding();
@@ -352,7 +350,7 @@ public class AssistedCalibration {
 		drawPadding();
 
 		if( detected ) {
-			saver.process(inputBuffered,input, sides);
+			saver.process(input, sides);
 			gui.getInfoPanel().updateView(saver.getCurrentView());
 			gui.getInfoPanel().updateFocusScore(saver.getFocusScore());
 
@@ -381,7 +379,7 @@ public class AssistedCalibration {
 			if( resetImageSelector ) {
 				saver.clearHistory();
 			} else {
-				saver.process(inputBuffered, input, sides);
+				saver.process( input, sides);
 			}
 
 			renderCalibrationPoints(stationaryTime, points.points);
