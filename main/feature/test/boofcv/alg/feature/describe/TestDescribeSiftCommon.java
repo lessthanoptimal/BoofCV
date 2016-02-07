@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,14 @@ import static org.junit.Assert.assertTrue;
 public class TestDescribeSiftCommon {
 
 	@Test
-	public void massageDescriptor() {
+	public void normalizeDescriptor() {
 		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
 		descriptor.value[5] = 100;
 		descriptor.value[20] = 120;
 		descriptor.value[60] = 20;
 
 		DescribeSiftCommon alg = new DescribeSiftCommon(4,4,8,0.5,0.2);
-		alg.massageDescriptor(descriptor);
+		alg.normalizeDescriptor(descriptor,alg.maxDescriptorElementValue);
 
 		assertEquals(1,normL2(descriptor),1e-8);
 

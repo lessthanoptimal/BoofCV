@@ -26,6 +26,10 @@ Alpha 0.22
 
 - HOG
 
+Massive Refactorings
+- MultiSpectral to Planar
+- Delete type specific functions from FactoryDerivative
+
 Future
 
 - Dense Features

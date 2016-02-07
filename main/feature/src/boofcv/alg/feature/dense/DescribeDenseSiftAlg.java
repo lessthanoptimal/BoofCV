@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -194,7 +194,7 @@ public class DescribeDenseSiftAlg<D extends ImageSingleBand> extends DescribeSif
 			}
 		}
 
-		massageDescriptor(desc);
+		normalizeDescriptor(desc,maxDescriptorElementValue);
 	}
 
 	public double getPeriodRows() {

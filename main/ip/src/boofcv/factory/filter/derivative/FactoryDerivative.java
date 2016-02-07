@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,7 @@ import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 import java.lang.reflect.Method;
 
@@ -39,6 +36,101 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public class FactoryDerivative {
+
+	/**
+	 * Returns the gradient for single band images of the specified type
+	 * @param type Type of gradient
+	 * @param inputType Type of input image
+	 * @param derivType Type of gradient image.  null for default
+	 * @param <I> Input image
+	 * @param <D> Derivative image
+	 * @return gradient filter
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImageGradient<I,D> gradientSB( DerivativeType type , Class<I> inputType , Class<D> derivType )
+	{
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(inputType);
+
+		Class which;
+
+		switch( type ) {
+			case PREWITT:
+				which = GradientPrewitt.class;
+				break;
+
+			case SOBEL:
+				which = GradientSobel.class;
+				break;
+
+			case THREE:
+				which = GradientThree.class;
+				break;
+
+			case TWO_0:
+				which = GradientTwo0.class;
+				break;
+
+			case TWO_1:
+				which = GradientTwo1.class;
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown type "+type);
+		}
+
+		Method m = findDerivative(which,inputType,derivType);
+		return new ImageGradient_Reflection<I,D>(m);
+	}
+
+	/**
+	 * Filters for computing the gradient of {@link MultiSpectral} images.
+	 *
+	 * @param type Which gradient to compute
+	 * @param numBands Number of bands in the image
+	 * @param inputType Type of data on input
+	 * @param derivType Type of data on output (null for default)
+	 * @param <I> Image type
+	 * @param <D> Derivative type
+	 * @return the filter
+	 */
+	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	ImageGradient<MultiSpectral<I>,MultiSpectral<D>>
+	gradientMS(DerivativeType type , int numBands , Class<I> inputType , Class<D> derivType )
+	{
+		ImageGradient<I,D> g = gradientSB(type,inputType,derivType);
+		return new ImageGradient_MS<I, D>(g,numBands);
+	}
+
+
+	public static <I extends ImageBase, D extends ImageBase>
+	ImageGradient<I,D>
+	gradient(DerivativeType type , ImageType<I> inputType , ImageType<D> derivType )
+	{
+		if( derivType != null ) {
+			if( inputType.getFamily() != derivType.getFamily() )
+				throw new IllegalArgumentException("input and output must be of the same family");
+		}
+
+		switch( inputType.getFamily() ) {
+			case SINGLE_BAND: {
+				Class derivClass = derivType != null ? derivType.getImageClass() : null;
+				return gradientSB(type,inputType.getImageClass(),derivClass);
+			}
+
+			case MULTI_SPECTRAL: {
+				int numBands = inputType.getNumBands();
+				Class derivClass = derivType != null ? derivType.getImageClass() : null;
+				return gradientMS(type,numBands,inputType.getImageClass(),derivClass);
+			}
+
+			case INTERLEAVED:
+				throw new IllegalArgumentException("INTERLEAVED images not yet supported");
+
+			default:
+				throw new IllegalArgumentException("Unknown image type");
+		}
+	}
 
 	public static <I extends ImageSingleBand, D extends ImageSingleBand>
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)

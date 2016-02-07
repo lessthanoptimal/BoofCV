@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class DescribePointSift<Deriv extends ImageSingleBand> extends DescribeSi
 
 		computeRawDescriptor(c_x, c_y, sigma, orientation);
 
-		massageDescriptor(descriptor);
+		normalizeDescriptor(descriptor,maxDescriptorElementValue);
 	}
 
 	/**

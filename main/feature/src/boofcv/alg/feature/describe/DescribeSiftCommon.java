@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,12 @@ public class DescribeSiftCommon {
 	/**
 	 * Adjusts the descriptor.  This adds lighting invariance and reduces the affects of none-affine changes
 	 * in lighting.
+	 *
+	 * 1) Apply L2 normalization
+	 * 2) Clip using max descriptor value
+	 * 3) Apply L2 normalization again
 	 */
-	protected void massageDescriptor( TupleDesc_F64 descriptor ) {
+	public static void normalizeDescriptor(TupleDesc_F64 descriptor , double maxDescriptorElementValue ) {
 		// normalize descriptor to unit length
 		UtilFeature.normalizeL2(descriptor);
 

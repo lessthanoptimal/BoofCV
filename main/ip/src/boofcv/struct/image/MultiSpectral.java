@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
+// TODO Rename to ImagePlanar ?
 public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<MultiSpectral<T>>{
 
 	/**
