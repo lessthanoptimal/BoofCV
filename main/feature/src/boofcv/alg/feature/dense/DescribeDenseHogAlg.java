@@ -21,7 +21,10 @@ package boofcv.alg.feature.dense;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
 import boofcv.alg.filter.derivative.DerivativeType;
+import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -136,6 +139,17 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 						DescribeDenseHogAlg.this.widthBlock *DescribeDenseHogAlg.this.widthBlock);
 			}
 		};
+
+		computeCellWeights();
+	}
+
+	/**
+	 * Computes the value of weights inside of a block
+	 */
+	protected void computeCellWeights() {
+		Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian2D_F64(0.5*widthBlock,widthBlock/2,widthBlock%2==1,false);
+		KernelMath.normalizeMaxOne(kernel);
+		weights = kernel.data;
 	}
 
 	/**
@@ -175,6 +189,7 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 			cells = a;
 		}
 
+		//
 		computeCells(imageWidth,imageHeight);
 
 		int cellRowMax = cellRows - widthBlock;
@@ -197,8 +212,20 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	 * @param pixelY1 Pixel coordinate Y-axis upper extent
 	 * @param output List of descriptions
 	 */
-	public void getDescriptorsInRegion(int pixelX0 , int pixelY0 , int pixelX1 , int pixelY1 , List<TupleDesc_F64> output ) {
+	public void getDescriptorsInRegion(int pixelX0 , int pixelY0 , int pixelX1 , int pixelY1 ,
+									   List<TupleDesc_F64> output ) {
+		int gridX0 = (int)Math.ceil(pixelX0/(double)widthCell);
+		int gridY0 = (int)Math.ceil(pixelY0/(double)widthCell);
 
+		int gridX1 = pixelX1/widthCell - widthBlock;
+		int gridY1 = pixelY1/widthCell - widthBlock;
+
+		for (int y = gridY0; y <= gridY1; y++) {
+			int index = y*cellCols + gridX0;
+			for (int x = gridX0; x <= gridX1; x++) {
+				output.add( descriptions.get(index) );
+			}
+		}
 	}
 
 	/**

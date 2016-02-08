@@ -32,6 +32,11 @@ public class TestDescribeDenseHogAlg {
 	}
 
 	@Test
+	public void computeCellWeights() {
+		fail("Implement");
+	}
+
+	@Test
 	public void getDescriptorsInRegion() {
 		fail("Implement");
 	}

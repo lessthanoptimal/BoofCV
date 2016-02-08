@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -310,8 +310,30 @@ public class TestKernelMath {
 
 		double total = 2*9;
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 9; i++)
 			assertEquals(2.0 / total,kernel.data[i], 1e-8);
+	}
+
+	@Test
+	public void normalizeMaxOne_F64_2D() {
+		Kernel2D_F64 kernel = new Kernel2D_F64(3);
+		for (int i = 0; i < 9; i++)
+			kernel.data[i] = 2.0F*i;
+
+		KernelMath.normalizeMaxOne(kernel);
+
+		int N = kernel.width*kernel.width;
+
+		double max = 0;
+		int numZero = 0;
+		for (int i = 0; i < N; i++) {
+			max = Math.max(max,kernel.data[i]);
+			if( kernel.data[i] == 0 )
+				numZero++;
+		}
+
+		assertEquals(1,numZero);
+		assertEquals(1,max,1e-8);
 	}
 
 	@Test

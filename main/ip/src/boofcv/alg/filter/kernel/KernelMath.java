@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -428,6 +428,20 @@ public class KernelMath {
 		for (int i = 0; i < data.length; i++) norm += data[i]*data[i];
 		norm = Math.sqrt(norm);
 		for (int i = 0; i < data.length; i++) data[i] /= norm;
+	}
+
+	/**
+	 * Normalizes it such that the largest element is equal to one
+	 */
+	public static void normalizeMaxOne(Kernel2D_F64 kernel) {
+		double max = -Double.MAX_VALUE;
+		int N = kernel.width*kernel.width;
+		for (int i = 0; i < N; i++) {
+			max = Math.max(max,kernel.data[i]);
+		}
+		for (int i = 0; i < N; i++) {
+			kernel.data[i] /= max;
+		}
 	}
 
 	public static ImageFloat32 convertToImage( Kernel2D_F32 kernel ) {
