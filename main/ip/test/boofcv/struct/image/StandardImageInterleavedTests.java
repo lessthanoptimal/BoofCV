@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,13 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardImageInterleavedTests {
+public abstract class StandardImageInterleavedTests<T extends ImageInterleaved> {
 
 	public Random rand = new Random(234);
 
-	public abstract ImageInterleaved createImage(int width, int height, int numBands);
+	public abstract T createImage(int width, int height, int numBands);
+
+	public abstract T createImage();
 
 	public abstract Number randomNumber();
 
@@ -47,7 +49,7 @@ public abstract class StandardImageInterleavedTests {
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(ImageInterleaved img) {
+	public void setRandom(T img) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -62,7 +64,7 @@ public abstract class StandardImageInterleavedTests {
 	 */
 	@Test
 	public void isSubimage() {
-		ImageInterleaved a = createImage(10, 20, 3);
+		T a = createImage(10, 20, 3);
 
 		assertFalse(a.isSubimage());
 
@@ -75,7 +77,7 @@ public abstract class StandardImageInterleavedTests {
 	 */
 	@Test
 	public void get_set() {
-		ImageInterleaved img = createImage(10, 20, 3);
+		T img = createImage(10, 20, 3);
 		setRandom(img);
 
 		for( int y = 0; y < img.height; y++ ) {
@@ -99,7 +101,7 @@ public abstract class StandardImageInterleavedTests {
 	 */
 	@Test
 	public void getBand_setBand() {
-		ImageInterleaved img = createImage(10, 20, 2);
+		T img = createImage(10, 20, 2);
 		setRandom(img);
 
 		for( int y = 0; y < img.height; y++ ) {
@@ -125,7 +127,7 @@ public abstract class StandardImageInterleavedTests {
 	 */
 	@Test
 	public void accessorBounds() {
-		ImageInterleaved img = createImage(10, 20, 3);
+		T img = createImage(10, 20, 3);
 
 		checkBound(img, "get", 2, null);
 		checkBoundBand(img, "getBand", 0, null);
@@ -133,7 +135,7 @@ public abstract class StandardImageInterleavedTests {
 		checkBoundBand(img, "setBand", 1, randomNumber());
 	}
 
-	private void checkBound(ImageInterleaved img, String method,
+	private void checkBound(T img, String method,
 							int type, Object typeData) {
 		checkException(img, method, type, typeData, -1, 0);
 		checkException(img, method, type, typeData, 0, -1);
@@ -141,7 +143,7 @@ public abstract class StandardImageInterleavedTests {
 		checkException(img, method, type, typeData, 0, img.getHeight());
 	}
 
-	private void checkBoundBand(ImageInterleaved img, String method,
+	private void checkBoundBand(T img, String method,
 								int type, Object typeData) {
 		checkException(img, method, type, typeData, -1, 0, 0);
 		checkException(img, method, type, typeData, 0, -1, 0);
@@ -221,6 +223,33 @@ public abstract class StandardImageInterleavedTests {
 				return false;
 		}
 		return true;
+	}
+
+	@Test
+	public void setNumBands() {
+		T a = createImage(10, 20, 3);
+
+		a.setNumBands(2);
+
+		assertEquals(2,a.getNumBands());
+		assertEquals(2,a.getImageType().getNumBands());
+	}
+
+	@Test
+	public void checkImageTypeSet() {
+		T a = createImage(10, 20, 3);
+
+		assertTrue(a.getImageType() != null);
+		assertEquals(3,a.getImageType().getNumBands());
+	}
+
+	@Test
+	public void checkNoArgumentConstructor() {
+		T a = createImage();
+
+		assertTrue(a._getData() == null);
+		assertTrue(a.getPrimitiveDataType() != null);
+		assertTrue(a.getImageType() != null);
 	}
 
 }

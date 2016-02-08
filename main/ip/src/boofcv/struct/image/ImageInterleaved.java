@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,10 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 */
 	public int numBands;
 
+	{
+		this.imageType = (ImageType)ImageType.il(0, getClass());
+	}
+
 	/**
 	 * Creates a new image with all of its parameters initialized, including the
 	 * data array.
@@ -54,7 +58,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		this.numBands = numBands;
 		this.width = width;
 		this.height = height;
-		this.imageType = (ImageType)ImageType.il(numBands, getClass());
+		this.imageType.numBands = numBands;
 	}
 
 	protected ImageInterleaved() {
@@ -142,10 +146,11 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 
 	@Override
 	public int getNumBands() {
-		return numBands;
+		return imageType.getNumBands();
 	}
 
 	public final void setNumBands(int numBands) {
+		this.imageType.numBands = numBands;
 		this.numBands = numBands;
 	}
 

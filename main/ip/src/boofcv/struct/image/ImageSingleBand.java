@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,10 @@ import java.lang.reflect.Array;
 @SuppressWarnings({"unchecked"})
 public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBase<T> {
 
+	{
+		this.imageType = (ImageType)ImageType.single(getClass());
+	}
+
 	/**
 	 * Creates a new image with all of its parameters initialized, including the
 	 * data array.
@@ -77,7 +81,6 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		this.stride = width;
 		this.width = width;
 		this.height = height;
-		this.imageType = (ImageType)ImageType.single(getClass());
 	}
 
 	protected ImageSingleBand() {

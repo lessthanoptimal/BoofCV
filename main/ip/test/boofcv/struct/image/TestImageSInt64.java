@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,19 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt64 extends StandardSingleBandTests {
+public class TestImageSInt64 extends StandardSingleBandTests<ImageSInt64> {
 
 	public TestImageSInt64() {
 	}
 
 	@Override
-	public ImageSingleBand createImage(int width, int height) {
+	public ImageSInt64 createImage(int width, int height) {
 		return new ImageSInt64(width, height);
+	}
+
+	@Override
+	public ImageSInt64 createImage() {
+		return new ImageSInt64();
 	}
 
 	@Override

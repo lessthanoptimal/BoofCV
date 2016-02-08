@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,6 @@ public class TestConvertBufferedImage {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-
 	@Test
 	public void checkInputs() {
 		BufferedImage found;
@@ -79,6 +78,8 @@ public class TestConvertBufferedImage {
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
 		assertEquals(3, found.numBands);
+		assertEquals(3, found.getImageType().getNumBands());
+
 		assertTrue(found.data != null);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
 
@@ -95,7 +96,7 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test(expected=IllegalArgumentException.class)
-	public void extractInterlacedInt8_indexed() {
+	public void extractInterleavedInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
 		ConvertBufferedImage.extractInterleavedU8(origImg);

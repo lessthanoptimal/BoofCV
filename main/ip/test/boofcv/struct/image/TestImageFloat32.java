@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,17 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageFloat32 extends StandardSingleBandTests {
+public class TestImageFloat32 extends StandardSingleBandTests<ImageFloat32> {
 
 
 	@Override
-	public ImageSingleBand createImage(int width, int height) {
+	public ImageFloat32 createImage(int width, int height) {
 		return new ImageFloat32(width, height);
+	}
+
+	@Override
+	public ImageFloat32 createImage() {
+		return new ImageFloat32();
 	}
 
 	@Override

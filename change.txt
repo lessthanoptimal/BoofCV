@@ -12,6 +12,10 @@ Version : Alpha 0.22
 - CameraCalibration
   * Made internal data structures and function protected to make it easier to extend by an external class
   * Fixed bug where visualization artifacts were being saved to disk
+- No argument constructor in most image types
+  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+- Fixed bug in ConvertBufferedImage.extract where number of bands in interleaved images was not being set in ImageType
+  * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
 
 - TODO Automate fault detection from regression tests
 - TODO Regression test for dense image descriptors

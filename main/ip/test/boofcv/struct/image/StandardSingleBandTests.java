@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,18 +38,20 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardSingleBandTests {
+public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 
 	public Random rand = new Random(234);
 
-	public abstract ImageSingleBand createImage(int width, int height);
+	public abstract T createImage(int width, int height);
+
+	public abstract T createImage();
 
 	public abstract Number randomNumber();
 
 	/**
 	 * Sets each element in the image to a random value.
 	 */
-	public void setRandom(ImageSingleBand img) {
+	public void setRandom(T img) {
 		Object data = img._getData();
 
 		int N = Array.getLength(data);
@@ -63,7 +65,7 @@ public abstract class StandardSingleBandTests {
 	 */
 	@Test
 	public void get_set() {
-		ImageSingleBand img = createImage(10, 20);
+		T img = createImage(10, 20);
 		setRandom(img);
 
 		Number expected = randomNumber();
@@ -90,7 +92,7 @@ public abstract class StandardSingleBandTests {
 	 */
 	@Test
 	public void unsafe_get_set() {
-		ImageSingleBand img = createImage(10, 20);
+		T img = createImage(10, 20);
 		setRandom(img);
 
 		Number expected = randomNumber();
@@ -182,10 +184,10 @@ public abstract class StandardSingleBandTests {
 	
 	@Test
 	public void subimage() {
-		ImageSingleBand img = createImage(10, 20);
+		T img = createImage(10, 20);
 		setRandom(img);
 		
-		ImageSingleBand sub = img.subimage(2,3,3,5, null);
+		T sub = (T)img.subimage(2,3,3,5, null);
 
 		assertTrue(img.getImageType() == sub.getImageType());
 		assertEquals(1, sub.getWidth());
@@ -254,5 +256,13 @@ public abstract class StandardSingleBandTests {
 				assertEquals(valA, valB, 1e-8);
 			}
 		}
+	}
+
+	@Test
+	public void checkNoArgumentConstructor() {
+		ImageSingleBand a = createImage();
+
+		assertTrue(a._getData() == null);
+		assertTrue(a.getImageType() != null);
 	}
 }

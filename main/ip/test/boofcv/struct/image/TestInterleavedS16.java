@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,17 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestInterleavedS16 extends StandardImageInterleavedTests {
+public class TestInterleavedS16 extends StandardImageInterleavedTests<InterleavedS16> {
 
 
 	@Override
-	public ImageInterleaved createImage(int width, int height, int numBands) {
+	public InterleavedS16 createImage(int width, int height, int numBands) {
 		return new InterleavedS16(width, height, numBands);
+	}
+
+	@Override
+	public InterleavedS16 createImage() {
+		return new InterleavedS16();
 	}
 
 	@Override

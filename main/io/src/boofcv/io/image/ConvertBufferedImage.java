@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class ConvertBufferedImage {
 			ret.height = img.getHeight();
 			ret.stride = raster.getScanlineStride();
 			ret.startIndex = raster.getDataOffset(0)-raster.getPixelStride()+1;
-			ret.numBands = raster.getNumBands();
+			ret.setNumBands( raster.getNumBands() );
 			ret.data = raster.getDataStorage();
 
 			return ret;
