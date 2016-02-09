@@ -171,10 +171,27 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		locations.reset();
 		descriptions.reset();
 
-		int imageWidth = derivX.width;
-		int imageHeight = derivX.height;
-
 		// see if the cell array needs to grow for this image.  Recycle data when growing
+		growCellArray(derivX.width, derivX.height);
+
+		computeCellHistograms();
+
+		int cellRowMax = cellRows - widthBlock;
+		int cellColMax = cellCols - widthBlock;
+
+		for (int i = 0; i < cellRowMax; i++) {
+			for (int j = 0; j < cellColMax; j++) {
+				computeDescriptor(i,j);
+			}
+		}
+
+	}
+
+	/**
+	 * Determines if the cell array needs to grow.  If it does a new array is declared.  Old data is recycled when
+	 * possible
+	 */
+	void growCellArray(int imageWidth, int imageHeight) {
 		cellRows = imageWidth/ widthCell;
 		cellCols = imageHeight/ widthCell;
 
@@ -188,19 +205,6 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 			}
 			cells = a;
 		}
-
-		//
-		computeCells(imageWidth,imageHeight);
-
-		int cellRowMax = cellRows - widthBlock;
-		int cellColMax = cellCols - widthBlock;
-
-		for (int i = 0; i < cellRowMax; i++) {
-			for (int j = 0; j < cellColMax; j++) {
-				computeDescriptor(i,j);
-			}
-		}
-
 	}
 
 	/**
@@ -259,12 +263,13 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 
 	/**
 	 * Compute histograms for all the cells inside the image using precomputed derivative.
-	 *
-	 *
-	 * @param width image width
-	 * @param height image height
+
 	 */
-	void computeCells( int width , int height ) {
+	void computeCellHistograms() {
+
+		int width = cellCols*widthCell;
+		int height = cellRows*widthCell;
+
 		float angleBinSize = GrlConstants.F_PI/orientationBins;
 
 		int indexCell = 0;
@@ -287,12 +292,12 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 
 						// Add the weighted gradient using bilinear interpolation
 						float findex0 = angle/angleBinSize;
-						int index0 = ((int)findex0)%orientationBins;
+						int index0 = (int)findex0;
 						int index1 = (index0+1)%orientationBins;
 
-						float weight1 = (findex0-index0)/angleBinSize;
+						float weight1 = findex0-index0;
 
-						c.histogram[index0] = magnitude*(1.0f-weight1);
+						c.histogram[index0%orientationBins] = magnitude*(1.0f-weight1);
 						c.histogram[index1] = magnitude*weight1;
 					}
 				}
