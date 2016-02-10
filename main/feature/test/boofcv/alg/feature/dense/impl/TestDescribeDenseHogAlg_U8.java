@@ -18,8 +18,20 @@
 
 package boofcv.alg.feature.dense.impl;
 
+import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.ImageUInt8;
+
 /**
  * @author Peter Abeles
  */
 public class TestDescribeDenseHogAlg_U8 extends GenericDescribeDenseHogAlgChecks {
+	public TestDescribeDenseHogAlg_U8() {
+		super(ImageType.single(ImageUInt8.class));
+	}
+
+	@Override
+	public DescribeDenseHogAlg<ImageUInt8,?> createAlg(int orientationBins, int widthCell, int widthBlock , int stepBlock) {
+		return new DescribeDenseHogAlg_U8(orientationBins,widthCell,widthBlock,stepBlock);
+	}
 }

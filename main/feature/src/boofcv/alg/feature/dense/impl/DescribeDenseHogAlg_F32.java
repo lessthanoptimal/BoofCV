@@ -28,12 +28,12 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class DescribeDenseHogAlg_F32 extends DescribeDenseHogAlg<ImageFloat32,ImageFloat32> {
-	public DescribeDenseHogAlg_F32(int orientationBins, int widthCell, int widthBlock) {
-		super(orientationBins, widthCell, widthBlock, ImageType.single(ImageFloat32.class));
+	public DescribeDenseHogAlg_F32(int orientationBins, int widthCell, int widthBlock, int stepBlock) {
+		super(orientationBins, widthCell, widthBlock, stepBlock, ImageType.single(ImageFloat32.class));
 	}
 
 	@Override
-	protected void computeDerivative(int pixelIndex) {
+	public void computeDerivative(int pixelIndex) {
 		pixelDX = derivX.data[pixelIndex];
 		pixelDY = derivY.data[pixelIndex];
 	}

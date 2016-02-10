@@ -34,20 +34,20 @@ public class DescribeDenseHogAlg_MSU8 extends DescribeDenseHogAlg
 {
 	int numBands;
 
-	public DescribeDenseHogAlg_MSU8(int orientationBins, int widthCell, int widthBlock, int numBands ) {
-		super(orientationBins, widthCell, widthBlock, ImageType.ms(numBands,ImageUInt8.class));
+	public DescribeDenseHogAlg_MSU8(int orientationBins, int widthCell, int widthBlock, int stepBlock, int numBands ) {
+		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.ms(numBands,ImageUInt8.class));
 		this.numBands = numBands;
 	}
 
 	@Override
-	protected void computeDerivative(int pixelIndex) {
+	public void computeDerivative(int pixelIndex) {
 
 		float maxDX=0,maxDY=0;
 		float maxNorm = 0;
 
 		for (int i = 0; i < numBands; i++) {
 			float dx = derivX.bands[i].data[pixelIndex];
-			float dy = derivX.bands[i].data[pixelIndex];
+			float dy = derivY.bands[i].data[pixelIndex];
 
 			float n = dx*dx + dy*dy;
 			if( n > maxNorm ) {

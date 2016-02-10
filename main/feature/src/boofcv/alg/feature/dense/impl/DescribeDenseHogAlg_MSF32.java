@@ -35,20 +35,20 @@ public class DescribeDenseHogAlg_MSF32 extends DescribeDenseHogAlg
 		<MultiSpectral<ImageFloat32>,MultiSpectral<ImageFloat32>>
 {
 	int numBands;
-	public DescribeDenseHogAlg_MSF32(int orientationBins, int widthCell, int widthBlock, int numBands ) {
-		super(orientationBins, widthCell, widthBlock, ImageType.ms(numBands,ImageFloat32.class));
+	public DescribeDenseHogAlg_MSF32(int orientationBins, int widthCell, int widthBlock, int stepBlock, int numBands ) {
+		super(orientationBins, widthCell, widthBlock, stepBlock , ImageType.ms(numBands,ImageFloat32.class));
 		this.numBands = numBands;
 	}
 
 	@Override
-	protected void computeDerivative(int pixelIndex) {
+	public void computeDerivative(int pixelIndex) {
 
 		float maxDX=0,maxDY=0;
 		float maxNorm = 0;
 
 		for (int i = 0; i < numBands; i++) {
 			float dx = derivX.bands[i].data[pixelIndex];
-			float dy = derivX.bands[i].data[pixelIndex];
+			float dy = derivY.bands[i].data[pixelIndex];
 
 			float n = dx*dx + dy*dy;
 			if( n > maxNorm ) {

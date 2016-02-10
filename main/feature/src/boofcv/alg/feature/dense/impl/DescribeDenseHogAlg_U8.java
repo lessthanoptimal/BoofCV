@@ -29,12 +29,12 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class DescribeDenseHogAlg_U8 extends DescribeDenseHogAlg<ImageUInt8,ImageSInt16> {
-	public DescribeDenseHogAlg_U8(int orientationBins, int widthCell, int widthBlock) {
-		super(orientationBins, widthCell, widthBlock, ImageType.single(ImageUInt8.class));
+	public DescribeDenseHogAlg_U8(int orientationBins, int widthCell, int widthBlock, int stepBlock) {
+		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.single(ImageUInt8.class));
 	}
 
 	@Override
-	protected void computeDerivative(int pixelIndex) {
+	public void computeDerivative(int pixelIndex) {
 		pixelDX = derivX.data[pixelIndex];
 		pixelDY = derivY.data[pixelIndex];
 	}

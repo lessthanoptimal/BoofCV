@@ -96,6 +96,7 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	int orientationBins; // number of orientation bins computed in a block
 	int widthCell; // number of pixels wide a cell is
 	int widthBlock;  // number of cells wide a block is
+	int stepBlock; // how many cells are skipped between a block
 
 	// storage for histograms in each cell
 	Cell cells[] = new Cell[0];
@@ -117,10 +118,15 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
 	 * @param widthCell Number of pixel's wide a cell is.  8 recommended
 	 * @param widthBlock Number of cells
+	 * @param stepBlock Number of cells which are skipped between each block
 	 */
 	public DescribeDenseHogAlg(int orientationBins , int widthCell , int widthBlock ,
+							   int stepBlock ,
 							   ImageType<Input> imageType )
 	{
+		if( stepBlock <= 0 )
+			throw new IllegalArgumentException("stepBlock must be >= 1");
+
 		this.imageType = imageType;
 		gradient = FactoryDerivative.gradient(DerivativeType.THREE,imageType,null);
 		ImageType<Derivative> derivType = gradient.getDerivativeType();
@@ -131,6 +137,7 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		this.orientationBins = orientationBins;
 		this.widthCell = widthCell;
 		this.widthBlock = widthBlock;
+		this.stepBlock = stepBlock;
 
 		descriptions = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override
@@ -176,11 +183,11 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 
 		computeCellHistograms();
 
-		int cellRowMax = cellRows - widthBlock;
-		int cellColMax = cellCols - widthBlock;
+		int cellRowMax = (cellRows - (widthBlock-1));
+		int cellColMax = (cellCols - (widthBlock-1));
 
-		for (int i = 0; i < cellRowMax; i++) {
-			for (int j = 0; j < cellColMax; j++) {
+		for (int i = 0; i < cellRowMax; i += stepBlock) {
+			for (int j = 0; j < cellColMax; j += stepBlock) {
 				computeDescriptor(i,j);
 			}
 		}
@@ -192,8 +199,8 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	 * possible
 	 */
 	void growCellArray(int imageWidth, int imageHeight) {
-		cellRows = imageWidth/ widthCell;
-		cellCols = imageHeight/ widthCell;
+		cellCols = imageWidth/ widthCell;
+		cellRows = imageHeight/ widthCell;
 
 		if( cellRows*cellCols > cells.length ) {
 			Cell[] a = new Cell[cellCols*cellRows];
@@ -226,20 +233,20 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 
 		for (int y = gridY0; y <= gridY1; y++) {
 			int index = y*cellCols + gridX0;
-			for (int x = gridX0; x <= gridX1; x++) {
-				output.add( descriptions.get(index) );
+			for (int x = gridX0; x <= gridX1; x++ ) {
+				output.add( descriptions.get(index++) );
 			}
 		}
 	}
 
 	/**
 	 * Compute the descriptor from the specified cells.  (row,col) to (row+w,col+w)
-	 * @param row Lower extent of rows
-	 * @param col Lower extent of columns
+	 * @param row Lower extent of cell rows
+	 * @param col Lower extent of cell columns
 	 */
-	private void computeDescriptor(int row, int col) {
+	void computeDescriptor(int row, int col) {
 		// set location to top-left pixel
-		locations.grow().set(row*widthCell,col*widthCell);
+		locations.grow().set(col*widthCell,row*widthCell);
 
 		TupleDesc_F64 d = descriptions.grow();
 
@@ -308,7 +315,7 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	/**
 	 * Computes and stores the gradient at the specified pixel.  pixelIndex = y*columns + x
 	 */
-	protected abstract void computeDerivative( int pixelIndex );
+	public abstract void computeDerivative( int pixelIndex );
 
 	/**
 	 * List of locations for each descriptor.
@@ -322,6 +329,22 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	 */
 	public FastQueue<TupleDesc_F64> getDescriptions() {
 		return descriptions;
+	}
+
+	public Derivative _getDerivX() {
+		return derivX;
+	}
+
+	public Derivative _getDerivY() {
+		return derivY;
+	}
+
+	public float _getPixelDX() {
+		return pixelDX;
+	}
+
+	public float _getPixelDY() {
+		return pixelDY;
 	}
 
 	/**
