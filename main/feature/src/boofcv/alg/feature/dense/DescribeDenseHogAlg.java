@@ -359,6 +359,10 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return imageType;
 	}
 
+	public TupleDesc_F64 createDescription() {
+		return new TupleDesc_F64(orientationBins*widthBlock*widthBlock);
+	}
+
 	static class Cell
 	{
 		float histogram[];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	@Override
 	public void process(T input ) {
 		if( periodX <= 0 || periodY <= 0 )
-			throw new IllegalArgumentException("Must call configure(0 first");
+			throw new IllegalArgumentException("Must call configure() first");
 
 		alg.setImage(input);
 
