@@ -41,17 +41,8 @@ public class DescribeImageDenseHoG<T extends ImageBase> implements DescribeImage
 		this.hog = hog;
 	}
 
-	// TODO remove period from interface.
-	// TODO rescale the image
-	@Override
-	public void configure(double descriptorScale, double periodX, double periodY) {
-
-	}
-
 	@Override
 	public void process(T input) {
-
-		// TODO handle scaling
 		hog.setInput(input);
 		hog.process();
 

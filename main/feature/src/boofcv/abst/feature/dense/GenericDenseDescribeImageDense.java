@@ -54,13 +54,22 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	/**
 	 * Configures dense description.
 	 * @param alg Sparse feature sampler.
+	 * @param scaleToRadius Conversion between requested descriptor scale to its actual radius
+	 * @param descriptorScale Relative scale of the descriptor's region
+	 * @param samplePeriodX How frequently the image is sampled in pixels. X-axis
+	 * @param samplePeriodY How frequently the image is sampled in pixels. Y-axis
 	 */
-	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg,double scaleToRadius) {
+	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg,
+										  double scaleToRadius,
+										  double descriptorScale,
+										  double samplePeriodX ,
+										  double samplePeriodY ) {
 		this.scaleToRadius = scaleToRadius;
 		this.alg = alg;
+
+		configure(descriptorScale,samplePeriodX,samplePeriodY);
 	}
 
-	@Override
 	public void configure( double scale , double periodX, double periodY) {
 		this.radius = scale*scaleToRadius;
 		this.periodX = (int)(periodX+0.5);

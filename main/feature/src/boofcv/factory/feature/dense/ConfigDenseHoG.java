@@ -25,7 +25,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigFeatureHoG implements Configuration {
+public class ConfigDenseHoG implements Configuration {
 
 	/**
 	 * Number of orientation bins.
@@ -38,7 +38,7 @@ public class ConfigFeatureHoG implements Configuration {
 	/**
 	 * Number of cells wide a block is
 	 */
-	public int widthBlock = 2;
+	public int widthBlock = 3;
 	/**
 	 * Number of cells that are skipped between two blocks.
 	 */

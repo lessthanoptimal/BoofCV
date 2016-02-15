@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,8 +45,7 @@ public class TestGenericDenseDescribeImage {
 	public void process() {
 		DummyFeature sparse = new DummyFeature();
 
-		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1);
-		alg.configure(1.5,3,4);
+		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1.5,3,4);
 
 		ImageUInt8 image = new ImageUInt8(100,110);
 
@@ -82,6 +81,35 @@ public class TestGenericDenseDescribeImage {
 				count++;
 			}
 		}
+	}
+
+	@Test
+	public void checkDescriptorScale() {
+		DummyFeature sparse = new DummyFeature();
+
+		ImageUInt8 image = new ImageUInt8(100,110);
+
+		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1,8,9);
+
+		alg.configure(1, 8, 9);
+		alg.process(image);
+		int found10 = alg.getDescriptions().size();
+
+		alg.configure(1.5, 8, 9);
+		alg.process(image);
+		int found15 = alg.getDescriptions().size();
+
+		alg.configure(0.75, 8, 9);
+		alg.process(image);
+		int found07a = alg.getDescriptions().size();
+
+		alg.configure(0.75, 8*0.75, 9*0.75);
+		alg.process(image);
+		int found07b = alg.getDescriptions().size();
+
+		assertTrue(found07a == found10);
+		assertTrue(found07b > found10);
+		assertTrue(found10 > found15);
 	}
 
 	public static class DummyFeature implements DescribeRegionPoint {

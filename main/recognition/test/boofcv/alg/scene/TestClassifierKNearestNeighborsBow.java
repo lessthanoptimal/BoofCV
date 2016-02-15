@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,11 +115,6 @@ public class TestClassifierKNearestNeighborsBow {
 	protected class DummyDense implements DescribeImageDense {
 
 		List<TupleDesc> descriptions = new ArrayList<TupleDesc>();
-
-		@Override
-		public void configure(double descriptorScale, double periodX, double periodY) {
-
-		}
 
 		@Override
 		public void process(ImageBase input) {

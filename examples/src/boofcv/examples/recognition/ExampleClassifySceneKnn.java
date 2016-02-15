@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.bow.LearnSceneFromFiles;
 import boofcv.alg.scene.ClassifierKNearestNeighborsBow;
 import boofcv.alg.scene.FeatureToWordHistogram_F64;
 import boofcv.alg.scene.HistogramScene;
-import boofcv.factory.feature.dense.FactoryDescribeImageDense;
+import boofcv.factory.feature.dense.*;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.learning.ConfusionMatrixPanel;
 import boofcv.io.UtilIO;
@@ -229,13 +229,16 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	public static void main(String[] args) {
 
-		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
-				FactoryDescribeImageDense.surfFast(null, ImageUInt8.class);
-//				FactoryDescribeImageDense.surfStable(null, ImageUInt8.class);
-		desc.configure(1, 8, 8);
+		ConfigDenseSurfFast surfFast = new ConfigDenseSurfFast(new DenseSampling(8,8));
+		ConfigDenseSurfStable surfStable = new ConfigDenseSurfStable(new DenseSampling(8,8));
+		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
+		ConfigDenseHoG hog = new ConfigDenseHoG();
 
-//				FactoryDescribeImageDense.sift(null, ImageUInt8.class);
-//		desc.configure(1, 6, 6);
+		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
+				FactoryDescribeImageDense.surfFast(surfFast, ImageUInt8.class);
+//				FactoryDescribeImageDense.surfStable(surfStable, ImageUInt8.class);
+//				FactoryDescribeImageDense.sift(sift, ImageUInt8.class);
+//				FactoryDescribeImageDense.hog(hog, ImageType.single(ImageUInt8.class));
 
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
@@ -271,6 +274,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// For SIFT descriptor the accuracy is          54.0%
 		// For  "fast"  SURF descriptor the accuracy is 52.2%
 		// For "stable" SURF descriptor the accuracy is 49.4%
+		// For HOG                                      52.4%
 
 		// SURF results are interesting. "Stable" is significantly better than "fast"!
 		// One explanation is that the descriptor for "fast" samples a smaller region than "stable", by a

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,19 +39,6 @@ import java.util.List;
 public interface DescribeImageDense<T extends ImageBase, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
-	/**
-	 * <p>Configures how features are sampled across the image.</p>
-	 *
-	 * NOTE: The specific implementation is allowed to tweak these numbers.  The period might be adjusted to ensure
-	 * an even sampling across the entire image is done.
-	 *
-	 * @param descriptorScale Scales the size of the region the descriptor is computed up or down, e.g. 2 = twice as
-	 *                        large.  Try 1.0
-	 * @param periodX Pixels between samples along x-axis
-	 * @param periodY Pixels between samples along y-axis
-	 */
-	void configure( double descriptorScale , double periodX , double periodY );
-
 	/**
 	 * Processes the image and computes the dense image features.
 	 *

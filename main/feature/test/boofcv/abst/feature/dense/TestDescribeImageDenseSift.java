@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.abst.feature.dense;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.dense.ConfigDenseSift;
+import boofcv.factory.feature.dense.DenseSampling;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageFloat32;
@@ -49,38 +51,8 @@ public class TestDescribeImageDenseSift {
 	int widthScaleOne;
 
 	public TestDescribeImageDenseSift() {
-		DescribeImageDenseSift alg = createAlg(ImageUInt8.class);
+		DescribeImageDenseSift alg = createAlg(ImageUInt8.class,5,5);
 		widthScaleOne = alg.getAlg().getCanonicalRadius()*2;
-	}
-
-	@Test
-	public void checkDescriptorScale() {
-		for (Class type : imageTypes) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type, width, height);
-			GImageMiscOps.fillUniform(image, rand, 0, 200);
-
-			DescribeImageDense alg = createAlg(type);
-
-			alg.configure(1, 8, 9);
-			alg.process(image);
-			int found10 = alg.getDescriptions().size();
-
-			alg.configure(1.5, 8, 9);
-			alg.process(image);
-			int found15 = alg.getDescriptions().size();
-
-			alg.configure(0.75, 8, 9);
-			alg.process(image);
-			int found07a = alg.getDescriptions().size();
-
-			alg.configure(0.75, 8*0.75, 9*0.75);
-			alg.process(image);
-			int found07b = alg.getDescriptions().size();
-
-			assertTrue(found07a == found10);
-			assertTrue(found07b > found10);
-			assertTrue(found10 > found15);
-		}
 	}
 
 	/**
@@ -92,9 +64,7 @@ public class TestDescribeImageDenseSift {
 			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type,width,height);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
-			DescribeImageDense alg = createAlg(type);
-
-			alg.configure(1,8,9);
+			DescribeImageDense alg = createAlg(type,8,9);
 
 			alg.process(image);
 
@@ -122,9 +92,7 @@ public class TestDescribeImageDenseSift {
 			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type,width,height);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
-			DescribeImageDense alg = createAlg(type);
-
-			alg.configure(1,8,9);
+			DescribeImageDense alg = createAlg(type,8,9);
 
 			alg.process(image);
 
@@ -144,8 +112,11 @@ public class TestDescribeImageDenseSift {
 		}
 	}
 
-	private <T extends DescribeImageDense> T createAlg( Class imageType ) {
-		return (T)FactoryDescribeImageDense.sift(null,imageType);
+	private <T extends DescribeImageDense> T createAlg( Class imageType , double periodX , double periodY  ) {
+
+		ConfigDenseSift config = new ConfigDenseSift(new DenseSampling(periodX,periodY));
+
+		return (T)FactoryDescribeImageDense.sift(config,imageType);
 	}
 
 	private TupleDesc_F64 describe( int x , int y , ImageSingleBand image , DescribeImageDense alg ) {
