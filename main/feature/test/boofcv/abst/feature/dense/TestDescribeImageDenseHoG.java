@@ -18,16 +18,69 @@
 
 package boofcv.abst.feature.dense;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.feature.dense.ConfigDenseHoG;
+import boofcv.factory.feature.dense.FactoryDescribeImageDense;
+import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.List;
+import java.util.Random;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestDescribeImageDenseHoG {
+
+	int width = 120;
+	int height = 90;
+
+	Random rand = new Random(234);
+
+	ImageType imageTypes[] = new ImageType[]{
+			ImageType.single(ImageUInt8.class), ImageType.single(ImageFloat32.class),
+			ImageType.ms(2, ImageDataType.U8),ImageType.ms(2, ImageDataType.F32) };
+
+	/**
+	 * Checks to see if valid locations are returned.  Very simple test.  Can't test descriptor correctness since
+	 * there isn't a sparse HOG yet.
+	 */
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void checkSampleLocations() {
+		ConfigDenseHoG config = new ConfigDenseHoG();
+
+		int offX = config.widthCell*config.widthBlock/2;
+		int offY = config.widthCell*config.widthBlock/2;
+		int stride = config.widthCell*config.stepBlock;
+
+		for( ImageType type : imageTypes ) {
+			ImageBase image = type.createImage(width,height);
+			GImageMiscOps.fillUniform(image,rand,0,200);
+
+			DescribeImageDense alg = createAlg(type,config);
+
+			alg.process(image);
+
+			List<Point2D_I32> locations = alg.getLocations();
+
+			assertTrue(locations.size() > 0 );
+			assertEquals(locations.size(),alg.getDescriptions().size());
+
+			for( int i = 0; i < locations.size(); i++ ) {
+				Point2D_I32 p = locations.get(i);
+
+				// see if the feature lies on a grid that's at the descriptor region's center
+				assertEquals( 0 , (p.x-offX)%stride );
+				assertEquals( 0 , (p.y-offY)%stride );
+			}
+		}
+	}
+
+	private <T extends DescribeImageDense> T createAlg( ImageType imageType , ConfigDenseHoG config ) {
+		return (T) FactoryDescribeImageDense.hog(config,imageType);
 	}
 }

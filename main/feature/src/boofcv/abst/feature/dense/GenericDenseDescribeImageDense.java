@@ -70,11 +70,18 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 		configure(descriptorScale,samplePeriodX,samplePeriodY);
 	}
 
-	public void configure( double scale , double periodX, double periodY) {
-		this.radius = scale*scaleToRadius;
+	/**
+	 * Configures size of the descriptor and the frequency at which it's computed
+	 *
+	 * @param descriptorRegionScale Relative size of the descriptor region to its canonical size
+	 * @param periodX Period in pixels along x-axis of samples
+	 * @param periodY Period in pixels along y-axis of samples
+	 */
+	public void configure( double descriptorRegionScale , double periodX, double periodY) {
+		this.radius = descriptorRegionScale*scaleToRadius;
 		this.periodX = (int)(periodX+0.5);
 		this.periodY = (int)(periodY+0.5);
-		this.featureWidth = (int)(alg.getCanonicalWidth()*scale + 0.5);
+		this.featureWidth = (int)(alg.getCanonicalWidth()*descriptorRegionScale + 0.5);
 
 		descriptions = new FastQueue<Desc>(alg.getDescriptionType(),true) {
 			@Override

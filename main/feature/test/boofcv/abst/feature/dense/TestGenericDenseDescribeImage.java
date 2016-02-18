@@ -107,9 +107,11 @@ public class TestGenericDenseDescribeImage {
 		alg.process(image);
 		int found07b = alg.getDescriptions().size();
 
+		// same sampling period, should have same number of samples
 		assertTrue(found07a == found10);
+		assertTrue(found10 == found15);
+		// sampling period is shorter so there should be more features
 		assertTrue(found07b > found10);
-		assertTrue(found10 > found15);
 	}
 
 	public static class DummyFeature implements DescribeRegionPoint {
@@ -123,6 +125,7 @@ public class TestGenericDenseDescribeImage {
 		@Override
 		public void setImage(ImageBase image) {
 			this.image = image;
+			count = 0;
 		}
 
 		@Override
