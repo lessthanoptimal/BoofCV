@@ -36,6 +36,7 @@ public class VisualizeHogCells {
 	float cos[],sin[];
 
 	boolean localMax = false;
+	boolean showGrid = false;
 
 	public VisualizeHogCells(DescribeDenseHogAlg<?,?> hog , boolean logIntensity ) {
 
@@ -81,9 +82,30 @@ public class VisualizeHogCells {
 	public void render( Graphics2D g2 ) {
 
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+
+
+		if( showGrid ) {
+			int cell = hog.getWidthCell();
+			int rows = hog.getCellRows();
+			int cols = hog.getCellCols();
+			int width = cell*cols;
+			int height = cell*rows;
+
+			g2.setColor(new Color(150, 150, 0));
+			g2.setStroke(new BasicStroke(1));
+
+			for (int i = 0; i < rows; i++) {
+				g2.drawLine(0,i*cell,width,i*cell);
+			}
+			for (int i = 0; i < cols; i++) {
+				g2.drawLine(i*cell,0,i*cell,height);
+			}
+
+		}
+
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(1));
-
 		if( localMax ) {
 			local(g2);
 		} else {
@@ -100,7 +122,7 @@ public class VisualizeHogCells {
 
 		int numAngles = hog.getOrientationBins();
 
-		float r = cell/2;
+		float r = cell/2-1;
 
 		Line2D.Float line = new Line2D.Float();
 
@@ -122,10 +144,10 @@ public class VisualizeHogCells {
 
 					g2.setColor(colors[a]);
 
-					float x0 = c_x - r * cos[i] + 0.5f;
-					float x1 = c_x + r * cos[i] + 0.5f;
-					float y0 = c_y - r * sin[i] + 0.5f;
-					float y1 = c_y + r * sin[i] + 0.5f;
+					float x0 = c_x - r * cos[i];
+					float x1 = c_x + r * cos[i];
+					float y0 = c_y - r * sin[i];
+					float y1 = c_y + r * sin[i];
 
 					line.setLine(x0, y0, x1, y1);
 					g2.draw(line);
@@ -144,6 +166,7 @@ public class VisualizeHogCells {
 		int numAngles = hog.getOrientationBins();
 
 		float r = cell/2;
+		float foo = cell/2-2;
 
 		float maxValue = 0;
 		for (int y = 0; y < rows; y++) {
@@ -154,8 +177,6 @@ public class VisualizeHogCells {
 				}
 			}
 		}
-
-		System.out.println("max value "+maxValue);
 
 		Line2D.Float line = new Line2D.Float();
 
@@ -172,10 +193,10 @@ public class VisualizeHogCells {
 
 					g2.setColor(colors[a]);
 
-					float x0 = c_x - r * cos[i] + 0.5f;
-					float x1 = c_x + r * cos[i] + 0.5f;
-					float y0 = c_y - r * sin[i] + 0.5f;
-					float y1 = c_y + r * sin[i] + 0.5f;
+					float x0 = c_x - foo * cos[i];
+					float x1 = c_x + foo * cos[i];
+					float y0 = c_y - foo * sin[i];
+					float y1 = c_y + foo * sin[i];
 
 					line.setLine(x0, y0, x1, y1);
 					g2.draw(line);
@@ -190,5 +211,13 @@ public class VisualizeHogCells {
 
 	public void setLocalMax(boolean localMax) {
 		this.localMax = localMax;
+	}
+
+	public boolean isShowGrid() {
+		return showGrid;
+	}
+
+	public void setShowGrid(boolean showGrid) {
+		this.showGrid = showGrid;
 	}
 }

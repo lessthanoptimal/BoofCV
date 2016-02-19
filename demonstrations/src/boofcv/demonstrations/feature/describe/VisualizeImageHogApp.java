@@ -30,6 +30,8 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -39,7 +41,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO add ability to control visualization options
-	// TODo change HOG cell size
+	// TODO change HOG cell size
+	// TODO render grid overlay
 public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBase<T> {
 
 	DescribeDenseHogAlg<T,?> hog;
@@ -57,6 +60,35 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		visualizers.setLocalMax(false);
 
 		add(imagePanel,BorderLayout.CENTER);
+
+		imagePanel.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int row = e.getY()/hog.getWidthCell();
+				int col = e.getX()/hog.getWidthCell();
+
+				if( row >= 0 && col >= 0 && row < hog.getCellRows() &&  col < hog.getCellCols() ) {
+					DescribeDenseHogAlg.Cell c = hog.getCell(row,col);
+					System.out.print("Cell["+row+" , "+col+"] histogram =");
+					for (int i = 0; i < c.histogram.length; i++) {
+						System.out.print("  "+c.histogram[i]);
+					}
+					System.out.println();
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+		});
 	}
 
 	@Override

@@ -300,14 +300,15 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 						// Add the weighted gradient using bilinear interpolation
 						float findex0 = angle/angleBinSize;
 						int index0 = (int)findex0;
+						float weight1 = findex0-index0;
+						index0 %= orientationBins;
 						int index1 = (index0+1)%orientationBins;
 
-						float weight1 = findex0-index0;
-
-						c.histogram[index0%orientationBins] = magnitude*(1.0f-weight1);
-						c.histogram[index1] = magnitude*weight1;
+						c.histogram[index0] += magnitude*(1.0f-weight1);
+						c.histogram[index1] += magnitude*weight1;
 					}
 				}
+
 			}
 		}
 	}
