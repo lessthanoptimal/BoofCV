@@ -367,6 +367,22 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return stepBlock;
 	}
 
+	public int getOrientationBins() {
+		return orientationBins;
+	}
+
+	public int getCellRows() {
+		return cellRows;
+	}
+
+	public int getCellCols() {
+		return cellCols;
+	}
+
+	public Cell getCell( int row , int col ) {
+		return cells[row*cellCols + col];
+	}
+
 	public void setStepBlock(int stepBlock) {
 		this.stepBlock = stepBlock;
 	}
@@ -379,9 +395,9 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return new TupleDesc_F64(orientationBins*widthBlock*widthBlock);
 	}
 
-	static class Cell
+	public static class Cell
 	{
-		float histogram[];
+		public float histogram[];
 
 		public void reset() {
 			Arrays.fill(histogram,0);
