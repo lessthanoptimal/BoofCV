@@ -30,6 +30,7 @@ import boofcv.gui.learning.ConfusionMatrixPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.learning.Confusion;
 import org.ddogleg.clustering.AssignCluster;
@@ -235,10 +236,10 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		ConfigDenseHoG hog = new ConfigDenseHoG();
 
 		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
-				FactoryDescribeImageDense.surfFast(surfFast, ImageUInt8.class);
+//				FactoryDescribeImageDense.surfFast(surfFast, ImageUInt8.class);
 //				FactoryDescribeImageDense.surfStable(surfStable, ImageUInt8.class);
 //				FactoryDescribeImageDense.sift(sift, ImageUInt8.class);
-//				FactoryDescribeImageDense.hog(hog, ImageType.single(ImageUInt8.class));
+				FactoryDescribeImageDense.hog(hog, ImageType.single(ImageUInt8.class));
 
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);
@@ -274,7 +275,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// For SIFT descriptor the accuracy is          54.0%
 		// For  "fast"  SURF descriptor the accuracy is 52.2%
 		// For "stable" SURF descriptor the accuracy is 49.4%
-		// For HOG                                      52.4%
+		// For HOG                                      53.3%
 
 		// SURF results are interesting. "Stable" is significantly better than "fast"!
 		// One explanation is that the descriptor for "fast" samples a smaller region than "stable", by a
