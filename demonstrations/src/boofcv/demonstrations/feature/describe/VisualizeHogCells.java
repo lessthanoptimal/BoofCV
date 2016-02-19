@@ -32,28 +32,18 @@ import java.awt.image.BufferedImage;
 public class VisualizeHogCells {
 
 	DescribeDenseHogAlg<?,?> hog;
-	Color colors[] = new Color[256];
+	Color colors[];
 	float cos[],sin[];
 
 	boolean localMax = false;
 	boolean showGrid = false;
 
-	public VisualizeHogCells(DescribeDenseHogAlg<?,?> hog , boolean logIntensity ) {
+	public VisualizeHogCells(DescribeDenseHogAlg<?,?> hog ) {
+		setHoG(hog);
+	}
 
+	public synchronized void setHoG(DescribeDenseHogAlg<?, ?> hog) {
 		this.hog = hog;
-
-		if( logIntensity ) {
-			double k = 255.0 / Math.log(255);
-			for (int i = 0; i < colors.length; i++) {
-				int v = (int) (k * Math.log(i + 1));
-				colors[i] = new Color(v, v, v);
-			}
-		} else {
-			for (int i = 0; i < colors.length; i++) {
-				colors[i] = new Color(i, i, i);
-			}
-		}
-
 		int numAngles = hog.getOrientationBins();
 		cos = new float[numAngles];
 		sin = new float[numAngles];
@@ -79,7 +69,7 @@ public class VisualizeHogCells {
 			return input;
 	}
 
-	public void render( Graphics2D g2 ) {
+	public synchronized void render( Graphics2D g2 ) {
 
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -219,5 +209,21 @@ public class VisualizeHogCells {
 
 	public void setShowGrid(boolean showGrid) {
 		this.showGrid = showGrid;
+	}
+
+	public void setShowLog(boolean logIntensity) {
+		Color colors[] = new Color[256];
+		if( logIntensity ) {
+			double k = 255.0 / Math.log(255);
+			for (int i = 0; i < colors.length; i++) {
+				int v = (int) (k * Math.log(i + 1));
+				colors[i] = new Color(v, v, v);
+			}
+		} else {
+			for (int i = 0; i < colors.length; i++) {
+				colors[i] = new Color(i, i, i);
+			}
+		}
+		this.colors = colors;
 	}
 }

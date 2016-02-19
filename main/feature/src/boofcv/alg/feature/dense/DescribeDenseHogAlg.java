@@ -356,6 +356,10 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return widthCell*widthBlock;
 	}
 
+	public void setWidthCell(int widthCell) {
+		this.widthCell = widthCell;
+	}
+
 	public int getWidthCell() {
 		return widthCell;
 	}

@@ -52,14 +52,23 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	BufferedImage work;
 
-	public VisualizeImageHogApp(ConfigDenseHoG config, List<String> exampleInputs, ImageType<T> imageType) {
+	Object lock = new Object();
+
+	ControlHogPanel control = new ControlHogPanel(this);
+
+	boolean showInput = false;
+
+	public VisualizeImageHogApp(List<String> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-		hog = FactoryDescribeImageDenseAlg.hog(config,imageType);
-		visualizers = new VisualizeHogCells(hog,true);
-		visualizers.setLocalMax(false);
+		createHoG(imageType);
+		visualizers = new VisualizeHogCells(hog);
+		visualizers.setShowLog(control.doShowLog);
+		visualizers.setLocalMax(control.doShowLocal);
+		visualizers.setShowGrid(control.doShowGrid);
 
 		add(imagePanel,BorderLayout.CENTER);
+		add(control,BorderLayout.WEST);
 
 		imagePanel.addMouseListener(new MouseListener() {
 			@Override
@@ -91,22 +100,70 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		});
 	}
 
+	private void createHoG(ImageType<T> imageType) {
+		ConfigDenseHoG config = new ConfigDenseHoG();
+		config.widthCell = control.cellWidth;
+		config.orientationBins = control.histogram;
+
+		hog = FactoryDescribeImageDenseAlg.hog(config,imageType);
+	}
+
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
-		hog.setInput(input);
-		hog.process();
+		synchronized (lock) {
+			hog.setInput(input);
+			hog.process();
 
-		work = visualizers.createOutputBuffered(work);
+			work = visualizers.createOutputBuffered(work);
 
-		Graphics2D g2 = work.createGraphics();
-		g2.setColor(Color.BLACK);
-		g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			Graphics2D g2 = work.createGraphics();
+			g2.setColor(Color.BLACK);
+			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 
-		visualizers.render(g2);
+			visualizers.render(g2);
+
+			if( showInput )
+				g2.drawImage(buffered,0,0,buffered.getWidth()/5,buffered.getHeight()/5,null);
+		}
 
 		imagePanel.setBufferedImage(work);
 		imagePanel.setPreferredSize(new Dimension(work.getWidth(),work.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(work.getWidth(),work.getHeight()));
+	}
+
+	public void setCellWidth( int width ) {
+		synchronized (lock) {
+			hog.setWidthCell(width);
+			reprocessSingleImage();
+		}
+	}
+
+	public void setHistogram(int histogram) {
+		synchronized (lock) {
+			createHoG(imageType);
+			visualizers.setHoG(hog);
+			reprocessSingleImage();
+		}
+	}
+
+	public void setShowGrid(boolean showGrid) {
+		visualizers.showGrid = showGrid;
+		reprocessSingleImage();
+	}
+
+	public void setShowLocal(boolean show ) {
+		visualizers.localMax = show;
+		reprocessSingleImage();
+	}
+
+	public void setShowLog(boolean show ) {
+		visualizers.setShowLog(show);
+		reprocessSingleImage();
+	}
+
+	public void setShowInput( boolean show ) {
+		this.showInput = show;
+		reprocessSingleImage();
 	}
 
 	public static void main(String[] args) {
@@ -117,10 +174,7 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		examples.add(UtilIO.pathExample("particles01.jpg"));
 		ImageType imageType = ImageType.single(ImageUInt8.class);
 
-		ConfigDenseHoG config = new ConfigDenseHoG();
-		config.widthCell = 20;
-
-		VisualizeImageHogApp app = new VisualizeImageHogApp(config, examples, imageType);
+		VisualizeImageHogApp app = new VisualizeImageHogApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();

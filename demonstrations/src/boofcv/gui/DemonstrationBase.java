@@ -63,6 +63,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 	protected ImageType<T> imageType;
 	T input;
+	BufferedImage inputBuffered;
 	MediaManager media = new DefaultMediaManager();
 
 	public DemonstrationBase(List<String> exampleInputs, ImageType<T> imageType) {
@@ -276,6 +277,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 			inputMethod = InputMethod.IMAGE;
 			input.reshape(buffered.getWidth(),buffered.getHeight());
+			inputBuffered = buffered;
 			ConvertBufferedImage.convertFrom(buffered,input,true);
 			processImageThread(buffered, input);
 		}
@@ -387,15 +389,27 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 						if( time > 0 ) {
 							try {Thread.sleep(time);} catch (InterruptedException ignore) {}
 						} else {
-							Thread.yield();
+							try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 						}
+					} else {
+						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 					}
-					Thread.yield();
 					before = System.currentTimeMillis();
 				}
 			}
 			sequence.close();
 			running = false;
+		}
+	}
+
+	/**
+	 * If just a single image was processed it will process it again.  If it's a stream
+	 * there is no need to reprocess, the next image will be handled soon enough.
+	 */
+	public void reprocessSingleImage() {
+		if( sequenceThread == null ) {
+			// hmm if it's reprocessing the last image in a sequence this might not work
+			processImageThread(inputBuffered, input);
 		}
 	}
 
