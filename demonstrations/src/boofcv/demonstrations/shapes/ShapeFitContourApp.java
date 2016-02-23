@@ -177,7 +177,7 @@ public class ShapeFitContourApp
 		if( controlPanel.contoursVisible ) {
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(new Color(0, 100, 0));
-			VisualizeBinaryData.renderExternal(contours, scale, g2);
+			VisualizeBinaryData.renderExternal(contours, false,true, scale, g2);
 		}
 
 		if( activeAlg == 0 ) {

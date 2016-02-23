@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
 /**
  * @author Peter Abeles
  */
-class ThresholdControlPanel extends StandardAlgConfigPanel
+public class ThresholdControlPanel extends StandardAlgConfigPanel
 		implements ActionListener, ChangeListener
 {
 

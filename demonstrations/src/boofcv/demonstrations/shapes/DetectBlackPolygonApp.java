@@ -183,7 +183,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 					List<Contour> contours = detector.getAllContours();
 					g2.setStroke(new BasicStroke(1));
 					g2.setColor(Color.RED);
-					VisualizeBinaryData.renderExternal(contours, scale, g2);
+					VisualizeBinaryData.renderExternal(contours, false,true, scale, g2);
 				}
 
 				if (controls.bShowLines) {

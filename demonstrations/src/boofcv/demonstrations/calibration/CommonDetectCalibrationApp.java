@@ -224,7 +224,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 
 					g2.setStroke(new BasicStroke(1));
 					g2.setColor(Color.RED);
-					VisualizeBinaryData.renderExternal(contour,scale,g2);
+					VisualizeBinaryData.renderExternal(contour,false,true,scale,g2);
 				}
 
 				if( controlPanel.isShowGraph() ) {
