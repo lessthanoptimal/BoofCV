@@ -97,6 +97,16 @@ Below are a few useful custom Gradle scripts that can be invoked:
 
 _createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
 
+## Data Directory
+
+If you checked out the source code directly from GIT you will need to also checkout the data directory if you want to run most of the examples.
+
+```
+cd boofcv
+git submodule init
+git submodule update
+```
+
 ## Compilation Error
 
 A stable build should always compile out of the box with no problem.  All of the examples should run without any problems, as long as you don't modify anything, even slightly.  Before you complain about a problem on a stable build make sure you are absolutely certain that you're doing everything right.  If after a few 

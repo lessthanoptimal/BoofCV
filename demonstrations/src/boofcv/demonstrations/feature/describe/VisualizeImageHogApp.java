@@ -171,6 +171,7 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
 		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
+		examples.add(UtilIO.pathExample("shapes/concave01.jpg"));
 		examples.add(UtilIO.pathExample("particles01.jpg"));
 		ImageType imageType = ImageType.single(ImageUInt8.class);
 
