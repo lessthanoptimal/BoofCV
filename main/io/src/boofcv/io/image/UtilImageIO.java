@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,7 @@
 
 package boofcv.io.image;
 
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import org.ddogleg.struct.GrowQueue_I8;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -127,6 +124,16 @@ public class UtilImageIO {
 
 	public static <T extends ImageSingleBand> T loadImage( String directory , String fileName, Class<T> imageType ) {
 		return loadImage(new File(directory,fileName).getPath(),imageType);
+	}
+
+	public static <T extends ImageBase> T loadImage( File image, boolean orderRgb, ImageType<T> imageType ) {
+		BufferedImage img = loadImage(image.getAbsolutePath());
+		if( img == null )
+			return null;
+
+		T output = imageType.createImage(img.getWidth(),img.getHeight());
+		ConvertBufferedImage.convertFrom(img, orderRgb, output);
+		return output;
 	}
 
 	/**

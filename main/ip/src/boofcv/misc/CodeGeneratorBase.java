@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,10 @@ public abstract class CodeGeneratorBase {
 		out.println();
 		out.println("package " + getPackage() + ";");
 		out.println();
+	}
+
+	public String generatedString() {
+		return "@Generated(\""+getClass().getName()+"\")\n";
 	}
 
 	public String getPackage() {

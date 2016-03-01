@@ -23,11 +23,15 @@ Version : Alpha 0.22
   * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
 - Fixed bug in ConvertBufferedImage.extract where number of bands in interleaved images was not being set in ImageType
   * Fixed bug where imageType was not being set.  Thanks pcmoen for reporting the bug
+- PixelMath
+  * Added partial support for Interleaved images
+  * GPixelMath supports more than just single band images
 
 - TODO Automate fault detection from regression tests
 - TODO Regression test for dense image descriptors
 - TODO Naive implementation of DLS
 - TODO Rename MultiSpectral to Planar or ImagePlanar?
+- TODO Rename ImageUInt8 to ImageU8 ... etc ?
 
 ---------------------------------------------
 Date    : 2016/01/24

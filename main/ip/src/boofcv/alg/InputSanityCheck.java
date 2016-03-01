@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
@@ -80,6 +81,15 @@ public class InputSanityCheck {
 			throw new IllegalArgumentException("Image widths do not match. "+imgA.width+" "+imgB.width);
 		if (imgA.height != imgB.height)
 			throw new IllegalArgumentException("Image heights do not match. "+imgA.height+" "+imgB.height);
+	}
+
+	public static void checkSameShapeB(ImageMultiBand<?> imgA, ImageMultiBand<?> imgB) {
+		if (imgA.width != imgB.width)
+			throw new IllegalArgumentException("Image widths do not match. "+imgA.width+" "+imgB.width);
+		if (imgA.height != imgB.height)
+			throw new IllegalArgumentException("Image heights do not match. "+imgA.height+" "+imgB.height);
+		if (imgA.getNumBands() != imgB.getNumBands())
+			throw new IllegalArgumentException("Number of bands do not match "+imgA.getNumBands()+" "+imgB.getNumBands());
 	}
 
 	public static void checkSameShape(ImagePyramid<?> imgA, ImagePyramid<?> imgB) {
