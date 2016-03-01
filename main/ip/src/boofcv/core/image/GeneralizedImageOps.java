@@ -119,6 +119,17 @@ public class GeneralizedImageOps {
 		return createSingleBand(typeClass, width, height);
 	}
 
+	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height, int numBands ) {
+		if( type == MultiSpectral.class )
+			throw new IllegalArgumentException("Can't use this function with multi-spectral because the data type needs to be specified too");
+
+		if( ImageSingleBand.class.isAssignableFrom(type))
+			return (T)createSingleBand((Class)type,width,height);
+		else if( ImageInterleaved.class.isAssignableFrom(type))
+			return (T)createInterleaved((Class)type,width,height,numBands);
+		else
+			throw new RuntimeException("Unknown");
+	}
 	public static <T extends ImageSingleBand> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
