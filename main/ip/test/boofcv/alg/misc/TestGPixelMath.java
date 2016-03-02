@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.misc;
 
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -182,11 +182,20 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			which = 0;
 		}
 
-		ImageSingleBand t = (ImageSingleBand)targetParam[which];
-		ImageSingleBand v = (ImageSingleBand)validationParam[which];
+		ImageBase t = (ImageBase)targetParam[which];
+		ImageBase v = (ImageBase)validationParam[which];
 
 		// if it is full of zeros something went wrong
-		assertTrue(GImageStatistics.maxAbs(t) != 0);
+		boolean foundNotZero = false;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if( GeneralizedImageOps.get(t,j,i,0) != 0 ) {
+					foundNotZero = true;
+					break;
+				}
+			}
+		}
+		assertTrue(foundNotZero);
 
 		BoofTesting.assertEquals(t, v, 0);
 	}

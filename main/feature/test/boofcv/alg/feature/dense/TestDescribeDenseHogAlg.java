@@ -185,9 +185,14 @@ public class TestDescribeDenseHogAlg {
 
 	@Test
 	public void computeCells() {
-		Helper helper = new Helper(10,8,3);
+
+		int cellWidth = 8;
+
+		Helper helper = new Helper(10,cellWidth,3);
 
 		helper.growCellArray(width,height);
+
+		int N = cellWidth*cellWidth;
 
 		for (int angle = 0; angle < 360; angle++) {
 			helper.angle = (float)(angle*Math.PI/180.0);
@@ -205,11 +210,11 @@ public class TestDescribeDenseHogAlg {
 
 				for (int j = 0; j < c.histogram.length; j++) {
 					if( j == targetBin ) {
-						assertEquals(expected,c.histogram[j],1e-5f);
+						assertEquals(N*expected,c.histogram[j],1e-3f);
 					} else if( j == (targetBin+1)%10 ) {
-						assertEquals(1.0f-expected,c.histogram[j],1e-5f);
+						assertEquals(N*(1.0f-expected),c.histogram[j],1e-3f);
 					} else {
-						assertEquals(0.0f,c.histogram[j],1e-5f);
+						assertEquals(0.0f,c.histogram[j],1e-3f);
 					}
 				}
 			}
