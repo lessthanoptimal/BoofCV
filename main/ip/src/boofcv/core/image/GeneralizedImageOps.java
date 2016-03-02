@@ -239,6 +239,40 @@ public class GeneralizedImageOps {
 		}
 	}
 
+	public static void setB(ImageBase img, int x, int y, int band , double value ) {
+		if( img instanceof MultiSpectral ) {
+			MultiSpectral ms = (MultiSpectral) img;
+
+			GeneralizedImageOps.set(ms.getBand(band),x,y,value);
+		} else if( img instanceof ImageInterleaved ) {
+			if (img instanceof InterleavedU8) {
+				((InterleavedU8) img).setBand(x, y, band, (byte) value);
+			} else if (img instanceof InterleavedS8) {
+				((InterleavedS8) img).setBand(x, y, band, (byte) value);
+			} else if (img instanceof InterleavedS16) {
+				((InterleavedS16) img).setBand(x, y, band, (short) value);
+			} else if (img instanceof InterleavedU16) {
+				((InterleavedU16) img).setBand(x, y, band, (short) value);
+			} else if (img instanceof InterleavedS32) {
+				((InterleavedS32) img).setBand(x, y, band, (int) value);
+			} else if (img instanceof InterleavedS64) {
+				((InterleavedS64) img).setBand(x, y, band, (long) value);
+			} else if (img instanceof InterleavedF32) {
+				((InterleavedF32) img).setBand(x, y, band, (float) value);
+			} else if (img instanceof InterleavedF64) {
+				((InterleavedF64) img).setBand(x, y, band, value);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
+			}
+		} else if( img instanceof ImageSingleBand ) {
+			if( band != 0 )
+				throw new IllegalArgumentException("For a single band image the input pixel must have 1 band");
+			set((ImageSingleBand)img,x,y,value);
+		} else {
+			throw new IllegalArgumentException("Add support for this image type!");
+		}
+	}
+
 	public static <T extends ImageSingleBand> int getNumBits(Class<T> type) {
 		if (type == ImageUInt8.class) {
 			return 8;

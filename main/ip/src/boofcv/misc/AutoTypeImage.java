@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,53 +51,15 @@ public enum AutoTypeImage {
 
 	private Class<?> primitiveType;
 
-	AutoTypeImage( Class<?> imageType ) {
+	AutoTypeImage(Class<?> imageType ) {
 
 		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
 		try {
 			ImageSingleBand img = (ImageSingleBand)imageType.newInstance();
-			primitiveType = img.getDataType().getDataType();
+			setByDataType(img.getDataType());
 			dataType = primitiveType.getSimpleName();
-			numBits = img.getDataType().getNumBits();
 
-			if( img.getDataType().isInteger() ) {
-				isInteger = true;
-				if( numBits <= 32 )
-					sumType = "int";
-				else
-					sumType = "long";
-				if( numBits <= 16 )
-					largeSumType = "int";
-				else
-					largeSumType = "long";
-
-				if( !img.getDataType().isSigned() ) {
-					abbreviatedType = "U";
-					isSigned = false;
-					if( byte.class == primitiveType) {
-						bitWise = "& 0xFF";
-					} else if( short.class == primitiveType) {
-						bitWise = "& 0xFFFF";
-					}
-				} else {
-					abbreviatedType = "S";
-					isSigned = true;
-				}
-
-			} else {
-				abbreviatedType = "F";
-				isSigned = true;
-				isInteger = false;
-				if( imageType == ImageFloat32.class ) {
-					sumType = "float";
-				} else {
-					sumType = "double";
-				}
-				largeSumType = "double";
-			}
-
-			abbreviatedType += numBits;
 
 		} catch (InstantiationException e) {
 			throw new RuntimeException(e);
@@ -119,7 +81,45 @@ public enum AutoTypeImage {
 			this.sumType = "double";
 		}
 		abbreviatedType += numBits;
+	}
 
+	private void setByDataType( ImageDataType type ) {
+		primitiveType = type.getDataType();
+		numBits = type.getNumBits();
+		abbreviatedType = type.toString();
+
+		if( type.isInteger() ) {
+			isInteger = true;
+			if( numBits <= 32 )
+				sumType = "int";
+			else
+				sumType = "long";
+			if( numBits <= 16 )
+				largeSumType = "int";
+			else
+				largeSumType = "long";
+
+			if( !type.isSigned() ) {
+				isSigned = false;
+				if( byte.class == primitiveType) {
+					bitWise = "& 0xFF";
+				} else if( short.class == primitiveType) {
+					bitWise = "& 0xFFFF";
+				}
+			} else {
+				isSigned = true;
+			}
+
+		} else {
+			isSigned = true;
+			isInteger = false;
+			if( type.getNumBits() == 32 ) {
+				sumType = "float";
+			} else {
+				sumType = "double";
+			}
+			largeSumType = "double";
+		}
 	}
 
 	public static AutoTypeImage[] getIntegerTypes() {
@@ -148,6 +148,14 @@ public enum AutoTypeImage {
 
 	public static AutoTypeImage[] getUnsigned() {
 		return new AutoTypeImage[]{U8,U16};
+	}
+
+	public String getImageName( ImageType.Family family ) {
+		if( family == ImageType.Family.INTERLEAVED)
+			return getInterleavedName();
+		else {
+			return getSingleBandName();
+		}
 	}
 
 	public String getInterleavedName() {

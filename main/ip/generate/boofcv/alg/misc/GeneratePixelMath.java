@@ -29,9 +29,6 @@ import java.util.List;
 import static boofcv.misc.AutoTypeImage.*;
 
 
-// TODO pass in a function to generate operation on the fly so that unsigned case is correctly handled
-// TODO just do that for everything?
-
 /**
  * Generates functions inside of {@link boofcv.alg.misc.ImageMiscOps}.
  *

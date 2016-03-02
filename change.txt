@@ -26,6 +26,9 @@ Version : Alpha 0.22
 - PixelMath
   * Added partial support for Interleaved images
   * GPixelMath supports more than just single band images
+- ImageStatistics
+  * Added partial support for Interleaved images
+  * GPixelMath supports more than just single band images
 
 - TODO Automate fault detection from regression tests
 - TODO Regression test for dense image descriptors

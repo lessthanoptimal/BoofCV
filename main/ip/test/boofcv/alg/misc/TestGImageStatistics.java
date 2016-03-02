@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageBase;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -45,8 +45,8 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 		Class<?> param[] = validation.getParameterTypes();
 		String name = candidate.getName();
 
-		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand((Class)param[0], width, height);
-		ImageSingleBand inputB = null;
+		ImageBase inputA = GeneralizedImageOps.createImage((Class)param[0], width, height, numBands);
+		ImageBase inputB = null;
 
 		Object[][] ret = new Object[1][param.length];
 
@@ -64,16 +64,16 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;
 		} else if( name.equals("meanDiffSq")) {
-			inputB = GeneralizedImageOps.createSingleBand((Class)param[1], width, height);
+			inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 		} else if( name.equals("meanDiffAbs")) {
-			inputB = GeneralizedImageOps.createSingleBand((Class)param[1], width, height);
+			inputB = GeneralizedImageOps.createImage((Class)param[1], width, height, numBands);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
 		} else if( name.equals("histogram")) {
 			int histogramSize = 10;
-			if( inputA.getDataType().isSigned() )
+			if( inputA.getImageType().getDataType().isSigned() )
 				histogramSize += 11;
 			ret[0][0] = inputA;
 			ret[0][1] = -10;
