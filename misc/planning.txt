@@ -1,11 +1,16 @@
-Alpha 0.22
+Alpha 0.23
+
+- TODO Automate fault detection from regression tests
+- TODO Regression test for dense image descriptors
+- TODO Naive implementation of DLS
+- TODO Rename MultiSpectral to Planar or ImagePlanar?
+- TODO Rename ImageUInt8 to ImageU8 ... etc ?
 
 - Regression
   * Chessboard image border to fiducial regression
   * Support binary features in Detect/Describe regression
   * Standardized format which is easy for human and machine to read?
     - This should enable easy automated checks for significant change
-  * Regression for dense image features?
 
 - Unit Tests for applications
   * compare output to expected file bit by bit
@@ -23,8 +28,6 @@ Alpha 0.22
   * binary pattern grid
   * Ability to change calibration model and recompute
   * Ability to remove images and recompute
-
-- HOG
 
 Massive Refactorings
 - MultiSpectral to Planar

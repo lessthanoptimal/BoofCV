@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.22-SNAPSHOT'
+    version = '0.22'
 }
 
 subprojects {

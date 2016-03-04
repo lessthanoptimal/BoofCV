@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2016/
+Date    : 2016/03/04
 Version : Alpha 0.22
 
 - Deleted MedianImageFilter
@@ -15,7 +15,7 @@ Version : Alpha 0.22
 - Implementation of ImageGradient for MultiSpectral images
 - FactoryDerivative
   * Can now create derivatives using enum type
-- Added Histogram of Oriented Gradient
+- Added Histogram of Oriented Gradient (HOG) dense image descriptor
 - DescribeImageDense
   * Removed configure() since it couldn't be generalized to HOG
   * Created config classes for all dense descriptors
@@ -29,12 +29,6 @@ Version : Alpha 0.22
 - ImageStatistics
   * Added partial support for Interleaved images
   * GPixelMath supports more than just single band images
-
-- TODO Automate fault detection from regression tests
-- TODO Regression test for dense image descriptors
-- TODO Naive implementation of DLS
-- TODO Rename MultiSpectral to Planar or ImagePlanar?
-- TODO Rename ImageUInt8 to ImageU8 ... etc ?
 
 ---------------------------------------------
 Date    : 2016/01/24
