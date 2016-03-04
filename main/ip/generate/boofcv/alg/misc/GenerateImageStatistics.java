@@ -472,7 +472,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 			out.print("\tprivate static "+sumType+" "+name+"( "+input.getDataType()+"[] array , int startIndex , int rows , int columns , int stride ) {\n" +
 					"\n" +
-					"\t\t"+sumType+" output = array[startIndex];\n" +
+					"\t\t"+sumType+" output = array[startIndex]"+input.getBitWise()+";\n" +
 					"\n" +
 					"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
 					"\t\t\tint index = startIndex + y*stride;\n" +

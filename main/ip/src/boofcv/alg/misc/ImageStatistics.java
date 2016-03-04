@@ -54,7 +54,7 @@ public class ImageStatistics {
 
 	private static int minU( byte[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;
@@ -91,7 +91,7 @@ public class ImageStatistics {
 
 	private static int maxU( byte[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;
@@ -128,7 +128,7 @@ public class ImageStatistics {
 
 	private static int maxAbsU( byte[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;
@@ -696,7 +696,7 @@ public class ImageStatistics {
 
 	private static int minU( short[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFFFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;
@@ -733,7 +733,7 @@ public class ImageStatistics {
 
 	private static int maxU( short[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFFFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;
@@ -770,7 +770,7 @@ public class ImageStatistics {
 
 	private static int maxAbsU( short[] array , int startIndex , int rows , int columns , int stride ) {
 
-		int output = array[startIndex];
+		int output = array[startIndex]& 0xFFFF;
 
 		for( int y = 0; y < rows; y++ ) {
 			int index = startIndex + y*stride;

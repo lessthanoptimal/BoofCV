@@ -124,10 +124,18 @@ public class TestImageStatistics {
 			Number o = (Number)m.invoke(null,input);
 			assertEquals(-2,o.doubleValue(),1e-8);
 		} else {
-			GImageMiscOps.fillUniform(input, rand, 0,20);
-			GeneralizedImageOps.setB(input,0,3,0,100);
-			Number o = (Number)m.invoke(null,input);
-			assertEquals(100,o.doubleValue(),1e-8);
+			GImageMiscOps.fillUniform(input, rand, 0,200);
+
+			double maxValue = input.getImageType().getDataType().getMaxValue();
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					double before = GeneralizedImageOps.get(input,x,y,0);
+					GeneralizedImageOps.setB(input,x,y,0,maxValue);
+					Number o = (Number)m.invoke(null,input);
+					assertEquals(maxValue,o.doubleValue(),1e-8);
+					GeneralizedImageOps.setB(input,x,y,0,before);
+				}
+			}
 		}
 	}
 
@@ -142,10 +150,18 @@ public class TestImageStatistics {
 			assertEquals(-30,o.doubleValue(),1e-8);
 
 		} else {
-			GImageMiscOps.fillUniform(input, rand, 5,20);
-			GeneralizedImageOps.setB(input,0,3,0,2);
-			Number o = (Number)m.invoke(null,input);
-			assertEquals(2,o.doubleValue(),1e-8);
+			double maxValue = input.getImageType().getDataType().getMaxValue();
+			GImageMiscOps.fillUniform(input, rand, 100,maxValue);
+
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					double before = GeneralizedImageOps.get(input,x,y,0);
+					GeneralizedImageOps.setB(input,x,y,0,5);
+					Number o = (Number)m.invoke(null,input);
+					assertEquals(5,o.doubleValue(),1e-8);
+					GeneralizedImageOps.setB(input,x,y,0,before);
+				}
+			}
 		}
 	}
 
