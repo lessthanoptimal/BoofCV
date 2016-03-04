@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -99,13 +98,13 @@ public class ExampleRectifyCalibratedStereo {
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, ImageFloat32.class);
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, ImageFloat32.class);
+		ImageDistort rectifyImageLeft =
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, distLeft.getImageType());
+		ImageDistort rectifyImageRight =
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, distRight.getImageType());
 
-		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);
-		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
+		rectifyImageLeft.apply(distLeft,rectLeft);
+		rectifyImageRight.apply(distRight,rectRight);
 
 		// convert for output
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);

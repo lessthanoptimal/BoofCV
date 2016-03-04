@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,9 @@ package boofcv.alg.geo;
 import boofcv.alg.distort.*;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -30,7 +32,9 @@ import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.distort.SequencePointTransform_F64;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -426,17 +430,18 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageSingleBand> ImageDistort<T,T>
-	rectifyImage(IntrinsicParameters param, DenseMatrix64F rectify , BorderType borderType, Class<T> imageType)
+	public static <T extends ImageBase> ImageDistort<T,T>
+	rectifyImage(IntrinsicParameters param, DenseMatrix64F rectify , BorderType borderType, ImageType<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip ) {
 			borderType = BorderType.EXTENDED;
 		}
-		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, borderType);
+		InterpolatePixel<T> interp =
+				FactoryInterpolation.createPixel(0,255, TypeInterpolate.BILINEAR,borderType,imageType);
 
 		// only compute the transform once
-		ImageDistort<T,T> ret = FactoryDistort.distortSB(true, interp, imageType);
+		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, imageType);
 		ret.setRenderAll(!skip);
 
 		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -114,7 +115,7 @@ public class StereoProcessingBase<T extends ImageSingleBand> {
 		rectK = rectifyAlg.getCalibrationMatrix();
 		rectR = rectifyAlg.getRectifiedRotation();
 
-		Class<T> imageType = (Class<T>)imageLeftRect.getClass();
+		ImageType<T> imageType = imageLeftRect.getImageType();
 		distortLeftRect = RectifyImageOps.rectifyImage(stereoParam.left, rect1, BorderType.SKIP, imageType);
 		distortRightRect = RectifyImageOps.rectifyImage(stereoParam.right, rect2, BorderType.SKIP, imageType);
 

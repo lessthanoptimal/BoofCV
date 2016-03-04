@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.factory.distort;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.impl.*;
+import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.*;
@@ -28,6 +29,28 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class FactoryDistort {
+
+	/**
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation
+	 * and interpolation instance.
+	 *
+	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
+	 * @param interp Which interpolation algorithm should be used.
+	 * @param outputType Type of output image.
+	 */
+	public static <Input extends ImageBase, Output extends ImageBase>
+	ImageDistort<Input, Output> distort(boolean cached, InterpolatePixel<Input> interp, ImageType<Output> outputType) {
+		switch( outputType.getFamily() ) {
+			case SINGLE_BAND:
+				return distortSB(cached,(InterpolatePixelS)interp,outputType.getImageClass());
+			case MULTI_SPECTRAL:
+				return distortMS(cached,(InterpolatePixelS)interp,outputType.getImageClass());
+			case INTERLEAVED:
+				return distortIL(cached,(InterpolatePixelMB) interp, (ImageType)outputType);
+			default:
+				throw new IllegalArgumentException("Unknown image family "+outputType.getFamily());
+		}
+	}
 
 	/**
 	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the specified image type, transformation

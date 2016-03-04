@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,9 +131,9 @@ public class ExampleStereoDisparity {
 
 		// undistorted and rectify images
 		ImageDistort<ImageUInt8,ImageUInt8> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.SKIP, origLeft.getImageType());
 		ImageDistort<ImageUInt8,ImageUInt8> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, ImageUInt8.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.SKIP, origRight.getImageType());
 
 		imageDistortLeft.apply(origLeft, rectLeft);
 		imageDistortRight.apply(origRight, rectRight);

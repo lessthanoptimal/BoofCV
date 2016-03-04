@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -245,10 +246,12 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel_F64(calib.left, rect1);
 
+		ImageType<T> imageType = ImageType.single(activeAlg.getInputType());
+
 		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
-				calib.left, rect1, BorderType.SKIP, activeAlg.getInputType());
+				calib.left, rect1, BorderType.SKIP,imageType);
 		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
-				calib.right, rect2, BorderType.SKIP, activeAlg.getInputType());
+				calib.right, rect2, BorderType.SKIP, imageType);
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

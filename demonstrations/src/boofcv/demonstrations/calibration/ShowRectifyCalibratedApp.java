@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -119,10 +120,11 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
 		// Will rectify the image
+		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.VALUE, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.VALUE, imageType);
 		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.VALUE, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.VALUE, imageType);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);

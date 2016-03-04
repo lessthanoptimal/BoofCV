@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GPixelMath;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -47,6 +48,8 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleMultiSpectralImages {
 
+	public static ListDisplayPanel gui = new ListDisplayPanel();
+
 	/**
 	 * Many operations designed to only work on {@link boofcv.struct.image.ImageSingleBand} can be applied
 	 * to a MultiSpectral image by feeding in each band one at a time.
@@ -69,8 +72,9 @@ public class ExampleMultiSpectralImages {
 		// and output
 		BufferedImage output = new BufferedImage(image.width,image.height,input.getType());
 		ConvertBufferedImage.convertTo(blurred, output,true);
-		ShowImages.showWindow(input,"Input");
-		ShowImages.showWindow(output,"Output");
+
+		gui.addImage(input,"Input");
+		gui.addImage(output,"Gaussian Blur");
 	}
 
 	/**
@@ -103,9 +107,9 @@ public class ExampleMultiSpectralImages {
 	public static void convertToGray( BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
 		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
-		
+
 		ImageUInt8 gray = new ImageUInt8( image.width,image.height);
-		
+
 		// creates a gray scale image by averaging intensity value across pixels
 		GPixelMath.averageBand(image, gray);
 		BufferedImage outputAve = ConvertBufferedImage.convertTo(gray,null);
@@ -113,8 +117,8 @@ public class ExampleMultiSpectralImages {
 		// create an output image just from the first band
 		BufferedImage outputBand0 = ConvertBufferedImage.convertTo(image.getBand(0),null);
 
-		ShowImages.showWindow(outputAve,"Average");
-		ShowImages.showWindow(outputBand0,"Band 0");
+		gui.addImage(outputAve,"Gray Averaged");
+		gui.addImage(outputBand0,"Band 0");
 	}
 	
 	public static void main( String args[] ) {
@@ -123,7 +127,9 @@ public class ExampleMultiSpectralImages {
 		// Uncomment lines below to run each example
 
 		ExampleMultiSpectralImages.independent(input);
-//		ExampleMultiSpectralImages.pixelAccess(input);
-//		ExampleMultiSpectralImages.convertToGray(input);
+		ExampleMultiSpectralImages.pixelAccess(input);
+		ExampleMultiSpectralImages.convertToGray(input);
+
+		ShowImages.showWindow(gui,"Multi Spectral Examples",true);
 	}
 }
