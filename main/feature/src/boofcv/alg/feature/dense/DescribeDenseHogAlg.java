@@ -79,6 +79,9 @@ import java.util.List;
  * The gradient is computed for each band individually.  The band with the largest magnitude at that specific
  * pixel is used as the gradient for the pixel.
  *
+ * <p>[1] Dalal, Navneet, and Bill Triggs. "Histograms of oriented gradients for human detection." Computer
+ * Vision and Pattern Recognition, 2005. CVPR 2005.</p>
+ *
  * @author Peter Abeles
  */
 public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative extends ImageBase> {
@@ -117,7 +120,7 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	 *
 	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
 	 * @param widthCell Number of pixel's wide a cell is.  8 recommended
-	 * @param widthBlock Number of cells
+	 * @param widthBlock Number of cells's wide a black is. 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
 	public DescribeDenseHogAlg(int orientationBins , int widthCell , int widthBlock ,

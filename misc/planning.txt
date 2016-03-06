@@ -1,16 +1,12 @@
 Alpha 0.23
 
-- TODO Automate fault detection from regression tests
-- TODO Regression test for dense image descriptors
-- TODO Naive implementation of DLS
-- TODO Rename MultiSpectral to Planar or ImagePlanar?
-- TODO Rename ImageUInt8 to ImageU8 ... etc ?
-
 - Regression
   * Chessboard image border to fiducial regression
   * Support binary features in Detect/Describe regression
   * Standardized format which is easy for human and machine to read?
     - This should enable easy automated checks for significant change
+  * Automate fault detection from regression tests
+  * Split runtime regression off from stability
 
 - Unit Tests for applications
   * compare output to expected file bit by bit
@@ -31,7 +27,12 @@ Alpha 0.23
 
 Massive Refactorings
 - MultiSpectral to Planar
+- ImageUInt8 to ImageU8 ... etc
 - Delete type specific functions from FactoryDerivative
+
+Face Detectors
+ - https://github.com/nenadmarkus/pico
+ - http://libccv.org/doc/doc-scd/
 
 Future
 
