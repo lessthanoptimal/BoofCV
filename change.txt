@@ -17,7 +17,7 @@ Version : 0.23
 - ImplOrientationImageAverageIntegral
   * Fixed internal null pointer exception
   * Fixed bad unit test
-  * Thanks pcmoen whose comment lead to finding this bug
+  * Thanks pcmoen for pointing out this bug
 
 
 - TODO HOG
