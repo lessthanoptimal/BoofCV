@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ImplOrientationSlidingWindowIntegral
 	public ImplOrientationSlidingWindowIntegral(double radiusToScale , double samplePeriod, double windowSize,
 												int sampleRadius, double weightSigma, int sampleKernelWidth,
 												Class<T> integralType) {
-		super(radiusToScale,sampleRadius,samplePeriod,sampleKernelWidth,weightSigma,integralType);
+		super(radiusToScale,sampleRadius,samplePeriod,sampleKernelWidth,weightSigma, true, integralType);
 		this.windowSize = windowSize;
 
 		derivX = new double[sampleWidth * sampleWidth];

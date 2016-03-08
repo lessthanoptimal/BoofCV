@@ -55,20 +55,21 @@ public class FactoryDescribeImageDense {
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param configSurf SURF configuration. Pass in null for default options.
+	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,TupleDesc_F64> surfFast(ConfigDenseSurfFast configSurf , Class<T> imageType)
+	DescribeImageDense<T,TupleDesc_F64> surfFast(ConfigDenseSurfFast config , Class<T> imageType)
 	{
-		configSurf.checkValidity();
+		if( config == null )
+			config = new ConfigDenseSurfFast();
 
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(configSurf.surf, imageType);
+				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<T,TupleDesc_F64>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS,
-				configSurf.descriptorScale, configSurf.sampling.periodX,configSurf.sampling.periodY);
+				config.descriptorScale, config.sampling.periodX,config.sampling.periodY);
 	}
 
 	/**
@@ -80,21 +81,24 @@ public class FactoryDescribeImageDense {
 	 *
 	 * @see DescribePointSurf
 	 *
-	 * @param configSurf SURF configuration. Pass in null for default options.
+	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageSingleBand, II extends ImageSingleBand>
-	DescribeImageDense<T,TupleDesc_F64> surfStable( ConfigDenseSurfStable configSurf,
+	DescribeImageDense<T,TupleDesc_F64> surfStable( ConfigDenseSurfStable config,
 												   Class<T> imageType) {
 
-		configSurf.checkValidity();
+		if( config == null )
+			config = new ConfigDenseSurfStable();
+
+		config.checkValidity();
 
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
-				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(configSurf.surf, imageType);
+				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<T,TupleDesc_F64>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS,
-				configSurf.descriptorScale, configSurf.sampling.periodX,configSurf.sampling.periodY);
+				config.descriptorScale, config.sampling.periodX,config.sampling.periodY);
 	}
 
 	/**
@@ -102,12 +106,15 @@ public class FactoryDescribeImageDense {
 	 *
 	 * @see DescribeDenseSiftAlg
 	 *
-	 * @param config Configuration for SIFT descriptor.  All parameters are used but sigmaToPixels.  null for defaults.
+	 * @param config Configuration for SIFT descriptor. null for defaults.
 	 * @param imageType Type of input image
 	 * @return Dense SIFT
 	 */
 	public static <T extends ImageSingleBand>
 	DescribeImageDense<T,TupleDesc_F64> sift(ConfigDenseSift config , Class<T> imageType ) {
+		if( config == null )
+			config = new ConfigDenseSift();
+
 		config.checkValidity();
 
 		ConfigSiftDescribe c = config.sift;

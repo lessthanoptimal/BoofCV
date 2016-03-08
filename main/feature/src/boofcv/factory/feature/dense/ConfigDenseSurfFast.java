@@ -31,10 +31,11 @@ public class ConfigDenseSurfFast implements Configuration {
 	 * Configuration for Stable SURF descriptor
 	 */
 	public ConfigSurfDescribe.Speed surf = new ConfigSurfDescribe.Speed();
+
 	/**
-	 * How the image should be sampled
+	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 8, period Y = 8.
 	 */
-	public DenseSampling sampling;
+	public DenseSampling sampling = new DenseSampling(8,8);
 	/**
 	 * Relative size of descriptor
 	 */
@@ -42,6 +43,9 @@ public class ConfigDenseSurfFast implements Configuration {
 
 	public ConfigDenseSurfFast(DenseSampling sampling) {
 		this.sampling = sampling;
+	}
+
+	public ConfigDenseSurfFast() {
 	}
 
 	@Override

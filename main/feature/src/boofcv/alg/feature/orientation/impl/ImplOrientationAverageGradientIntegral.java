@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageSingleBand,G 
 												  int sampleRadius, double period,
 												  int sampleWidth, double weightSigma,
 												  Class<T> imageType) {
-		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma,imageType);
+		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma, true, imageType);
 	}
 
 	@Override

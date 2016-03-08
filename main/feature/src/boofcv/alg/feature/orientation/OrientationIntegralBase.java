@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public abstract class OrientationIntegralBase<II extends ImageSingleBand,G exten
 	// how often the image is sampled
 	protected double period;
 
-	double objectRadiusToScale;
+	protected double objectRadiusToScale;
 
 	// used to sample the image when it's on the image's border
 	protected SparseScaleGradient<II,G> g;
@@ -64,27 +64,28 @@ public abstract class OrientationIntegralBase<II extends ImageSingleBand,G exten
 	Class<II> integralType;
 	/**
 	 * Configure orientation estimation.
-	 *
-	 * @param sampleRadius The radius of samples that it will do.  Typically 6.
+	 *  @param sampleRadius The radius of samples that it will do.  Typically 6.
 	 * @param period How often the image is sampled in pixels at canonical size. Internally, this value
 	 *               is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
 	 * @param kernelWidth How wide of a kernel should be used to sample. Try 4
-	 * @param weightSigma Sigma for weighting.  zero for unweighted.
+	 * @param weightSigma Sigma for weighting.  &le; zero for unweighted.
+	 * @param assignDefaultRadius If true it will set the object's radius to a scale of 1
 	 */
 	public OrientationIntegralBase(double objectRadiusToScale, int sampleRadius, double period,
-								   int kernelWidth, double weightSigma ,
-								   Class<II> integralType) {
+								   int kernelWidth, double weightSigma,
+								   boolean assignDefaultRadius, Class<II> integralType) {
 		this.objectRadiusToScale = objectRadiusToScale;
 		this.sampleRadius = sampleRadius;
 		this.period = period;
 		this.kernelWidth = kernelWidth;
 		this.sampleWidth = sampleRadius *2+1;
 		this.integralType = integralType;
-		if( weightSigma != 0 )
+		if( weightSigma > 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma, sampleRadius);
 
 		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, integralType);
-		setObjectRadius(1.0/objectRadiusToScale);
+		if( assignDefaultRadius )
+			setObjectRadius(1.0/objectRadiusToScale);
 	}
 	
 	@Override

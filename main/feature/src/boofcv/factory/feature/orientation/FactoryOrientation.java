@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,8 +58,20 @@ public class FactoryOrientation {
 		}
 	}
 
+	/**
+	 * Creates an implementation of the SIFT orientation estimation algorithm
+	 *
+	 * @param configSS Configuration of the scale-space.  null for default
+	 * @param configOri  Orientation configuration. null for default
+	 * @param imageType Type of input image
+	 * @return SIFT orientation image
+	 */
 	public static <T extends ImageSingleBand>
 	OrientationImage<T> sift(ConfigSiftScaleSpace configSS , ConfigSiftOrientation configOri, Class<T> imageType ) {
+		if( configSS == null )
+			configSS = new ConfigSiftScaleSpace();
+		configSS.checkValidity();
+
 		OrientationHistogramSift<ImageFloat32> ori = FactoryOrientationAlgs.sift(configOri,ImageFloat32.class);
 
 		SiftScaleSpace ss = new SiftScaleSpace(

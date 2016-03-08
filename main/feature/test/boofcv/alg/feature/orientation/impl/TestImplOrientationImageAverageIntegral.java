@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,16 +30,21 @@ import org.junit.Test;
  */
 public class TestImplOrientationImageAverageIntegral {
 	double angleTol = 0.01;
-	int r = 3;
+	int r = 4;
+
+	double radiusToScale = 0.25;
+	double period = 1.0;
 
 	@Test
 	public void standardUnweighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
-				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,0,ImageFloat32.class);
+		double scale = 1.0/radiusToScale;
 
-		tests.setup(angleTol, r*2+1+2 , alg,ImageFloat32.class);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
+				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,ImageFloat32.class);
+
+		tests.setup(angleTol, (int)Math.round(scale*period+r) , alg,ImageFloat32.class);
 		tests.checkSubImages();
 		tests.performAll();
 	}
@@ -48,10 +53,12 @@ public class TestImplOrientationImageAverageIntegral {
 	public void standardWeighted() {
 		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
-				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,-1,ImageFloat32.class);
+		double scale = 1.0/radiusToScale;
 
-		tests.setup(angleTol, r*2+1+2 ,alg,ImageFloat32.class);
+		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
+				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,ImageFloat32.class);
+
+		tests.setup(angleTol, (int)Math.round(scale*period+r) ,alg,ImageFloat32.class);
 		tests.performAll();
 	}
 }

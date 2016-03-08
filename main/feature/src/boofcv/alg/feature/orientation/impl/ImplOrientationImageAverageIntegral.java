@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 											   int sampleRadius, double period,
 											   int sampleWidth, double weightSigma,
 											   Class<T> imageType) {
-		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma,imageType);
+		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma, false, imageType);
 
 		int w = sampleRadius*2+1;
 		kerCosine = new Kernel2D_F64(w);
@@ -72,6 +72,7 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 		kerSine.set(sampleRadius,sampleRadius,0);
 
 		sampler = FactorySparseIntegralFilters.sample(imageType);
+		setObjectRadius(1.0/objectRadiusToScale);
 	}
 
 	@Override
@@ -90,8 +91,8 @@ public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G ext
 	public double compute(double c_x, double c_y) {
 
 		double period = scale*this.period;
-		double tl_x = c_x - sampleRadius *period;
-		double tl_y = c_y - sampleRadius *period;
+		double tl_x = c_x - sampleRadius*period;
+		double tl_y = c_y - sampleRadius*period;
 
 		if( weights == null )
 			return computeUnweighted(tl_x,tl_y,period);
