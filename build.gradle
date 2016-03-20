@@ -50,6 +50,8 @@ subprojects {
                 srcDir 'test'
                 srcDir 'generate'
                 srcDir 'benchmark'
+                srcDir 'experimental/src'
+                srcDir 'experimental/test'
             }
             resources {
                 srcDir 'resources/test'

@@ -18,7 +18,6 @@
 
 package boofcv.alg.descriptor;
 
-import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_B;
@@ -48,13 +47,27 @@ public class BenchmarkDescriptorDistance {
 
 	public static class HammingTable extends PerformerBase {
 
-		ScoreAssociateHamming_B table = new ScoreAssociateHamming_B();
+		HammingTable16 table = new HammingTable16();
 
 		@Override
 		public void process() {
 			for (int i = 0; i < binaryA.size(); i++) {
-				table.score(binaryA.get(i),binaryB.get(i));
+				tableScore(binaryA.get(i),binaryB.get(i));
 			}
+		}
+
+		private int tableScore(TupleDesc_B a, TupleDesc_B b) {
+			int score = 0;
+
+			for( int i = 0; i < a.data.length; i++ ) {
+				int dataA = a.data[i];
+				int dataB = b.data[i];
+
+				score += table.lookup( (short)dataA , (short)dataB );
+				score += table.lookup( (short)(dataA >> 16) , (short)(dataB >> 16) );
+			}
+
+			return score;
 		}
 	}
 

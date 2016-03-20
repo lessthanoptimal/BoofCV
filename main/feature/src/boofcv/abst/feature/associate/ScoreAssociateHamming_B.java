@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.descriptor.HammingTable16;
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_B;
 
@@ -30,22 +30,9 @@ import boofcv.struct.feature.TupleDesc_B;
  */
 public class ScoreAssociateHamming_B implements ScoreAssociation<TupleDesc_B>{
 
-	HammingTable16 table = new HammingTable16();
-
 	@Override
 	public double score(TupleDesc_B a, TupleDesc_B b) {
-
-		int score = 0;
-
-		for( int i = 0; i < a.data.length; i++ ) {
-			int dataA = a.data[i];
-			int dataB = b.data[i];
-
-			score += table.lookup( (short)dataA , (short)dataB );
-			score += table.lookup( (short)(dataA >> 16) , (short)(dataB >> 16) );
-		}
-
-		return score;
+		return DescriptorDistance.hamming(a,b);
 	}
 
 	@Override

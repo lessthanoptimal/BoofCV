@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.square;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.descriptor.HammingTable16;
+import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -71,9 +71,6 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 
 	// list of all known targets
 	private List<FiducialDef> targets = new ArrayList<FiducialDef>();
-
-	// lookup table to make computing the match score very fast
-	private HammingTable16 table = new HammingTable16();
 
 	// description of the current target candidate
 	private  short squareDef[] = new short[DESC_LENGTH];
@@ -214,7 +211,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	protected int hamming(short[] a, short[] b) {
 		int distance = 0;
 		for (int i = 0; i < a.length; i++) {
-			distance += table.lookup(a[i],b[i]);
+			distance += DescriptorDistance.hamming((a[i]&0xFFFF) ^ (b[i]&0xFFFF));
 		}
 		return distance;
 	}

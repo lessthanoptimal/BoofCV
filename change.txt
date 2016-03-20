@@ -18,6 +18,11 @@ Version : 0.23
   * Fixed internal null pointer exception
   * Fixed bad unit test
   * Thanks pcmoen for pointing out this bug
+- Hamming Distance
+  * New algorithm from Sean Eron Anderson Bit Twiddling Hack
+  * 68 times faster than equivalent older code
+  * 8 times faster than a lookup table!
+  * Thanks pcmoen for finding this gem and the pull request
 
 
 - TODO HOG
