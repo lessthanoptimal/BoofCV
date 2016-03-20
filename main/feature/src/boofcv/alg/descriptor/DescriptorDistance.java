@@ -205,16 +205,17 @@ public class DescriptorDistance {
 	/**
 	 * Computes the hamming distance.  A bit = 0 is a match and 1 is not match
 	 *
+	 * Based on code snippet from <a href="http://graphics.stanford.edu/~seander/bithacks.html">Sean Eron Anderson Bit Twiddling Hacks</a>.
+	 *
 	 * @param val Hamming encoding
 	 * @return The hamming distance
 	 */
 	public static int hamming( int val ) {
-		int distance = 0;
-
-		while( val != 0 ) {
-			val &= val - 1;
-			distance++;
-		}
-		return distance;
+		int c;
+		int v = val;
+		v = v - ((v >> 1) & 0x55555555);
+		v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+		c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+		return c;
 	}
 }
