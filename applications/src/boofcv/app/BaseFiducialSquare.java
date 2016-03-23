@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -481,7 +481,7 @@ public abstract class BaseFiducialSquare {
 		out.println("  -1 originX mul -1 originY mul translate");
 	}
 
-	public static String binaryToHex( ImageUInt8 binary ) {
+	public static String binaryToHex( GrayU8 binary ) {
 
 		if( binary.width%8 != 0 )
 			throw new RuntimeException("Width must be divisible by 8");

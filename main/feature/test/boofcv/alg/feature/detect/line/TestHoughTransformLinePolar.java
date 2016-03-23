@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.line;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class TestHoughTransformLinePolar {
 	 */
 	@Test
 	public void obviousLines() {
-		ImageUInt8 image = new ImageUInt8(width,height);
+		GrayU8 image = new GrayU8(width,height);
 
 		for( int i = 0; i < height; i++ ) {
 			image.set(5,i,1);

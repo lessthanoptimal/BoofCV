@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.io.wrapper.images;
 
 import boofcv.io.UtilIO;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class TestLoadFileImageSequence {
 	 */
 	@Test
 	public void basicLoadTest() {
-		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageType.single(ImageFloat32.class),
+		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
 				UtilIO.getPathToBase()+"main/io/data/test/","png");
 
 
@@ -49,7 +49,7 @@ public class TestLoadFileImageSequence {
 		int total = 0;
 		while( alg.hasNext() ) {
 			total++;
-			ImageFloat32 image = alg.next();
+			GrayF32 image = alg.next();
 			assertEquals(100,image.width);
 			assertEquals(100,image.height);
 
@@ -66,7 +66,7 @@ public class TestLoadFileImageSequence {
 	 */
 	@Test
 	public void checkLoop() {
-		LoadFileImageSequence<ImageFloat32> alg = new LoadFileImageSequence<ImageFloat32>(ImageType.single(ImageFloat32.class),
+		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
 				UtilIO.getPathToBase()+"main/io/data/test/","png");
 		alg.setLoop(true);
 
@@ -75,7 +75,7 @@ public class TestLoadFileImageSequence {
 		int total = 0;
 		while( alg.hasNext() && total < 6 ) {
 			total++;
-			ImageFloat32 image = alg.next();
+			GrayF32 image = alg.next();
 			assertEquals(100,image.width);
 			assertEquals(100,image.height);
 

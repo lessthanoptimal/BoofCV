@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.core.image.border.BorderIndex1D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -48,8 +48,8 @@ public class ImplWaveletTransformNaive {
 	 * @param input Input image which is being transform. Not modified.
 	 * @param output where the output is written to. Modified
 	 */
-	public static void horizontal( BorderIndex1D border , WlCoef_F32 coefficients ,
-								   ImageFloat32 input , ImageFloat32 output ) {
+	public static void horizontal(BorderIndex1D border , WlCoef_F32 coefficients ,
+								  GrayF32 input , GrayF32 output ) {
 
 		UtilWavelet.checkShape(input,output);
 
@@ -96,8 +96,8 @@ public class ImplWaveletTransformNaive {
 	 * @param input Input image which is being transform. Not modified.
 	 * @param output where the output is written to. Modified
 	 */
-	public static void vertical( BorderIndex1D border , WlCoef_F32 coefficients ,
-								 ImageFloat32 input , ImageFloat32 output ) {
+	public static void vertical(BorderIndex1D border , WlCoef_F32 coefficients ,
+								GrayF32 input , GrayF32 output ) {
 
 		UtilWavelet.checkShape(input,output);
 
@@ -143,7 +143,7 @@ public class ImplWaveletTransformNaive {
 	 * @param input Transformed image. Not modified.
 	 * @param output Reconstruction of original image. Modified
 	 */
-	public static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_F32> inverseCoef , ImageFloat32 input , ImageFloat32 output ) {
+	public static void horizontalInverse(BorderIndex1D border , WlBorderCoef<WlCoef_F32> inverseCoef , GrayF32 input , GrayF32 output ) {
 
 		UtilWavelet.checkShape(output,input);
 
@@ -215,7 +215,7 @@ public class ImplWaveletTransformNaive {
 	 * @param input Transformed image. Not modified.
 	 * @param output Reconstruction of original image. Modified
 	 */
-	public static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_F32> inverseCoef , ImageFloat32 input , ImageFloat32 output ) {
+	public static void verticalInverse(BorderIndex1D border , WlBorderCoef<WlCoef_F32> inverseCoef , GrayF32 input , GrayF32 output ) {
 
 		UtilWavelet.checkShape(output,input);
 
@@ -287,8 +287,8 @@ public class ImplWaveletTransformNaive {
 	 * @param input Input image which is being transform. Not modified.
 	 * @param output where the output is written to. Modified
 	 */
-	public static void horizontal( BorderIndex1D border , WlCoef_I32 coefficients ,
-								   ImageInteger input , ImageInteger output ) {
+	public static void horizontal(BorderIndex1D border , WlCoef_I32 coefficients ,
+								  GrayI input , GrayI output ) {
 
 		UtilWavelet.checkShape(input,output);
 
@@ -338,8 +338,8 @@ public class ImplWaveletTransformNaive {
 	 * @param input Input image which is being transform. Not modified.
 	 * @param output where the output is written to. Modified
 	 */
-	public static void vertical( BorderIndex1D border , WlCoef_I32 coefficients ,
-								 ImageInteger input , ImageInteger output ) {
+	public static void vertical(BorderIndex1D border , WlCoef_I32 coefficients ,
+								GrayI input , GrayI output ) {
 
 		UtilWavelet.checkShape(input,output);
 
@@ -388,7 +388,7 @@ public class ImplWaveletTransformNaive {
 	 * @param input Transformed image. Not modified.
 	 * @param output Reconstruction of original image. Modified
 	 */
-	public static void horizontalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> inverseCoef , ImageInteger input , ImageInteger output ) {
+	public static void horizontalInverse(BorderIndex1D border , WlBorderCoef<WlCoef_I32> inverseCoef , GrayI input , GrayI output ) {
 
 		UtilWavelet.checkShape(output,input);
 
@@ -464,7 +464,7 @@ public class ImplWaveletTransformNaive {
 	 * @param input Transformed image. Not modified.
 	 * @param output Reconstruction of original image. Modified
 	 */
-	public static void verticalInverse( BorderIndex1D border , WlBorderCoef<WlCoef_I32> inverseCoef , ImageInteger input , ImageInteger output ) {
+	public static void verticalInverse(BorderIndex1D border , WlBorderCoef<WlCoef_I32> inverseCoef , GrayI input , GrayI output ) {
 
 		UtilWavelet.checkShape(output,input);
 

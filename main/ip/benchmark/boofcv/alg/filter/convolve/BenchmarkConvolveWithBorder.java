@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -43,15 +43,15 @@ public class BenchmarkConvolveWithBorder {
 
 	static private Kernel2D_F32 kernel2D_F32;
 	static private Kernel1D_F32 kernelF32;
-	static private ImageFloat32 imgFloat32;
-	static private ImageFloat32 out_F32;
+	static private GrayF32 imgFloat32;
+	static private GrayF32 out_F32;
 	static private Kernel1D_I32 kernelI32;
 	static private Kernel2D_I32 kernel2D_I32;
-	static private ImageUInt8 imgInt8;
-	static private ImageSInt16 imgInt16;
-	static private ImageUInt8 out_I8;
-	static private ImageSInt16 out_I16;
-	static private ImageSInt32 out_I32;
+	static private GrayU8 imgInt8;
+	static private GrayS16 imgInt16;
+	static private GrayU8 out_I8;
+	static private GrayS16 out_I16;
+	static private GrayS32 out_I32;
 	static private ImageBorder_S32 border_I32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 	static private ImageBorder_F32 border_F32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 
@@ -60,13 +60,13 @@ public class BenchmarkConvolveWithBorder {
 	private int radius;
 
 	public BenchmarkConvolveWithBorder() {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I32 = new ImageSInt32(imgWidth,imgHeight);
-		out_I16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I8 = new ImageUInt8(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		out_F32 = new ImageFloat32(imgWidth,imgHeight);
+		imgInt8 = new GrayU8(imgWidth,imgHeight);
+		imgInt16 = new GrayS16(imgWidth,imgHeight);
+		out_I32 = new GrayS32(imgWidth,imgHeight);
+		out_I16 = new GrayS16(imgWidth,imgHeight);
+		out_I8 = new GrayU8(imgWidth,imgHeight);
+		imgFloat32 = new GrayF32(imgWidth,imgHeight);
+		out_F32 = new GrayF32(imgWidth,imgHeight);
 
 		Random rand = new Random(234234);
 		ImageMiscOps.fillUniform(imgInt8,rand, 0, 100);

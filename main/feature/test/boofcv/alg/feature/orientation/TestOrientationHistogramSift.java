@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import org.junit.Test;
@@ -42,22 +42,22 @@ public class TestOrientationHistogramSift {
 
 	@Test
 	public void process_easy() {
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
+		GrayF32 derivX = new GrayF32(width, height);
+		GrayF32 derivY = new GrayF32(width, height);
 
 		process_easy(derivX,derivY);
 		BoofTesting.checkSubImage(this,"process_easy",true,derivX,derivY);
 	}
 
-	public void process_easy( ImageFloat32 derivX, ImageFloat32 derivY ) {
+	public void process_easy(GrayF32 derivX, GrayF32 derivY ) {
 		double theta0 = 0.5, theta1 = -1.2;
 		ImageMiscOps.fill(derivX, (float) Math.cos(theta0)*1.5f);
 		ImageMiscOps.fill(derivY, (float) Math.sin(theta0)*1.5f);
 		GImageMiscOps.fillRectangle(derivX,(float) Math.cos(theta1),20,0,30,60);
 		GImageMiscOps.fillRectangle(derivY,(float) Math.sin(theta1),20,0,30,60);
 
-		OrientationHistogramSift<ImageFloat32> alg =
-				new OrientationHistogramSift<ImageFloat32>(36, 1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg =
+				new OrientationHistogramSift<GrayF32>(36, 1.5,GrayF32.class);
 		alg.setImageGradient(derivX, derivY);
 
 		alg.process(20,25,4);
@@ -75,10 +75,10 @@ public class TestOrientationHistogramSift {
 	 */
 	@Test
 	public void computeHistogram() {
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
+		GrayF32 derivX = new GrayF32(width, height);
+		GrayF32 derivY = new GrayF32(width, height);
 		int N = 36;
-		OrientationHistogramSift<ImageFloat32> alg = new OrientationHistogramSift<ImageFloat32>(N, 1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg = new OrientationHistogramSift<GrayF32>(N, 1.5,GrayF32.class);
 		alg.setImageGradient(derivX, derivY);
 
 		for (int degrees = 5; degrees < 360; degrees+=10) {
@@ -113,8 +113,8 @@ public class TestOrientationHistogramSift {
 
 	@Test
 	public void findHistogramPeaks() {
-		OrientationHistogramSift<ImageFloat32> alg =
-				new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg =
+				new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
 
 		int N = alg.histogramX.length;
 
@@ -153,8 +153,8 @@ public class TestOrientationHistogramSift {
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
 
-		OrientationHistogramSift<ImageFloat32> alg =
-				new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg =
+				new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
 
 		// repeat this test all the way around the histogram to ensure wrapping is handled correctly.
 		int N = alg.histogramX.length;
@@ -187,8 +187,8 @@ public class TestOrientationHistogramSift {
 		double dx0 = Math.cos(theta0), dx1 = Math.cos(theta1), dx2 = Math.cos(theta2);
 		double dy0 = Math.sin(theta0), dy1 = Math.sin(theta1), dy2 = Math.sin(theta2);
 
-		OrientationHistogramSift<ImageFloat32> alg =
-				new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg =
+				new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
 
 		alg.histogramX[2] = dx0; alg.histogramY[2] = dy0;
 		alg.histogramX[3] = dx1; alg.histogramY[3] = dy1;
@@ -204,7 +204,7 @@ public class TestOrientationHistogramSift {
 	@Test
 	public void computeWeight() {
 
-		OrientationHistogramSift<ImageFloat32> alg = new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> alg = new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
 
 		double sigma = 2;
 

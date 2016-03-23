@@ -15,17 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 
 import javax.annotation.Generated;
 
 /**
  * <p>
- * Implementation of {@link ImplSsdCornerBase} for {@link ImageSInt16}.
+ * Implementation of {@link ImplSsdCornerBase} for {@link GrayS16}.
  * </p>
  * 
  * <p>
@@ -35,7 +36,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplSsdCorner")
-public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<ImageSInt16,ImageSInt32> {
+public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS32> {
 
 	// temporary storage for convolution along in the vertical axis.
 	private int tempXX[] = new int[1];
@@ -46,7 +47,7 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<ImageSInt16,Im
 	protected int totalXX, totalYY, totalXY;
 
 	public ImplSsdCorner_S16( int windowRadius) {
-		super(windowRadius,ImageSInt32.class);
+		super(windowRadius,GrayS32.class);
 	}
 
 	@Override
@@ -136,7 +137,7 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<ImageSInt16,Im
 	 * calculations for each window and avoiding cache misses. Then compute the eigen values
 	 */
 	@Override
-	protected void vertical( ImageFloat32 intensity ) {
+	protected void vertical( GrayF32 intensity ) {
 		int[] hXX = horizXX.data;
 		int[] hXY = horizXY.data;
 		int[] hYY = horizYY.data;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplFastHelper_F32 extends GenericImplFastHelperTests<ImageFloat32> {
+public class TestImplFastHelper_F32 extends GenericImplFastHelperTests<GrayF32> {
 
 	public TestImplFastHelper_F32() {
-		super(ImageFloat32.class, new ImplFastHelper_F32(10), 10);
+		super(GrayF32.class, new ImplFastHelper_F32(10), 10);
 	}
 
 }

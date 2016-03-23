@@ -33,9 +33,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.homography.UtilHomography;
@@ -70,7 +70,7 @@ import java.util.List;
  */
 // TODO create unit test for bright object
 	// TODO create a way to check to see if the black border is black
-public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
+public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 	// Storage for the found fiducials
 	private FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
@@ -81,10 +81,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private BinaryPolygonDetector<T> squareDetector;
 
 	// image with lens and perspective distortion removed from it
-	ImageFloat32 square;
+	GrayF32 square;
 
 	// storage for binary image
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
 	// Used to compute/remove perspective distortion
 	private HomographyLinear4 computeHomography = new HomographyLinear4(true);
@@ -92,7 +92,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
 	private DenseMatrix64F H_refined = new DenseMatrix64F(3,3);
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
-	private ImageDistort<T,ImageFloat32> removePerspective;
+	private ImageDistort<T,GrayF32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 
 	// How wide the border is relative to the fiducial's total width
@@ -150,7 +150,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		this.inputToBinary = inputToBinary;
 		this.squareDetector = squareDetector;
 		this.inputType = inputType;
-		this.square = new ImageFloat32(squarePixels,squarePixels);
+		this.square = new GrayF32(squarePixels,squarePixels);
 
 		for (int i = 0; i < 4; i++) {
 			pairsRemovePerspective.add(new AssociatedPair());
@@ -165,7 +165,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		// is sent to fiducial decoder
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
 		interp.setBorder(FactoryImageBorder.single(inputType, BorderType.EXTENDED));
-		removePerspective = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
+		removePerspective = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		// if no camera parameters is specified default to this
 		pointUndistToDist = new DoNothingTransform_F64();
@@ -432,7 +432,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 	 * @param edgeOutside Average pixel value along edge outside
 	 * @return true if the square matches a known target.
 	 */
-	protected abstract boolean processSquare( ImageFloat32 square , Result result , double edgeInside , double edgeOutside  );
+	protected abstract boolean processSquare(GrayF32 square , Result result , double edgeInside , double edgeOutside  );
 
 	/**
 	 * Used to toggle on/off verbose debugging information
@@ -446,7 +446,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageSingleBand> {
 		return squareDetector;
 	}
 
-	public ImageUInt8 getBinary() {
+	public GrayU8 getBinary() {
 		return binary;
 	}
 

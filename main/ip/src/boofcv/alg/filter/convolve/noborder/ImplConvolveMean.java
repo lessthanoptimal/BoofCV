@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
  */
 public class ImplConvolveMean {
 
-	public static void horizontal( ImageUInt8 input , ImageInt8 output , int radius ) {
+	public static void horizontal(GrayU8 input , GrayI8 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int divisor = kernelWidth;
@@ -59,7 +59,7 @@ public class ImplConvolveMean {
 		}
 	}
 
-	public static void vertical( ImageUInt8 input , ImageInt8 output , int radius ) {
+	public static void vertical(GrayU8 input , GrayI8 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -95,7 +95,7 @@ public class ImplConvolveMean {
 		}
 	}
 
-	public static void horizontal( ImageSInt16 input , ImageInt16 output , int radius ) {
+	public static void horizontal(GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int divisor = kernelWidth;
@@ -124,7 +124,7 @@ public class ImplConvolveMean {
 		}
 	}
 
-	public static void vertical( ImageSInt16 input , ImageInt16 output , int radius ) {
+	public static void vertical(GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -160,7 +160,7 @@ public class ImplConvolveMean {
 		}
 	}
 
-	public static void horizontal( ImageFloat32 input , ImageFloat32 output , int radius ) {
+	public static void horizontal(GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final float divisor = kernelWidth;
@@ -188,7 +188,7 @@ public class ImplConvolveMean {
 		}
 	}
 
-	public static void vertical( ImageFloat32 input , ImageFloat32 output , int radius ) {
+	public static void vertical(GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;

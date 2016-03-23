@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.sparse.SparseImageSample_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.struct.shapes.RectangleLength2D_I32;
@@ -52,7 +52,7 @@ public class TrackerMeanShiftLikelihood<T extends ImageBase> {
 	private SparseImageSample_F32<T> targetModel;
 
 	// image used to store the likelihood
-	private ImageFloat32 pdf = new ImageFloat32(1,1);
+	private GrayF32 pdf = new GrayF32(1,1);
 	// current location of the target
 	private RectangleLength2D_I32 location = new RectangleLength2D_I32();
 

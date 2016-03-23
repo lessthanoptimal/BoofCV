@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
@@ -52,7 +52,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener {
 	T grayImage;
 
@@ -154,7 +154,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 		// todo modifying buffered images which might be actively being displayed, could mess up swing
 
 		intensityAlg.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
-		ImageFloat32 intensity = intensityAlg.getIntensity();
+		GrayF32 intensity = intensityAlg.getIntensity();
 		intensityImage = VisualizeImageData.colorizeSign(
 				intensityAlg.getIntensity(), null, ImageStatistics.maxAbs(intensity));
 
@@ -246,7 +246,7 @@ public class CompareFeatureExtractorApp<T extends ImageSingleBand, D extends Ima
 	}
 
 	public static void main(String args[]) {
-		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(ImageFloat32.class, ImageFloat32.class);
+		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(GrayF32.class, GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.Method;
@@ -48,7 +48,7 @@ public class FactoryConvolve {
 	 * @param border How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
+	public static <Input extends ImageGray, Output extends ImageGray>
 	ConvolveInterface<Input,Output>
 	convolve( Kernel1D kernel, Class<Input> inputType, Class<Output> outputType , BorderType border , boolean isHorizontal )
 	{
@@ -99,7 +99,7 @@ public class FactoryConvolve {
 	 * @param borderType How the image border is handled.
 	 * @return FilterInterface which will perform the specified convolution.
 	 */
-	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
+	public static <Input extends ImageGray, Output extends ImageGray>
 	ConvolveInterface<Input,Output>
 	convolve( Kernel2D kernel, Class<Input> inputType, Class<Output> outputType , BorderType borderType)
 	{

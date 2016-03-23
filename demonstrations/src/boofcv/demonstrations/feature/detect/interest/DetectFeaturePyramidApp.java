@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 import java.awt.image.BufferedImage;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 {
 	static int NUM_FEATURES = 100;
@@ -143,7 +143,7 @@ public class DetectFeaturePyramidApp <T extends ImageSingleBand, D extends Image
 
 	public static void main( String args[] ) {
 
-		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(ImageFloat32.class,ImageFloat32.class);
+		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(GrayF32.class,GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

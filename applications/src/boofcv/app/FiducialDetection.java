@@ -38,8 +38,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
@@ -68,7 +68,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 	PrintStream outputFile;
 
-	FiducialDetector<ImageUInt8> detector;
+	FiducialDetector<GrayU8> detector;
 
 	void printHelp() {
 		System.out.println("java -jar BLAH <Input Flags> <Fiducial Type> <Fiducial Flags>");
@@ -225,7 +225,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 
-		detector = FactoryFiducial.squareBinary(configFid, configThreshold, ImageUInt8.class);
+		detector = FactoryFiducial.squareBinary(configFid, configThreshold, GrayU8.class);
 	}
 
 	void parseImage( int index , String []args ) {
@@ -271,15 +271,15 @@ public class FiducialDetection extends BaseStandardInputApp {
 		else
 			configThreshold = ConfigThreshold.fixed(DEFAULT_THRESHOLD);
 
-		SquareImage_to_FiducialDetector<ImageUInt8> detector =
-				FactoryFiducial.squareImage(config, configThreshold, ImageUInt8.class);
+		SquareImage_to_FiducialDetector<GrayU8> detector =
+				FactoryFiducial.squareImage(config, configThreshold, GrayU8.class);
 
 		for (int i = 0; i < paths.size(); i++) {
 			BufferedImage buffered = UtilImageIO.loadImage(paths.get(i));
 			if( buffered == null )
 				throw new RuntimeException("Can't find pattern "+paths.get(i));
 
-			ImageUInt8 pattern = new ImageUInt8(buffered.getWidth(),buffered.getHeight());
+			GrayU8 pattern = new GrayU8(buffered.getWidth(),buffered.getHeight());
 
 			ConvertBufferedImage.convertFrom(buffered, pattern);
 
@@ -320,7 +320,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
 		ConfigChessboard config = new ConfigChessboard(rows, cols, width);
 
-		detector = FactoryFiducial.calibChessboard(config, ImageUInt8.class);
+		detector = FactoryFiducial.calibChessboard(config, GrayU8.class);
 	}
 	void parseSquareGrid( int index , String []args ) {
 		int rows=-1,cols=-1;
@@ -357,7 +357,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("square grid: rows = "+rows+" columns = "+cols+"  square width "+width+"  space "+space);
 		ConfigSquareGrid config = new ConfigSquareGrid(rows, cols, width,space);
 
-		detector = FactoryFiducial.calibSquareGrid(config, ImageUInt8.class);
+		detector = FactoryFiducial.calibSquareGrid(config, GrayU8.class);
 	}
 
 	private static IntrinsicParameters handleIntrinsic(IntrinsicParameters intrinsic, int width, int height) {
@@ -392,7 +392,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 	/**
 	 * Displays a continuous stream of images
 	 */
-	private void processStream( IntrinsicParameters intrinsic , SimpleImageSequence<ImageUInt8> sequence , ImagePanel gui , long pauseMilli) {
+	private void processStream(IntrinsicParameters intrinsic , SimpleImageSequence<GrayU8> sequence , ImagePanel gui , long pauseMilli) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
@@ -400,7 +400,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		int frameNumber = 0;
 		while( sequence.hasNext() ) {
 			long before = System.currentTimeMillis();
-			ImageUInt8 input = sequence.next();
+			GrayU8 input = sequence.next();
 			BufferedImage buffered = sequence.getGuiImage();
 			try {
 				detector.detect(input);
@@ -445,7 +445,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
-		ImageUInt8 gray = new ImageUInt8(buffered.getWidth(),buffered.getHeight());
+		GrayU8 gray = new GrayU8(buffered.getWidth(),buffered.getHeight());
 		ConvertBufferedImage.convertFrom(buffered,gray);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
@@ -527,17 +527,17 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		IntrinsicParameters intrinsic = intrinsicPath == null ? null : (IntrinsicParameters)UtilIO.loadXML(intrinsicPath);
 
-		SimpleImageSequence<ImageUInt8> sequence = null;
+		SimpleImageSequence<GrayU8> sequence = null;
 		long pause = 0;
 		BufferedImage buffered = null;
 		if( inputType == InputType.VIDEO || inputType == InputType.WEBCAM ) {
 			if( inputType == InputType.WEBCAM ) {
 				String device = getCameraDeviceString();
-				sequence = media.openCamera(device,desiredWidth, desiredHeight,ImageType.single(ImageUInt8.class));
+				sequence = media.openCamera(device,desiredWidth, desiredHeight,ImageType.single(GrayU8.class));
 			} else {
 				// just assume 30ms is appropriate.  Should let the use specify this number
 				pause = 30;
-				sequence = media.openVideo(filePath,ImageType.single(ImageUInt8.class));
+				sequence = media.openVideo(filePath,ImageType.single(GrayU8.class));
 				sequence.setLoop(true);
 			}
 			intrinsic = handleIntrinsic(intrinsic, sequence.getNextWidth(), sequence.getNextHeight());

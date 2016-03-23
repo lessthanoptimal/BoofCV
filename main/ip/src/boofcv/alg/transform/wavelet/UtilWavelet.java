@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class UtilWavelet {
 	 * @param original Original input image.
 	 * @param transformed Image which has been transformed.
 	 */
-	public static void checkShape( ImageSingleBand original , ImageSingleBand transformed )
+	public static void checkShape(ImageGray original , ImageGray transformed )
 	{
 		if( transformed.width % 2 == 1 || transformed.height % 2 == 1 )
 			throw new IllegalArgumentException("Image containing the wavelet transform must have an even width and height.");
@@ -56,7 +56,7 @@ public class UtilWavelet {
 	}
 
 
-	public static void checkShape( WlCoef desc , ImageSingleBand original , ImageSingleBand transformed , int level )
+	public static void checkShape(WlCoef desc , ImageGray original , ImageGray transformed , int level )
 	{
 		ImageDimension tranDim = UtilWavelet.transformDimension(original,level);
 
@@ -329,14 +329,14 @@ public class UtilWavelet {
 	 * @param transform
 	 * @param numLevels Number of levels in the transform
 	 */
-	public static void adjustForDisplay( ImageSingleBand transform , int numLevels , double valueRange ) {
-		if( transform instanceof ImageFloat32 )
-			adjustForDisplay((ImageFloat32)transform,numLevels,(float)valueRange);
+	public static void adjustForDisplay(ImageGray transform , int numLevels , double valueRange ) {
+		if( transform instanceof GrayF32)
+			adjustForDisplay((GrayF32)transform,numLevels,(float)valueRange);
 		else
-			adjustForDisplay((ImageInteger)transform,numLevels,(int)valueRange);
+			adjustForDisplay((GrayI)transform,numLevels,(int)valueRange);
 	}
 
-	private static void adjustForDisplay( ImageFloat32 transform , int numLevels , float valueRange ) {
+	private static void adjustForDisplay(GrayF32 transform , int numLevels , float valueRange ) {
 		int div = (int)Math.pow(2,numLevels);
 
 		int minX = 0;
@@ -369,7 +369,7 @@ public class UtilWavelet {
 		}
 	}
 
-	private static void adjustForDisplay( ImageInteger transform , int numLevels , int valueRange ) {
+	private static void adjustForDisplay(GrayI transform , int numLevels , int valueRange ) {
 		int div = (int)Math.pow(2,numLevels);
 
 		int minX = 0;

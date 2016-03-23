@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class HoughTransformLineFootOfNorm {
 	int originY;
 	// contains a set of counts for detected lines in each pixel
 	// floating point image used because that's what FeatureExtractor's take as input
-	ImageFloat32 transform = new ImageFloat32(1,1);
+	GrayF32 transform = new GrayF32(1,1);
 	// found lines in transform space
 	QueueCorner foundLines = new QueueCorner(10);
 	// list of points in the transform with non-zero values
@@ -89,7 +89,7 @@ public class HoughTransformLineFootOfNorm {
 	 * @param derivY Image derivative along y-axis.
 	 * @param binary Non-zero pixels are considered to be line pixels.
 	 */
-	public <D extends ImageSingleBand> void transform( D derivX , D derivY , ImageUInt8 binary )
+	public <D extends ImageGray> void transform(D derivX , D derivY , GrayU8 binary )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,binary);
 
@@ -100,12 +100,12 @@ public class HoughTransformLineFootOfNorm {
 		originY = derivX.height/2;
 		candidates.reset();
 
-		if( derivX instanceof ImageFloat32 )
-			_transform((ImageFloat32)derivX,(ImageFloat32)derivY,binary);
-		else if( derivX instanceof ImageSInt16 )
-			_transform((ImageSInt16)derivX,(ImageSInt16)derivY,binary);
-		else if( derivX instanceof ImageSInt32 )
-			_transform((ImageSInt32)derivX,(ImageSInt32)derivY,binary);
+		if( derivX instanceof GrayF32)
+			_transform((GrayF32)derivX,(GrayF32)derivY,binary);
+		else if( derivX instanceof GrayS16)
+			_transform((GrayS16)derivX,(GrayS16)derivY,binary);
+		else if( derivX instanceof GrayS32)
+			_transform((GrayS32)derivX,(GrayS32)derivY,binary);
 		else
 			throw new IllegalArgumentException("Unsupported derivative image type: "+derivX.getClass().getSimpleName());
 	}
@@ -174,7 +174,7 @@ public class HoughTransformLineFootOfNorm {
 	 *
 	 * @return Transform image.
 	 */
-	public ImageFloat32 getTransform() {
+	public GrayF32 getTransform() {
 		return transform;
 	}
 
@@ -188,7 +188,7 @@ public class HoughTransformLineFootOfNorm {
 		return foundIntensity.data;
 	}
 
-	private void _transform( ImageFloat32 derivX , ImageFloat32 derivY , ImageUInt8 binary )
+	private void _transform(GrayF32 derivX , GrayF32 derivY , GrayU8 binary )
 	{
 		// apply the transform to the entire image
 		for( int y = 0; y < binary.height; y++ ) {
@@ -204,7 +204,7 @@ public class HoughTransformLineFootOfNorm {
 		}
 	}
 
-	private void _transform( ImageSInt16 derivX , ImageSInt16 derivY , ImageUInt8 binary )
+	private void _transform(GrayS16 derivX , GrayS16 derivY , GrayU8 binary )
 	{
 		// apply the transform to the entire image
 		for( int y = 0; y < binary.height; y++ ) {
@@ -220,7 +220,7 @@ public class HoughTransformLineFootOfNorm {
 		}
 	}
 
-	private void _transform( ImageSInt32 derivX , ImageSInt32 derivY , ImageUInt8 binary )
+	private void _transform(GrayS32 derivX , GrayS32 derivY , GrayU8 binary )
 	{
 		// apply the transform to the entire image
 		for( int y = 0; y < binary.height; y++ ) {

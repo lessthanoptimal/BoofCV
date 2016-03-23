@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -80,11 +80,11 @@ public class TestConvolveImageStandardSparse {
 	}
 
 	private void checkMethod(Method method, int width, int height, int kernelOffset , int kernelWidth, Random rand) {
-		ImageUInt8 seedImage = new ImageUInt8(width,height);
+		GrayU8 seedImage = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(seedImage,rand,0,255);
 
 		// creates a floating point image with integer elements
-		ImageFloat32 floatImage = new ImageFloat32(width,height);
+		GrayF32 floatImage = new GrayF32(width,height);
 		ConvertImage.convert(seedImage,floatImage);
 
 		sumKernel = 0;
@@ -103,14 +103,14 @@ public class TestConvolveImageStandardSparse {
 
 		expectedOutput = computeExpected(seedImage,!isFloatingKernel,isDivisor);
 
-		ImageSingleBand inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
+		ImageGray inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
 		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
 
 		checkResults(method,inputKernel,inputImage,inputStorage);
 	}
 
-	private void checkResults(Method method, Object inputKernel, ImageSingleBand<?> inputImage, Object inputStorage) {
+	private void checkResults(Method method, Object inputKernel, ImageGray<?> inputImage, Object inputStorage) {
 		try {
 			Number result;
 			if( method.getParameterTypes().length == 6 )
@@ -128,20 +128,20 @@ public class TestConvolveImageStandardSparse {
 		}
 	}
 
-	private float computeExpected( ImageUInt8 image , boolean isInteger , boolean isDivisor ) {
+	private float computeExpected(GrayU8 image , boolean isInteger , boolean isDivisor ) {
 
 		if( isInteger && isDivisor  ) {
-			ImageUInt8 temp = new ImageUInt8(image.width,image.height);
-			ImageUInt8 temp2 = new ImageUInt8(image.width,image.height);
+			GrayU8 temp = new GrayU8(image.width,image.height);
+			GrayU8 temp2 = new GrayU8(image.width,image.height);
 
 			ConvolveImageNoBorder.horizontal(kernelI32,image,temp,sumKernel);
 			ConvolveImageNoBorder.vertical(kernelI32,temp,temp2,sumKernel);
 
 			return temp2.get(targetX,targetY);
 		} else {
-			ImageFloat32 imageF = new ImageFloat32(image.width,image.height);
-			ImageFloat32 temp = new ImageFloat32(image.width,image.height);
-			ImageFloat32 temp2 = new ImageFloat32(image.width,image.height);
+			GrayF32 imageF = new GrayF32(image.width,image.height);
+			GrayF32 temp = new GrayF32(image.width,image.height);
+			GrayF32 temp2 = new GrayF32(image.width,image.height);
 
 			ConvertImage.convert(image,imageF);
 

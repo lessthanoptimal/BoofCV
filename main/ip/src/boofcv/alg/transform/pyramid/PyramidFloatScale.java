@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -35,7 +35,7 @@ import boofcv.struct.pyramid.PyramidFloat;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidFloatScale< T extends ImageSingleBand>
+public class PyramidFloatScale< T extends ImageGray>
 		extends PyramidFloat<T> {
 
 	// interpolation algorithm

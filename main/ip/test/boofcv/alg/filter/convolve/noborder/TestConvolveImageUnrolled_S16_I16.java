@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayI16;
+import boofcv.struct.image.GrayS16;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -37,7 +37,7 @@ public class TestConvolveImageUnrolled_S16_I16 {
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_S16_I16.class.getMethod("convolve",
-					Kernel2D_I32.class, ImageSInt16.class, ImageInt16.class );
+					Kernel2D_I32.class, GrayS16.class, GrayI16.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -48,7 +48,7 @@ public class TestConvolveImageUnrolled_S16_I16 {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_S16_I16.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class);
+					Kernel1D_I32.class, GrayS16.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -59,7 +59,7 @@ public class TestConvolveImageUnrolled_S16_I16 {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_S16_I16.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class);
+					Kernel1D_I32.class, GrayS16.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

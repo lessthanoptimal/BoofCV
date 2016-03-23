@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerTwoPassKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
+public class PointTrackerTwoPassKltPyramid<I extends ImageGray,D extends ImageGray>
 	extends PointTrackerKltPyramid<I,D> implements PointTrackerTwoPass<I>
 {
 	// list of active tracks before the current image is processed

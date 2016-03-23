@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayI8;
+import boofcv.struct.image.GrayU8;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -51,8 +51,8 @@ public class ConvolveUnsafe_U8 {
 		}
 	}
 
-	public static boolean convolve( Kernel2D_I32 kernel ,
-									ImageUInt8 image, ImageInt8 dest , int divisor ) {
+	public static boolean convolve(Kernel2D_I32 kernel ,
+								   GrayU8 image, GrayI8 dest , int divisor ) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest,divisor);
@@ -69,8 +69,8 @@ public class ConvolveUnsafe_U8 {
 	}
 
 
-	public static void convolve3(Kernel2D_I32 kernel, ImageUInt8 src,
-								 ImageInt8 dest, int divisor) {
+	public static void convolve3(Kernel2D_I32 kernel, GrayU8 src,
+								 GrayI8 dest, int divisor) {
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
 
@@ -156,8 +156,8 @@ public class ConvolveUnsafe_U8 {
 		}
 	}
 
-	public static void convolve5(Kernel2D_I32 kernel, ImageUInt8 src,
-								 ImageInt8 dest, int divisor) {
+	public static void convolve5(Kernel2D_I32 kernel, GrayU8 src,
+								 GrayI8 dest, int divisor) {
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
 

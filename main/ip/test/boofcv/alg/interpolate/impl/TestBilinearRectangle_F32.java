@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearRectangle_F32 extends GeneralBilinearRectangleChecks<ImageFloat32>{
+public class TestBilinearRectangle_F32 extends GeneralBilinearRectangleChecks<GrayF32>{
 
 
 	public TestBilinearRectangle_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width,height);
+	protected GrayF32 createImage(int width, int height) {
+		return new GrayF32(width,height);
 	}
 }

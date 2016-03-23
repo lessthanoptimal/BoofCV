@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedStandardSparse;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Performs a convolution around a single pixel only using two 1D kernels in the horizontal and vertical direction.
@@ -46,8 +46,8 @@ public class ConvolveNormalizedSparse {
 	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
 	 * @return Result of the convolution.
 	 */
-	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
-								  ImageFloat32 input, int c_x , int c_y, float storage[] )
+	public static float convolve(Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
+								 GrayF32 input, int c_x , int c_y, float storage[] )
 	{
 		if( horizontal.width != vertical.width )
 			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");
@@ -67,8 +67,8 @@ public class ConvolveNormalizedSparse {
 	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
 	 * @return Result of the convolution.
 	 */
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageUInt8 input, int c_x , int c_y, int storage[] )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		if( horizontal.width != vertical.width )
 			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");
@@ -88,8 +88,8 @@ public class ConvolveNormalizedSparse {
 	 * @param storage Temporary storage.  Needs to be the same size as the kernels being convolved.
 	 * @return Result of the convolution.
 	 */
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageSInt16 input, int c_x , int c_y, int storage[] )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		if( horizontal.width != vertical.width )
 			throw new IllegalArgumentException("Both kernels need to be the same width.  Change code if this is a problem.");

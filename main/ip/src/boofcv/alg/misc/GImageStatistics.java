@@ -33,23 +33,23 @@ public class GImageStatistics {
 	 * @return Largest pixel absolute value.
 	 */
 	public static double maxAbs( ImageBase input ) {
-		if( input instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageUInt8) input);
-			} else if (ImageSInt8.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageSInt8) input);
-			} else if (ImageUInt16.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageUInt16) input);
-			} else if (ImageSInt16.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageSInt16) input);
-			} else if (ImageSInt32.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageSInt32) input);
-			} else if (ImageSInt64.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageSInt64) input);
-			} else if (ImageFloat32.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageFloat32) input);
-			} else if (ImageFloat64.class == input.getClass()) {
-				return ImageStatistics.maxAbs((ImageFloat64) input);
+		if( input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayU8) input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayS8) input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayU16) input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayS16) input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayS32) input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayS64) input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayF32) input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.maxAbs((GrayF64) input);
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
@@ -85,23 +85,23 @@ public class GImageStatistics {
 	 * @return Maximum pixel value.
 	 */
 	public static double max( ImageBase input ) {
-		if( input instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == input.getClass()) {
-				return ImageStatistics.max((ImageUInt8) input);
-			} else if (ImageSInt8.class == input.getClass()) {
-				return ImageStatistics.max((ImageSInt8) input);
-			} else if (ImageUInt16.class == input.getClass()) {
-				return ImageStatistics.max((ImageUInt16) input);
-			} else if (ImageSInt16.class == input.getClass()) {
-				return ImageStatistics.max((ImageSInt16) input);
-			} else if (ImageSInt32.class == input.getClass()) {
-				return ImageStatistics.max((ImageSInt32) input);
-			} else if (ImageSInt64.class == input.getClass()) {
-				return ImageStatistics.max((ImageSInt64) input);
-			} else if (ImageFloat32.class == input.getClass()) {
-				return ImageStatistics.max((ImageFloat32) input);
-			} else if (ImageFloat64.class == input.getClass()) {
-				return ImageStatistics.max((ImageFloat64) input);
+		if( input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.max((GrayU8) input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.max((GrayS8) input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.max((GrayU16) input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.max((GrayS16) input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.max((GrayS32) input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.max((GrayS64) input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.max((GrayF32) input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.max((GrayF64) input);
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type");
 			}
@@ -137,23 +137,23 @@ public class GImageStatistics {
 	 * @return Minimum pixel value.
 	 */
 	public static double min( ImageBase input ) {
-		if( input instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == input.getClass()) {
-				return ImageStatistics.min((ImageUInt8) input);
-			} else if (ImageSInt8.class == input.getClass()) {
-				return ImageStatistics.min((ImageSInt8) input);
-			} else if (ImageUInt16.class == input.getClass()) {
-				return ImageStatistics.min((ImageUInt16) input);
-			} else if (ImageSInt16.class == input.getClass()) {
-				return ImageStatistics.min((ImageSInt16) input);
-			} else if (ImageSInt32.class == input.getClass()) {
-				return ImageStatistics.min((ImageSInt32) input);
-			} else if (ImageSInt64.class == input.getClass()) {
-				return ImageStatistics.min((ImageSInt64) input);
-			} else if (ImageFloat32.class == input.getClass()) {
-				return ImageStatistics.min((ImageFloat32) input);
-			} else if (ImageFloat64.class == input.getClass()) {
-				return ImageStatistics.min((ImageFloat64) input);
+		if( input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.min((GrayU8) input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.min((GrayS8) input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.min((GrayU16) input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.min((GrayS16) input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.min((GrayS32) input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.min((GrayS64) input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.min((GrayF32) input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.min((GrayF64) input);
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
@@ -192,23 +192,23 @@ public class GImageStatistics {
 	 */
 	public static double sum( ImageBase input ) {
 
-		if( input instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == input.getClass()) {
-				return ImageStatistics.sum((ImageUInt8) input);
-			} else if (ImageSInt8.class == input.getClass()) {
-				return ImageStatistics.sum((ImageSInt8) input);
-			} else if (ImageUInt16.class == input.getClass()) {
-				return ImageStatistics.sum((ImageUInt16) input);
-			} else if (ImageSInt16.class == input.getClass()) {
-				return ImageStatistics.sum((ImageSInt16) input);
-			} else if (ImageSInt32.class == input.getClass()) {
-				return ImageStatistics.sum((ImageSInt32) input);
-			} else if (ImageSInt64.class == input.getClass()) {
-				return ImageStatistics.sum((ImageSInt64) input);
-			} else if (ImageFloat32.class == input.getClass()) {
-				return ImageStatistics.sum((ImageFloat32) input);
-			} else if (ImageFloat64.class == input.getClass()) {
-				return ImageStatistics.sum((ImageFloat64) input);
+		if( input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.sum((GrayU8) input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.sum((GrayS8) input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.sum((GrayU16) input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.sum((GrayS16) input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.sum((GrayS32) input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.sum((GrayS64) input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.sum((GrayF32) input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.sum((GrayF64) input);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
@@ -245,23 +245,23 @@ public class GImageStatistics {
 	 */
 	public static double mean( ImageBase input ) {
 
-		if( input instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == input.getClass()) {
-				return ImageStatistics.mean((ImageUInt8) input);
-			} else if (ImageSInt8.class == input.getClass()) {
-				return ImageStatistics.mean((ImageSInt8) input);
-			} else if (ImageUInt16.class == input.getClass()) {
-				return ImageStatistics.mean((ImageUInt16) input);
-			} else if (ImageSInt16.class == input.getClass()) {
-				return ImageStatistics.mean((ImageSInt16) input);
-			} else if (ImageSInt32.class == input.getClass()) {
-				return ImageStatistics.mean((ImageSInt32) input);
-			} else if (ImageSInt64.class == input.getClass()) {
-				return ImageStatistics.mean((ImageSInt64) input);
-			} else if (ImageFloat32.class == input.getClass()) {
-				return ImageStatistics.mean((ImageFloat32) input);
-			} else if (ImageFloat64.class == input.getClass()) {
-				return ImageStatistics.mean((ImageFloat64) input);
+		if( input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.mean((GrayU8) input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.mean((GrayS8) input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.mean((GrayU16) input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.mean((GrayS16) input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.mean((GrayS32) input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.mean((GrayS64) input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.mean((GrayF32) input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.mean((GrayF64) input);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
@@ -297,24 +297,24 @@ public class GImageStatistics {
 	 * @param mean Mean pixel intensity value.
 	 * @return Pixel variance
 	 */
-	public static <T extends ImageSingleBand> double variance( T input , double mean ) {
+	public static <T extends ImageGray> double variance(T input , double mean ) {
 
-		if( ImageUInt8.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageUInt8)input,mean);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageSInt8)input,mean);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageUInt16)input,mean);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageSInt16)input,mean);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageSInt32)input,mean);
-		} else if( ImageSInt64.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageSInt64)input,mean);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageFloat32)input,mean);
-		} else if( ImageFloat64.class == input.getClass() ) {
-			return ImageStatistics.variance((ImageFloat64)input,mean);
+		if( GrayU8.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayU8)input,mean);
+		} else if( GrayS8.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayS8)input,mean);
+		} else if( GrayU16.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayU16)input,mean);
+		} else if( GrayS16.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayS16)input,mean);
+		} else if( GrayS32.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayS32)input,mean);
+		} else if( GrayS64.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayS64)input,mean);
+		} else if( GrayF32.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayF32)input,mean);
+		} else if( GrayF64.class == input.getClass() ) {
+			return ImageStatistics.variance((GrayF64)input,mean);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type");
 		}
@@ -329,23 +329,23 @@ public class GImageStatistics {
 	 */
 	public static <T extends ImageBase> double meanDiffSq( T inputA , T inputB ) {
 
-		if( inputA instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageUInt8) inputA, (ImageUInt8) inputB);
-			} else if (ImageSInt8.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageSInt8) inputA, (ImageSInt8) inputB);
-			} else if (ImageUInt16.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageUInt16) inputA, (ImageUInt16) inputB);
-			} else if (ImageSInt16.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageSInt16) inputA, (ImageSInt16) inputB);
-			} else if (ImageSInt32.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageSInt32) inputA, (ImageSInt32) inputB);
-			} else if (ImageSInt64.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageSInt64) inputA, (ImageSInt64) inputB);
-			} else if (ImageFloat32.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageFloat32) inputA, (ImageFloat32) inputB);
-			} else if (ImageFloat64.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffSq((ImageFloat64) inputA, (ImageFloat64) inputB);
+		if( inputA instanceof ImageGray) {
+			if (GrayU8.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayU8) inputA, (GrayU8) inputB);
+			} else if (GrayS8.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayS8) inputA, (GrayS8) inputB);
+			} else if (GrayU16.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayU16) inputA, (GrayU16) inputB);
+			} else if (GrayS16.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayS16) inputA, (GrayS16) inputB);
+			} else if (GrayS32.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayS32) inputA, (GrayS32) inputB);
+			} else if (GrayS64.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayS64) inputA, (GrayS64) inputB);
+			} else if (GrayF32.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayF32) inputA, (GrayF32) inputB);
+			} else if (GrayF64.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffSq((GrayF64) inputA, (GrayF64) inputB);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
@@ -383,23 +383,23 @@ public class GImageStatistics {
 	 */
 	public static <T extends ImageBase> double meanDiffAbs( T inputA , T inputB ) {
 
-		if( inputA instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageUInt8) inputA, (ImageUInt8) inputB);
-			} else if (ImageSInt8.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageSInt8) inputA, (ImageSInt8) inputB);
-			} else if (ImageUInt16.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageUInt16) inputA, (ImageUInt16) inputB);
-			} else if (ImageSInt16.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageSInt16) inputA, (ImageSInt16) inputB);
-			} else if (ImageSInt32.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageSInt32) inputA, (ImageSInt32) inputB);
-			} else if (ImageSInt64.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageSInt64) inputA, (ImageSInt64) inputB);
-			} else if (ImageFloat32.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageFloat32) inputA, (ImageFloat32) inputB);
-			} else if (ImageFloat64.class == inputA.getClass()) {
-				return ImageStatistics.meanDiffAbs((ImageFloat64) inputA, (ImageFloat64) inputB);
+		if( inputA instanceof ImageGray) {
+			if (GrayU8.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayU8) inputA, (GrayU8) inputB);
+			} else if (GrayS8.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayS8) inputA, (GrayS8) inputB);
+			} else if (GrayU16.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayU16) inputA, (GrayU16) inputB);
+			} else if (GrayS16.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayS16) inputA, (GrayS16) inputB);
+			} else if (GrayS32.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayS32) inputA, (GrayS32) inputB);
+			} else if (GrayS64.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayS64) inputA, (GrayS64) inputB);
+			} else if (GrayF32.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayF32) inputA, (GrayF32) inputB);
+			} else if (GrayF64.class == inputA.getClass()) {
+				return ImageStatistics.meanDiffAbs((GrayF64) inputA, (GrayF64) inputB);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
@@ -436,23 +436,23 @@ public class GImageStatistics {
 	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
-	public static void histogram( ImageSingleBand input , int minValue , int histogram[] ) {
-		if( ImageUInt8.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageUInt8)input,histogram);
-		} else if( ImageSInt8.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageSInt8)input,minValue,histogram);
-		} else if( ImageUInt16.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageUInt16)input,histogram);
-		} else if( ImageSInt16.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageSInt16)input,minValue,histogram);
-		} else if( ImageSInt32.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageSInt32)input,minValue,histogram);
-		} else if( ImageSInt64.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageSInt64)input,minValue,histogram);
-		} else if( ImageFloat32.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageFloat32)input,minValue,histogram);
-		} else if( ImageFloat64.class == input.getClass() ) {
-			ImageStatistics.histogram((ImageFloat64)input,minValue,histogram);
+	public static void histogram(ImageGray input , int minValue , int histogram[] ) {
+		if( GrayU8.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayU8)input,histogram);
+		} else if( GrayS8.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayS8)input,minValue,histogram);
+		} else if( GrayU16.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayU16)input,histogram);
+		} else if( GrayS16.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayS16)input,minValue,histogram);
+		} else if( GrayS32.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayS32)input,minValue,histogram);
+		} else if( GrayS64.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayS64)input,minValue,histogram);
+		} else if( GrayF32.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayF32)input,minValue,histogram);
+		} else if( GrayF64.class == input.getClass() ) {
+			ImageStatistics.histogram((GrayF64)input,minValue,histogram);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type");
 		}

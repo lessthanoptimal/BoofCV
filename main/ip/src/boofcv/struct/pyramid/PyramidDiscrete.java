@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class PyramidDiscrete<T extends ImageSingleBand> extends ImagePyramidBase<T> {
+public abstract class PyramidDiscrete<T extends ImageGray> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
 	public int scale[];

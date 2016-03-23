@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,11 @@ import boofcv.struct.image.*;
  */
 public class ImplConvertYV12 {
 
-	public static void yv12ToMultiRgb_U8(byte[] dataYV, MultiSpectral<ImageUInt8> output) {
+	public static void yv12ToMultiRgb_U8(byte[] dataYV, Planar<GrayU8> output) {
 
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;
@@ -106,11 +106,11 @@ public class ImplConvertYV12 {
 		}
 	}
 
-	public static void yv12ToMultiRgb_F32(byte[] dataYV, MultiSpectral<ImageFloat32> output) {
+	public static void yv12ToMultiRgb_F32(byte[] dataYV, Planar<GrayF32> output) {
 
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;

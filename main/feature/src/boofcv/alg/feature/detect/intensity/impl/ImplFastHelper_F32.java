@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class ImplFastHelper_F32 implements FastHelper<ImageFloat32> {
-	private ImageFloat32 image;
+public class ImplFastHelper_F32 implements FastHelper<GrayF32> {
+	private GrayF32 image;
 
 	// how similar do the pixel in the circle need to be to the center pixel
 	private float pixelTol;
@@ -42,7 +42,7 @@ public class ImplFastHelper_F32 implements FastHelper<ImageFloat32> {
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image , int offsets[] ) {
+	public void setImage(GrayF32 image , int offsets[] ) {
 		this.image = image;
 		this.offsets = offsets;
 	}

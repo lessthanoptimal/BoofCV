@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.alg.feature.color;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -43,7 +43,7 @@ public class TestHistogramFeatureOps {
 	@Test
 	public void histogram_U8() {
 
-		ImageUInt8 image = new ImageUInt8(width,height);
+		GrayU8 image = new GrayU8(width,height);
 
 		image.set(2, 3, 40);
 		image.set(2, 4, 40);
@@ -81,7 +81,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_U16() {
-		ImageUInt16 image = new ImageUInt16(width,height);
+		GrayU16 image = new GrayU16(width,height);
 
 		image.set(2, 3, 40000);
 		image.set(2, 4, 40000);
@@ -104,7 +104,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_F32() {
-		ImageFloat32 image = new ImageFloat32(width,height);
+		GrayF32 image = new GrayF32(width,height);
 
 		image.set(2, 3, 40);
 		image.set(2, 4, 40);
@@ -143,7 +143,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_MS_U8() {
-		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,2);
+		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
 		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
@@ -170,10 +170,10 @@ public class TestHistogramFeatureOps {
 	 */
 	@Test
 	public void histogram_MS_U8_compareToSingle() {
-		ImageUInt8 image = new ImageUInt8(width,height);
+		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
-		MultiSpectral<ImageUInt8> ms = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,1);
+		Planar<GrayU8> ms = new Planar<GrayU8>(GrayU8.class,width,height,1);
 		ms.setBand(0,image);
 
 		TupleDesc_F64 expected = new TupleDesc_F64(256);
@@ -190,7 +190,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_MS_F32() {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,2);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
 		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
@@ -217,10 +217,10 @@ public class TestHistogramFeatureOps {
 	 */
 	@Test
 	public void histogram_MS_F32_compareToSingle() {
-		ImageFloat32 image = new ImageFloat32(width,height);
+		GrayF32 image = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(image,rand,-100,100);
 
-		MultiSpectral<ImageFloat32> ms = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,1);
+		Planar<GrayF32> ms = new Planar<GrayF32>(GrayF32.class,width,height,1);
 		ms.setBand(0,image);
 
 		TupleDesc_F64 expected = new TupleDesc_F64(200);

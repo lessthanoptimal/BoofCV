@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestThresholdSauvola {
 	@Test
 	public void simple() {
 		int radius = 5;
-		ImageUInt8 expected = new ImageUInt8(30,35);
+		GrayU8 expected = new GrayU8(30,35);
 
 		for (int y = radius; y < expected.height-radius; y++) {
 			expected.set(20,y,1);
@@ -50,12 +50,12 @@ public class TestThresholdSauvola {
 			expected.set(22,y,1);
 		}
 
-		ImageFloat32 input = new ImageFloat32(expected.width,expected.height);
+		GrayF32 input = new GrayF32(expected.width,expected.height);
 		for (int i = 0; i < input.width * input.height; i++) {
 			input.data[i] = expected.data[i] == 0 ? 255 : 0;
 		}
 
-		ImageUInt8 found = new ImageUInt8(expected.width,expected.height);
+		GrayU8 found = new GrayU8(expected.width,expected.height);
 
 		ThresholdSauvola alg = new ThresholdSauvola(radius,0.5f,true);
 
@@ -79,13 +79,13 @@ public class TestThresholdSauvola {
 	}
 
 	private void checkBruteForce(int w, int h, int radius, float k, boolean down) {
-		ImageUInt8 expected = new ImageUInt8(w,h);
-		ImageUInt8 found = new ImageUInt8(w,h);
-		ImageFloat32 input = new ImageFloat32(w,h);
+		GrayU8 expected = new GrayU8(w,h);
+		GrayU8 found = new GrayU8(w,h);
+		GrayF32 input = new GrayF32(w,h);
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
 
-		ImageFloat32 mean = new ImageFloat32(w,h);
-		ImageFloat32 stdev = new ImageFloat32(w,h);
+		GrayF32 mean = new GrayF32(w,h);
+		GrayF32 stdev = new GrayF32(w,h);
 
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
@@ -115,7 +115,7 @@ public class TestThresholdSauvola {
 		BoofTesting.assertEquals(expected, found, 0);
 	}
 
-	private float mean( ImageFloat32 input , int c_x , int c_y , int radius ) {
+	private float mean(GrayF32 input , int c_x , int c_y , int radius ) {
 		int x0 = c_x - radius;
 		int x1 = x0 + radius*2 + 1;
 		int y0 = c_y - radius;
@@ -136,7 +136,7 @@ public class TestThresholdSauvola {
 		return total/((x1-x0)*(y1-y0));
 	}
 
-	private float stdev( ImageFloat32 input , float mean, int c_x , int c_y , int radius ) {
+	private float stdev(GrayF32 input , float mean, int c_x , int c_y , int radius ) {
 		int x0 = c_x - radius;
 		int x1 = x0 + radius*2 + 1;
 		int y0 = c_y - radius;

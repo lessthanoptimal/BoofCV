@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface RefineBinaryPolygon<T extends ImageSingleBand> {
+public interface RefineBinaryPolygon<T extends ImageGray> {
 
 	/**
 	 * Sets the input image

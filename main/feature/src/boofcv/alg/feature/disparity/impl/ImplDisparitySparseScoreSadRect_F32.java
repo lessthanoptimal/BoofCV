@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link ImageFloat32}.
+ * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayF32}.
  * </p>
  *
  * <p>
@@ -34,7 +34,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDisparitySparseScoreSadRect_F32 extends DisparitySparseScoreSadRect<float[],ImageFloat32> {
+public class ImplDisparitySparseScoreSadRect_F32 extends DisparitySparseScoreSadRect<float[],GrayF32> {
 
 	// scores up to the maximum baseline
 	float scores[];
@@ -84,8 +84,8 @@ public class ImplDisparitySparseScoreSadRect_F32 extends DisparitySparseScoreSad
 	}
 
 	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
+	public Class<GrayF32> getImageType() {
+		return GrayF32.class;
 	}
 
 }

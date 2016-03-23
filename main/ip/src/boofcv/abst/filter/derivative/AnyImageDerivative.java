@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class AnyImageDerivative<I extends ImageGray, D extends ImageGray> {
 
 	// filters for computing image derivatives
 	private ConvolveInterface<I, D> derivX;
@@ -180,12 +180,12 @@ public class AnyImageDerivative<I extends ImageSingleBand, D extends ImageSingle
 	}
 
 	private void declareTree( int maxDerivativeOrder ) {
-		derivatives = (D[][])new ImageSingleBand[maxDerivativeOrder][];
+		derivatives = (D[][])new ImageGray[maxDerivativeOrder][];
 		stale = new boolean[maxDerivativeOrder][];
 
 		for( int i = 0; i < maxDerivativeOrder; i++) {
 			int N = (int)Math.pow(2,i+1);
-			derivatives[i] = (D[])new ImageSingleBand[N];
+			derivatives[i] = (D[])new ImageGray[N];
 			stale[i] = new boolean[N];
 			for( int j = 0; j < N; j++ ) {
 				stale[i][j] = true;

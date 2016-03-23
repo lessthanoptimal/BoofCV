@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -34,13 +34,13 @@ public class TestDenseOpticalFlowBlockPyramid {
 
 	@Test
 	public void findFlow() {
-		Dummy alg = new Dummy(3,2,200,ImageUInt8.class);
+		Dummy alg = new Dummy(3,2,200,GrayU8.class);
 
 		alg.minScore = 0.1f;
 		alg.targetX = 4;
 		alg.targetY = 8;
 
-		ImageUInt8 image = new ImageUInt8(30,40);
+		GrayU8 image = new GrayU8(30,40);
 		ImageFlow.D flow = new ImageFlow.D();
 
 		// see if it selects the obvious minimum
@@ -67,7 +67,7 @@ public class TestDenseOpticalFlowBlockPyramid {
 	public void checkNeighbors() {
 		int sr = 3;
 		int rr = 2;
-		Dummy alg = new Dummy(sr,rr,200,ImageUInt8.class);
+		Dummy alg = new Dummy(sr,rr,200,GrayU8.class);
 
 		alg.scores = new float[20*30];
 		Arrays.fill(alg.scores,20);
@@ -135,10 +135,10 @@ public class TestDenseOpticalFlowBlockPyramid {
 		}
 
 		@Override
-		protected void extractTemplate(int cx, int cy, ImageSingleBand prev) {}
+		protected void extractTemplate(int cx, int cy, ImageGray prev) {}
 
 		@Override
-		protected float computeError(int cx, int cy, ImageSingleBand curr) {
+		protected float computeError(int cx, int cy, ImageGray curr) {
 			if( sameScore )
 				return minScore;
 			else {

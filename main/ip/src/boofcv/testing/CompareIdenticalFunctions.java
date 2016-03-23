@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.testing;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.Method;
 
@@ -39,7 +39,7 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Class<?> e[] = m.getParameterTypes();
 
 		for( Class<?> c : e ) {
-			if( ImageSingleBand.class.isAssignableFrom(c))
+			if( ImageGray.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
@@ -70,8 +70,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Object[] ret = new Object[ targetParam.length ];
 
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( ImageSingleBand.class.isAssignableFrom(targetParam[i].getClass()) ) {
-				ret[i] = ((ImageSingleBand)targetParam[i]).clone();
+			if( ImageGray.class.isAssignableFrom(targetParam[i].getClass()) ) {
+				ret[i] = ((ImageGray)targetParam[i]).clone();
 			} else {
 				ret[i] = targetParam[i];
 			}
@@ -84,11 +84,11 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
 		for( int i = 0; i < targetParam.length; i++ ) {
-			if( !ImageSingleBand.class.isAssignableFrom(targetParam[i].getClass()) )
+			if( !ImageGray.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;
 
-			ImageSingleBand t = (ImageSingleBand)targetParam[i];
-			ImageSingleBand v = (ImageSingleBand)validationParam[i];
+			ImageGray t = (ImageGray)targetParam[i];
+			ImageGray v = (ImageGray)validationParam[i];
 
 			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}

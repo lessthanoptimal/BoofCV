@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,10 @@ import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -50,7 +50,7 @@ public class ExampleBackgroundRemovalStationary {
 //		String fileName = UtilIO.pathExample("tracking/chipmunk.mjpeg"); // Camera moves.  Stationary will fail here
 
 		// Comment/Uncomment to switch input image type
-		ImageType imageType = ImageType.single(ImageFloat32.class);
+		ImageType imageType = ImageType.single(GrayF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
@@ -71,7 +71,7 @@ public class ExampleBackgroundRemovalStationary {
 //				media.openCamera(null,640,480,background.getImageType());
 
 		// Declare storage for segmented image.  1 = moving foreground and 0 = background
-		ImageUInt8 segmented = new ImageUInt8(video.getNextWidth(),video.getNextHeight());
+		GrayU8 segmented = new GrayU8(video.getNextWidth(),video.getNextHeight());
 
 		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);
 		ImageGridPanel gui = new ImageGridPanel(1,2);

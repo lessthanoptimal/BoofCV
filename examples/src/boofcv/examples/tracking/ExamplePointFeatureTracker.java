@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 import java.awt.*;
@@ -52,7 +52,7 @@ import java.io.FileNotFoundException;
  *
  * @author Peter Abeles
  */
-public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends ImageSingleBand>
+public class ExamplePointFeatureTracker< T extends ImageGray, D extends ImageGray>
 {
 	// type of input image
 	Class<T> imageType;
@@ -151,7 +151,7 @@ public class ExamplePointFeatureTracker< T extends ImageSingleBand, D extends Im
 
 	public static void main( String args[] ) throws FileNotFoundException {
 
-		Class imageType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 

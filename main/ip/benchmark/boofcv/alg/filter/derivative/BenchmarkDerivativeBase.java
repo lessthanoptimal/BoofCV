@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -39,29 +39,29 @@ public abstract class BenchmarkDerivativeBase {
 	public static ImageBorder_S32 borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 	public static ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 
-	public static ImageFloat32 imgFloat32;
-	public static ImageFloat32 derivX_F32;
-	public static ImageFloat32 derivY_F32;
-	public static ImageFloat32 derivXY_F32;
-	public static ImageUInt8 imgInt8;
-	public static ImageSInt16 derivX_I16;
-	public static ImageSInt16 derivY_I16;
+	public static GrayF32 imgFloat32;
+	public static GrayF32 derivX_F32;
+	public static GrayF32 derivY_F32;
+	public static GrayF32 derivXY_F32;
+	public static GrayU8 imgInt8;
+	public static GrayS16 derivX_I16;
+	public static GrayS16 derivY_I16;
 
-	public static ImageSInt16 derivXY_I16;
+	public static GrayS16 derivXY_I16;
 
 
 	public abstract void profile_I8();
 	public abstract void profile_F32();
 
 	public void process() {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		derivX_I16 = new ImageSInt16(imgWidth,imgHeight);
-		derivY_I16 = new ImageSInt16(imgWidth,imgHeight);
-		derivXY_I16 = new ImageSInt16(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		derivX_F32 = new ImageFloat32(imgWidth,imgHeight);
-		derivY_F32 = new ImageFloat32(imgWidth,imgHeight);
-		derivXY_F32 = new ImageFloat32(imgWidth,imgHeight);
+		imgInt8 = new GrayU8(imgWidth,imgHeight);
+		derivX_I16 = new GrayS16(imgWidth,imgHeight);
+		derivY_I16 = new GrayS16(imgWidth,imgHeight);
+		derivXY_I16 = new GrayS16(imgWidth,imgHeight);
+		imgFloat32 = new GrayF32(imgWidth,imgHeight);
+		derivX_F32 = new GrayF32(imgWidth,imgHeight);
+		derivY_F32 = new GrayF32(imgWidth,imgHeight);
+		derivXY_F32 = new GrayF32(imgWidth,imgHeight);
 
 		Random rand = new Random(123);
 		GImageMiscOps.fillUniform(imgInt8, rand, 0, 100);

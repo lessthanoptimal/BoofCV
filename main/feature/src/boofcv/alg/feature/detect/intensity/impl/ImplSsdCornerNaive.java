@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Naive implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} which performs computations in a straight
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiCornerIntensity<T> {
+public class ImplSsdCornerNaive<T extends ImageGray> implements ShiTomasiCornerIntensity<T> {
 
 	// feature's radius
 	private int radius;
@@ -60,7 +60,7 @@ public class ImplSsdCornerNaive<T extends ImageSingleBand> implements ShiTomasiC
 	}
 
 	@Override
-	public void process(T derivX, T derivY, ImageFloat32 intensity ) {
+	public void process(T derivX, T derivY, GrayF32 intensity ) {
 
 		final int imgHeight = derivX.getHeight();
 		final int imgWidth = derivX.getWidth();

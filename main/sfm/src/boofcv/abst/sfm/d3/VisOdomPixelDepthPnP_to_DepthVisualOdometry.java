@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
@@ -47,7 +47,7 @@ import static boofcv.alg.distort.LensDistortionOps.transformPoint;
  */
 // TODO WARNING! active list has been modified by dropping and adding tracks
 // this is probably true of other SFM algorithms
-public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageSingleBand>
+public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageGray>
 	implements DepthVisualOdometry<Vis,Depth> , AccessPointTracks3D
 {
 	// low level algorithm

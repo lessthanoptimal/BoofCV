@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,9 @@ import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -44,7 +44,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowImageBlurApp<T extends ImageSingleBand>
+public class ShowImageBlurApp<T extends ImageGray>
 	extends SelectAlgorithmAndInputPanel implements ChangeListener
 {
 	int radius = 2;
@@ -56,9 +56,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 	ImagePanel gui = new ImagePanel();
 	boolean processedImage = false;
 
-	MultiSpectral<T> input;
-	MultiSpectral<T> output;
-	MultiSpectral<T> storage;
+	Planar<T> input;
+	Planar<T> output;
+	Planar<T> storage;
 	BufferedImage renderedImage;
 	
 	// tells progress monitor the current progress
@@ -72,9 +72,9 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 		addAlgorithm(0,"Median",2);
 
 		this.imageType = imageType;
-		input = new MultiSpectral<T>(imageType, 1, 1 , 3);
-		output = new MultiSpectral<T>(imageType, 1, 1 , 3);
-		storage = new MultiSpectral<T>(imageType, 1, 1 , 3);
+		input = new Planar<T>(imageType, 1, 1 , 3);
+		output = new Planar<T>(imageType, 1, 1 , 3);
+		storage = new Planar<T>(imageType, 1, 1 , 3);
 
 		addToToolbar(createRadialSelect());
 
@@ -229,7 +229,7 @@ public class ShowImageBlurApp<T extends ImageSingleBand>
 	public static void main(String args[]) {
 
 //		ShowImageBlurApp<ImageFloat32> app = new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
-		ShowImageBlurApp<ImageUInt8> app = new ShowImageBlurApp<ImageUInt8>(ImageUInt8.class);
+		ShowImageBlurApp<GrayU8> app = new ShowImageBlurApp<GrayU8>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));

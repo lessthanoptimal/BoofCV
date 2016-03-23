@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseImageOperator;
 
 import java.util.Random;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GeneralSparseOperatorTests
-<T extends ImageSingleBand>
+<T extends ImageGray>
 {
 	protected Random rand = new Random(12342);
 	protected int width = 30;

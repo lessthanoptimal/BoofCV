@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseImageGradient;
@@ -64,7 +64,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurf<II extends ImageSingleBand> {
+public class DescribePointSurf<II extends ImageGray> {
 
 	// Number of sub-regions wide the large grid is
 	protected int widthLargeGrid;

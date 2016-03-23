@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class EdgeIntensitiesApp<T extends ImageSingleBand> {
+public class EdgeIntensitiesApp<T extends ImageGray> {
 
 	Class<T> imageType;
 
@@ -163,7 +163,7 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 		T blur = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		for( int sigma = 1; sigma <= 3; sigma++ ) {
-			Kernel1D g = FactoryKernelGaussian.gaussian1D(ImageFloat32.class,sigma,-1);
+			Kernel1D g = FactoryKernelGaussian.gaussian1D(GrayF32.class,sigma,-1);
 			Kernel1D d = GradientThree.getKernelX(false);
 			Kernel1D god = GKernelMath.convolve1D(d,g);
 			ConvolveInterface<T,T> f = FactoryConvolve.convolve(god,imageType,imageType, BorderType.EXTENDED,true);
@@ -208,7 +208,7 @@ public class EdgeIntensitiesApp<T extends ImageSingleBand> {
 	}
 
 	public static void main( String args[] ) {
-		EdgeIntensitiesApp app = new EdgeIntensitiesApp(ImageFloat32.class);
+		EdgeIntensitiesApp app = new EdgeIntensitiesApp(GrayF32.class);
 		app.init();
 
 		// see how similar the result is if the order in which the operations is done is swapped

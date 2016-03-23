@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -36,13 +36,13 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloat32> {
+public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> {
 
 	double sigmas[] = new double[]{1,2};
 	double scales[] = new double[]{3,5};
 
 	public TestPyramidFloatGaussianScale() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	/**
@@ -51,34 +51,34 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 	@Test
 	public void update() {
 
-		ImageFloat32 img = new ImageFloat32(width,height);
+		GrayF32 img = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this, "_update", true, img);
 	}
 
-	public void _update(ImageFloat32 img) {
+	public void _update(GrayF32 img) {
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(img, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(img, BorderType.EXTENDED);
 
-		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
+		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
 
 		alg.process(img);
 
 		// test the first layer
-		BlurFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,3,-1);
-		ImageFloat32 blurrImg = new ImageFloat32(width, height);
+		BlurFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class,3,-1);
+		GrayF32 blurrImg = new GrayF32(width, height);
 		blur.process(img, blurrImg);
-		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
+		GrayF32 expected = new GrayF32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
 		new FDistort(blurrImg,expected).scaleExt().apply();
-		ImageFloat32 found = alg.getLayer(0);
+		GrayF32 found = alg.getLayer(0);
 
 		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
-		blur = FactoryBlurFilter.gaussian(ImageFloat32.class,sigmas[0],-1);
-		blurrImg = new ImageFloat32(expected.width,expected.height);
+		blur = FactoryBlurFilter.gaussian(GrayF32.class,sigmas[0],-1);
+		blurrImg = new GrayF32(expected.width,expected.height);
 		blur.process(expected,blurrImg);
-		expected = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
+		expected = new GrayF32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
 		new FDistort(blurrImg,expected).scaleExt().apply();
 		found = alg.getLayer(1);
 
@@ -86,13 +86,13 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 	}
 
 	@Override
-	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
 		double a[] = BoofMiscOps.convertTo_F64(scales);
 		double sigmas[] = new double[ scales.length ];
 		for( int i = 0; i < sigmas.length; i++ )
 			sigmas[i] = i+1;
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(imageType,BorderType.EXTENDED);
-		return new PyramidFloatGaussianScale<ImageFloat32>(interp,a,sigmas,imageType);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(imageType,BorderType.EXTENDED);
+		return new PyramidFloatGaussianScale<GrayF32>(interp,a,sigmas,imageType);
 	}
 
 	/**
@@ -101,10 +101,10 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 	 */
 	@Test
 	public void checkSigmas() {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.
-				bilinearPixelS(ImageFloat32.class,BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.
+				bilinearPixelS(GrayF32.class,BorderType.EXTENDED);
 		double scales[] = new double[]{1,1};
-		PyramidFloatGaussianScale<ImageFloat32> alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
+		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
 
 		// easy case with no adjustment to the scales
 		assertEquals(1,alg.getSigma(0),1e-6);
@@ -112,7 +112,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<ImageFloa
 
 		// now the input image is being scaled
 		scales = new double[]{2,3};
-		alg = new PyramidFloatGaussianScale<ImageFloat32>(interp,scales,sigmas,imageType);
+		alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
 		assertEquals(1,alg.getSigma(0),1e-6);
 		assertEquals(4.123105625617661,alg.getSigma(1),0.001);
 	}

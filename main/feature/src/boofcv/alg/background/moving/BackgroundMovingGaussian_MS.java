@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,18 +30,18 @@ import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 
 /**
- * Implementation of {@link BackgroundMovingGaussian} for {@link MultiSpectral}.
+ * Implementation of {@link BackgroundMovingGaussian} for {@link Planar}.
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
-		extends BackgroundMovingGaussian<MultiSpectral<T>,Motion>
+public class BackgroundMovingGaussian_MS<T extends ImageGray, Motion extends InvertibleTransform<Motion>>
+		extends BackgroundMovingGaussian<Planar<T>,Motion>
 {
 
 	// interpolates the input image
-	protected InterpolatePixelMB<MultiSpectral<T>> interpolateInput;
+	protected InterpolatePixelMB<Planar<T>> interpolateInput;
 	// interpolates the background image
-	protected InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
+	protected InterpolatePixelMB<Planar<GrayF32>> interpolationBG;
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand inputWrapper;
@@ -50,7 +50,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 	protected float[] pixelInput;
 
 	// background is composed of bands*2 channels.  even = mean, odd = variance
-	MultiSpectral<ImageFloat32> background;
+	Planar<GrayF32> background;
 
 	/**
 	 * Configurations background removal.
@@ -65,7 +65,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 	public BackgroundMovingGaussian_MS(float learnRate, float threshold,
 									   PointTransformModel_F32<Motion> transform,
 									   TypeInterpolate interpType,
-									   ImageType<MultiSpectral<T>> imageType)
+									   ImageType<Planar<T>> imageType)
 	{
 		super(learnRate, threshold, transform, imageType);
 
@@ -74,7 +74,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 		this.interpolateInput = FactoryInterpolation.createPixelMB(0, 255,
 				TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
 
-		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,2*numBands);
+		background = new Planar<GrayF32>(GrayF32.class,1,1,2*numBands);
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, background.getImageType());
 		this.interpolationBG.setImage(background);
@@ -108,7 +108,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, MultiSpectral<T> frame) {
+	protected void updateBackground(int x0, int y0, int x1, int y1, Planar<T> frame) {
 		transform.setModel(worldToCurrent);
 		interpolateInput.setImage(frame);
 
@@ -125,8 +125,8 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 					interpolateInput.get(work.x,work.y,pixelInput);
 
 					for (int band = 0; band < numBands; band++) {
-						ImageFloat32 backgroundMean = background.getBand(band*2);
-						ImageFloat32 backgroundVar = background.getBand(band*2+1);
+						GrayF32 backgroundMean = background.getBand(band*2);
+						GrayF32 backgroundVar = background.getBand(band*2+1);
 
 						float inputValue = pixelInput[band];
 						float meanBG = backgroundMean.data[indexBG];
@@ -147,7 +147,7 @@ public class BackgroundMovingGaussian_MS<T extends ImageSingleBand, Motion exten
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, MultiSpectral<T> frame, ImageUInt8 segmented) {
+	protected void _segment(Motion currentToWorld, Planar<T> frame, GrayU8 segmented) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

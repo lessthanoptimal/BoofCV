@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.edge;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
@@ -33,12 +33,12 @@ import static org.junit.Assert.*;
 public class TestPolygonEdgeIntensity {
 	@Test
 	public void computeEdge() {
-		ImageUInt8 image = new ImageUInt8(400,500);
+		GrayU8 image = new GrayU8(400,500);
 
 		int value = 200;
 		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
 
-		PolygonEdgeIntensity<ImageUInt8> alg = new PolygonEdgeIntensity<ImageUInt8>(2,2,10,ImageUInt8.class);
+		PolygonEdgeIntensity<GrayU8> alg = new PolygonEdgeIntensity<GrayU8>(2,2,10,GrayU8.class);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 
@@ -58,12 +58,12 @@ public class TestPolygonEdgeIntensity {
 
 	@Test
 	public void checkIntensity() {
-		ImageUInt8 image = new ImageUInt8(400,500);
+		GrayU8 image = new GrayU8(400,500);
 
 		int value = 200;
 		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
 
-		PolygonEdgeIntensity<ImageUInt8> alg = new PolygonEdgeIntensity<ImageUInt8>(2,2,10,ImageUInt8.class);
+		PolygonEdgeIntensity<GrayU8> alg = new PolygonEdgeIntensity<GrayU8>(2,2,10,GrayU8.class);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 		UtilPolygons2D_F64.convert(new Rectangle2D_F64(20,30,60,70),polygon);

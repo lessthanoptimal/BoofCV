@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.denoise.wavelet;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.sorting.QuickSelect;
 
 
@@ -50,7 +50,7 @@ public class UtilDenoiseWavelet {
 	 * @param storage Used to temporarily store the absolute value of each element in the subband.
 	 * @return estimated noise variance.
 	 */
-	public static float estimateNoiseStdDev( ImageFloat32 subband , float storage[] ) {
+	public static float estimateNoiseStdDev(GrayF32 subband , float storage[] ) {
 
 		storage = subbandAbsVal(subband, storage );
 
@@ -62,7 +62,7 @@ public class UtilDenoiseWavelet {
 	 * Computes the absolute value of each element in the subband image are places it into
 	 * 'coef'
 	 */
-	public static float[] subbandAbsVal(ImageFloat32 subband, float[] coef ) {
+	public static float[] subbandAbsVal(GrayF32 subband, float[] coef ) {
 		if( coef == null ) {
 			coef = new float[subband.width*subband.height];
 		}
@@ -98,7 +98,7 @@ public class UtilDenoiseWavelet {
 	 * @param noiseSigma Estimated noise sigma.
 	 * @return universal threshold.
 	 */
-	public static double universalThreshold( ImageSingleBand image , double noiseSigma ) {
+	public static double universalThreshold(ImageGray image , double noiseSigma ) {
 		int w = image.width;
 		int h = image.height;
 

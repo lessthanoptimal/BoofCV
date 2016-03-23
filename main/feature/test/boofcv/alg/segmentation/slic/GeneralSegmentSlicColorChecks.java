@@ -23,8 +23,8 @@ import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -55,7 +55,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase> {
 	@Test
 	public void easyTest() {
 		T input = imageType.createImage(30,40);
-		ImageSInt32 output = new ImageSInt32(30,40);
+		GrayS32 output = new GrayS32(30,40);
 
 		GImageMiscOps.fillRectangle(input, 100, 0, 0, 15, 40);
 
@@ -177,7 +177,7 @@ public abstract class GeneralSegmentSlicColorChecks<T extends ImageBase> {
 	/**
 	 * Each region is assumed to be filled with a single color
 	 */
-	private void checkUnique( SegmentSlic<T> alg , ImageSInt32 output , int numRegions ) {
+	private void checkUnique(SegmentSlic<T> alg , GrayS32 output , int numRegions ) {
 
 		boolean assigned[] = new boolean[ numRegions ];
 		Arrays.fill(assigned, false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.feature.describe.DescribePointPixelRegion;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F32;
 import boofcv.struct.feature.TupleDesc_U8;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegion<T extends ImageSingleBand, D extends TupleDesc>
+public class WrapDescribePixelRegion<T extends ImageGray, D extends TupleDesc>
 		implements DescribeRegionPoint<T,D>
 {
 	DescribePointPixelRegion<T,D> alg;

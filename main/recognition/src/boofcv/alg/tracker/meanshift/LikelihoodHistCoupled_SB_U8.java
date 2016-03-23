@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.meanshift;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
@@ -34,9 +34,9 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  * </p>
  * @author Peter Abeles
  */
-public class LikelihoodHistCoupled_SB_U8 implements PixelLikelihood<ImageUInt8>
+public class LikelihoodHistCoupled_SB_U8 implements PixelLikelihood<GrayU8>
 {
-	ImageUInt8 image;
+	GrayU8 image;
 
 	// maximum value a pixel can have.
 	int maxPixelValue;
@@ -50,7 +50,7 @@ public class LikelihoodHistCoupled_SB_U8 implements PixelLikelihood<ImageUInt8>
 	}
 
 	@Override
-	public void setImage(ImageUInt8 image) {
+	public void setImage(GrayU8 image) {
 		this.image = image;
 
 		if( hist.length != numBins ) {

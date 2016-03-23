@@ -19,17 +19,17 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
 
 /**
- *  * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link ImageFloat32}
+ *  * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link GrayF32}
  *
  * @author Peter Abeles
  */
 public class ThresholdSquareBlockMinMax_F32
-	extends ThresholdSquareBlockMinMax<ImageFloat32,InterleavedF32>
+	extends ThresholdSquareBlockMinMax<GrayF32,InterleavedF32>
 {
 	float scale;
 	boolean down;
@@ -42,7 +42,7 @@ public class ThresholdSquareBlockMinMax_F32
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , ImageFloat32 input, ImageUInt8 output ) {
+	protected void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -95,7 +95,7 @@ public class ThresholdSquareBlockMinMax_F32
 	}
 
 	@Override
-	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , ImageFloat32 input) {
+	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , GrayF32 input) {
 
 		float min,max;
 		min = max = input.unsafe_get(x0,y0);

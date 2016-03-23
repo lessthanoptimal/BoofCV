@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.segmentation;
 
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class TestImageSegmentationOps {
 
 	@Test
 	public void countRegionPixels_single() {
-		ImageSInt32 output = new ImageSInt32(4,5);
+		GrayS32 output = new GrayS32(4,5);
 
 		output.data = new int[]{
 				0, 0, 0, 1,
@@ -51,7 +51,7 @@ public class TestImageSegmentationOps {
 
 	@Test
 	public void countRegionPixels_all() {
-		ImageSInt32 output = new ImageSInt32(4,5);
+		GrayS32 output = new GrayS32(4,5);
 
 		output.data = new int[]{
 				0, 0, 0, 1,
@@ -74,16 +74,16 @@ public class TestImageSegmentationOps {
 	 */
 	@Test
 	public void regionPixelId_to_Compact() {
-		ImageSInt32 graph = new ImageSInt32(4,5);
-		ImageSInt32 output = new ImageSInt32(4,5);
+		GrayS32 graph = new GrayS32(4,5);
+		GrayS32 output = new GrayS32(4,5);
 
 		regionPixelId_to_Compact(graph, output);
 		regionPixelId_to_Compact(BoofTesting.createSubImageOf(graph), output);
 		regionPixelId_to_Compact(graph, BoofTesting.createSubImageOf(output));
 	}
 
-	private void regionPixelId_to_Compact(ImageSInt32 graph, ImageSInt32 output) {
-		ImageSInt32 input = new ImageSInt32(4,5);
+	private void regionPixelId_to_Compact(GrayS32 graph, GrayS32 output) {
+		GrayS32 input = new GrayS32(4,5);
 		input.data = new int[]{
 				2, 2, 2, 5,
 				5, 5, 5, 5,
@@ -105,7 +105,7 @@ public class TestImageSegmentationOps {
 
 		ImageSegmentationOps.regionPixelId_to_Compact(graph, rootNodes, output);
 
-		ImageSInt32 expected = new ImageSInt32(4,5);
+		GrayS32 expected = new GrayS32(4,5);
 		expected.data = new int[]{
 				0, 0, 0, 1,
 				1, 1, 1, 1,
@@ -128,7 +128,7 @@ public class TestImageSegmentationOps {
 
 	@Test
 	public void markRegionBorders1() {
-		ImageSInt32 input = new ImageSInt32(4,5);
+		GrayS32 input = new GrayS32(4,5);
 		input.data = new int[]{
 				0, 0, 0, 1,
 				0, 0, 0, 1,
@@ -136,7 +136,7 @@ public class TestImageSegmentationOps {
 				0, 2, 2, 2,
 				0, 2, 2, 2};
 
-		ImageUInt8 expected = new ImageUInt8(4,5);
+		GrayU8 expected = new GrayU8(4,5);
 		expected.data = new byte[]{
 				0, 0, 1, 1,
 				0, 1, 1, 1,
@@ -144,7 +144,7 @@ public class TestImageSegmentationOps {
 				1, 1, 0, 0,
 				1, 1, 0, 0};
 
-		ImageUInt8 found = new ImageUInt8(4,5);
+		GrayU8 found = new GrayU8(4,5);
 
 		ImageSegmentationOps.markRegionBorders(input, found);
 		BoofTesting.assertEquals(expected, found, 1e-4);
@@ -152,7 +152,7 @@ public class TestImageSegmentationOps {
 
 	@Test
 	public void markRegionBorders2() {
-		ImageSInt32 input = new ImageSInt32(4,5);
+		GrayS32 input = new GrayS32(4,5);
 		input.data = new int[]{
 				0, 0, 0, 0,
 				0, 0, 0, 0,
@@ -160,7 +160,7 @@ public class TestImageSegmentationOps {
 				0, 0, 0, 0,
 				0, 0, 0, 2};
 
-		ImageUInt8 expected = new ImageUInt8(4,5);
+		GrayU8 expected = new GrayU8(4,5);
 		expected.data = new byte[]{
 				0, 0, 0, 0,
 				0, 0, 0, 0,
@@ -168,7 +168,7 @@ public class TestImageSegmentationOps {
 				0, 0, 0, 1,
 				0, 0, 1, 1};
 
-		ImageUInt8 found = new ImageUInt8(4,5);
+		GrayU8 found = new GrayU8(4,5);
 
 		ImageSegmentationOps.markRegionBorders(input, found);
 		BoofTesting.assertEquals(expected, found, 1e-4);

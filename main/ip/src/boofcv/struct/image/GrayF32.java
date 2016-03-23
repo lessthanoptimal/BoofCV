@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Image with a pixel type of signed 64-bit integer
+ * Image with a pixel type of 32-bit float.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
+public class GrayF32 extends GrayF<GrayF32> {
 
-	public long data[];
+	public float data[];
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -35,14 +35,14 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageSInt64(int width, int height) {
+	public GrayF32(int width, int height) {
 		super(width, height);
 	}
 
 	/**
 	 * Creates an image with no data declared and the width/height set to zero.
 	 */
-	public ImageSInt64() {
+	public GrayF32() {
 	}
 
 	/**
@@ -52,14 +52,14 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 	 * @param y pixel coordinate.
 	 * @return Pixel intensity value.
 	 */
-	public long get(int x, int y) {
+	public float get(int x, int y) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: ( " + x + " , " + y + " )");
 
 		return unsafe_get(x,y);
 	}
 
-	public long unsafe_get(int x, int y) {
+	public float unsafe_get(int x, int y) {
 		return data[getIndex(x, y)];
 	}
 
@@ -70,20 +70,42 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 	 * @param y	 pixel coordinate.
 	 * @param value The pixel's new value.
 	 */
-	public void set(int x, int y, long value) {
+	public void set(int x, int y, float value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
-		unsafe_set(x, y, value);
+		unsafe_set(x,y,value);
 	}
 
-	public void unsafe_set(int x, int y, long value) {
+	public void unsafe_set(int x, int y, float value) {
 		data[getIndex(x, y)] = value;
 	}
 
-	@Override
-	public ImageDataType getDataType() {
-		return ImageDataType.S64;
+	public void print() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%4.1f ",unsafe_get(x, y));
+			}
+			System.out.println();
+		}
+	}
+
+	public void print( String format ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf(format+" ",unsafe_get(x, y));
+			}
+			System.out.println();
+		}
+	}
+
+	public void printInt() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%3d ",(int)unsafe_get(x,y));
+			}
+			System.out.println();
+		}
 	}
 
 	@Override
@@ -93,21 +115,26 @@ public class ImageSInt64 extends ImageSingleBand<ImageSInt64> {
 
 	@Override
 	protected void _setData(Object data) {
-		this.data = (long[]) data;
+		this.data = (float[]) data;
 	}
 
 	@Override
-	public ImageSInt64 _createNew(int imgWidth, int imgHeight) {
+	public GrayF32 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageSInt64();
-		return new ImageSInt64(imgWidth, imgHeight);
+			return new GrayF32();
+		return new GrayF32(imgWidth, imgHeight);
 	}
 
-	public long[] getData() {
+	@Override
+	public ImageDataType getDataType() {
+		return ImageDataType.F32;
+	}
+
+	public float[] getData() {
 		return data;
 	}
 
-	public void setData(long[] data) {
+	public void setData(float[] data) {
 		this.data = data;
 	}
 }

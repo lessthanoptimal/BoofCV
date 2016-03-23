@@ -29,15 +29,15 @@ import boofcv.struct.image.*;
 public enum AutoTypeImage {
 	I("ImageInteger","int",true,0),
 	I8("ImageInt8","byte",true,8),
-	U8(ImageUInt8.class),
-	S8(ImageSInt8.class),
+	U8(GrayU8.class),
+	S8(GrayS8.class),
 	I16("ImageInt16","short",true,16),
-	U16(ImageUInt16.class),
-	S16(ImageSInt16.class),
-	S32(ImageSInt32.class),
-	S64(ImageSInt64.class),
-	F32(ImageFloat32.class),
-	F64(ImageFloat64.class);
+	U16(GrayU16.class),
+	S16(GrayS16.class),
+	S32(GrayS32.class),
+	S64(GrayS64.class),
+	F32(GrayF32.class),
+	F64(GrayF64.class);
 
 	private String imageSingleName;
 	private String dataType;
@@ -56,7 +56,7 @@ public enum AutoTypeImage {
 		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
 		try {
-			ImageSingleBand img = (ImageSingleBand)imageType.newInstance();
+			ImageGray img = (ImageGray)imageType.newInstance();
 			setByDataType(img.getDataType());
 			dataType = primitiveType.getSimpleName();
 

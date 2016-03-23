@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -75,24 +75,24 @@ public class TestConvolveNormalized_JustBorder {
 			int borderY0=0,borderY1=0;
 
 			if( methodTest.getName().contentEquals("convolve")) {
-				t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
-				v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
+				t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
+				v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
 				borderX0=borderY0 = offset;
 				borderX1=borderY1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("horizontal") ) {
-				t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
-				v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
+				t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
+				v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
 				borderX0 = offset;
 				borderX1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("vertical")) {
 				if( methodTest.getParameterTypes().length == 3 ) {
-					t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
-					v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
+					t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
+					v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
 					borderY0 = offset;
 					borderY1 = kernelRadius * 2 - offset;
 				} else {
-					t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[3]);
-					v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[3]);
+					t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[3]);
+					v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[3]);
 					borderX0=borderY0 = offset;
 					borderX1=borderY1 = kernelRadius*2-offset;
 				}

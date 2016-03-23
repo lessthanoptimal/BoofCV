@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestGeneralToInterestPoint {
 
-	ImageFloat32 input = new ImageFloat32(10,20);
+	GrayF32 input = new GrayF32(10,20);
 
 	/**
 	 * Several basic functionality tests
@@ -38,8 +38,8 @@ public class TestGeneralToInterestPoint {
 	public void various() {
 		Helper detector = new Helper();
 		detector.maximum = true;
-		GeneralToInterestPoint<ImageFloat32,ImageFloat32> alg =
-				new GeneralToInterestPoint<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		GeneralToInterestPoint<GrayF32,GrayF32> alg =
+				new GeneralToInterestPoint<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 
 		alg.detect(input);
 
@@ -59,8 +59,8 @@ public class TestGeneralToInterestPoint {
 	@Test
 	public void checkMinimumsMaximums() {
 		Helper detector = new Helper();
-		GeneralToInterestPoint<ImageFloat32,ImageFloat32> alg =
-				new GeneralToInterestPoint<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		GeneralToInterestPoint<GrayF32,GrayF32> alg =
+				new GeneralToInterestPoint<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 
 		// both turned off
 		alg.detect(input);
@@ -82,7 +82,7 @@ public class TestGeneralToInterestPoint {
 		assertEquals(6,alg.getNumberOfFeatures());
 	}
 
-	public static class Helper extends GeneralFeatureDetector<ImageFloat32,ImageFloat32> {
+	public static class Helper extends GeneralFeatureDetector<GrayF32,GrayF32> {
 
 		public int calledProcess = 0;
 		public boolean minimum = false;
@@ -90,9 +90,9 @@ public class TestGeneralToInterestPoint {
 
 
 		@Override
-		public void process(ImageFloat32 image,
-							ImageFloat32 derivX, ImageFloat32 derivY,
-							ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY) {
+		public void process(GrayF32 image,
+							GrayF32 derivX, GrayF32 derivY,
+							GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY) {
 			calledProcess++;
 		}
 

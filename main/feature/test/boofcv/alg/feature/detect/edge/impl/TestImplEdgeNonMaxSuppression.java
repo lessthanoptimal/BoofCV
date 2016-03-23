@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -41,9 +41,9 @@ public class TestImplEdgeNonMaxSuppression {
 
 	@Test
 	public void naive4() {
-		ImageFloat32 intensity = new ImageFloat32(3,3);
-		ImageFloat32 output = new ImageFloat32(3,3);
-		ImageSInt8 direction = new ImageSInt8(3,3);
+		GrayF32 intensity = new GrayF32(3,3);
+		GrayF32 output = new GrayF32(3,3);
+		GrayS8 direction = new GrayS8(3,3);
 
 		// test it against simple positive and negative cases
 		for( int dir = -1; dir < 3; dir++ ) {
@@ -66,7 +66,7 @@ public class TestImplEdgeNonMaxSuppression {
 		}
 	}
 
-	private void setByDirection4( ImageFloat32 img , int dir , float value ) {
+	private void setByDirection4(GrayF32 img , int dir , float value ) {
 		if( dir == 0 ) {
 			img.set(0,1,value);
 			img.set(2,1,value);
@@ -87,9 +87,9 @@ public class TestImplEdgeNonMaxSuppression {
 	 */
 	@Test
 	public void naive4_equal() {
-		ImageFloat32 intensity = new ImageFloat32(3,3);
-		ImageFloat32 output = new ImageFloat32(3,3);
-		ImageSInt8 direction = new ImageSInt8(3,3);
+		GrayF32 intensity = new GrayF32(3,3);
+		GrayF32 output = new GrayF32(3,3);
+		GrayS8 direction = new GrayS8(3,3);
 
 		GImageMiscOps.fill(intensity, 2);
 
@@ -101,9 +101,9 @@ public class TestImplEdgeNonMaxSuppression {
 
 	@Test
 	public void naive8() {
-		ImageFloat32 intensity = new ImageFloat32(3,3);
-		ImageFloat32 output = new ImageFloat32(3,3);
-		ImageSInt8 direction = new ImageSInt8(3,3);
+		GrayF32 intensity = new GrayF32(3,3);
+		GrayF32 output = new GrayF32(3,3);
+		GrayS8 direction = new GrayS8(3,3);
 
 		// test it against simple positive and negative cases
 		for( int dir = -3; dir < 5; dir++ ) {
@@ -126,7 +126,7 @@ public class TestImplEdgeNonMaxSuppression {
 		}
 	}
 
-	private void setByDirection8( ImageFloat32 img , int dir , float value ) {
+	private void setByDirection8(GrayF32 img , int dir , float value ) {
 		if( dir == 0 || dir == 4) {
 			img.set(0,1,value);
 			img.set(2,1,value);
@@ -147,9 +147,9 @@ public class TestImplEdgeNonMaxSuppression {
 	 */
 	@Test
 	public void naive8_equal() {
-		ImageFloat32 intensity = new ImageFloat32(3,3);
-		ImageFloat32 output = new ImageFloat32(3,3);
-		ImageSInt8 direction = new ImageSInt8(3,3);
+		GrayF32 intensity = new GrayF32(3,3);
+		GrayF32 output = new GrayF32(3,3);
+		GrayS8 direction = new GrayS8(3,3);
 
 		GImageMiscOps.fill(intensity, 2);
 
@@ -161,15 +161,15 @@ public class TestImplEdgeNonMaxSuppression {
 
 	@Test
 	public void inner4() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"inner4",true,intensity, direction, expected, found);
 	}
 
-	public void inner4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void inner4(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
 		ImageMiscOps.fillUniform(direction, rand, -1, 3);
@@ -193,15 +193,15 @@ public class TestImplEdgeNonMaxSuppression {
 
 	@Test
 	public void inner8() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"inner8",true,intensity, direction, expected, found);
 	}
 
-	public void inner8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void inner8(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
 		ImageMiscOps.fillUniform(direction, rand, -3, 5);
 
@@ -224,15 +224,15 @@ public class TestImplEdgeNonMaxSuppression {
 
 	@Test
 	public void border4() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"border4",true,intensity, direction, expected, found);
 	}
 
-	public void border4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void border4(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 
 		// just test the image border
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
@@ -255,15 +255,15 @@ public class TestImplEdgeNonMaxSuppression {
 
 @Test
 	public void border8() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"border8",true,intensity, direction, expected, found);
 	}
 
-	public void border8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void border8(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 		// just test the image border
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
 		ImageMiscOps.fillUniform(direction, rand, -3, 5);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,10 +46,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageFloat32 input , ImageUInt8 output ,
-										float threshold , boolean down )
+	public static GrayU8 threshold(GrayF32 input , GrayU8 output ,
+								   float threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -95,10 +95,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageFloat64 input , ImageUInt8 output ,
-										double threshold , boolean down )
+	public static GrayU8 threshold(GrayF64 input , GrayU8 output ,
+								   double threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -144,10 +144,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageUInt8 input , ImageUInt8 output ,
-										int threshold , boolean down )
+	public static GrayU8 threshold(GrayU8 input , GrayU8 output ,
+								   int threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -193,10 +193,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageSInt16 input , ImageUInt8 output ,
-										int threshold , boolean down )
+	public static GrayU8 threshold(GrayS16 input , GrayU8 output ,
+								   int threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -242,10 +242,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageUInt16 input , ImageUInt8 output ,
-										int threshold , boolean down )
+	public static GrayU8 threshold(GrayU16 input , GrayU8 output ,
+								   int threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -291,10 +291,10 @@ public class ThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 threshold( ImageSInt32 input , ImageUInt8 output ,
-										int threshold , boolean down )
+	public static GrayU8 threshold(GrayS32 input , GrayU8 output ,
+								   int threshold , boolean down )
 	{
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -344,15 +344,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 localSquare( ImageUInt8 input , ImageUInt8 output ,
-											 int radius , float scale , boolean down ,
-											 ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+	public static GrayU8 localSquare(GrayU8 input , GrayU8 output ,
+									 int radius , float scale , boolean down ,
+									 GrayU8 storage1 , GrayU8 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU8.class);
 
-		ImageUInt8 mean = storage1;
+		GrayU8 mean = storage1;
 
 		BlurImageOps.mean(input,mean,radius,storage2);
 
@@ -411,15 +411,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 localGaussian( ImageUInt8 input , ImageUInt8 output ,
-											   int radius , float scale , boolean down ,
-											   ImageUInt8 storage1 , ImageUInt8 storage2 ) {
+	public static GrayU8 localGaussian(GrayU8 input , GrayU8 output ,
+									   int radius , float scale , boolean down ,
+									   GrayU8 storage1 , GrayU8 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageUInt8.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageUInt8.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU8.class);
 
-		ImageUInt8 blur = storage1;
+		GrayU8 blur = storage1;
 
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
@@ -477,15 +477,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 localSquare( ImageFloat32 input , ImageUInt8 output ,
-											 int radius , float scale , boolean down ,
-											 ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+	public static GrayU8 localSquare(GrayF32 input , GrayU8 output ,
+									 int radius , float scale , boolean down ,
+									 GrayF32 storage1 , GrayF32 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageFloat32.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayF32.class);
 
-		ImageFloat32 mean = storage1;
+		GrayF32 mean = storage1;
 
 		BlurImageOps.mean(input,mean,radius,storage2);
 
@@ -543,15 +543,15 @@ public class ThresholdImageOps {
 	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
 	 * @return Thresholded image.
 	 */
-	public static ImageUInt8 localGaussian( ImageFloat32 input , ImageUInt8 output ,
-											   int radius , float scale , boolean down ,
-											   ImageFloat32 storage1 , ImageFloat32 storage2 ) {
+	public static GrayU8 localGaussian(GrayF32 input , GrayU8 output ,
+									   int radius , float scale , boolean down ,
+									   GrayF32 storage1 , GrayF32 storage2 ) {
 
-		output = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);
-		storage1 = InputSanityCheck.checkDeclare(input,storage1,ImageFloat32.class);
-		storage2 = InputSanityCheck.checkDeclare(input,storage2,ImageFloat32.class);
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayF32.class);
 
-		ImageFloat32 blur = storage1;
+		GrayF32 blur = storage1;
 
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 

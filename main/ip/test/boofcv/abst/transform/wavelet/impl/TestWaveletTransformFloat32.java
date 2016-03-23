@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.testing.BoofTesting;
@@ -43,19 +43,19 @@ public class TestWaveletTransformFloat32 {
 
 	@Test
 	public void compareToWaveletTransformOps() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
-		ImageFloat32 origCopy = orig.clone();
+		GrayF32 origCopy = orig.clone();
 
 		int N = 3;
 		ImageDimension dimen = UtilWavelet.transformDimension(orig,N);
 
-		ImageFloat32 found = new ImageFloat32(dimen.width,dimen.height);
-		ImageFloat32 expected = new ImageFloat32(dimen.width,dimen.height);
+		GrayF32 found = new GrayF32(dimen.width,dimen.height);
+		GrayF32 expected = new GrayF32(dimen.width,dimen.height);
 
 		WaveletDescription<WlCoef_F32> desc = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 
-		ImageFloat32 storage = new ImageFloat32(dimen.width,dimen.height);
+		GrayF32 storage = new GrayF32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
 		WaveletTransformFloat32 alg = new WaveletTransformFloat32(desc,N,0,255);
@@ -67,7 +67,7 @@ public class TestWaveletTransformFloat32 {
 		BoofTesting.assertEquals(expected,found, 1e-4);
 
 		// test inverse transform
-		ImageFloat32 reconstructed = new ImageFloat32(width,height);
+		GrayF32 reconstructed = new GrayF32(width,height);
 		alg.invert(found,reconstructed);
 		BoofTesting.assertEquals(orig,reconstructed, 1e-4);
 		// make sure the input has not been modified

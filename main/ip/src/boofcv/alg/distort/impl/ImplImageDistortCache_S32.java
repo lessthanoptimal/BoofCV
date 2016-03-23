@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,16 +20,16 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 
 /**
- * Implementation of {@link ImageDistortCache_SB} for {@link boofcv.struct.image.ImageSInt32}.
+ * Implementation of {@link ImageDistortCache_SB} for {@link GrayS32}.
  *
  * @author Peter Abeles
  */
-public class ImplImageDistortCache_S32<Input extends ImageSingleBand>
-		extends ImageDistortCache_SB<Input,ImageSInt32> {
+public class ImplImageDistortCache_S32<Input extends ImageGray>
+		extends ImageDistortCache_SB<Input,GrayS32> {
 	public ImplImageDistortCache_S32(InterpolatePixelS<Input> interp)
 	{
 		super( interp );

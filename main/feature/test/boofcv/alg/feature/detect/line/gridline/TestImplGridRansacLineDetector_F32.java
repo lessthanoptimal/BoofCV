@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,22 +20,22 @@ package boofcv.alg.feature.detect.line.gridline;
 
 import boofcv.alg.feature.detect.line.CommonGridRansacLineDetectorChecks;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplGridRansacLineDetector_F32 extends CommonGridRansacLineDetectorChecks<ImageFloat32> {
+public class TestImplGridRansacLineDetector_F32 extends CommonGridRansacLineDetectorChecks<GrayF32> {
 
 	public TestImplGridRansacLineDetector_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public GridRansacLineDetector<ImageFloat32> createDetector(int regionSize, int maxDetectLines,
-															   ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher) {
+	public GridRansacLineDetector<GrayF32> createDetector(int regionSize, int maxDetectLines,
+														  ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher) {
 		return new ImplGridRansacLineDetector_F32(regionSize,maxDetectLines,robustMatcher);
 	}
 }

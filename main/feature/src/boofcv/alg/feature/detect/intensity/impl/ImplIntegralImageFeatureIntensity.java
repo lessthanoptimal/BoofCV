@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 
 
 /**
@@ -41,8 +41,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Brute force approach which is easy to validate through visual inspection.
 	 */
-	public static void hessianNaive( ImageFloat32 integral, int skip , int size ,
-									 ImageFloat32 intensity)
+	public static void hessianNaive(GrayF32 integral, int skip , int size ,
+									GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;
@@ -68,8 +68,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
 	 */
-	public static void hessianBorder( ImageFloat32 integral, int skip , int size ,
-									  ImageFloat32 intensity)
+	public static void hessianBorder(GrayF32 integral, int skip , int size ,
+									 GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;
@@ -111,7 +111,7 @@ public class ImplIntegralImageFeatureIntensity {
 		}
 	}
 
-	private static void computeHessian(ImageFloat32 integral, ImageFloat32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	private static void computeHessian(GrayF32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
 		float Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);
@@ -128,8 +128,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Optimizes intensity for the inner image.  
 	 */
-	public static void hessianInner( ImageFloat32 integral, int skip , int size ,
-									 ImageFloat32 intensity)
+	public static void hessianInner(GrayF32 integral, int skip , int size ,
+									GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;
@@ -214,8 +214,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Brute force approach which is easy to validate through visual inspection.
 	 */
-	public static void hessianNaive( ImageSInt32 integral, int skip , int size ,
-									 ImageFloat32 intensity)
+	public static void hessianNaive(GrayS32 integral, int skip , int size ,
+									GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;
@@ -241,8 +241,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
 	 */
-	public static void hessianBorder( ImageSInt32 integral, int skip , int size ,
-									  ImageFloat32 intensity)
+	public static void hessianBorder(GrayS32 integral, int skip , int size ,
+									 GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;
@@ -284,7 +284,7 @@ public class ImplIntegralImageFeatureIntensity {
 		}
 	}
 
-	private static void computeHessian(ImageSInt32 integral, ImageFloat32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	private static void computeHessian(GrayS32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
 		float Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);
@@ -301,8 +301,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Optimizes intensity for the inner image.  
 	 */
-	public static void hessianInner( ImageSInt32 integral, int skip , int size ,
-									 ImageFloat32 intensity)
+	public static void hessianInner(GrayS32 integral, int skip , int size ,
+									GrayF32 intensity)
 	{
 		final int w = intensity.width;
 		final int h = intensity.height;

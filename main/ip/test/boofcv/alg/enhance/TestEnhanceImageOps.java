@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.enhance;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayI;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -66,8 +66,8 @@ public class TestEnhanceImageOps {
 			numFound++;
 
 			Class imageType = methods[i].getParameterTypes()[0];
-			ImageInteger input = (ImageInteger)GeneralizedImageOps.createSingleBand(imageType, width, height);
-			ImageInteger output = (ImageInteger)GeneralizedImageOps.createSingleBand(imageType,width,height);
+			GrayI input = (GrayI)GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI output = (GrayI)GeneralizedImageOps.createSingleBand(imageType,width,height);
 
 			equalizeLocal(input, output);
 
@@ -77,9 +77,9 @@ public class TestEnhanceImageOps {
 		assertEquals(2, numFound);
 	}
 
-	public void equalizeLocal( ImageInteger input , ImageInteger found ) {
+	public void equalizeLocal(GrayI input , GrayI found ) {
 
-		ImageInteger expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 
 		int transform[] = new int[10];

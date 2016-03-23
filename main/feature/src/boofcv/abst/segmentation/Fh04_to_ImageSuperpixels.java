@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.segmentation;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -35,7 +35,7 @@ public class Fh04_to_ImageSuperpixels<T extends ImageBase> implements ImageSuper
 	SegmentFelzenszwalbHuttenlocher04<T> alg;
 	ConnectRule rule;
 
-	ImageSInt32 pixelToSegment = new ImageSInt32(1,1);
+	GrayS32 pixelToSegment = new GrayS32(1,1);
 
 	public Fh04_to_ImageSuperpixels(SegmentFelzenszwalbHuttenlocher04<T> alg, ConnectRule rule) {
 		this.alg = alg;
@@ -43,7 +43,7 @@ public class Fh04_to_ImageSuperpixels<T extends ImageBase> implements ImageSuper
 	}
 
 	@Override
-	public void segment(T input, ImageSInt32 output) {
+	public void segment(T input, GrayS32 output) {
 
 		pixelToSegment.reshape(input.width, input.height);
 

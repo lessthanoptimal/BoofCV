@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -44,9 +44,9 @@ import org.ddogleg.struct.GrowQueue_F64;
 public class CompleteSift extends SiftDetector
 {
 	// estimate orientation
-	OrientationHistogramSift<ImageFloat32> orientation;
+	OrientationHistogramSift<GrayF32> orientation;
 	// describes the keypoints
-	DescribePointSift<ImageFloat32> describe;
+	DescribePointSift<GrayF32> describe;
 	// storage for found features
 	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
@@ -54,11 +54,11 @@ public class CompleteSift extends SiftDetector
 	GrowQueue_F64 orientations = new GrowQueue_F64();
 
 	// used to compute the image gradient
-	ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.three_F32();
+	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three_F32();
 
 	// spacial derivative for the current scale in the octave
-	ImageFloat32 derivX = new ImageFloat32(1,1);
-	ImageFloat32 derivY = new ImageFloat32(1,1);
+	GrayF32 derivX = new GrayF32(1,1);
+	GrayF32 derivY = new GrayF32(1,1);
 
 	/**
 	 * Configures SIFT
@@ -70,8 +70,8 @@ public class CompleteSift extends SiftDetector
 	 * @param describe Describes a SIFT feature
 	 */
 	public CompleteSift(SiftScaleSpace scaleSpace, double edgeR, NonMaxLimiter extractor,
-						OrientationHistogramSift<ImageFloat32> orientation,
-						DescribePointSift<ImageFloat32> describe) {
+						OrientationHistogramSift<GrayF32> orientation,
+						DescribePointSift<GrayF32> describe) {
 		super(scaleSpace, edgeR, extractor);
 
 		this.orientation = orientation;
@@ -87,7 +87,7 @@ public class CompleteSift extends SiftDetector
 	}
 
 	@Override
-	public void process(ImageFloat32 input) {
+	public void process(GrayF32 input) {
 		features.reset();
 		locations.reset();
 		orientations.reset();
@@ -98,7 +98,7 @@ public class CompleteSift extends SiftDetector
 	protected void detectFeatures(int scaleIndex) {
 
 		// compute image derivative for this scale
-		ImageFloat32 input = scaleSpace.getImageScale(scaleIndex);
+		GrayF32 input = scaleSpace.getImageScale(scaleIndex);
 		derivX.reshape(input.width,input.height);
 		derivY.reshape(input.width,input.height);
 		gradient.process(input,derivX,derivY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribePointBinaryCompare<T extends ImageSingleBand> {
+public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray> {
 
 	Random rand = new Random(234);
 	int width = 30;

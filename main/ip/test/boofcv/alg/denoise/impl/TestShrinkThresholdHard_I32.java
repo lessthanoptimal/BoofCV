@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdHard_I32;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,10 +39,10 @@ public class TestShrinkThresholdHard_I32 {
 
 	@Test
 	public void basicTest() {
-		performBasicSoftTest(new ImageSInt32(width,height),new ShrinkThresholdHard_I32());
+		performBasicSoftTest(new GrayS32(width,height),new ShrinkThresholdHard_I32());
 	}
 
-	public static <T extends ImageSingleBand> void performBasicSoftTest( T image , ShrinkThresholdRule<T> rule ) {
+	public static <T extends ImageGray> void performBasicSoftTest(T image , ShrinkThresholdRule<T> rule ) {
 		final int height = image.height;
 		final int width = image.width;
 

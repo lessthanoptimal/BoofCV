@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -157,7 +157,7 @@ public class DerivativeIntegralImage {
 		return ret;
 	}
 
-	public static void derivXX( ImageFloat32 input , ImageFloat32 output , int size )
+	public static void derivXX(GrayF32 input , GrayF32 output , int size )
 	{
 		int blockW = size/3;
 		int blockH = size-blockW-1;
@@ -184,7 +184,7 @@ public class DerivativeIntegralImage {
 		}
 	}
 
-	public static void derivYY( ImageFloat32 input , ImageFloat32 output , int size )
+	public static void derivYY(GrayF32 input , GrayF32 output , int size )
 	{
 		int blockH = size/3;
 		int blockW = size-blockH-1;
@@ -212,7 +212,7 @@ public class DerivativeIntegralImage {
 		}
 	}
 
-	public static void derivXY( ImageFloat32 input , ImageFloat32 output , int size )
+	public static void derivXY(GrayF32 input , GrayF32 output , int size )
 	{
 		int block = size/3;
 

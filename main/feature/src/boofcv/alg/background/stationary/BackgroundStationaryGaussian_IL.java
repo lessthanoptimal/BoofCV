@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedF32;
 
 /**
@@ -126,7 +126,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved>
 	}
 
 	@Override
-	public void segment( T frame, ImageUInt8 segmented) {
+	public void segment( T frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;

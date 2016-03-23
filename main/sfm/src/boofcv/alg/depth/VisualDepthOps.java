@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -42,7 +42,7 @@ public class VisualDepthOps {
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
-	public static void depthTo3D( IntrinsicParameters param , ImageUInt16 depth , FastQueue<Point3D_F64> cloud ) {
+	public static void depthTo3D(IntrinsicParameters param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
 		PointTransform_F64 p2n = LensDistortionOps.transformPoint(param).undistort_F64(true,false);
@@ -78,8 +78,8 @@ public class VisualDepthOps {
 	 * @param cloud Output point cloud
 	 * @param cloudColor Output color for each point in the cloud
 	 */
-	public static void depthTo3D( IntrinsicParameters param , MultiSpectral<ImageUInt8> rgb , ImageUInt16 depth ,
-								  FastQueue<Point3D_F64> cloud , FastQueueArray_I32 cloudColor ) {
+	public static void depthTo3D(IntrinsicParameters param , Planar<GrayU8> rgb , GrayU16 depth ,
+								 FastQueue<Point3D_F64> cloud , FastQueueArray_I32 cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();
 
@@ -88,9 +88,9 @@ public class VisualDepthOps {
 
 		Point2D_F64 n = new Point2D_F64();
 
-		ImageUInt8 colorR = rgb.getBand(0);
-		ImageUInt8 colorG = rgb.getBand(1);
-		ImageUInt8 colorB = rgb.getBand(2);
+		GrayU8 colorR = rgb.getBand(0);
+		GrayU8 colorG = rgb.getBand(1);
+		GrayU8 colorB = rgb.getBand(2);
 
 		for( int y = 0; y < depth.height; y++ ) {
 			int index = depth.startIndex + y*depth.stride;

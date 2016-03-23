@@ -39,8 +39,8 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -85,9 +85,9 @@ public class TestBaseDetectFiducialSquare {
 		worldPts.add(new Point3D_F64( 0.5*r, -0.5*r, 0));
 
 		// create a pattern with a corner for orientation and put it into the image
-		ImageUInt8 pattern = createPattern(6*20, true);
+		GrayU8 pattern = createPattern(6*20, true);
 
-		ImageUInt8 image = new ImageUInt8(640,480);
+		GrayU8 image = new GrayU8(640,480);
 
 		for (int i = 0; i < 4; i++) {
 
@@ -137,11 +137,11 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	private void checkFindKnown(IntrinsicParameters intrinsic, double tol ) {
-		ImageUInt8 pattern = createPattern(6*20, false);
+		GrayU8 pattern = createPattern(6*20, false);
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
 //		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  100,50,  100,150,  50,150);
 
-		ImageUInt8 image = new ImageUInt8(640,480);
+		GrayU8 image = new GrayU8(640,480);
 		ImageMiscOps.fill(image, 255);
 		render(pattern, where, image);
 
@@ -233,8 +233,8 @@ public class TestBaseDetectFiducialSquare {
 
 	private void detectWithLensDistortion(List<Point2D_F64> expected, DetectCorner detector, IntrinsicParameters intrinsic) {
 		// create a pattern with a corner for orientation and put it into the image
-		ImageUInt8 pattern = createPattern(6*20, true);
-		ImageUInt8 image = new ImageUInt8(640,480);
+		GrayU8 pattern = createPattern(6*20, true);
+		GrayU8 image = new GrayU8(640,480);
 		ImageMiscOps.fill(image, 255);
 		image.subimage(60, 300, 60 + pattern.width, 300 + pattern.height, null).setTo(pattern);
 		// place the pattern right next to one of the corners to maximize distortion
@@ -243,10 +243,10 @@ public class TestBaseDetectFiducialSquare {
 		PointTransform_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
 		PointTransform_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.VALUE, ImageUInt8.class);
-		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distortSB(false, interp, ImageUInt8.class);
+				TypeInterpolate.BILINEAR, BorderType.VALUE, GrayU8.class);
+		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, interp, GrayU8.class);
 		distorter.setModel(new PointToPixelTransform_F32(distToUndistort));
-		ImageUInt8 distorted = new ImageUInt8(640,480);
+		GrayU8 distorted = new GrayU8(640,480);
 		distorter.apply(image, distorted);
 
 		detector.configure(intrinsic, false);
@@ -295,9 +295,9 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(200+120,300+120));
 
 		// create a pattern with a corner for orientation and put it into the image
-		ImageUInt8 pattern = createPattern(6*20, true);
+		GrayU8 pattern = createPattern(6*20, true);
 
-		ImageUInt8 image = new ImageUInt8(640,480);
+		GrayU8 image = new GrayU8(640,480);
 
 		for (int i = 0; i < 4; i++) {
 
@@ -330,8 +330,8 @@ public class TestBaseDetectFiducialSquare {
 	 *
 	 * @param squareLowLeft If true a square will be added to the image lower left
 	 */
-	public static ImageUInt8 createPattern(int length, boolean squareLowLeft) {
-		ImageUInt8 pattern = new ImageUInt8( length , length );
+	public static GrayU8 createPattern(int length, boolean squareLowLeft) {
+		GrayU8 pattern = new GrayU8( length , length );
 
 		if( length%6 != 0 )
 			throw new RuntimeException("Must be divisible by 6!");
@@ -356,7 +356,7 @@ public class TestBaseDetectFiducialSquare {
 		return pattern;
 	}
 
-	public static void checkPattern( ImageFloat32 image ) {
+	public static void checkPattern( GrayF32 image ) {
 
 		int x0 = image.width/6;
 		int y0 = image.height/6;
@@ -391,7 +391,7 @@ public class TestBaseDetectFiducialSquare {
 	/**
 	 * Draws a distorted pattern onto the output
 	 */
-	public static void render( ImageUInt8 pattern , Quadrilateral_F64 where , ImageUInt8 output ) {
+	public static void render(GrayU8 pattern , Quadrilateral_F64 where , GrayU8 output ) {
 
 		int w = pattern.width;
 		int h = pattern.height;
@@ -418,17 +418,17 @@ public class TestBaseDetectFiducialSquare {
 //		try {Thread.sleep(10000);} catch (InterruptedException e) {}
 	}
 
-	public static class Dummy extends BaseDetectFiducialSquare<ImageUInt8> {
+	public static class Dummy extends BaseDetectFiducialSquare<GrayU8> {
 
-		public List<ImageFloat32> detected = new ArrayList<ImageFloat32>();
+		public List<GrayF32> detected = new ArrayList<GrayF32>();
 
 		protected Dummy() {
-			super(FactoryThresholdBinary.globalFixed(50,true,ImageUInt8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,0.65,100, ImageUInt8.class);
+			super(FactoryThresholdBinary.globalFixed(50,true,GrayU8.class),
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class),0.25,0.65,100, GrayU8.class);
 		}
 
 		@Override
-		public boolean processSquare(ImageFloat32 square, Result result, double a , double b) {
+		public boolean processSquare(GrayF32 square, Result result, double a , double b) {
 			detected.add(square.clone());
 			return true;
 		}
@@ -437,14 +437,14 @@ public class TestBaseDetectFiducialSquare {
 	/**
 	 * Accepts the pattern when it's in the lower left corner
 	 */
-	public static class DetectCorner extends BaseDetectFiducialSquare<ImageUInt8> {
+	public static class DetectCorner extends BaseDetectFiducialSquare<GrayU8> {
 		protected DetectCorner() {
-			super(FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class),
-					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),ImageUInt8.class),0.25,0.65,100, ImageUInt8.class);
+			super(FactoryThresholdBinary.globalFixed(50, true, GrayU8.class),
+					FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4),GrayU8.class),0.25,0.65,100, GrayU8.class);
 		}
 
 		@Override
-		public boolean processSquare(ImageFloat32 square, Result result, double a , double b) {
+		public boolean processSquare(GrayF32 square, Result result, double a , double b) {
 
 //			square.printInt();
 

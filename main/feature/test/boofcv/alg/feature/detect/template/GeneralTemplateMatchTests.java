@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
+public abstract class GeneralTemplateMatchTests<T extends ImageGray> {
 
 	Random rand = new Random(344);
 
@@ -112,7 +112,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 			int y0 = alg.getBorderY0();
 			int y1 = image.width - (template.width - x0);
 
-			ImageFloat32 intensity = alg.getIntensity();
+			GrayF32 intensity = alg.getIntensity();
 
 			for (int y = y0; y < y1; y++) {
 				for (int x = x0; x < x1; x++) {
@@ -137,7 +137,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 			int y0 = alg.getBorderY0();
 			int y1 = image.width - (template.width - x0);
 
-			ImageFloat32 intensity = alg.getIntensity();
+			GrayF32 intensity = alg.getIntensity();
 
 			for (int y = y0; y < y1; y++) {
 				for (int x = x0; x < x1; x++) {
@@ -244,7 +244,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		assertTrue(scoreMask*0.8 > scoreNoMask );
 	}
 
-	public float fractionBest( ImageFloat32 intensity , int x , int y ) {
+	public float fractionBest(GrayF32 intensity , int x , int y ) {
 		float min = ImageStatistics.min(intensity);
 		float max = ImageStatistics.max(intensity);
 
@@ -253,7 +253,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		return (value-min)/(max-min);
 	}
 
-	public float fractionAverage( ImageFloat32 intensity , int x , int y ) {
+	public float fractionAverage(GrayF32 intensity , int x , int y ) {
 		float min = ImageStatistics.min(intensity);
 		float max = ImageStatistics.max(intensity);
 		float average = (float)ImageStatistics.mean(intensity);
@@ -297,7 +297,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageSingleBand> {
 		int y0 = alg.getBorderY0();
 		int y1 = image.height - (template.height - x0);
 
-		ImageFloat32 adjusted = alg.getIntensity().subimage(x0, y0, x1, y1, null);
+		GrayF32 adjusted = alg.getIntensity().subimage(x0, y0, x1, y1, null);
 
 		// solutions should be local maximums
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, -Float.MAX_VALUE, 0, true));

@@ -21,8 +21,8 @@ package boofcv.gui.binary;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import sun.awt.image.ByteInterleavedRaster;
 import sun.awt.image.IntegerInterleavedRaster;
@@ -235,7 +235,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int colors[], BufferedImage out) {
+	public static BufferedImage renderLabeled(GrayS32 labelImage, int colors[], BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(labelImage.getWidth(),labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -264,7 +264,7 @@ public class VisualizeBinaryData {
 	 * @param out Output image.  If null a new image is declared
 	 * @return Colorized labeled image
 	 */
-	public static BufferedImage renderLabeledBG(ImageSInt32 labelImage, int numRegions, BufferedImage out) {
+	public static BufferedImage renderLabeledBG(GrayS32 labelImage, int numRegions, BufferedImage out) {
 
 		int colors[] = new int[numRegions+1];
 
@@ -285,7 +285,7 @@ public class VisualizeBinaryData {
 	 * @param out Output image.  If null a new image is declared
 	 * @return Colorized labeled image
 	 */
-	public static BufferedImage renderLabeled(ImageSInt32 labelImage, int numRegions, BufferedImage out) {
+	public static BufferedImage renderLabeled(GrayS32 labelImage, int numRegions, BufferedImage out) {
 
 		int colors[] = new int[numRegions];
 
@@ -297,7 +297,7 @@ public class VisualizeBinaryData {
 		return renderLabeled(labelImage, colors, out);
 	}
 
-	private static void _renderLabeled(ImageSInt32 labelImage, BufferedImage out, int[] colors) {
+	private static void _renderLabeled(GrayS32 labelImage, BufferedImage out, int[] colors) {
 		int w = labelImage.getWidth();
 		int h = labelImage.getHeight();
 
@@ -310,7 +310,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderLabeled(ImageSInt32 labelImage, int[] colors, IntegerInterleavedRaster raster) {
+	private static void renderLabeled(GrayS32 labelImage, int[] colors, IntegerInterleavedRaster raster) {
 		int rasterIndex = 0;
 		int data[] = raster.getDataStorage();
 
@@ -334,7 +334,7 @@ public class VisualizeBinaryData {
 	 * @param out (Output) optional storage for output image
 	 * @return Output rendered binary image
 	 */
-	public static BufferedImage renderBinary(ImageUInt8 binaryImage, boolean invert, BufferedImage out) {
+	public static BufferedImage renderBinary(GrayU8 binaryImage, boolean invert, BufferedImage out) {
 
 		if( out == null ) {
 			out = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
@@ -356,7 +356,7 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	private static void _renderBinary(ImageUInt8 binaryImage, boolean invert, BufferedImage out) {
+	private static void _renderBinary(GrayU8 binaryImage, boolean invert, BufferedImage out) {
 		int w = binaryImage.getWidth();
 		int h = binaryImage.getHeight();
 
@@ -379,7 +379,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary(ImageUInt8 binaryImage, boolean invert, ByteInterleavedRaster raster) {
+	private static void renderBinary(GrayU8 binaryImage, boolean invert, ByteInterleavedRaster raster) {
 		int rasterIndex = 0;
 		byte data[] = raster.getDataStorage();
 
@@ -428,7 +428,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary(ImageUInt8 binaryImage, boolean invert, IntegerInterleavedRaster raster) {
+	private static void renderBinary(GrayU8 binaryImage, boolean invert, IntegerInterleavedRaster raster) {
 		int rasterIndex = 0;
 		int data[] = raster.getDataStorage();
 

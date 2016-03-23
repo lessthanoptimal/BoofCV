@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import georegression.metric.UtilAngle;
 import org.ddogleg.sorting.QuickSort_F64;
@@ -34,7 +34,7 @@ import org.ddogleg.sorting.QuickSort_F64;
  * @author Peter Abeles
  */
 public class ImplOrientationSlidingWindowIntegral
-		<T extends ImageSingleBand,G extends GradientValue>
+		<T extends ImageGray,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	// where the output from the derivative is stored

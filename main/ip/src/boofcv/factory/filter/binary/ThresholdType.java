@@ -19,7 +19,7 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Enum for all the types of thresholding provided in BoofCV
@@ -46,13 +46,13 @@ public enum ThresholdType {
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#localGaussian(ImageUInt8, ImageUInt8, int, float, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localGaussian(GrayU8, GrayU8, int, float, boolean, GrayU8, GrayU8)
 	 */
 	LOCAL_GAUSSIAN(true,false),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
-	 * @see ThresholdImageOps#localSquare(ImageUInt8, ImageUInt8, int, float, boolean, ImageUInt8, ImageUInt8)
+	 * @see ThresholdImageOps#localSquare(GrayU8, GrayU8, int, float, boolean, GrayU8, GrayU8)
 	 */
 	LOCAL_SQUARE(true,false),
 	/**

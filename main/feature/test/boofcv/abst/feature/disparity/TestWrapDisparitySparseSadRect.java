@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreSadRect_F32;
 import boofcv.alg.feature.disparity.impl.ImplSelectSparseBasicWta_F32;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -50,19 +50,19 @@ public class TestWrapDisparitySparseSadRect {
 		int minDisparity = 3;
 		int maxDisparity = 12;
 
-		ImageFloat32 left = new ImageFloat32(w,h);
-		ImageFloat32 right = new ImageFloat32(w,h);
+		GrayF32 left = new GrayF32(w,h);
+		GrayF32 right = new GrayF32(w,h);
 
-		StereoDisparity<ImageFloat32,ImageUInt8> validator =
+		StereoDisparity<GrayF32,GrayU8> validator =
 				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,
-						minDisparity,maxDisparity,r,r,-1,-1,-1,ImageFloat32.class);
-		StereoDisparitySparse<ImageFloat32> alg =
-				new WrapDisparitySparseSadRect<float[],ImageFloat32>(
+						minDisparity,maxDisparity,r,r,-1,-1,-1,GrayF32.class);
+		StereoDisparitySparse<GrayF32> alg =
+				new WrapDisparitySparseSadRect<float[],GrayF32>(
 						new ImplDisparitySparseScoreSadRect_F32(minDisparity,maxDisparity,r,r),
 						new ImplSelectSparseBasicWta_F32());
 
 		validator.process(left,right);
-		ImageUInt8 expected = validator.getDisparity();
+		GrayU8 expected = validator.getDisparity();
 		alg.setImages(left,right);
 
 		for( int y = 0; y < h; y++ ) {

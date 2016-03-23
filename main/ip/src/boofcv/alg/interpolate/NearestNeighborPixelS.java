@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,14 @@
 package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  *  Performs nearest neighbor interpolation to extract values between pixels in an image.
  *
  * @author Peter Abeles
  */
-public abstract class NearestNeighborPixelS<T extends ImageSingleBand> implements InterpolatePixelS<T> {
+public abstract class NearestNeighborPixelS<T extends ImageGray> implements InterpolatePixelS<T> {
 	protected ImageBorder<T> border;
 	protected T orig;
 	protected int stride;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
 import java.util.Random;
@@ -30,7 +30,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class TldFernClassifier<T extends ImageSingleBand> {
+public class TldFernClassifier<T extends ImageGray> {
 
 	// maximum value of a fern for P and N.  Used for re-normalization
 	protected int maxP = 0;

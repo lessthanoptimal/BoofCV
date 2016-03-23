@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,16 +32,16 @@ public class TestFilterImageReflection {
 	 */
 	@Test
 	public void basicTest2() {
-		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy",2,3,ImageUInt8.class,ImageUInt16.class);
+		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy",2,3,GrayU8.class,GrayU16.class);
 
-		ImageUInt8 in = new ImageUInt8(5,5);
-		ImageUInt16 out = new ImageUInt16(5,5);
+		GrayU8 in = new GrayU8(5,5);
+		GrayU16 out = new GrayU16(5,5);
 		filter.process(in,out);
 
 		assertEquals(2,filter.getHorizontalBorder());
 		assertEquals(3,filter.getVerticalBorder());
-		assertTrue(ImageUInt8.class==filter.getInputType().getImageClass());
-		assertTrue(ImageUInt16.class==filter.getOutputType().getImageClass());
+		assertTrue(GrayU8.class==filter.getInputType().getImageClass());
+		assertTrue(GrayU16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));
     }
 
@@ -50,24 +50,24 @@ public class TestFilterImageReflection {
 	 */
 	@Test
 	public void basicTest3() {
-		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy2",2,3,ImageUInt8.class,ImageUInt16.class);
+		FilterImageReflection filter = new FilterImageReflection(getClass(),"methodDummy2",2,3,GrayU8.class,GrayU16.class);
 
-		ImageUInt8 in = new ImageUInt8(5,5);
-		ImageUInt16 out = new ImageUInt16(5,5);
+		GrayU8 in = new GrayU8(5,5);
+		GrayU16 out = new GrayU16(5,5);
 		filter.process(in,out);
 
 		assertEquals(2,filter.getHorizontalBorder());
 		assertEquals(3,filter.getVerticalBorder());
-		assertTrue(ImageUInt8.class==filter.getInputType().getImageClass());
-		assertTrue(ImageUInt16.class==filter.getOutputType().getImageClass());
+		assertTrue(GrayU8.class==filter.getInputType().getImageClass());
+		assertTrue(GrayU16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));
 	}
 
-	public static void methodDummy( ImageUInt8 imgA , ImageUInt16 imgB ) {
+	public static void methodDummy(GrayU8 imgA , GrayU16 imgB ) {
 		imgB.set(0,0,1);
 	}
 
-	public static void methodDummy2( ImageUInt8 imgA , int numTimes , ImageUInt16 imgB ) {
+	public static void methodDummy2(GrayU8 imgA , int numTimes , GrayU16 imgB ) {
 		imgB.set(0,0,1);
 	}
 }

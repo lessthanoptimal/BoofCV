@@ -96,14 +96,14 @@ public class ConvertBufferedImage {
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static ImageUInt8 extractImageUInt8(BufferedImage img) {
+	public static GrayU8 extractImageUInt8(BufferedImage img) {
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 
 			ByteInterleavedRaster raster = (ByteInterleavedRaster) img.getRaster();
 			if (raster.getNumBands() != 1)
 				throw new IllegalArgumentException("Input image has more than one channel");
-			ImageUInt8 ret = new ImageUInt8();
+			GrayU8 ret = new GrayU8();
 
 			ret.width = img.getWidth();
 			ret.height = img.getHeight();
@@ -178,7 +178,7 @@ public class ConvertBufferedImage {
 	 * @param img Input image who's data will be wrapped by the returned BufferedImage.
 	 * @return BufferedImage which shared data with the input image.
 	 */
-	public static BufferedImage extractBuffered(ImageUInt8 img) {
+	public static BufferedImage extractBuffered(GrayU8 img) {
 		if (img.isSubimage())
 			throw new IllegalArgumentException("Sub-images are not supported for this operation");
 
@@ -213,11 +213,11 @@ public class ConvertBufferedImage {
 	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
 	 */
 	public static <T extends ImageBase> void convertFrom(BufferedImage src, T dst , boolean orderRgb) {
-		if( dst instanceof ImageSingleBand ) {
-			ImageSingleBand sb = (ImageSingleBand)dst;
-			convertFromSingle(src, sb, (Class<ImageSingleBand>) sb.getClass());
-		} else if( dst instanceof MultiSpectral ) {
-			MultiSpectral ms = (MultiSpectral)dst;
+		if( dst instanceof ImageGray) {
+			ImageGray sb = (ImageGray)dst;
+			convertFromSingle(src, sb, (Class<ImageGray>) sb.getClass());
+		} else if( dst instanceof Planar) {
+			Planar ms = (Planar)dst;
 			convertFromMulti(src,ms,orderRgb,ms.getBandType());
 		} else if( dst instanceof ImageInterleaved ) {
 			convertFromInterleaved(src, (ImageInterleaved) dst, orderRgb);
@@ -240,11 +240,11 @@ public class ConvertBufferedImage {
 
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
-				convertFromSingle(src, (ImageSingleBand)out, imageType.getImageClass());
+				convertFromSingle(src, (ImageGray)out, imageType.getImageClass());
 				break;
 
 			case MULTI_SPECTRAL:
-				convertFromMulti(src, (MultiSpectral) out, orderRgb, imageType.getImageClass());
+				convertFromMulti(src, (Planar) out, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -264,11 +264,11 @@ public class ConvertBufferedImage {
 
 		switch( imageType.getFamily() ) {
 			case SINGLE_BAND:
-				convertFromSingle(src, (ImageSingleBand)output, imageType.getImageClass());
+				convertFromSingle(src, (ImageGray)output, imageType.getImageClass());
 				break;
 
 			case MULTI_SPECTRAL:
-				convertFromMulti(src, (MultiSpectral) output, orderRgb, imageType.getImageClass());
+				convertFromMulti(src, (Planar) output, orderRgb, imageType.getImageClass());
 				break;
 
 			case INTERLEAVED:
@@ -286,33 +286,33 @@ public class ConvertBufferedImage {
 	 * Converts a buffered image into an image of the specified type.  In a 'dst' image is provided
 	 * it will be used for output, otherwise a new image will be created.
 	 */
-	public static <T extends ImageSingleBand> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
-		if (type == ImageUInt8.class) {
-			return (T) convertFrom(src, (ImageUInt8) dst);
-		} else if( ImageInt16.class.isAssignableFrom(type) ) {
-			return (T) convertFrom(src, (ImageInt16) dst,(Class)type);
-		} else if (type == ImageFloat32.class) {
-			return (T) convertFrom(src, (ImageFloat32) dst);
+	public static <T extends ImageGray> T convertFromSingle(BufferedImage src, T dst, Class<T> type) {
+		if (type == GrayU8.class) {
+			return (T) convertFrom(src, (GrayU8) dst);
+		} else if( GrayI16.class.isAssignableFrom(type) ) {
+			return (T) convertFrom(src, (GrayI16) dst,(Class)type);
+		} else if (type == GrayF32.class) {
+			return (T) convertFrom(src, (GrayF32) dst);
 		} else {
 			throw new IllegalArgumentException("Unknown type " + type);
 		}
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.ImageUInt8}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayU8}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convertFrom(BufferedImage src, ImageUInt8 dst) {
+	public static GrayU8 convertFrom(BufferedImage src, GrayU8 dst) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			dst = new ImageUInt8(src.getWidth(), src.getHeight());
+			dst = new GrayU8(src.getWidth(), src.getHeight());
 		}
 
 		try {
@@ -338,14 +338,14 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.ImageInt16}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayI16}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageInt16>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
+	public static <T extends GrayI16>T convertFrom(BufferedImage src, T dst , Class<T> type ) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				throw new IllegalArgumentException("image dimension are different");
@@ -368,21 +368,21 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.ImageFloat32}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayF32}.  If the buffered image
 	 * has multiple channels the intensities of each channel are averaged together.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convertFrom(BufferedImage src, ImageFloat32 dst) {
+	public static GrayF32 convertFrom(BufferedImage src, GrayF32 dst) {
 		if (dst != null) {
 			if (src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
 				String difference = "src = "+src.getWidth()+"x"+src.getHeight()+"  dst = "+dst.getWidth()+"x"+dst.getHeight();
 				throw new IllegalArgumentException("image dimension are different. "+difference);
 			}
 		} else {
-			dst = new ImageFloat32(src.getWidth(), src.getHeight());
+			dst = new GrayF32(src.getWidth(), src.getHeight());
 		}
 
 		try {
@@ -408,7 +408,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.MultiSpectral} image of the specified
+	 * Converts the buffered image into an {@link Planar} image of the specified
 	 * type. 
 	 *
 	 * @param src Input image. Not modified.
@@ -418,8 +418,8 @@ public class ConvertBufferedImage {
 	 * @param type Which type of data structure is each band. (ImageUInt8 or ImageFloat32)
 	 * @return Converted image.
 	 */
-	public static <T extends ImageSingleBand> MultiSpectral<T>
-	convertFromMulti(BufferedImage src, MultiSpectral<T> dst , boolean orderRgb , Class<T> type )
+	public static <T extends ImageGray> Planar<T>
+	convertFromMulti(BufferedImage src, Planar<T> dst , boolean orderRgb , Class<T> type )
 	{
 		if( src == null )
 			throw new IllegalArgumentException("src is null!");
@@ -440,37 +440,37 @@ public class ConvertBufferedImage {
 				numBands = raster.getNumBands();
 
 			if( dst == null)
-				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),numBands);
+				dst = new Planar<T>(type,src.getWidth(),src.getHeight(),numBands);
 			else if( dst.getNumBands() != numBands )
 				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
 
-			if( type == ImageUInt8.class ) {
+			if( type == GrayU8.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
-							ConvertRaster.bufferedToGray(src, ((MultiSpectral<ImageUInt8>) dst).getBand(i));
+							ConvertRaster.bufferedToGray(src, ((Planar<GrayU8>) dst).getBand(i));
 					} else {
-						ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>) dst);
+						ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (Planar<GrayU8>) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>) dst);
+					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayU8>) dst);
 				} else {
-					ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>) dst);
+					ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);
 				}
-			} else if( type == ImageFloat32.class ) {
+			} else if( type == GrayF32.class ) {
 				if (src.getRaster() instanceof ByteInterleavedRaster &&
 						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
 					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
 						for( int i = 0; i < dst.getNumBands(); i++ )
-							ConvertRaster.bufferedToGray(src,((MultiSpectral<ImageFloat32>)dst).getBand(i));
+							ConvertRaster.bufferedToGray(src,((Planar<GrayF32>)dst).getBand(i));
 					} else {
-						ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>) dst);
+						ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (Planar<GrayF32>) dst);
 					}
 				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>) dst);
+					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (Planar<GrayF32>) dst);
 				} else {
-					ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>) dst);
+					ConvertRaster.bufferedToMulti_F32(src, (Planar<GrayF32>) dst);
 				}
 			} else {
 				throw new IllegalArgumentException("Band type not supported yet");
@@ -479,12 +479,12 @@ public class ConvertBufferedImage {
 		} catch( java.security.AccessControlException e) {
 			// Applets don't allow access to the raster()
 			if( dst == null )
-				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
+				dst = new Planar<T>(type,src.getWidth(),src.getHeight(),3);
 
-			if( type == ImageUInt8.class ) {
-				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>) dst);
-			} else if( type == ImageFloat32.class ) {
-				ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
+			if( type == GrayU8.class ) {
+				ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);
+			} else if( type == GrayF32.class ) {
+				ConvertRaster.bufferedToMulti_F32(src, (Planar<GrayF32>)dst);
 			}
 		}
 
@@ -589,23 +589,23 @@ public class ConvertBufferedImage {
 	 * @return Converted image.
 	 */
 	public static BufferedImage convertTo( ImageBase src, BufferedImage dst, boolean orderRgb ) {
-		if( src instanceof ImageSingleBand ) {
-			if( ImageUInt8.class == src.getClass() ) {
-				return convertTo((ImageUInt8)src,dst);
-			} else if( ImageInt16.class.isInstance(src) ) {
-				return convertTo((ImageInt16)src,dst);
-			} else if( ImageFloat32.class == src.getClass() ) {
-				return convertTo((ImageFloat32)src,dst);
+		if( src instanceof ImageGray) {
+			if( GrayU8.class == src.getClass() ) {
+				return convertTo((GrayU8)src,dst);
+			} else if( GrayI16.class.isInstance(src) ) {
+				return convertTo((GrayI16)src,dst);
+			} else if( GrayF32.class == src.getClass() ) {
+				return convertTo((GrayF32)src,dst);
 			} else {
 				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
 			}
-		} else if( src instanceof MultiSpectral ) {
-			MultiSpectral ms = (MultiSpectral)src;
+		} else if( src instanceof Planar) {
+			Planar ms = (Planar)src;
 
-			if( ImageUInt8.class == ms.getBandType() ) {
-				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst, orderRgb);
-			} else if( ImageFloat32.class == ms.getBandType() ) {
-				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst, orderRgb);
+			if( GrayU8.class == ms.getBandType() ) {
+				return convertTo_U8((Planar<GrayU8>) ms, dst, orderRgb);
+			} else if( GrayF32.class == ms.getBandType() ) {
+				return convertTo_F32((Planar<GrayF32>) ms, dst, orderRgb);
 			} else {
 				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getBandType().getSimpleName());
 			}
@@ -623,14 +623,14 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageUInt8} into a BufferedImage.  If the buffered image
+	 * Converts a {@link GrayU8} into a BufferedImage.  If the buffered image
 	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo(ImageUInt8 src, BufferedImage dst) {
+	public static BufferedImage convertTo(GrayU8 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		try {
@@ -652,14 +652,14 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageInt16} into a BufferedImage.  If the buffered image
+	 * Converts a {@link GrayI16} into a BufferedImage.  If the buffered image
 	 * has multiple channels then the input image is copied into each channel.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo(ImageInt16 src, BufferedImage dst) {
+	public static BufferedImage convertTo(GrayI16 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		try {
@@ -683,7 +683,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts the buffered image into an {@link boofcv.struct.image.ImageFloat32}.  If the buffered image
+	 * Converts the buffered image into an {@link GrayF32}.  If the buffered image
 	 * has multiple channels then the input image is copied into each channel.  The floating
 	 * point image is assumed to be between 0 and 255.
 	 *
@@ -691,7 +691,7 @@ public class ConvertBufferedImage {
 	 * @param dst Where the converted image is written to.  If null a new image is created.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo(ImageFloat32 src, BufferedImage dst) {
+	public static BufferedImage convertTo(GrayF32 src, BufferedImage dst) {
 		dst = checkInputs(src, dst);
 
 		try {
@@ -713,7 +713,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} {@link ImageUInt8} into a BufferedImage.
+	 * Converts a {@link Planar} {@link GrayU8} into a BufferedImage.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
@@ -721,7 +721,7 @@ public class ConvertBufferedImage {
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo_U8(MultiSpectral<ImageUInt8> src, BufferedImage dst, boolean orderRgb ) {
+	public static BufferedImage convertTo_U8(Planar<GrayU8> src, BufferedImage dst, boolean orderRgb ) {
 		dst = checkInputs(src, dst);
 
 		if( orderRgb ) {
@@ -747,7 +747,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} {@link ImageFloat32} into a BufferedImage.
+	 * Converts a {@link Planar} {@link GrayF32} into a BufferedImage.
 	 *
 	 * @param src Input image.
 	 * @param dst Where the converted image is written to.  If null a new image is created.
@@ -755,7 +755,7 @@ public class ConvertBufferedImage {
 	 *                 order based on BufferedImage.TYPE. Most of the time you want this to be true.
 	 * @return Converted image.
 	 */
-	public static BufferedImage convertTo_F32(MultiSpectral<ImageFloat32> src, BufferedImage dst, boolean orderRgb) {
+	public static BufferedImage convertTo_F32(Planar<GrayF32> src, BufferedImage dst, boolean orderRgb) {
 		dst = checkInputs(src, dst);
 
 		if( orderRgb ) {
@@ -839,14 +839,14 @@ public class ConvertBufferedImage {
 				throw new IllegalArgumentException("image dimension are different");
 			}
 		} else {
-			if( ImageInt8.class.isInstance(src))
+			if( GrayI8.class.isInstance(src))
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-			else if( ImageFloat.class.isInstance(src) )
+			else if( GrayF.class.isInstance(src) )
 				// no good equivalent.  Just assume the image is a regular gray scale image
 				// with pixel values from 0 to 255
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
 //			throw new RuntimeException("Fail!");
-			else if( ImageInteger.class.isInstance(src))
+			else if( GrayI.class.isInstance(src))
 				// no good equivalent.  I'm giving it the biggest pixel for the range
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);
 			else
@@ -877,12 +877,12 @@ public class ConvertBufferedImage {
 	 * Returns a new image with the color bands in the appropriate ordering.  The returned image will
 	 * reference the original image's image arrays.
 	 */
-	public static MultiSpectral orderBandsIntoBuffered(MultiSpectral src, BufferedImage dst) {
+	public static Planar orderBandsIntoBuffered(Planar src, BufferedImage dst) {
 		// see if no change is required
 		if( dst.getType() == BufferedImage.TYPE_INT_RGB )
 			return src;
 
-		MultiSpectral tmp = new MultiSpectral(src.type, src.getNumBands());
+		Planar tmp = new Planar(src.type, src.getNumBands());
 		tmp.width = src.width;
 		tmp.height = src.height;
 		tmp.stride = src.stride;
@@ -982,8 +982,8 @@ public class ConvertBufferedImage {
 	 * Invoking this function ensures that the image will have the expected ordering.  For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */
-	public static <T extends ImageSingleBand>
-	void orderBandsIntoRGB( MultiSpectral<T> image , BufferedImage input ) {
+	public static <T extends ImageGray>
+	void orderBandsIntoRGB(Planar<T> image , BufferedImage input ) {
 
 		boolean swap = swapBandOrder(input);
 
@@ -1023,8 +1023,8 @@ public class ConvertBufferedImage {
 		}
 	}
 
-	public static <T extends ImageSingleBand>
-	void orderBandsBufferedFromRgb(MultiSpectral<T> image, BufferedImage input) {
+	public static <T extends ImageGray>
+	void orderBandsBufferedFromRgb(Planar<T> image, BufferedImage input) {
 
 		boolean swap = swapBandOrder(input);
 

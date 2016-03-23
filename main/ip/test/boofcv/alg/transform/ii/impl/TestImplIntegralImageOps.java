@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,15 +64,15 @@ public class TestImplIntegralImageOps {
 		Class inputType = paramType[0];
 		Class outputType = paramType[1];
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		BoofTesting.checkSubImage(this,"checkTransformResults",true,m,input,integral);
 	}
 
-	public void checkTransformResults(Method m , ImageSingleBand a, ImageSingleBand b) throws InvocationTargetException, IllegalAccessException {
+	public void checkTransformResults(Method m , ImageGray a, ImageGray b) throws InvocationTargetException, IllegalAccessException {
 
 		m.invoke(null,a,b);
 
@@ -102,8 +102,8 @@ public class TestImplIntegralImageOps {
 
 	public void convolve( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageSInt32 expected = new ImageSInt32(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
 		ConvolveWithBorder.convolve(kernel,input,expected,border);
@@ -112,10 +112,10 @@ public class TestImplIntegralImageOps {
 		Class inputType = paramType[0];
 		Class outputType = paramType[2];
 
-		ImageSingleBand inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
-		ImageSingleBand expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
-		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray found = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
 		GConvertImage.convert(input,inputII);
 		GConvertImage.convert(expected,expectedII);
@@ -141,8 +141,8 @@ public class TestImplIntegralImageOps {
 
 	public void convolveBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Kernel2D_I32 kernel = new Kernel2D_I32(3, new int[]{1,1,1,2,2,2,1,1,1});
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageSInt32 expected = new ImageSInt32(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayS32 expected = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 10);
 		ImageBorder_S32 border = FactoryImageBorderAlgs.value( input, 0);
 		ConvolveWithBorder.convolve(kernel,input,expected,border);
@@ -151,10 +151,10 @@ public class TestImplIntegralImageOps {
 		Class inputType = paramType[0];
 		Class outputType = paramType[2];
 
-		ImageSingleBand inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
-		ImageSingleBand expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
-		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray inputII = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray expectedII = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray found = GeneralizedImageOps.createSingleBand(outputType, width, height);
 
 		GConvertImage.convert(input,inputII);
 		GConvertImage.convert(expected,expectedII);
@@ -181,11 +181,11 @@ public class TestImplIntegralImageOps {
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];
 
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
 		GImageMiscOps.fillUniform(integral, rand, 0, 1000);
 
-		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray expected = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
 		IntegralKernel kernel = new IntegralKernel(2);
 		kernel.blocks[0] = new ImageRectangle(-2,-2,1,1);
@@ -214,10 +214,10 @@ public class TestImplIntegralImageOps {
 	public void block_unsafe( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];
-		Class origType = inputType == ImageSInt32.class ? ImageUInt8.class : inputType;
+		Class origType = inputType == GrayS32.class ? GrayU8.class : inputType;
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(origType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
 		GImageMiscOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);
@@ -236,10 +236,10 @@ public class TestImplIntegralImageOps {
 	public void block_zero( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramType[] = m.getParameterTypes();
 		Class inputType = paramType[0];
-		Class origType = inputType == ImageSInt32.class ? ImageUInt8.class : inputType;
+		Class origType = inputType == GrayS32.class ? GrayU8.class : inputType;
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(origType, width, height);
-		ImageSingleBand integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(origType, width, height);
+		ImageGray integral = GeneralizedImageOps.createSingleBand(inputType, width, height);
 
 		GImageMiscOps.fill(input,1);
 		GIntegralImageOps.transform(input,integral);

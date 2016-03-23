@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.abst.segmentation;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width, height);
-			ImageSInt32 output = new ImageSInt32(width, height);
+			GrayS32 output = new GrayS32(width, height);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
@@ -70,7 +70,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 
 			assertTrue(alg.getTotalSuperpixels() > 4);
 
-			ImageUInt8 binary = new ImageUInt8(width,height);
+			GrayU8 binary = new GrayU8(width,height);
 			boolean selected[] = new boolean[ alg.getTotalSuperpixels()];
 
 			for (int i = 0; i < alg.getTotalSuperpixels(); i++) {
@@ -96,20 +96,20 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
-			ImageSInt32 expected = new ImageSInt32(width,height);
+			GrayS32 expected = new GrayS32(width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
 			alg.segment(input,expected);
 
 			// provide an output which is a sub-image
-			ImageSInt32 found = new ImageSInt32(width+3,height+2).subimage(2,1,width+2,height+1);
+			GrayS32 found = new GrayS32(width+3,height+2).subimage(2,1,width+2,height+1);
 			alg.segment(input,found);
 			BoofTesting.assertEquals(expected,found,0);
 
 			// Now make the input image an output
 			input = BoofTesting.createSubImageOf(input);
-			found = new ImageSInt32(width,height);
+			found = new GrayS32(width,height);
 
 			alg.segment(input,found);
 			BoofTesting.assertEquals(expected,found,0);
@@ -126,7 +126,7 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
-			ImageSInt32 output = new ImageSInt32(width,height);
+			GrayS32 output = new GrayS32(width,height);
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
 			alg.segment(input,output);
@@ -161,12 +161,12 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width,height);
-			ImageSInt32 output = new ImageSInt32(width,height);
+			GrayS32 output = new GrayS32(width,height);
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
 			alg.segment(input,output);
 
-			ImageSInt32 output2 = new ImageSInt32(width,height);
+			GrayS32 output2 = new GrayS32(width,height);
 			alg.segment(input,output2);
 
 			for( int y = 0; y < height; y++ ) {
@@ -187,13 +187,13 @@ public abstract class GeneralImageSuperpixelsChecks<T extends ImageBase> {
 			ImageSuperpixels<T> alg = createAlg(t);
 
 			T input = t.createImage(width/2,height/2);
-			ImageSInt32 output = new ImageSInt32(width/2,height/2);
+			GrayS32 output = new GrayS32(width/2,height/2);
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
 			alg.segment(input,output);
 
 			input = t.createImage(width,height);
-			output = new ImageSInt32(width,height);
+			output = new GrayS32(width,height);
 
 			alg.segment(input,output);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Changes behavior of {@link PointTrackerCombined} so that it conforms to the {@link PointTrackerTwoPass} interface.
  *
  * @author Peter Abeles
  */
-public class PointTrackerTwoPassCombined<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+public class PointTrackerTwoPassCombined<I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 	extends PointTrackerCombined<I,D,Desc> implements PointTrackerTwoPass<I>
 {
 	public PointTrackerTwoPassCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,

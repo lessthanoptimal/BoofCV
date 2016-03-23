@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -50,10 +50,10 @@ public class TestCannyEdge {
 	 */
 	@Test
 	public void canHandleNoTexture_and_zeroThresh() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output = new GrayU8(width,height);
 
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(true);
 
 		alg.process(input,0,0,output);
 
@@ -77,8 +77,8 @@ public class TestCannyEdge {
 	 */
 	@Test
 	public void constantGradient() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output = new GrayU8(width,height);
 
 		// the whole image has a constant gradient
 		for( int i = 0; i < input.width; i++ ) {
@@ -87,7 +87,7 @@ public class TestCannyEdge {
 			}
 		}
 
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(true);
 
 		alg.process(input,1,2,output);
 
@@ -97,11 +97,11 @@ public class TestCannyEdge {
 	@Test
 	public void basicTestPoints() {
 
-		ImageUInt8 input = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
 
 		ImageMiscOps.fillRectangle(input,50,20,30,40,50);
 
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(true);
 
 		alg.process(input,10,50,null);
 
@@ -120,16 +120,16 @@ public class TestCannyEdge {
 
 	@Test
 	public void basicTestMarks() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 binary = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 binary = new GrayU8(width,height);
 
 		ImageMiscOps.fillRectangle(input,50,20,30,40,50);
 
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(false);
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(false);
 
 		alg.process(input,10,50,binary);
 
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 		// set pixels to 1 if there are where the edge could lie
 		ImageMiscOps.fillRectangle(expected,1,19,29,42,52);
 		ImageMiscOps.fillRectangle(expected,0,21,31,38,48);
@@ -149,7 +149,7 @@ public class TestCannyEdge {
 
 	@Test
 	public void checkThresholds() {
-		ImageUInt8 input = new ImageUInt8(15,20);
+		GrayU8 input = new GrayU8(15,20);
 
 		input.set(5,0,50);
 		input.set(5,1,50);
@@ -160,7 +160,7 @@ public class TestCannyEdge {
 
 		// manually inspecting the image shows that the intensity image has a max value of 34 and a
 		// smallest value of 2
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(true);
 		alg.process(input,1,28,null);
 		assertEquals(1, alg.getContours().size());
 
@@ -178,14 +178,14 @@ public class TestCannyEdge {
 	 */
 	@Test
 	public void checkEquivalentOutput() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output0 = new ImageUInt8(width,height);
-		ImageUInt8 output1 = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output0 = new GrayU8(width,height);
+		GrayU8 output1 = new GrayU8(width,height);
 
 		for( int i = 0; i < 10; i++ ) {
 			ImageMiscOps.fillUniform(input,rand,0,200);
-			CannyEdge<ImageUInt8,ImageSInt16> algTrace = createCanny(true);
-			CannyEdge<ImageUInt8,ImageSInt16> algMark = createCanny(false);
+			CannyEdge<GrayU8,GrayS16> algTrace = createCanny(true);
+			CannyEdge<GrayU8,GrayS16> algMark = createCanny(false);
 
 			algTrace.process(input,20,100,output0);
 			algMark.process(input,20,100,output1);
@@ -199,23 +199,23 @@ public class TestCannyEdge {
 	 */
 	@Test
 	public void checkSubImage() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,200);
 
 		BoofTesting.checkSubImage(this,"checkSubImage",true,input,output);
 	}
 
-	public void checkSubImage( ImageUInt8 input , ImageUInt8 output ) {
-		CannyEdge<ImageUInt8,ImageSInt16> alg = createCanny(true);
+	public void checkSubImage(GrayU8 input , GrayU8 output ) {
+		CannyEdge<GrayU8,GrayS16> alg = createCanny(true);
 		alg.process(input,1,100,output);
 	}
 
-	private CannyEdge<ImageUInt8,ImageSInt16> createCanny( boolean saveTrace ) {
-		BlurFilter<ImageUInt8> blur = FactoryBlurFilter.gaussian(ImageUInt8.class, -1, 1);
-		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class, ImageSInt16.class);
+	private CannyEdge<GrayU8,GrayS16> createCanny(boolean saveTrace ) {
+		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
+		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
-		return new CannyEdge<ImageUInt8,ImageSInt16>(blur,gradient,saveTrace);
+		return new CannyEdge<GrayU8,GrayS16>(blur,gradient,saveTrace);
 	}
 
 	private void checkNeighbor( List<Point2D_I32> list ) {

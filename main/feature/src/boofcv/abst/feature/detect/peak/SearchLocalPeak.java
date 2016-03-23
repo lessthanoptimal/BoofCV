@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.abst.feature.detect.peak;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Interface for searching for local peaks near by a user specified point.
  *
  * @author Peter Abeles
  */
-public interface SearchLocalPeak<T extends ImageSingleBand> {
+public interface SearchLocalPeak<T extends ImageGray> {
 
 	/**
 	 * Specifies the image which is to be searched

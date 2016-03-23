@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,10 +39,10 @@ public class TestPyramidDiscreteAverage {
 	 */
 	@Test
 	public void basicTest() {
-		ImageFloat32 input = new ImageFloat32(40,80);
+		GrayF32 input = new GrayF32(40,80);
 		ImageMiscOps.fillUniform(input, rand, -20, 50);
 
-		PyramidDiscreteAverage<ImageFloat32> alg = new PyramidDiscreteAverage<ImageFloat32>(ImageFloat32.class,true,1,2,4);
+		PyramidDiscreteAverage<GrayF32> alg = new PyramidDiscreteAverage<GrayF32>(GrayF32.class,true,1,2,4);
 
 		alg.process(input);
 
@@ -52,7 +52,7 @@ public class TestPyramidDiscreteAverage {
 		float expected = (input.get(0,0) +  input.get(0,1) + input.get(1,0) + input.get(1,1))/4;
 		assertEquals(expected,alg.getLayer(1).get(0,0),1e-4);
 
-		ImageFloat32 layer = alg.getLayer(1);
+		GrayF32 layer = alg.getLayer(1);
 		expected = (layer.get(0,0) +  layer.get(0,1) + layer.get(1,0) + layer.get(1,1))/4;
 		assertEquals(expected,alg.getLayer(2).get(0,0),1e-4);
 	}

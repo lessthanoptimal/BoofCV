@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,18 +22,18 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.alg.feature.describe.BaseTestDescribePointBinaryCompare;
 import boofcv.alg.feature.describe.DescribePointBinaryCompare;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDescribeBinaryCompare_F32 extends BaseTestDescribePointBinaryCompare<ImageFloat32> {
+public class TestImplDescribeBinaryCompare_F32 extends BaseTestDescribePointBinaryCompare<GrayF32> {
 	public TestImplDescribeBinaryCompare_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	protected DescribePointBinaryCompare<ImageFloat32> createAlg(BinaryCompareDefinition_I32 def) {
+	protected DescribePointBinaryCompare<GrayF32> createAlg(BinaryCompareDefinition_I32 def) {
 		return new ImplDescribeBinaryCompare_F32(def);
 	}
 }

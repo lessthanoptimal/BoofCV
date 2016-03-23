@@ -30,8 +30,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -67,14 +67,14 @@ public class ExampleRectifyCalibratedStereo {
 		BufferedImage origRight = UtilImageIO.loadImage(dir,"right05.jpg");
 
 		// distorted images
-		MultiSpectral<ImageFloat32> distLeft =
-				ConvertBufferedImage.convertFromMulti(origLeft, null,true, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> distRight =
-				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
+		Planar<GrayF32> distLeft =
+				ConvertBufferedImage.convertFromMulti(origLeft, null,true, GrayF32.class);
+		Planar<GrayF32> distRight =
+				ConvertBufferedImage.convertFromMulti(origRight, null,true, GrayF32.class);
 
 		// storage for undistorted + rectified images
-		MultiSpectral<ImageFloat32> rectLeft = distLeft.createSameShape();
-		MultiSpectral<ImageFloat32> rectRight = distRight.createSameShape();
+		Planar<GrayF32> rectLeft = distLeft.createSameShape();
+		Planar<GrayF32> rectRight = distRight.createSameShape();
 
 		// Compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();

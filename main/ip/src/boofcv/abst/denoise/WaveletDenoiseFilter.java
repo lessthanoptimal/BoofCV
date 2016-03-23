@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,16 +35,16 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class WaveletDenoiseFilter<T extends ImageSingleBand> implements FilterImageInterface<T, T> {
+public class WaveletDenoiseFilter<T extends ImageGray> implements FilterImageInterface<T, T> {
 
 	// performs the wavelet transform
-	private WaveletTransform<T,ImageSingleBand,?> wavelet;
+	private WaveletTransform<T,ImageGray,?> wavelet;
 
 	// algorithm used to denoise the image
 	private DenoiseWavelet alg;
 
 	// where the wavelet transform is stored
-	private ImageSingleBand transform;
+	private ImageGray transform;
 
 	/**
 	 * Specifies which wavelet and algorithm is used for removing image noise.
@@ -54,7 +54,7 @@ public class WaveletDenoiseFilter<T extends ImageSingleBand> implements FilterIm
 	 */
 	public WaveletDenoiseFilter(WaveletTransform<T, ?, ?> wavelet,
 								DenoiseWavelet denoiser) {
-		this.wavelet = (WaveletTransform<T,ImageSingleBand,?>)wavelet;
+		this.wavelet = (WaveletTransform<T,ImageGray,?>)wavelet;
 		this.alg = denoiser;
 	}
 

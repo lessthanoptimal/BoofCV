@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearRectangle_U8 extends GeneralBilinearRectangleChecks<ImageUInt8>{
+public class TestBilinearRectangle_U8 extends GeneralBilinearRectangleChecks<GrayU8>{
 
 
 	public TestBilinearRectangle_U8() {
-		super(ImageUInt8.class);
+		super(GrayU8.class);
 	}
 
 	@Override
-	protected ImageUInt8 createImage(int width, int height) {
-		return new ImageUInt8(width,height);
+	protected GrayU8 createImage(int width, int height) {
+		return new GrayU8(width,height);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -37,14 +37,14 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<ImageUInt8>  {
+public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<GrayU8>  {
 
 	// used to read outside the image border
 	private ImageBorder_S32 border;
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
-	private ImageUInt8 image;
+	private GrayU8 image;
 	// minimum and maximum allowed pixel values
 	private float min,max;
 
@@ -55,19 +55,19 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Ima
 	}
 
 	@Override
-	public void setBorder(ImageBorder<ImageUInt8> border) {
+	public void setBorder(ImageBorder<GrayU8> border) {
 		this.border = (ImageBorder_S32)border;
 	}
 
 	@Override
-	public void setImage(ImageUInt8 image ) {
+	public void setImage(GrayU8 image ) {
 		if( border != null )
 			border.setImage(image);
 		this.image = image;
 	}
 
 	@Override
-	public ImageUInt8 getImage() {
+	public GrayU8 getImage() {
 		return image;
 	}
 
@@ -202,12 +202,12 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Ima
 		return kernel.getRadius();
 	}
 	@Override
-	public ImageBorder<ImageUInt8> getBorder() {
+	public ImageBorder<GrayU8> getBorder() {
 		return border;
 	}
 	@Override
-	public ImageType<ImageUInt8> getImageType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getImageType() {
+		return ImageType.single(GrayU8.class);
 	}
 
 }

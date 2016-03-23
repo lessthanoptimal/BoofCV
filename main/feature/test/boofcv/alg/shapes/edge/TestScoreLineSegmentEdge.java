@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.edge;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -38,11 +38,11 @@ public class TestScoreLineSegmentEdge {
 	@Test
 	public void checkIsAverage() {
 		int value = 200;
-		ImageUInt8 image = new ImageUInt8(400,500);
+		GrayU8 image = new GrayU8(400,500);
 
 		ImageMiscOps.fillRectangle(image, value, 20, 30, 40, 40);
 
-		ScoreLineSegmentEdge<ImageUInt8> alg = new ScoreLineSegmentEdge<ImageUInt8>(20,ImageUInt8.class);
+		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<GrayU8>(20,GrayU8.class);
 		alg.setImage(image);
 
 		// compute the edge along the top edge
@@ -62,11 +62,11 @@ public class TestScoreLineSegmentEdge {
 	 */
 	@Test
 	public void checkImageBorder() {
-		ImageUInt8 image = new ImageUInt8(400,500);
+		GrayU8 image = new GrayU8(400,500);
 
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
-		ScoreLineSegmentEdge<ImageUInt8> alg = new ScoreLineSegmentEdge<ImageUInt8>(20,ImageUInt8.class);
+		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<GrayU8>(20,GrayU8.class);
 		alg.setImage(image);
 
 		// all along image border, check each border

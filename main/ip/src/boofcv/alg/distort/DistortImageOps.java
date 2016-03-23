@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PixelTransform_F64;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
@@ -83,10 +83,10 @@ public class DistortImageOps {
 
 		PixelTransformAffine_F32 model = new PixelTransformAffine_F32(m);
 
-		if( input instanceof ImageSingleBand ) {
-			distortSingle((ImageSingleBand)input, (ImageSingleBand)output, model, interpType, borderType);
-		} else if( input instanceof MultiSpectral ) {
-			distortMS((MultiSpectral) input, (MultiSpectral) output, model, borderType, interpType);
+		if( input instanceof ImageGray) {
+			distortSingle((ImageGray)input, (ImageGray)output, model, interpType, borderType);
+		} else if( input instanceof Planar) {
+			distortMS((Planar) input, (Planar) output, model, borderType, interpType);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class DistortImageOps {
 	 * @param interpType Which type of pixel interpolation should be used. BILINEAR is in general recommended
 	 * @param borderType Specifies how to handle image borders.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	public static <Input extends ImageGray,Output extends ImageGray>
 	void distortSingle(Input input, Output output,
 					   PixelTransform_F32 transform,
 					   TypeInterpolate interpType, BorderType borderType)
@@ -131,7 +131,7 @@ public class DistortImageOps {
 	 * @param transform The transform that is being applied to the image
 	 * @param interp Interpolation algorithm.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	public static <Input extends ImageGray,Output extends ImageGray>
 	void distortSingle(Input input, Output output,
 					   boolean renderAll, PixelTransform_F32 transform,
 					   InterpolatePixelS<Input> interp)
@@ -144,7 +144,7 @@ public class DistortImageOps {
 	}
 
 	/**
-	 * Applies a pixel transform to a {@link MultiSpectral} image.
+	 * Applies a pixel transform to a {@link Planar} image.
 	 *
 	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 *
@@ -154,8 +154,8 @@ public class DistortImageOps {
 	 * @param borderType Describes how pixels outside the image border should be handled.
 	 * @param interpType Which type of pixel interpolation should be used.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand,
-			M extends MultiSpectral<Input>,N extends MultiSpectral<Output>>
+	public static <Input extends ImageGray,Output extends ImageGray,
+			M extends Planar<Input>,N extends Planar<Output>>
 	void distortMS(M input, N output,
 				   PixelTransform_F32 transform,
 				   BorderType borderType, TypeInterpolate interpType)
@@ -184,7 +184,7 @@ public class DistortImageOps {
 	 * @param inputType Image of single band image it will process.
 	 * @return The {@link ImageDistort}
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
+	public static <Input extends ImageGray,Output extends ImageGray>
 	ImageDistort<Input,Output> createImageDistort(PointTransform_F32 transform,
 												  TypeInterpolate interpType, BorderType borderType,
 												  Class<Input> inputType, Class<Output> outputType)
@@ -211,10 +211,10 @@ public class DistortImageOps {
 
 		PixelTransformAffine_F32 model = DistortSupport.transformScale(output, input, null);
 
-		if( input instanceof ImageSingleBand ) {
-			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, interpType, borderType);
-		} else if( input instanceof MultiSpectral ) {
-			distortMS((MultiSpectral) input, (MultiSpectral) output, model,  borderType, interpType);
+		if( input instanceof ImageGray) {
+			distortSingle((ImageGray) input, (ImageGray) output, model, interpType, borderType);
+		} else if( input instanceof Planar) {
+			distortMS((Planar) input, (Planar) output, model,  borderType, interpType);
 		}
 	}
 
@@ -248,15 +248,15 @@ public class DistortImageOps {
 		PixelTransform_F32 model = DistortSupport.transformRotate(input.width / 2, input.height / 2,
 				output.width / 2 - offX, output.height / 2 - offY, angleInputToOutput);
 
-		if( input instanceof ImageSingleBand ) {
-			distortSingle((ImageSingleBand) input, (ImageSingleBand) output, model, interpType, borderType);
-		} else if( input instanceof MultiSpectral ) {
-			distortMS((MultiSpectral) input, (MultiSpectral) output, model,borderType, interpType);
+		if( input instanceof ImageGray) {
+			distortSingle((ImageGray) input, (ImageGray) output, model, interpType, borderType);
+		} else if( input instanceof Planar) {
+			distortMS((Planar) input, (Planar) output, model,borderType, interpType);
 		}
 	}
 
 	/**
-	 * Applies a distortion to a {@link MultiSpectral} image.
+	 * Applies a distortion to a {@link Planar} image.
 	 *
 	 * @deprecated As of v0.19.  Use {@link FDistort} instead
 	 *
@@ -265,9 +265,9 @@ public class DistortImageOps {
 	 * @param distortion The distortion model
 	 * @param <Input> Band type.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
-	void distortMS( MultiSpectral<Input> input , MultiSpectral<Output> output ,
-					ImageDistort<Input,Output> distortion )
+	public static <Input extends ImageGray,Output extends ImageGray>
+	void distortMS(Planar<Input> input , Planar<Output> output ,
+				   ImageDistort<Input,Output> distortion )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ )
 			distortion.apply(input.getBand(band),output.getBand(band));

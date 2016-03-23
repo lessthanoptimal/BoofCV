@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,10 @@ import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 
 /**
@@ -35,14 +35,14 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class DerivativeHelperFunctions {
 
-	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
+	public static void processBorderHorizontal(GrayU8 orig , GrayS16 deriv ,
+											   Kernel1D_I32 kernel , ImageBorder_S32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
 
-		ImageUInt8 origSub;
-		ImageSInt16 derivSub;
+		GrayU8 origSub;
+		GrayS16 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
@@ -52,14 +52,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderHorizontal( ImageUInt8 orig , ImageSInt32 deriv ,
-												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
+	public static void processBorderHorizontal(GrayU8 orig , GrayS32 deriv ,
+											   Kernel1D_I32 kernel , ImageBorder_S32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
 
-		ImageUInt8 origSub;
-		ImageSInt32 derivSub;
+		GrayU8 origSub;
+		GrayS32 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
@@ -69,14 +69,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderHorizontal( ImageSInt16 orig , ImageSInt16 deriv ,
-												Kernel1D_I32 kernel , ImageBorder_S32 borderType )
+	public static void processBorderHorizontal(GrayS16 orig , GrayS16 deriv ,
+											   Kernel1D_I32 kernel , ImageBorder_S32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType,deriv);
 
-		ImageSInt16 origSub;
-		ImageSInt16 derivSub;
+		GrayS16 origSub;
+		GrayS16 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
@@ -86,14 +86,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderVertical( ImageUInt8 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
+	public static void processBorderVertical(GrayU8 orig , GrayS16 deriv ,
+											 Kernel1D_I32 kernel , ImageBorder_S32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel,borderType,deriv);
 
-		ImageUInt8 origSub;
-		ImageSInt16 derivSub;
+		GrayU8 origSub;
+		GrayS16 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
@@ -103,14 +103,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderVertical( ImageUInt8 orig , ImageSInt32 deriv ,
-											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
+	public static void processBorderVertical(GrayU8 orig , GrayS32 deriv ,
+											 Kernel1D_I32 kernel , ImageBorder_S32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel,borderType,deriv);
 
-		ImageUInt8 origSub;
-		ImageSInt32 derivSub;
+		GrayU8 origSub;
+		GrayS32 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
@@ -120,14 +120,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderVertical( ImageSInt16 orig , ImageSInt16 deriv ,
-											  Kernel1D_I32 kernel , ImageBorder_S32 borderType)
+	public static void processBorderVertical(GrayS16 orig , GrayS16 deriv ,
+											 Kernel1D_I32 kernel , ImageBorder_S32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv);
 
-		ImageSInt16 origSub;
-		ImageSInt16 derivSub;
+		GrayS16 origSub;
+		GrayS16 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);
@@ -137,14 +137,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.vertical(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderHorizontal( ImageFloat32 orig , ImageFloat32 deriv ,
-												Kernel1D_F32 kernel , ImageBorder_F32 borderType )
+	public static void processBorderHorizontal(GrayF32 orig , GrayF32 deriv ,
+											   Kernel1D_F32 kernel , ImageBorder_F32 borderType )
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.horizontal(kernel, borderType , deriv );
 
-		ImageFloat32 origSub;
-		ImageFloat32 derivSub;
+		GrayF32 origSub;
+		GrayF32 derivSub;
 
 		origSub = orig.subimage(0,0,orig.width,2, null);
 		derivSub = deriv.subimage(0,0,orig.width,2, null);
@@ -154,14 +154,14 @@ public class DerivativeHelperFunctions {
 		ConvolveImageNoBorder.horizontal(kernel,origSub,derivSub);
 	}
 
-	public static void processBorderVertical( ImageFloat32 orig , ImageFloat32 deriv ,
-											  Kernel1D_F32 kernel , ImageBorder_F32 borderType)
+	public static void processBorderVertical(GrayF32 orig , GrayF32 deriv ,
+											 Kernel1D_F32 kernel , ImageBorder_F32 borderType)
 	{
 		borderType.setImage(orig);
 		ConvolveJustBorder_General.vertical(kernel, borderType ,deriv );
 
-		ImageFloat32 origSub;
-		ImageFloat32 derivSub;
+		GrayF32 origSub;
+		GrayF32 derivSub;
 
 		origSub = orig.subimage(0,0,2,orig.height, null);
 		derivSub = deriv.subimage(0,0,2,orig.height, null);

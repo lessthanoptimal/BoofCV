@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation.watershed;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.CircularQueue_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -37,13 +37,13 @@ import org.ddogleg.struct.GrowQueue_I32;
  * </p>
  *
  * <p>
- * If the image is processed with {@link #process(boofcv.struct.image.ImageUInt8)} then a new region is
+ * If the image is processed with {@link #process(GrayU8)} then a new region is
  * created at each local minima and assigned a unique ID &gt; 0. The total number of regions found is returned
  * by {@link #getTotalRegions()}.  This technique will lead to over segmentation on many images.
  * </p>
  *
  * <p>
- * Initial seeds are provided with a call to {@link #process(boofcv.struct.image.ImageUInt8, boofcv.struct.image.ImageSInt32)}.
+ * Initial seeds are provided with a call to {@link #process(GrayU8, GrayS32)}.
  * No new regions will be created.  By providing an initial set of seeds over segmentation can be avoided, but
  * prior knowledge of the image is typically needed to create the seeds.
  * </p>
@@ -86,13 +86,13 @@ public abstract class WatershedVincentSoille1991 {
 	// Output image.  This is im_o in the paper.
 	// The output image has a 1-pixel wide border which means that bound checks don't need
 	// to happen when examining a pixel's neighbor.
-	protected ImageSInt32 output = new ImageSInt32(1,1);
+	protected GrayS32 output = new GrayS32(1,1);
 	// storage for sub-image output
-	protected ImageSInt32 outputSub = new ImageSInt32();
+	protected GrayS32 outputSub = new GrayS32();
 
 	// work image of distances. im_d in the paper
 	// also has a 1 pixel border
-	protected ImageSInt32 distance = new ImageSInt32(1,1);
+	protected GrayS32 distance = new GrayS32(1,1);
 	protected int currentDistance;
 
 	// label of the region being marked
@@ -116,7 +116,7 @@ public abstract class WatershedVincentSoille1991 {
 	 *
 	 * @param input Input gray-scale image.
 	 */
-	public void process( ImageUInt8 input ) {
+	public void process( GrayU8 input ) {
 		// input = im_0
 
 		removedWatersheds = false;
@@ -204,7 +204,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * @param seeds (Output) Segmented image containing seeds.  Note that all seeds should have a value &gt; 0 and have a
 	 *              value &le; numRegions.
 	 */
-	public void process( ImageUInt8 input , ImageSInt32 seeds ) {
+	public void process(GrayU8 input , GrayS32 seeds ) {
 		InputSanityCheck.checkSameShape(input,seeds);
 
 		removedWatersheds = false;
@@ -338,7 +338,7 @@ public abstract class WatershedVincentSoille1991 {
 	/**
 	 * Very fast histogram based sorting.  Index of each pixel is placed inside a list for its intensity level.
 	 */
-	protected void sortPixels(ImageUInt8 input) {
+	protected void sortPixels(GrayU8 input) {
 		// initialize histogram
 		for( int i = 0; i < histogram.length; i++ ) {
 			histogram[i].reset();
@@ -358,7 +358,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * Segmented output image with watersheds.  This is a sub-image of {@link #getOutputBorder()} to remove
 	 * the outside border of -1 valued pixels.
 	 */
-	public ImageSInt32 getOutput() {
+	public GrayS32 getOutput() {
 		output.subimage(1,1,output.width-1,output.height-1,outputSub);
 		return outputSub;
 	}
@@ -367,7 +367,7 @@ public abstract class WatershedVincentSoille1991 {
 	 * The entire segmented image used internally.  This contains a 1-pixel border around the entire
 	 * image filled with pixels of value -1.
 	 */
-	public ImageSInt32 getOutputBorder() {
+	public GrayS32 getOutputBorder() {
 		return output;
 	}
 

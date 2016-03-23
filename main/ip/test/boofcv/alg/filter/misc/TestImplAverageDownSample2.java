@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.misc;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -66,15 +66,15 @@ public class TestImplAverageDownSample2 {
 		Class inputType = m.getParameterTypes()[0];
 		Class outputType = m.getParameterTypes()[1];
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType,width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 			int downWidth = AverageDownSampleOps.downSampleSize(width,2);
 			int downHeight = AverageDownSampleOps.downSampleSize(height,2);
 
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
-			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
+			ImageGray found = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
 
 			try {
 				m.invoke(null, input, found);

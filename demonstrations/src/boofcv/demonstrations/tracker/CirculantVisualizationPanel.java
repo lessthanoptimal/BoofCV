@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.core.image.ConvertImage;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 
 import javax.swing.*;
@@ -51,7 +51,7 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	BufferedImage template;
 	BufferedImage response;
 
-	ImageFloat32 tmp = new ImageFloat32(1,1);
+	GrayF32 tmp = new GrayF32(1,1);
 
 
 	public CirculantVisualizationPanel(Listener listener) {
@@ -100,8 +100,8 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 			selected.x1 = selected.x0 + (int)r.width;
 			selected.y1 = selected.y0 + (int)r.height;
 
-			ImageFloat64 template = tracker.getTargetTemplate();
-			ImageFloat64 response = tracker.getResponse();
+			GrayF64 template = tracker.getTargetTemplate();
+			GrayF64 response = tracker.getResponse();
 
 			if( this.template == null ) {
 				this.template = new BufferedImage(template.width,template.height,BufferedImage.TYPE_INT_RGB);

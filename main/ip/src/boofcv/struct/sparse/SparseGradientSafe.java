@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.sparse;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wraps around other {@link SparseImageGradient} classes and checks to see if
@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageSingleBand;
  * 
  * @author Peter Abeles
  */
-public class SparseGradientSafe<T extends ImageSingleBand, G extends GradientValue>
+public class SparseGradientSafe<T extends ImageGray, G extends GradientValue>
 	implements SparseImageGradient<T,G>
 {
 	SparseImageGradient<T,G> wrap;

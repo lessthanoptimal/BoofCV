@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.template;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 /**
@@ -31,7 +31,7 @@ public class TestTemplateDiffSquared {
 	public void instanceF32() {
 		TemplateDiffSquared.F32 alg = new TemplateDiffSquared.F32();
 
-		new GeneralTemplateMatchTests<ImageFloat32>(alg, ImageFloat32.class) {
+		new GeneralTemplateMatchTests<GrayF32>(alg, GrayF32.class) {
 		}.allTests();
 	}
 
@@ -39,7 +39,7 @@ public class TestTemplateDiffSquared {
 	public void instanceU8() {
 		TemplateDiffSquared.U8 alg = new TemplateDiffSquared.U8();
 
-		new GeneralTemplateMatchTests<ImageUInt8>(alg, ImageUInt8.class) {
+		new GeneralTemplateMatchTests<GrayU8>(alg, GrayU8.class) {
 		}.allTests();
 	}
 }

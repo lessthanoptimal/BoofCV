@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.filter.derivative.GeneralSparseSampleTests;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import org.junit.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<ImageSInt32> {
+public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<GrayS32> {
 
 	private static int baseR = 2;
 
 	public TestSparseIntegralSample_I32() {
-		super(ImageSInt32.class, new SparseIntegralSample_I32(),-baseR-1,-baseR-1,baseR,baseR);
+		super(GrayS32.class, new SparseIntegralSample_I32(),-baseR-1,-baseR-1,baseR,baseR);
 		((SparseIntegralSample_I32)alg).setWidth(baseR*2+1);
 	}
 

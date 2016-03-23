@@ -22,8 +22,8 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSsdCornerBase<D extends ImageSingleBand, D2 extends ImageSingleBand>
+public abstract class ImplSsdCornerBase<D extends ImageGray, D2 extends ImageGray>
 		implements GradientCornerIntensity<D>
 {
 	// input image gradient
@@ -89,7 +89,7 @@ public abstract class ImplSsdCornerBase<D extends ImageSingleBand, D2 extends Im
 	}
 
 	@Override
-	public void process(D derivX, D derivY, ImageFloat32 intensity ) {
+	public void process(D derivX, D derivY, GrayF32 intensity ) {
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
 		setImageShape(derivX.getWidth(),derivX.getHeight());
@@ -106,6 +106,6 @@ public abstract class ImplSsdCornerBase<D extends ImageSingleBand, D2 extends Im
 
 	protected abstract void horizontal();
 
-	protected abstract void vertical(ImageFloat32 intensity);
+	protected abstract void vertical(GrayF32 intensity);
 
 }

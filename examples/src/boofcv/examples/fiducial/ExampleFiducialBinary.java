@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
@@ -52,11 +52,11 @@ public class ExampleFiducialBinary {
 		BufferedImage input = UtilImageIO.loadImage(directory , "image0000.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0001.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0002.jpg");
-		ImageFloat32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(ImageFloat32.class));
+		GrayF32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(GrayF32.class));
 
 		// Detect the fiducial
-		FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareBinary(
-				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), ImageFloat32.class);
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
+				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
 //				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),ImageFloat32.class);
 
 		detector.setIntrinsic(param);

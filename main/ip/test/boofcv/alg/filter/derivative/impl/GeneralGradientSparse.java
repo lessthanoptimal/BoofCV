@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
 import org.junit.Before;
@@ -43,8 +43,8 @@ public abstract class GeneralGradientSparse {
 	Random rand = new Random(234);
 
 	Class imageType,derivType;
-	ImageSingleBand image;
-	ImageSingleBand derivX,derivY;
+	ImageGray image;
+	ImageGray derivX,derivY;
 
 	protected int lower=-1;
 	protected int upper=1;

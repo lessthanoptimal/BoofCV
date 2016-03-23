@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -59,21 +59,21 @@ public class VisualizeSquareFiducial {
 
 	static ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6);
 
-	static InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, ImageFloat32.class);
+	static InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, GrayF32.class);
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
 		IntrinsicParameters intrinsic = nameIntrinsic == null ? null : (IntrinsicParameters)UtilIO.loadXML(nameIntrinsic);
-		ImageFloat32 input = UtilImageIO.loadImage(nameImage, ImageFloat32.class);
-		ImageFloat32 undistorted = new ImageFloat32(input.width,input.height);
+		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
+		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
 		Detector detector = new Detector();
 
 		if( intrinsic != null ) {
 			IntrinsicParameters paramUndist = new IntrinsicParameters();
-			ImageDistort<ImageFloat32, ImageFloat32> undistorter = LensDistortionOps.imageRemoveDistortion(
+			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.imageRemoveDistortion(
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
-					ImageType.single(ImageFloat32.class));
+					ImageType.single(GrayF32.class));
 
 			detector.configure(paramUndist,false);
 			undistorter.apply(input,undistorted);
@@ -140,17 +140,17 @@ public class VisualizeSquareFiducial {
 		dist.compute(p.x,p.y,o);
 	}
 
-	public static class Detector extends BaseDetectFiducialSquare<ImageFloat32> {
+	public static class Detector extends BaseDetectFiducialSquare<GrayF32> {
 
-		public List<ImageFloat32> squares = new ArrayList<ImageFloat32>();
+		public List<GrayF32> squares = new ArrayList<GrayF32>();
 
 		protected Detector() {
-			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class),
-					0.25,0.65,200,ImageFloat32.class);
+			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class),
+					0.25,0.65,200,GrayF32.class);
 		}
 
 		@Override
-		protected boolean processSquare(ImageFloat32 square, Result result, double a, double b) {
+		protected boolean processSquare(GrayF32 square, Result result, double a, double b) {
 			squares.add(square.clone());
 			return true;
 		}

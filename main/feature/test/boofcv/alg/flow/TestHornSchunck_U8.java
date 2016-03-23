@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunck_U8 extends ChecksHornSchunck<ImageUInt8,ImageSInt16> {
+public class TestHornSchunck_U8 extends ChecksHornSchunck<GrayU8,GrayS16> {
 
 
 	public TestHornSchunck_U8() {
-		super(ImageUInt8.class, ImageSInt16.class);
+		super(GrayU8.class, GrayS16.class);
 	}
 
 	@Override
-	public HornSchunck<ImageUInt8, ImageSInt16> createAlg() {
+	public HornSchunck<GrayU8, GrayS16> createAlg() {
 		return new HornSchunck_U8(0.2f,1);
 	}
 }

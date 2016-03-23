@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class NoCacheScaleSpace<I extends ImageSingleBand, D extends ImageSingleBand>
+public class NoCacheScaleSpace<I extends ImageGray, D extends ImageGray>
 		implements GaussianScaleSpace<I,D>
 {
 	// reference to the original input image

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 
 /**
  * Benchmarks related to computing image derivatives
@@ -30,10 +30,10 @@ import boofcv.struct.image.ImageSInt16;
  */
 public class BenchmarkHessianSobel extends BenchmarkDerivativeBase {
 
-	static ImageFloat32 tempA_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageFloat32 tempB_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageSInt16 tempA_I16 = new ImageSInt16(imgWidth,imgHeight);
-	static ImageSInt16 tempB_I16 = new ImageSInt16(imgWidth,imgHeight);
+	static GrayF32 tempA_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayF32 tempB_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayS16 tempA_I16 = new GrayS16(imgWidth,imgHeight);
+	static GrayS16 tempB_I16 = new GrayS16(imgWidth,imgHeight);
 
 
 	public static class Hessian_I8 extends PerformerBase

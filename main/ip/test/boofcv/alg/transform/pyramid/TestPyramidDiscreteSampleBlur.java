@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -31,10 +31,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<ImageFloat32> {
+public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<GrayF32> {
 
 	public TestPyramidDiscreteSampleBlur() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	/**
@@ -42,23 +42,23 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<ImageFloa
 	 */
 	@Test
 	public void _update() {
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this, "_update", true, input);
 	}
 
-	public void _update(ImageFloat32 input) {
+	public void _update(GrayF32 input) {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
-		ImageFloat32 convImg = new ImageFloat32(width, height);
-		ImageFloat32 convImg2 = new ImageFloat32(width/2, height/2);
+		GrayF32 convImg = new GrayF32(width, height);
+		GrayF32 convImg2 = new GrayF32(width/2, height/2);
 
-		ImageFloat32 storage = new ImageFloat32(width, height);
+		GrayF32 storage = new GrayF32(width, height);
 
 		ConvolveNormalized.horizontal(kernel,input,storage);
 		ConvolveNormalized.vertical(kernel,storage,convImg);
 
-		PyramidDiscreteSampleBlur<ImageFloat32> alg =
-				new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
+		PyramidDiscreteSampleBlur<GrayF32> alg =
+				new PyramidDiscreteSampleBlur<GrayF32>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
 
 		alg.process(input);
 
@@ -96,21 +96,21 @@ public class TestPyramidDiscreteSampleBlur extends GenericPyramidTests<ImageFloa
 	public void checkSigmas() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
 
-		PyramidDiscreteSampleBlur<ImageFloat32> alg =
-				new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
+		PyramidDiscreteSampleBlur<GrayF32> alg =
+				new PyramidDiscreteSampleBlur<GrayF32>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
 
 		assertEquals(0,alg.getSigma(0),1e-8);
 		assertEquals(3,alg.getSigma(1),1e-8);
 		assertEquals(6.7082,alg.getSigma(2),1e-3);
 
-		alg = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{2,4,8});
+		alg = new PyramidDiscreteSampleBlur<GrayF32>(kernel,3,GrayF32.class,true,new int[]{2,4,8});
 		assertEquals(0,alg.getSigma(0),1e-8);
 		assertEquals(6,alg.getSigma(1),1e-8);
 	}
 
 	@Override
-	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
+	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1,3);
-		return new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,3,ImageFloat32.class,true,new int[]{1,2,4});
+		return new PyramidDiscreteSampleBlur<GrayF32>(kernel,3,GrayF32.class,true,new int[]{1,2,4});
 	}
 }

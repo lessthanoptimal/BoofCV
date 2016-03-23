@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
@@ -53,7 +53,7 @@ public abstract class GeneralDetectLineTests {
 		this.imageTypes = imageTypes;
 	}
 
-	public abstract <T extends ImageSingleBand> DetectLine<T> createAlg( Class<T> imageType );
+	public abstract <T extends ImageGray> DetectLine<T> createAlg(Class<T> imageType );
 
 	/**
 	 * See if it can detect an obvious line in an image.
@@ -75,7 +75,7 @@ public abstract class GeneralDetectLineTests {
 		}
 	}
 
-	private <T extends ImageSingleBand> void obviousLine( Class<T> imageType ) {
+	private <T extends ImageGray> void obviousLine(Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GImageMiscOps.fillRectangle(input, 30, 0, 0, lineLocation, height);
@@ -104,7 +104,7 @@ public abstract class GeneralDetectLineTests {
 		assertTrue(foundMatch);
 	}
 
-	private <T extends ImageSingleBand> void subImages( Class<T> imageType ) {
+	private <T extends ImageGray> void subImages(Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GImageMiscOps.fillRectangle(input,30,0,0,lineLocation,height);

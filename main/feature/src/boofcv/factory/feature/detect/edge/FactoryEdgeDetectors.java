@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.CannyEdgeDynamic;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Creates different types of edge detectors.
@@ -47,7 +47,7 @@ public class FactoryEdgeDetectors {
 	 * @param derivType Type of image derivative.
 	 * @return Canny edge detector
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	CannyEdge<T,D> canny( int blurRadius , boolean saveTrace , boolean dynamicThreshold, Class<T> imageType , Class<D> derivType )
 	{
 		BlurFilter<T> blur = FactoryBlurFilter.gaussian(imageType, -1, blurRadius);

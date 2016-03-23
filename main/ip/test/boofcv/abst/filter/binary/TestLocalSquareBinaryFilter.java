@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -38,13 +38,13 @@ public class TestLocalSquareBinaryFilter {
 
 	@Test
 	public void compare() {
-		Class imageTypes[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+		Class imageTypes[] = new Class[]{GrayU8.class,GrayF32.class};
 
 		for( Class type : imageTypes ) {
 
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(type, 30, 40);
-			ImageUInt8 found = new ImageUInt8(30,40);
-			ImageUInt8 expected = new ImageUInt8(30,40);
+			ImageGray input = GeneralizedImageOps.createSingleBand(type, 30, 40);
+			GrayU8 found = new GrayU8(30,40);
+			GrayU8 expected = new GrayU8(30,40);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.image.BufferedImage;
 
@@ -53,7 +53,7 @@ public class DetectFastHessianApp {
 
 	static int NUM_FEATURES = 120;
 
-	private static <T extends ImageSingleBand> void doStuff( Class<T> imageType , BufferedImage input ) {
+	private static <T extends ImageGray> void doStuff(Class<T> imageType , BufferedImage input ) {
 		T workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract( 5 , 1 , 5, true) );
@@ -73,7 +73,7 @@ public class DetectFastHessianApp {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
-		doStuff(ImageFloat32.class,input);
+		doStuff(GrayF32.class,input);
 //		doStuff(ImageUInt8.class,input);
 	}
 }

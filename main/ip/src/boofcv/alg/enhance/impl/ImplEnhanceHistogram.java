@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.*;
  */
 public class ImplEnhanceHistogram {
 
-	public static void applyTransform( ImageUInt8 input , int transform[] , ImageUInt8 output ) {
+	public static void applyTransform(GrayU8 input , int transform[] , GrayU8 output ) {
 		for( int i = 0; i < input.height; i++ ) {
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
@@ -43,7 +43,7 @@ public class ImplEnhanceHistogram {
 		}
 	}
 
-	public static void applyTransform( ImageUInt16 input , int transform[] , ImageUInt16 output ) {
+	public static void applyTransform(GrayU16 input , int transform[] , GrayU16 output ) {
 		for( int i = 0; i < input.height; i++ ) {
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
@@ -54,7 +54,7 @@ public class ImplEnhanceHistogram {
 		}
 	}
 
-	public static void applyTransform( ImageSInt8 input , int transform[] , int minValue , ImageSInt8 output ) {
+	public static void applyTransform(GrayS8 input , int transform[] , int minValue , GrayS8 output ) {
 		for( int i = 0; i < input.height; i++ ) {
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
@@ -65,7 +65,7 @@ public class ImplEnhanceHistogram {
 		}
 	}
 
-	public static void applyTransform( ImageSInt16 input , int transform[] , int minValue , ImageSInt16 output ) {
+	public static void applyTransform(GrayS16 input , int transform[] , int minValue , GrayS16 output ) {
 		for( int i = 0; i < input.height; i++ ) {
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
@@ -76,7 +76,7 @@ public class ImplEnhanceHistogram {
 		}
 	}
 
-	public static void applyTransform( ImageSInt32 input , int transform[] , int minValue , ImageSInt32 output ) {
+	public static void applyTransform(GrayS32 input , int transform[] , int minValue , GrayS32 output ) {
 		for( int i = 0; i < input.height; i++ ) {
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
@@ -91,8 +91,8 @@ public class ImplEnhanceHistogram {
 	 * Inefficiently computes the local histogram, but can handle every possible case for image size and
 	 * local region size
 	 */
-	public static void equalizeLocalNaive( ImageUInt8 input , int radius , ImageUInt8 output ,
-										   int histogram[] )
+	public static void equalizeLocalNaive(GrayU8 input , int radius , GrayU8 output ,
+										  int histogram[] )
 	{
 		int width = 2*radius+1;
 		int maxValue = histogram.length-1;
@@ -150,8 +150,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Performs local histogram equalization just on the inner portion of the image
 	 */
-	public static void equalizeLocalInner( ImageUInt8 input , int radius , ImageUInt8 output ,
-										   int histogram[] ) {
+	public static void equalizeLocalInner(GrayU8 input , int radius , GrayU8 output ,
+										  int histogram[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -207,8 +207,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
-	public static void equalizeLocalRow( ImageUInt8 input , int radius , int startY , ImageUInt8 output ,
-										 int histogram[] , int transform[] ) {
+	public static void equalizeLocalRow(GrayU8 input , int radius , int startY , GrayU8 output ,
+										int histogram[] , int transform[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -302,8 +302,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
-	public static void equalizeLocalCol( ImageUInt8 input , int radius , int startX , ImageUInt8 output ,
-										 int histogram[] , int transform[] ) {
+	public static void equalizeLocalCol(GrayU8 input , int radius , int startX , GrayU8 output ,
+										int histogram[] , int transform[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -367,7 +367,7 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Computes the local histogram just for the specified inner region
 	 */
-	public static void localHistogram( ImageUInt8 input , int x0 , int y0 , int x1, int y1 , int histogram[] ) {
+	public static void localHistogram(GrayU8 input , int x0 , int y0 , int x1, int y1 , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 
@@ -384,8 +384,8 @@ public class ImplEnhanceHistogram {
 	 * Inefficiently computes the local histogram, but can handle every possible case for image size and
 	 * local region size
 	 */
-	public static void equalizeLocalNaive( ImageUInt16 input , int radius , ImageUInt16 output ,
-										   int histogram[] )
+	public static void equalizeLocalNaive(GrayU16 input , int radius , GrayU16 output ,
+										  int histogram[] )
 	{
 		int width = 2*radius+1;
 		int maxValue = histogram.length-1;
@@ -443,8 +443,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Performs local histogram equalization just on the inner portion of the image
 	 */
-	public static void equalizeLocalInner( ImageUInt16 input , int radius , ImageUInt16 output ,
-										   int histogram[] ) {
+	public static void equalizeLocalInner(GrayU16 input , int radius , GrayU16 output ,
+										  int histogram[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -500,8 +500,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Local equalization along a row.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
-	public static void equalizeLocalRow( ImageUInt16 input , int radius , int startY , ImageUInt16 output ,
-										 int histogram[] , int transform[] ) {
+	public static void equalizeLocalRow(GrayU16 input , int radius , int startY , GrayU16 output ,
+										int histogram[] , int transform[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -595,8 +595,8 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Local equalization along a column.  Image must be at least the histogram's width (2*r+1) in width and height.
 	 */
-	public static void equalizeLocalCol( ImageUInt16 input , int radius , int startX , ImageUInt16 output ,
-										 int histogram[] , int transform[] ) {
+	public static void equalizeLocalCol(GrayU16 input , int radius , int startX , GrayU16 output ,
+										int histogram[] , int transform[] ) {
 
 		int width = 2*radius+1;
 		int area = width*width;
@@ -660,7 +660,7 @@ public class ImplEnhanceHistogram {
 	/**
 	 * Computes the local histogram just for the specified inner region
 	 */
-	public static void localHistogram( ImageUInt16 input , int x0 , int y0 , int x1, int y1 , int histogram[] ) {
+	public static void localHistogram(GrayU16 input , int x0 , int y0 , int x1, int y1 , int histogram[] ) {
 		for( int i = 0; i < histogram.length; i++ )
 			histogram[i] = 0;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.calib;
 
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareGrid<T extends ImageSingleBand> {
+public class DetectFiducialSquareGrid<T extends ImageGray> {
 
 	// dimension of grid.  This only refers to black squares and not the white space between
 	int numRows;

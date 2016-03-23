@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,26 +25,26 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkFastIntensity< T extends ImageSingleBand> {
+public class BenchmarkFastIntensity< T extends ImageGray> {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
 	T input;
-	ImageFloat32 intensity;
+	GrayF32 intensity;
 
 	public BenchmarkFastIntensity(Class<T> imageType) {
 		input = GeneralizedImageOps.createSingleBand(imageType,imgWidth,imgHeight);
-		intensity = new ImageFloat32(input.width,input.height);
+		intensity = new GrayF32(input.width,input.height);
 
 		Random rand = new Random(234);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
@@ -55,25 +55,25 @@ public class BenchmarkFastIntensity< T extends ImageSingleBand> {
 
 		@Override
 		public void process() {
-			corner.process((ImageUInt8)input);
+			corner.process((GrayU8)input);
 		}
 	}
 
 	public class FAST9 extends PerformerBase {
-		ImplFastIntensity9<ImageUInt8> corner = new ImplFastIntensity9<ImageUInt8>(new ImplFastHelper_U8(60));
+		ImplFastIntensity9<GrayU8> corner = new ImplFastIntensity9<GrayU8>(new ImplFastHelper_U8(60));
 
 		@Override
 		public void process() {
-			corner.process((ImageUInt8)input,intensity);
+			corner.process((GrayU8)input,intensity);
 		}
 	}
 
 	public class FAST12 extends PerformerBase {
-		ImplFastIntensity12<ImageUInt8> corner = new ImplFastIntensity12<ImageUInt8>(new ImplFastHelper_U8(60));
+		ImplFastIntensity12<GrayU8> corner = new ImplFastIntensity12<GrayU8>(new ImplFastHelper_U8(60));
 
 		@Override
 		public void process() {
-			corner.process((ImageUInt8)input,intensity);
+			corner.process((GrayU8)input,intensity);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class BenchmarkFastIntensity< T extends ImageSingleBand> {
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkFastIntensity benchmark = new BenchmarkFastIntensity(ImageUInt8.class);
+		BenchmarkFastIntensity benchmark = new BenchmarkFastIntensity(GrayU8.class);
 
 		benchmark.evaluate();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.jcodec.JCodecSimplified;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
@@ -39,12 +39,12 @@ public class ExampleJCodecDisplayFrames {
 	public static void main(String[] args) {
 
 		String fileName = UtilIO.pathExample("background/highway_bridge_jitter.mp4");
-		ImageType type = ImageType.ms(3, ImageUInt8.class);
+		ImageType type = ImageType.ms(3, GrayU8.class);
 //		ImageType type = ImageType.single(ImageUInt8.class);
 //		ImageType type = ImageType.ms(3, ImageFloat32.class);
 //		ImageType type = ImageType.single(ImageFloat32.class);
 
-		JCodecSimplified sequence = new JCodecSimplified<MultiSpectral<ImageUInt8>>(fileName,type);
+		JCodecSimplified sequence = new JCodecSimplified<Planar<GrayU8>>(fileName,type);
 
 		BufferedImage out;
 		if(sequence.hasNext()) {

@@ -27,9 +27,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,13 +45,13 @@ import java.util.ArrayList;
 // select algorithm
 // configure universal threshold
 // configure adaptive threshold
-public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectInputPanel
+public class DemoImageThresholdingApp<T extends ImageGray> extends SelectInputPanel
 	implements DemoThresholdingPanel.Listener
 {
 
 	Class<T> imageType;
 	T imageInput;
-	ImageUInt8 imageBinary = new ImageUInt8(1,1);
+	GrayU8 imageBinary = new GrayU8(1,1);
 	BufferedImage work;
 
 	ImagePanel gui = new ImagePanel();
@@ -156,7 +156,7 @@ public class DemoImageThresholdingApp<T extends ImageSingleBand> extends SelectI
 	}
 
 	public static void main( String args[] ) {
-		DemoImageThresholdingApp app = new DemoImageThresholdingApp(ImageFloat32.class);
+		DemoImageThresholdingApp app = new DemoImageThresholdingApp(GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.blur.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -32,16 +32,16 @@ public class TestImplMedianHistogramInnerNaive {
 
 	@Test
 	public void compareToSort() {
-		ImageUInt8 image = new ImageUInt8(20,30);
+		GrayU8 image = new GrayU8(20,30);
 		ImageMiscOps.fillUniform(image,new Random(234), 0, 100);
 
-		ImageUInt8 found = new ImageUInt8( image.width , image.height );
-		ImageUInt8 expected = new ImageUInt8( image.width , image.height );
+		GrayU8 found = new GrayU8( image.width , image.height );
+		GrayU8 expected = new GrayU8( image.width , image.height );
 
 		BoofTesting.checkSubImage(this, "compareToSort", true, image, found, expected);
 	}
 
-	public void compareToSort(ImageUInt8 image, ImageUInt8 found, ImageUInt8 expected) {
+	public void compareToSort(GrayU8 image, GrayU8 found, GrayU8 expected) {
 		for( int radius = 1; radius <= 3; radius++ ) 
 		{
 			ImplMedianHistogramInnerNaive.process(image,found,radius,null,null);

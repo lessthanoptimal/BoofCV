@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 public class TestBoofMiscOps {
 	@Test
 	public void boundRectangleInside() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		checkBound(-2,-3,5,6,0,0,5,6,image);
 		checkBound(16,15,22,26,16,15,20,25,image);
@@ -42,7 +42,7 @@ public class TestBoofMiscOps {
 
 	private void checkBound( int x0, int y0, int x1 , int y1,
 							 int ex0, int ey0, int ex1, int ey1 ,
-							 ImageSingleBand image )
+							 ImageGray image )
 	{
 		ImageRectangle a = new ImageRectangle(x0,y0,x1,y1);
 		BoofMiscOps.boundRectangleInside(image,a);
@@ -54,7 +54,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_img_float() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,0f,0f));
 		assertTrue(BoofMiscOps.checkInside(image,19f,24f));
@@ -80,7 +80,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_img_double() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,0d,0d));
 		assertTrue(BoofMiscOps.checkInside(image,19d,24d));
@@ -107,7 +107,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_w_h() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,2,3,2,3));
 		assertTrue(BoofMiscOps.checkInside(image,17,21,2,3));
@@ -121,7 +121,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_radius_int() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,2,2,2));
 		assertTrue(BoofMiscOps.checkInside(image,17,22,2));
@@ -140,7 +140,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_radius_F32() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,2f,2f,2f));
 		assertTrue(BoofMiscOps.checkInside(image,17f,22f,2f));
@@ -167,7 +167,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_radius_F64() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,2d,2d,2d));
 		assertTrue(BoofMiscOps.checkInside(image,17d,22d,2d));
@@ -194,7 +194,7 @@ public class TestBoofMiscOps {
 
 	@Test
 	public void checkInside_ImageRectangle() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 
 		assertTrue(BoofMiscOps.checkInside(image,new ImageRectangle(0,0,20,25)));
 		assertTrue(BoofMiscOps.checkInside(image,new ImageRectangle(2,4,15,23)));

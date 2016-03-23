@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class IntensityFeaturePyramidApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 {
 	ListDisplayPanel gui = new ListDisplayPanel();
@@ -58,7 +58,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 	BufferedImage input;
 	T workImage;
-	ImageFloat32 scaledIntensity;
+	GrayF32 scaledIntensity;
 	Class<T> imageType;
 	AnyImageDerivative<T,D> anyDerivative;
 	boolean processedImage = false;
@@ -136,7 +136,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 			intensity.process(scaledImage,derivX,derivY,derivXX,derivYY,derivXY);
 
-			ImageFloat32 featureImg = intensity.getIntensity();
+			GrayF32 featureImg = intensity.getIntensity();
 
 			// scale it up to full resolution
 			new FDistort(featureImg,scaledIntensity).interpNN().scaleExt().apply();
@@ -158,7 +158,7 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 		setInputImage(input);
 		this.input = input;
 		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		scaledIntensity = new ImageFloat32(workImage.width,workImage.height);
+		scaledIntensity = new GrayF32(workImage.width,workImage.height);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -196,8 +196,8 @@ public class IntensityFeaturePyramidApp<T extends ImageSingleBand, D extends Ima
 
 	public static void main( String args[] ) {
 
-		IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32> app =
-				new IntensityFeaturePyramidApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		IntensityFeaturePyramidApp<GrayF32,GrayF32> app =
+				new IntensityFeaturePyramidApp<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 //		IntensityFeaturePyramidApp<ImageUInt8, ImageSInt16> app =
 //				new IntensityFeaturePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);

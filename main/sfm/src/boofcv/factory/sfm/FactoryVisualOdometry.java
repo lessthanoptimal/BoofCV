@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
@@ -86,7 +86,7 @@ public class FactoryVisualOdometry {
 	 * @param <T>
 	 * @return New instance of
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	MonocularPlaneVisualOdometry<T> monoPlaneInfinity(int thresholdAdd,
 													  int thresholdRetire,
 
@@ -137,7 +137,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed
 	 * @return MonocularPlaneVisualOdometry
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
 													  double maxCellsPerPixel,
 													  double mapHeightFraction ,
@@ -177,7 +177,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed.
 	 * @return StereoVisualOdometry
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	StereoVisualOdometry<T> stereoDepth(double inlierPixelTol,
 										int thresholdAdd,
 										int thresholdRetire ,
@@ -230,7 +230,7 @@ public class FactoryVisualOdometry {
 	 * @param depthType Type of depth image being processed.
 	 * @return StereoVisualOdometry
 	 */
-	public static <Vis extends ImageSingleBand, Depth extends ImageSingleBand>
+	public static <Vis extends ImageGray, Depth extends ImageGray>
 	DepthVisualOdometry<Vis,Depth> depthDepthPnP(double inlierPixelTol,
 												 int thresholdAdd,
 												 int thresholdRetire ,
@@ -285,7 +285,7 @@ public class FactoryVisualOdometry {
 	 * @param imageType Type of image being processed
 	 * @return Stereo visual odometry algorithm.
 	 */
-	public static <T extends ImageSingleBand, Desc extends TupleDesc>
+	public static <T extends ImageGray, Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoDualTrackerPnP(int thresholdAdd, int thresholdRetire,
 												 double inlierPixelTol,
 												 double epipolarPixelTol,
@@ -339,7 +339,7 @@ public class FactoryVisualOdometry {
 	 *
 	 * @see VisOdomQuadPnP
 	 */
-	public static <T extends ImageSingleBand,Desc extends TupleDesc>
+	public static <T extends ImageGray,Desc extends TupleDesc>
 	StereoVisualOdometry<T> stereoQuadPnP( double inlierPixelTol ,
 										   double epipolarPixelTol ,
 										   double maxDistanceF2F,

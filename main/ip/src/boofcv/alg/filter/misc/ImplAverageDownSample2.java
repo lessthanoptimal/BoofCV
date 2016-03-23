@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public class ImplAverageDownSample2 {
-	public static void down( ImageUInt8 input , ImageInt8 output ) {
+	public static void down(GrayU8 input , GrayI8 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -85,7 +85,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageSInt8 input , ImageInt8 output ) {
+	public static void down(GrayS8 input , GrayI8 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -140,7 +140,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageUInt16 input , ImageInt16 output ) {
+	public static void down(GrayU16 input , GrayI16 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -195,7 +195,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageSInt16 input , ImageInt16 output ) {
+	public static void down(GrayS16 input , GrayI16 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -250,7 +250,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageSInt32 input , ImageSInt32 output ) {
+	public static void down(GrayS32 input , GrayS32 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -305,7 +305,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageFloat32 input , ImageFloat32 output ) {
+	public static void down(GrayF32 input , GrayF32 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
@@ -360,7 +360,7 @@ public class ImplAverageDownSample2 {
 		}
 	}
 
-	public static void down( ImageFloat64 input , ImageFloat64 output ) {
+	public static void down(GrayF64 input , GrayF64 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 

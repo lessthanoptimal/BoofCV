@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.peak;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,12 +31,12 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class GeneralSearchLocalPeakChecks {
 
-	Class<ImageFloat32> imageType = ImageFloat32.class;
-	ImageFloat32 image = new ImageFloat32(30,40);
+	Class<GrayF32> imageType = GrayF32.class;
+	GrayF32 image = new GrayF32(30,40);
 
 	protected float toleranceCenter = 0.1f;
 
-	public abstract SearchLocalPeak createSearch( Class<ImageFloat32> imageType );
+	public abstract SearchLocalPeak createSearch( Class<GrayF32> imageType );
 
 	@Test
 	public void gaussian() {
@@ -52,7 +52,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 			}
 		}
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -69,7 +69,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(cx,cy,10);
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -102,7 +102,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(1,10,10);
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -115,7 +115,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(image.width-2,10,10);
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -128,7 +128,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(10,1,10);
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 
@@ -141,7 +141,7 @@ public abstract class GeneralSearchLocalPeakChecks {
 
 		image.set(10,image.height-2,10);
 
-		SearchLocalPeak<ImageFloat32> search = createSearch(imageType);
+		SearchLocalPeak<GrayF32> search = createSearch(imageType);
 		search.setImage(image);
 		search.setSearchRadius(5);
 

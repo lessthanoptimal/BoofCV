@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,10 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -45,8 +45,8 @@ public class TestSegmentMeanShiftSearchColor {
 
 	Random rand = new Random(234);
 
-	ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(2,ImageFloat32.class);
-	InterpolatePixelMB<MultiSpectral<ImageFloat32>> interp =
+	ImageType<Planar<GrayF32>> imageType = ImageType.ms(2,GrayF32.class);
+	InterpolatePixelMB<Planar<GrayF32>> interp =
 			FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
 
 	/**
@@ -54,19 +54,19 @@ public class TestSegmentMeanShiftSearchColor {
 	 */
 	@Test
 	public void simpleTest() {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
-		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
-				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
+		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
+				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
 						(30,0.05f,interp,2,2,200,false,imageType);
 
 		alg.process(image);
 
 		FastQueue<Point2D_I32> locations = alg.getModeLocation();
 		GrowQueue_I32 counts = alg.getRegionMemberCount();
-		ImageSInt32 peaks = alg.getPixelToRegion();
+		GrayS32 peaks = alg.getPixelToRegion();
 		FastQueue<float[]> values = alg.getModeColor();
 
 		// there should be a fair number of local peaks due to the image being random
@@ -98,13 +98,13 @@ public class TestSegmentMeanShiftSearchColor {
 
 	@Test
 	public void findPeak_inside() {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
 
 		// works better with this example when its uniform
-		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
-				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
+		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
+				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
 						(30,0.05f,interp,2,2,3,false,imageType);
 
 		interp.setImage(image);
@@ -122,12 +122,12 @@ public class TestSegmentMeanShiftSearchColor {
 	}
 
 	private void findPeak_border(int cx, int cy, int startX, int startY) {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
-		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> alg =
-				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
+		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
+				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
 						(30,0.05f,interp,2,2,200,false,imageType);
 
 		interp.setImage(image);
@@ -148,22 +148,22 @@ public class TestSegmentMeanShiftSearchColor {
 	}
 
 	public void compareToGray( boolean fast ) {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,1);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,1);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
-		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(1,ImageFloat32.class);
-		InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpMB =
+		ImageType<Planar<GrayF32>> imageType = ImageType.ms(1,GrayF32.class);
+		InterpolatePixelMB<Planar<GrayF32>> interpMB =
 				FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
-		InterpolatePixelS<ImageFloat32> interpSB = FactoryInterpolation.bilinearPixelS(
-				ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interpSB = FactoryInterpolation.bilinearPixelS(
+				GrayF32.class, BorderType.EXTENDED);
 
-		SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>> algMB =
-				new SegmentMeanShiftSearchColor<MultiSpectral<ImageFloat32>>
+		SegmentMeanShiftSearchColor<Planar<GrayF32>> algMB =
+				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
 						(30,0.05f,interpMB,2,2,200,fast,imageType);
 
-		SegmentMeanShiftSearchGray<ImageFloat32> algSB =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interpSB,2,2,200,fast);
+		SegmentMeanShiftSearchGray<GrayF32> algSB =
+				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interpSB,2,2,200,fast);
 
 		algMB.process(image);
 		algSB.process(image.getBand(0));
@@ -182,8 +182,8 @@ public class TestSegmentMeanShiftSearchColor {
 			assertEquals(algMB.getRegionMemberCount().get(i),algSB.getRegionMemberCount().get(i));
 		}
 
-		ImageSInt32 segmentMB = algMB.getPixelToRegion();
-		ImageSInt32 segmentSB = algSB.getPixelToRegion();
+		GrayS32 segmentMB = algMB.getPixelToRegion();
+		GrayS32 segmentSB = algSB.getPixelToRegion();
 
 		for( int y = 0; y < segmentMB.height; y++ ) {
 			for( int x = 0; x < segmentMB.width; x++ ) {

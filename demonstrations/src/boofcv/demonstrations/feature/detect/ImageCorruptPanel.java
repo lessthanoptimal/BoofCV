@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.basic.GGrayImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -92,7 +92,7 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 	 * @param original Original uncorrupted image.
 	 * @param corrupted Corrupted mage.
 	 */
-	public <T extends ImageSingleBand> void corruptImage( T original , T corrupted )
+	public <T extends ImageGray> void corruptImage(T original , T corrupted )
 	{
 		GGrayImageOps.stretch(original, valueScale, valueOffset, 255.0, corrupted);
 		GImageMiscOps.addGaussian(corrupted, rand, valueNoise, 0, 255);

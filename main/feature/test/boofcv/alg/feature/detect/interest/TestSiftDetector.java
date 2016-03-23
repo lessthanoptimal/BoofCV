@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class TestSiftDetector {
 		for( int radius : new int[]{2,5} ) {
 			int width = radius*2+1;
 			for (boolean white : new boolean[]{true, false}) {
-				ImageFloat32 input = new ImageFloat32(80, 70);
+				GrayF32 input = new GrayF32(80, 70);
 				if (white) {
 					GImageMiscOps.fillRectangle(input, 200, c_x - radius, c_y - radius, width, width);
 				} else {
@@ -75,9 +75,9 @@ public class TestSiftDetector {
 
 	@Test
 	public void isScaleSpaceExtremum() {
-		ImageFloat32 upper = new ImageFloat32(30,40);
-		ImageFloat32 current = new ImageFloat32(30,40);
-		ImageFloat32 lower = new ImageFloat32(30,40);
+		GrayF32 upper = new GrayF32(30,40);
+		GrayF32 current = new GrayF32(30,40);
+		GrayF32 lower = new GrayF32(30,40);
 
 		SiftDetector alg = createDetector();
 		alg.dogLower = lower; alg.dogTarget = current; alg.dogUpper = upper;
@@ -98,9 +98,9 @@ public class TestSiftDetector {
 	 */
 	@Test
 	public void processFeatureCandidate_NoChange() {
-		ImageFloat32 upper = new ImageFloat32(30,40);
-		ImageFloat32 current = new ImageFloat32(30,40);
-		ImageFloat32 lower = new ImageFloat32(30,40);
+		GrayF32 upper = new GrayF32(30,40);
+		GrayF32 current = new GrayF32(30,40);
+		GrayF32 lower = new GrayF32(30,40);
 
 		SiftDetector alg = createDetector();
 		alg.pixelScaleToInput = 2.0;
@@ -126,9 +126,9 @@ public class TestSiftDetector {
 	 */
 	@Test
 	public void processFeatureCandidate_Shift() {
-		ImageFloat32 upper = new ImageFloat32(30,40);
-		ImageFloat32 current = new ImageFloat32(30,40);
-		ImageFloat32 lower = new ImageFloat32(30,40);
+		GrayF32 upper = new GrayF32(30,40);
+		GrayF32 current = new GrayF32(30,40);
+		GrayF32 lower = new GrayF32(30,40);
 
 		SiftDetector alg = createDetector();
 		alg.pixelScaleToInput = 2.0;
@@ -175,7 +175,7 @@ public class TestSiftDetector {
 	@Test
 	public void isEdge() {
 		// create an edge
-		ImageFloat32 input = new ImageFloat32(100,120);
+		GrayF32 input = new GrayF32(100,120);
 		GImageMiscOps.fillRectangle(input,100,0,0,50,120);
 
 		SiftDetector alg = createDetector();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.feature.interest;
 import boofcv.abst.feature.detect.interest.WrapSiftDetector;
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 /**
@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class TestWrapSiftDetector {
 
-	Class types[] = new Class[]{ImageUInt8.class,ImageFloat32.class};
+	Class types[] = new Class[]{GrayU8.class,GrayF32.class};
 
 	@Test
 	public void testAllImageTypes() {

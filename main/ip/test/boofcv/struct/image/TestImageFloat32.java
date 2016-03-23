@@ -21,17 +21,17 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageFloat32 extends StandardSingleBandTests<ImageFloat32> {
+public class TestImageFloat32 extends StandardSingleBandTests<GrayF32> {
 
 
 	@Override
-	public ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+	public GrayF32 createImage(int width, int height) {
+		return new GrayF32(width, height);
 	}
 
 	@Override
-	public ImageFloat32 createImage() {
-		return new ImageFloat32();
+	public GrayF32 createImage() {
+		return new GrayF32();
 	}
 
 	@Override

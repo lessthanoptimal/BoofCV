@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener {
 
 	static int maxFeatures = 400;
@@ -195,7 +195,7 @@ public class DetectFeaturePointApp<T extends ImageSingleBand, D extends ImageSin
 	}
 
 	public static void main(String args[]) {
-		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageFloat32.class, ImageFloat32.class);
+		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayF32.class, GrayF32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();

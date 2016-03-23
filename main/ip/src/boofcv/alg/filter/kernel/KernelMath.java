@@ -19,9 +19,9 @@
 package boofcv.alg.filter.kernel;
 
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayS32;
 
 
 /**
@@ -444,9 +444,9 @@ public class KernelMath {
 		}
 	}
 
-	public static ImageFloat32 convertToImage( Kernel2D_F32 kernel ) {
+	public static GrayF32 convertToImage(Kernel2D_F32 kernel ) {
 		int w = kernel.getWidth();
-		ImageFloat32 ret = new ImageFloat32(w,w);
+		GrayF32 ret = new GrayF32(w,w);
 
 		for( int i = 0; i < w; i++ ) {
 			for( int j = 0; j < w; j++ ) {
@@ -457,9 +457,9 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static ImageSInt32 convertToImage( Kernel2D_I32 kernel ) {
+	public static GrayS32 convertToImage(Kernel2D_I32 kernel ) {
 		int w = kernel.getWidth();
-		ImageSInt32 ret = new ImageSInt32(w,w);
+		GrayS32 ret = new GrayS32(w,w);
 
 		for( int i = 0; i < w; i++ ) {
 			for( int j = 0; j < w; j++ ) {
@@ -470,7 +470,7 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_F32 convertToKernel( ImageFloat32 image ) {
+	public static Kernel2D_F32 convertToKernel( GrayF32 image ) {
 		int w = image.getWidth();
 		Kernel2D_F32 ret = new Kernel2D_F32(w);
 
@@ -483,7 +483,7 @@ public class KernelMath {
 		return ret;
 	}
 
-	public static Kernel2D_I32 convertToKernel( ImageInteger image ) {
+	public static Kernel2D_I32 convertToKernel( GrayI image ) {
 		int w = image.getWidth();
 		Kernel2D_I32 ret = new Kernel2D_I32(w);
 

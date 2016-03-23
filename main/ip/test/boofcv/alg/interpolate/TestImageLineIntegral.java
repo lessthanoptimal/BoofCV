@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +45,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void zeroLengthLine() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
 		alg.setImage(FactoryGImageSingleBand.wrap(img));
@@ -59,7 +59,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void inside_SlopeZero() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
 		alg.setImage(FactoryGImageSingleBand.wrap(img));
@@ -78,7 +78,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void across_SlopeZero() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 		img.set(6,7,50);
 		img.set(6,8,10);
@@ -106,7 +106,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void nearBorder_SlopeZero() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		img.set(0,0,100);
 		img.set(9,14,120);
 
@@ -124,7 +124,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void inside_nonZero() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		ImageMiscOps.fill(img,255);
 		img.set(6,6,100);
 
@@ -145,7 +145,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void across_nonZero() {
-		ImageUInt8 img = new ImageUInt8(10,15);
+		GrayU8 img = new GrayU8(10,15);
 		ImageMiscOps.fill(img, 255);
 		img.set(6,6,100);
 		img.set(6,7,200);
@@ -183,7 +183,7 @@ public class TestImageLineIntegral {
 	 */
 	@Test
 	public void nearBorder_nonZero() {
-		ImageUInt8 img = new ImageUInt8(2,2);
+		GrayU8 img = new GrayU8(2,2);
 		img.set(0,0,100);
 		img.set(0,1,200);
 		img.set(1,0,140);
@@ -202,7 +202,7 @@ public class TestImageLineIntegral {
 
 	@Test
 	public void isInside() {
-		ImageUInt8 img = new ImageUInt8(12,14);
+		GrayU8 img = new GrayU8(12,14);
 		alg.setImage(FactoryGImageSingleBand.wrap(img));
 		assertTrue(alg.isInside(0,0));
 		assertTrue(alg.isInside(12,14));

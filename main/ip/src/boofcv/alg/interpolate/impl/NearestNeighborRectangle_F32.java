@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -27,22 +27,22 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborRectangle_F32 implements InterpolateRectangle<ImageFloat32>  {
+public class NearestNeighborRectangle_F32 implements InterpolateRectangle<GrayF32>  {
 
-	ImageFloat32 image;
+	GrayF32 image;
 
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(GrayF32 image) {
 		this.image = image;
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public GrayF32 getImage() {
 		return image;
 	}
 
 	@Override
-	public void region(float tl_x, float tl_y, ImageFloat32 dest) {
+	public void region(float tl_x, float tl_y, GrayF32 dest) {
 
 		int x = (int)tl_x;
 		int y = (int)tl_y;

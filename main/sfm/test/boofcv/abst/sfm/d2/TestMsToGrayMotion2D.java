@@ -18,9 +18,9 @@
 
 package boofcv.abst.sfm.d2;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -36,9 +36,9 @@ public class TestMsToGrayMotion2D {
 	@Test
 	public void basicTests() {
 		Dummy child = new Dummy();
-		MsToGrayMotion2D alg = new MsToGrayMotion2D(child, ImageFloat32.class);
+		MsToGrayMotion2D alg = new MsToGrayMotion2D(child, GrayF32.class);
 
-		MultiSpectral<ImageFloat32> ms = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,30,3);
+		Planar<GrayF32> ms = new Planar<GrayF32>(GrayF32.class,20,30,3);
 
 		assertTrue(alg.process(ms));
 		assertTrue(child.input != null );

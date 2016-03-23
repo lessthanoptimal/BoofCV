@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,10 @@
 package boofcv.factory.filter.kernel;
 
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -149,14 +149,14 @@ public class TestFactoryKernel {
 
 	@Test
 	public void getKernelType() {
-		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.getKernelType(ImageFloat32.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageSInt32.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageSInt16.class,1));
-		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(ImageUInt8.class,1));
+		assertTrue((Class)Kernel1D_F32.class == FactoryKernel.getKernelType(GrayF32.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayS32.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayS16.class,1));
+		assertTrue((Class)Kernel1D_I32.class == FactoryKernel.getKernelType(GrayU8.class,1));
 
-		assertTrue((Class)Kernel2D_F32.class == FactoryKernel.getKernelType(ImageFloat32.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageSInt32.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageSInt16.class,2));
-		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(ImageUInt8.class,2));
+		assertTrue((Class)Kernel2D_F32.class == FactoryKernel.getKernelType(GrayF32.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayS32.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayS16.class,2));
+		assertTrue((Class)Kernel2D_I32.class == FactoryKernel.getKernelType(GrayU8.class,2));
 	}
 }

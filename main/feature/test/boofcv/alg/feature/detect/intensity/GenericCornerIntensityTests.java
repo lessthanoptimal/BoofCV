@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 import static org.junit.Assert.assertTrue;
 
@@ -33,12 +33,12 @@ public abstract class GenericCornerIntensityTests {
 	protected int width = 20;
 	protected int height = 21;
 
-	protected ImageUInt8 imageI = new ImageUInt8(width,height);
-	protected ImageFloat32 imageF = new ImageFloat32(width,height);
-	protected ImageFloat32 intensity = new ImageFloat32(width,height);
+	protected GrayU8 imageI = new GrayU8(width,height);
+	protected GrayF32 imageF = new GrayF32(width,height);
+	protected GrayF32 intensity = new GrayF32(width,height);
 
 
-	public abstract void computeIntensity( ImageFloat32 intensity );
+	public abstract void computeIntensity( GrayF32 intensity );
 
 	public void performAllTests() {
 		testLargerCorner();
@@ -95,7 +95,7 @@ public abstract class GenericCornerIntensityTests {
 		return intensity.get(2,2);
 	}
 
-	public ImageUInt8 createUniformI8() {
+	public GrayU8 createUniformI8() {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				imageI.set(j,i,10);
@@ -105,7 +105,7 @@ public abstract class GenericCornerIntensityTests {
 		return imageI;
 	}
 
-	public ImageFloat32 createUniformF32() {
+	public GrayF32 createUniformF32() {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				imageF.set(j,i,10);
@@ -115,7 +115,7 @@ public abstract class GenericCornerIntensityTests {
 		return imageF;
 	}
 
-	public ImageUInt8 createCornerI8() {
+	public GrayU8 createCornerI8() {
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
@@ -129,7 +129,7 @@ public abstract class GenericCornerIntensityTests {
 		return imageI;
 	}
 
-	public ImageFloat32 createCornerF32() {
+	public GrayF32 createCornerF32() {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j > width/2 && i > height/2)

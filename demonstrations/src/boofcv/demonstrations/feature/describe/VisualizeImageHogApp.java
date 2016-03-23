@@ -25,9 +25,9 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -173,7 +173,7 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
 		examples.add(UtilIO.pathExample("shapes/concave01.jpg"));
 		examples.add(UtilIO.pathExample("particles01.jpg"));
-		ImageType imageType = ImageType.single(ImageUInt8.class);
+		ImageType imageType = ImageType.single(GrayU8.class);
 
 		VisualizeImageHogApp app = new VisualizeImageHogApp(examples, imageType);
 

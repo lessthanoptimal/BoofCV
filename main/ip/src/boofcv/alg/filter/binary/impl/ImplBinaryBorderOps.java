@@ -20,7 +20,7 @@ package boofcv.alg.filter.binary.impl;
 
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Binary operations performed only along the image's border.
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class ImplBinaryBorderOps {
-	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
+	public static void erode4(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 		
@@ -64,7 +64,7 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
+	public static void dilate4(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 
@@ -100,7 +100,7 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
+	public static GrayU8 edge4(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
@@ -138,7 +138,7 @@ public class ImplBinaryBorderOps {
 		return output;
 	}
 
-	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
+	public static void erode8(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
@@ -178,7 +178,7 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
+	public static void dilate8(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 
@@ -218,7 +218,7 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
+	public static void edge8(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,1);
 		
@@ -258,7 +258,7 @@ public class ImplBinaryBorderOps {
 		}
 	}
 
-	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
+	public static void removePointNoise(GrayU8 input, GrayU8 output) {
 
 		ImageBorder_S32 in = ImageBorderValue.wrap(input,0);
 

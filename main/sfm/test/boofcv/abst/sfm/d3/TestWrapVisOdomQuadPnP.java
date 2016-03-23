@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,29 +31,29 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<ImageFloat32> {
+public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
 	public TestWrapVisOdomQuadPnP() {
-		super(ImageFloat32.class,0.3);
+		super(GrayF32.class,0.3);
 	}
 
 	@Override
-	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
+	public StereoVisualOdometry<GrayF32> createAlgorithm() {
 		GeneralFeatureIntensity intensity =
-				FactoryIntensityPoint.shiTomasi(1, false, ImageFloat32.class);
+				FactoryIntensityPoint.shiTomasi(1, false, GrayF32.class);
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 0, true, false, true));
-		GeneralFeatureDetector<ImageFloat32,ImageFloat32> general =
-				new GeneralFeatureDetector<ImageFloat32,ImageFloat32>(intensity,nonmax);
+		GeneralFeatureDetector<GrayF32,GrayF32> general =
+				new GeneralFeatureDetector<GrayF32,GrayF32>(intensity,nonmax);
 		general.setMaxFeatures(600);
-		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,ImageFloat32.class,ImageFloat32.class);
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageFloat32.class);
+		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,GrayF32.class,GrayF32.class);
+		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);
 		DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-		return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5, 200, Double.MAX_VALUE, 300, 50, detDescMulti, ImageFloat32.class);
+		return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5, 200, Double.MAX_VALUE, 300, 50, detDescMulti, GrayF32.class);
 	}
 }

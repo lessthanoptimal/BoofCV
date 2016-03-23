@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 import java.awt.*;
@@ -49,11 +49,11 @@ public class ExampleTrackerMeanShiftLikelihood {
 	 * Very simple implementation of PixelLikelihood.  Uses linear distance to compute how close
 	 * a color is to the target color.
 	 */
-	public static class RgbLikelihood implements PixelLikelihood<MultiSpectral<ImageUInt8>> {
+	public static class RgbLikelihood implements PixelLikelihood<Planar<GrayU8>> {
 
 		int targetRed,targetGreen,targetBlue;
 		float radius = 35;
-		MultiSpectral<ImageUInt8> image;
+		Planar<GrayU8> image;
 
 		public RgbLikelihood(int targetRed, int targetGreen, int targetBlue) {
 			this.targetRed = targetRed;
@@ -62,7 +62,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		}
 
 		@Override
-		public void setImage(MultiSpectral<ImageUInt8> image) {
+		public void setImage(Planar<GrayU8> image) {
 			this.image = image;
 		}
 
@@ -101,18 +101,18 @@ public class ExampleTrackerMeanShiftLikelihood {
 		String fileName = UtilIO.pathExample("tracking/balls_blue_red.mjpeg");
 		RectangleLength2D_I32 location = new RectangleLength2D_I32(394,247,475-394,325-247);
 
-		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
+		ImageType<Planar<GrayU8>> imageType = ImageType.ms(3,GrayU8.class);
 
-		SimpleImageSequence<MultiSpectral<ImageUInt8>> video = media.openVideo(fileName, imageType);
+		SimpleImageSequence<Planar<GrayU8>> video = media.openVideo(fileName, imageType);
 
 		// Return a higher likelihood for pixels close to this RGB color
 		RgbLikelihood likelihood = new RgbLikelihood(64,71,69);
 
-		TrackerMeanShiftLikelihood<MultiSpectral<ImageUInt8>> tracker =
-				new TrackerMeanShiftLikelihood<MultiSpectral<ImageUInt8>>(likelihood,50,0.1f);
+		TrackerMeanShiftLikelihood<Planar<GrayU8>> tracker =
+				new TrackerMeanShiftLikelihood<Planar<GrayU8>>(likelihood,50,0.1f);
 
 		// specify the target's initial location and initialize with the first frame
-		MultiSpectral<ImageUInt8> frame = video.next();
+		Planar<GrayU8> frame = video.next();
 		// Note that the tracker will not automatically invoke RgbLikelihood.createModel() in its initialize function
 		tracker.initialize(frame,location);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,22 +19,22 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link HornSchunck} for {@link ImageFloat32}.
+ * Implementation of {@link HornSchunck} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
+public class HornSchunck_F32 extends HornSchunck<GrayF32,GrayF32> {
 
 	public HornSchunck_F32(float alpha, int numIterations) {
-		super(alpha, numIterations, ImageType.single(ImageFloat32.class));
+		super(alpha, numIterations, ImageType.single(GrayF32.class));
 	}
 
 	@Override
-	protected void computeDerivX(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 derivX) {
+	protected void computeDerivX(GrayF32 image1, GrayF32 image2, GrayF32 derivX) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -66,7 +66,7 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 	}
 
 	@Override
-	protected void computeDerivY(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 derivY) {
+	protected void computeDerivY(GrayF32 image1, GrayF32 image2, GrayF32 derivY) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -98,7 +98,7 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 	}
 
 	@Override
-	protected void computeDerivT(ImageFloat32 image1, ImageFloat32 image2, ImageFloat32 difference) {
+	protected void computeDerivT(GrayF32 image1, GrayF32 image2, GrayF32 difference) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -126,8 +126,8 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 		}
 	}
 
-	protected static void borderDerivT(ImageFloat32 imageA , ImageFloat32 imageB ,
-									   ImageFloat32 difference, int x, int y) {
+	protected static void borderDerivT(GrayF32 imageA , GrayF32 imageB ,
+									   GrayF32 difference, int x, int y) {
 		float d0 = getBorderT(imageA, imageB, x, y);
 		float d1 = getBorderT(imageA, imageB, x+1, y);
 		float d2 = getBorderT(imageA, imageB, x, y+1);
@@ -136,7 +136,7 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 		difference.unsafe_set(x,y, 0.25f*(d0+d1+d2+d3));
 	}
 
-	protected static float getBorderT(ImageFloat32 imageA, ImageFloat32 imageB, int x, int y) {
+	protected static float getBorderT(GrayF32 imageA, GrayF32 imageB, int x, int y) {
 		if( x < 0 ) x = 0;
 		else if( x >= imageA.width ) x = imageA.width-1;
 		if( y < 0 ) y = 0;
@@ -146,8 +146,8 @@ public class HornSchunck_F32 extends HornSchunck<ImageFloat32,ImageFloat32> {
 	}
 
 	@Override
-	protected void findFlow( ImageFloat32 derivX , ImageFloat32 derivY ,
-							 ImageFloat32 derivT , ImageFlow output) {
+	protected void findFlow(GrayF32 derivX , GrayF32 derivY ,
+							GrayF32 derivT , ImageFlow output) {
 
 		int N = output.width*output.height;
 

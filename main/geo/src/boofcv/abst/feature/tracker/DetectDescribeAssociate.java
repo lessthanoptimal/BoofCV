@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.tracker;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeAssociate<I extends ImageSingleBand, Desc extends TupleDesc>
+public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
 	// associates features between two images together

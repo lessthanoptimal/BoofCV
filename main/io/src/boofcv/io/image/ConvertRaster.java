@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ByteInterleavedRaster src, ImageUInt8 dst) {
+	public static void bufferedToGray(ByteInterleavedRaster src, GrayU8 dst) {
 		byte[] srcData = src.getDataStorage();
 
 		byte[] data = dst.data;
@@ -64,7 +64,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ShortInterleavedRaster src, ImageInt16 dst) {
+	public static void bufferedToGray(ShortInterleavedRaster src, GrayI16 dst) {
 		short[] srcData = src.getDataStorage();
 
 		int numBands = src.getNumBands();
@@ -94,7 +94,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(ByteInterleavedRaster src, ImageFloat32 dst) {
+	public static void bufferedToGray(ByteInterleavedRaster src, GrayF32 dst) {
 		byte[] srcData = src.getDataStorage();
 
 		float[] data = dst.data;
@@ -119,7 +119,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(SunWritableRaster src, ImageUInt8 dst) {
+	public static void bufferedToGray(SunWritableRaster src, GrayU8 dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
@@ -151,7 +151,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(SunWritableRaster src, ImageFloat32 dst) {
+	public static void bufferedToGray(SunWritableRaster src, GrayF32 dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
@@ -177,7 +177,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] data, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -196,7 +196,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] data, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] data, int size, int srcStride, int srcOffset, int srcStrideDiff) {
 		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 			System.arraycopy(srcData, 0, data, 0, size);
 		else {
@@ -209,7 +209,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_U8(ImageUInt8 dst, byte[] srcData, byte[] dstData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, byte[] dstData, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -227,7 +227,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -246,7 +246,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcStride, int srcOffset) {
+	private static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcStride, int srcOffset) {
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -258,7 +258,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_F32(ImageFloat32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, float[] data, int srcOffset, int srcStrideDiff) {
 		int indexSrc = srcOffset;
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -279,7 +279,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(ByteInterleavedRaster src, MultiSpectral<ImageUInt8> dst) {
+	public static void bufferedToMulti_U8(ByteInterleavedRaster src, Planar<GrayU8> dst) {
 		byte[] srcData = src.getDataStorage();
 
 		int numBands = src.getNumBands();
@@ -302,7 +302,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(ByteInterleavedRaster src, MultiSpectral<ImageFloat32> dst) {
+	public static void bufferedToMulti_F32(ByteInterleavedRaster src, Planar<GrayF32> dst) {
 		byte[] srcData = src.getDataStorage();
 
 		int numBands = src.getNumBands();
@@ -364,7 +364,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(SunWritableRaster src, MultiSpectral<ImageUInt8> dst) {
+	public static void bufferedToMulti_U8(SunWritableRaster src, Planar<GrayU8> dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
@@ -391,7 +391,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(SunWritableRaster src, MultiSpectral<ImageFloat32> dst) {
+	public static void bufferedToMulti_F32(SunWritableRaster src, Planar<GrayF32> dst) {
 		if( src.getDataBuffer().getDataType() != DataBuffer.TYPE_BYTE )
 			throw new RuntimeException("Unsupported type");
 
@@ -415,7 +415,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -436,7 +436,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] data = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -452,7 +452,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_MSF32(MultiSpectral<ImageFloat32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -470,7 +470,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -490,7 +490,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte dstData[] = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -502,7 +502,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_MSU8(MultiSpectral<ImageUInt8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -588,7 +588,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(IntegerInterleavedRaster src, ImageUInt8 dst) {
+	public static void bufferedToGray(IntegerInterleavedRaster src, GrayU8 dst) {
 		int[] srcData = src.getDataStorage();
 
 		byte[] data = dst.data;
@@ -619,7 +619,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToGray(IntegerInterleavedRaster src, ImageFloat32 dst) {
+	public static void bufferedToGray(IntegerInterleavedRaster src, GrayF32 dst) {
 		int[] srcData = src.getDataStorage();
 
 		float[] data = dst.data;
@@ -650,7 +650,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(IntegerInterleavedRaster src, MultiSpectral<ImageUInt8> dst) {
+	public static void bufferedToMulti_U8(IntegerInterleavedRaster src, Planar<GrayU8> dst) {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
@@ -701,7 +701,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(IntegerInterleavedRaster src, MultiSpectral<ImageFloat32> dst) {
+	public static void bufferedToMulti_F32(IntegerInterleavedRaster src, Planar<GrayF32> dst) {
 		int[] srcData = src.getDataStorage();
 
 		int srcStride = src.getScanlineStride();
@@ -852,7 +852,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToGray(BufferedImage src, ImageUInt8 dst) {
+	public static void bufferedToGray(BufferedImage src, GrayU8 dst) {
 		bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 	}
 
@@ -905,7 +905,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToGray(BufferedImage src, ImageInt16 dst) {
+	public static void bufferedToGray(BufferedImage src, GrayI16 dst) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
@@ -952,7 +952,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToGray(BufferedImage src, ImageFloat32 dst) {
+	public static void bufferedToGray(BufferedImage src, GrayF32 dst) {
 		bufferedToGray(src,dst.data,dst.startIndex,dst.stride);
 	}
 
@@ -1008,7 +1008,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToMulti_U8(BufferedImage src, MultiSpectral<ImageUInt8> dst) {
+	public static void bufferedToMulti_U8(BufferedImage src, Planar<GrayU8> dst) {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -1030,7 +1030,7 @@ public class ConvertRaster {
 			}
 		} else {
 			ConvertRaster.bufferedToGray(src, dst.getBand(0));
-			ImageUInt8 band1 = dst.getBand(0);
+			GrayU8 band1 = dst.getBand(0);
 			for (int i = 1; i < dst.getNumBands(); i++) {
 				dst.getBand(i).setTo(band1);
 			}
@@ -1049,7 +1049,7 @@ public class ConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToMulti_F32(BufferedImage src, MultiSpectral<ImageFloat32> dst) {
+	public static void bufferedToMulti_F32(BufferedImage src, Planar<GrayF32> dst) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
@@ -1162,7 +1162,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageUInt8 src, ByteInterleavedRaster dst) {
+	public static void grayToBuffered(GrayU8 src, ByteInterleavedRaster dst) {
 
 		final byte[] srcData = src.data;
 		final byte[] dstData = dst.getDataStorage();
@@ -1216,7 +1216,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageInt16 src, ByteInterleavedRaster dst) {
+	public static void grayToBuffered(GrayI16 src, ByteInterleavedRaster dst) {
 
 		final short[] srcData = src.data;
 		final byte[] dstData = dst.getDataStorage();
@@ -1267,7 +1267,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageFloat32 src, ByteInterleavedRaster dst) {
+	public static void grayToBuffered(GrayF32 src, ByteInterleavedRaster dst) {
 
 		final float[] srcData = src.data;
 		final byte[] dstData = dst.getDataStorage();
@@ -1318,7 +1318,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageInt16 src, ShortInterleavedRaster dst) {
+	public static void grayToBuffered(GrayI16 src, ShortInterleavedRaster dst) {
 
 		final short[] srcData = src.data;
 		final short[] dstData = dst.getDataStorage();
@@ -1369,7 +1369,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(MultiSpectral<ImageUInt8> src, ByteInterleavedRaster dst) {
+	public static void multToBuffered_U8(Planar<GrayU8> src, ByteInterleavedRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1431,7 +1431,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_F32(MultiSpectral<ImageFloat32> src, ByteInterleavedRaster dst) {
+	public static void multToBuffered_F32(Planar<GrayF32> src, ByteInterleavedRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1493,7 +1493,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageUInt8 src, IntegerInterleavedRaster dst) {
+	public static void grayToBuffered(GrayU8 src, IntegerInterleavedRaster dst) {
 
 		final byte[] srcData = src.data;
 		final int[] dstData = dst.getDataStorage();
@@ -1527,7 +1527,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageInt16 src, IntegerInterleavedRaster dst) {
+	public static void grayToBuffered(GrayI16 src, IntegerInterleavedRaster dst) {
 		final short[] srcData = src.data;
 		final int[] dstData = dst.getDataStorage();
 
@@ -1560,7 +1560,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageFloat32 src, IntegerInterleavedRaster dst) {
+	public static void grayToBuffered(GrayF32 src, IntegerInterleavedRaster dst) {
 		final float[] srcData = src.data;
 		final int[] dstData = dst.getDataStorage();
 
@@ -1593,7 +1593,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(MultiSpectral<ImageUInt8> src, IntegerInterleavedRaster dst) {
+	public static void multToBuffered_U8(Planar<GrayU8> src, IntegerInterleavedRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1640,7 +1640,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_F32(MultiSpectral<ImageFloat32> src, IntegerInterleavedRaster dst) {
+	public static void multToBuffered_F32(Planar<GrayF32> src, IntegerInterleavedRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1687,7 +1687,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageUInt8 src, BufferedImage dst) {
+	public static void grayToBuffered(GrayU8 src, BufferedImage dst) {
 
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();
@@ -1707,7 +1707,7 @@ public class ConvertRaster {
 
 	}
 
-	public static void grayToBuffered(ImageInt16 src, BufferedImage dst) {
+	public static void grayToBuffered(GrayI16 src, BufferedImage dst) {
 
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();
@@ -1726,7 +1726,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void grayToBuffered(ImageFloat32 src, BufferedImage dst) {
+	public static void grayToBuffered(GrayF32 src, BufferedImage dst) {
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();
 
@@ -1744,7 +1744,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(MultiSpectral<ImageUInt8> src, BufferedImage dst) {
+	public static void multToBuffered_U8(Planar<GrayU8> src, BufferedImage dst) {
 
 		if (src.getNumBands() != 3)
 			throw new IllegalArgumentException("src must have three bands");
@@ -1771,7 +1771,7 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_F32(MultiSpectral<ImageFloat32> src, BufferedImage dst) {
+	public static void multToBuffered_F32(Planar<GrayF32> src, BufferedImage dst) {
 
 		if (src.getNumBands() != 3)
 			throw new IllegalArgumentException("src must have three bands");

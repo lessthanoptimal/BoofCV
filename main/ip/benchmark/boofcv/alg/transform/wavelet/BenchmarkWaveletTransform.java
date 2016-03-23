@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -45,12 +45,12 @@ public class BenchmarkWaveletTransform {
 	static WaveletDescription<WlCoef_F32> desc_F32 = FactoryWaveletDaub.biorthogonal_F32(5, BorderType.REFLECT);
 	static WaveletDescription<WlCoef_I32> desc_I32 = FactoryWaveletDaub.biorthogonal_I32(5,BorderType.REFLECT);
 
-	static ImageFloat32 orig_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageFloat32 temp1_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageFloat32 temp2_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageSInt32 orig_I32 = new ImageSInt32(imgWidth,imgHeight);
-	static ImageSInt32 temp1_I32 = new ImageSInt32(imgWidth,imgHeight);
-	static ImageSInt32 temp2_I32 = new ImageSInt32(imgWidth,imgHeight);
+	static GrayF32 orig_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayF32 temp1_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayF32 temp2_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayS32 orig_I32 = new GrayS32(imgWidth,imgHeight);
+	static GrayS32 temp1_I32 = new GrayS32(imgWidth,imgHeight);
+	static GrayS32 temp2_I32 = new GrayS32(imgWidth,imgHeight);
 
 	public static class Naive_F32 extends PerformerBase {
 
@@ -88,14 +88,14 @@ public class BenchmarkWaveletTransform {
 
 	public static class FullLevel3_F32 extends PerformerBase {
 
-		static ImageFloat32 copy = new ImageFloat32(imgWidth,imgHeight);
-		ImageFloat32 tran;
-		ImageFloat32 storage;
+		static GrayF32 copy = new GrayF32(imgWidth,imgHeight);
+		GrayF32 tran;
+		GrayF32 storage;
 
 		public FullLevel3_F32() {
 			ImageDimension dim = UtilWavelet.transformDimension(copy,3);
-			tran = new ImageFloat32(dim.width,dim.height);
-			storage = new ImageFloat32(dim.width,dim.height);
+			tran = new GrayF32(dim.width,dim.height);
+			storage = new GrayF32(dim.width,dim.height);
 		}
 
 		@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -54,19 +54,19 @@ public class VisualizeCannySteps {
 	public static void main( String args[] ){
 
 		BufferedImage input = UtilImageIO.loadImage(fileName);
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
 
-		ImageFloat32 blurred = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageFloat32 derivX = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageFloat32 derivY = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageFloat32 intensity = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageFloat32 orientation = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageFloat32 suppressed = new ImageFloat32(inputF32.width,inputF32.height);
-		ImageSInt8 direction = new ImageSInt8(inputF32.width,inputF32.height);
-		ImageUInt8 output = new ImageUInt8(inputF32.width,inputF32.height);
+		GrayF32 blurred = new GrayF32(inputF32.width,inputF32.height);
+		GrayF32 derivX = new GrayF32(inputF32.width,inputF32.height);
+		GrayF32 derivY = new GrayF32(inputF32.width,inputF32.height);
+		GrayF32 intensity = new GrayF32(inputF32.width,inputF32.height);
+		GrayF32 orientation = new GrayF32(inputF32.width,inputF32.height);
+		GrayF32 suppressed = new GrayF32(inputF32.width,inputF32.height);
+		GrayS8 direction = new GrayS8(inputF32.width,inputF32.height);
+		GrayU8 output = new GrayU8(inputF32.width,inputF32.height);
 
-		BlurStorageFilter<ImageFloat32> blur = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,2);
-		ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.sobel_F32();
+		BlurStorageFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class,-1,2);
+		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel_F32();
 
 		blur.process(inputF32,blurred);
 		gradient.process(blurred,derivX,derivY);

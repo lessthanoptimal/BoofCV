@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter.derivative;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface ImageHessianDirect<Input extends ImageSingleBand, Output extends ImageSingleBand>
+public interface ImageHessianDirect<Input extends ImageGray, Output extends ImageGray>
 		extends ImageDerivative<Input,Output> 
 {
 

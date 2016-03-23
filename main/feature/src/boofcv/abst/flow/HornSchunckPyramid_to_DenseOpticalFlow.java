@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.flow;
 
 import boofcv.alg.flow.HornSchunckPyramid;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageSingleBand>
+public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageGray>
 	implements DenseOpticalFlow<T>
 {
 	HornSchunckPyramid<T> hornSchunck;
@@ -45,8 +45,8 @@ public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageSingleBand>
 
 		hornSchunck.process(source,destination);
 
-		ImageFloat32 flowX = hornSchunck.getFlowX();
-		ImageFloat32 flowY = hornSchunck.getFlowY();
+		GrayF32 flowX = hornSchunck.getFlowX();
+		GrayF32 flowY = hornSchunck.getFlowY();
 
 		int index = 0;
 		for( int y = 0; y < flow.height; y++){

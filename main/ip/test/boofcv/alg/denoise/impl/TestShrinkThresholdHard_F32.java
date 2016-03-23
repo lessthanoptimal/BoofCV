@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.denoise.impl;
 
 import boofcv.alg.denoise.wavelet.ShrinkThresholdHard_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 
@@ -34,7 +34,7 @@ public class TestShrinkThresholdHard_F32 {
 	@Test
 	public void basicTest() {
 		TestShrinkThresholdHard_I32.performBasicSoftTest(
-				new ImageFloat32(width,height),
+				new GrayF32(width,height),
 				new ShrinkThresholdHard_F32());
 	}
 }

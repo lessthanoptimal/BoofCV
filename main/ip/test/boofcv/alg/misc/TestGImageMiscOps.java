@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
@@ -55,7 +55,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 		for( int i = 0; i < param.length; i++ ) {
 			if( ImageBase.class.isAssignableFrom(param[i]) ) {
-				if( ImageSingleBand.class.isAssignableFrom(param[i])) {
+				if( ImageGray.class.isAssignableFrom(param[i])) {
 					inputA = GeneralizedImageOps.createSingleBand((Class) param[i], width, height);
 					inputSquare = GeneralizedImageOps.createSingleBand((Class) param[i], width, width);
 				} else {

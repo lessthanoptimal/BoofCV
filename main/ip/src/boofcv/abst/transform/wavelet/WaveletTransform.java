@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.transform.wavelet;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -36,7 +36,7 @@ import boofcv.struct.wavelet.WlCoef;
  * @author Peter Abeles
  */
 public interface WaveletTransform
-		<O extends ImageSingleBand, T extends ImageSingleBand, C extends WlCoef >
+		<O extends ImageGray, T extends ImageGray, C extends WlCoef >
 {
 	/**
 	 * Computes the wavelet transform of the input image.  If no output/transform image is provided a new image is

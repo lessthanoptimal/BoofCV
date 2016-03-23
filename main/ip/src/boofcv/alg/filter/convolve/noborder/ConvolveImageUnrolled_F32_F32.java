@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -39,8 +39,8 @@ import boofcv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 public class ConvolveImageUnrolled_F32_F32 {
-	public static boolean horizontal( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest) {
+	public static boolean horizontal(Kernel1D_F32 kernel ,
+									 GrayF32 image, GrayF32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -73,8 +73,8 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest) {
+	public static boolean vertical(Kernel1D_F32 kernel ,
+								   GrayF32 image, GrayF32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -107,8 +107,8 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest) {
+	public static boolean convolve(Kernel2D_F32 kernel ,
+								   GrayF32 image, GrayF32 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -141,7 +141,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void horizontal3(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -170,7 +170,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void horizontal5(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -203,7 +203,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void horizontal7(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -240,7 +240,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void horizontal9(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -281,7 +281,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void horizontal11(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -326,7 +326,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical3( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void vertical3(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -361,7 +361,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical5( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void vertical5(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -402,7 +402,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical7( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void vertical7(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -449,7 +449,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical9( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void vertical9(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -502,7 +502,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical11( Kernel1D_F32 kernel , ImageFloat32 image, ImageFloat32 dest )
+	public static void vertical11(Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
 	{
 		final float[] dataSrc = image.data;
 		final float[] dataDst = dest.data;
@@ -561,7 +561,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve3( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	public static void convolve3(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
 	{
 		final float[] dataSrc = src.data;
 		final float[] dataDst = dest.data;
@@ -614,7 +614,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve5( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	public static void convolve5(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
 	{
 		final float[] dataSrc = src.data;
 		final float[] dataDst = dest.data;
@@ -675,7 +675,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve7( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	public static void convolve7(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
 	{
 		final float[] dataSrc = src.data;
 		final float[] dataDst = dest.data;
@@ -744,7 +744,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve9( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	public static void convolve9(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
 	{
 		final float[] dataSrc = src.data;
 		final float[] dataDst = dest.data;
@@ -821,7 +821,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve11( Kernel2D_F32 kernel, ImageFloat32 src, ImageFloat32 dest)
+	public static void convolve11(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
 	{
 		final float[] dataSrc = src.data;
 		final float[] dataDst = dest.data;

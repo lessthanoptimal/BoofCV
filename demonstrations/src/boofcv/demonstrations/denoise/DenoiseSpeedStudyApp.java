@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.denoise;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,8 +43,8 @@ public class DenoiseSpeedStudyApp {
 	int height = 480;
 
 	Random rand = new Random(2234);
-	ImageFloat32 image = new ImageFloat32(width,height);
-	ImageFloat32 imageDenoised = new ImageFloat32(width,height);
+	GrayF32 image = new GrayF32(width,height);
+	GrayF32 imageDenoised = new GrayF32(width,height);
 
 	public class RunFilter implements Performer
 	{

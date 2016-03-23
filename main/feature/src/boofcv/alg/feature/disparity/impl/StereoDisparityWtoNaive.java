@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Very basic algorithm for testing stereo disparity algorithms for correctness and employs a
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
+public class StereoDisparityWtoNaive<I extends ImageGray> {
 	// left and right camera images
 	I imageLeft;
 	I imageRight;
@@ -70,7 +70,7 @@ public class StereoDisparityWtoNaive<I extends ImageSingleBand> {
 	 * @param left Left camera image.
 	 * @param right Right camera image.
 	 */
-	public void process( I left , I right , ImageFloat32 imageDisparity ) {
+	public void process( I left , I right , GrayF32 imageDisparity ) {
 		// check inputs and initialize data structures
 		InputSanityCheck.checkSameShape(left,right,imageDisparity);
 		this.imageLeft = left;

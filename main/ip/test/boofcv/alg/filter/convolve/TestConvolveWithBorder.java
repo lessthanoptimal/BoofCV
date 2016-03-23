@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -64,7 +64,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	 * Fillers the border in the larger image with an extended version of the smaller image.  A duplicate
 	 * of the smaller image is contained in the center of the larger image.
 	 */
-	protected void fillTestImage(ImageSingleBand smaller, ImageSingleBand larger,
+	protected void fillTestImage(ImageGray smaller, ImageGray larger,
 								 KernelBase kernel , String functionName ) {
 
 		computeBorder(kernel,functionName);
@@ -125,9 +125,9 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		ImageSingleBand src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
+		ImageGray src = ConvolutionTestHelper.createImage(validation.getParameterTypes()[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 5);
-		ImageSingleBand dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
+		ImageGray dst = ConvolutionTestHelper.createImage(validation.getParameterTypes()[2], width, height);
 
 		Object[][] ret = new Object[1][paramTypes.length];
 		ret[0][0] = createKernel(paramTypes[0], kernelWidth, kernelOffset);
@@ -142,7 +142,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Object[] ret =  new Object[]{targetParam[0],targetParam[1],targetParam[2]};
 
-		ImageSingleBand inputImage = (ImageSingleBand)targetParam[1];
+		ImageGray inputImage = (ImageGray)targetParam[1];
 
 		KernelBase kernel = (KernelBase)targetParam[0];
 
@@ -152,17 +152,17 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		int h = borderY0+borderY1;
 
 		ret[1] = inputImage._createNew(width+w,height+h);
-		ret[2] = ((ImageSingleBand)targetParam[2])._createNew(width+w,height+h);
+		ret[2] = ((ImageGray)targetParam[2])._createNew(width+w,height+h);
 
-		fillTestImage(inputImage,(ImageSingleBand)ret[1],kernel,m.getName());
+		fillTestImage(inputImage,(ImageGray)ret[1],kernel,m.getName());
 
 		return ret;
 	}
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-		ImageSingleBand targetOut = (ImageSingleBand)targetParam[2];
-		ImageSingleBand validationOut = (ImageSingleBand)validationParam[2];
+		ImageGray targetOut = (ImageGray)targetParam[2];
+		ImageGray validationOut = (ImageGray)validationParam[2];
 
 		// remove the border
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());

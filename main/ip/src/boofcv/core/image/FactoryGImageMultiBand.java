@@ -31,16 +31,16 @@ import boofcv.struct.image.*;
 public class FactoryGImageMultiBand {
 
 	public static GImageMultiBand wrap( ImageBase image ) {
-		if( image instanceof ImageSingleBand )
-			return wrap((ImageSingleBand)image);
-		else if( image instanceof MultiSpectral )
-			return wrap((MultiSpectral)image);
+		if( image instanceof ImageGray)
+			return wrap((ImageGray)image);
+		else if( image instanceof Planar)
+			return wrap((Planar)image);
 		else if( image instanceof ImageInterleaved )
 			return wrap((ImageInterleaved)image);
 		throw new RuntimeException("Unknown image type");
 	}
 
-	public static GImageMultiBand wrap( ImageSingleBand image ) {
+	public static GImageMultiBand wrap( ImageGray image ) {
 		return new GSingleToMB(FactoryGImageSingleBand.wrap(image));
 	}
 
@@ -63,7 +63,7 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
-	public static GImageMultiBand wrap( MultiSpectral image ) {
+	public static GImageMultiBand wrap( Planar image ) {
 		return new MS(image);
 	}
 
@@ -91,10 +91,10 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static class MS implements GImageMultiBand {
-		MultiSpectral image;
+		Planar image;
 		GImageSingleBand bandWrappers[];
 
-		public MS(MultiSpectral image) {
+		public MS(Planar image) {
 			wrap(image);
 		}
 
@@ -104,14 +104,14 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void wrap(ImageBase image) {
 			if( this.image == null ) {
-				this.image = (MultiSpectral) image;
+				this.image = (Planar) image;
 
 				bandWrappers = new GImageSingleBand[this.image.getNumBands()];
 				for (int i = 0; i < bandWrappers.length; i++) {
 					bandWrappers[i] = FactoryGImageSingleBand.wrap(this.image.getBand(i));
 				}
 			} else {
-				this.image = (MultiSpectral) image;
+				this.image = (Planar) image;
 				for (int i = 0; i < bandWrappers.length; i++) {
 					bandWrappers[i].wrap(this.image.getBand(i));
 				}
@@ -175,9 +175,9 @@ public class FactoryGImageMultiBand {
 		@Override
 		public void wrap(ImageBase image) {
 			if( this.sb == null ) {
-				this.sb = FactoryGImageSingleBand.wrap((ImageSingleBand)image);
+				this.sb = FactoryGImageSingleBand.wrap((ImageGray)image);
 			} else {
-				this.sb.wrap((ImageSingleBand)image);
+				this.sb.wrap((ImageGray)image);
 			}
 		}
 

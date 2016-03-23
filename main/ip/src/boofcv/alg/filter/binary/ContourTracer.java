@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -43,9 +43,9 @@ public class ContourTracer {
 	private FastQueue<Point2D_I32> storagePoints;
 
 	// binary image being traced
-	private ImageUInt8 binary;
+	private GrayU8 binary;
 	// label image being marked
-	private ImageSInt32 labeled;
+	private GrayS32 labeled;
 
 	// storage for contour
 	private List<Point2D_I32> contour;
@@ -100,7 +100,7 @@ public class ContourTracer {
 	 * @param labeled Labeled image.  Size is the same as the original binary image without border.
 	 * @param storagePoints
 	 */
-	public void setInputs( ImageUInt8 binary , ImageSInt32 labeled , FastQueue<Point2D_I32> storagePoints ) {
+	public void setInputs(GrayU8 binary , GrayS32 labeled , FastQueue<Point2D_I32> storagePoints ) {
 		this.binary = binary;
 		this.labeled = labeled;
 		this.storagePoints = storagePoints;

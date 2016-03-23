@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -97,9 +97,9 @@ public class TestDetectChessSquarePoints {
 	public void basicTest(int rows, int cols) {
 //		System.out.println("grid shape rows = "+ rows +" cols = "+ cols);
 
-		ImageUInt8 binary = createTarget(rows, cols);
+		GrayU8 binary = createTarget(rows, cols);
 
-		ImageUInt8 gray = binary.clone();
+		GrayU8 gray = binary.clone();
 		PixelMath.multiply(gray, 200, gray);
 		PixelMath.minus(255,gray,gray);
 
@@ -108,10 +108,10 @@ public class TestDetectChessSquarePoints {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException ignore) {}
 
-		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4,4),ImageUInt8.class);
-		DetectChessSquarePoints<ImageUInt8> alg =
-				new DetectChessSquarePoints<ImageUInt8>(rows, cols,2, detectorSquare);
+		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
+				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
+		DetectChessSquarePoints<GrayU8> alg =
+				new DetectChessSquarePoints<GrayU8>(rows, cols,2, detectorSquare);
 
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
@@ -134,9 +134,9 @@ public class TestDetectChessSquarePoints {
 		}
 	}
 
-	private ImageUInt8 createTarget(int rows, int cols) {
+	private GrayU8 createTarget(int rows, int cols) {
 		int squareLength2 = squareLength-2;
-		ImageUInt8 binary = new ImageUInt8(w,h);
+		GrayU8 binary = new GrayU8(w,h);
 
 		SimpleMatrix a = new SimpleMatrix(1,2);
 		a.set(5);
@@ -174,9 +174,9 @@ public class TestDetectChessSquarePoints {
 		int gridWidth=4;
 		int gridHeight=5;
 
-		ImageUInt8 binary = createTarget(gridHeight, gridWidth);
+		GrayU8 binary = createTarget(gridHeight, gridWidth);
 
-		ImageUInt8 gray = binary.clone();
+		GrayU8 gray = binary.clone();
 		PixelMath.multiply(gray, 200, gray);
 		PixelMath.minus(255,gray,gray);
 
@@ -185,10 +185,10 @@ public class TestDetectChessSquarePoints {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException ignore) {}
 
-		BinaryPolygonDetector<ImageUInt8> detectorSquare = FactoryShapeDetector.
-				polygon(new ConfigPolygonDetector(4,4),ImageUInt8.class);
-		DetectChessSquarePoints<ImageUInt8> alg =
-				new DetectChessSquarePoints<ImageUInt8>(gridWidth,gridHeight,2, detectorSquare);
+		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
+				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
+		DetectChessSquarePoints<GrayU8> alg =
+				new DetectChessSquarePoints<GrayU8>(gridWidth,gridHeight,2, detectorSquare);
 
 		assertFalse(alg.process(gray, binary));
 	}
@@ -239,7 +239,7 @@ public class TestDetectChessSquarePoints {
 
 		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
 
-		DetectChessSquarePoints<ImageUInt8> alg = new DetectChessSquarePoints<ImageUInt8>(2,2,0.01,null);
+		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<GrayU8>(2,2,0.01,null);
 
 		for( int[]shape : shapes ) {
 //			System.out.println(shape[0]+" "+shape[1]);
@@ -311,7 +311,7 @@ public class TestDetectChessSquarePoints {
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessSquarePoints<ImageUInt8> alg = new DetectChessSquarePoints<ImageUInt8>(2,2,0.01,null);
+		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<GrayU8>(2,2,0.01,null);
 
 		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
 

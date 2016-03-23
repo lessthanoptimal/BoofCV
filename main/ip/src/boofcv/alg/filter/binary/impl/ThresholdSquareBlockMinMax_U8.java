@@ -19,16 +19,16 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU8;
 
 /**
- * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link ImageUInt8}
+ * Implementation of {@link ThresholdSquareBlockMinMax} for input images of type {@link GrayU8}
  *
  * @author Peter Abeles
  */
 public class ThresholdSquareBlockMinMax_U8
-	extends ThresholdSquareBlockMinMax<ImageUInt8,InterleavedU8>
+	extends ThresholdSquareBlockMinMax<GrayU8,InterleavedU8>
 {
 	double scale;
 	boolean down;
@@ -41,7 +41,7 @@ public class ThresholdSquareBlockMinMax_U8
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , ImageUInt8 input, ImageUInt8 output ) {
+	protected void thresholdBlock(int blockX0 , int blockY0 , GrayU8 input, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -94,7 +94,7 @@ public class ThresholdSquareBlockMinMax_U8
 	}
 
 	@Override
-	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , ImageUInt8 input) {
+	protected void computeMinMaxBlock(int x0 , int y0 , int width , int height , int indexMinMax , GrayU8 input) {
 
 		int min,max;
 		min = max = input.unsafe_get(x0,y0);

@@ -23,8 +23,8 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.CachedSineCosine_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
@@ -74,7 +74,7 @@ public class HoughTransformLinePolar {
 	double r_max;
 	// contains a set of counts for detected lines in each pixel
 	// floating point image used because that's what FeatureExtractor's take as input
-	ImageFloat32 transform = new ImageFloat32(1,1);
+	GrayF32 transform = new GrayF32(1,1);
 	// found lines in transform space
 	QueueCorner foundLines = new QueueCorner(10);
 	// line intensities for later pruning
@@ -111,7 +111,7 @@ public class HoughTransformLinePolar {
 	 *
 	 * @param binary Binary image that indicates which pixels lie on edges.
 	 */
-	public void transform( ImageUInt8 binary )
+	public void transform( GrayU8 binary )
 	{
 		ImageMiscOps.fill(transform, 0);
 
@@ -216,7 +216,7 @@ public class HoughTransformLinePolar {
 	 *
 	 * @return Transform image.
 	 */
-	public ImageFloat32 getTransform() {
+	public GrayF32 getTransform() {
 		return transform;
 	}
 

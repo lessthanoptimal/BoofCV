@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +36,7 @@ public class TestImplHarrisCorner_S16 extends GenericCornerIntensityGradientTest
 	}
 
 	@Override
-	public void computeIntensity( ImageFloat32 intensity ) {
+	public void computeIntensity( GrayF32 intensity ) {
 		detector.process(derivX_I16,derivY_I16,intensity);
 	}
 

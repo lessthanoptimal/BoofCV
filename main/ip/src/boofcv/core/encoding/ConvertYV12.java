@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,21 +39,21 @@ public class ConvertYV12 {
      */
     public static void yu12ToBoof(byte[] data, int width, int height, ImageBase output) {
 
-        if( output instanceof MultiSpectral) {
-            MultiSpectral ms = (MultiSpectral) output;
+        if( output instanceof Planar) {
+            Planar ms = (Planar) output;
 
-            if (ms.getBandType() == ImageUInt8.class) {
+            if (ms.getBandType() == GrayU8.class) {
                 ImplConvertYV12.yv12ToMultiRgb_U8(data, ms);
-            } else if (ms.getBandType() == ImageFloat32.class) {
+            } else if (ms.getBandType() == GrayF32.class) {
                 ImplConvertYV12.yv12ToMultiRgb_F32(data, ms);
             } else {
                 throw new IllegalArgumentException("Unsupported output band format");
             }
-        } else if( output instanceof ImageSingleBand) {
-            if (output.getClass() == ImageUInt8.class) {
-                yu12ToGray(data, width, height, (ImageUInt8) output);
-            } else if (output.getClass() == ImageFloat32.class) {
-                yu12ToGray(data, width, height, (ImageFloat32) output);
+        } else if( output instanceof ImageGray) {
+            if (output.getClass() == GrayU8.class) {
+                yu12ToGray(data, width, height, (GrayU8) output);
+            } else if (output.getClass() == GrayF32.class) {
+                yu12ToGray(data, width, height, (GrayF32) output);
             } else {
                 throw new IllegalArgumentException("Unsupported output type");
             }
@@ -79,12 +79,12 @@ public class ConvertYV12 {
      * @param output Output: Optional storage for output image.  Can be null.
      * @return Gray scale image
      */
-    public static ImageUInt8 yu12ToGray( byte[] data , int width , int height , ImageUInt8 output ) {
+    public static GrayU8 yu12ToGray(byte[] data , int width , int height , GrayU8 output ) {
         if( output != null ) {
             if( output.width != width || output.height != height )
                 throw new IllegalArgumentException("output width and height must be "+width+" "+height);
         } else {
-            output = new ImageUInt8(width,height);
+            output = new GrayU8(width,height);
         }
 
         ImplConvertNV21.nv21ToGray(data, output);
@@ -101,12 +101,12 @@ public class ConvertYV12 {
      * @param output Output: Optional storage for output image.  Can be null.
      * @return Gray scale image
      */
-    public static ImageFloat32 yu12ToGray( byte[] data , int width , int height , ImageFloat32 output ) {
+    public static GrayF32 yu12ToGray(byte[] data , int width , int height , GrayF32 output ) {
         if( output != null ) {
             if( output.width != width || output.height != height )
                 throw new IllegalArgumentException("output width and height must be "+width+" "+height);
         } else {
-            output = new ImageFloat32(width,height);
+            output = new GrayF32(width,height);
         }
 
         ImplConvertNV21.nv21ToGray(data, output);

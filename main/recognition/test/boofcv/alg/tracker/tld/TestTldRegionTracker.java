@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.junit.Test;
@@ -47,13 +47,13 @@ public class TestTldRegionTracker {
 
 	Random rand = new Random(234);
 
-	ImageUInt8 input = new ImageUInt8(width,height);
-	PyramidDiscrete<ImageUInt8> pyramid;
+	GrayU8 input = new GrayU8(width,height);
+	PyramidDiscrete<GrayU8> pyramid;
 
 	public TestTldRegionTracker() {
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,ImageUInt8.class);
+		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,GrayU8.class);
 		pyramid.process(input);
 	}
 
@@ -103,8 +103,8 @@ public class TestTldRegionTracker {
 	 */
 	@Test
 	public void spawnGrid_fail() {
-		PyramidDiscrete<ImageUInt8> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,ImageUInt8.class);
-		pyramid.process(new ImageUInt8(width,height));
+		PyramidDiscrete<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true,GrayU8.class);
+		pyramid.process(new GrayU8(width,height));
 
 		TldRegionTracker alg = createAlg();
 
@@ -119,12 +119,12 @@ public class TestTldRegionTracker {
 		}
 	}
 
-	private TldRegionTracker<ImageUInt8,ImageSInt16> createAlg() {
+	private TldRegionTracker<GrayU8,GrayS16> createAlg() {
 
-		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class,ImageSInt16.class);
-		PyramidKltTracker<ImageUInt8,ImageSInt16> tracker =
-				FactoryTrackerAlg.kltPyramid(new KltConfig(), ImageUInt8.class, ImageSInt16.class);
+		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
+		PyramidKltTracker<GrayU8,GrayS16> tracker =
+				FactoryTrackerAlg.kltPyramid(new KltConfig(), GrayU8.class, GrayS16.class);
 
-		return new TldRegionTracker<ImageUInt8,ImageSInt16>(10,5,100,gradient,tracker,ImageUInt8.class,ImageSInt16.class);
+		return new TldRegionTracker<GrayU8,GrayS16>(10,5,100,gradient,tracker,GrayU8.class,GrayS16.class);
 	}
 }

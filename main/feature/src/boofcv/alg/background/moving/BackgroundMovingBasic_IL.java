@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 
 /**
- * Implementation of {@link BackgroundMovingBasic} for {@link MultiSpectral}.
+ * Implementation of {@link BackgroundMovingBasic} for {@link Planar}.
  *
  * @author Peter Abeles
  */
@@ -134,7 +134,7 @@ public class BackgroundMovingBasic_IL<T extends ImageInterleaved, Motion extends
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, ImageUInt8 segmented) {
+	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

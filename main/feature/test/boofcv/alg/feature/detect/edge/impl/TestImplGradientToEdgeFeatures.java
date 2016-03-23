@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -52,18 +52,18 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityE( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
 	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
-		ImageFloat32 intensity = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"intensityE",false,m, derivX, derivY, intensity);
 	}
 
-	public void intensityE(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
+	public void intensityE(Method m, ImageGray derivX, ImageGray derivY, GrayF32 intensity) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,intensity);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -83,18 +83,18 @@ public class TestImplGradientToEdgeFeatures {
 	public void intensityAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
 	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
-		ImageFloat32 intensity = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"intensityAbs",false,m, derivX, derivY, intensity);
 	}
 
-	public void intensityAbs(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 intensity) throws IllegalAccessException, InvocationTargetException {
+	public void intensityAbs(Method m, ImageGray derivX, ImageGray derivY, GrayF32 intensity) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,intensity);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -114,18 +114,18 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
 	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
-		ImageFloat32 angle = new ImageFloat32(width,height);
+		GrayF32 angle = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"direction",false,m, derivX, derivY, angle);
 	}
 
-	public void direction(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
+	public void direction(Method m, ImageGray derivX, ImageGray derivY, GrayF32 angle) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,angle);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);
@@ -145,18 +145,18 @@ public class TestImplGradientToEdgeFeatures {
 	public void direction2( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class derivType = m.getParameterTypes()[0];
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, -20, 20);
 	    GImageMiscOps.fillUniform(derivY, rand, -20, 20);
 
-		ImageFloat32 angle = new ImageFloat32(width,height);
+		GrayF32 angle = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"direction2",false,m, derivX, derivY, angle);
 	}
 
-	public void direction2(Method m, ImageSingleBand derivX, ImageSingleBand derivY, ImageFloat32 angle) throws IllegalAccessException, InvocationTargetException {
+	public void direction2(Method m, ImageGray derivX, ImageGray derivY, GrayF32 angle) throws IllegalAccessException, InvocationTargetException {
 		m.invoke(null,derivX,derivY,angle);
 
 		double x = GeneralizedImageOps.get(derivX,5,10);

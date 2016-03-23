@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,23 +34,23 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeImageData {
 
-	public static BufferedImage standard(ImageSingleBand<?> src, BufferedImage dst) {
+	public static BufferedImage standard(ImageGray<?> src, BufferedImage dst) {
 		if (src.getDataType().isInteger()) {
-			ImageInteger srcInt = (ImageInteger) src;
+			GrayI srcInt = (GrayI) src;
 
 			if (src.getDataType().isSigned()) {
 				double max = GImageStatistics.maxAbs(srcInt);
 				return colorizeSign(srcInt, dst, (int) max);
 			} else {
 				if (src.getDataType().getNumBits() == 8) {
-					dst = ConvertBufferedImage.convertTo((ImageUInt8) src, dst);
+					dst = ConvertBufferedImage.convertTo((GrayU8) src, dst);
 				} else {
 					double max = GImageStatistics.maxAbs(srcInt);
 					dst = grayUnsigned(srcInt, dst, (int) max);
 				}
 			}
-		} else if (ImageFloat32.class.isAssignableFrom(src.getClass())) {
-			ImageFloat32 img = (ImageFloat32) src;
+		} else if (GrayF32.class.isAssignableFrom(src.getClass())) {
+			GrayF32 img = (GrayF32) src;
 			float max = ImageStatistics.maxAbs(img);
 
 			boolean hasNegative = false;
@@ -66,7 +66,7 @@ public class VisualizeImageData {
 			if (hasNegative)
 				return colorizeSign(img, dst, (int) max);
 			else
-				return grayMagnitude((ImageFloat32) src, dst, max);
+				return grayMagnitude((GrayF32) src, dst, max);
 		}
 
 		return dst;
@@ -83,7 +83,7 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image. If &le; 0 then the max value will be used
 	 * @return Rendered image.
 	 */
-	public static BufferedImage colorizeSign(ImageSingleBand src, BufferedImage dst, double normalize) {
+	public static BufferedImage colorizeSign(ImageGray src, BufferedImage dst, double normalize) {
 		dst = checkInputs(src, dst);
 
 		if (normalize <= 0) {
@@ -96,14 +96,14 @@ public class VisualizeImageData {
 			return dst;
 		}
 
-		if (src.getClass().isAssignableFrom(ImageFloat32.class)) {
-			return colorizeSign((ImageFloat32) src, dst, (float) normalize);
+		if (src.getClass().isAssignableFrom(GrayF32.class)) {
+			return colorizeSign((GrayF32) src, dst, (float) normalize);
 		} else {
-			return colorizeSign((ImageInteger) src, dst, (int) normalize);
+			return colorizeSign((GrayI) src, dst, (int) normalize);
 		}
 	}
 
-	private static BufferedImage colorizeSign(ImageInteger src, BufferedImage dst, int normalize) {
+	private static BufferedImage colorizeSign(GrayI src, BufferedImage dst, int normalize) {
 		dst = checkInputs(src, dst);
 
 		for (int y = 0; y < src.height; y++) {
@@ -123,7 +123,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage grayUnsigned(ImageInteger src, BufferedImage dst, int normalize) {
+	public static BufferedImage grayUnsigned(GrayI src, BufferedImage dst, int normalize) {
 		dst = checkInputs(src, dst);
 
 		if (src.getDataType().isSigned())
@@ -154,18 +154,18 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image. If < 0 then this value is automatically computed.
 	 * @return Rendered image.
 	 */
-	public static BufferedImage grayMagnitude(ImageSingleBand src, BufferedImage dst, double normalize) {
+	public static BufferedImage grayMagnitude(ImageGray src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
 			normalize = GImageStatistics.maxAbs(src);
 
 		dst = checkInputs(src, dst);
 
 		if (src.getDataType().isInteger()) {
-			return grayMagnitude((ImageInteger) src, dst, (int) normalize);
-		} else if( src instanceof ImageFloat32 ){
-			return grayMagnitude((ImageFloat32) src, dst, (float) normalize);
-		} else if( src instanceof ImageFloat64 ){
-			return grayMagnitude((ImageFloat64) src, dst, (float) normalize);
+			return grayMagnitude((GrayI) src, dst, (int) normalize);
+		} else if( src instanceof GrayF32){
+			return grayMagnitude((GrayF32) src, dst, (float) normalize);
+		} else if( src instanceof GrayF64){
+			return grayMagnitude((GrayF64) src, dst, (float) normalize);
 		} else {
 			throw new RuntimeException("Unsupported type");
 		}
@@ -181,20 +181,20 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image.
 	 * @return Rendered image.
 	 */
-	public static BufferedImage grayMagnitudeTemp(ImageSingleBand src, BufferedImage dst, double normalize) {
+	public static BufferedImage grayMagnitudeTemp(ImageGray src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
 			normalize = GImageStatistics.maxAbs(src);
 
 		dst = checkInputs(src, dst);
 
 		if (src.getDataType().isInteger()) {
-			return grayMagnitudeTemp((ImageInteger) src, dst, (int) normalize);
+			return grayMagnitudeTemp((GrayI) src, dst, (int) normalize);
 		} else {
 			throw new RuntimeException("Add support");
 		}
 	}
 
-	private static BufferedImage grayMagnitude(ImageInteger src, BufferedImage dst, int maxValue) {
+	private static BufferedImage grayMagnitude(GrayI src, BufferedImage dst, int maxValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				int v = Math.abs(src.get(x, y));
@@ -208,7 +208,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage grayMagnitudeTemp(ImageInteger src, BufferedImage dst, int maxValue) {
+	private static BufferedImage grayMagnitudeTemp(GrayI src, BufferedImage dst, int maxValue) {
 		int halfValue = maxValue / 2 + maxValue % 2;
 
 		for (int y = 0; y < src.height; y++) {
@@ -251,21 +251,21 @@ public class VisualizeImageData {
 	 * @param invalidColor RGB value for invalid pixels.  Try 0xFF << 8 for green
 	 * @return Rendered image.
 	 */
-	public static BufferedImage disparity(ImageSingleBand disparity, BufferedImage dst,
+	public static BufferedImage disparity(ImageGray disparity, BufferedImage dst,
 										  int minDisparity, int maxDisparity, int invalidColor) {
 		if( dst == null )
 			dst = new BufferedImage(disparity.getWidth(),disparity.getHeight(),BufferedImage.TYPE_INT_RGB);
 
 		if (disparity.getDataType().isInteger()) {
-			return disparity((ImageInteger) disparity, dst, minDisparity, maxDisparity, invalidColor);
-		} else if (disparity instanceof ImageFloat32) {
-			return disparity((ImageFloat32) disparity, dst, minDisparity, maxDisparity, invalidColor);
+			return disparity((GrayI) disparity, dst, minDisparity, maxDisparity, invalidColor);
+		} else if (disparity instanceof GrayF32) {
+			return disparity((GrayF32) disparity, dst, minDisparity, maxDisparity, invalidColor);
 		} else {
 			throw new RuntimeException("Add support");
 		}
 	}
 
-	private static BufferedImage disparity(ImageInteger src, BufferedImage dst,
+	private static BufferedImage disparity(GrayI src, BufferedImage dst,
 										   int minValue, int maxValue, int invalidColor) {
 		int range = maxValue - minValue;
 
@@ -293,7 +293,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage disparity(ImageFloat32 src, BufferedImage dst,
+	private static BufferedImage disparity(GrayF32 src, BufferedImage dst,
 										   int minValue, int maxValue, int invalidColor) {
 		float range = maxValue - minValue;
 
@@ -321,7 +321,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage colorizeSign(ImageFloat32 src, BufferedImage dst, float maxAbsValue) {
+	private static BufferedImage colorizeSign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.get(x, y);
@@ -339,7 +339,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	public static BufferedImage graySign(ImageFloat32 src, BufferedImage dst, float maxAbsValue) {
+	public static BufferedImage graySign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
 		dst = checkInputs(src, dst);
 
 		if (maxAbsValue < 0)
@@ -358,7 +358,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage grayMagnitude(ImageFloat32 src, BufferedImage dst, float maxAbsValue) {
+	private static BufferedImage grayMagnitude(GrayF32 src, BufferedImage dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = Math.abs(src.get(x, y));
@@ -372,7 +372,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage grayMagnitude(ImageFloat64 src, BufferedImage dst, double maxAbsValue) {
+	private static BufferedImage grayMagnitude(GrayF64 src, BufferedImage dst, double maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				double v = Math.abs(src.get(x, y));
@@ -410,11 +410,11 @@ public class VisualizeImageData {
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient( ImageSingleBand derivX , ImageSingleBand derivY , double maxAbsValue ){
-		if( derivX instanceof  ImageSInt16 ) {
-			return colorizeGradient((ImageSInt16)derivX,(ImageSInt16)derivY,(int)maxAbsValue);
-		} else if( derivX instanceof  ImageFloat32 ) {
-			return colorizeGradient((ImageFloat32)derivX,(ImageFloat32)derivY,(int)maxAbsValue);
+	public static BufferedImage colorizeGradient(ImageGray derivX , ImageGray derivY , double maxAbsValue ){
+		if( derivX instanceof GrayS16) {
+			return colorizeGradient((GrayS16)derivX,(GrayS16)derivY,(int)maxAbsValue);
+		} else if( derivX instanceof GrayF32) {
+			return colorizeGradient((GrayF32)derivX,(GrayF32)derivY,(int)maxAbsValue);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -428,7 +428,7 @@ public class VisualizeImageData {
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient( ImageSInt16 derivX , ImageSInt16 derivY , int maxAbsValue ) {
+	public static BufferedImage colorizeGradient(GrayS16 derivX , GrayS16 derivY , int maxAbsValue ) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
 		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
@@ -487,7 +487,7 @@ public class VisualizeImageData {
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient( ImageFloat32 derivX , ImageFloat32 derivY , float maxAbsValue ) {
+	public static BufferedImage colorizeGradient(GrayF32 derivX , GrayF32 derivY , float maxAbsValue ) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
 		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);

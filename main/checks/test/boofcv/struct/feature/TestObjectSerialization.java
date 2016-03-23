@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,22 +108,22 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testFastQueue() {
-		FastQueue<ImageUInt8> list = new FastQueue<ImageUInt8>(ImageUInt8.class,false);
+		FastQueue<GrayU8> list = new FastQueue<GrayU8>(GrayU8.class,false);
 
-		list.add(new ImageUInt8(1,2));
-		list.add(new ImageUInt8(2,4));
+		list.add(new GrayU8(1,2));
+		list.add(new GrayU8(2,4));
 
 		UtilIO.saveXML(list, "temp.txt");
 
-		FastQueue<ImageUInt8> found = UtilIO.loadXML("temp.txt");
+		FastQueue<GrayU8> found = UtilIO.loadXML("temp.txt");
 
 		assertEquals(list.size(),found.size());
 		assertTrue(list.type == found.type);
 		assertFalse(found.isDeclareInstances());
 
 		for( int i = 0; i < list.size; i++ ) {
-			ImageUInt8 a = list.get(i);
-			ImageUInt8 b = found.get(i);
+			GrayU8 a = list.get(i);
+			GrayU8 b = found.get(i);
 			assertEquals(a.width,b.width);
 			assertEquals(a.height,b.height);
 			assertEquals(a.data.length,b.data.length);
@@ -149,18 +149,18 @@ public class TestObjectSerialization {
 	@Test
 	public void testSingleBandImages() {
 		Class []types = new Class[]{
-					ImageUInt8.class, ImageSInt8.class,
-					ImageUInt16.class,ImageSInt16.class,
-					ImageSInt32.class,ImageSInt64.class,
-					ImageFloat32.class,ImageFloat64.class};
+					GrayU8.class, GrayS8.class,
+					GrayU16.class,GrayS16.class,
+					GrayS32.class,GrayS64.class,
+					GrayF32.class,GrayF64.class};
 
 		for( Class imageType : types ) {
-			ImageSingleBand original = GeneralizedImageOps.createSingleBand(imageType,3,5);
+			ImageGray original = GeneralizedImageOps.createSingleBand(imageType,3,5);
 			GImageMiscOps.addUniform(original,rand,0,100);
 
 			UtilIO.saveXML(original, "temp.txt");
 
-			ImageSingleBand found = UtilIO.loadXML("temp.txt");
+			ImageGray found = UtilIO.loadXML("temp.txt");
 			assertEquals(original.width,found.width);
 			assertEquals(original.height,found.height);
 			assertEquals(original.stride,found.stride);
@@ -179,11 +179,11 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testMultiSpectral() {
-		MultiSpectral original = new MultiSpectral(ImageUInt8.class,40,50,3);
+		Planar original = new Planar(GrayU8.class,40,50,3);
 		GImageMiscOps.addUniform(original, rand, 0, 100);
 		UtilIO.saveXML(original, "temp.txt");
 
-		MultiSpectral found = UtilIO.loadXML("temp.txt");
+		Planar found = UtilIO.loadXML("temp.txt");
 		assertEquals(original.width,found.width);
 		assertEquals(original.height,found.height);
 		assertEquals(original.stride,found.stride);

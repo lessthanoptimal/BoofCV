@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,20 +49,20 @@ public class ImageType<T extends ImageBase> implements Serializable {
 		this.numBands = numBands;
 	}
 
-	public static <I extends ImageSingleBand> ImageType<I> single( Class<I> imageType ) {
+	public static <I extends ImageGray> ImageType<I> single(Class<I> imageType ) {
 		return new ImageType<I>(Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
 	}
 
-	public static <I extends ImageSingleBand> ImageType<I> single( ImageDataType type ) {
+	public static <I extends ImageGray> ImageType<I> single(ImageDataType type ) {
 		return new ImageType<I>(Family.SINGLE_BAND, type,1);
 	}
 
-	public static <I extends ImageSingleBand> ImageType<MultiSpectral<I>> ms( int numBands , Class<I> imageType ) {
-		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
+	public static <I extends ImageGray> ImageType<Planar<I>> ms(int numBands , Class<I> imageType ) {
+		return new ImageType<Planar<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
 	}
 
-	public static <I extends ImageSingleBand> ImageType<MultiSpectral<I>> ms( int numBands , ImageDataType type ) {
-		return new ImageType<MultiSpectral<I>>(Family.MULTI_SPECTRAL, type,numBands);
+	public static <I extends ImageGray> ImageType<Planar<I>> ms(int numBands , ImageDataType type ) {
+		return new ImageType<Planar<I>>(Family.MULTI_SPECTRAL, type,numBands);
 	}
 
 	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, Class<I> imageType) {
@@ -93,7 +93,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 				return (T)GeneralizedImageOps.createInterleaved(getImageClass(), width, height, numBands);
 
 			case MULTI_SPECTRAL:
-				return (T)new MultiSpectral(getImageClass(),width,height,numBands);
+				return (T)new Planar(getImageClass(),width,height,numBands);
 
 			default:
 				throw new IllegalArgumentException("Type not yet supported");
@@ -112,7 +112,7 @@ public class ImageType<T extends ImageBase> implements Serializable {
 				return (T[])Array.newInstance(getImageClass(),length);
 
 			case MULTI_SPECTRAL:
-				return (T[])new MultiSpectral[ length ];
+				return (T[])new Planar[ length ];
 
 			default:
 				throw new IllegalArgumentException("Type not yet supported");
@@ -136,16 +136,16 @@ public class ImageType<T extends ImageBase> implements Serializable {
 			case SINGLE_BAND:
 			case MULTI_SPECTRAL:
 				switch( dataType ) {
-					case F32: return ImageFloat32.class;
-					case F64: return ImageFloat64.class;
-					case U8: return ImageUInt8.class;
-					case S8: return ImageSInt8.class;
-					case U16: return ImageUInt16.class;
-					case S16: return ImageSInt16.class;
-					case S32: return ImageSInt32.class;
-					case S64: return ImageSInt64.class;
-					case I8: return ImageInt8.class;
-					case I16: return ImageInt16.class;
+					case F32: return GrayF32.class;
+					case F64: return GrayF64.class;
+					case U8: return GrayU8.class;
+					case S8: return GrayS8.class;
+					case U16: return GrayU16.class;
+					case S16: return GrayS16.class;
+					case S32: return GrayS32.class;
+					case S64: return GrayS64.class;
+					case I8: return GrayI8.class;
+					case I16: return GrayI16.class;
 				}
 				break;
 

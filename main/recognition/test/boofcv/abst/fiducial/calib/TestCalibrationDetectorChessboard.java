@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.calib.FactoryCalibrationTarget;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
+	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
 
 		ImageMiscOps.fill(original, 255);
 

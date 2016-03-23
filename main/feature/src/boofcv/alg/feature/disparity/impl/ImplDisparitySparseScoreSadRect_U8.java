@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link ImageUInt8}.
+ * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayU8}.
  * </p>
  *
  * <p>
@@ -34,7 +34,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDisparitySparseScoreSadRect_U8 extends DisparitySparseScoreSadRect<int[],ImageUInt8> {
+public class ImplDisparitySparseScoreSadRect_U8 extends DisparitySparseScoreSadRect<int[],GrayU8> {
 
 	// scores up to the maximum baseline
 	int scores[];
@@ -84,8 +84,8 @@ public class ImplDisparitySparseScoreSadRect_U8 extends DisparitySparseScoreSadR
 	}
 
 	@Override
-	public Class<ImageUInt8> getImageType() {
-		return ImageUInt8.class;
+	public Class<GrayU8> getImageType() {
+		return GrayU8.class;
 	}
 
 }

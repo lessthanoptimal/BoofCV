@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -139,7 +139,7 @@ public class TestImageSingleBand {
 		assertEquals(4 * 10 + 3, a.getIndex(3, 4));
 	}
 
-	private static class DummyImage extends ImageSingleBand<DummyImage> {
+	private static class DummyImage extends ImageGray<DummyImage> {
 		int data[];
 
 		private DummyImage(int width, int height) {

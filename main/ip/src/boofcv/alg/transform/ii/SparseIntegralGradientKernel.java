@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue_F64;
 import boofcv.struct.sparse.SparseImageGradient;
 
@@ -28,7 +28,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class SparseIntegralGradientKernel<T extends ImageSingleBand>
+public class SparseIntegralGradientKernel<T extends ImageGray>
 		implements SparseImageGradient<T, GradientValue_F64>
 {
 	// input integral image

@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeBinaryContourApp <T extends ImageSingleBand> extends DemonstrationBase<T>
+public class VisualizeBinaryContourApp <T extends ImageGray> extends DemonstrationBase<T>
 	implements ThresholdControlPanel.Listener
 {
 	VisualizePanel guiImage;
@@ -50,8 +50,8 @@ public class VisualizeBinaryContourApp <T extends ImageSingleBand> extends Demon
 	LinearContourLabelChang2004 contourAlg;
 	InputToBinary<T> inputToBinary;
 
-	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageSInt32 labeled = new ImageSInt32(1,1);
+	GrayU8 binary = new GrayU8(1,1);
+	GrayS32 labeled = new GrayS32(1,1);
 
 	BufferedImage original;
 	BufferedImage work;
@@ -168,7 +168,7 @@ public class VisualizeBinaryContourApp <T extends ImageSingleBand> extends Demon
 		examples.add("shapes/concave01.jpg");
 		examples.add("shapes/polygons01.jpg");
 
-		VisualizeBinaryContourApp app = new VisualizeBinaryContourApp(examples,ImageType.single(ImageFloat32.class));
+		VisualizeBinaryContourApp app = new VisualizeBinaryContourApp(examples,ImageType.single(GrayF32.class));
 
 		app.openFile(new File(examples.get(0)));
 

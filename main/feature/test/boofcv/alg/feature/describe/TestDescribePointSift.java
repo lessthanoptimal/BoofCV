@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -46,14 +46,14 @@ public class TestDescribePointSift {
 	 */
 	@Test
 	public void process() {
-		ImageFloat32 derivX = new ImageFloat32(200,200);
-		ImageFloat32 derivY = new ImageFloat32(200,200);
+		GrayF32 derivX = new GrayF32(200,200);
+		GrayF32 derivY = new GrayF32(200,200);
 
 		GImageMiscOps.fillUniform(derivX,rand,-100,100);
 		GImageMiscOps.fillUniform(derivY,rand,-100,100);
 
-		DescribePointSift<ImageFloat32> alg =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<GrayF32> alg =
+				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		List<Point2D_I32> testPoints = new ArrayList<Point2D_I32>();
@@ -75,11 +75,11 @@ public class TestDescribePointSift {
 	 */
 	@Test
 	public void computeRawDescriptor_scale() {
-		ImageFloat32 derivX = new ImageFloat32(200,200);
-		ImageFloat32 derivY = new ImageFloat32(200,200);
+		GrayF32 derivX = new GrayF32(200,200);
+		GrayF32 derivY = new GrayF32(200,200);
 
-		DescribePointSift<ImageFloat32> alg =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<GrayF32> alg =
+				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		int r = alg.getCanonicalRadius();
 		ImageMiscOps.fillRectangle(derivX,5.0f,60,60,2*r,2*r);
 
@@ -117,13 +117,13 @@ public class TestDescribePointSift {
 	 */
 	@Test
 	public void computeRawDescriptor_rotation() {
-		ImageFloat32 derivX = new ImageFloat32(60,55);
-		ImageFloat32 derivY = new ImageFloat32(60,55);
+		GrayF32 derivX = new GrayF32(60,55);
+		GrayF32 derivY = new GrayF32(60,55);
 
 		ImageMiscOps.fill(derivX,5.0f);
 		
-		DescribePointSift<ImageFloat32> alg =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		DescribePointSift<GrayF32> alg =
+				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		for( int i = 0; i < 8; i++ ) {

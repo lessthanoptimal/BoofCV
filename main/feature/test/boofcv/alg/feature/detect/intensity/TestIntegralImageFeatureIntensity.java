@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity;
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -43,10 +43,10 @@ public class TestIntegralImageFeatureIntensity {
 	 */
 	@Test
 	public void hessian_F32() {
-		ImageFloat32 original = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 original = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(original, rand, 0, 50);
 		IntegralImageOps.transform(original,integral);
@@ -68,10 +68,10 @@ public class TestIntegralImageFeatureIntensity {
 	 */
 	@Test
 	public void hessian_S32() {
-		ImageSInt32 original = new ImageSInt32(width,height);
-		ImageSInt32 integral = new ImageSInt32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayS32 original = new GrayS32(width,height);
+		GrayS32 integral = new GrayS32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(original, rand, 0, 50);
 		IntegralImageOps.transform(original,integral);

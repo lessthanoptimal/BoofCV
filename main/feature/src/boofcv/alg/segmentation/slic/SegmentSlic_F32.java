@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation of {@link SegmentSlic} for image of type {@link ImageFloat32}.
+ * Implementation of {@link SegmentSlic} for image of type {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class SegmentSlic_F32 extends SegmentSlic<ImageFloat32> {
+public class SegmentSlic_F32 extends SegmentSlic<GrayF32> {
 	public SegmentSlic_F32(int numberOfRegions, float m, int totalIterations,
 						   ConnectRule connectRule) {
-		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(ImageFloat32.class));
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.single(GrayF32.class));
 	}
 
 	@Override

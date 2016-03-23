@@ -21,7 +21,7 @@ package boofcv.alg.feature.orientation.impl;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleSample_F64;
 
@@ -34,7 +34,7 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationImageAverageIntegral<T extends ImageSingleBand,G extends GradientValue>
+public class ImplOrientationImageAverageIntegral<T extends ImageGray,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	// cosine values for each pixel

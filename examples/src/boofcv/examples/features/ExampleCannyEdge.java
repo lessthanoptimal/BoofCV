@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -47,13 +47,13 @@ public class ExampleCannyEdge {
 	public static void main( String args[] ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
-		ImageUInt8 edgeImage = gray.createSameShape();
+		GrayU8 gray = ConvertBufferedImage.convertFrom(image,(GrayU8)null);
+		GrayU8 edgeImage = gray.createSameShape();
 
 		// Create a canny edge detector which will dynamically compute the threshold based on maximum edge intensity
 		// It has also been configured to save the trace as a graph.  This is the graph created while performing
 		// hysteresis thresholding.
-		CannyEdge<ImageUInt8,ImageSInt16> canny = FactoryEdgeDetectors.canny(2,true, true, ImageUInt8.class, ImageSInt16.class);
+		CannyEdge<GrayU8,GrayS16> canny = FactoryEdgeDetectors.canny(2,true, true, GrayU8.class, GrayS16.class);
 
 		// The edge image is actually an optional parameter.  If you don't need it just pass in null
 		canny.process(gray,0.1f,0.3f,edgeImage);

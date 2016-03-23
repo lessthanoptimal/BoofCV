@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayI16;
+import boofcv.struct.image.GrayS16;
 
 
 /**
@@ -32,7 +32,7 @@ public class TestConvolveDownNoBorderUnrolled_S16_I16 extends StandardConvolveUn
 	public TestConvolveDownNoBorderUnrolled_S16_I16() {
 		this.numUnrolled = GenerateConvolveDownNoBorderUnrolled.numUnrolled;
 		this.target = ConvolveDownNoBorderUnrolled_S16_I16.class;
-		this.param1D = new Class<?>[]{Kernel1D_I32.class, ImageSInt16.class, ImageInt16.class , int.class };
-		this.param2D = new Class<?>[]{Kernel2D_I32.class, ImageSInt16.class, ImageInt16.class , int.class };
+		this.param1D = new Class<?>[]{Kernel1D_I32.class, GrayS16.class, GrayI16.class , int.class };
+		this.param2D = new Class<?>[]{Kernel2D_I32.class, GrayS16.class, GrayI16.class , int.class };
 	}
 }

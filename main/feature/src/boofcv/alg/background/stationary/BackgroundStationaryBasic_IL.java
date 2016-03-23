@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundStationaryBasic} for {@link ImageSingleBand}.
+ * Implementation of {@link BackgroundStationaryBasic} for {@link ImageGray}.
  *
  * @author Peter Abeles
  */
@@ -96,7 +96,7 @@ public class BackgroundStationaryBasic_IL<T extends ImageInterleaved>
 	}
 
 	@Override
-	public void segment(T frame, ImageUInt8 segmented) {
+	public void segment(T frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;

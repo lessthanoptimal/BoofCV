@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,10 @@
 package boofcv.alg.background.stationary;
 
 import boofcv.alg.background.BackgroundModelStationary;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
@@ -30,8 +30,8 @@ import boofcv.struct.image.ImageUInt8;
 public class TestBackgroundStationaryBasic_SB extends GenericBackgroundStationaryBasicChecks {
 
 	public TestBackgroundStationaryBasic_SB() {
-		imageTypes.add(ImageType.single(ImageUInt8.class));
-		imageTypes.add(ImageType.single(ImageFloat32.class));
+		imageTypes.add(ImageType.single(GrayU8.class));
+		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
 	@Override

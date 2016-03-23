@@ -25,7 +25,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DescribePointBriefSO<T extends ImageSingleBand> {
+public class DescribePointBriefSO<T extends ImageGray> {
 	// describes the BRIEF feature
 	protected BinaryCompareDefinition_I32 definition;
 

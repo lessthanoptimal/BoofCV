@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleGradient;
 
@@ -30,7 +30,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public abstract class SparseIntegralGradient_NoBorder <T extends ImageSingleBand, G extends GradientValue>
+public abstract class SparseIntegralGradient_NoBorder <T extends ImageGray, G extends GradientValue>
 		extends SparseScaleGradient<T, G>
 {
 	// radius of the kernel

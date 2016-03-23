@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.detect.edge;
 
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Common tests for tracking hysteresis edges
@@ -117,8 +117,8 @@ public abstract class CommonHysteresisEdgeTrace {
 			1,1,1,1,1,
 			0,0,0,0,0};
 
-	public ImageFloat32 intensity( int which ) {
-		ImageFloat32 a = new ImageFloat32();
+	public GrayF32 intensity(int which ) {
+		GrayF32 a = new GrayF32();
 		setShape(which,a);
 		if( which == 0 ) {
 			a.data = inten0;
@@ -134,8 +134,8 @@ public abstract class CommonHysteresisEdgeTrace {
 		return a.clone();
 	}
 
-	public ImageSInt8 direction( int which ) {
-		ImageSInt8 a = new ImageSInt8();
+	public GrayS8 direction(int which ) {
+		GrayS8 a = new GrayS8();
 		setShape(which,a);
 		if( which == 0 ) {
 			a.data = dir0;
@@ -151,8 +151,8 @@ public abstract class CommonHysteresisEdgeTrace {
 		return a.clone();
 	}
 
-	public ImageUInt8 expected( int which ) {
-		ImageUInt8 a = new ImageUInt8();
+	public GrayU8 expected(int which ) {
+		GrayU8 a = new GrayU8();
 		setShape(which,a);
 		if( which == 0 ) {
 			a.data = expect0;

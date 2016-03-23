@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.testing;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -133,8 +133,8 @@ public abstract class CompareEquivalentFunctions {
 		for( int i = 0; i < param.length; i++ ) {
 			if( param[i] == null )
 				continue;
-			if( ImageSingleBand.class.isAssignableFrom(param[i].getClass())) {
-				ret[i] = BoofTesting.createSubImageOf((ImageSingleBand)param[i]);
+			if( ImageGray.class.isAssignableFrom(param[i].getClass())) {
+				ret[i] = BoofTesting.createSubImageOf((ImageGray)param[i]);
 			} else {
 				ret[i] = param[i];
 			}

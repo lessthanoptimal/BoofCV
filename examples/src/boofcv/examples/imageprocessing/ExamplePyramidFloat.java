@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class ExamplePyramidFloat<T extends ImageSingleBand> {
+public class ExamplePyramidFloat<T extends ImageGray> {
 
 	// specifies the image type
 	Class<T> imageType;
@@ -85,7 +85,7 @@ public class ExamplePyramidFloat<T extends ImageSingleBand> {
 	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
-		ExamplePyramidFloat<ImageFloat32> app = new ExamplePyramidFloat<ImageFloat32>(ImageFloat32.class);
+		ExamplePyramidFloat<GrayF32> app = new ExamplePyramidFloat<GrayF32>(GrayF32.class);
 //		ExamplePyramidFloat<ImageUInt8> app = new ExamplePyramidFloat<ImageUInt8>(ImageUInt8.class);
 
 		app.standard();

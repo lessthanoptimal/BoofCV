@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -41,7 +41,7 @@ public class ThresholdCornerExtractor {
 	/**
 	 * Selects pixels as corners which are above the threshold.
 	 */
-	public void process(ImageFloat32 intensity, QueueCorner corners ) {
+	public void process(GrayF32 intensity, QueueCorner corners ) {
 		corners.reset();
 
 		float data[] = intensity.data;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.denoise.wavelet;
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -37,9 +37,9 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
+public class DenoiseVisuShrink_F32 implements DenoiseWavelet<GrayF32> {
 
-	ShrinkThresholdRule<ImageFloat32> rule = new ShrinkThresholdSoft_F32();
+	ShrinkThresholdRule<GrayF32> rule = new ShrinkThresholdSoft_F32();
 
 	/**
 	 * Applies VisuShrink denoising to the provided multilevel wavelet transform using
@@ -49,7 +49,7 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
 	 * @param numLevels Number of levels in the transform.
 	 */
 	@Override
-	public void denoise( ImageFloat32 transform , int numLevels ) {
+	public void denoise(GrayF32 transform , int numLevels ) {
 		int scale = UtilWavelet.computeScale(numLevels);
 
 		final int h = transform.height;
@@ -59,7 +59,7 @@ public class DenoiseVisuShrink_F32 implements DenoiseWavelet<ImageFloat32> {
 		final int innerWidth = w/scale;
 		final int innerHeight = h/scale;
 
-		ImageFloat32 subbandHH = transform.subimage(w/2,h/2,w,h, null);
+		GrayF32 subbandHH = transform.subimage(w/2,h/2,w,h, null);
 		float sigma = UtilDenoiseWavelet.estimateNoiseStdDev(subbandHH,null);
 		float threshold = (float) UtilDenoiseWavelet.universalThreshold(subbandHH,sigma);
 

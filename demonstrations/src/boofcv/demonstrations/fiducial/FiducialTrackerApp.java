@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,10 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
 
 import javax.swing.*;
@@ -63,8 +63,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FiducialTrackerApp<I extends ImageSingleBand>
-		extends VideoProcessAppBase<MultiSpectral<I>>
+public class FiducialTrackerApp<I extends ImageGray>
+		extends VideoProcessAppBase<Planar<I>>
 {
 	public static final String SQUARE_NUMBER = "Square Number";
 	public static final String SQUARE_PICTURE = "Square Picture";
@@ -124,7 +124,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	}
 
 	@Override
-	public void process( final SimpleImageSequence<MultiSpectral<I>> sequence ) {
+	public void process( final SimpleImageSequence<Planar<I>> sequence ) {
 
 		// stop the image processing code
 		stopWorker();
@@ -158,7 +158,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	}
 
 	@Override
-	protected void updateAlg(MultiSpectral<I> frame, BufferedImage buffImage) {
+	protected void updateAlg(Planar<I> frame, BufferedImage buffImage) {
 
 		if( detector.getInputType().getFamily() == ImageType.Family.SINGLE_BAND ) {
 			gray.reshape(frame.width, frame.height);
@@ -171,7 +171,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 	}
 
 	@Override
-	protected void updateAlgGUI(MultiSpectral<I> frame, BufferedImage imageGUI, double fps) {
+	protected void updateAlgGUI(Planar<I> frame, BufferedImage imageGUI, double fps) {
 		if( firstFrame ) {
 			panel.setPreferredSize(new Dimension(imageGUI.getWidth(),imageGUI.getHeight()));
 			firstFrame = false;
@@ -309,7 +309,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 		stabilityMax.location = 0.05;
 		stabilityMax.orientation = 0.02;
 
-		SimpleImageSequence<MultiSpectral<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
+		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
 
 		if( video == null ) {
 			System.err.println("Can't find video "+videoName);
@@ -340,7 +340,7 @@ public class FiducialTrackerApp<I extends ImageSingleBand>
 
 	public static void main(String[] args) {
 //		Class type = ImageFloat32.class;
-		Class type = ImageUInt8.class;
+		Class type = GrayU8.class;
 
 		FiducialTrackerApp app = new FiducialTrackerApp(type);
 

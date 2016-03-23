@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.interest;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
@@ -32,7 +32,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class GeneralToInterestMulti<T extends ImageSingleBand, D extends ImageSingleBand>
+public class GeneralToInterestMulti<T extends ImageGray, D extends ImageGray>
 		implements DetectorInterestPointMulti<T>
 {
 	// point detector configured to detect minimums and maximums

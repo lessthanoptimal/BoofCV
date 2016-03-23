@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseImageSample_F64;
 import boofcv.testing.BoofTesting;
 
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class GeneralSparseSampleTests <T extends ImageSingleBand>
+public class GeneralSparseSampleTests <T extends ImageGray>
 	extends GeneralSparseOperatorTests<T>
 {
 	protected SparseImageSample_F64<T> alg;

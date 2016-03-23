@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
+	public static void horizontal(Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
@@ -67,7 +67,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
+	public static void vertical(Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
@@ -91,7 +91,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 image, ImageFloat32 dest ) {
+	public static void convolve(Kernel2D_F32 kernel, GrayF32 image, GrayF32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
@@ -115,7 +115,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
@@ -134,7 +134,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
@@ -153,7 +153,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt8 dest ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayU8 image, GrayI8 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {
@@ -172,7 +172,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
@@ -191,7 +191,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt32 image, ImageSInt32 dest ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayS32 image, GrayS32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width ) {
@@ -210,7 +210,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
@@ -229,7 +229,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 image, ImageSInt32 dest ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayS32 image, GrayS32 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.height ) {
@@ -248,7 +248,7 @@ public class ConvolveNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayS16 image, GrayI16 dest ) {
 		InputSanityCheck.checkSameShape(image, dest);
 
 		if( kernel.width >= image.width || kernel.width >= image.height ) {

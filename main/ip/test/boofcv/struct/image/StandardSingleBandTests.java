@@ -32,13 +32,13 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Standard tests for children of {@link ImageSingleBand}.  Ensures that they contain
+ * Standard tests for children of {@link ImageGray}.  Ensures that they contain
  * all the expected functions and that they have the expected behavior.  This is done
  * through extensive use of reflections.
  *
  * @author Peter Abeles
  */
-public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
+public abstract class StandardSingleBandTests<T extends ImageGray> {
 
 	public Random rand = new Random(234);
 
@@ -119,13 +119,13 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 	 */
 	@Test
 	public void accessorBounds() {
-		ImageSingleBand img = createImage(10, 20);
+		ImageGray img = createImage(10, 20);
 
 		checkBound(img, "get", 0, null);
 		checkBound(img, "set", 1, randomNumber());
 	}
 
-	private void checkBound(ImageSingleBand img, String method,
+	private void checkBound(ImageGray img, String method,
 							int type, Object typeData) {
 		checkException(img, method, type, typeData, -1, 0);
 		checkException(img, method, type, typeData, 0, -1);
@@ -133,7 +133,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 		checkException(img, method, type, typeData, 0, img.getHeight());
 	}
 
-	private void checkException(ImageSingleBand img, String method,
+	private void checkException(ImageGray img, String method,
 								int type, Object typeData, int... where) {
 		boolean found = false;
 		try {
@@ -145,7 +145,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 		assertTrue("No exception was thrown", found);
 	}
 
-	private Object call(ImageSingleBand img, String method,
+	private Object call(ImageGray img, String method,
 						int type, Object typeData, int... where) {
 		try {
 			Class<?>[] paramTypes = type == 0 ?
@@ -202,7 +202,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 	
 	@Test
 	public void reshape() {
-		ImageSingleBand img = createImage(10, 20);
+		ImageGray img = createImage(10, 20);
 		
 		// reshape to something smaller
 		img.reshape(5,4);
@@ -219,7 +219,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 	public void serialize() throws IOException, ClassNotFoundException {
 
 		// randomly fill the image
-		ImageSingleBand imgA = createImage(10, 20);
+		ImageGray imgA = createImage(10, 20);
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
 		for (int i = 0; i < imgA.getHeight(); i++) {
 			for (int j = 0; j < imgA.getWidth(); j++) {
@@ -228,7 +228,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 		}
 
 		// make a copy of the original
-		ImageSingleBand imgB = (ImageSingleBand)imgA.clone();
+		ImageGray imgB = (ImageGray)imgA.clone();
 
 
 		ByteArrayOutputStream streamOut = new ByteArrayOutputStream(1000);
@@ -240,14 +240,14 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 		ByteArrayInputStream streamIn = new ByteArrayInputStream(streamOut.toByteArray());
 		ObjectInputStream in = new ObjectInputStream(streamIn);
 
-		ImageSingleBand found = (ImageSingleBand)in.readObject();
+		ImageGray found = (ImageGray)in.readObject();
 
 		// see if everything is equals
 		checkEquals(imgA, imgB);
 		checkEquals(imgA, found);
 	}
 
-	private void checkEquals(ImageSingleBand imgA, ImageSingleBand imgB) {
+	private void checkEquals(ImageGray imgA, ImageGray imgB) {
 		for (int i = 0; i < imgA.getHeight(); i++) {
 			for (int j = 0; j < imgA.getWidth(); j++) {
 				double valA = GeneralizedImageOps.get(imgA, j, i);
@@ -260,7 +260,7 @@ public abstract class StandardSingleBandTests<T extends ImageSingleBand> {
 
 	@Test
 	public void checkNoArgumentConstructor() {
-		ImageSingleBand a = createImage();
+		ImageGray a = createImage();
 
 		assertTrue(a._getData() == null);
 		assertTrue(a.getImageType() != null);

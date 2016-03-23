@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.color;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 /**
  * <p>
@@ -279,17 +279,17 @@ public class ColorHsv {
 	 * @param hsv (Input) Image in HSV format
 	 * @param rgb (Output) Image in RGB format
 	 */
-	public static void hsvToRgb_F32( MultiSpectral<ImageFloat32> hsv , MultiSpectral<ImageFloat32> rgb ) {
+	public static void hsvToRgb_F32(Planar<GrayF32> hsv , Planar<GrayF32> rgb ) {
 
 		InputSanityCheck.checkSameShape(hsv, rgb);
 
-		ImageFloat32 H = hsv.getBand(0);
-		ImageFloat32 S = hsv.getBand(1);
-		ImageFloat32 V = hsv.getBand(2);
+		GrayF32 H = hsv.getBand(0);
+		GrayF32 S = hsv.getBand(1);
+		GrayF32 V = hsv.getBand(2);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
 		for( int row = 0; row < hsv.height; row++ ) {
 			int indexHsv = hsv.startIndex + row*hsv.stride;
@@ -348,17 +348,17 @@ public class ColorHsv {
 	 * @param rgb (Input) Image in RGB format
 	 * @param hsv (Output) Image in HSV format
 	 */
-	public static void rgbToHsv_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> hsv ) {
+	public static void rgbToHsv_F32(Planar<GrayF32> rgb , Planar<GrayF32> hsv ) {
 
 		InputSanityCheck.checkSameShape(rgb, hsv);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
-		ImageFloat32 H = hsv.getBand(0);
-		ImageFloat32 S = hsv.getBand(1);
-		ImageFloat32 V = hsv.getBand(2);
+		GrayF32 H = hsv.getBand(0);
+		GrayF32 S = hsv.getBand(1);
+		GrayF32 V = hsv.getBand(2);
 
 		for( int row = 0; row < hsv.height; row++ ) {
 			int indexRgb = rgb.startIndex + row*rgb.stride;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.interest;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralInterestPointDetectorChecks<T extends ImageSingleBand> {
+public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray> {
 
 	private Random rand = new Random(234);
 

@@ -21,20 +21,20 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt16 extends StandardImageIntegerTests<ImageSInt16> {
+public class TestImageSInt16 extends StandardImageIntegerTests<GrayS16> {
 
 	public TestImageSInt16() {
 		super(true);
 	}
 
 	@Override
-	public ImageSInt16 createImage(int width, int height) {
-		return new ImageSInt16(width, height);
+	public GrayS16 createImage(int width, int height) {
+		return new GrayS16(width, height);
 	}
 
 	@Override
-	public ImageSInt16 createImage() {
-		return new ImageSInt16();
+	public GrayS16 createImage() {
+		return new GrayS16();
 	}
 
 	@Override

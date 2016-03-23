@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -48,8 +48,8 @@ public class HysteresisEdgeTracePoints {
 	public static final float MARK_TRAVERSED = -1;
 
 	// reference to input intensity and direction images
-	private ImageFloat32 intensity; // intensity after edge non-maximum suppression
-	private ImageSInt8 direction; // 4-direction
+	private GrayF32 intensity; // intensity after edge non-maximum suppression
+	private GrayS8 direction; // 4-direction
 
 	// List of found contours in the image
 	private List<EdgeContour> contours = new ArrayList<EdgeContour>();
@@ -73,7 +73,7 @@ public class HysteresisEdgeTracePoints {
 	 * @param lower Lower threshold.
 	 * @param upper Upper threshold.
 	 */
-	public void process( ImageFloat32 intensity , ImageSInt8 direction , float lower , float upper ) {
+	public void process(GrayF32 intensity , GrayS8 direction , float lower , float upper ) {
 		if( lower < 0 )
 			throw new IllegalArgumentException("Lower must be >= 0!");
 		InputSanityCheck.checkSameShape(intensity, direction);

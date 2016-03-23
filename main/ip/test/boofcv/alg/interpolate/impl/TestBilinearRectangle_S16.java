@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestBilinearRectangle_S16 extends GeneralBilinearRectangleChecks<ImageSInt16>{
+public class TestBilinearRectangle_S16 extends GeneralBilinearRectangleChecks<GrayS16>{
 
 
 	public TestBilinearRectangle_S16() {
-		super(ImageSInt16.class);
+		super(GrayS16.class);
 	}
 
 	@Override
-	protected ImageSInt16 createImage(int width, int height) {
-		return new ImageSInt16(width,height);
+	protected GrayS16 createImage(int width, int height) {
+		return new GrayS16(width,height);
 	}
 }

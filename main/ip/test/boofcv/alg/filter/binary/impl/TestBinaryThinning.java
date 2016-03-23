@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestBinaryThinning {
 	 */
 	@Test
 	public void thinning() {
-		ImageUInt8 img = new ImageUInt8(20,25);
+		GrayU8 img = new GrayU8(20,25);
 
 		ImageMiscOps.fill(img.subimage(1, 5, 19, 10), 1);
 
@@ -62,7 +62,7 @@ public class TestBinaryThinning {
 	 */
 	@Test
 	public void thinning_line2pixel() {
-		ImageUInt8 img = new ImageUInt8(20,25);
+		GrayU8 img = new GrayU8(20,25);
 
 		ImageMiscOps.fill(img.subimage(0, 5, 20, 7), 1);
 
@@ -80,7 +80,7 @@ public class TestBinaryThinning {
 	@Test
 	public void findBlackPixels() {
 
-		ImageUInt8 img = new ImageUInt8(5,7);
+		GrayU8 img = new GrayU8(5,7);
 		img.set(2, 3, 1);
 		img.set(4, 1, 1);
 
@@ -88,7 +88,7 @@ public class TestBinaryThinning {
 		findBlackPixels(BoofTesting.createSubImageOf(img));
 	}
 
-	private void findBlackPixels(ImageUInt8 img) {
+	private void findBlackPixels(GrayU8 img) {
 		GrowQueue_I32 marked = new GrowQueue_I32();
 		BinaryThinning alg = new BinaryThinning();
 
@@ -103,10 +103,10 @@ public class TestBinaryThinning {
 	@Test
 	public void checkGenericMask() {
 		// manually construct masks which will fit the first of each type of mask
-		ImageUInt8 imgA = new ImageUInt8(3,3);
+		GrayU8 imgA = new GrayU8(3,3);
 		imgA.data = new byte[]{0,0,0, 0,1,0, 1,1,1};
 
-		ImageUInt8 imgB = new ImageUInt8(3,3);
+		GrayU8 imgB = new GrayU8(3,3);
 		imgB.data = new byte[]{0,0,0, 1,1,0, 1,1,0};
 
 		BinaryThinning alg = new BinaryThinning();
@@ -116,7 +116,7 @@ public class TestBinaryThinning {
 		checkGenericMask(BoofTesting.createSubImageOf(imgA), BoofTesting.createSubImageOf(imgB), alg);
 	}
 
-	private void checkGenericMask(ImageUInt8 imgA, ImageUInt8 imgB, BinaryThinning alg) {
+	private void checkGenericMask(GrayU8 imgA, GrayU8 imgB, BinaryThinning alg) {
 		for (int maskIndex = 0; maskIndex < 8; maskIndex++) {
 			BinaryThinning.Mask mask = alg.masks[maskIndex];
 			if( maskIndex % 2 == 0 ) {
@@ -138,10 +138,10 @@ public class TestBinaryThinning {
 	@Test
 	public void checkInnerMask() {
 		// manually construct masks which will fit the first of each type of mask
-		ImageUInt8 imgA = new ImageUInt8(3,3);
+		GrayU8 imgA = new GrayU8(3,3);
 		imgA.data = new byte[]{0,0,0, 0,1,0, 1,1,1};
 
-		ImageUInt8 imgB = new ImageUInt8(3,3);
+		GrayU8 imgB = new GrayU8(3,3);
 		imgB.data = new byte[]{0,0,0, 1,1,0, 1,1,0};
 
 		BinaryThinning alg = new BinaryThinning();
@@ -151,7 +151,7 @@ public class TestBinaryThinning {
 		checkInnerMask(BoofTesting.createSubImageOf(imgA), BoofTesting.createSubImageOf(imgB), alg);
 	}
 
-	private void checkInnerMask(ImageUInt8 imgA, ImageUInt8 imgB, BinaryThinning alg) {
+	private void checkInnerMask(GrayU8 imgA, GrayU8 imgB, BinaryThinning alg) {
 		for (int maskIndex = 0; maskIndex < 8; maskIndex++) {
 			BinaryThinning.Mask mask = alg.masks[maskIndex];
 			if( maskIndex % 2 == 0 ) {
@@ -176,7 +176,7 @@ public class TestBinaryThinning {
 	 */
 	@Test
 	public void checkSameInnerAndOuter() {
-		ImageUInt8 img = new ImageUInt8(200,300);
+		GrayU8 img = new GrayU8(200,300);
 
 		ImageMiscOps.fillUniform(img,rand,0,2);
 

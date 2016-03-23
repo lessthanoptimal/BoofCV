@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class EnhanceImageOps {
 	 * @param transform Input transformation table.
 	 * @param output Output image.
 	 */
-	public static void applyTransform( ImageUInt8 input , int transform[] , ImageUInt8 output ) {
+	public static void applyTransform(GrayU8 input , int transform[] , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceHistogram.applyTransform(input,transform,output);
@@ -83,7 +83,7 @@ public class EnhanceImageOps {
 	 * @param transform Input transformation table.
 	 * @param output Output image.
 	 */
-	public static void applyTransform( ImageUInt16 input , int transform[] , ImageUInt16 output ) {
+	public static void applyTransform(GrayU16 input , int transform[] , GrayU16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceHistogram.applyTransform(input,transform,output);
@@ -97,7 +97,7 @@ public class EnhanceImageOps {
 	 * @param transform Input transformation table.
 	 * @param output Output image.
 	 */
-	public static void applyTransform( ImageSInt8 input , int transform[] , int minValue, ImageSInt8 output ) {
+	public static void applyTransform(GrayS8 input , int transform[] , int minValue, GrayS8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
@@ -111,7 +111,7 @@ public class EnhanceImageOps {
 	 * @param transform Input transformation table.
 	 * @param output Output image.
 	 */
-	public static void applyTransform( ImageSInt16 input , int transform[] , int minValue, ImageSInt16 output ) {
+	public static void applyTransform(GrayS16 input , int transform[] , int minValue, GrayS16 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
@@ -125,7 +125,7 @@ public class EnhanceImageOps {
 	 * @param transform Input transformation table.
 	 * @param output Output image.
 	 */
-	public static void applyTransform( ImageSInt32 input , int transform[] , int minValue, ImageSInt32 output ) {
+	public static void applyTransform(GrayS32 input , int transform[] , int minValue, GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
@@ -140,8 +140,8 @@ public class EnhanceImageOps {
 	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
 	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
 	 */
-	public static void equalizeLocal( ImageUInt8 input , int radius , ImageUInt8 output ,
-									  int histogram[] , int transform[] ) {
+	public static void equalizeLocal(GrayU8 input , int radius , GrayU8 output ,
+									 int histogram[] , int transform[] ) {
 
 		InputSanityCheck.checkSameShape(input, output);
 
@@ -180,8 +180,8 @@ public class EnhanceImageOps {
 	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
 	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
 	 */
-	public static void equalizeLocal( ImageUInt16 input , int radius , ImageUInt16 output ,
-									  int histogram[] , int transform[] ) {
+	public static void equalizeLocal(GrayU16 input , int radius , GrayU16 output ,
+									 int histogram[] , int transform[] ) {
 
 		InputSanityCheck.checkSameShape(input, output);
 
@@ -217,7 +217,7 @@ public class EnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static void sharpen4( ImageUInt8 input , ImageUInt8 output ) {
+	public static void sharpen4(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
@@ -230,7 +230,7 @@ public class EnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static void sharpen4( ImageFloat32 input , ImageFloat32 output ) {
+	public static void sharpen4(GrayF32 input , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
@@ -243,7 +243,7 @@ public class EnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static void sharpen8( ImageUInt8 input , ImageUInt8 output ) {
+	public static void sharpen8(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
@@ -256,7 +256,7 @@ public class EnhanceImageOps {
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public static void sharpen8( ImageFloat32 input , ImageFloat32 output ) {
+	public static void sharpen8(GrayF32 input , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		ImplEnhanceFilter.sharpenInner8(input,output,0,255);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
@@ -61,7 +61,7 @@ import georegression.struct.se.Se3_F64;
 // DEVELOPMENT NOTE: This right now assumes that the depth image contains depth.  A transform could be added which
 //                   would convert it from the internal value into depth. This would allow a sparse depth calculation
 //                   right now the depth of the whole image must be computed.
-public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageSingleBand>
+public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageGray>
 		extends VisualOdometry<Se3_F64>
 {
 	/**

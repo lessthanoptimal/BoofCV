@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.color.ColorHsv;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
@@ -35,12 +35,12 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
-public class LikelihoodHueSatHistInd_MS_U8 implements PixelLikelihood<MultiSpectral<ImageUInt8>>
+public class LikelihoodHueSatHistInd_MS_U8 implements PixelLikelihood<Planar<GrayU8>>
 {
 	// each band in the image
-	private ImageUInt8 imageRed;
-	private ImageUInt8 imageGreen;
-	private ImageUInt8 imageBlue;
+	private GrayU8 imageRed;
+	private GrayU8 imageGreen;
+	private GrayU8 imageBlue;
 
 	// storage for RGB to HSV conversion
 	private float hsv[] = new float[3];
@@ -74,7 +74,7 @@ public class LikelihoodHueSatHistInd_MS_U8 implements PixelLikelihood<MultiSpect
 	}
 
 	@Override
-	public void setImage(MultiSpectral<ImageUInt8> image) {
+	public void setImage(Planar<GrayU8> image) {
 		imageRed = image.getBand(0);
 		imageGreen = image.getBand(1);
 		imageBlue = image.getBand(2);

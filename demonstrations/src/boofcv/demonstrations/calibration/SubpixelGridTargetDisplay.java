@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.distort.FDistort;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 
@@ -37,7 +37,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class SubpixelGridTargetDisplay<T extends ImageSingleBand> 
+public class SubpixelGridTargetDisplay<T extends ImageGray>
 		extends JPanel {
 
 	Class<T> imageType;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.Stack;
  *
  * @author Peter Abeles
  */
-public class TldTemplateMatching<T extends ImageSingleBand> {
+public class TldTemplateMatching<T extends ImageGray> {
 
 	// set of features for positive and negative examples
 	private List<NccFeature> templatePositive = new ArrayList<NccFeature>();

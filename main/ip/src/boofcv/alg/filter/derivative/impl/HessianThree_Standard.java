@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 
 /**
@@ -35,10 +35,10 @@ public class HessianThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void process(ImageFloat32 orig,
-							   ImageFloat32 derivXX,
-							   ImageFloat32 derivYY,
-							   ImageFloat32 derivXY) {
+	public static void process(GrayF32 orig,
+							   GrayF32 derivXX,
+							   GrayF32 derivYY,
+							   GrayF32 derivXY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivXX.data;
 		final float[] imgY = derivYY.data;
@@ -70,10 +70,10 @@ public class HessianThree_Standard {
 	/**
 	 * Computes the derivative along the x and y axes
 	 */
-	public static void process(ImageUInt8 orig,
-							   ImageSInt16 derivXX,
-							   ImageSInt16 derivYY,
-							   ImageSInt16 derivXY) {
+	public static void process(GrayU8 orig,
+							   GrayS16 derivXX,
+							   GrayS16 derivYY,
+							   GrayS16 derivXY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivXX.data;
 		final short[] imgY = derivYY.data;

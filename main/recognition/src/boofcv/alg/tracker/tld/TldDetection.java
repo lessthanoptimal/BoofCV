@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TldDetection<T extends ImageSingleBand> {
+public class TldDetection<T extends ImageGray> {
 
 	// Detects rectangles: Removes candidates don't match the fern descriptors
 	private TldFernClassifier<T> fern;

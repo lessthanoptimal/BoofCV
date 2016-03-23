@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,21 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_MsF32 extends GeneralSegmentSlicColorChecks<MultiSpectral<ImageFloat32>> {
+public class TestSegmentSlic_MsF32 extends GeneralSegmentSlicColorChecks<Planar<GrayF32>> {
 
 	public TestSegmentSlic_MsF32() {
-		super(ImageType.ms(3, ImageFloat32.class));
+		super(ImageType.ms(3, GrayF32.class));
 	}
 
 	@Override
-	public SegmentSlic<MultiSpectral<ImageFloat32>> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
+	public SegmentSlic<Planar<GrayF32>> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
 		return new SegmentSlic_MsF32(numberOfRegions,m,totalIterations,rule,3);
 	}
 

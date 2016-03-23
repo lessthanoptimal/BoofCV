@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -46,9 +46,9 @@ public class ExampleImageConvert {
 	// image loaded from a file
 	BufferedImage image;
 	// gray scale image with element values from 0 to 255
-	ImageUInt8 gray;
+	GrayU8 gray;
 	// Derivative of gray image.  Elements are 16-bit signed integers
-	ImageSInt16 derivX,derivY;
+	GrayS16 derivX,derivY;
 
 	void convert() {
 		// Converting between BoofCV image types is easy with ConvertImage.  ConvertImage copies
@@ -56,7 +56,7 @@ public class ExampleImageConvert {
 		// in account the storage capabilities of these different class types.
 
 		// Going from an unsigned 8-bit image to unsigned 16-bit image is no problem
-		ImageUInt16 imageU16 = new ImageUInt16(gray.width,gray.height);
+		GrayU16 imageU16 = new GrayU16(gray.width,gray.height);
 		ConvertImage.convert(gray,imageU16);
 
 		// You can convert back into the 8-bit image from the 16-bit image with no problem
@@ -65,12 +65,12 @@ public class ExampleImageConvert {
 
 		// Here is an example where you over flow the image after converting
 		// There won't be an exception or any error messages but the output image will be corrupted
-		ImageUInt8 imageBad = new ImageUInt8(derivX.width,derivX.height);
+		GrayU8 imageBad = new GrayU8(derivX.width,derivX.height);
 		ConvertImage.convert(derivX,imageBad);
 
 		// One way to get around this problem rescale and adjust the pixel values so that they
 		// will be within a valid range.
-		ImageSInt16 scaledAbs = new ImageSInt16(derivX.width,derivX.height);
+		GrayS16 scaledAbs = new GrayS16(derivX.width,derivX.height);
 		GPixelMath.abs(derivX,scaledAbs);
 		GPixelMath.multiply(scaledAbs, 255.0 / ImageStatistics.max(scaledAbs), scaledAbs);
 
@@ -94,9 +94,9 @@ public class ExampleImageConvert {
 	public void createImages() {
 		image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
-		gray = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
-		derivX = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
-		derivY = GeneralizedImageOps.createSingleBand(ImageSInt16.class, gray.getWidth(), gray.getHeight());
+		gray = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
+		derivX = GeneralizedImageOps.createSingleBand(GrayS16.class, gray.getWidth(), gray.getHeight());
+		derivY = GeneralizedImageOps.createSingleBand(GrayS16.class, gray.getWidth(), gray.getHeight());
 
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL, gray, derivX, derivY, BorderType.EXTENDED);
 	}

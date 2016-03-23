@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,9 +50,9 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -70,8 +70,8 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
-		extends DepthVideoAppBase<I,ImageUInt16> implements VisualizeApp, VisualOdometryPanel.Listener
+public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
+		extends DepthVideoAppBase<I,GrayU16> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
 	VisualOdometryPanel guiInfo;
@@ -82,7 +82,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 	BufferedImage renderedDepth;
 
-	DepthVisualOdometry<I,ImageUInt16> alg;
+	DepthVisualOdometry<I,GrayU16> alg;
 
 	boolean hasProcessedImage = false;
 	boolean noFault;
@@ -96,7 +96,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 	int whichAlg;
 
 	public VisualizeDepthVisualOdometryApp(Class<I> imageType) {
-		super(1, imageType, ImageUInt16.class);
+		super(1, imageType, GrayU16.class);
 
 		addAlgorithm(0, "Single P3P : KLT", 0);
 		addAlgorithm(0, "Single P3P : ST-BRIEF", 1);
@@ -174,7 +174,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 
 	@Override
-	protected void process(SimpleImageSequence<I> sequence1, SimpleImageSequence<ImageUInt16> sequence2 ) {
+	protected void process(SimpleImageSequence<I> sequence1, SimpleImageSequence<GrayU16> sequence2 ) {
 		// stop the image processing code
 		stopWorker();
 
@@ -189,7 +189,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 	}
 
 	@Override
-	protected void updateAlg(I frame1, BufferedImage buffImage1, ImageUInt16 frame2, BufferedImage buffImage2) {
+	protected void updateAlg(I frame1, BufferedImage buffImage1, GrayU16 frame2, BufferedImage buffImage2) {
 		if( config.visualParam.width != frame1.width || config.visualParam.height != frame1.height )
 			throw new IllegalArgumentException("Miss match between calibration and actual image size");
 
@@ -202,7 +202,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 	@Override
 	protected void updateAlgGUI(I frame1, final BufferedImage buffImage1,
-								ImageUInt16 frame2, final BufferedImage buffImage2, final double fps) {
+								GrayU16 frame2, final BufferedImage buffImage2, final double fps) {
 		if( !noFault) {
 			numFaults++;
 			return;
@@ -281,11 +281,11 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 		startWorkerThread();
 	}
 
-	private DepthVisualOdometry<I,ImageUInt16> createVisualOdometry( int whichAlg ) {
+	private DepthVisualOdometry<I,GrayU16> createVisualOdometry(int whichAlg ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DepthSparse3D<ImageUInt16> sparseDepth = new DepthSparse3D.I<ImageUInt16>(1e-3);
+		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<GrayU16>(1e-3);
 
 		PkltConfig pkltConfig = new PkltConfig();
 		pkltConfig.templateRadius = 3;
@@ -298,7 +298,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 					imageType, derivType);
 
 			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
+					depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
 		} else if( whichAlg == 1 ) {
 
 			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
@@ -314,7 +314,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
 
 			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, ImageUInt16.class);
+					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);
 		} else if( whichAlg == 2 ) {
 			PointTracker<I> tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
@@ -323,7 +323,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
 
 			return FactoryVisualOdometry.
-					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, ImageUInt16.class);
+					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, GrayU16.class);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -400,7 +400,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageSingleBand>
 
 	public static void main( String args[] ) throws FileNotFoundException {
 
-		Class type = ImageFloat32.class;
+		Class type = GrayF32.class;
 //		Class type = ImageUInt8.class;
 
 		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(type);

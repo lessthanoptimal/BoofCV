@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 import java.awt.*;
@@ -54,7 +54,7 @@ public class ExampleTrackerObjectQuad {
 
 		// Create the tracker.  Comment/Uncomment to change the tracker.
 		TrackerObjectQuad tracker =
-				FactoryTrackerObjectQuad.circulant(null, ImageUInt8.class);
+				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
 //				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
 //				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), ImageType.ms(3, ImageUInt8.class));

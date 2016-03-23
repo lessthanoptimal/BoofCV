@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -31,7 +31,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeDynamic<T extends ImageSingleBand, D extends ImageSingleBand> extends CannyEdge<T,D>
+public class CannyEdgeDynamic<T extends ImageGray, D extends ImageGray> extends CannyEdge<T,D>
 {
 	/**
 	 * Constructor and configures algorithm
@@ -44,7 +44,7 @@ public class CannyEdgeDynamic<T extends ImageSingleBand, D extends ImageSingleBa
 	}
 
 	@Override
-	protected void performThresholding(float threshLow, float threshHigh, ImageUInt8 output) {
+	protected void performThresholding(float threshLow, float threshHigh, GrayU8 output) {
 
 		if( threshLow < 0 || threshLow > 1 || threshHigh < 0 || threshHigh > 1 )
 			throw new IllegalArgumentException("Relative thresholds must be from 0 to 1, inclusive.");

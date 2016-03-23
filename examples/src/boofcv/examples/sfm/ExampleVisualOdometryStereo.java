@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -54,33 +54,33 @@ public class ExampleVisualOdometryStereo {
 
 		// load camera description and the video sequence
 		StereoParameters stereoParam = UtilIO.loadXML(media.openFile(directory + "stereo.xml"));
-		SimpleImageSequence<ImageUInt8> video1 = media.openVideo(directory + "left.mjpeg", ImageType.single(ImageUInt8.class));
-		SimpleImageSequence<ImageUInt8> video2 = media.openVideo(directory+"right.mjpeg", ImageType.single(ImageUInt8.class));
+		SimpleImageSequence<GrayU8> video1 = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
+		SimpleImageSequence<GrayU8> video2 = media.openVideo(directory+"right.mjpeg", ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
 
-		PointTrackerTwoPass<ImageUInt8> tracker =
+		PointTrackerTwoPass<GrayU8> tracker =
 				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
-						ImageUInt8.class, ImageSInt16.class);
+						GrayU8.class, GrayS16.class);
 
 		// computes the depth of each point
-		StereoDisparitySparse<ImageUInt8> disparity =
-				FactoryStereoDisparity.regionSparseWta(0, 150, 3, 3, 30, -1, true, ImageUInt8.class);
+		StereoDisparitySparse<GrayU8> disparity =
+				FactoryStereoDisparity.regionSparseWta(0, 150, 3, 3, 30, -1, true, GrayU8.class);
 
 		// declares the algorithm
-		StereoVisualOdometry<ImageUInt8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,true,
-				disparity, tracker, ImageUInt8.class);
+		StereoVisualOdometry<GrayU8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,true,
+				disparity, tracker, GrayU8.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(stereoParam);
 
 		// Process the video sequence and output the location plus number of inliers
 		while( video1.hasNext() ) {
-			ImageUInt8 left = video1.next();
-			ImageUInt8 right = video2.next();
+			GrayU8 left = video1.next();
+			GrayU8 right = video2.next();
 
 			if( !visualOdometry.process(left,right) ) {
 				throw new RuntimeException("VO Failed!");

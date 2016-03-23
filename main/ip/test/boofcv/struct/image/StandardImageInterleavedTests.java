@@ -28,7 +28,7 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Standard tests for children of {@link ImageSingleBand}.  Ensures that they contain
+ * Standard tests for children of {@link ImageGray}.  Ensures that they contain
  * all the expected functions and that they have the expected behavior.  This is done
  * through extensive use of reflections.
  *

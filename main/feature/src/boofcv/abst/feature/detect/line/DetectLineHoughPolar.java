@@ -27,9 +27,9 @@ import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
 
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSingleBand> implements DetectLine<I> {
+public class DetectLineHoughPolar<I extends ImageGray, D extends ImageGray> implements DetectLine<I> {
 
 	// transform algorithm
 	HoughTransformLinePolar alg;
@@ -70,12 +70,12 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 	D derivY;
 
 	// edge intensity image
-	ImageFloat32 intensity = new ImageFloat32(1,1);
+	GrayF32 intensity = new GrayF32(1,1);
 
 	// detected edge image
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
-	ImageFloat32 suppressed = new ImageFloat32(1,1);
+	GrayF32 suppressed = new GrayF32(1,1);
 //	ImageFloat32 angle = new ImageFloat32(1,1);
 //	ImageSInt8 direction = new ImageSInt8(1,1);
 
@@ -199,11 +199,11 @@ public class DetectLineHoughPolar<I extends ImageSingleBand, D extends ImageSing
 		return derivY;
 	}
 
-	public ImageFloat32 getEdgeIntensity() {
+	public GrayF32 getEdgeIntensity() {
 		return intensity;
 	}
 
-	public ImageUInt8 getBinary() {
+	public GrayU8 getBinary() {
 		return binary;
 	}
 }

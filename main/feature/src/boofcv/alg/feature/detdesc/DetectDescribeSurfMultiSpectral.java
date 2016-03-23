@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,15 +24,15 @@ import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeatureQueue;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.List;
 
 /**
- * Computes a color SURF descriptor from a {@link boofcv.struct.image.MultiSpectral} image.  Features are detected,
+ * Computes a color SURF descriptor from a {@link Planar} image.  Features are detected,
  * orientation estimated, and laplacian sign computed using a gray scale image.  The gray scale image is found by
  * computing the average across all bands for each pixel.  A descriptor is computed inside band individually
  * and stored in a descriptor which is N*length long.  N = number of bands and length = number of
@@ -44,7 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
+public class DetectDescribeSurfMultiSpectral<II extends ImageGray>
 {
 	// SURF algorithms
 	private FastHessianFeatureDetector<II> detector;
@@ -84,7 +84,7 @@ public class DetectDescribeSurfMultiSpectral<II extends ImageSingleBand>
 	 * @param grayII Gray-scale integral image
 	 * @param colorII Color integral image
 	 */
-	public void detect( II grayII , MultiSpectral<II> colorII ) {
+	public void detect( II grayII , Planar<II> colorII ) {
 
 		orientation.setImage(grayII);
 		describe.setImage(grayII,colorII);

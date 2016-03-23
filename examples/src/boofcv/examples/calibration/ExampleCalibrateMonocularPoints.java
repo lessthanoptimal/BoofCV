@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
@@ -88,7 +88,7 @@ public class ExampleCalibrateMonocularPoints {
 		for( String n : imageNames ) {
 			CalibrationObservation set = new CalibrationObservation();
 			BufferedImage img = UtilImageIO.loadImage(n);
-			ImageFloat32 input = ConvertBufferedImage.convertFrom(img,(ImageFloat32)null);
+			GrayF32 input = ConvertBufferedImage.convertFrom(img,(GrayF32)null);
 
 			if( !detector.process(input) )
 				throw new RuntimeException("Detection failed!");

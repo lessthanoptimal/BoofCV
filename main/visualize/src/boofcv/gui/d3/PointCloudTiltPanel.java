@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.d3;
 
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
@@ -114,7 +114,7 @@ public class PointCloudTiltPanel extends JPanel
 	/**
 	 * Updates the view, must be called in a GUI thread
 	 */
-	public void process( ImageSingleBand disparity , BufferedImage color ) {
+	public void process(ImageGray disparity , BufferedImage color ) {
 		view.process(disparity,color);
 
 		tiltSlider.removeChangeListener(this);

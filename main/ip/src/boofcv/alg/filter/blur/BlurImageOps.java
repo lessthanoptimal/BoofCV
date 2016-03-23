@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,10 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 /**
  * Catch all class for function which "blur" an image, typically used to "reduce" the amount
@@ -50,7 +50,7 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static ImageUInt8 mean(ImageUInt8 input, ImageUInt8 output, int radius, ImageUInt8 storage) {
+	public static GrayU8 mean(GrayU8 input, GrayU8 output, int radius, GrayU8 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -72,7 +72,7 @@ public class BlurImageOps {
 	 * @param radius Radius of the median blur function.
 	 * @return Output blurred image.
 	 */
-	public static ImageUInt8 median(ImageUInt8 input, ImageUInt8 output, int radius) {
+	public static GrayU8 median(GrayU8 input, GrayU8 output, int radius) {
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -98,10 +98,10 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static ImageUInt8 gaussian(ImageUInt8 input, ImageUInt8 output, double sigma , int radius,
-									  ImageUInt8 storage ) {
+	public static GrayU8 gaussian(GrayU8 input, GrayU8 output, double sigma , int radius,
+								  GrayU8 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
-		storage = InputSanityCheck.checkDeclare(input,storage,ImageUInt8.class);
+		storage = InputSanityCheck.checkDeclare(input,storage,GrayU8.class);
 
 		Kernel1D_I32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_I32.class,sigma,radius);
 
@@ -120,7 +120,7 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static ImageFloat32 mean(ImageFloat32 input, ImageFloat32 output, int radius, ImageFloat32 storage) {
+	public static GrayF32 mean(GrayF32 input, GrayF32 output, int radius, GrayF32 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -142,7 +142,7 @@ public class BlurImageOps {
 	 * @param radius Radius of the median blur function.
 	 * @return Output blurred image.
 	 */
-	public static ImageFloat32 median(ImageFloat32 input, ImageFloat32 output, int radius) {
+	public static GrayF32 median(GrayF32 input, GrayF32 output, int radius) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -164,9 +164,9 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static ImageFloat32 gaussian(ImageFloat32 input, ImageFloat32 output,
-										double sigma , int radius,
-										ImageFloat32 storage ) {
+	public static GrayF32 gaussian(GrayF32 input, GrayF32 output,
+								   double sigma , int radius,
+								   GrayF32 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
@@ -179,7 +179,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies mean box filter to a {@link MultiSpectral}
+	 * Applies mean box filter to a {@link Planar}
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -188,8 +188,8 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> mean(MultiSpectral<T> input, MultiSpectral<T> output, int radius , T storage ) {
+	public static <T extends ImageGray>
+	Planar<T> mean(Planar<T> input, Planar<T> output, int radius , T storage ) {
 
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
@@ -203,7 +203,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies median filter to a {@link MultiSpectral}
+	 * Applies median filter to a {@link Planar}
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -211,8 +211,8 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> median(MultiSpectral<T> input, MultiSpectral<T> output, int radius ) {
+	public static <T extends ImageGray>
+	Planar<T> median(Planar<T> input, Planar<T> output, int radius ) {
 
 		if( output == null )
 			output = input._createNew(input.width,input.height);
@@ -224,7 +224,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies Gaussian blur to a {@link boofcv.struct.image.MultiSpectral}
+	 * Applies Gaussian blur to a {@link Planar}
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -234,8 +234,8 @@ public class BlurImageOps {
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> gaussian(MultiSpectral<T> input, MultiSpectral<T> output, double sigma , int radius, T storage ) {
+	public static <T extends ImageGray>
+	Planar<T> gaussian(Planar<T> input, Planar<T> output, double sigma , int radius, T storage ) {
 
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);

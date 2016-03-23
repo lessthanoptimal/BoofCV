@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.segmentation.watershed;
 
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TestRemoveWatersheds {
 	 */
 	@Test
 	public void basic() {
-		ImageSInt32 segmented = new ImageSInt32(5,7);
+		GrayS32 segmented = new GrayS32(5,7);
 		segmented.data = new int[] {
 				-1,-1,-1,-1,-1,
 				-1, 1, 1, 1,-1,
@@ -44,7 +44,7 @@ public class TestRemoveWatersheds {
 
 		// technically it could be assigned other values and still be a valid solution
 		// this expected image is created knowing the exact internal algorithm
-		ImageSInt32 expected = new ImageSInt32(5,7);
+		GrayS32 expected = new GrayS32(5,7);
 		expected.data = new int[] {
 				-1,-1,-1,-1,-1,
 				-1, 0, 0, 0,-1,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Converts an implementation of {@link OrientationGradient} into {@link OrientationImage}.
  *
  * @author Peter Abeles
  */
-public class OrientationGradientToImage<T extends ImageSingleBand, D extends ImageSingleBand>
+public class OrientationGradientToImage<T extends ImageGray, D extends ImageGray>
 	implements OrientationImage<T>
 {
 	ImageGradient<T,D> gradient;

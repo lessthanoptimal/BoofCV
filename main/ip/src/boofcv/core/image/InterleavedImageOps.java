@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,8 @@
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedF32;
 
 /**
@@ -30,13 +31,13 @@ import boofcv.struct.image.InterleavedF32;
 public class InterleavedImageOps {
 
 	/**
-	 * Splits the 2-band interleaved into into two {@link boofcv.struct.image.ImageSingleBand}.
+	 * Splits the 2-band interleaved into into two {@link ImageGray}.
 	 *
 	 * @param interleaved (Input) Interleaved image with 2 bands
 	 * @param band0 (Output) band 0
 	 * @param band1 (Output) band 1
 	 */
-	public static void split2( InterleavedF32 interleaved , ImageFloat32 band0 , ImageFloat32 band1 ) {
+	public static void split2(InterleavedF32 interleaved , GrayF32 band0 , GrayF32 band1 ) {
 		if( interleaved.numBands != 2 )
 			throw new IllegalArgumentException("Input interleaved image must have 2 bands");
 		InputSanityCheck.checkSameShape(band0, interleaved);
@@ -57,13 +58,13 @@ public class InterleavedImageOps {
 	}
 
 	/**
-	 * Combines two {@link boofcv.struct.image.ImageSingleBand} into a single {@link boofcv.struct.image.ImageInterleaved}.
+	 * Combines two {@link ImageGray} into a single {@link boofcv.struct.image.ImageInterleaved}.
 	 *
 	 * @param band0 (Input) band 0
 	 * @param band1 (Input) band 1
 	 * @param interleaved (Output) Interleaved image with 2 bands
 	 */
-	public static void merge2( ImageFloat32 band0 , ImageFloat32 band1 , InterleavedF32 interleaved ) {
+	public static void merge2(GrayF32 band0 , GrayF32 band1 , InterleavedF32 interleaved ) {
 		if( interleaved.numBands != 2 )
 			throw new IllegalArgumentException("Output interleaved image must have 2 bands");
 

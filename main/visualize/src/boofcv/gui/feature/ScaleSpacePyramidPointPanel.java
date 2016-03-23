@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.distort.FDistort;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
@@ -84,8 +84,8 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 //		System.out.println("level "+level);
 		if( level > 0 && ss != null ) {
 
-			ImageSingleBand small = ss.getLayer(level-1);
-			ImageSingleBand enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
+			ImageGray small = ss.getLayer(level-1);
+			ImageGray enlarge = GeneralizedImageOps.createSingleBand(small.getClass(), ss.getInputWidth(), ss.getInputHeight());
 			new FDistort(small,enlarge).interpNN().apply();
 
 			// if the size isn't the same null it so a new image will be declared

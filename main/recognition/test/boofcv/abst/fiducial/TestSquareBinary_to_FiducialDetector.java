@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,10 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 import java.awt.image.BufferedImage;
 
@@ -42,8 +42,8 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	String directory = UtilIO.pathExample("fiducial/binary/");
 
 	public TestSquareBinary_to_FiducialDetector() {
-		types.add( ImageType.single(ImageUInt8.class));
-		types.add( ImageType.single(ImageFloat32.class));
+		types.add( ImageType.single(GrayU8.class));
+		types.add( ImageType.single(GrayF32.class));
 	}
 
 	@Override

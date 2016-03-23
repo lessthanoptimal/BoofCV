@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.alg.background.moving;
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.Homography2D_F32;
 
 /**
@@ -33,8 +33,8 @@ import georegression.struct.homography.Homography2D_F32;
 public class TestBackgroundMovingBasic_SB extends GenericBackgroundMovingBasicChecks
 {
 	public TestBackgroundMovingBasic_SB() {
-		imageTypes.add(ImageType.single(ImageUInt8.class));
-		imageTypes.add(ImageType.single(ImageFloat32.class));
+		imageTypes.add(ImageType.single(GrayU8.class));
+		imageTypes.add(ImageType.single(GrayF32.class));
 	}
 
 	@Override

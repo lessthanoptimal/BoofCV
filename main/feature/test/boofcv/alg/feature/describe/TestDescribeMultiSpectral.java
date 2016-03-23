@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.alg.feature.describe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -49,7 +49,7 @@ public class TestDescribeMultiSpectral {
 
 		DummyAlg alg = new DummyAlg(descs);
 
-		alg.setImage(new MultiSpectral(ImageSInt8.class,1,1,2));
+		alg.setImage(new Planar(GrayS8.class,1,1,2));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class TestDescribeMultiSpectral {
 
 		DummyAlg alg = new DummyAlg(descs);
 
-		alg.setImage(new MultiSpectral(ImageSInt8.class,1,1,3));
+		alg.setImage(new Planar(GrayS8.class,1,1,3));
 		alg.process(0, 1, 2, 3, alg.createDescription());
 
 		assertEquals(30, alg.createDescription().size());

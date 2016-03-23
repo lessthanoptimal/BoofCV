@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Computes disparity SAD scores using a rectangular region at the specified points only along
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageSingleBand> {
+public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageGray> {
 	// maximum and minimum allowed image disparity
 	protected int minDisparity;
 	protected int maxDisparity;

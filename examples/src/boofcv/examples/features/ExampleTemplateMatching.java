@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.Match;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -54,11 +54,11 @@ public class ExampleTemplateMatching {
 	 * @param expectedMatches Number of expected matches it hopes to find
 	 * @return List of match location and scores
 	 */
-	private static List<Match> findMatches(ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask,
+	private static List<Match> findMatches(GrayF32 image, GrayF32 template, GrayF32 mask,
 										   int expectedMatches) {
 		// create template matcher.
-		TemplateMatching<ImageFloat32> matcher =
-				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
+		TemplateMatching<GrayF32> matcher =
+				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
 
 		// Find the points which match the template the best
 		matcher.setTemplate(template, mask,expectedMatches);
@@ -72,17 +72,17 @@ public class ExampleTemplateMatching {
 	 * Computes the template match intensity image and displays the results. Brighter intensity indicates
 	 * a better match to the template.
 	 */
-	public static void showMatchIntensity(ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask) {
+	public static void showMatchIntensity(GrayF32 image, GrayF32 template, GrayF32 mask) {
 
 		// create algorithm for computing intensity image
-		TemplateMatchingIntensity<ImageFloat32> matchIntensity =
-				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, ImageFloat32.class);
+		TemplateMatchingIntensity<GrayF32> matchIntensity =
+				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
 
 		// apply the template to the image
 		matchIntensity.process(image, template, mask);
 
 		// get the results
-		ImageFloat32 intensity = matchIntensity.getIntensity();
+		GrayF32 intensity = matchIntensity.getIntensity();
 
 		// adjust the intensity image so that white indicates a good match and black a poor match
 		// the scale is kept linear to highlight how ambiguous the solution is
@@ -103,10 +103,10 @@ public class ExampleTemplateMatching {
 		// Load image and templates
 		String directory = UtilIO.pathExample("template");
 
-		ImageFloat32 image = UtilImageIO.loadImage(directory ,"desktop.png", ImageFloat32.class);
-		ImageFloat32 templateCursor = UtilImageIO.loadImage(directory , "cursor.png", ImageFloat32.class);
-		ImageFloat32 maskCursor = UtilImageIO.loadImage(directory , "cursor_mask.png", ImageFloat32.class);
-		ImageFloat32 templatePaint = UtilImageIO.loadImage(directory , "paint.png", ImageFloat32.class);
+		GrayF32 image = UtilImageIO.loadImage(directory ,"desktop.png", GrayF32.class);
+		GrayF32 templateCursor = UtilImageIO.loadImage(directory , "cursor.png", GrayF32.class);
+		GrayF32 maskCursor = UtilImageIO.loadImage(directory , "cursor_mask.png", GrayF32.class);
+		GrayF32 templatePaint = UtilImageIO.loadImage(directory , "paint.png", GrayF32.class);
 
 		// create output image to show results
 		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
@@ -134,7 +134,7 @@ public class ExampleTemplateMatching {
 	 * Helper function will is finds matches and displays the results as colored rectangles
 	 */
 	private static void drawRectangles(Graphics2D g2,
-									   ImageFloat32 image, ImageFloat32 template, ImageFloat32 mask,
+									   GrayF32 image, GrayF32 template, GrayF32 mask,
 									   int expectedMatches) {
 		List<Match> found = findMatches(image, template, mask, expectedMatches);
 

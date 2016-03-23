@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,25 @@ package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
 * @author Peter Abeles
 */
-public class TestFhEdgeWeights8_U8 extends GenericFhEdgeWeightsChecks<ImageUInt8> {
+public class TestFhEdgeWeights8_U8 extends GenericFhEdgeWeightsChecks<GrayU8> {
 
 	public TestFhEdgeWeights8_U8() {
-		super(ImageType.single(ImageUInt8.class), ConnectRule.EIGHT);
+		super(ImageType.single(GrayU8.class), ConnectRule.EIGHT);
 	}
 
 	@Override
-	public FhEdgeWeights<ImageUInt8> createAlg() {
+	public FhEdgeWeights<GrayU8> createAlg() {
 		return new FhEdgeWeights8_U8();
 	}
 
 	@Override
-	public float weight( ImageUInt8 input , int indexA, int indexB) {
+	public float weight(GrayU8 input , int indexA, int indexB) {
 		return Math.abs((input.data[indexA]&0xFF) - (input.data[indexB]&0xFF));
 	}
 }

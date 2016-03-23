@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -48,17 +48,17 @@ public class ExampleWatershedWithSeeds {
 	public static void main(String[] args) {
 
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
-		ImageUInt8 input = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
+		GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 
 		// declare working data
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width,input.height);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		// Try using the mean pixel value to create a binary image then erode it to separate the particles from
 		// each other
 		double mean = ImageStatistics.mean(input);
 		ThresholdImageOps.threshold(input, binary, (int) mean, true);
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary, 2, null);
+		GrayU8 filtered = BinaryImageOps.erode8(binary, 2, null);
 		int numRegions = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label).size() + 1;
 		// +1 to regions because contour only counts blobs and not the background
 
@@ -68,7 +68,7 @@ public class ExampleWatershedWithSeeds {
 
 		watershed.process(input,label);
 
-		ImageSInt32 output = watershed.getOutput();
+		GrayS32 output = watershed.getOutput();
 
 		BufferedImage outLabeled = VisualizeBinaryData.renderLabeledBG(label, numRegions, null);
 		VisualizeRegions.watersheds(output,image,1);

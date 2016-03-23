@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99OptimizationFunction;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ public class CalibrateMonoPlanar {
 	 * @param image Image of a calibration target
 	 * @return true if a target was detected in the image or not
 	 */
-	public boolean addImage( ImageFloat32 image ) {
+	public boolean addImage( GrayF32 image ) {
 
 		if( widthImg == 0 ) {
 			widthImg = image.width;

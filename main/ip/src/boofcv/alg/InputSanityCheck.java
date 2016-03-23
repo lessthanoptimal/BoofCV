@@ -20,8 +20,8 @@ package boofcv.alg;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -41,7 +41,7 @@ public class InputSanityCheck {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageSingleBand> T checkReshape( T target , ImageSingleBand testImage , Class<T> targetType )
+	public static <T extends ImageGray> T checkReshape(T target , ImageGray testImage , Class<T> targetType )
 	{
 		if( target == null ) {
 			return GeneralizedImageOps.createSingleBand(targetType, testImage.width, testImage.height);
@@ -55,7 +55,7 @@ public class InputSanityCheck {
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
-	public static <T extends ImageSingleBand> T checkDeclare(T input, T output) {
+	public static <T extends ImageGray> T checkDeclare(T input, T output) {
 		if (output == null) {
 			output = (T) input._createNew(input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
@@ -67,7 +67,7 @@ public class InputSanityCheck {
 	 * If the output has not been declared a new instance is declared.  If an instance of the output
 	 * is provided its bounds are checked.
 	 */
-	public static <In extends ImageSingleBand,Out extends ImageSingleBand>
+	public static <In extends ImageGray,Out extends ImageGray>
 	Out checkDeclare(In input, Out output , Class<Out> typeOut) {
 		if (output == null) {
 			output = (Out) GeneralizedImageOps.createSingleBand(typeOut,input.width, input.height);

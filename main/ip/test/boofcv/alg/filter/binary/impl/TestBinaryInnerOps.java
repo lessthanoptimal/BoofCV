@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -41,8 +41,8 @@ public class TestBinaryInnerOps {
 
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-			ImageUInt8 t = (ImageUInt8) targetParam[1];
-			ImageUInt8 v = (ImageUInt8) validationParam[1];
+			GrayU8 t = (GrayU8) targetParam[1];
+			GrayU8 v = (GrayU8) validationParam[1];
 
 			for (int y = 1; y < t.height - 1; y++) {
 				for (int x = 1; x < t.width - 1; x++) {

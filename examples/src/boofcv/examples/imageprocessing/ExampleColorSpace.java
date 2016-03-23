@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.color.ColorYuv;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
@@ -40,13 +40,13 @@ public class ExampleColorSpace {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image
-		MultiSpectral<ImageFloat32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, ImageFloat32.class);
+		Planar<GrayF32> rgb = ConvertBufferedImage.convertFromMulti(image, null,true, GrayF32.class);
 
 		//---- convert RGB image into different color formats
-		MultiSpectral<ImageFloat32> hsv = rgb.createSameShape();
+		Planar<GrayF32> hsv = rgb.createSameShape();
 		ColorHsv.rgbToHsv_F32(rgb, hsv);
 
-		MultiSpectral<ImageFloat32> yuv = rgb.createSameShape();
+		Planar<GrayF32> yuv = rgb.createSameShape();
 		ColorYuv.yuvToRgb_F32(rgb, yuv);
 
 		//---- Convert individual pixels into different formats

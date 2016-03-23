@@ -23,7 +23,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -47,7 +47,7 @@ public class TestCalibrateMonoPlanar {
 	fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
-	ImageFloat32 blank = new ImageFloat32(intrinsic.width,intrinsic.height);
+	GrayF32 blank = new GrayF32(intrinsic.width,intrinsic.height);
 
 	List<Se3_F64> targetToCamera = new ArrayList<Se3_F64>();
 
@@ -101,7 +101,7 @@ public class TestCalibrateMonoPlanar {
 		List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
 
 		@Override
-		public boolean process(ImageFloat32 input) {
+		public boolean process(GrayF32 input) {
 
 			Se3_F64 t2c = targetToCamera.get(count++);
 

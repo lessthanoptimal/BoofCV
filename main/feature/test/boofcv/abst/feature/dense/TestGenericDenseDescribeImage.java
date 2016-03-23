@@ -21,9 +21,9 @@ package boofcv.abst.feature.dense;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class TestGenericDenseDescribeImage {
 
 		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1.5,3,4);
 
-		ImageUInt8 image = new ImageUInt8(100,110);
+		GrayU8 image = new GrayU8(100,110);
 
 		alg.process(image);
 		List<TupleDesc_F64> descs = alg.getDescriptions();
@@ -87,7 +87,7 @@ public class TestGenericDenseDescribeImage {
 	public void checkDescriptorScale() {
 		DummyFeature sparse = new DummyFeature();
 
-		ImageUInt8 image = new ImageUInt8(100,110);
+		GrayU8 image = new GrayU8(100,110);
 
 		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1,8,9);
 
@@ -116,7 +116,7 @@ public class TestGenericDenseDescribeImage {
 
 	public static class DummyFeature implements DescribeRegionPoint {
 
-		ImageType type = ImageType.single(ImageUInt8.class);
+		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;
 		ImageBase image;
 		FastQueue<Point2D_I32> points = new FastQueue<Point2D_I32>(Point2D_I32.class,true);

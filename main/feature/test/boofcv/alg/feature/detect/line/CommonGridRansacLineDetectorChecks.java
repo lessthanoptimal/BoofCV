@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.feature.detect.line.gridline.GridLineModelDistance;
 import boofcv.alg.feature.detect.line.gridline.GridLineModelFitter;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CommonGridRansacLineDetectorChecks< D extends ImageSingleBand> {
+public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray> {
 	int width = 40;
 	int height = 30;
 
@@ -69,7 +69,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageSingleB
 	protected void checkObvious( int regionSize ) {
 //		System.out.println("regionSize = "+regionSize);
 		int where = 25;
-		ImageUInt8 edgeImage = new ImageUInt8(width,height);
+		GrayU8 edgeImage = new GrayU8(width,height);
 		D derivX = GeneralizedImageOps.createSingleBand(derivType,width,height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType,width,height);
 

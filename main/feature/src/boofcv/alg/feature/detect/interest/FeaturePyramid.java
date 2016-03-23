@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
 
@@ -54,14 +54,14 @@ import java.util.List;
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
 @SuppressWarnings({"unchecked"})
-public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand>
+public class FeaturePyramid<T extends ImageGray, D extends ImageGray>
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// generalized feature detector.  Used to find candidate features in each scale's image
 	private GeneralFeatureDetector<T, D> detector;
 	private float baseThreshold;
 	// feature intensity in the pyramid
-	protected ImageFloat32 intensities[];
+	protected GrayF32 intensities[];
 	protected int spaceIndex = 0;
 
 	protected List<Point2D_I16> maximums[];
@@ -99,10 +99,10 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 	public void detect(PyramidFloat<T> ss) {
 		spaceIndex = 0;
 		if (intensities == null) {
-			intensities = new ImageFloat32[3];
-			intensities[0] = new ImageFloat32(1, 1);
-			intensities[1] = new ImageFloat32(1, 1);
-			intensities[2] = new ImageFloat32(1, 1);
+			intensities = new GrayF32[3];
+			intensities[0] = new GrayF32(1, 1);
+			intensities[1] = new GrayF32(1, 1);
+			intensities[2] = new GrayF32(1, 1);
 
 			maximums = new List[3];
 			maximums[0] = new ArrayList<Point2D_I16>();
@@ -172,7 +172,7 @@ public class FeaturePyramid<T extends ImageSingleBand, D extends ImageSingleBand
 
 		List<Point2D_I16> candidates = maximums[index1];
 		ImageBorder_F32 inten0 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index0], 0);
-		ImageFloat32 inten1 = intensities[index1];
+		GrayF32 inten1 = intensities[index1];
 		ImageBorder_F32 inten2 = (ImageBorder_F32) FactoryImageBorderAlgs.value(intensities[index2], 0);
 
 		float scale0 = (float) ss.scale[layerID - 1];

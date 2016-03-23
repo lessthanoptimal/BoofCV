@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.struct.sparse;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Samples the image using a kernel which can be rescaled
  *
  * @author Peter Abeles
  */
-public abstract class SparseScaleSample_F64<T extends ImageSingleBand>
+public abstract class SparseScaleSample_F64<T extends ImageGray>
 		implements SparseImageSample_F64<T>
 {
 	protected T input;

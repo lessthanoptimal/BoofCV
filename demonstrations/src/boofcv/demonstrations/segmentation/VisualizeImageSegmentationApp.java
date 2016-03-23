@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	int activeDisplay = 0;
 
 	T color;
-	ImageSInt32 pixelToRegion = new ImageSInt32(1,1);
+	GrayS32 pixelToRegion = new GrayS32(1,1);
 
 	SegmentConfigPanel leftPanel;
 	ImagePanel gui = new ImagePanel();
@@ -70,7 +70,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	boolean busy = false;
 
 	public VisualizeImageSegmentationApp() {
-		this((ImageType)ImageType.ms(3,ImageFloat32.class));
+		this((ImageType)ImageType.ms(3,GrayF32.class));
 	}
 
 	public VisualizeImageSegmentationApp(ImageType<T> imageType ) {
@@ -236,7 +236,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	}
 
 	public static void main(String[] args) {
-		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3,ImageFloat32.class);
+		ImageType<Planar<GrayF32>> imageType = ImageType.ms(3,GrayF32.class);
 //		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);

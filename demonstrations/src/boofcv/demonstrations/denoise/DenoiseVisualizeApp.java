@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -58,7 +58,7 @@ import java.util.Vector;
  *
  * @author Peter Abeles
  */
-public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingleBand,W extends WlCoef>
+public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W extends WlCoef>
 	extends SelectAlgorithmAndInputPanel implements DenoiseInfoPanel.Listener
 {
 
@@ -217,10 +217,10 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 			filter.process(noisy,output);
 		}
 
-		final double algError = computeError((ImageFloat32)output,(ImageFloat32)input);
-		final double algErrorEdge = computeWeightedError((ImageFloat32)output,(ImageFloat32)input,(ImageFloat32)deriv);
-		final double noiseError = computeError((ImageFloat32)noisy,(ImageFloat32)input);
-		final double noiseErrorEdge = computeWeightedError((ImageFloat32)noisy,(ImageFloat32)input,(ImageFloat32)deriv);
+		final double algError = computeError((GrayF32)output,(GrayF32)input);
+		final double algErrorEdge = computeWeightedError((GrayF32)output,(GrayF32)input,(GrayF32)deriv);
+		final double noiseError = computeError((GrayF32)noisy,(GrayF32)input);
+		final double noiseErrorEdge = computeWeightedError((GrayF32)noisy,(GrayF32)input,(GrayF32)deriv);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -281,7 +281,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	}
 
 	// todo push to what ops? Also what is this error called again?
-	public static double computeError(ImageFloat32 imgA, ImageFloat32 imgB ) {
+	public static double computeError(GrayF32 imgA, GrayF32 imgB ) {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -298,8 +298,8 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	}
 
 	// todo push to what ops?
-	public static double computeWeightedError(ImageFloat32 imgA, ImageFloat32 imgB ,
-											  ImageFloat32 imgWeight ) {
+	public static double computeWeightedError(GrayF32 imgA, GrayF32 imgB ,
+											  GrayF32 imgWeight ) {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -319,7 +319,7 @@ public class DenoiseVisualizeApp<T extends ImageSingleBand,D extends ImageSingle
 	}
 
 	public static void main( String args[] ) {
-		DenoiseVisualizeApp app = new DenoiseVisualizeApp(ImageFloat32.class);
+		DenoiseVisualizeApp app = new DenoiseVisualizeApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));

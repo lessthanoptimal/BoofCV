@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
@@ -59,13 +59,13 @@ public class RenderSquareBinaryGridFiducial {
 		return points;
 	}
 
-	public ImageFloat32 generate( int numRows, int numCols ) {
+	public GrayF32 generate(int numRows, int numCols ) {
 		expectedCorners.clear();
 
 		int imageWidth = (numCols*2+2)*squareWidth;
 		int imageHeight = (numRows*2+2)*squareWidth;
 
-		ImageFloat32 image = new ImageFloat32(imageWidth,imageHeight);
+		GrayF32 image = new GrayF32(imageWidth,imageHeight);
 		ImageMiscOps.fill(image, 255);
 
 		int number = 0;
@@ -81,7 +81,7 @@ public class RenderSquareBinaryGridFiducial {
 		return image;
 	}
 
-	private void generateSquare( int x0 , int y0 , int width , int value , ImageFloat32 image ) {
+	private void generateSquare( int x0 , int y0 , int width , int value , GrayF32 image ) {
 		ImageMiscOps.fillRectangle(image,0,x0,y0,width,width);
 
 		int innerWidth = (int)(width*(1.0-border*2)+0.5);

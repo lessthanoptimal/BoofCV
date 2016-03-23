@@ -21,8 +21,8 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * 
  * @author Peter Abeles
  */
-public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+public class WrapperMedianCornerIntensity<I extends ImageGray, D extends ImageGray>
 		extends BaseGeneralFeatureIntensity<I,D>  {
 
 	Method m;
@@ -44,7 +44,7 @@ public class WrapperMedianCornerIntensity<I extends ImageSingleBand, D extends I
 										Class<I> imageType ) {
 		this.medianFilter = medianFilter;
 		try {
-			m = MedianCornerIntensity.class.getMethod("process",ImageFloat32.class,imageType,imageType);
+			m = MedianCornerIntensity.class.getMethod("process",GrayF32.class,imageType,imageType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}

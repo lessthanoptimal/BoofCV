@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.feature.detect.interest.UnrollSiftScaleSpaceGradient;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wrapper around {@link OrientationHistogramSift} for {@link OrientationImage}.  Selects
@@ -32,18 +32,18 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class OrientationSiftToImage<T extends ImageSingleBand>
+public class OrientationSiftToImage<T extends ImageGray>
 		implements OrientationImage<T>
 {
 	UnrollSiftScaleSpaceGradient scaleSpace;
-	OrientationHistogramSift<ImageFloat32> alg;
+	OrientationHistogramSift<GrayF32> alg;
 	UnrollSiftScaleSpaceGradient.ImageScale image;
 	double sigma = 1.0/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 	Class<T> imageType;
-	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+	GrayF32 imageFloat = new GrayF32(1,1);
 
-	public OrientationSiftToImage(OrientationHistogramSift<ImageFloat32> alg,
+	public OrientationSiftToImage(OrientationHistogramSift<GrayF32> alg,
 								  SiftScaleSpace ss, Class<T> imageType ) {
 		this.alg = alg;
 		this.scaleSpace = new UnrollSiftScaleSpaceGradient(ss);
@@ -53,9 +53,9 @@ public class OrientationSiftToImage<T extends ImageSingleBand>
 	@Override
 	public void setImage(T image) {
 
-		ImageFloat32 input;
-		if( image instanceof ImageFloat32 ) {
-			input = (ImageFloat32)image;
+		GrayF32 input;
+		if( image instanceof GrayF32) {
+			input = (GrayF32)image;
 		} else {
 			imageFloat.reshape(image.width,image.height);
 			GConvertImage.convert(image,imageFloat);

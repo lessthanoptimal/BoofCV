@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -79,7 +79,7 @@ public abstract class NonMaxBlock {
 	 * @param localMin (Output) storage for found local minimums.
 	 * @param localMax (Output) storage for found local maximums.
 	 */
-	public void process(ImageFloat32 intensityImage, QueueCorner localMin, QueueCorner localMax) {
+	public void process(GrayF32 intensityImage, QueueCorner localMin, QueueCorner localMax) {
 
 		this.localMin = localMin;
 		this.localMax = localMax;
@@ -101,7 +101,7 @@ public abstract class NonMaxBlock {
 		}
 	}
 
-	protected abstract void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img );
+	protected abstract void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img );
 
 	public void setSearchRadius(int radius) {
 		this.radius = radius;

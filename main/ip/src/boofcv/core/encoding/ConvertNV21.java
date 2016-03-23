@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,21 +39,21 @@ public class ConvertNV21 {
 	 */
 	public static void nv21ToBoof(byte[] data, int width, int height, ImageBase output) {
 
-		if( output instanceof MultiSpectral) {
-			MultiSpectral ms = (MultiSpectral) output;
+		if( output instanceof Planar) {
+			Planar ms = (Planar) output;
 
-			if (ms.getBandType() == ImageUInt8.class) {
+			if (ms.getBandType() == GrayU8.class) {
 				ConvertNV21.nv21ToMsRgb_U8(data, width, height, ms);
-			} else if (ms.getBandType() == ImageFloat32.class) {
+			} else if (ms.getBandType() == GrayF32.class) {
 				ConvertNV21.nv21ToMsRgb_F32(data, width, height , ms);
 			} else {
 				throw new IllegalArgumentException("Unsupported output band format");
 			}
-		} else if( output instanceof ImageSingleBand) {
-			if (output.getClass() == ImageUInt8.class) {
-				nv21ToGray(data, width, height, (ImageUInt8) output);
-			} else if (output.getClass() == ImageFloat32.class) {
-				nv21ToGray(data, width, height, (ImageFloat32) output);
+		} else if( output instanceof ImageGray) {
+			if (output.getClass() == GrayU8.class) {
+				nv21ToGray(data, width, height, (GrayU8) output);
+			} else if (output.getClass() == GrayF32.class) {
+				nv21ToGray(data, width, height, (GrayF32) output);
 			} else {
 				throw new IllegalArgumentException("Unsupported output type");
 			}
@@ -81,14 +81,14 @@ public class ConvertNV21 {
 	 * @param <T> Output image type
 	 * @return Gray scale image
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	T nv21ToGray( byte[] data , int width , int height ,
 				  T output , Class<T> outputType ) {
 
-		if( outputType == ImageUInt8.class ) {
-			return (T)nv21ToGray(data,width,height,(ImageUInt8)output);
-		} else if( outputType == ImageFloat32.class ) {
-			return (T)nv21ToGray(data,width,height,(ImageFloat32)output);
+		if( outputType == GrayU8.class ) {
+			return (T)nv21ToGray(data,width,height,(GrayU8)output);
+		} else if( outputType == GrayF32.class ) {
+			return (T)nv21ToGray(data,width,height,(GrayF32)output);
 		} else {
 			throw new IllegalArgumentException("Unsupported BoofCV Image Type "+outputType.getSimpleName());
 		}
@@ -103,12 +103,12 @@ public class ConvertNV21 {
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 * @return Gray scale image
 	 */
-	public static ImageUInt8 nv21ToGray( byte[] data , int width , int height , ImageUInt8 output ) {
+	public static GrayU8 nv21ToGray(byte[] data , int width , int height , GrayU8 output ) {
 		if( output != null ) {
 			if( output.width != width || output.height != height )
 				throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		} else {
-			output = new ImageUInt8(width,height);
+			output = new GrayU8(width,height);
 		}
 
 		ImplConvertNV21.nv21ToGray(data, output);
@@ -125,12 +125,12 @@ public class ConvertNV21 {
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 * @return Gray scale image
 	 */
-	public static ImageFloat32 nv21ToGray( byte[] data , int width , int height , ImageFloat32 output ) {
+	public static GrayF32 nv21ToGray(byte[] data , int width , int height , GrayF32 output ) {
 		if( output != null ) {
 			if( output.width != width || output.height != height )
 				throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		} else {
-			output = new ImageFloat32(width,height);
+			output = new GrayF32(width,height);
 		}
 
 		ImplConvertNV21.nv21ToGray(data, output);
@@ -139,7 +139,7 @@ public class ConvertNV21 {
 	}
 
 	/**
-	 * Converts an NV21 image into a {@link MultiSpectral} YUV image.
+	 * Converts an NV21 image into a {@link Planar} YUV image.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
@@ -148,31 +148,31 @@ public class ConvertNV21 {
 	 * @param outputType  Output: Type of output image
 	 * @param <T> Output image type
 	 */
-	public static <T extends ImageSingleBand>
-	MultiSpectral<T> nv21ToMsYuv( byte[] data , int width , int height ,
-								  MultiSpectral<T> output , Class<T> outputType ) {
+	public static <T extends ImageGray>
+	Planar<T> nv21ToMsYuv(byte[] data , int width , int height ,
+						  Planar<T> output , Class<T> outputType ) {
 
-		if( outputType == ImageUInt8.class ) {
-			return (MultiSpectral)nv21ToMsYuv_U8(data,width,height,(MultiSpectral)output);
-		} else if( outputType == ImageFloat32.class ) {
-			return (MultiSpectral)nv21ToMsYuv_F32(data,width,height,(MultiSpectral)output);
+		if( outputType == GrayU8.class ) {
+			return (Planar)nv21ToMsYuv_U8(data,width,height,(Planar)output);
+		} else if( outputType == GrayF32.class ) {
+			return (Planar)nv21ToMsYuv_F32(data,width,height,(Planar)output);
 		} else {
 			throw new IllegalArgumentException("Unsupported BoofCV Image Type "+outputType.getSimpleName());
 		}
 	}
 
 	/**
-	 * Converts an NV21 image into a {@link MultiSpectral} YUV image with U8 bands.
+	 * Converts an NV21 image into a {@link Planar} YUV image with U8 bands.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static MultiSpectral<ImageUInt8> nv21ToMsYuv_U8( byte[] data , int width , int height ,
-															MultiSpectral<ImageUInt8> output ) {
+	public static Planar<GrayU8> nv21ToMsYuv_U8(byte[] data , int width , int height ,
+												Planar<GrayU8> output ) {
 		if( output == null ) {
-			output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+			output = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -184,17 +184,17 @@ public class ConvertNV21 {
 	}
 
 	/**
-	 * Converts an NV21 image into a {@link MultiSpectral} RGB image with U8 bands.
+	 * Converts an NV21 image into a {@link Planar} RGB image with U8 bands.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static MultiSpectral<ImageUInt8> nv21ToMsRgb_U8( byte[] data , int width , int height ,
-															MultiSpectral<ImageUInt8> output ) {
+	public static Planar<GrayU8> nv21ToMsRgb_U8(byte[] data , int width , int height ,
+												Planar<GrayU8> output ) {
 		if( output == null ) {
-			output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+			output = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -228,17 +228,17 @@ public class ConvertNV21 {
 	}
 
 	/**
-	 * Converts an NV21 image into a {@link MultiSpectral} YUV image with F32 bands.
+	 * Converts an NV21 image into a {@link Planar} YUV image with F32 bands.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static MultiSpectral<ImageFloat32> nv21ToMsYuv_F32( byte[] data , int width , int height ,
-															   MultiSpectral<ImageFloat32> output ) {
+	public static Planar<GrayF32> nv21ToMsYuv_F32(byte[] data , int width , int height ,
+												  Planar<GrayF32> output ) {
 		if( output == null ) {
-			output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+			output = new Planar<GrayF32>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -250,17 +250,17 @@ public class ConvertNV21 {
 	}
 
 	/**
-	 * Converts an NV21 image into a {@link MultiSpectral} RGB image with F32 bands.
+	 * Converts an NV21 image into a {@link Planar} RGB image with F32 bands.
 	 *
 	 * @param data Input: NV21 image data
 	 * @param width Input: NV21 image width
 	 * @param height Input: NV21 image height
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 */
-	public static MultiSpectral<ImageFloat32> nv21ToMsRgb_F32( byte[] data , int width , int height ,
-															 MultiSpectral<ImageFloat32> output ) {
+	public static Planar<GrayF32> nv21ToMsRgb_F32(byte[] data , int width , int height ,
+												  Planar<GrayF32> output ) {
 		if( output == null ) {
-			output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+			output = new Planar<GrayF32>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.CombineFilesTogether;
 import boofcv.io.video.VideoMjpegCodec;
+import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt16;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import javax.imageio.ImageIO;
@@ -161,7 +161,7 @@ public class ImageStreamSequence<T extends ImageBase>
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true, ImageType.single(ImageUInt16.class));
+		ImageStreamSequence stream = new ImageStreamSequence("combined.mpng",true, ImageType.single(GrayU16.class));
 
 		while( stream.hasNext() ) {
 			System.out.println("Image");

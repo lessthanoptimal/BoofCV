@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Contains common functions for computing disparity scores.
@@ -44,7 +44,7 @@ public class UtilDisparityScore {
 	 * @param regionWidth Size of the sample region's width
 	 * @param elementScore Storage for scores of individual pixels
 	 */
-	public static void computeScoreRow(ImageUInt8 left, ImageUInt8 right, int row, int[] scores,
+	public static void computeScoreRow(GrayU8 left, GrayU8 right, int row, int[] scores,
 									   int minDisparity , int maxDisparity , int regionWidth ,
 									   int elementScore[] ) {
 
@@ -87,7 +87,7 @@ public class UtilDisparityScore {
 	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	public static void computeScoreRowSad(ImageUInt8 left, ImageUInt8 right,
+	public static void computeScoreRowSad(GrayU8 left, GrayU8 right,
 										  int elementMax, int indexLeft, int indexRight,
 										  int elementScore[])
 	{
@@ -113,7 +113,7 @@ public class UtilDisparityScore {
 	 * @param regionWidth Size of the sample region's width
 	 * @param elementScore Storage for scores of individual pixels
 	 */
-	public static void computeScoreRow(ImageSInt16 left, ImageSInt16 right, int row, int[] scores,
+	public static void computeScoreRow(GrayS16 left, GrayS16 right, int row, int[] scores,
 									   int minDisparity , int maxDisparity , int regionWidth ,
 									   int elementScore[] ) {
 
@@ -156,7 +156,7 @@ public class UtilDisparityScore {
 	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	public static void computeScoreRowSad(ImageSInt16 left, ImageSInt16 right,
+	public static void computeScoreRowSad(GrayS16 left, GrayS16 right,
 										  int elementMax, int indexLeft, int indexRight,
 										  int elementScore[])
 	{
@@ -182,7 +182,7 @@ public class UtilDisparityScore {
 	 * @param regionWidth Size of the sample region's width
 	 * @param elementScore Storage for scores of individual pixels
 	 */
-	public static void computeScoreRow(ImageFloat32 left, ImageFloat32 right, int row, float[] scores,
+	public static void computeScoreRow(GrayF32 left, GrayF32 right, int row, float[] scores,
 									   int minDisparity , int maxDisparity , int regionWidth ,
 									   float elementScore[] ) {
 
@@ -225,7 +225,7 @@ public class UtilDisparityScore {
 	 * is in its own function so that it can be overridden and have different cost functions
 	 * inserted easily.
 	 */
-	public static void computeScoreRowSad(ImageFloat32 left, ImageFloat32 right,
+	public static void computeScoreRowSad(GrayF32 left, GrayF32 right,
 										  int elementMax, int indexLeft, int indexRight,
 										  float elementScore[])
 	{

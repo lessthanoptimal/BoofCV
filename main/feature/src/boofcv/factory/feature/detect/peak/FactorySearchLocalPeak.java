@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.weights.WeightPixelGaussian_F32;
 import boofcv.alg.weights.WeightPixelUniform_F32;
 import boofcv.alg.weights.WeightPixel_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for implementations of {@link SearchLocalPeak}
@@ -40,7 +40,7 @@ public class FactorySearchLocalPeak {
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelUniform_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights, imageType);
@@ -54,7 +54,7 @@ public class FactorySearchLocalPeak {
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
 		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
 		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights,imageType);

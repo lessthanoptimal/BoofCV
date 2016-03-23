@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -55,10 +55,10 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
-			ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
-			ImageSingleBand derivXY = GeneralizedImageOps.createSingleBand(param[1], width, height);
-			ImageFloat32 intensity = new ImageFloat32(width,height);
+			ImageGray derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageGray derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageGray derivXY = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			GrayF32 intensity = new GrayF32(width,height);
 
 			GImageMiscOps.fillUniform(derivXX, rand, -10, 10);
 			GImageMiscOps.fillUniform(derivYY, rand, -10, 10);
@@ -71,8 +71,8 @@ public class TestImplHessianBlobIntensity {
 		assertEquals(numExpected,total);
 	}
 
-	public void performDeterminant( Method m , ImageFloat32 intensity,
-									ImageSingleBand derivXX, ImageSingleBand derivYY, ImageSingleBand derivXY )
+	public void performDeterminant(Method m , GrayF32 intensity,
+								   ImageGray derivXX, ImageGray derivYY, ImageGray derivXY )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,intensity,derivXX,derivYY,derivXY);
@@ -97,9 +97,9 @@ public class TestImplHessianBlobIntensity {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
-			ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
-			ImageFloat32 intensity = new ImageFloat32(width,height);
+			ImageGray derivXX = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			ImageGray derivYY = GeneralizedImageOps.createSingleBand(param[1], width, height);
+			GrayF32 intensity = new GrayF32(width,height);
 
 			GImageMiscOps.fillUniform(derivXX, rand, -10, 10);
 			GImageMiscOps.fillUniform(derivYY, rand, -10, 10);
@@ -111,8 +111,8 @@ public class TestImplHessianBlobIntensity {
 		assertEquals(numExpected,total);
 	}
 
-	public void performTrace( Method m , ImageFloat32 intensity,
-									ImageSingleBand derivXX, ImageSingleBand derivYY )
+	public void performTrace(Method m , GrayF32 intensity,
+							 ImageGray derivXX, ImageGray derivYY )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		m.invoke(null,intensity,derivXX,derivYY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.describe.impl.ImplSurfDescribeOps;
 import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseScaleGradient;
 
 
@@ -55,7 +55,7 @@ public class SurfDescribeOps {
 	 * @param derivX Derivative x wavelet output. length = radiusRegions*radiusRegions
 	 * @param derivY Derivative y wavelet output. length = radiusRegions*radiusRegions
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void gradient(T ii, double tl_x, double tl_y, double samplePeriod ,
 				  int regionSize, double kernelWidth,
 				  boolean useHaar, double[] derivX, double derivY[])
@@ -68,9 +68,9 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageFloat32 ii , double tl_x , double tl_y , double samplePeriod ,
-							int regionSize , double kernelWidth ,
-							float[] derivX , float[] derivY )
+	void gradient_noborder(GrayF32 ii , double tl_x , double tl_y , double samplePeriod ,
+						   int regionSize , double kernelWidth ,
+						   float[] derivX , float[] derivY )
 	{
 		ImplSurfDescribeOps.gradientInner(ii,tl_x,tl_y,samplePeriod,regionSize, kernelWidth, derivX,derivY);
 	}
@@ -80,9 +80,9 @@ public class SurfDescribeOps {
 	 * of the image.  This includes the convolution kernel's radius.
 	 */
 	public static
-	void gradient_noborder( ImageSInt32 ii , double tl_x , double tl_y , double samplePeriod ,
-							int regionSize , double kernelWidth ,
-							int[] derivX , int[] derivY )
+	void gradient_noborder(GrayS32 ii , double tl_x , double tl_y , double samplePeriod ,
+						   int regionSize , double kernelWidth ,
+						   int[] derivX , int[] derivY )
 	{
 		ImplSurfDescribeOps.gradientInner(ii,tl_x,tl_y,samplePeriod, regionSize, kernelWidth, derivX,derivY);
 	}
@@ -95,7 +95,7 @@ public class SurfDescribeOps {
 	 * @param imageType Type of image being processed.
 	 * @return Sparse gradient algorithm
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SparseScaleGradient<T,?> createGradient( boolean useHaar , Class<T> imageType )
 	{
 		if( useHaar )
@@ -116,7 +116,7 @@ public class SurfDescribeOps {
 	 * @param c Cosine of the orientation
 	 * @param s Sine of the orientation   
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	boolean isInside( T ii , double X , double Y , int radiusRegions , int kernelSize ,
 					  double scale, double c , double s )
 	{

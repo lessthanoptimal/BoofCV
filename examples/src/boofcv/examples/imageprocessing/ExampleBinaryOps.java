@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -52,9 +52,9 @@ public class ExampleBinaryOps {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
 
 		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
+		GrayU8 binary = new GrayU8(input.width,input.height);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		// Select a global threshold using Otsu's method.
 		double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);
@@ -65,7 +65,7 @@ public class ExampleBinaryOps {
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
 		// this is less efficient, but easier to code.
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary, 1, null);
+		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
 		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
 		// Detect blobs inside the image using an 8-connect rule

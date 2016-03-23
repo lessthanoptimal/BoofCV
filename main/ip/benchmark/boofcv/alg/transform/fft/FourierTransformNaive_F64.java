@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.fft;
 
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 
 /**
  * Direct implementation of a Fourier transform.  Horribly inefficient.
@@ -108,10 +108,10 @@ public class FourierTransformNaive_F64 {
 		}
 	}
 
-	public static void forward( ImageFloat64 inputR , ImageFloat64 outputR , ImageFloat64 outputI ) {
+	public static void forward(GrayF64 inputR , GrayF64 outputR , GrayF64 outputI ) {
 
-		ImageFloat64 tempR = new ImageFloat64(inputR.width,inputR.height);
-		ImageFloat64 tempI = new ImageFloat64(outputI.width,outputI.height);
+		GrayF64 tempR = new GrayF64(inputR.width,inputR.height);
+		GrayF64 tempI = new GrayF64(outputI.width,outputI.height);
 
 		for( int y = 0; y < inputR.height; y++ ) {
 			int index = inputR.startIndex + inputR.stride*y;
@@ -141,9 +141,9 @@ public class FourierTransformNaive_F64 {
 		}
 	}
 
-	public static void inverse( ImageFloat64 inputR , ImageFloat64 inputI, ImageFloat64 outputR ) {
-		ImageFloat64 tempR = new ImageFloat64(inputR.width,inputR.height);
-		ImageFloat64 tempI = new ImageFloat64(inputI.width,inputI.height);
+	public static void inverse(GrayF64 inputR , GrayF64 inputI, GrayF64 outputR ) {
+		GrayF64 tempR = new GrayF64(inputR.width,inputR.height);
+		GrayF64 tempI = new GrayF64(inputI.width,inputI.height);
 
 		for( int y = 0; y < inputR.height; y++ ) {
 			int index = inputR.startIndex + inputR.stride*y;

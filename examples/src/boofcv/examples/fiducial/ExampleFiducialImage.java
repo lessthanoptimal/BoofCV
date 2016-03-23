@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
@@ -57,27 +57,27 @@ public class ExampleFiducialImage {
 		// load the lens distortion parameters and the input image
 		IntrinsicParameters param = UtilIO.loadXML(imagePath, "intrinsic.xml");
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
-		ImageFloat32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(ImageFloat32.class));
+		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 
 		// Detect the fiducial
-		SquareImage_to_FiducialDetector<ImageFloat32> detector = FactoryFiducial.squareImage(
-				new ConfigFiducialImage(), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), ImageFloat32.class);
+		SquareImage_to_FiducialDetector<GrayF32> detector = FactoryFiducial.squareImage(
+				new ConfigFiducialImage(), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
 //				new ConfigFiducialImage(), ConfigThreshold.fixed(100), ImageFloat32.class);
 
 		// give it a description of all the targets
 		double width = 4; // 4 cm
-		detector.addPatternImage(loadImage(patternPath , "ke.png",          ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "dog.png",         ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yu.png",          ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yu_inverted.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "pentarose.png",   ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "text_boofcv.png", ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "leaf01.png",      ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "leaf02.png",      ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "hand01.png",      ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "chicken.png",     ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "h2o.png",         ImageFloat32.class), 100, width);
-		detector.addPatternImage(loadImage(patternPath , "yinyang.png",     ImageFloat32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "ke.png",          GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "dog.png",         GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yu.png",          GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yu_inverted.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "pentarose.png",   GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "text_boofcv.png", GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "leaf01.png",      GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "leaf02.png",      GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "hand01.png",      GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "chicken.png",     GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "h2o.png",         GrayF32.class), 100, width);
+		detector.addPatternImage(loadImage(patternPath , "yinyang.png",     GrayF32.class), 100, width);
 
 		detector.setIntrinsic(param);
 

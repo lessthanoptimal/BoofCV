@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.alg.feature.detect.interest.*;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 /**
@@ -54,7 +54,7 @@ public class FactoryInterestPoint {
 	 * @param derivType Image type for gradient.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scale , Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T, D> gradient = null;
@@ -77,7 +77,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
 										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
@@ -101,7 +101,7 @@ public class FactoryInterestPoint {
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
 										  double[] scales, boolean pyramid,
 										  Class<T> inputType) {
@@ -124,12 +124,12 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 * @see FastHessianFeatureDetector
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InterestPointDetector<T> fastHessian( ConfigFastHessian config ) {
 		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config));
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InterestPointDetector<T> sift(ConfigSiftScaleSpace configSS ,
 								  ConfigSiftDetector configDet , Class<T> imageType ) {
 

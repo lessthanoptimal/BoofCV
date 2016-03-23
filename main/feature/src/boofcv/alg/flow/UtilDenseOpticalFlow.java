@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
 import boofcv.alg.transform.pyramid.PyramidFloatScale;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 /**
@@ -57,7 +57,7 @@ public class UtilDenseOpticalFlow {
 	 * @param <T> Image type
 	 * @return The image pyramid.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	PyramidFloat<T> standardPyramid( int width , int height ,
 									 double scale, double sigma ,
 									 int minSize, int maxLayers , Class<T> imageType ) {

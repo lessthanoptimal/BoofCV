@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Random;
 
@@ -41,17 +41,17 @@ public class ExampleWaveletDenoise {
 
 		// load the input image, declare data structures, create a noisy image
 		Random rand = new Random(234);
-		ImageFloat32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"),ImageFloat32.class);
+		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"),GrayF32.class);
 
-		ImageFloat32 noisy = input.clone();
+		GrayF32 noisy = input.clone();
 		GImageMiscOps.addGaussian(noisy, rand, 20, 0, 255);
-		ImageFloat32 denoised = noisy.createSameShape();
+		GrayF32 denoised = noisy.createSameShape();
 
 		// How many levels in wavelet transform
 		int numLevels = 4;
 		// Create the noise removal algorithm
-		WaveletDenoiseFilter<ImageFloat32> denoiser =
-				FactoryImageDenoise.waveletBayes(ImageFloat32.class,numLevels,0,255);
+		WaveletDenoiseFilter<GrayF32> denoiser =
+				FactoryImageDenoise.waveletBayes(GrayF32.class,numLevels,0,255);
 
 		// remove noise from the image
 		denoiser.process(noisy,denoised);

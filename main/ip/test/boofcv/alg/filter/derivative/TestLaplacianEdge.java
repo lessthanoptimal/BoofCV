@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -46,14 +46,14 @@ public class TestLaplacianEdge {
 
 	@Test
 	public void process_U8_S16() {
-		ImageUInt8 img = new ImageUInt8(width, height);
+		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
-		ImageSInt16 deriv = new ImageSInt16(width, height);
+		GrayS16 deriv = new GrayS16(width, height);
 		BoofTesting.checkSubImage(this, "process_U8_S16", true, img, deriv);
 	}
 
-	public void process_U8_S16(ImageUInt8 img, ImageSInt16 deriv) {
+	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
 		LaplacianEdge.process(img, deriv);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
@@ -64,14 +64,14 @@ public class TestLaplacianEdge {
 
 	@Test
 	public void process_I8_F32() {
-		ImageUInt8 img = new ImageUInt8(width, height);
+		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
-		ImageFloat32 deriv = new ImageFloat32(width, height);
+		GrayF32 deriv = new GrayF32(width, height);
 		BoofTesting.checkSubImage(this, "process_U8_F32", true, img, deriv);
 	}
 
-	public void process_U8_F32(ImageUInt8 img, ImageFloat32 deriv) {
+	public void process_U8_F32(GrayU8 img, GrayF32 deriv) {
 		LaplacianEdge.process(img, deriv);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
@@ -82,14 +82,14 @@ public class TestLaplacianEdge {
 
 	@Test
 	public void process_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
+		GrayF32 img = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 1);
 
-		ImageFloat32 deriv = new ImageFloat32(width, height);
+		GrayF32 deriv = new GrayF32(width, height);
 		BoofTesting.checkSubImage(this, "process_F32", true, img, deriv);
 	}
 
-	public void process_F32(ImageFloat32 img, ImageFloat32 deriv) {
+	public void process_F32(GrayF32 img, GrayF32 deriv) {
 		LaplacianEdge.process(img, deriv);
 
 		float expected = -4*img.get(1, 1) + img.get(0, 1) + img.get(1, 0)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,40 +68,40 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageSingleBand input , int sampleWidth , ImageSingleBand output ) {
+	public static void down(ImageGray input , int sampleWidth , ImageGray output ) {
 		if( sampleWidth == 2 ) {
-			if( input instanceof ImageUInt8 ) {
-				ImplAverageDownSample2.down((ImageUInt8) input, (ImageInt8) output);
-			} else if( input instanceof ImageSInt8) {
-				ImplAverageDownSample2.down((ImageSInt8) input, (ImageInt8) output);
-			} else if( input instanceof ImageUInt16) {
-				ImplAverageDownSample2.down((ImageUInt16) input, (ImageInt16) output);
-			} else if( input instanceof ImageSInt16) {
-				ImplAverageDownSample2.down((ImageSInt16) input, (ImageInt16) output);
-			} else if( input instanceof ImageSInt32) {
-				ImplAverageDownSample2.down((ImageSInt32) input, (ImageSInt32) output);
-			} else if( input instanceof ImageFloat32) {
-				ImplAverageDownSample2.down((ImageFloat32) input, (ImageFloat32) output);
-			} else if( input instanceof ImageFloat64) {
-				ImplAverageDownSample2.down((ImageFloat64) input, (ImageFloat64) output);
+			if( input instanceof GrayU8) {
+				ImplAverageDownSample2.down((GrayU8) input, (GrayI8) output);
+			} else if( input instanceof GrayS8) {
+				ImplAverageDownSample2.down((GrayS8) input, (GrayI8) output);
+			} else if( input instanceof GrayU16) {
+				ImplAverageDownSample2.down((GrayU16) input, (GrayI16) output);
+			} else if( input instanceof GrayS16) {
+				ImplAverageDownSample2.down((GrayS16) input, (GrayI16) output);
+			} else if( input instanceof GrayS32) {
+				ImplAverageDownSample2.down((GrayS32) input, (GrayS32) output);
+			} else if( input instanceof GrayF32) {
+				ImplAverageDownSample2.down((GrayF32) input, (GrayF32) output);
+			} else if( input instanceof GrayF64) {
+				ImplAverageDownSample2.down((GrayF64) input, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image type");
 			}
 		} else {
-			if( input instanceof ImageUInt8 ) {
-				ImplAverageDownSampleN.down((ImageUInt8) input, sampleWidth , (ImageInt8) output);
-			} else if( input instanceof ImageSInt8) {
-				ImplAverageDownSampleN.down((ImageSInt8) input, sampleWidth , (ImageInt8) output);
-			} else if( input instanceof ImageUInt16) {
-				ImplAverageDownSampleN.down((ImageUInt16) input, sampleWidth , (ImageInt16) output);
-			} else if( input instanceof ImageSInt16) {
-				ImplAverageDownSampleN.down((ImageSInt16) input, sampleWidth , (ImageInt16) output);
-			} else if( input instanceof ImageSInt32) {
-				ImplAverageDownSampleN.down((ImageSInt32) input, sampleWidth , (ImageSInt32) output);
-			} else if( input instanceof ImageFloat32) {
-				ImplAverageDownSampleN.down((ImageFloat32) input, sampleWidth , (ImageFloat32) output);
-			} else if( input instanceof ImageFloat64) {
-				ImplAverageDownSampleN.down((ImageFloat64) input, sampleWidth , (ImageFloat64) output);
+			if( input instanceof GrayU8) {
+				ImplAverageDownSampleN.down((GrayU8) input, sampleWidth , (GrayI8) output);
+			} else if( input instanceof GrayS8) {
+				ImplAverageDownSampleN.down((GrayS8) input, sampleWidth , (GrayI8) output);
+			} else if( input instanceof GrayU16) {
+				ImplAverageDownSampleN.down((GrayU16) input, sampleWidth , (GrayI16) output);
+			} else if( input instanceof GrayS16) {
+				ImplAverageDownSampleN.down((GrayS16) input, sampleWidth , (GrayI16) output);
+			} else if( input instanceof GrayS32) {
+				ImplAverageDownSampleN.down((GrayS32) input, sampleWidth , (GrayS32) output);
+			} else if( input instanceof GrayF32) {
+				ImplAverageDownSampleN.down((GrayF32) input, sampleWidth , (GrayF32) output);
+			} else if( input instanceof GrayF64) {
+				ImplAverageDownSampleN.down((GrayF64) input, sampleWidth , (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image type");
 			}
@@ -116,29 +116,29 @@ public class AverageDownSampleOps {
 	 */
 	public static <T extends ImageBase>
 	void down( T input , T output ) {
-		if( ImageSingleBand.class.isAssignableFrom(input.getClass())  ) {
-			if (input instanceof ImageUInt8) {
-				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
-				ImplAverageDownSample.horizontal((ImageUInt8) input, middle);
-				ImplAverageDownSample.vertical(middle, (ImageInt8) output);
-			} else if (input instanceof ImageUInt16) {
-				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
-				ImplAverageDownSample.horizontal((ImageUInt16) input, middle);
-				ImplAverageDownSample.vertical(middle, (ImageUInt16) output);
-			} else if (input instanceof ImageFloat32) {
-				ImageFloat32 middle = new ImageFloat32(output.width, input.height);
-				ImplAverageDownSample.horizontal((ImageFloat32) input, middle);
-				ImplAverageDownSample.vertical(middle, (ImageFloat32) output);
-			} else if (input instanceof ImageFloat64) {
-				ImageFloat64 middle = new ImageFloat64(output.width, input.height);
-				ImplAverageDownSample.horizontal((ImageFloat64) input, middle);
-				ImplAverageDownSample.vertical(middle, (ImageFloat64) output);
+		if( ImageGray.class.isAssignableFrom(input.getClass())  ) {
+			if (input instanceof GrayU8) {
+				GrayF32 middle = new GrayF32(output.width, input.height);
+				ImplAverageDownSample.horizontal((GrayU8) input, middle);
+				ImplAverageDownSample.vertical(middle, (GrayI8) output);
+			} else if (input instanceof GrayU16) {
+				GrayF32 middle = new GrayF32(output.width, input.height);
+				ImplAverageDownSample.horizontal((GrayU16) input, middle);
+				ImplAverageDownSample.vertical(middle, (GrayU16) output);
+			} else if (input instanceof GrayF32) {
+				GrayF32 middle = new GrayF32(output.width, input.height);
+				ImplAverageDownSample.horizontal((GrayF32) input, middle);
+				ImplAverageDownSample.vertical(middle, (GrayF32) output);
+			} else if (input instanceof GrayF64) {
+				GrayF64 middle = new GrayF64(output.width, input.height);
+				ImplAverageDownSample.horizontal((GrayF64) input, middle);
+				ImplAverageDownSample.vertical(middle, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image type");
 			}
-		} else if( MultiSpectral.class.isAssignableFrom(input.getClass())  ) {
-			MultiSpectral in = (MultiSpectral)input;
-			MultiSpectral out = (MultiSpectral)output;
+		} else if( Planar.class.isAssignableFrom(input.getClass())  ) {
+			Planar in = (Planar)input;
+			Planar out = (Planar)output;
 
 			int N = in.getNumBands();
 
@@ -155,8 +155,8 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageSingleBand> void down( MultiSpectral<T> input ,
-														 int sampleWidth , MultiSpectral<T> output )
+	public static <T extends ImageGray> void down(Planar<T> input ,
+												  int sampleWidth , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			down(input.getBand(band), sampleWidth, output.getBand(band));
@@ -169,7 +169,7 @@ public class AverageDownSampleOps {
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageSingleBand> void down( MultiSpectral<T> input , MultiSpectral<T> output )
+	public static <T extends ImageGray> void down(Planar<T> input , Planar<T> output )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			down(input.getBand(band), output.getBand(band));
@@ -183,7 +183,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageUInt8 input , int sampleWidth , ImageInt8 output ) {
+	public static void down(GrayU8 input , int sampleWidth , GrayI8 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -198,7 +198,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageSInt8 input , int sampleWidth , ImageInt8 output ) {
+	public static void down(GrayS8 input , int sampleWidth , GrayI8 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -213,7 +213,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageUInt16 input , int sampleWidth , ImageInt16 output ) {
+	public static void down(GrayU16 input , int sampleWidth , GrayI16 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -228,7 +228,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageSInt16 input , int sampleWidth , ImageInt16 output ) {
+	public static void down(GrayS16 input , int sampleWidth , GrayI16 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -243,7 +243,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageSInt32 input , int sampleWidth , ImageSInt32 output ) {
+	public static void down(GrayS32 input , int sampleWidth , GrayS32 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -258,7 +258,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageFloat32 input , int sampleWidth , ImageFloat32 output ) {
+	public static void down(GrayF32 input , int sampleWidth , GrayF32 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {
@@ -273,7 +273,7 @@ public class AverageDownSampleOps {
 	 * @param sampleWidth Width of square region.
 	 * @param output Output image. Modified.
 	 */
-	public static void down( ImageFloat64 input , int sampleWidth , ImageFloat64 output ) {
+	public static void down(GrayF64 input , int sampleWidth , GrayF64 output ) {
 		if( sampleWidth == 2 ) {
 			ImplAverageDownSample2.down( input, output);
 		} else {

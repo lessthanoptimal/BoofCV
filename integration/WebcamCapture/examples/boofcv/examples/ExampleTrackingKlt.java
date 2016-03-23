@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
 import java.awt.*;
@@ -48,7 +48,7 @@ public class ExampleTrackingKlt {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(-1,8,1);
 		PkltConfig configKlt = new PkltConfig(3,new int[]{1,2,4,8});
 
-		PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(configKlt,configDetector,ImageFloat32.class,null);
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKlt,configDetector,GrayF32.class,null);
 
 		// Open a webcam at a resolution close to 640x480
 		Webcam webcam = UtilWebcamCapture.openDefault(640,480);
@@ -62,7 +62,7 @@ public class ExampleTrackingKlt {
 		int minimumTracks = 100;
 		while( true ) {
 			BufferedImage image = webcam.getImage();
-			ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
+			GrayF32 gray = ConvertBufferedImage.convertFrom(image,(GrayF32)null);
 
 			tracker.process(gray);
 

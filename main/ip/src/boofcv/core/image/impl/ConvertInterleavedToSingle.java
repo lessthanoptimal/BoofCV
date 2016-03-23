@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ import boofcv.struct.image.*;
 
 /**
  * Low level implementations of different methods for converting {@link boofcv.struct.image.ImageInterleaved} into
- * {@link boofcv.struct.image.ImageSingleBand}.
+ * {@link ImageGray}.
  *
  * <ul>
  * <li>Average computes the average value of each pixel across the bands.
@@ -35,7 +35,7 @@ import boofcv.struct.image.*;
  */
 public class ConvertInterleavedToSingle {
 
-	public static void average( InterleavedU8 from , ImageUInt8 to ) {
+	public static void average( InterleavedU8 from , GrayU8 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -61,7 +61,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedS8 from , ImageSInt8 to ) {
+	public static void average( InterleavedS8 from , GrayS8 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -87,7 +87,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedU16 from , ImageUInt16 to ) {
+	public static void average( InterleavedU16 from , GrayU16 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -113,7 +113,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedS16 from , ImageSInt16 to ) {
+	public static void average( InterleavedS16 from , GrayS16 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -139,7 +139,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedS32 from , ImageSInt32 to ) {
+	public static void average( InterleavedS32 from , GrayS32 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -165,7 +165,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedS64 from , ImageSInt64 to ) {
+	public static void average( InterleavedS64 from , GrayS64 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -191,7 +191,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedF32 from , ImageFloat32 to ) {
+	public static void average( InterleavedF32 from , GrayF32 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
@@ -217,7 +217,7 @@ public class ConvertInterleavedToSingle {
 		}
 	}
 
-	public static void average( InterleavedF64 from , ImageFloat64 to ) {
+	public static void average( InterleavedF64 from , GrayF64 to ) {
 		final int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import boofcv.struct.sparse.SparseImageGradient;
 
@@ -28,10 +28,10 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class GradientSparsePrewitt_F32 implements SparseImageGradient<ImageFloat32,GradientValue_F32> {
+public class GradientSparsePrewitt_F32 implements SparseImageGradient<GrayF32,GradientValue_F32> {
 
 	// image being processed
-	ImageFloat32 input;
+	GrayF32 input;
 	// specifies how the image border is handled
 	ImageBorder_F32 border;
 	// storage for computed gradient
@@ -85,7 +85,7 @@ public class GradientSparsePrewitt_F32 implements SparseImageGradient<ImageFloat
 	}
 
 	@Override
-	public void setImage(ImageFloat32 input) {
+	public void setImage(GrayF32 input) {
 		this.input = input;
 		if( border != null ) {
 			border.setImage(input);

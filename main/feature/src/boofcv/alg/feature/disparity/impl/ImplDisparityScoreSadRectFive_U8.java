@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,13 +20,13 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
- * images of type {@link ImageUInt8}.
+ * images of type {@link GrayU8}.
  * </p>
  *
  * <p>
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
-		extends DisparityScoreWindowFive<ImageUInt8,Disparity>
+public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageGray>
+		extends DisparityScoreWindowFive<GrayU8,Disparity>
 {
 
 	// Computes disparity from scores
@@ -62,7 +62,7 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
 	}
 
 	@Override
-	public void _process( ImageUInt8 left , ImageUInt8 right , Disparity disparity ) {
+	public void _process(GrayU8 left , GrayU8 right , Disparity disparity ) {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new int[regionHeight][lengthHorizontal];
 			verticalScore = new int[regionHeight][lengthHorizontal];
@@ -82,7 +82,7 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow( ImageUInt8 left, ImageUInt8 right ) {
+	private void computeFirstRow(GrayU8 left, GrayU8 right ) {
 		int firstRow[] = verticalScore[0];
 		activeVerticalScore = 1;
 
@@ -110,7 +110,7 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows( ImageUInt8 left, ImageUInt8 right )
+	private void computeRemainingRows(GrayU8 left, GrayU8 right )
 	{
 		for( int row = regionHeight; row < left.height; row++ , activeVerticalScore++) {
 			int oldRow = row%regionHeight;
@@ -194,8 +194,8 @@ public class ImplDisparityScoreSadRectFive_U8<Disparity extends ImageSingleBand>
 	}
 
 	@Override
-	public Class<ImageUInt8> getInputType() {
-		return ImageUInt8.class;
+	public Class<GrayU8> getInputType() {
+		return GrayU8.class;
 	}
 
 	@Override

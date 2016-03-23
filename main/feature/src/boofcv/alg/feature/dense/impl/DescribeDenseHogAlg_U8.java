@@ -19,18 +19,18 @@
 package boofcv.alg.feature.dense.impl;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation pf {@link DescribeDenseHogAlg} for {@link ImageUInt8}.
+ * Implementation pf {@link DescribeDenseHogAlg} for {@link GrayU8}.
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogAlg_U8 extends DescribeDenseHogAlg<ImageUInt8,ImageSInt16> {
+public class DescribeDenseHogAlg_U8 extends DescribeDenseHogAlg<GrayU8,GrayS16> {
 	public DescribeDenseHogAlg_U8(int orientationBins, int widthCell, int widthBlock, int stepBlock) {
-		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.single(ImageUInt8.class));
+		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.single(GrayU8.class));
 	}
 
 	@Override

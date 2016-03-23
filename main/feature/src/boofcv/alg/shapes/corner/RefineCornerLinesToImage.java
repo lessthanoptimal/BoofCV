@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.shapes.corner;
 
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
@@ -46,7 +46,7 @@ import georegression.struct.point.Vector2D_F64;
  *
  * @author Peter Abeles
  */
-public class RefineCornerLinesToImage<T extends ImageSingleBand> {
+public class RefineCornerLinesToImage<T extends ImageGray> {
 
 	// How far away from a corner will it sample the line
 	double cornerOffset;

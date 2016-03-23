@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.core.image;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Benchmarks related to functions inside of ConvertImage
@@ -33,11 +33,11 @@ public class BenchmarkConvertImage {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 
-	static ImageFloat32 imgFloat32;
-	static ImageUInt8 imgUInt8;
-	static ImageSInt16 imgUInt16;
-	static ImageUInt8 imgSInt8;
-	static ImageSInt16 imgSInt16;
+	static GrayF32 imgFloat32;
+	static GrayU8 imgUInt8;
+	static GrayS16 imgUInt16;
+	static GrayU8 imgSInt8;
+	static GrayS16 imgSInt16;
 
 	public static class Float32toInt8 extends PerformerBase
 	{
@@ -49,9 +49,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int8ToFloat32 extends PerformerBase
 	{
-		ImageUInt8 img;
+		GrayU8 img;
 
-		public Int8ToFloat32(ImageUInt8 img) {
+		public Int8ToFloat32(GrayU8 img) {
 			this.img = img;
 		}
 
@@ -63,9 +63,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int16ToFloat32 extends PerformerBase
 	{
-		ImageSInt16 img;
+		GrayS16 img;
 
-		public Int16ToFloat32(ImageSInt16 img) {
+		public Int16ToFloat32(GrayS16 img) {
 			this.img = img;
 		}
 
@@ -77,9 +77,9 @@ public class BenchmarkConvertImage {
 
 	public static class Int16ToInt8 extends PerformerBase
 	{
-		ImageSInt16 img;
+		GrayS16 img;
 
-		public Int16ToInt8(ImageSInt16 img) {
+		public Int16ToInt8(GrayS16 img) {
 			this.img = img;
 		}
 
@@ -90,11 +90,11 @@ public class BenchmarkConvertImage {
 	}
 
 	public static void main( String args[] ) {
-		imgSInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgSInt16 = new ImageSInt16(imgWidth,imgHeight);
-		imgUInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgUInt16 = new ImageSInt16(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
+		imgSInt8 = new GrayU8(imgWidth,imgHeight);
+		imgSInt16 = new GrayS16(imgWidth,imgHeight);
+		imgUInt8 = new GrayU8(imgWidth,imgHeight);
+		imgUInt16 = new GrayS16(imgWidth,imgHeight);
+		imgFloat32 = new GrayF32(imgWidth,imgHeight);
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.filter.convolve;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface ConvolveInterface <Input extends ImageSingleBand, Output extends ImageSingleBand>
+public interface ConvolveInterface <Input extends ImageGray, Output extends ImageGray>
 		extends FilterImageInterface<Input,Output>
 {
 	/**

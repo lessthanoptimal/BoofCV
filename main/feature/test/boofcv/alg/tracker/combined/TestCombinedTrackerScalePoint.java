@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -156,7 +156,7 @@ public class TestCombinedTrackerScalePoint {
 		}
 
 		@Override
-		public void setInputs( ImagePyramid image , ImageSingleBand[] derivX , ImageSingleBand[] derivY ) {}
+		public void setInputs(ImagePyramid image , ImageGray[] derivX , ImageGray[] derivY ) {}
 
 		@Override
 		public void setDescription( float x , float y , PyramidKltFeature ret ) {}

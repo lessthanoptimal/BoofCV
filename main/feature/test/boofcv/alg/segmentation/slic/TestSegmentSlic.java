@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class TestSegmentSlic {
 			}
 		};
 
-		alg.input = new ImageUInt8(100,122);
+		alg.input = new GrayU8(100,122);
 		alg.gridInterval = 10;
 		alg.clusters.resize(120);
 
@@ -72,7 +72,7 @@ public class TestSegmentSlic {
 	public void computeClusterDistance() {
 		DummySlic alg = new DummySlic(4,1,10);
 
-		ImageUInt8 input = new ImageUInt8(7,9);
+		GrayU8 input = new GrayU8(7,9);
 		alg.initalize(input);
 
 		SegmentSlic.Cluster c0 = alg.clusters.grow();
@@ -132,7 +132,7 @@ public class TestSegmentSlic {
 			alg.pixels.get(i).add(c2,0.2f);
 		}
 
-		alg.input = new ImageUInt8(2,3);
+		alg.input = new GrayU8(2,3);
 		alg.updateClusters();
 
 		double w = (2.0/3.0) + 0.25;
@@ -169,7 +169,7 @@ public class TestSegmentSlic {
 			alg.pixels.get(i).add(c2,0.2f);
 		}
 
-		ImageSInt32 image = new ImageSInt32(2,3);
+		GrayS32 image = new GrayS32(2,3);
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 		FastQueue<float[]> regionColor = new ColorQueue_F32(1);
 
@@ -256,10 +256,10 @@ public class TestSegmentSlic {
 		assertEquals(56.8f,c.color[1],1e-4f);
 	}
 
-	public static class DummySlic extends SegmentSlic<ImageUInt8> {
+	public static class DummySlic extends SegmentSlic<GrayU8> {
 
 		public DummySlic(int numberOfRegions, float m, int totalIterations) {
-			super(numberOfRegions, m, totalIterations, ConnectRule.EIGHT, ImageType.single(ImageUInt8.class));
+			super(numberOfRegions, m, totalIterations, ConnectRule.EIGHT, ImageType.single(GrayU8.class));
 		}
 
 		@Override

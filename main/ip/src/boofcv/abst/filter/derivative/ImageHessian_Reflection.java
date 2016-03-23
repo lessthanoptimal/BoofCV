@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageHessian_Reflection<Output extends ImageSingleBand>
+public class ImageHessian_Reflection<Output extends ImageGray>
 		implements ImageHessian<Output>
 {
 	// How the image border should be handled

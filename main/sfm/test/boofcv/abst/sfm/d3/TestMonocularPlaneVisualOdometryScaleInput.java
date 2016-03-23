@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 import org.junit.Test;
@@ -37,8 +37,8 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	int height = 320;
 
 	MonoPlaneParameters param;
-	ImageFloat32 image;
-	ImageType<ImageFloat32> type = ImageType.single(ImageFloat32.class);
+	GrayF32 image;
+	ImageType<GrayF32> type = ImageType.single(GrayF32.class);
 	boolean result;
 	boolean resetCalled = false;
 
@@ -52,7 +52,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		extrinsic.T.x=8;
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 		assertTrue(this.param == null);
 		alg.setCalibration(new MonoPlaneParameters(intrinsic,extrinsic));
 
@@ -68,10 +68,10 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		IntrinsicParameters intrinsic = createIntrinsic();
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 		alg.setCalibration(new MonoPlaneParameters(intrinsic, new Se3_F64()));
 
-		ImageFloat32 inputImage = new ImageFloat32(width,height);
+		GrayF32 inputImage = new GrayF32(width,height);
 
 		alg.process(inputImage);
 
@@ -86,7 +86,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<ImageFloat32> alg = new MonocularPlaneVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 
 		assertTrue(type == alg.getImageType());
 	}
@@ -95,7 +95,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		return new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
 	}
 
-	protected class Dummy implements MonocularPlaneVisualOdometry<ImageFloat32> {
+	protected class Dummy implements MonocularPlaneVisualOdometry<GrayF32> {
 
 		@Override
 		public void setCalibration(MonoPlaneParameters config ) {
@@ -103,13 +103,13 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		}
 
 		@Override
-		public boolean process(ImageFloat32 l) {
+		public boolean process(GrayF32 l) {
 			image = l;
 			return result;
 		}
 
 		@Override
-		public ImageType<ImageFloat32> getImageType() {
+		public ImageType<GrayF32> getImageType() {
 			return type;
 		}
 

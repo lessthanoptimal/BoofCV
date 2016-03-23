@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class TestPyramidDiscrete {
 	 */
 	@Test
 	public void setScaling_positive() {
-		PyramidDiscrete<ImageUInt8> pyramid = new DummyDiscrete<ImageUInt8>(ImageUInt8.class,false);
+		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<GrayU8>(GrayU8.class,false);
 
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,200);
@@ -56,7 +56,7 @@ public class TestPyramidDiscrete {
 	 */
 	@Test
 	public void setScaling_negative() {
-		PyramidDiscrete<ImageUInt8> pyramid = new DummyDiscrete<ImageUInt8>(ImageUInt8.class,true);
+		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<GrayU8>(GrayU8.class,true);
 
 		try {
 			pyramid.setScaleFactors(1,2,5);
@@ -72,7 +72,7 @@ public class TestPyramidDiscrete {
 		} catch( RuntimeException e ){}
 	}
 
-	private static class DummyDiscrete<T extends ImageSingleBand> extends PyramidDiscrete<T> {
+	private static class DummyDiscrete<T extends ImageGray> extends PyramidDiscrete<T> {
 
 		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference) {
 			super(imageType, saveOriginalReference);

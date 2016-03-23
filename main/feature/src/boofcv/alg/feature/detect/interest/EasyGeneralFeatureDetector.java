@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,14 +24,14 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Detects features using {@link GeneralFeatureDetector} but Handles all the derivative computations automatically.
  *
  * @author Peter Abeles
  */
-public class EasyGeneralFeatureDetector<T extends ImageSingleBand, D extends ImageSingleBand> {
+public class EasyGeneralFeatureDetector<T extends ImageGray, D extends ImageGray> {
 
 	// Feature detector
 	protected GeneralFeatureDetector<T, D> detector;

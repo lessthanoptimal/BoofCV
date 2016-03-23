@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,19 +30,19 @@ import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 
 /**
- * Implementation of {@link BackgroundMovingBasic} for {@link MultiSpectral}.
+ * Implementation of {@link BackgroundMovingBasic} for {@link Planar}.
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
-	extends BackgroundMovingBasic<MultiSpectral<T>,Motion>
+public class BackgroundMovingBasic_MS<T extends ImageGray, Motion extends InvertibleTransform<Motion>>
+	extends BackgroundMovingBasic<Planar<T>,Motion>
 {
 	// where the background image is stored
-	protected MultiSpectral<ImageFloat32> background;
+	protected Planar<GrayF32> background;
 	// interpolates the input image
-	protected InterpolatePixelMB<MultiSpectral<T>> interpolationInput;
+	protected InterpolatePixelMB<Planar<T>> interpolationInput;
 	// interpolates the background image
-	protected InterpolatePixelMB<MultiSpectral<ImageFloat32>> interpolationBG;
+	protected InterpolatePixelMB<Planar<GrayF32>> interpolationBG;
 
 	// wrappers which provide abstraction across image types
 	protected GImageMultiBand backgroundWrapper;
@@ -54,22 +54,22 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	public BackgroundMovingBasic_MS(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
 									TypeInterpolate interpType,
-									ImageType<MultiSpectral<T>> imageType) {
+									ImageType<Planar<T>> imageType) {
 		super(learnRate, threshold,transform, imageType);
 
 		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType,BorderType.EXTENDED,imageType);
 
 		int numBands = imageType.getNumBands();
-		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
+		background = new Planar<GrayF32>(GrayF32.class,1,1,numBands);
 
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
-				0, 255, interpType, BorderType.EXTENDED, ImageType.ms(numBands, ImageFloat32.class));
+				0, 255, interpType, BorderType.EXTENDED, ImageType.ms(numBands, GrayF32.class));
 		this.interpolationBG.setImage(background);
 
 		pixelInput = new float[numBands];
 		pixelBack = new float[numBands];
 
-		backgroundWrapper = FactoryGImageMultiBand.create(ImageType.ms(numBands, ImageFloat32.class));
+		backgroundWrapper = FactoryGImageMultiBand.create(ImageType.ms(numBands, GrayF32.class));
 		backgroundWrapper.wrap(background);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
@@ -80,7 +80,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	 *
 	 * @return background image.
 	 */
-	public MultiSpectral<ImageFloat32> getBackground() {
+	public Planar<GrayF32> getBackground() {
 		return background;
 	}
 
@@ -102,7 +102,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	}
 
 	@Override
-	protected void updateBackground(int x0, int y0, int x1, int y1, MultiSpectral<T> frame) {
+	protected void updateBackground(int x0, int y0, int x1, int y1, Planar<T> frame) {
 
 		transform.setModel(worldToCurrent);
 		interpolationInput.setImage(frame);
@@ -138,7 +138,7 @@ public class BackgroundMovingBasic_MS<T extends ImageSingleBand, Motion extends 
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, MultiSpectral<T> frame, ImageUInt8 segmented) {
+	protected void _segment(Motion currentToWorld, Planar<T> frame, GrayU8 segmented) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

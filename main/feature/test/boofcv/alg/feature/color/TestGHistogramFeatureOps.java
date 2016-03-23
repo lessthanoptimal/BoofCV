@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -42,13 +42,13 @@ public class TestGHistogramFeatureOps {
 	int width = 30;
 	int height = 40;
 
-	Class[] supported = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class[] supported = new Class[]{GrayU8.class, GrayF32.class};
 
 	@Test
 	public void histogram_sb() {
 
 		for( Class type : supported ) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type,width,height);
+			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
 			TupleDesc_F64 found = new TupleDesc_F64(200);
@@ -56,10 +56,10 @@ public class TestGHistogramFeatureOps {
 
 			GHistogramFeatureOps.histogram(image, 0, 200, found);
 
-			if( type == ImageFloat32.class ) {
-				HistogramFeatureOps.histogram((ImageFloat32)image,0,200,expected);
+			if( type == GrayF32.class ) {
+				HistogramFeatureOps.histogram((GrayF32)image,0,200,expected);
 			} else {
-				HistogramFeatureOps.histogram((ImageUInt8)image,200,expected);
+				HistogramFeatureOps.histogram((GrayU8)image,200,expected);
 			}
 
 			assertEquals(0, DescriptorDistance.euclidean(expected,found),1e-8);
@@ -69,7 +69,7 @@ public class TestGHistogramFeatureOps {
 	@Test
 	public void histogram_ms() {
 		for( Class type : supported ) {
-			MultiSpectral image = new MultiSpectral(type,width,height,2);
+			Planar image = new Planar(type,width,height,2);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
 			Histogram_F64 found = new Histogram_F64(50,40);
@@ -79,7 +79,7 @@ public class TestGHistogramFeatureOps {
 
 			GHistogramFeatureOps.histogram(image, found);
 
-			if( type == ImageFloat32.class ) {
+			if( type == GrayF32.class ) {
 				HistogramFeatureOps.histogram_F32(image, expected);
 			} else {
 				HistogramFeatureOps.histogram_U8(image, expected);
@@ -92,7 +92,7 @@ public class TestGHistogramFeatureOps {
 
 	@Test
 	public void histogram_array() {
-		MultiSpectral<ImageUInt8> image = new MultiSpectral(ImageUInt8.class,width,height,2);
+		Planar<GrayU8> image = new Planar(GrayU8.class,width,height,2);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 
 		double[] pixels = new double[ image.width*image.height*2 ];

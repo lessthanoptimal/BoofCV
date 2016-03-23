@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.factory.filter.convolve.FactoryConvolveSparse;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.polyPeak;
@@ -96,14 +96,14 @@ public class SiftDetector {
 	protected FastQueue<ScalePoint> detections = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 	// Computes image derivatives. used in edge rejection
-	ImageConvolveSparse<ImageFloat32,?> derivXX;
-	ImageConvolveSparse<ImageFloat32,?> derivXY;
-	ImageConvolveSparse<ImageFloat32,?> derivYY;
+	ImageConvolveSparse<GrayF32,?> derivXX;
+	ImageConvolveSparse<GrayF32,?> derivXY;
+	ImageConvolveSparse<GrayF32,?> derivYY;
 
 	// local scale space around the current scale image being processed
-	ImageFloat32 dogLower;  // DoG image in lower scale
-	ImageFloat32 dogTarget; // DoG image in target scale
-	ImageFloat32 dogUpper;  // DoG image in upper scale
+	GrayF32 dogLower;  // DoG image in lower scale
+	GrayF32 dogTarget; // DoG image in target scale
+	GrayF32 dogUpper;  // DoG image in upper scale
 	double sigmaLower, sigmaTarget, sigmaUpper;
 
 	// finds features from 2D intensity image
@@ -146,11 +146,11 @@ public class SiftDetector {
 		Kernel1D_F32 kernelDD = KernelMath.convolve1D_F32(kernelD, kernelD);
 		Kernel2D_F32 kernelXY = KernelMath.convolve2D(kernelD, kernelD);
 
-		derivXX = FactoryConvolveSparse.horizontal1D(ImageFloat32.class, kernelDD);
-		derivXY = FactoryConvolveSparse.convolve2D(ImageFloat32.class, kernelXY);
-		derivYY = FactoryConvolveSparse.vertical1D(ImageFloat32.class, kernelDD);
+		derivXX = FactoryConvolveSparse.horizontal1D(GrayF32.class, kernelDD);
+		derivXY = FactoryConvolveSparse.convolve2D(GrayF32.class, kernelXY);
+		derivYY = FactoryConvolveSparse.vertical1D(GrayF32.class, kernelDD);
 
-		ImageBorder<ImageFloat32> border = FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED);
+		ImageBorder<GrayF32> border = FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
 
 		derivXX.setImageBorder(border);
 		derivXY.setImageBorder(border);
@@ -162,7 +162,7 @@ public class SiftDetector {
 	 *
 	 * @param input Input image.  Not modified.
 	 */
-	public void process( ImageFloat32 input ) {
+	public void process( GrayF32 input ) {
 
 		scaleSpace.initialize(input);
 		detections.reset();

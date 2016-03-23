@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.template;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.Match;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ public class TestTemplateMatching {
 
 	List<Match> expected;
 
-	ImageFloat32 input = new ImageFloat32(width, height);
-	ImageFloat32 template = new ImageFloat32(5, 6);
+	GrayF32 input = new GrayF32(width, height);
+	GrayF32 template = new GrayF32(5, 6);
 
 	/**
 	 * Basic detection task with an extraction algorithm that has no border
@@ -115,7 +115,7 @@ public class TestTemplateMatching {
 
 		TemplateMatching alg = new TemplateMatching(intensity);
 
-		alg.setTemplate(template, new ImageFloat32(5,5), 10);
+		alg.setTemplate(template, new GrayF32(5,5), 10);
 		alg.process(input);
 
 		assertTrue(intensity.maskedCalled);
@@ -140,7 +140,7 @@ public class TestTemplateMatching {
 
 	private class  DummyIntensity implements TemplateMatchingIntensity {
 
-		ImageFloat32 intensity = new ImageFloat32(width, height);
+		GrayF32 intensity = new GrayF32(width, height);
 		boolean border;
 		int offsetX, offsetY;
 		boolean maskedCalled = false;
@@ -170,7 +170,7 @@ public class TestTemplateMatching {
 		}
 
 		@Override
-		public ImageFloat32 getIntensity() {
+		public GrayF32 getIntensity() {
 			return intensity;
 		}
 

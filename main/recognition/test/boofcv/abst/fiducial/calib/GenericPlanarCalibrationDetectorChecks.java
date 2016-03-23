@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -55,21 +55,21 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	int width = 300,height= 300;
 
-	ImageFloat32 original;
-	ImageFloat32 distorted;
+	GrayF32 original;
+	GrayF32 distorted;
 	List<CalibrationObservation> solutions = new ArrayList<CalibrationObservation>();
 
 	PointTransform_F32 d2o;
 	PointTransform_F64 o2d;
 
-	public abstract void renderTarget( ImageFloat32 original , List<CalibrationObservation> solutions );
+	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
 
 	public abstract CalibrationDetector createDetector();
 
 	@Before
 	public void setup() {
-		original = new ImageFloat32(width,height);
-		distorted = new ImageFloat32(width, height);
+		original = new GrayF32(width,height);
+		distorted = new GrayF32(width, height);
 		renderTarget(original, solutions);
 	}
 
@@ -161,7 +161,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		checkList(found, true);
 	}
 
-	private void display( ImageFloat32 image ) {
+	private void display( GrayF32 image ) {
 		BufferedImage visualized = ConvertBufferedImage.convertTo(image, null, true);
 		ShowImages.showWindow(visualized, "Input");
 

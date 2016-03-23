@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,24 +32,24 @@ import boofcv.struct.image.*;
 public class DiscreteFourierTransformOps {
 
 	/**
-	 * Creates a {@link DiscreteFourierTransform} for images of type {@link ImageFloat32}.
+	 * Creates a {@link DiscreteFourierTransform} for images of type {@link GrayF32}.
 	 *
 	 * @see GeneralPurposeFFT_F32_2D
 	 *
 	 * @return {@link DiscreteFourierTransform}
 	 */
-	public static DiscreteFourierTransform<ImageFloat32,InterleavedF32>  createTransformF32() {
+	public static DiscreteFourierTransform<GrayF32,InterleavedF32>  createTransformF32() {
 		return new GeneralFft_to_DiscreteFourierTransform_F32();
 	}
 
 	/**
-	 * Creates a {@link DiscreteFourierTransform} for images of type {@link ImageFloat64}.
+	 * Creates a {@link DiscreteFourierTransform} for images of type {@link GrayF64}.
 	 *
 	 * @see GeneralPurposeFFT_F64_2D
 	 *
 	 * @return {@link DiscreteFourierTransform}
 	 */
-	public static DiscreteFourierTransform<ImageFloat64,InterleavedF64>  createTransformF64() {
+	public static DiscreteFourierTransform<GrayF64,InterleavedF64>  createTransformF64() {
 		return new GeneralFft_to_DiscreteFourierTransform_F64();
 	}
 
@@ -255,7 +255,7 @@ public class DiscreteFourierTransformOps {
 	 * @param transform (Input)  Complex interleaved image
 	 * @param magnitude (Output) Magnitude of image
 	 */
-	public static void magnitude( InterleavedF32 transform , ImageFloat32 magnitude ) {
+	public static void magnitude( InterleavedF32 transform , GrayF32 magnitude ) {
 		checkImageArguments(magnitude,transform);
 
 		for( int y = 0; y < transform.height; y++ ) {
@@ -279,7 +279,7 @@ public class DiscreteFourierTransformOps {
 	 * @param transform (Input)  Complex interleaved image
 	 * @param magnitude (Output) Magnitude of image
 	 */
-	public static void magnitude( InterleavedF64 transform , ImageFloat64 magnitude ) {
+	public static void magnitude( InterleavedF64 transform , GrayF64 magnitude ) {
 		checkImageArguments(magnitude,transform);
 
 		for( int y = 0; y < transform.height; y++ ) {
@@ -303,7 +303,7 @@ public class DiscreteFourierTransformOps {
 	 * @param transform (Input) Complex interleaved image
 	 * @param phase (output) Phase of image
 	 */
-	public static void phase( InterleavedF32 transform , ImageFloat32 phase ) {
+	public static void phase( InterleavedF32 transform , GrayF32 phase ) {
 		checkImageArguments(phase,transform);
 
 		for( int y = 0; y < transform.height; y++ ) {
@@ -327,7 +327,7 @@ public class DiscreteFourierTransformOps {
 	 * @param transform (Input) Complex interleaved image
 	 * @param phase (output) Phase of image
 	 */
-	public static void phase( InterleavedF64 transform , ImageFloat64 phase ) {
+	public static void phase( InterleavedF64 transform , GrayF64 phase ) {
 		checkImageArguments(phase,transform);
 
 		for( int y = 0; y < transform.height; y++ ) {
@@ -351,7 +351,7 @@ public class DiscreteFourierTransformOps {
 	 * @param real (Input) Regular image.
 	 * @param complex (Output) Equivalent complex image.
 	 */
-	public static void realToComplex( ImageFloat32 real , InterleavedF32 complex ) {
+	public static void realToComplex(GrayF32 real , InterleavedF32 complex ) {
 		checkImageArguments(real,complex);
 		for( int y = 0; y < complex.height; y++ ) {
 
@@ -371,7 +371,7 @@ public class DiscreteFourierTransformOps {
 	 * @param real (Input) Regular image.
 	 * @param complex (Output) Equivalent complex image.
 	 */
-	public static void realToComplex( ImageFloat64 real , InterleavedF64 complex ) {
+	public static void realToComplex(GrayF64 real , InterleavedF64 complex ) {
 		checkImageArguments(real,complex);
 		for( int y = 0; y < complex.height; y++ ) {
 
@@ -392,7 +392,7 @@ public class DiscreteFourierTransformOps {
 	 * @param complexB (Input) Complex image
 	 * @param complexC (Output) Complex image
 	 */
-	public static void multiplyRealComplex( ImageFloat32 realA ,
+	public static void multiplyRealComplex( GrayF32 realA ,
 											InterleavedF32 complexB , InterleavedF32 complexC ) {
 
 		checkImageArguments(realA,complexB);
@@ -424,7 +424,7 @@ public class DiscreteFourierTransformOps {
 	 * @param complexB (Input) Complex image
 	 * @param complexC (Output) Complex image
 	 */
-	public static void multiplyRealComplex( ImageFloat64 realA ,
+	public static void multiplyRealComplex( GrayF64 realA ,
 											InterleavedF64 complexB , InterleavedF64 complexC ) {
 
 		checkImageArguments(realA,complexB);

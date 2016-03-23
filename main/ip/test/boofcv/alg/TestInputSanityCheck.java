@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -33,22 +33,22 @@ public class TestInputSanityCheck {
 
 	@Test
 	public void checkShape_two() {
-		ImageUInt8 a = new ImageUInt8(imgWidth, imgHeight);
-		ImageUInt8 b = new ImageUInt8(imgWidth, imgHeight);
+		GrayU8 a = new GrayU8(imgWidth, imgHeight);
+		GrayU8 b = new GrayU8(imgWidth, imgHeight);
 
 		// InputSanityCheck test
 		InputSanityCheck.checkSameShape(a, b);
 
 		// negative test
 		try {
-			b = new ImageUInt8(imgWidth + 1, imgHeight);
+			b = new GrayU8(imgWidth + 1, imgHeight);
 			InputSanityCheck.checkSameShape(a, b);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {
 		}
 
 		try {
-			b = new ImageUInt8(imgWidth, imgHeight + 1);
+			b = new GrayU8(imgWidth, imgHeight + 1);
 			InputSanityCheck.checkSameShape(a, b);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {
@@ -57,37 +57,37 @@ public class TestInputSanityCheck {
 
 	@Test
 	public void checkShape_three() {
-		ImageUInt8 a = new ImageUInt8(imgWidth, imgHeight);
-		ImageUInt8 b = new ImageUInt8(imgWidth, imgHeight);
-		ImageUInt8 c = new ImageUInt8(imgWidth, imgHeight);
+		GrayU8 a = new GrayU8(imgWidth, imgHeight);
+		GrayU8 b = new GrayU8(imgWidth, imgHeight);
+		GrayU8 c = new GrayU8(imgWidth, imgHeight);
 
 		// InputSanityCheck test
 		InputSanityCheck.checkSameShape(a, b, c);
 
 		// negative test
 		try {
-			b = new ImageUInt8(imgWidth + 1, imgHeight);
+			b = new GrayU8(imgWidth + 1, imgHeight);
 			InputSanityCheck.checkSameShape(a, b, c);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {
 		}
 
 		try {
-			b = new ImageUInt8(imgWidth, imgHeight + 1);
+			b = new GrayU8(imgWidth, imgHeight + 1);
 			InputSanityCheck.checkSameShape(a, b, c);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {
 		}
-		b = new ImageUInt8(imgWidth, imgHeight);
+		b = new GrayU8(imgWidth, imgHeight);
 		try {
-			c = new ImageUInt8(imgWidth + 1, imgHeight);
+			c = new GrayU8(imgWidth + 1, imgHeight);
 			InputSanityCheck.checkSameShape(a, b, c);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {
 		}
 
 		try {
-			c = new ImageUInt8(imgWidth, imgHeight + 1);
+			c = new GrayU8(imgWidth, imgHeight + 1);
 			InputSanityCheck.checkSameShape(a, b, c);
 			fail("Didn't throw an exception");
 		} catch (IllegalArgumentException e) {

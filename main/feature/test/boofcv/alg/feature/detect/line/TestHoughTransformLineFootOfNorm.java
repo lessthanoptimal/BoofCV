@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,13 +42,13 @@ public class TestHoughTransformLineFootOfNorm {
 	 */
 	@Test
 	public void obviousLines() {
-		obviousLines(ImageFloat32.class);
-		obviousLines(ImageSInt16.class);
-		obviousLines(ImageSInt32.class);
+		obviousLines(GrayF32.class);
+		obviousLines(GrayS16.class);
+		obviousLines(GrayS32.class);
 	}
 
-	private <D extends ImageSingleBand> void obviousLines( Class<D> derivType ) {
-		ImageUInt8 binary = new ImageUInt8(width,height);
+	private <D extends ImageGray> void obviousLines(Class<D> derivType ) {
+		GrayU8 binary = new GrayU8(width,height);
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 

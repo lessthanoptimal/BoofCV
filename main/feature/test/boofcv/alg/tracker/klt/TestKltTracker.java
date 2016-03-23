@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -42,9 +42,9 @@ public class TestKltTracker {
 	int imageWidth = 40;
 	int imageHeight = 50;
 
-	ImageFloat32 image = new ImageFloat32(imageWidth, imageHeight);
-	ImageFloat32 derivX = new ImageFloat32(imageWidth, imageHeight);
-	ImageFloat32 derivY = new ImageFloat32(imageWidth, imageHeight);
+	GrayF32 image = new GrayF32(imageWidth, imageHeight);
+	GrayF32 derivX = new GrayF32(imageWidth, imageHeight);
+	GrayF32 derivY = new GrayF32(imageWidth, imageHeight);
 
 	/**
 	 * Process the same features in two different sets of image.  only difference is that one is a sub image
@@ -56,13 +56,13 @@ public class TestKltTracker {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		KltTracker<ImageFloat32, ImageFloat32> trackerA = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> trackerA = createDefaultTracker();
 		trackerA.setImage(image, derivX, derivY);
 
-		KltTracker<ImageFloat32, ImageFloat32> trackerB = createDefaultTracker();
-		ImageFloat32 image = BoofTesting.createSubImageOf(this.image);
-		ImageFloat32 derivX = BoofTesting.createSubImageOf(this.derivX);
-		ImageFloat32 derivY = BoofTesting.createSubImageOf(this.derivY);
+		KltTracker<GrayF32, GrayF32> trackerB = createDefaultTracker();
+		GrayF32 image = BoofTesting.createSubImageOf(this.image);
+		GrayF32 derivX = BoofTesting.createSubImageOf(this.derivX);
+		GrayF32 derivY = BoofTesting.createSubImageOf(this.derivY);
 		trackerB.setImage(image, derivX, derivY);
 
 		for( int y = 0; y < imageHeight; y += 4) {
@@ -109,7 +109,7 @@ public class TestKltTracker {
 		ImageMiscOps.fillUniform(image,rand,0,100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(3);
 
@@ -144,7 +144,7 @@ public class TestKltTracker {
 		ImageMiscOps.fillUniform(image,rand,0,100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(3);
 
@@ -176,7 +176,7 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void setDescription_outsideFail() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(3);
 		feature.setPosition(-100,200);
@@ -193,7 +193,7 @@ public class TestKltTracker {
 		ImageMiscOps.fillUniform(image,rand,0,100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 
 		KltFeature featureA = new KltFeature(3);
@@ -218,7 +218,7 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void setDescription_borderNaN() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 
 		KltFeature feature = new KltFeature(3);
@@ -240,7 +240,7 @@ public class TestKltTracker {
 	 */
 	@Test
 	public void detectBadFeature() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);
 
@@ -258,7 +258,7 @@ public class TestKltTracker {
 		ImageMiscOps.fillUniform(image,rand,0,100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend.class));
 
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		KltFeature feature = new KltFeature(2);
 
@@ -290,7 +290,7 @@ public class TestKltTracker {
 
 	@Test
 	public void isDescriptionComplete() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
 		KltFeature f = new KltFeature(2);
 		tracker.lengthFeature = 25;
@@ -307,11 +307,11 @@ public class TestKltTracker {
 
 	@Test
 	public void isFullyInside() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
 		KltFeature f = new KltFeature(2);
 
-		tracker.image = new ImageFloat32(imageWidth,imageHeight);
+		tracker.image = new GrayF32(imageWidth,imageHeight);
 		tracker.setAllowedBounds(f);
 
 		assertTrue(tracker.isFullyInside(imageWidth/2,imageHeight/2));
@@ -331,12 +331,12 @@ public class TestKltTracker {
 
 	@Test
 	public void isFullyOutside() {
-		KltTracker<ImageFloat32, ImageFloat32> tracker = createDefaultTracker();
+		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
 		int r = 2;
 		KltFeature f = new KltFeature(r);
 
-		tracker.image = new ImageFloat32(imageWidth,imageHeight);
+		tracker.image = new GrayF32(imageWidth,imageHeight);
 		tracker.setAllowedBounds(f);
 
 		assertFalse(tracker.isFullyOutside(-r,-r));
@@ -351,16 +351,16 @@ public class TestKltTracker {
 		assertTrue(tracker.isFullyOutside(imageWidth+r-1,imageHeight+r-0.999f));
 	}
 
-	public static KltTracker<ImageFloat32, ImageFloat32> createDefaultTracker() {
+	public static KltTracker<GrayF32, GrayF32> createDefaultTracker() {
 		KltConfig config = new KltConfig();
 		config.maxPerPixelError = 10;
 		config.maxIterations = 30;
 		config.minDeterminant = 0.01f;
 		config.minPositionDelta = 0.001f;
 
-		InterpolateRectangle<ImageFloat32> interp1 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
-		InterpolateRectangle<ImageFloat32> interp2 = FactoryInterpolation.bilinearRectangle(ImageFloat32.class);
+		InterpolateRectangle<GrayF32> interp1 = FactoryInterpolation.bilinearRectangle(GrayF32.class);
+		InterpolateRectangle<GrayF32> interp2 = FactoryInterpolation.bilinearRectangle(GrayF32.class);
 
-		return new KltTracker<ImageFloat32, ImageFloat32>(interp1, interp2,config);
+		return new KltTracker<GrayF32, GrayF32>(interp1, interp2,config);
 	}
 }

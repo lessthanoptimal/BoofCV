@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -50,7 +50,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface GradientCornerIntensity<T extends ImageSingleBand> extends FeatureIntensity<T> {
+public interface GradientCornerIntensity<T extends ImageGray> extends FeatureIntensity<T> {
 
 	/**
 	 * Computes feature intensity image.
@@ -59,5 +59,5 @@ public interface GradientCornerIntensity<T extends ImageSingleBand> extends Feat
 	 * @param derivY Image derivative along the y-axis.
 	 * @param intensity Output intensity image
 	 */
-	public void process(T derivX, T derivY , ImageFloat32 intensity );
+	public void process(T derivX, T derivY , GrayF32 intensity );
 }

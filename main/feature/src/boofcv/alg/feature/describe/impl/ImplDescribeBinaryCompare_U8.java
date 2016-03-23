@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.alg.feature.describe.DescribePointBinaryCompare;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDescribeBinaryCompare_U8 extends DescribePointBinaryCompare<ImageUInt8> {
+public class ImplDescribeBinaryCompare_U8 extends DescribePointBinaryCompare<GrayU8> {
 
 	public ImplDescribeBinaryCompare_U8(BinaryCompareDefinition_I32 definition) {
 		super(definition);

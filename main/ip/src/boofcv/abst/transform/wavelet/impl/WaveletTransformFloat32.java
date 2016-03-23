@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,21 +22,21 @@ import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.alg.transform.wavelet.WaveletTransformOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 
 
 /**
- * Implementation of {@link boofcv.abst.transform.wavelet.WaveletTransform} for {@link ImageFloat32}.
+ * Implementation of {@link boofcv.abst.transform.wavelet.WaveletTransform} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,ImageFloat32, WlCoef_F32> {
+public class WaveletTransformFloat32 implements WaveletTransform<GrayF32,GrayF32, WlCoef_F32> {
 
-	ImageFloat32 copy = new ImageFloat32(1,1);
-	ImageFloat32 temp = new ImageFloat32(1,1);
+	GrayF32 copy = new GrayF32(1,1);
+	GrayF32 temp = new GrayF32(1,1);
 	WaveletDescription<WlCoef_F32> desc;
 	// number of levels in the transform
 	int numLevels;
@@ -54,11 +54,11 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	}
 
 	@Override
-	public ImageFloat32 transform(ImageFloat32 original, ImageFloat32 transformed) {
+	public GrayF32 transform(GrayF32 original, GrayF32 transformed) {
 
 		if( transformed == null ) {
 			ImageDimension d = UtilWavelet.transformDimension(original,numLevels);
-			transformed = new ImageFloat32(d.width,d.height);
+			transformed = new GrayF32(d.width,d.height);
 		}
 		temp.reshape(transformed.width,transformed.height);
 		copy.reshape(original.width,original.height);
@@ -70,7 +70,7 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	}
 
 	@Override
-	public void invert(ImageFloat32 transformed, ImageFloat32 original) {
+	public void invert(GrayF32 transformed, GrayF32 original) {
 		temp.reshape(transformed.width,transformed.height);
 		copy.reshape(transformed.width,transformed.height);
 		copy.setTo(transformed);
@@ -94,7 +94,7 @@ public class WaveletTransformFloat32 implements WaveletTransform<ImageFloat32,Im
 	}
 
 	@Override
-	public Class<ImageFloat32> getOriginalType() {
-		return ImageFloat32.class;
+	public Class<GrayF32> getOriginalType() {
+		return GrayF32.class;
 	}
 }

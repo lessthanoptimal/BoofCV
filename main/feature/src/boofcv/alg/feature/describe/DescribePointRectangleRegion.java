@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Base class for describing a rectangular region using pixels.
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointRectangleRegion<T extends ImageSingleBand>
+public abstract class DescribePointRectangleRegion<T extends ImageGray>
 {
 	// image that descriptors are being extracted from
 	protected T image;

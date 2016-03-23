@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 
 
 /**
@@ -53,7 +53,7 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 {
 	}
 
 	@Override
-	public void setImage( ImageFloat64 image ) {
+	public void setImage( GrayF64 image ) {
 		super.setImage(image);
 		colWrap.setLength(image.width);
 		rowWrap.setLength(image.height);

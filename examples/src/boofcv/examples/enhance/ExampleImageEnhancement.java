@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -49,8 +49,8 @@ public class ExampleImageEnhancement {
 	 */
 	public static void histogram() {
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
-		ImageUInt8 adjusted = gray.createSameShape();
+		GrayU8 gray = ConvertBufferedImage.convertFrom(buffered,(GrayU8)null);
+		GrayU8 adjusted = gray.createSameShape();
 
 		int histogram[] = new int[256];
 		int transform[] = new int[256];
@@ -76,8 +76,8 @@ public class ExampleImageEnhancement {
 	 */
 	public static void sharpen() {
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(buffered,(ImageUInt8)null);
-		ImageUInt8 adjusted = gray.createSameShape();
+		GrayU8 gray = ConvertBufferedImage.convertFrom(buffered,(GrayU8)null);
+		GrayU8 adjusted = gray.createSameShape();
 
 
 		ListDisplayPanel panel = new ListDisplayPanel();

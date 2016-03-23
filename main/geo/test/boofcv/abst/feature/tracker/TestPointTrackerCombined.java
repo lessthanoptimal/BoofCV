@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,38 +33,38 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerCombined extends StandardPointTracker<ImageFloat32> {
+public class TestPointTrackerCombined extends StandardPointTracker<GrayF32> {
 
 	public TestPointTrackerCombined() {
 		super(true, false);
 	}
 
 	@Override
-	public PointTracker<ImageFloat32> createTracker() {
-		DescribePointBrief<ImageFloat32> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
+	public PointTracker<GrayF32> createTracker() {
+		DescribePointBrief<GrayF32> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
+				FactoryBlurFilter.gaussian(GrayF32.class, 0, 4));
 
-		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0), false, ImageFloat32.class);
+		GeneralFeatureDetector<GrayF32,GrayF32> corner =
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0), false, GrayF32.class);
 
-		InterestPointDetector<ImageFloat32> detector =
-				FactoryInterestPoint.wrapPoint(corner, 1,ImageFloat32.class, ImageFloat32.class);
+		InterestPointDetector<GrayF32> detector =
+				FactoryInterestPoint.wrapPoint(corner, 1,GrayF32.class, GrayF32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription<TupleDesc_B> association =
 				FactoryAssociation.greedy(score, 400, true);
 
-		PointTracker<ImageFloat32> pointTracker = FactoryPointTracker.combined(
+		PointTracker<GrayF32> pointTracker = FactoryPointTracker.combined(
 				detector, null,
-				new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class),
-				association, null, 20, ImageFloat32.class);
+				new WrapDescribeBrief<GrayF32>(brief,GrayF32.class),
+				association, null, 20, GrayF32.class);
 
 		return pointTracker;
 	}

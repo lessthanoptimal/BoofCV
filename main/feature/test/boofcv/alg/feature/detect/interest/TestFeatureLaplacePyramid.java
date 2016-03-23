@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -38,23 +38,23 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetectorTests 
 	}
 
 	@Override
-	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
+	protected Object createDetector(GeneralFeatureDetector<GrayF32, GrayF32> detector) {
 
-		ImageFunctionSparse<ImageFloat32> sparseLaplace =
-				FactoryDerivativeSparse.createLaplacian(ImageFloat32.class, null);
-		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv =  GImageDerivativeOps.
-				derivativeForScaleSpace(ImageFloat32.class, ImageFloat32.class);
+		ImageFunctionSparse<GrayF32> sparseLaplace =
+				FactoryDerivativeSparse.createLaplacian(GrayF32.class, null);
+		AnyImageDerivative<GrayF32, GrayF32> deriv =  GImageDerivativeOps.
+				derivativeForScaleSpace(GrayF32.class, GrayF32.class);
 
-		return new FeatureLaplacePyramid<ImageFloat32, ImageFloat32>(detector, sparseLaplace, deriv, 1);
+		return new FeatureLaplacePyramid<GrayF32, GrayF32>(detector, sparseLaplace, deriv, 1);
 	}
 
 	@Override
-	protected int detectFeature(ImageFloat32 input, Object detector) {
+	protected int detectFeature(GrayF32 input, Object detector) {
 
-		PyramidFloat<ImageFloat32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8}, ImageFloat32.class);
+		PyramidFloat<GrayF32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8}, GrayF32.class);
 		ss.process(input);
 
-		FeatureLaplacePyramid<ImageFloat32, ImageFloat32> alg = (FeatureLaplacePyramid<ImageFloat32, ImageFloat32>) detector;
+		FeatureLaplacePyramid<GrayF32, GrayF32> alg = (FeatureLaplacePyramid<GrayF32, GrayF32>) detector;
 		alg.detect(ss);
 
 		return alg.getInterestPoints().size();

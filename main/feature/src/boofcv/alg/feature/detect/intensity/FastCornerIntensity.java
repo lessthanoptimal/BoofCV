@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity;
 import boofcv.alg.feature.detect.intensity.impl.FastHelper;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class FastCornerIntensity<T extends ImageSingleBand> implements FeatureIntensity<T> {
+public abstract class FastCornerIntensity<T extends ImageGray> implements FeatureIntensity<T> {
 
 	// radius of the circle being sampled
 	protected static final int radius = 3;
@@ -106,7 +106,7 @@ public abstract class FastCornerIntensity<T extends ImageSingleBand> implements 
 		return radius;
 	}
 
-	public void process( T image , ImageFloat32 intensity ) {
+	public void process( T image , GrayF32 intensity ) {
 		candidates.reset();
 		this.image = image;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,22 +21,22 @@ package boofcv.abst.filter.interpolate;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
- * Wrapper around {@link InterpolatePixelS} which allows it to interpolate {@link MultiSpectral} inside
+ * Wrapper around {@link InterpolatePixelS} which allows it to interpolate {@link Planar} inside
  * a {@link InterpolatePixelMB}.  Performs the same calculations multiple times compared to a custom solution.
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_MS_using_SB<T extends ImageSingleBand>
-		implements InterpolatePixelMB<MultiSpectral<T>>
+public class InterpolatePixel_MS_using_SB<T extends ImageGray>
+		implements InterpolatePixelMB<Planar<T>>
 {
 	InterpolatePixelS<T> alg;
 
-	MultiSpectral<T> image;
+	Planar<T> image;
 
 	public InterpolatePixel_MS_using_SB(InterpolatePixelS<T> alg) {
 		this.alg = alg;
@@ -61,24 +61,24 @@ public class InterpolatePixel_MS_using_SB<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void setBorder(ImageBorder<MultiSpectral<T>> border) {
+	public void setBorder(ImageBorder<Planar<T>> border) {
 		this.alg.setBorder((ImageBorder)border);
 	}
 
 	@Override
-	public ImageBorder<MultiSpectral<T>> getBorder() {
+	public ImageBorder<Planar<T>> getBorder() {
 		throw new RuntimeException("Need to write code to handle this");
 	}
 
 	@Override
-	public void setImage(MultiSpectral<T> image) {
+	public void setImage(Planar<T> image) {
 		this.image = image;
 		// set it to use the first band by default so that other functions can work
 		alg.setImage( image.getBand(0));
 	}
 
 	@Override
-	public MultiSpectral<T> getImage() {
+	public Planar<T> getImage() {
 		return image;
 	}
 
@@ -98,7 +98,7 @@ public class InterpolatePixel_MS_using_SB<T extends ImageSingleBand>
 	}
 
 	@Override
-	public ImageType<MultiSpectral<T>> getImageType() {
+	public ImageType<Planar<T>> getImageType() {
 		throw new RuntimeException("Image type isn't determined until it processes an image");
 	}
 }

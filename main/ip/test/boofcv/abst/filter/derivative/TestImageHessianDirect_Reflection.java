@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.filter.derivative;
 
 import boofcv.alg.filter.derivative.HessianSobel;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -40,14 +40,14 @@ public class TestImageHessianDirect_Reflection {
 	 */
 	@Test
 	public void testNoException() throws NoSuchMethodException {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 derivXX = new ImageFloat32(width,height);
-		ImageFloat32 derivYY = new ImageFloat32(width,height);
-		ImageFloat32 derivXY = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 derivXX = new GrayF32(width,height);
+		GrayF32 derivYY = new GrayF32(width,height);
+		GrayF32 derivXY = new GrayF32(width,height);
 
-		Method m = HessianSobel.class.getMethod("process",ImageFloat32.class,ImageFloat32.class,ImageFloat32.class,ImageFloat32.class, ImageBorder_F32.class);
+		Method m = HessianSobel.class.getMethod("process",GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
 
-		ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32> alg = new ImageHessianDirect_Reflection<ImageFloat32,ImageFloat32>(m);
+		ImageHessianDirect_Reflection<GrayF32,GrayF32> alg = new ImageHessianDirect_Reflection<GrayF32,GrayF32>(m);
 
 		alg.process(input,derivXX,derivYY,derivXY);
 	}

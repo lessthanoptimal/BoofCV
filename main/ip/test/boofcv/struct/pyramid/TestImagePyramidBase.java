@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.struct.pyramid;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -37,10 +37,10 @@ public class TestImagePyramidBase {
 
 	@Test
 	public void setTo() {
-		Dummy a = new Dummy(ImageUInt8.class,false);
+		Dummy a = new Dummy(GrayU8.class,false);
 		a.setScaleFactors(1, 2, 4);
 		a.initialize(100, 120);
-		Dummy b = new Dummy(ImageUInt8.class,false);
+		Dummy b = new Dummy(GrayU8.class,false);
 		b.setScaleFactors(1, 2, 4);
 		b.initialize(100, 120);
 
@@ -60,20 +60,20 @@ public class TestImagePyramidBase {
 	 */
 	@Test
 	public void saveOriginalReference() {
-		Dummy pyramid = new Dummy(ImageUInt8.class,false);
+		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
 
 		assertTrue(pyramid.getLayer(0) != null);
 
-		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid = new Dummy(GrayU8.class,true);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
 
 		assertTrue(pyramid.getLayer(0) == null);
 
 		// first layer is not 1 so the flag should be ignored
-		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid = new Dummy(GrayU8.class,true);
 		pyramid.setScaleFactors(2,4);
 		pyramid.initialize(100,120);
 
@@ -82,7 +82,7 @@ public class TestImagePyramidBase {
 
 	@Test
 	public void initialize() {
-		Dummy pyramid = new Dummy(ImageUInt8.class,false);
+		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
 
@@ -91,13 +91,13 @@ public class TestImagePyramidBase {
 		}
 
 		// see if it obeys the saveOriginalReference flag
-		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid = new Dummy(GrayU8.class,true);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
 		assertTrue(pyramid.layers[0] == null);
 		
 		// if the first layer is not 1 then an image should be declared
-		pyramid = new Dummy(ImageUInt8.class,true);
+		pyramid = new Dummy(GrayU8.class,true);
 		pyramid.setScaleFactors(2,4);
 		pyramid.initialize(100,120);
 		assertTrue(pyramid.layers[0] != null);
@@ -105,7 +105,7 @@ public class TestImagePyramidBase {
 
 	@Test
 	public void getWidth_Height() {
-		Dummy pyramid = new Dummy(ImageUInt8.class,false);
+		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
 
@@ -120,7 +120,7 @@ public class TestImagePyramidBase {
 	@Test
 	public void checkScales() {
 		// Test positive cases
-		Dummy pyramid = new Dummy(ImageUInt8.class,false);
+		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4,8);
 		pyramid.checkScales();
 

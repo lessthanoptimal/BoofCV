@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.DiscretizedCircle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericImplFastHelperTests<T extends ImageSingleBand> {
+public abstract class GenericImplFastHelperTests<T extends ImageGray> {
 
 	Class<T> imageType;
 	FastHelper<T> alg;

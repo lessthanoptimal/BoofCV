@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.segmentation;
 
 import boofcv.alg.segmentation.slic.SegmentSlic;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -38,7 +38,7 @@ public class Slic_to_ImageSuperpixels<T extends ImageBase> implements ImageSuper
 	}
 
 	@Override
-	public void segment(T input, ImageSInt32 output) {
+	public void segment(T input, GrayS32 output) {
 		slic.process(input,output);
 	}
 

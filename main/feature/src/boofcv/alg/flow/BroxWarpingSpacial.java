@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.Arrays;
@@ -51,7 +51,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyramidBase<T> {
+public class BroxWarpingSpacial<T extends ImageGray> extends DenseFlowPyramidBase<T> {
 
 	// regularization term
 	private static final double EPSILON = 0.001;
@@ -73,49 +73,49 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	private float convergeTolerance;
 
 	// derivative of first image
-	private ImageFloat32 deriv1X = new ImageFloat32(1,1);
-	private ImageFloat32 deriv1Y = new ImageFloat32(1,1);
+	private GrayF32 deriv1X = new GrayF32(1,1);
+	private GrayF32 deriv1Y = new GrayF32(1,1);
 
 	// derivatives of second image
-	private ImageFloat32 deriv2X = new ImageFloat32(1,1);
-	private ImageFloat32 deriv2Y = new ImageFloat32(1,1);
-	private ImageFloat32 deriv2XX = new ImageFloat32(1,1);
-	private ImageFloat32 deriv2YY = new ImageFloat32(1,1);
-	private ImageFloat32 deriv2XY = new ImageFloat32(1,1);
+	private GrayF32 deriv2X = new GrayF32(1,1);
+	private GrayF32 deriv2Y = new GrayF32(1,1);
+	private GrayF32 deriv2XX = new GrayF32(1,1);
+	private GrayF32 deriv2YY = new GrayF32(1,1);
+	private GrayF32 deriv2XY = new GrayF32(1,1);
 
-	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.three(ImageFloat32.class, ImageFloat32.class);
-	private ImageHessian<ImageFloat32> hessian = FactoryDerivative.hessianThree(ImageFloat32.class);
+	private ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, GrayF32.class);
+	private ImageHessian<GrayF32> hessian = FactoryDerivative.hessianThree(GrayF32.class);
 
 	// flow estimation at the start of the iteration
-	protected ImageFloat32 flowU = new ImageFloat32(1,1); // flow along x-axis
-	protected ImageFloat32 flowV = new ImageFloat32(1,1); // flow along y-axis
+	protected GrayF32 flowU = new GrayF32(1,1); // flow along x-axis
+	protected GrayF32 flowV = new GrayF32(1,1); // flow along y-axis
 
 	// storage for the warped flow
-	protected ImageFloat32 warpImage2 = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2XX = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2YY = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2XY = new ImageFloat32(1,1);
+	protected GrayF32 warpImage2 = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2X = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2Y = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2XX = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2YY = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2XY = new GrayF32(1,1);
 
 	// derivative of flow
-	protected ImageFloat32 derivFlowUX = new ImageFloat32(1,1);
-	protected ImageFloat32 derivFlowUY = new ImageFloat32(1,1);
-	protected ImageFloat32 derivFlowVX = new ImageFloat32(1,1);
-	protected ImageFloat32 derivFlowVY = new ImageFloat32(1,1);
+	protected GrayF32 derivFlowUX = new GrayF32(1,1);
+	protected GrayF32 derivFlowUY = new GrayF32(1,1);
+	protected GrayF32 derivFlowVX = new GrayF32(1,1);
+	protected GrayF32 derivFlowVY = new GrayF32(1,1);
 
-	protected ImageFloat32 psiSmooth = new ImageFloat32(1,1);
-	protected ImageFloat32 psiData = new ImageFloat32(1,1);
-	protected ImageFloat32 psiGradient = new ImageFloat32(1,1);
+	protected GrayF32 psiSmooth = new GrayF32(1,1);
+	protected GrayF32 psiData = new GrayF32(1,1);
+	protected GrayF32 psiGradient = new GrayF32(1,1);
 
 	// divergence for u,v,d
-	protected ImageFloat32 divU = new ImageFloat32(1,1);
-	protected ImageFloat32 divV = new ImageFloat32(1,1);
-	protected ImageFloat32 divD = new ImageFloat32(1,1);
+	protected GrayF32 divU = new GrayF32(1,1);
+	protected GrayF32 divV = new GrayF32(1,1);
+	protected GrayF32 divD = new GrayF32(1,1);
 
 	// motion increments for optical flow
-	protected ImageFloat32 du = new ImageFloat32(1,1);
-	protected ImageFloat32 dv = new ImageFloat32(1,1);
+	protected GrayF32 du = new GrayF32(1,1);
+	protected GrayF32 dv = new GrayF32(1,1);
 
 	/**
 	 * Configures flow estimation
@@ -123,7 +123,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	 * @param config Configuration parameters
 	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
 	 */
-	public BroxWarpingSpacial(ConfigBroxWarping config, InterpolatePixelS<ImageFloat32> interp)
+	public BroxWarpingSpacial(ConfigBroxWarping config, InterpolatePixelS<GrayF32> interp)
 	{
 		super(config.pyrScale,config.pyrSigma,config.pyrMaxLayers,interp);
 		this.alpha = config.alpha;
@@ -142,13 +142,13 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	 * @param image1 Pyramid of first image
 	 * @param image2 Pyramid of second image
 	 */
-	public void process( ImagePyramid<ImageFloat32> image1 , ImagePyramid<ImageFloat32> image2 )
+	public void process(ImagePyramid<GrayF32> image1 , ImagePyramid<GrayF32> image2 )
 	{
 		// Process the pyramid from low resolution to high resolution
 		boolean first = true;
 		for( int i = image1.getNumLayers()-1; i >= 0; i-- ) {
-			ImageFloat32 layer1 = image1.getLayer(i);
-			ImageFloat32 layer2 = image2.getLayer(i);
+			GrayF32 layer1 = image1.getLayer(i);
+			GrayF32 layer2 = image2.getLayer(i);
 
 			resizeForLayer(layer1.width,layer2.height);
 
@@ -217,8 +217,8 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	 */
 	protected void interpolateFlowScale(int widthNew, int heightNew) {
 		// warping isn't done until later so use those images as temporary storage
-		ImageFloat32 enlargedU = warpDeriv2X;
-		ImageFloat32 enlargedV = warpDeriv2Y;
+		GrayF32 enlargedU = warpDeriv2X;
+		GrayF32 enlargedV = warpDeriv2Y;
 
 		// use the previous low resolution flow estimate to initialize the new image
 		interpolateFlowScale(flowU, enlargedU);
@@ -236,10 +236,10 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	 * Computes the flow for a layer using Taylor series expansion and Successive Over-Relaxation linear solver.
 	 * Flow estimates from previous layers are feed into this by setting initFlow and flow to their values.
 	 */
-	protected void processLayer( ImageFloat32 image1 , ImageFloat32 image2 ,
-								 ImageFloat32 deriv1X , ImageFloat32 deriv1Y,
-								 ImageFloat32 deriv2X , ImageFloat32 deriv2Y,
-								 ImageFloat32 deriv2XX , ImageFloat32 deriv2YY,ImageFloat32 deriv2XY) {
+	protected void processLayer(GrayF32 image1 , GrayF32 image2 ,
+								GrayF32 deriv1X , GrayF32 deriv1Y,
+								GrayF32 deriv2X , GrayF32 deriv2Y,
+								GrayF32 deriv2XX , GrayF32 deriv2YY, GrayF32 deriv2XY) {
 
 		int N = image1.width*image1.height;
 		int stride = image1.stride;
@@ -327,7 +327,7 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	 * @param ipy (x,y+1)
 	 * @param imy (x,y-1)
 	 */
-	private float iterationSor(ImageFloat32 image1, ImageFloat32 deriv1X, ImageFloat32 deriv1Y,
+	private float iterationSor(GrayF32 image1, GrayF32 deriv1X, GrayF32 deriv1Y,
 							   int i, int ipx, int imx, int ipy, int imy) {
 		float w = SOR_RELAXATION;
 
@@ -374,8 +374,8 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	/**
 	 * Equation 5.  Psi_s
 	 */
-	private void computePsiSmooth( ImageFloat32 ux , ImageFloat32 uy , ImageFloat32 vx , ImageFloat32 vy ,
-								   ImageFloat32 psiSmooth ) {
+	private void computePsiSmooth(GrayF32 ux , GrayF32 uy , GrayF32 vx , GrayF32 vy ,
+								  GrayF32 psiSmooth ) {
 		int N = derivFlowUX.width * derivFlowUX.height;
 
 		for( int i = 0; i < N; i++ ) {
@@ -394,12 +394,12 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	/**
 	 * Compute Psi-data using equation 6 and approximation in equation 5
 	 */
-	protected void computePsiDataPsiGradient(ImageFloat32 image1, ImageFloat32 image2,
-											 ImageFloat32 deriv1x, ImageFloat32 deriv1y,
-											 ImageFloat32 deriv2x, ImageFloat32 deriv2y,
-											 ImageFloat32 deriv2xx, ImageFloat32 deriv2yy, ImageFloat32 deriv2xy,
-											 ImageFloat32 du, ImageFloat32 dv,
-											 ImageFloat32 psiData, ImageFloat32 psiGradient ) {
+	protected void computePsiDataPsiGradient(GrayF32 image1, GrayF32 image2,
+											 GrayF32 deriv1x, GrayF32 deriv1y,
+											 GrayF32 deriv2x, GrayF32 deriv2y,
+											 GrayF32 deriv2xx, GrayF32 deriv2yy, GrayF32 deriv2xy,
+											 GrayF32 du, GrayF32 dv,
+											 GrayF32 psiData, GrayF32 psiGradient ) {
 		int N = image1.width * image1.height;
 
 		for( int i = 0; i < N; i++ ) {
@@ -425,8 +425,8 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 	/**
 	 * Computes the divergence for u,v, and d. Equation 8 and Equation 10.
 	 */
-	private void computeDivUVD( ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi ,
-								ImageFloat32 divU , ImageFloat32 divV , ImageFloat32 divD ) {
+	private void computeDivUVD(GrayF32 u , GrayF32 v , GrayF32 psi ,
+							   GrayF32 divU , GrayF32 divV , GrayF32 divD ) {
 
 		final int stride = psi.stride;
 
@@ -470,9 +470,9 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		}
 	}
 
-	protected void computeDivUVD_safe( int x , int y ,
-									   ImageFloat32 u , ImageFloat32 v , ImageFloat32 psi ,
-									   ImageFloat32 divU , ImageFloat32 divV , ImageFloat32 divD ) {
+	protected void computeDivUVD_safe(int x , int y ,
+									  GrayF32 u , GrayF32 v , GrayF32 psi ,
+									  GrayF32 divU , GrayF32 divV , GrayF32 divD ) {
 
 		int index = u.getIndex(x, y);
 		int index_px = s(x + 1, y);
@@ -509,11 +509,11 @@ public class BroxWarpingSpacial<T extends ImageSingleBand> extends DenseFlowPyra
 		return warpImage2.getIndex(x,y);
 	}
 
-	public ImageFloat32 getFlowX() {
+	public GrayF32 getFlowX() {
 		return flowU;
 	}
 
-	public ImageFloat32 getFlowY() {
+	public GrayF32 getFlowY() {
 		return flowV;
 	}
 }

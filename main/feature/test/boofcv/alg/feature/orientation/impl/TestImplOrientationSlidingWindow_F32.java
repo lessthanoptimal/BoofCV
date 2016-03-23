@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 
@@ -33,7 +33,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<ImageFloat32> tests = new GenericOrientationGradientTests<ImageFloat32>();
+		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<GrayF32>();
 
 		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,false);
 		alg.setObjectRadius(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<ImageFloat32> tests = new GenericOrientationGradientTests<ImageFloat32>();
+		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<GrayF32>();
 
 		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,true);
 		alg.setObjectRadius(r);

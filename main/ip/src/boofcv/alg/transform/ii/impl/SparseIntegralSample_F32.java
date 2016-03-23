@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.SparseScaleSample_F64;
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  *
  * @author Peter Abeles
  */
-public class SparseIntegralSample_F32 extends SparseScaleSample_F64<ImageFloat32> {
+public class SparseIntegralSample_F32 extends SparseScaleSample_F64<GrayF32> {
 
 	int r;
 

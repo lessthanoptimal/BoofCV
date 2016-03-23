@@ -25,9 +25,9 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -41,12 +41,12 @@ public class BenchmarkThresholding {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
-	static ImageFloat32 inputF32 = new ImageFloat32(imgWidth, imgHeight);
-	static ImageSInt32 output_S32 = new ImageSInt32(imgWidth, imgHeight);
-	static ImageUInt8 output_U8 = new ImageUInt8(imgWidth, imgHeight);
-	static ImageUInt8 work = new ImageUInt8(imgWidth, imgHeight);
-	static ImageUInt8 work2 = new ImageUInt8(imgWidth, imgHeight);
+	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
+	static GrayF32 inputF32 = new GrayF32(imgWidth, imgHeight);
+	static GrayS32 output_S32 = new GrayS32(imgWidth, imgHeight);
+	static GrayU8 output_U8 = new GrayU8(imgWidth, imgHeight);
+	static GrayU8 work = new GrayU8(imgWidth, imgHeight);
+	static GrayU8 work2 = new GrayU8(imgWidth, imgHeight);
 
 	static int threshLower = 20;
 	static int threshUpper = 30;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -41,15 +41,15 @@ public class BenchmarkImagePyramids {
 	static int height = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 input = new ImageFloat32(width,height);
+	static GrayF32 input = new GrayF32(width,height);
 
 	static int scalesD[] = new int[]{1,2,4,8};
 	static double scalesF[] = new double[]{1,2,4,8};
 
-	static PyramidDiscrete<ImageFloat32> pyramidD;
-	static PyramidFloat<ImageFloat32> pyramidF;
+	static PyramidDiscrete<GrayF32> pyramidD;
+	static PyramidFloat<GrayF32> pyramidF;
 
-	static Class<ImageFloat32> imageType = ImageFloat32.class;
+	static Class<GrayF32> imageType = GrayF32.class;
 
 	public static class Float_F32 extends PerformerBase {
 
@@ -69,9 +69,9 @@ public class BenchmarkImagePyramids {
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		pyramidD = new PyramidDiscreteSampleBlur<ImageFloat32>(kernel,2,ImageFloat32.class,true,scalesD);
+		pyramidD = new PyramidDiscreteSampleBlur<GrayF32>(kernel,2,GrayF32.class,true,scalesD);
 
-		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, ImageFloat32.class);
+		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, GrayF32.class);
 
 	}
 

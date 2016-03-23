@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.abst.feature.detect.line;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -34,11 +34,11 @@ public class TestDetectLineHoughFoot extends GeneralDetectLineTests {
 
 
 	public TestDetectLineHoughFoot() {
-		super(ImageUInt8.class,ImageFloat32.class);
+		super(GrayU8.class,GrayF32.class);
 	}
 
 	@Override
-	public <T extends ImageSingleBand>
+	public <T extends ImageGray>
 	DetectLine<T> createAlg(Class<T> imageType) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);

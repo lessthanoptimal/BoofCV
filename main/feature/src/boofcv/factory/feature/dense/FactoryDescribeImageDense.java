@@ -36,7 +36,7 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -59,7 +59,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DescribeImageDense<T,TupleDesc_F64> surfFast(ConfigDenseSurfFast config , Class<T> imageType)
 	{
 		if( config == null )
@@ -85,7 +85,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DescribeImageDense<T,TupleDesc_F64> surfStable( ConfigDenseSurfStable config,
 												   Class<T> imageType) {
 
@@ -110,7 +110,7 @@ public class FactoryDescribeImageDense {
 	 * @param imageType Type of input image
 	 * @return Dense SIFT
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DescribeImageDense<T,TupleDesc_F64> sift(ConfigDenseSift config , Class<T> imageType ) {
 		if( config == null )
 			config = new ConfigDenseSift();

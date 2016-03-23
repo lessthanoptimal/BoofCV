@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,21 +23,18 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundStationaryBasic} for {@link boofcv.struct.image.MultiSpectral}.
+ * Implementation of {@link BackgroundStationaryBasic} for {@link Planar}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
+public class BackgroundStationaryBasic_SB<T extends ImageGray>
 	extends BackgroundStationaryBasic<T>
 {
 	// storage for background image
-	protected ImageFloat32 background = new ImageFloat32(1,1);
+	protected GrayF32 background = new GrayF32(1,1);
 
 	// wrapper which provides abstraction across image types
 	protected GImageSingleBand inputWrapper;
@@ -54,7 +51,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 	 *
 	 * @return background image.
 	 */
-	public ImageFloat32 getBackground() {
+	public GrayF32 getBackground() {
 		return background;
 	}
 
@@ -91,7 +88,7 @@ public class BackgroundStationaryBasic_SB<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void segment(T frame, ImageUInt8 segmented) {
+	public void segment(T frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;

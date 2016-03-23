@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ package boofcv.alg.feature.detect.line;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.line.gridline.Edgel;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.ClosestPoint2D_F32;
 import georegression.struct.line.LineParametric2D_F32;
@@ -59,7 +59,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
+public abstract class GridRansacLineDetector<D extends ImageGray> {
 
 	// size of a region's width/height in pixels
 	protected int regionSize;
@@ -101,7 +101,7 @@ public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
 	 * @param derivY Image derivative along x-axis. Not modified.
 	 * @param binaryEdges True values indicate that a pixel is an edge pixel. Not modified.
 	 */
-	public void process( D derivX , D derivY , ImageUInt8 binaryEdges )
+	public void process( D derivX , D derivY , GrayU8 binaryEdges )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,binaryEdges);
 
@@ -146,7 +146,7 @@ public abstract class GridRansacLineDetector<D extends ImageSingleBand> {
 	 * @param derivY contains image derivative y-axis
 	 * @param binaryEdges Mark indicting which pixels are edges along a line
 	 */
-	protected abstract void detectEdgels( int index0 , int x0 , int y0 , D derivX , D derivY , ImageUInt8 binaryEdges);
+	protected abstract void detectEdgels( int index0 , int x0 , int y0 , D derivX , D derivY , GrayU8 binaryEdges);
 
 	/**
 	 * Searches for lines inside inside the region..

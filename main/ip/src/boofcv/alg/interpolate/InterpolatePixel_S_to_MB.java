@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,16 +19,16 @@
 package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
  * Wrapper that allows a {@link InterpolatePixelS} to be used as a {@link InterpolatePixelMB},
- * input image has to be {@link ImageSingleBand}.
+ * input image has to be {@link ImageGray}.
  *
  * @author Peter Abeles
  */
-public class InterpolatePixel_S_to_MB<T extends ImageSingleBand> implements InterpolatePixelMB<T>
+public class InterpolatePixel_S_to_MB<T extends ImageGray> implements InterpolatePixelMB<T>
 {
 	InterpolatePixelS<T> interp;
 

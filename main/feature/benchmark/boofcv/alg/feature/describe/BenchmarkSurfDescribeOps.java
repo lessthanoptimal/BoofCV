@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleGradient;
 
@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkSurfDescribeOps<T extends ImageSingleBand>
+public class BenchmarkSurfDescribeOps<T extends ImageGray>
 {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
@@ -51,7 +51,7 @@ public class BenchmarkSurfDescribeOps<T extends ImageSingleBand>
 	SparseScaleGradient<T,?> g;
 
 	public BenchmarkSurfDescribeOps() {
-		this((Class<T>)ImageFloat32.class);
+		this((Class<T>)GrayF32.class);
 	}
 
 	public BenchmarkSurfDescribeOps(Class<T> imageType) {

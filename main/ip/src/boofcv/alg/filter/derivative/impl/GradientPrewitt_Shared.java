@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 
 /**
@@ -29,9 +29,9 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class GradientPrewitt_Shared {
-	public static void process(ImageUInt8 orig,
-							   ImageSInt16 derivX,
-							   ImageSInt16 derivY) {
+	public static void process(GrayU8 orig,
+							   GrayS16 derivX,
+							   GrayS16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -62,9 +62,9 @@ public class GradientPrewitt_Shared {
 		}
 	}
 
-	public static void process(ImageSInt16 orig,
-							   ImageSInt16 derivX,
-							   ImageSInt16 derivY) {
+	public static void process(GrayS16 orig,
+							   GrayS16 derivX,
+							   GrayS16 derivY) {
 		final short[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -95,9 +95,9 @@ public class GradientPrewitt_Shared {
 		}
 	}
 
-	public static void process(ImageFloat32 orig,
-							   ImageFloat32 derivX,
-							   ImageFloat32 derivY) {
+	public static void process(GrayF32 orig,
+							   GrayF32 derivX,
+							   GrayF32 derivY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;

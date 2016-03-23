@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -55,8 +55,8 @@ public class TestImplEnhanceHistogram {
 			numFound++;
 
 			Class imageType = methods[i].getParameterTypes()[0];
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(imageType,width,height);
-			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageType,width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(imageType,width,height);
+			ImageGray output = GeneralizedImageOps.createSingleBand(imageType,width,height);
 
 			applyTransform( input , output );
 
@@ -66,7 +66,7 @@ public class TestImplEnhanceHistogram {
 		assertEquals(5,numFound);
 	}
 
-	public void applyTransform( ImageSingleBand input , ImageSingleBand output ) {
+	public void applyTransform(ImageGray input , ImageGray output ) {
 		int min = input.getDataType().isSigned() ? -10 : 0;
 		int transform[] = new int[10-min];
 
@@ -108,8 +108,8 @@ public class TestImplEnhanceHistogram {
 			numFound++;
 
 			Class imageType = method.getParameterTypes()[0];
-			ImageInteger input = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
-			ImageInteger output = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI input = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI output = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 			equalizeLocalNaive(input, output);
 
@@ -119,9 +119,9 @@ public class TestImplEnhanceHistogram {
 		assertEquals(2,numFound);
 	}
 
-	public void equalizeLocalNaive( ImageInteger input , ImageInteger output ) {
+	public void equalizeLocalNaive(GrayI input , GrayI output ) {
 
-		ImageInteger tmp = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+		GrayI tmp = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int transform[] = new int[10];
 		int histogram[] = new int[10];
 
@@ -154,8 +154,8 @@ public class TestImplEnhanceHistogram {
 					}
 
 					// use the full image algorithm
-					ImageInteger subIn = (ImageInteger)input.subimage(x0,y0,x1,y1, null);
-					ImageInteger subOut = (ImageInteger)tmp.subimage(x0,y0,x1,y1, null);
+					GrayI subIn = (GrayI)input.subimage(x0,y0,x1,y1, null);
+					GrayI subOut = (GrayI)tmp.subimage(x0,y0,x1,y1, null);
 					GImageStatistics.histogram(subIn,0, histogram);
 					EnhanceImageOps.equalize(histogram, transform);
 					GEnhanceImageOps.applyTransform(subIn, transform, 0,subOut);
@@ -181,8 +181,8 @@ public class TestImplEnhanceHistogram {
 			numFound++;
 
 			Class imageType = method.getParameterTypes()[0];
-			ImageInteger input = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
-			ImageInteger output = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI input = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI output = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 			equalizeLocalInner(input, output);
 			BoofTesting.checkSubImage(this, "equalizeLocalInner", true, input, output);
@@ -191,8 +191,8 @@ public class TestImplEnhanceHistogram {
 		assertEquals(2,numFound);
 	}
 
-	public void equalizeLocalInner( ImageInteger input , ImageInteger found ) {
-		ImageInteger expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+	public void equalizeLocalInner(GrayI input , GrayI found ) {
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 
 		GImageMiscOps.fillUniform(input,rand,0,10);
@@ -221,8 +221,8 @@ public class TestImplEnhanceHistogram {
 			numFound++;
 
 			Class imageType = method.getParameterTypes()[0];
-			ImageInteger input = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
-			ImageInteger output = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI input = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI output = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 			equalizeLocalRow(input, output);
 			BoofTesting.checkSubImage(this, "equalizeLocalRow", true, input, output);
@@ -231,8 +231,8 @@ public class TestImplEnhanceHistogram {
 		assertEquals(2,numFound);
 	}
 
-	public void equalizeLocalRow( ImageInteger input , ImageInteger found ) {
-		ImageInteger expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+	public void equalizeLocalRow(GrayI input , GrayI found ) {
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 
@@ -248,8 +248,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalRow", input, radius, 0, found, histogram,transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,0,width,radius, null);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,0,width,radius, null);
+			GrayI subExpected = (GrayI)expected.subimage(0,0,width,radius, null);
+			GrayI subFound = (GrayI)found.subimage(0,0,width,radius, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -268,8 +268,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalRow", input, radius, start, found, histogram,transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,start,width,height, null);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,start,width,height, null);
+			GrayI subExpected = (GrayI)expected.subimage(0,start,width,height, null);
+			GrayI subFound = (GrayI)found.subimage(0,start,width,height, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -277,7 +277,7 @@ public class TestImplEnhanceHistogram {
 		}
 	}
 
-	private void checkZeroOutsideRows( ImageInteger image , int y0 , int y1) {
+	private void checkZeroOutsideRows(GrayI image , int y0 , int y1) {
 		for( int y = 0; y < height; y++ ) {
 			if( y >= y0 && y < y1)
 				continue;
@@ -299,8 +299,8 @@ public class TestImplEnhanceHistogram {
 			numFound++;
 
 			Class imageType = method.getParameterTypes()[0];
-			ImageInteger input = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
-			ImageInteger output = (ImageInteger) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI input = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
+			GrayI output = (GrayI) GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 			equalizeLocalCol(input, output);
 			BoofTesting.checkSubImage(this, "equalizeLocalCol", true, input, output);
@@ -309,8 +309,8 @@ public class TestImplEnhanceHistogram {
 		assertEquals(2,numFound);
 	}
 
-	public void equalizeLocalCol( ImageInteger input , ImageInteger found ) {
-		ImageInteger expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
+	public void equalizeLocalCol(GrayI input , GrayI found ) {
+		GrayI expected = GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		int histogram[] = new int[10];
 		int transform[] = new int[10];
 
@@ -326,8 +326,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalCol", input, radius, 0, found, histogram, transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(0,radius,radius,height-radius-1, null);
-			ImageInteger subFound = (ImageInteger)found.subimage(0,radius,radius,height-radius-1, null);
+			GrayI subExpected = (GrayI)expected.subimage(0,radius,radius,height-radius-1, null);
+			GrayI subFound = (GrayI)found.subimage(0,radius,radius,height-radius-1, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -346,8 +346,8 @@ public class TestImplEnhanceHistogram {
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
 					"equalizeLocalCol", input, radius, start, found, histogram, transform);
 
-			ImageInteger subExpected = (ImageInteger)expected.subimage(start,radius,width,height-radius-1, null);
-			ImageInteger subFound = (ImageInteger)found.subimage(start,radius,width,height-radius-1, null);
+			GrayI subExpected = (GrayI)expected.subimage(start,radius,width,height-radius-1, null);
+			GrayI subFound = (GrayI)found.subimage(start,radius,width,height-radius-1, null);
 
 			// check solution
 			BoofTesting.assertEquals(subExpected,subFound,1e-10);
@@ -355,7 +355,7 @@ public class TestImplEnhanceHistogram {
 		}
 	}
 
-	private void checkZeroOutsideColumns( ImageInteger image , int x0 , int x1, int radius) {
+	private void checkZeroOutsideColumns(GrayI image , int x0 , int x1, int radius) {
 		for( int y = 0; y < height; y++ ) {
 			if( y < radius || y >= height-radius) {
 				continue;

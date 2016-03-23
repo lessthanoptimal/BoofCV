@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,8 +47,8 @@ public class ImageEnhanceApp
 	ImagePanel gui;
 
 	// converted input image
-	ImageUInt8 input;
-	ImageUInt8 enhanced = new ImageUInt8(1,1);
+	GrayU8 input;
+	GrayU8 enhanced = new GrayU8(1,1);
 	// if it has processed an image or not
 	boolean processImage = false;
 
@@ -121,8 +121,8 @@ public class ImageEnhanceApp
 
 	public void process( final BufferedImage input ) {
 		setInputImage(input);
-		this.input = ConvertBufferedImage.convertFromSingle(input, this.input, ImageUInt8.class);
-		this.enhanced = new ImageUInt8(input.getWidth(),input.getHeight());
+		this.input = ConvertBufferedImage.convertFromSingle(input, this.input, GrayU8.class);
+		this.enhanced = new GrayU8(input.getWidth(),input.getHeight());
 		this.output = new BufferedImage( input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
 
 		// over write input image so that it's gray scale

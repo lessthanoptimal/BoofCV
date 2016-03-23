@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.transform.ii.impl;
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
 import boofcv.alg.transform.ii.GeneralSparseGradientIntegralTests;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import org.junit.Test;
 
@@ -30,13 +30,13 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestSparseIntegralHaar_NoBorder_F32
-		extends GeneralSparseGradientIntegralTests<ImageFloat32,ImageFloat32,GradientValue_F32>
+		extends GeneralSparseGradientIntegralTests<GrayF32,GrayF32,GradientValue_F32>
 {
 	final static int size = 4;
 	final static int radius = size/2;
 
 	public TestSparseIntegralHaar_NoBorder_F32() {
-		super(ImageFloat32.class, ImageFloat32.class,-radius,-radius,radius,radius);
+		super(GrayF32.class, GrayF32.class,-radius,-radius,radius,radius);
 
 		alg = new SparseIntegralHaar_NoBorder_F32();
 		((SparseIntegralHaar_NoBorder_F32)alg).setWidth(size);

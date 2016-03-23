@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -47,7 +47,7 @@ public class TestVisualDepthOps {
 	@Test
 	public void depthTo3D() {
 
-		ImageUInt16 depth = new ImageUInt16(width,height);
+		GrayU16 depth = new GrayU16(width,height);
 
 		depth.set(200,80,3400);
 		depth.set(600,420,50);
@@ -64,12 +64,12 @@ public class TestVisualDepthOps {
 
 	@Test
 	public void depthTo3D_with_rgb() {
-		ImageUInt16 depth = new ImageUInt16(width,height);
+		GrayU16 depth = new GrayU16(width,height);
 
 		depth.set(200,80,3400);
 		depth.set(600,420,50);
 
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(rgb, rand, 0, 200);
 
 		FastQueue<Point3D_F64> pts = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
@@ -87,7 +87,7 @@ public class TestVisualDepthOps {
 		color(600, 420,rgb,color.get(1));
 	}
 
-	private void color( int x , int y , MultiSpectral<ImageUInt8> rgb, int found[] ) {
+	private void color(int x , int y , Planar<GrayU8> rgb, int found[] ) {
 
 		assertEquals(rgb.getBand(0).get(x,y),found[0]);
 		assertEquals(rgb.getBand(1).get(x,y),found[1]);

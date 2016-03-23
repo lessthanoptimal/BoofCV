@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.WrapFHtoInterestPoint;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 /**
@@ -41,7 +41,7 @@ public class TestWrapFHtoInterestPoint {
 	public void standard() {
 		WrapFHtoInterestPoint alg = new WrapFHtoInterestPoint(detector);
 
-		new GeneralInterestPointDetectorChecks(alg,false,true,ImageUInt8.class){}.performAllTests();
+		new GeneralInterestPointDetectorChecks(alg,false,true,GrayU8.class){}.performAllTests();
 	}
 
 }

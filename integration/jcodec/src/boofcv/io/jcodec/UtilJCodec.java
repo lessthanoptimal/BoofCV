@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,19 +33,19 @@ public class UtilJCodec {
 	 */
 	public static void convertToBoof(Picture input, ImageBase output) {
 		if( input.getColor() == ColorSpace.RGB ) {
-			ImplConvertJCodecPicture.RGB_to_MSU8(input, (MultiSpectral) output);
+			ImplConvertJCodecPicture.RGB_to_MSU8(input, (Planar) output);
 		} else if( input.getColor() == ColorSpace.YUV420 ) {
-			if( output instanceof MultiSpectral ) {
-				MultiSpectral ms = (MultiSpectral)output;
+			if( output instanceof Planar) {
+				Planar ms = (Planar)output;
 				if( ms.getImageType().getDataType() == ImageDataType.U8 ) {
 					ImplConvertJCodecPicture.yuv420_to_MsRgb_U8(input, ms);
 				} else if( ms.getImageType().getDataType() == ImageDataType.F32 ) {
 					ImplConvertJCodecPicture.yuv420_to_MsRgb_F32(input, ms);
 				}
-			} else if( output instanceof ImageUInt8 ) {
-				ImplConvertJCodecPicture.yuv420_to_U8(input, (ImageUInt8) output);
-			} else if( output instanceof ImageFloat32) {
-				ImplConvertJCodecPicture.yuv420_to_F32(input, (ImageFloat32) output);
+			} else if( output instanceof GrayU8) {
+				ImplConvertJCodecPicture.yuv420_to_U8(input, (GrayU8) output);
+			} else if( output instanceof GrayF32) {
+				ImplConvertJCodecPicture.yuv420_to_F32(input, (GrayF32) output);
 			} else {
 				throw new RuntimeException("Unexpected output image type");
 			}

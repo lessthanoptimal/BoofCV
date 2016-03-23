@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.io.image;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -72,11 +72,11 @@ public class TestUtilImageIO {
 	@Test
 	public void loadImage_saveImage_PPM() throws IOException {
 
-		MultiSpectral<ImageUInt8> orig = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		Planar<GrayU8> orig = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
 		UtilImageIO.savePPM(orig,"temp.ppm",null);
-		MultiSpectral<ImageUInt8> found = UtilImageIO.loadPPM_U8("temp.ppm",null,null);
+		Planar<GrayU8> found = UtilImageIO.loadPPM_U8("temp.ppm",null,null);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -92,11 +92,11 @@ public class TestUtilImageIO {
 
 	@Test
 	public void loadImage_saveImage_PGM() throws IOException {
-		ImageUInt8 orig = new ImageUInt8(width,height);
+		GrayU8 orig = new GrayU8(width,height);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
 		UtilImageIO.savePGM(orig,"temp.pgm");
-		ImageUInt8 found = UtilImageIO.loadPGM_U8("temp.pgm",null);
+		GrayU8 found = UtilImageIO.loadPGM_U8("temp.pgm",null);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {

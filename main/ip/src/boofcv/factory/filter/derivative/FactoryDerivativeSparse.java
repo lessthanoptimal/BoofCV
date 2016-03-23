@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,10 @@ import boofcv.core.image.border.*;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
 
@@ -52,7 +52,7 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
 	 * @return Filter for performing a sparse laplacian.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	ImageFunctionSparse<T> createLaplacian( Class<T> imageType , ImageBorder<T> border )
 	{
 		if( border == null ) {
@@ -60,13 +60,13 @@ public class FactoryDerivativeSparse {
 		}
 
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			ImageConvolveSparse<ImageFloat32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(ImageFloat32.class, LaplacianEdge.kernel_F32);
+			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, LaplacianEdge.kernel_F32);
 
 			r.setImageBorder((ImageBorder_F32)border);
 
 			return (ImageFunctionSparse<T>)r;
 		} else {
-			ImageConvolveSparse<ImageInteger, Kernel2D_I32> r = FactoryConvolveSparse.convolve2D(ImageInteger.class, LaplacianEdge.kernel_I32);
+			ImageConvolveSparse<GrayI, Kernel2D_I32> r = FactoryConvolveSparse.convolve2D(GrayI.class, LaplacianEdge.kernel_I32);
 
 			r.setImageBorder((ImageBorder_S32)border);
 
@@ -83,12 +83,12 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient
 	 */
-	public static <T extends ImageSingleBand, G extends GradientValue>
+	public static <T extends ImageGray, G extends GradientValue>
 	SparseImageGradient<T,G> createSobel( Class<T> imageType , ImageBorder<T> border )
 	{
-		if( imageType == ImageFloat32.class) {
+		if( imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseSobel_F32((ImageBorder_F32)border);
-		} else if( imageType == ImageUInt8.class ){
+		} else if( imageType == GrayU8.class ){
 			return (SparseImageGradient)new GradientSparseSobel_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
@@ -104,12 +104,12 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageSingleBand, G extends GradientValue>
+	public static <T extends ImageGray, G extends GradientValue>
 	SparseImageGradient<T,G> createPrewitt( Class<T> imageType , ImageBorder<T> border )
 	{
-		if( imageType == ImageFloat32.class) {
+		if( imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparsePrewitt_F32((ImageBorder_F32)border);
-		} else if( imageType == ImageUInt8.class ){
+		} else if( imageType == GrayU8.class ){
 			return (SparseImageGradient)new GradientSparsePrewitt_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
@@ -125,12 +125,12 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageSingleBand, G extends GradientValue>
+	public static <T extends ImageGray, G extends GradientValue>
 	SparseImageGradient<T,G> createThree( Class<T> imageType , ImageBorder<T> border )
 	{
-		if( imageType == ImageFloat32.class) {
+		if( imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseThree_F32((ImageBorder_F32)border);
-		} else if( imageType == ImageUInt8.class ){
+		} else if( imageType == GrayU8.class ){
 			return (SparseImageGradient)new GradientSparseThree_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
@@ -146,12 +146,12 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageSingleBand, G extends GradientValue>
+	public static <T extends ImageGray, G extends GradientValue>
 	SparseImageGradient<T,G> createTwo0( Class<T> imageType , ImageBorder<T> border )
 	{
-		if( imageType == ImageFloat32.class) {
+		if( imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseTwo0_F32((ImageBorder_F32)border);
-		} else if( imageType == ImageUInt8.class ){
+		} else if( imageType == GrayU8.class ){
 			return (SparseImageGradient)new GradientSparseTwo0_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
@@ -167,12 +167,12 @@ public class FactoryDerivativeSparse {
 	 * @param border How the border should be handled.  If null then the borders can't be processed.
 	 * @return Sparse gradient.
 	 */
-	public static <T extends ImageSingleBand, G extends GradientValue>
+	public static <T extends ImageGray, G extends GradientValue>
 	SparseImageGradient<T,G> createTwo1( Class<T> imageType , ImageBorder<T> border )
 	{
-		if( imageType == ImageFloat32.class) {
+		if( imageType == GrayF32.class) {
 			return (SparseImageGradient)new GradientSparseTwo1_F32((ImageBorder_F32)border);
-		} else if( imageType == ImageUInt8.class ){
+		} else if( imageType == GrayU8.class ){
 			return (SparseImageGradient)new GradientSparseTwo1_U8((ImageBorder_S32)border);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.line;
 
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineSegment2D_F32;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface DetectLineSegment<T extends ImageSingleBand> {
+public interface DetectLineSegment<T extends ImageGray> {
 
 	/**
 	 * Detect lines inside the image.

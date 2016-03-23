@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.misc;
 
 import boofcv.alg.InputSanityCheck;
@@ -39,7 +40,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageSInt8 input , ImageSInt8 output ) {
+	public static void abs(GrayS8 input , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -88,7 +89,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageSInt16 input , ImageSInt16 output ) {
+	public static void abs(GrayS16 input , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -137,7 +138,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageSInt32 input , ImageSInt32 output ) {
+	public static void abs(GrayS32 input , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -186,7 +187,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageSInt64 input , ImageSInt64 output ) {
+	public static void abs(GrayS64 input , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -235,7 +236,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageFloat32 input , ImageFloat32 output ) {
+	public static void abs(GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -284,7 +285,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs( ImageFloat64 input , ImageFloat64 output ) {
+	public static void abs(GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -332,7 +333,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageSInt8 input , ImageSInt8 output ) {
+	public static void invert(GrayS8 input , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -379,7 +380,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageSInt16 input , ImageSInt16 output ) {
+	public static void invert(GrayS16 input , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -426,7 +427,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageSInt32 input , ImageSInt32 output ) {
+	public static void invert(GrayS32 input , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -473,7 +474,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageSInt64 input , ImageSInt64 output ) {
+	public static void invert(GrayS64 input , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -520,7 +521,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageFloat32 input , ImageFloat32 output ) {
+	public static void invert(GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -567,7 +568,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert( ImageFloat64 input , ImageFloat64 output ) {
+	public static void invert(GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -616,7 +617,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageUInt8 input , double value , ImageUInt8 output ) {
+	public static void multiply(GrayU8 input , double value , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -668,7 +669,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt8 input , double value , ImageSInt8 output ) {
+	public static void multiply(GrayS8 input , double value , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -720,7 +721,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageUInt16 input , double value , ImageUInt16 output ) {
+	public static void multiply(GrayU16 input , double value , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -772,7 +773,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt16 input , double value , ImageSInt16 output ) {
+	public static void multiply(GrayS16 input , double value , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -824,7 +825,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt32 input , double value , ImageSInt32 output ) {
+	public static void multiply(GrayS32 input , double value , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -876,7 +877,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt64 input , double value , ImageSInt64 output ) {
+	public static void multiply(GrayS64 input , double value , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -928,7 +929,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageFloat32 input , float value , ImageFloat32 output ) {
+	public static void multiply(GrayF32 input , float value , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -980,7 +981,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageFloat64 input , double value , ImageFloat64 output ) {
+	public static void multiply(GrayF64 input , double value , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1032,7 +1033,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageUInt8 input , double value , int lower , int upper , ImageUInt8 output ) {
+	public static void multiply(GrayU8 input , double value , int lower , int upper , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1087,7 +1088,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt8 input , double value , int lower , int upper , ImageSInt8 output ) {
+	public static void multiply(GrayS8 input , double value , int lower , int upper , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1142,7 +1143,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageUInt16 input , double value , int lower , int upper , ImageUInt16 output ) {
+	public static void multiply(GrayU16 input , double value , int lower , int upper , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1197,7 +1198,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt16 input , double value , int lower , int upper , ImageSInt16 output ) {
+	public static void multiply(GrayS16 input , double value , int lower , int upper , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1252,7 +1253,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt32 input , double value , int lower , int upper , ImageSInt32 output ) {
+	public static void multiply(GrayS32 input , double value , int lower , int upper , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1307,7 +1308,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageSInt64 input , double value , long lower , long upper , ImageSInt64 output ) {
+	public static void multiply(GrayS64 input , double value , long lower , long upper , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1362,7 +1363,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
+	public static void multiply(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1417,7 +1418,7 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
+	public static void multiply(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1471,7 +1472,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageUInt8 input , double denominator , ImageUInt8 output ) {
+	public static void divide(GrayU8 input , double denominator , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1521,7 +1522,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt8 input , double denominator , ImageSInt8 output ) {
+	public static void divide(GrayS8 input , double denominator , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1571,7 +1572,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageUInt16 input , double denominator , ImageUInt16 output ) {
+	public static void divide(GrayU16 input , double denominator , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1621,7 +1622,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt16 input , double denominator , ImageSInt16 output ) {
+	public static void divide(GrayS16 input , double denominator , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1671,7 +1672,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt32 input , double denominator , ImageSInt32 output ) {
+	public static void divide(GrayS32 input , double denominator , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1721,7 +1722,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt64 input , double denominator , ImageSInt64 output ) {
+	public static void divide(GrayS64 input , double denominator , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1771,7 +1772,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageFloat32 input , float denominator , ImageFloat32 output ) {
+	public static void divide(GrayF32 input , float denominator , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1821,7 +1822,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageFloat64 input , double denominator , ImageFloat64 output ) {
+	public static void divide(GrayF64 input , double denominator , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1871,7 +1872,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageUInt8 input , double denominator , int lower , int upper , ImageUInt8 output ) {
+	public static void divide(GrayU8 input , double denominator , int lower , int upper , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1924,7 +1925,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt8 input , double denominator , int lower , int upper , ImageSInt8 output ) {
+	public static void divide(GrayS8 input , double denominator , int lower , int upper , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -1977,7 +1978,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageUInt16 input , double denominator , int lower , int upper , ImageUInt16 output ) {
+	public static void divide(GrayU16 input , double denominator , int lower , int upper , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2030,7 +2031,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt16 input , double denominator , int lower , int upper , ImageSInt16 output ) {
+	public static void divide(GrayS16 input , double denominator , int lower , int upper , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2083,7 +2084,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt32 input , double denominator , int lower , int upper , ImageSInt32 output ) {
+	public static void divide(GrayS32 input , double denominator , int lower , int upper , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2136,7 +2137,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageSInt64 input , double denominator , long lower , long upper , ImageSInt64 output ) {
+	public static void divide(GrayS64 input , double denominator , long lower , long upper , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2189,7 +2190,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageFloat32 input , float denominator , float lower , float upper , ImageFloat32 output ) {
+	public static void divide(GrayF32 input , float denominator , float lower , float upper , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2242,7 +2243,7 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide( ImageFloat64 input , double denominator , double lower , double upper , ImageFloat64 output ) {
+	public static void divide(GrayF64 input , double denominator , double lower , double upper , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2295,7 +2296,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageUInt8 input , int value , ImageUInt8 output ) {
+	public static void plus(GrayU8 input , int value , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2345,7 +2346,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt8 input , int value , ImageSInt8 output ) {
+	public static void plus(GrayS8 input , int value , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2395,7 +2396,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageUInt16 input , int value , ImageUInt16 output ) {
+	public static void plus(GrayU16 input , int value , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2445,7 +2446,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt16 input , int value , ImageSInt16 output ) {
+	public static void plus(GrayS16 input , int value , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2495,7 +2496,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt32 input , int value , ImageSInt32 output ) {
+	public static void plus(GrayS32 input , int value , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2545,7 +2546,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt64 input , long value , ImageSInt64 output ) {
+	public static void plus(GrayS64 input , long value , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2595,7 +2596,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageFloat32 input , float value , ImageFloat32 output ) {
+	public static void plus(GrayF32 input , float value , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2645,7 +2646,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageFloat64 input , double value , ImageFloat64 output ) {
+	public static void plus(GrayF64 input , double value , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2695,7 +2696,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageUInt8 input , int value , int lower , int upper , ImageUInt8 output ) {
+	public static void plus(GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2748,7 +2749,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt8 input , int value , int lower , int upper , ImageSInt8 output ) {
+	public static void plus(GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2801,7 +2802,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageUInt16 input , int value , int lower , int upper , ImageUInt16 output ) {
+	public static void plus(GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2854,7 +2855,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt16 input , int value , int lower , int upper , ImageSInt16 output ) {
+	public static void plus(GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2907,7 +2908,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt32 input , int value , int lower , int upper , ImageSInt32 output ) {
+	public static void plus(GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -2960,7 +2961,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageSInt64 input , long value , long lower , long upper , ImageSInt64 output ) {
+	public static void plus(GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3013,7 +3014,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
+	public static void plus(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3066,7 +3067,7 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
+	public static void plus(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3119,7 +3120,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageUInt8 input , int value , ImageUInt8 output ) {
+	public static void minus(GrayU8 input , int value , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3169,7 +3170,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt8 input , int value , ImageSInt8 output ) {
+	public static void minus(GrayS8 input , int value , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3219,7 +3220,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageUInt16 input , int value , ImageUInt16 output ) {
+	public static void minus(GrayU16 input , int value , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3269,7 +3270,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt16 input , int value , ImageSInt16 output ) {
+	public static void minus(GrayS16 input , int value , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3319,7 +3320,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt32 input , int value , ImageSInt32 output ) {
+	public static void minus(GrayS32 input , int value , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3369,7 +3370,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt64 input , long value , ImageSInt64 output ) {
+	public static void minus(GrayS64 input , long value , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3419,7 +3420,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageFloat32 input , float value , ImageFloat32 output ) {
+	public static void minus(GrayF32 input , float value , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3469,7 +3470,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageFloat64 input , double value , ImageFloat64 output ) {
+	public static void minus(GrayF64 input , double value , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3519,7 +3520,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageUInt8 input , int value , int lower , int upper , ImageUInt8 output ) {
+	public static void minus(GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3572,7 +3573,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt8 input , int value , int lower , int upper , ImageSInt8 output ) {
+	public static void minus(GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3625,7 +3626,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageUInt16 input , int value , int lower , int upper , ImageUInt16 output ) {
+	public static void minus(GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3678,7 +3679,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt16 input , int value , int lower , int upper , ImageSInt16 output ) {
+	public static void minus(GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3731,7 +3732,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt32 input , int value , int lower , int upper , ImageSInt32 output ) {
+	public static void minus(GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3784,7 +3785,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageSInt64 input , long value , long lower , long upper , ImageSInt64 output ) {
+	public static void minus(GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3837,7 +3838,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageFloat32 input , float value , float lower , float upper , ImageFloat32 output ) {
+	public static void minus(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3890,7 +3891,7 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( ImageFloat64 input , double value , double lower , double upper , ImageFloat64 output ) {
+	public static void minus(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3943,7 +3944,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageUInt8 input , ImageUInt8 output ) {
+	public static void minus(int value , GrayU8 input , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -3993,7 +3994,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt8 input , ImageSInt8 output ) {
+	public static void minus(int value , GrayS8 input , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4043,7 +4044,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageUInt16 input , ImageUInt16 output ) {
+	public static void minus(int value , GrayU16 input , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4093,7 +4094,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt16 input , ImageSInt16 output ) {
+	public static void minus(int value , GrayS16 input , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4143,7 +4144,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt32 input , ImageSInt32 output ) {
+	public static void minus(int value , GrayS32 input , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4193,7 +4194,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( long value , ImageSInt64 input , ImageSInt64 output ) {
+	public static void minus(long value , GrayS64 input , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4243,7 +4244,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( float value , ImageFloat32 input , ImageFloat32 output ) {
+	public static void minus(float value , GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4293,7 +4294,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( double value , ImageFloat64 input , ImageFloat64 output ) {
+	public static void minus(double value , GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4343,7 +4344,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageUInt8 input , int lower , int upper , ImageUInt8 output ) {
+	public static void minus(int value , GrayU8 input , int lower , int upper , GrayU8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4396,7 +4397,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt8 input , int lower , int upper , ImageSInt8 output ) {
+	public static void minus(int value , GrayS8 input , int lower , int upper , GrayS8 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4449,7 +4450,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageUInt16 input , int lower , int upper , ImageUInt16 output ) {
+	public static void minus(int value , GrayU16 input , int lower , int upper , GrayU16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4502,7 +4503,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt16 input , int lower , int upper , ImageSInt16 output ) {
+	public static void minus(int value , GrayS16 input , int lower , int upper , GrayS16 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4555,7 +4556,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( int value , ImageSInt32 input , int lower , int upper , ImageSInt32 output ) {
+	public static void minus(int value , GrayS32 input , int lower , int upper , GrayS32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4608,7 +4609,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( long value , ImageSInt64 input , long lower , long upper , ImageSInt64 output ) {
+	public static void minus(long value , GrayS64 input , long lower , long upper , GrayS64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4661,7 +4662,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( float value , ImageFloat32 input , float lower , float upper , ImageFloat32 output ) {
+	public static void minus(float value , GrayF32 input , float lower , float upper , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4714,7 +4715,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus( double value , ImageFloat64 input , double lower , double upper , ImageFloat64 output ) {
+	public static void minus(double value , GrayF64 input , double lower , double upper , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -4767,7 +4768,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageUInt8 img , int min , int max ) {
+	public static void boundImage(GrayU8 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4796,7 +4797,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageUInt8 imgA , ImageUInt8 imgB , ImageUInt8 diff ) {
+	public static void diffAbs(GrayU8 imgA , GrayU8 imgB , GrayU8 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -4816,16 +4817,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageUInt8> input , ImageUInt8 output ) {
+	public static void averageBand(Planar<GrayU8> input , GrayU8 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageUInt8[] bands = input.bands;
+		GrayU8[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -4850,7 +4851,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageSInt8 img , int min , int max ) {
+	public static void boundImage(GrayS8 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4879,7 +4880,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageSInt8 imgA , ImageSInt8 imgB , ImageSInt8 diff ) {
+	public static void diffAbs(GrayS8 imgA , GrayS8 imgB , GrayS8 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -4899,16 +4900,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageSInt8> input , ImageSInt8 output ) {
+	public static void averageBand(Planar<GrayS8> input , GrayS8 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageSInt8[] bands = input.bands;
+		GrayS8[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -4933,7 +4934,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageUInt16 img , int min , int max ) {
+	public static void boundImage(GrayU16 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4962,7 +4963,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageUInt16 imgA , ImageUInt16 imgB , ImageUInt16 diff ) {
+	public static void diffAbs(GrayU16 imgA , GrayU16 imgB , GrayU16 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -4982,16 +4983,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageUInt16> input , ImageUInt16 output ) {
+	public static void averageBand(Planar<GrayU16> input , GrayU16 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageUInt16[] bands = input.bands;
+		GrayU16[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5016,7 +5017,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageSInt16 img , int min , int max ) {
+	public static void boundImage(GrayS16 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5045,7 +5046,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageSInt16 imgA , ImageSInt16 imgB , ImageSInt16 diff ) {
+	public static void diffAbs(GrayS16 imgA , GrayS16 imgB , GrayS16 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -5065,16 +5066,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageSInt16> input , ImageSInt16 output ) {
+	public static void averageBand(Planar<GrayS16> input , GrayS16 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageSInt16[] bands = input.bands;
+		GrayS16[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5099,7 +5100,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageSInt32 img , int min , int max ) {
+	public static void boundImage(GrayS32 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5128,7 +5129,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageSInt32 imgA , ImageSInt32 imgB , ImageSInt32 diff ) {
+	public static void diffAbs(GrayS32 imgA , GrayS32 imgB , GrayS32 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -5148,16 +5149,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageSInt32> input , ImageSInt32 output ) {
+	public static void averageBand(Planar<GrayS32> input , GrayS32 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageSInt32[] bands = input.bands;
+		GrayS32[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5182,7 +5183,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageSInt64 img , long min , long max ) {
+	public static void boundImage(GrayS64 img , long min , long max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5211,7 +5212,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageSInt64 imgA , ImageSInt64 imgB , ImageSInt64 diff ) {
+	public static void diffAbs(GrayS64 imgA , GrayS64 imgB , GrayS64 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -5231,16 +5232,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageSInt64> input , ImageSInt64 output ) {
+	public static void averageBand(Planar<GrayS64> input , GrayS64 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageSInt64[] bands = input.bands;
+		GrayS64[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5265,7 +5266,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageFloat32 img , float min , float max ) {
+	public static void boundImage(GrayF32 img , float min , float max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5294,7 +5295,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 diff ) {
+	public static void diffAbs(GrayF32 imgA , GrayF32 imgB , GrayF32 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -5314,16 +5315,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageFloat32> input , ImageFloat32 output ) {
+	public static void averageBand(Planar<GrayF32> input , GrayF32 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageFloat32[] bands = input.bands;
+		GrayF32[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5348,7 +5349,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage( ImageFloat64 img , double min , double max ) {
+	public static void boundImage(GrayF64 img , double min , double max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5377,7 +5378,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param diff Absolute value of difference image. Modified.
 	 */
-	public static void diffAbs( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 diff ) {
+	public static void diffAbs(GrayF64 imgA , GrayF64 imgB , GrayF64 diff ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,diff);
 		
 		final int h = imgA.getHeight();
@@ -5397,16 +5398,16 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.
+	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
 	 * @param input MultiSpectral image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand( MultiSpectral<ImageFloat64> input , ImageFloat64 output ) {
+	public static void averageBand(Planar<GrayF64> input , GrayF64 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
-		ImageFloat64[] bands = input.bands;
+		GrayF64[] bands = input.bands;
 		
 		for (int y = 0; y < h; y++) {
 			int indexInput = input.getStartIndex() + y * input.getStride();
@@ -5433,7 +5434,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageUInt8 imgA , ImageUInt8 imgB , ImageUInt16 output ) {
+	public static void add(GrayU8 imgA , GrayU8 imgB , GrayU16 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5461,7 +5462,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageUInt8 imgA , ImageUInt8 imgB , ImageInt16 output ) {
+	public static void subtract(GrayU8 imgA , GrayU8 imgB , GrayI16 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5489,7 +5490,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageSInt8 imgA , ImageSInt8 imgB , ImageSInt16 output ) {
+	public static void add(GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5517,7 +5518,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageSInt8 imgA , ImageSInt8 imgB , ImageSInt16 output ) {
+	public static void subtract(GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5545,7 +5546,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageUInt16 imgA , ImageUInt16 imgB , ImageSInt32 output ) {
+	public static void add(GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5573,7 +5574,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageUInt16 imgA , ImageUInt16 imgB , ImageSInt32 output ) {
+	public static void subtract(GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5601,7 +5602,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageSInt16 imgA , ImageSInt16 imgB , ImageSInt32 output ) {
+	public static void add(GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5629,7 +5630,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageSInt16 imgA , ImageSInt16 imgB , ImageSInt32 output ) {
+	public static void subtract(GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5657,7 +5658,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageSInt32 imgA , ImageSInt32 imgB , ImageSInt32 output ) {
+	public static void add(GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5685,7 +5686,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageSInt32 imgA , ImageSInt32 imgB , ImageSInt32 output ) {
+	public static void subtract(GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5713,7 +5714,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageSInt64 imgA , ImageSInt64 imgB , ImageSInt64 output ) {
+	public static void add(GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5741,7 +5742,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageSInt64 imgA , ImageSInt64 imgB , ImageSInt64 output ) {
+	public static void subtract(GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5769,7 +5770,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+	public static void add(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5797,7 +5798,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+	public static void subtract(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5825,7 +5826,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void multiply( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+	public static void multiply(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5853,7 +5854,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void divide( ImageFloat32 imgA , ImageFloat32 imgB , ImageFloat32 output ) {
+	public static void divide(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5879,7 +5880,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( ImageFloat32 input , ImageFloat32 output ) {
+	public static void log(GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -5900,7 +5901,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Modified.
 	 */
-	public static void pow2( ImageFloat32 input , ImageFloat32 output ) {
+	public static void pow2(GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -5923,7 +5924,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the sqrt() image is written to. Modified.
 	 */
-	public static void sqrt( ImageFloat32 input , ImageFloat32 output ) {
+	public static void sqrt(GrayF32 input , GrayF32 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -5947,7 +5948,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void add( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+	public static void add(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -5975,7 +5976,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void subtract( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+	public static void subtract(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -6003,7 +6004,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void multiply( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+	public static void multiply(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -6031,7 +6032,7 @@ public class PixelMath {
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static void divide( ImageFloat64 imgA , ImageFloat64 imgB , ImageFloat64 output ) {
+	public static void divide(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
 		InputSanityCheck.checkSameShape(imgA,imgB,output);
 		
 		final int h = imgA.getHeight();
@@ -6057,7 +6058,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( ImageFloat64 input , ImageFloat64 output ) {
+	public static void log(GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -6078,7 +6079,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Modified.
 	 */
-	public static void pow2( ImageFloat64 input , ImageFloat64 output ) {
+	public static void pow2(GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 
@@ -6101,7 +6102,7 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the sqrt() image is written to. Modified.
 	 */
-	public static void sqrt( ImageFloat64 input , ImageFloat64 output ) {
+	public static void sqrt(GrayF64 input , GrayF64 output ) {
 
 		InputSanityCheck.checkSameShape(input,output);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -42,13 +42,13 @@ public class TestOrientationSiftToImage {
 		double pixelRadiusAtRadius1 = config.sigmaEnlarge/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
-		OrientationHistogramSift<ImageFloat32> orig = FactoryOrientationAlgs.sift(null,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> orig = FactoryOrientationAlgs.sift(null,GrayF32.class);
 
-		OrientationSiftToImage<ImageFloat32> alg =
-				new OrientationSiftToImage<ImageFloat32>(orig,ss,ImageFloat32.class);
+		OrientationSiftToImage<GrayF32> alg =
+				new OrientationSiftToImage<GrayF32>(orig,ss,GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol, (int)(pixelRadiusAtRadius1+0.5), alg, ImageFloat32.class);
+		tests.setup(angleTol, (int)(pixelRadiusAtRadius1+0.5), alg, GrayF32.class);
 		tests.performAll();
 	}
 }

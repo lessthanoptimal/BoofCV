@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -34,8 +34,8 @@ import boofcv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 public class ConvolveDownNoBorderUnrolled_F32_F32 {
-	public static boolean horizontal( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip) {
+	public static boolean horizontal(Kernel1D_F32 kernel ,
+									 GrayF32 image, GrayF32 dest , int skip) {
 		switch( kernel.width ) {
 			case 3:
 				horizontal3(kernel,image,dest,skip);
@@ -63,8 +63,8 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip) {
+	public static boolean vertical(Kernel1D_F32 kernel ,
+								   GrayF32 image, GrayF32 dest , int skip) {
 		switch( kernel.width ) {
 			case 3:
 				vertical3(kernel,image,dest,skip);
@@ -92,8 +92,8 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_F32 kernel ,
-								   ImageFloat32 image, ImageFloat32 dest , int skip ) {
+	public static boolean convolve(Kernel2D_F32 kernel ,
+								   GrayF32 image, GrayF32 dest , int skip ) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest,skip);
@@ -121,9 +121,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
+	public static void horizontal3(Kernel1D_F32 kernel ,
+								   GrayF32 input, GrayF32 output ,
+								   int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -155,9 +155,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
+	public static void horizontal5(Kernel1D_F32 kernel ,
+								   GrayF32 input, GrayF32 output ,
+								   int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -193,9 +193,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
+	public static void horizontal7(Kernel1D_F32 kernel ,
+								   GrayF32 input, GrayF32 output ,
+								   int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -235,9 +235,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
-									int skip ) {
+	public static void horizontal9(Kernel1D_F32 kernel ,
+								   GrayF32 input, GrayF32 output ,
+								   int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -281,8 +281,8 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_F32 kernel ,
-									ImageFloat32 input, ImageFloat32 output ,
+	public static void horizontal11(Kernel1D_F32 kernel ,
+									GrayF32 input, GrayF32 output ,
 									int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
@@ -331,9 +331,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical3( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
+	public static void vertical3(Kernel1D_F32 kernel,
+								 GrayF32 input, GrayF32 output,
+								 int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -366,9 +366,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical5( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
+	public static void vertical5(Kernel1D_F32 kernel,
+								 GrayF32 input, GrayF32 output,
+								 int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -407,9 +407,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical7( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
+	public static void vertical7(Kernel1D_F32 kernel,
+								 GrayF32 input, GrayF32 output,
+								 int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -454,9 +454,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical9( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
+	public static void vertical9(Kernel1D_F32 kernel,
+								 GrayF32 input, GrayF32 output,
+								 int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -507,9 +507,9 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical11( Kernel1D_F32 kernel,
-								 ImageFloat32 input, ImageFloat32 output,
-									int skip ) {
+	public static void vertical11(Kernel1D_F32 kernel,
+								  GrayF32 input, GrayF32 output,
+								  int skip ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 
@@ -566,7 +566,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve3( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve3(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, int skip )
 	{
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
@@ -620,7 +620,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve5( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve5(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, int skip )
 	{
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
@@ -682,7 +682,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve7( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve7(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, int skip )
 	{
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
@@ -752,7 +752,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve9( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve9(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, int skip )
 	{
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
@@ -830,7 +830,7 @@ public class ConvolveDownNoBorderUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve11( Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output, int skip )
+	public static void convolve11(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, int skip )
 	{
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;

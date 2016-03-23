@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
@@ -36,14 +36,14 @@ public class VisualizeAverageDownSample {
 	public static void main(String[] args) {
 		BufferedImage original = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,
 				original.getWidth(),original.getHeight(),3);
 
-		ConvertBufferedImage.convertFromMulti(original,input,true,ImageFloat32.class);
+		ConvertBufferedImage.convertFromMulti(original,input,true,GrayF32.class);
 
-		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,
 				original.getWidth()/3,original.getHeight()/3,3);
-		MultiSpectral<ImageFloat32> output2 = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		Planar<GrayF32> output2 = new Planar<GrayF32>(GrayF32.class,
 				original.getWidth()/3,original.getHeight()/3,3);
 
 		AverageDownSampleOps.down(input, output);

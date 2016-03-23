@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.io.jcodec;
 
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.NIOUtils;
@@ -91,7 +91,7 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 
 	@Override
 	public <InternalImage> InternalImage getGuiImage() {
-		MultiSpectral<ImageUInt8> boofColor = new MultiSpectral<ImageUInt8>(ImageUInt8.class,
+		Planar<GrayU8> boofColor = new Planar<GrayU8>(GrayU8.class,
 				frameCurrent.getWidth(),frameCurrent.getHeight(),3);
 
 		BufferedImage output = new BufferedImage(boofColor.width,boofColor.height,BufferedImage.TYPE_INT_RGB);

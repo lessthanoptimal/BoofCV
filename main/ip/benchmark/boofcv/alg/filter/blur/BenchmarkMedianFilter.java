@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInnerNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -38,13 +38,13 @@ public class BenchmarkMedianFilter  {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageFloat32 out_F32 = new ImageFloat32(imgWidth,imgHeight);
-	static ImageUInt8 imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-	static ImageSInt16 imgInt16 = new ImageSInt16(imgWidth,imgHeight);
-	static ImageUInt8 out_I8 = new ImageUInt8(imgWidth,imgHeight);
-	static ImageSInt16 out_I16 = new ImageSInt16(imgWidth,imgHeight);
-	static ImageSInt32 out_I32 = new ImageSInt32(imgWidth,imgHeight);
+	static GrayF32 imgFloat32 = new GrayF32(imgWidth,imgHeight);
+	static GrayF32 out_F32 = new GrayF32(imgWidth,imgHeight);
+	static GrayU8 imgInt8 = new GrayU8(imgWidth,imgHeight);
+	static GrayS16 imgInt16 = new GrayS16(imgWidth,imgHeight);
+	static GrayU8 out_I8 = new GrayU8(imgWidth,imgHeight);
+	static GrayS16 out_I16 = new GrayS16(imgWidth,imgHeight);
+	static GrayS32 out_I32 = new GrayS32(imgWidth,imgHeight);
 
 	// iterate through different sized kernel radius
 	private int radius;

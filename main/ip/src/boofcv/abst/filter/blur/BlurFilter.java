@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface BlurFilter<T extends ImageSingleBand> extends FilterImageInterface<T,T> {
+public interface BlurFilter<T extends ImageGray> extends FilterImageInterface<T,T> {
 
 	/**
 	 * Radius of the square region.  The width is defined as the radius*2 + 1.

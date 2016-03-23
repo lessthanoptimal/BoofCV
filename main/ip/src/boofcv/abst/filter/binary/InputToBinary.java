@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Outputs a binary image when given an input image
  *
  * @author Peter Abeles
  */
-public interface InputToBinary<Input extends ImageBase> extends FilterImageInterface<Input,ImageUInt8> {
+public interface InputToBinary<Input extends ImageBase> extends FilterImageInterface<Input,GrayU8> {
 }

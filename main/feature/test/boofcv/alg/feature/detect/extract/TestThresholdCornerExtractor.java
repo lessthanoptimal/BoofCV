@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -43,13 +43,13 @@ public class TestThresholdCornerExtractor {
 				0, 0, 0, 4, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0, 0, 0, 0};
-		ImageFloat32 img = new ImageFloat32(9, 8);
+		GrayF32 img = new GrayF32(9, 8);
 		img.data = inten;
 
 		BoofTesting.checkSubImage(this, "testThreshold", true, img);
 	}
 
-	public void testThreshold(ImageFloat32 img) {
+	public void testThreshold(GrayF32 img) {
 		ThresholdCornerExtractor extractor = new ThresholdCornerExtractor(1.5F);
 		QueueCorner corners = new QueueCorner(100);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -50,9 +50,9 @@ public class TestDetectFiducialSquareBinary {
 	static double blackBorderFraction = 0.65;
 
 	Random rand = new Random(234);
-	BinaryPolygonDetector<ImageUInt8> squareDetector = FactoryShapeDetector.polygon(
-			new ConfigPolygonDetector(false, 4,4),ImageUInt8.class);
-	InputToBinary<ImageUInt8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class);
+	BinaryPolygonDetector<GrayU8> squareDetector = FactoryShapeDetector.polygon(
+			new ConfigPolygonDetector(false, 4,4),GrayU8.class);
+	InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 
 	/**
 	 * Makes sure the found rotation matrix is correct
@@ -62,10 +62,10 @@ public class TestDetectFiducialSquareBinary {
 
 		IntrinsicParameters intrinsic = new IntrinsicParameters(500,500,0,320,240,640,480);
 
-		ImageFloat32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
-		ImageUInt8 rendered = new ImageUInt8(rendered_F32.width,rendered_F32.height);
+		GrayF32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
+		GrayU8 rendered = new GrayU8(rendered_F32.width,rendered_F32.height);
 		ConvertImage.convert(rendered_F32,rendered);
-		ImageUInt8 input = new ImageUInt8(640,480);
+		GrayU8 input = new GrayU8(640,480);
 
 		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
 		expected.add( new Point2D_F64(200,250+rendered.height));
@@ -77,9 +77,9 @@ public class TestDetectFiducialSquareBinary {
 			ImageMiscOps.fill(input, 255);
 			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
-			DetectFiducialSquareBinary<ImageUInt8> alg =
-					new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,borderWidth,blackBorderFraction,
-							inputToBinary,squareDetector, ImageUInt8.class);
+			DetectFiducialSquareBinary<GrayU8> alg =
+					new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+							inputToBinary,squareDetector, GrayU8.class);
 			alg.setLengthSide(2);
 			alg.configure(intrinsic, false);
 			alg.process(input);
@@ -109,14 +109,14 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void processSquare() {
 		for (int i = 0; i < 4; i++) {
-			ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
+			GrayF32 input = create(DetectFiducialSquareBinary.w, 314);
 
 			for (int j = 0; j < i - 1; j++) {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,borderWidth,blackBorderFraction,
-							inputToBinary,squareDetector,ImageUInt8.class);
+					new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+							inputToBinary,squareDetector,GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result,0,0));
@@ -131,12 +131,12 @@ public class TestDetectFiducialSquareBinary {
 	 */
 	@Test
 	public void processSquare_negative() {
-		ImageFloat32 input = create(DetectFiducialSquareBinary.w, 314);
+		GrayF32 input = create(DetectFiducialSquareBinary.w, 314);
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,ImageUInt8.class);
+				new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertFalse(alg.processSquare(input, result,0,0));
@@ -145,18 +145,18 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void getNumberOfDistinctFiducials() {
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<ImageUInt8>(3,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,ImageUInt8.class);
+				new DetectFiducialSquareBinary<GrayU8>(3,borderWidth,blackBorderFraction,
+						inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(32,alg.getNumberOfDistinctFiducials());
 
-		alg = new DetectFiducialSquareBinary<ImageUInt8>(4,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,ImageUInt8.class);
+		alg = new DetectFiducialSquareBinary<GrayU8>(4,borderWidth,blackBorderFraction,
+				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(4096,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<ImageUInt8>(5,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,ImageUInt8.class);
+		alg = new DetectFiducialSquareBinary<GrayU8>(5,borderWidth,blackBorderFraction,
+				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(2097152,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<ImageUInt8>(6,borderWidth,blackBorderFraction,
-				inputToBinary,squareDetector,ImageUInt8.class);
+		alg = new DetectFiducialSquareBinary<GrayU8>(6,borderWidth,blackBorderFraction,
+				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(4294967296L, alg.getNumberOfDistinctFiducials());
 	}
 
@@ -166,11 +166,11 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkGrid3x3() {
 		int number = 9;
-		ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,3, borderWidth);
+		GrayF32 input = create(DetectFiducialSquareBinary.w, number,3, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<ImageUInt8>(3,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,ImageUInt8.class);
+				new DetectFiducialSquareBinary<GrayU8>(3,borderWidth,blackBorderFraction,
+						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result,0,0));
@@ -184,11 +184,11 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkGrid5x5() {
 		int number = 299382;
-		ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,5, borderWidth);
+		GrayF32 input = create(DetectFiducialSquareBinary.w, number,5, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<ImageUInt8>(5,borderWidth,blackBorderFraction,
-						inputToBinary,squareDetector,ImageUInt8.class);
+				new DetectFiducialSquareBinary<GrayU8>(5,borderWidth,blackBorderFraction,
+						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result,0,0));
@@ -207,11 +207,11 @@ public class TestDetectFiducialSquareBinary {
 
 		for( double border : borders ) {
 
-			ImageFloat32 input = create(DetectFiducialSquareBinary.w, number,4, border);
+			GrayF32 input = create(DetectFiducialSquareBinary.w, number,4, border);
 
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<ImageUInt8>(gridWidth,border,blackBorderFraction,
-							inputToBinary,squareDetector,ImageUInt8.class);
+					new DetectFiducialSquareBinary<GrayU8>(gridWidth,border,blackBorderFraction,
+							inputToBinary,squareDetector,GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result,0,0));
@@ -219,15 +219,15 @@ public class TestDetectFiducialSquareBinary {
 			assertEquals(number, result.which);
 		}
 	}
-	public static ImageFloat32 create(int square, int value ) {
+	public static GrayF32 create(int square, int value ) {
 		return create(square,value,gridWidth,borderWidth);
 	}
 
-	public static ImageFloat32 create(int square, int value, int gridWidth , double borderFraction) {
+	public static GrayF32 create(int square, int value, int gridWidth , double borderFraction) {
 
 		int width = (int)Math.round((square*gridWidth)/(1-2.0*borderFraction));
 
-		ImageFloat32 ret = new ImageFloat32(width,width);
+		GrayF32 ret = new GrayF32(width,width);
 
 		int s2 = (int)Math.round(ret.width*borderFraction);
 		int s5 = s2+square*(gridWidth-1);

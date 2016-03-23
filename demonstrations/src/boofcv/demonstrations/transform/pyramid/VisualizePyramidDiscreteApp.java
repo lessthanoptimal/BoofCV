@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.swing.*;
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
+public class VisualizePyramidDiscreteApp <T extends ImageGray>
 	extends SelectInputPanel implements VisualizeApp
 {
 	int scales[] = new int[]{1,2,4,8,16};
@@ -96,7 +96,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageSingleBand>
 	}
 
 	public static void main( String args[] ) {
-		VisualizePyramidDiscreteApp<ImageFloat32> app = new VisualizePyramidDiscreteApp<ImageFloat32>(ImageFloat32.class);
+		VisualizePyramidDiscreteApp<GrayF32> app = new VisualizePyramidDiscreteApp<GrayF32>(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,10 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Benchmark for different convolution operations.
@@ -43,14 +43,14 @@ public class BenchmarkConvolveAbstracted {
 	static long TEST_TIME = 1000;
 
 	static Kernel1D_F32 kernelF32;
-	static ImageFloat32 imgFloat32;
-	static ImageFloat32 out_F32;
+	static GrayF32 imgFloat32;
+	static GrayF32 out_F32;
 	static Kernel1D_I32 kernelI32;
-	static ImageUInt8 imgInt8;
-	static ImageSInt16 imgInt16;
-	static ImageUInt8 out_I8;
-	static ImageSInt16 out_I16;
-	static ImageSInt32 out_I32;
+	static GrayU8 imgInt8;
+	static GrayS16 imgInt16;
+	static GrayU8 out_I8;
+	static GrayS16 out_I16;
+	static GrayS32 out_I32;
 
 	public static class Convolve_Vertical_I8_I16 extends PerformerBase
 	{
@@ -64,16 +64,16 @@ public class BenchmarkConvolveAbstracted {
 	{
 		@Override
 		public void process() {
-			FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-			FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class, BorderType.SKIP,false);
+			FilterImageInterface<GrayU8,GrayS16> filter =
+			FactoryConvolve.convolve(kernelI32,GrayU8.class,GrayS16.class, BorderType.SKIP,false);
 			filter.process(imgInt8,out_I16);
 		}
 	}
 
 	public static class Pre_Vertical_I8_I16 extends PerformerBase
 	{
-		FilterImageInterface<ImageUInt8,ImageSInt16> filter =
-					FactoryConvolve.convolve(kernelI32,ImageUInt8.class,ImageSInt16.class,BorderType.SKIP,false);
+		FilterImageInterface<GrayU8,GrayS16> filter =
+					FactoryConvolve.convolve(kernelI32,GrayU8.class,GrayS16.class,BorderType.SKIP,false);
 
 		@Override
 		public void process() {
@@ -83,13 +83,13 @@ public class BenchmarkConvolveAbstracted {
 
 
 	public static void main( String args[] ) {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		imgInt16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I32 = new ImageSInt32(imgWidth,imgHeight);
-		out_I16 = new ImageSInt16(imgWidth,imgHeight);
-		out_I8 = new ImageUInt8(imgWidth,imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth,imgHeight);
-		out_F32 = new ImageFloat32(imgWidth,imgHeight);
+		imgInt8 = new GrayU8(imgWidth,imgHeight);
+		imgInt16 = new GrayS16(imgWidth,imgHeight);
+		out_I32 = new GrayS32(imgWidth,imgHeight);
+		out_I16 = new GrayS16(imgWidth,imgHeight);
+		out_I8 = new GrayU8(imgWidth,imgHeight);
+		imgFloat32 = new GrayF32(imgWidth,imgHeight);
+		out_F32 = new GrayF32(imgWidth,imgHeight);
 
 
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");

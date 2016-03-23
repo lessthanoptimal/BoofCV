@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Extracts corners from a the image and or its gradient.  This is a generalized interface and lacks some of the functionality
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 
-public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends ImageSingleBand> {
+public interface GeneralFeatureIntensity<I extends ImageGray,D extends ImageGray> {
 
 	/**
 	 * Computes the corner's intensity.  Before computing the various image derivatives call
@@ -57,7 +57,7 @@ public interface GeneralFeatureIntensity<I extends ImageSingleBand,D extends Ima
 	 *
 	 * @return Corner intensity image.
 	 */
-	public ImageFloat32 getIntensity();
+	public GrayF32 getIntensity();
 
 	/**
 	 * (Optional) Returns a list of candidate for local minimums.

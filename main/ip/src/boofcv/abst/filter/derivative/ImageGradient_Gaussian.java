@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
@@ -36,7 +36,7 @@ import static boofcv.factory.filter.kernel.FactoryKernelGaussian.sigmaForRadius;
  *
  * @author Peter Abeles
  */
-public class ImageGradient_Gaussian<I extends ImageSingleBand, D extends ImageSingleBand>
+public class ImageGradient_Gaussian<I extends ImageGray, D extends ImageGray>
 		implements ImageGradient<I, D> {
 
 	// default border.

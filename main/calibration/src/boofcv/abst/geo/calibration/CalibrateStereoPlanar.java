@@ -21,7 +21,7 @@ package boofcv.abst.geo.calibration;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -107,7 +107,7 @@ public class CalibrateStereoPlanar {
 	 * @param left Image of left target.
 	 * @param right Image of right target.
 	 */
-	public boolean addPair( ImageFloat32 left , ImageFloat32 right ) {
+	public boolean addPair(GrayF32 left , GrayF32 right ) {
 		if( !calibLeft.addImage(left) )
 			return false;
 

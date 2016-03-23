@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class ImplMedianCornerIntensity {
 
-	public static void process(ImageFloat32 intensity , ImageFloat32 originalImage, ImageFloat32 medianImage)
+	public static void process(GrayF32 intensity , GrayF32 originalImage, GrayF32 medianImage)
 	{
 		final int width = originalImage.width;
 		final int height = originalImage.height;
@@ -48,7 +48,7 @@ public class ImplMedianCornerIntensity {
 		}
 	}
 
-	public static void process( ImageFloat32 intensity , ImageUInt8 originalImage, ImageUInt8 medianImage)
+	public static void process(GrayF32 intensity , GrayU8 originalImage, GrayU8 medianImage)
 	{
 		final int width = originalImage.width;
 		final int height = originalImage.height;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
@@ -52,14 +52,14 @@ public class TestDistortImageOps {
 	 */
 	@Test
 	public void scale_InterpTypeStyle() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		DistortImageOps.scale(input,output, BorderType.VALUE, TypeInterpolate.BILINEAR);
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
 
 		float scaleX = (float)input.width/(float)output.width;
@@ -87,8 +87,8 @@ public class TestDistortImageOps {
 	 */
 	@Test
 	public void rotate_SanityCheck() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(height,width);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output = new GrayF32(height,width);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 

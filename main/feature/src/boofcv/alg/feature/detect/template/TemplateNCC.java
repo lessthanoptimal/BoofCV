@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Template matching which uses normalized cross correlation (NCC).
@@ -41,7 +41,7 @@ public abstract class TemplateNCC <T extends ImageBase>
 	 */
 	public abstract void setupTemplate( T template );
 
-	public static class F32 extends TemplateNCC<ImageFloat32> {
+	public static class F32 extends TemplateNCC<GrayF32> {
 
 		float area;
 		float templateMean;
@@ -121,7 +121,7 @@ public abstract class TemplateNCC <T extends ImageBase>
 		}
 
 		@Override
-		public void setupTemplate(ImageFloat32 template) {
+		public void setupTemplate(GrayF32 template) {
 			area = template.width*template.height;
 
 			templateMean = 0;
@@ -151,7 +151,7 @@ public abstract class TemplateNCC <T extends ImageBase>
 		}
 	}
 
-	public static class U8 extends TemplateNCC<ImageUInt8> {
+	public static class U8 extends TemplateNCC<GrayU8> {
 
 		float area;
 		float templateMean;
@@ -234,7 +234,7 @@ public abstract class TemplateNCC <T extends ImageBase>
 		}
 
 		@Override
-		public void setupTemplate(ImageUInt8 template) {
+		public void setupTemplate(GrayU8 template) {
 			area = template.width*template.height;
 
 			templateMean = 0;

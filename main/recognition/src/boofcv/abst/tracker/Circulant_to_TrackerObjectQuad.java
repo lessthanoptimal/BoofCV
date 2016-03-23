@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.tracker;
 
 import boofcv.alg.tracker.circulant.CirculantTracker;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -31,7 +31,7 @@ import georegression.struct.shapes.RectangleLength2D_F32;
  *
  * @author Peter Abeles
  */
-public class Circulant_to_TrackerObjectQuad<T extends ImageSingleBand> implements TrackerObjectQuad<T> {
+public class Circulant_to_TrackerObjectQuad<T extends ImageGray> implements TrackerObjectQuad<T> {
 
 	CirculantTracker<T> tracker;
 	Rectangle2D_F64 rect = new Rectangle2D_F64();

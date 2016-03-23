@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.Complex64F;
@@ -47,17 +47,17 @@ public class TestCirculantTracker {
 	int width = 60;
 	int height = 80;
 
-	InterpolatePixelS<ImageFloat32> interp;
+	InterpolatePixelS<GrayF32> interp;
 
 	public TestCirculantTracker() {
-		interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+		interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 	}
 
 	@Test
 	public void meanShift() {
 		int w = 32;
 
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
 
 		int peakX = 13;
 		int peakY = 17;
@@ -80,14 +80,14 @@ public class TestCirculantTracker {
 
 	@Test
 	public void basicTrackingCheck() {
-		ImageFloat32 a = new ImageFloat32(30,35);
-		ImageFloat32 b = new ImageFloat32(30,35);
+		GrayF32 a = new GrayF32(30,35);
+		GrayF32 b = new GrayF32(30,35);
 
 		// randomize input image and move it
 		GImageMiscOps.fillUniform(a, rand, 0, 200);
 		GImageMiscOps.fillUniform(b,rand,0,200);
 
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a, 5, 6, 20, 25);
 
 		shiftCopy(2,4,a,b);
@@ -102,7 +102,7 @@ public class TestCirculantTracker {
 
 	@Test
 	public void computeCosineWindow() {
-		ImageFloat64 found = new ImageFloat64(20,25);
+		GrayF64 found = new GrayF64(20,25);
 
 		CirculantTracker.computeCosineWindow(found);
 
@@ -117,7 +117,7 @@ public class TestCirculantTracker {
 	@Test
 	public void computeGaussianWeights() {
 		int w = 16;
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
 
 		alg.gaussianWeight.reshape(w,w);
 		alg.gaussianWeightDFT.reshape(w, w);
@@ -127,7 +127,7 @@ public class TestCirculantTracker {
 		centeredSymmetricChecks(alg.gaussianWeight,true);
 	}
 
-	private void centeredSymmetricChecks( ImageFloat64 image , boolean offByOne ) {
+	private void centeredSymmetricChecks(GrayF64 image , boolean offByOne ) {
 
 		// see comments in computeGaussianWeights
 		int offX = offByOne ? 1-image.width%2 : 0;
@@ -164,15 +164,15 @@ public class TestCirculantTracker {
 	 */
 	@Test
 	public void updateTrackLocation() {
-		ImageFloat32 a = new ImageFloat32(100,100);
-		ImageFloat32 b = new ImageFloat32(100,100);
+		GrayF32 a = new GrayF32(100,100);
+		GrayF32 b = new GrayF32(100,100);
 
 		// randomize input image and move it
 		GImageMiscOps.fillUniform(a,rand,0,200);
 		GImageMiscOps.fillUniform(b,rand,0,200);
 		shiftCopy(0,0,a,b);
 
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a,5,6,20,25);
 
 		alg.updateTrackLocation(b);
@@ -205,17 +205,17 @@ public class TestCirculantTracker {
 	public void performLearning() {
 		float interp_factor = 0.075f;
 
-		ImageFloat32 a = new ImageFloat32(20,25);
-		ImageFloat32 b = new ImageFloat32(20,25);
+		GrayF32 a = new GrayF32(20,25);
+		GrayF32 b = new GrayF32(20,25);
 
 		ImageMiscOps.fill(a, 100);
 		ImageMiscOps.fill(b,200);
 
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a,0,0,20,25);
 
 		// copy its internal value
-		ImageFloat64 templateC = new ImageFloat64(alg.template.width,alg.template.height);
+		GrayF64 templateC = new GrayF64(alg.template.width,alg.template.height);
 		templateC.setTo(alg.template);
 
 		// give it two images
@@ -252,12 +252,12 @@ public class TestCirculantTracker {
 	}
 
 	public void dense_gauss_kernel( int offX , int offY ) {
-		ImageFloat64 region = new ImageFloat64(32,32);
-		ImageFloat64 target = new ImageFloat64(32,32);
-		ImageFloat64 k = new ImageFloat64(32,32);
+		GrayF64 region = new GrayF64(32,32);
+		GrayF64 target = new GrayF64(32,32);
+		GrayF64 k = new GrayF64(32,32);
 
-		CirculantTracker<ImageFloat32> alg = new CirculantTracker<ImageFloat32>(1f/16,0.2,1e-2,0.075,1.0,32,255,interp);
-		alg.initialize(new ImageFloat32(32,32),0,0,32,32);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,32,255,interp);
+		alg.initialize(new GrayF32(32,32),0,0,32,32);
 
 		// create a shape inside the image
 		GImageMiscOps.fillRectangle(region,200,10,15,5,7);
@@ -287,7 +287,7 @@ public class TestCirculantTracker {
 		assertEquals(expectedY,maxY);
 	}
 
-	private void shiftCopy(int offX, int offY, ImageFloat32 src, ImageFloat32 dst) {
+	private void shiftCopy(int offX, int offY, GrayF32 src, GrayF32 dst) {
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				int xx = x + offX;
@@ -300,7 +300,7 @@ public class TestCirculantTracker {
 		}
 	}
 
-	private void shiftCopy(int offX, int offY, ImageFloat64 src, ImageFloat64 dst) {
+	private void shiftCopy(int offX, int offY, GrayF64 src, GrayF64 dst) {
 		for( int y = 0; y < src.height; y++ ) {
 			for( int x = 0; x < src.width; x++ ) {
 				int xx = x + offX;
@@ -315,7 +315,7 @@ public class TestCirculantTracker {
 
 	@Test
 	public void imageDotProduct() {
-		ImageFloat64 a = new ImageFloat64(width,height);
+		GrayF64 a = new GrayF64(width,height);
 		ImageMiscOps.fillUniform(a,rand,0,10);
 
 		double total = 0;

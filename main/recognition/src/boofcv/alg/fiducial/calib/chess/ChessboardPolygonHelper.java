@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.PolygonHelper;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ChessboardPolygonHelper<T extends ImageSingleBand> implements PolygonHelper {
+public class ChessboardPolygonHelper<T extends ImageGray> implements PolygonHelper {
 	BinaryPolygonDetector<T> detectorSquare;
 	RefineBinaryPolygon<T> refineLine;
 	RefineBinaryPolygon<T> refineCorner;

@@ -22,7 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryStereoSim<I extends ImageSingleBand>
+public abstract class CheckVisualOdometryStereoSim<I extends ImageGray>
 	extends VideoSequenceSimulator<I>
 {
 	StereoParameters param = createStereoParam();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating sparse convolutions.
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageSingleBand;
 @SuppressWarnings({"unchecked"})
 public class FactoryConvolveSparse {
 
-	public static <T extends ImageSingleBand, K extends Kernel2D>
+	public static <T extends ImageGray, K extends Kernel2D>
 	ImageConvolveSparse<T,K> convolve2D(Class<T> imageType, K kernel) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Convolve2D_F32((Kernel2D_F32)kernel);
@@ -45,7 +45,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static <T extends ImageSingleBand, K extends Kernel1D>
+	public static <T extends ImageGray, K extends Kernel1D>
 	ImageConvolveSparse<T,K> vertical1D(Class<T> imageType, K kernel) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Vertical1D_F32((Kernel1D_F32)kernel);
@@ -54,7 +54,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static <T extends ImageSingleBand, K extends Kernel1D>
+	public static <T extends ImageGray, K extends Kernel1D>
 	ImageConvolveSparse<T,K> horizontal1D(Class<T> imageType, K kernel) {
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
 			return (ImageConvolveSparse<T,K>)new Horizontal1D_F32((Kernel1D_F32)kernel);
@@ -63,7 +63,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Convolve2D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel2D_F32> {
+	public static class Convolve2D_F32 extends ImageConvolveSparse<GrayF32, Kernel2D_F32> {
 
 		public Convolve2D_F32(Kernel2D_F32 kernel) {
 			super(kernel);
@@ -75,7 +75,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Convolve2D_I32 extends ImageConvolveSparse<ImageInteger, Kernel2D_I32> {
+	public static class Convolve2D_I32 extends ImageConvolveSparse<GrayI, Kernel2D_I32> {
 
 		public Convolve2D_I32(Kernel2D_I32 kernel) {
 			super(kernel);
@@ -87,7 +87,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Horizontal1D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_F32> {
+	public static class Horizontal1D_F32 extends ImageConvolveSparse<GrayF32, Kernel1D_F32> {
 
 		public Horizontal1D_F32(Kernel1D_F32 kernel) {
 			super(kernel);
@@ -99,7 +99,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Horizontal1D_I32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_I32> {
+	public static class Horizontal1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_I32> {
 
 		public Horizontal1D_I32(Kernel1D_I32 kernel) {
 			super(kernel);
@@ -111,7 +111,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Vertical1D_F32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_F32> {
+	public static class Vertical1D_F32 extends ImageConvolveSparse<GrayF32, Kernel1D_F32> {
 
 		public Vertical1D_F32(Kernel1D_F32 kernel) {
 			super(kernel);
@@ -123,7 +123,7 @@ public class FactoryConvolveSparse {
 		}
 	}
 
-	public static class Vertical1D_I32 extends ImageConvolveSparse<ImageFloat32, Kernel1D_I32> {
+	public static class Vertical1D_I32 extends ImageConvolveSparse<GrayF32, Kernel1D_I32> {
 
 		public Vertical1D_I32(Kernel1D_I32 kernel) {
 			super(kernel);

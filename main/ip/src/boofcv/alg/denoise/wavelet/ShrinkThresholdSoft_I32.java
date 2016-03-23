@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 
 
 /**
@@ -30,10 +30,10 @@ import boofcv.struct.image.ImageSInt32;
  *
  * @author Peter Abeles
  */
-public class ShrinkThresholdSoft_I32 implements ShrinkThresholdRule<ImageSInt32> {
+public class ShrinkThresholdSoft_I32 implements ShrinkThresholdRule<GrayS32> {
 
 	@Override
-	public void process(ImageSInt32 image, Number threshold) {
+	public void process(GrayS32 image, Number threshold) {
 		int f = threshold.intValue();
 
 		// see if all the coefficients should be set to zero

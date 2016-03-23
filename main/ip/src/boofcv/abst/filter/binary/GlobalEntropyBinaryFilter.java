@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Computes a threshold based on entropy to create a binary image
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy(boofcv.struct.image.ImageSingleBand, int, int)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#computeEntropy(ImageGray, int, int)
  *
  * @author Peter Abeles
  */
-public class GlobalEntropyBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class GlobalEntropyBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
@@ -50,7 +50,7 @@ public class GlobalEntropyBinaryFilter<T extends ImageSingleBand> implements Inp
 	}
 
 	@Override
-	public void process(T input, ImageUInt8 output) {
+	public void process(T input, GrayU8 output) {
 		double threshold = GThresholdImageOps.computeEntropy(input, minValue, maxValue);
 		GThresholdImageOps.threshold(input,output,threshold,down);
 	}
@@ -71,7 +71,7 @@ public class GlobalEntropyBinaryFilter<T extends ImageSingleBand> implements Inp
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getOutputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getOutputType() {
+		return ImageType.single(GrayU8.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -41,7 +41,7 @@ import java.util.*;
  *
  * @author
  */
-public class VideoSequenceSimulator<I extends ImageSingleBand> {
+public class VideoSequenceSimulator<I extends ImageGray> {
 
 	protected int width,height;
 
@@ -130,7 +130,7 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 		return outputImage;
 	}
 
-	public void renderDepth( Se3_F64 worldToCamera , ImageSingleBand depthImage , double units ) {
+	public void renderDepth(Se3_F64 worldToCamera , ImageGray depthImage , double units ) {
 
 		GImageMiscOps.fill(depthImage,0);
 		for( Square s : squares ) {
@@ -155,7 +155,7 @@ public class VideoSequenceSimulator<I extends ImageSingleBand> {
 		// TODO apply lens distortion
 	}
 
-	private void convexFill( Polygon2D_I32 poly , ImageSingleBand image , double value ) {
+	private void convexFill(Polygon2D_I32 poly , ImageGray image , double value ) {
 		int minX = Integer.MAX_VALUE; int maxX = Integer.MIN_VALUE;
 		int minY = Integer.MAX_VALUE; int maxY = Integer.MIN_VALUE;
 

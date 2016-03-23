@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class UnrollSiftScaleSpaceGradient {
 	List<ImageScale> allScales = new ArrayList<ImageScale>();
 
 	// used to compute the image gradient
-	ImageGradient<ImageFloat32,ImageFloat32> gradient = FactoryDerivative.three_F32();
+	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three_F32();
 
 	public UnrollSiftScaleSpaceGradient(SiftScaleSpace scaleSpace) {
 		this.scaleSpace = scaleSpace;
@@ -58,14 +58,14 @@ public class UnrollSiftScaleSpaceGradient {
 	 * Sets the input image.  Scale-space is computed and unrolled from this image
 	 * @param image
 	 */
-	public void setImage(ImageFloat32 image) {
+	public void setImage(GrayF32 image) {
 
 		scaleSpace.initialize(image);
 
 		usedScales.clear();
 		do {
 			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
-				ImageFloat32 scaleImage = scaleSpace.getImageScale(i);
+				GrayF32 scaleImage = scaleSpace.getImageScale(i);
 				double sigma = scaleSpace.computeSigmaScale(i);
 				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput();
 
@@ -102,8 +102,8 @@ public class UnrollSiftScaleSpaceGradient {
 	}
 
 	public static class ImageScale {
-		public ImageFloat32 derivX = new ImageFloat32(1,1);
-		public ImageFloat32 derivY = new ImageFloat32(1,1);
+		public GrayF32 derivX = new GrayF32(1,1);
+		public GrayF32 derivY = new GrayF32(1,1);
 		public double imageToInput;
 		public double sigma;
 	}

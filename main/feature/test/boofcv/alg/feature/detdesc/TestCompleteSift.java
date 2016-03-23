@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class TestCompleteSift {
 	 */
 	@Test
 	public void basic() {
-		ImageFloat32 image = new ImageFloat32(300,290);
+		GrayF32 image = new GrayF32(300,290);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 
 		CompleteSift alg = createAlg();
@@ -76,10 +76,10 @@ public class TestCompleteSift {
 
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
 		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,300);
-		OrientationHistogramSift<ImageFloat32> ori =
-				new OrientationHistogramSift<ImageFloat32>(36,1.5,ImageFloat32.class);
-		DescribePointSift<ImageFloat32> describe =
-				new DescribePointSift<ImageFloat32>(4,4,8,1.5,0.5,0.2,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> ori =
+				new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
+		DescribePointSift<GrayF32> describe =
+				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 
 		return new CompleteSift(ss,10,limiter,ori,describe);
 	}

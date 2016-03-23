@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,20 +20,20 @@ package boofcv.abst.segmentation;
 
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
 public class TestSlic_to_ImageSuperpixels<T extends ImageBase> extends GeneralImageSuperpixelsChecks<T> {
 	public TestSlic_to_ImageSuperpixels() {
-		super(ImageType.single(ImageUInt8.class),
-				ImageType.single(ImageFloat32.class),
-				ImageType.ms(3, ImageUInt8.class),
-				ImageType.ms(3, ImageFloat32.class));
+		super(ImageType.single(GrayU8.class),
+				ImageType.single(GrayF32.class),
+				ImageType.ms(3, GrayU8.class),
+				ImageType.ms(3, GrayF32.class));
 	}
 
 	@Override

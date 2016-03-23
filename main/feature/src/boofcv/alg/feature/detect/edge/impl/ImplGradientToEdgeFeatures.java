@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageSInt32;
  */
 public class ImplGradientToEdgeFeatures {
 
-	static public void intensityE( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -55,7 +55,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void intensityAbs( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -73,7 +73,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	static public void direction(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -94,7 +94,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction2( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	static public void direction2(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -115,7 +115,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void intensityE( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -135,7 +135,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void intensityAbs( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -153,7 +153,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	static public void direction(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -174,7 +174,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction2( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	static public void direction2(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -195,7 +195,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void intensityE( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -215,7 +215,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void intensityAbs( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -233,7 +233,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	static public void direction(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
@@ -254,7 +254,7 @@ public class ImplGradientToEdgeFeatures {
 		}
 	}
 
-	static public void direction2( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	static public void direction2(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
 import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppressionCrude;
 import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayS8;
 
 /**
  * <p>
@@ -55,7 +55,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -69,7 +69,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -83,7 +83,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	static public void direction(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -97,7 +97,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2( ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 angle )
+	static public void direction2(GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -111,7 +111,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -125,7 +125,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -139,7 +139,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	static public void direction(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -153,7 +153,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2( ImageSInt16 derivX , ImageSInt16 derivY , ImageFloat32 angle )
+	static public void direction2(GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -167,7 +167,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityE( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 intensity )
+	static public void intensityE(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -181,7 +181,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public void intensityAbs( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 intensity )
+	static public void intensityAbs(GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
@@ -195,7 +195,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public void direction( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	static public void direction(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -209,7 +209,7 @@ public class GradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public void direction2( ImageSInt32 derivX , ImageSInt32 derivY , ImageFloat32 angle )
+	static public void direction2(GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,angle);
 
@@ -231,9 +231,9 @@ public class GradientToEdgeFeatures {
 	 * image will be declared and returned. Modified.
 	 * @return Discretized direction.
 	 */
-	static public ImageSInt8 discretizeDirection4( ImageFloat32 angle , ImageSInt8 discrete )
+	static public GrayS8 discretizeDirection4(GrayF32 angle , GrayS8 discrete )
 	{
-		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageSInt8.class);
+		discrete = InputSanityCheck.checkDeclare(angle,discrete,GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
@@ -275,9 +275,9 @@ public class GradientToEdgeFeatures {
 	 * image will be declared and returned. Modified.
 	 * @return Discretized direction.
 	 */
-	static public ImageSInt8 discretizeDirection8( ImageFloat32 angle , ImageSInt8 discrete )
+	static public GrayS8 discretizeDirection8(GrayF32 angle , GrayS8 discrete )
 	{
-		discrete = InputSanityCheck.checkDeclare(angle,discrete,ImageSInt8.class);
+		discrete = InputSanityCheck.checkDeclare(angle,discrete,GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
@@ -311,11 +311,11 @@ public class GradientToEdgeFeatures {
 	 * </p>
 	 *
 	 * @param intensity Edge intensities. Not modified.
-	 * @param direction 4-Discretized direction.  See {@link #discretizeDirection4(boofcv.struct.image.ImageFloat32, boofcv.struct.image.ImageSInt8)}. Not modified.
+	 * @param direction 4-Discretized direction.  See {@link #discretizeDirection4(GrayF32, GrayS8)}. Not modified.
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppression4( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public GrayF32 nonMaxSuppression4(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,direction);
 		output = InputSanityCheck.checkDeclare(intensity,output);
@@ -333,11 +333,11 @@ public class GradientToEdgeFeatures {
 	 * </p>
 	 *
 	 * @param intensity Edge intensities. Not modified.
-	 * @param direction 8-Discretized direction.  See {@link #discretizeDirection8(boofcv.struct.image.ImageFloat32, boofcv.struct.image.ImageSInt8)}. Not modified.
+	 * @param direction 8-Discretized direction.  See {@link #discretizeDirection8(GrayF32, GrayS8)}. Not modified.
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppression8( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public GrayF32 nonMaxSuppression8(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,direction);
 		output = InputSanityCheck.checkDeclare(intensity,output);
@@ -361,7 +361,7 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageFloat32 derivX , ImageFloat32 derivY, ImageFloat32 output )
+	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayF32 derivX , GrayF32 derivY, GrayF32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);
@@ -385,7 +385,7 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageSInt16 derivX , ImageSInt16 derivY, ImageFloat32 output )
+	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayS16 derivX , GrayS16 derivY, GrayF32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);
@@ -409,7 +409,7 @@ public class GradientToEdgeFeatures {
 	 * @param output Filtered intensity. If null a new image will be declared and returned. Modified.
 	 * @return Filtered edge intensity.
 	 */
-	static public ImageFloat32 nonMaxSuppressionCrude4( ImageFloat32 intensity , ImageSInt32 derivX , ImageSInt32 derivY, ImageFloat32 output )
+	static public GrayF32 nonMaxSuppressionCrude4(GrayF32 intensity , GrayS32 derivX , GrayS32 derivY, GrayF32 output )
 	{
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);

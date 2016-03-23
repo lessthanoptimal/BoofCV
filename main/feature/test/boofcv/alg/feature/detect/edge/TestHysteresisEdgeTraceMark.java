@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -44,8 +44,8 @@ public class TestHysteresisEdgeTraceMark extends CommonHysteresisEdgeTrace {
 
 	@Test
 	public void test2() {
-		ImageSInt8 dir = direction(2);
-		ImageUInt8 out = new ImageUInt8(dir.width,dir.height);
+		GrayS8 dir = direction(2);
+		GrayU8 out = new GrayU8(dir.width,dir.height);
 
 		HysteresisEdgeTraceMark alg = new HysteresisEdgeTraceMark();
 
@@ -67,9 +67,9 @@ public class TestHysteresisEdgeTraceMark extends CommonHysteresisEdgeTrace {
 	}
 
 	private void standardTest( int which ) {
-		ImageFloat32 inten = intensity(which);
-		ImageSInt8 dir = direction(which);
-		ImageUInt8 out = new ImageUInt8(inten.width,inten.height);
+		GrayF32 inten = intensity(which);
+		GrayS8 dir = direction(which);
+		GrayU8 out = new GrayU8(inten.width,inten.height);
 
 		HysteresisEdgeTraceMark alg = new HysteresisEdgeTraceMark();
 

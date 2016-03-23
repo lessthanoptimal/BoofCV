@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void horizontal( ImageUInt8 src , ImageFloat32 dst ) {
+	public static void horizontal(GrayU8 src , GrayF32 dst ) {
 
 		if( src.width < dst.width )
 			throw new IllegalArgumentException("src width must be >= dst width");
@@ -97,7 +97,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void vertical( ImageFloat32 src , ImageInt8 dst ) {
+	public static void vertical(GrayF32 src , GrayI8 dst ) {
 
 		if( src.height < dst.height )
 			throw new IllegalArgumentException("src height must be >= dst height");
@@ -165,7 +165,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void horizontal( ImageUInt16 src , ImageFloat32 dst ) {
+	public static void horizontal(GrayU16 src , GrayF32 dst ) {
 
 		if( src.width < dst.width )
 			throw new IllegalArgumentException("src width must be >= dst width");
@@ -227,7 +227,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void vertical( ImageFloat32 src , ImageInt16 dst ) {
+	public static void vertical(GrayF32 src , GrayI16 dst ) {
 
 		if( src.height < dst.height )
 			throw new IllegalArgumentException("src height must be >= dst height");
@@ -295,7 +295,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void horizontal( ImageFloat32 src , ImageFloat32 dst ) {
+	public static void horizontal(GrayF32 src , GrayF32 dst ) {
 
 		if( src.width < dst.width )
 			throw new IllegalArgumentException("src width must be >= dst width");
@@ -357,7 +357,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void vertical( ImageFloat32 src , ImageFloat32 dst ) {
+	public static void vertical(GrayF32 src , GrayF32 dst ) {
 
 		if( src.height < dst.height )
 			throw new IllegalArgumentException("src height must be >= dst height");
@@ -425,7 +425,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void horizontal( ImageFloat64 src , ImageFloat64 dst ) {
+	public static void horizontal(GrayF64 src , GrayF64 dst ) {
 
 		if( src.width < dst.width )
 			throw new IllegalArgumentException("src width must be >= dst width");
@@ -487,7 +487,7 @@ public class ImplAverageDownSample {
 	 * @param src Input image.  Not modified.
 	 * @param dst Output image.  Modified.
 	 */
-	public static void vertical( ImageFloat64 src , ImageFloat64 dst ) {
+	public static void vertical(GrayF64 src , GrayF64 dst ) {
 
 		if( src.height < dst.height )
 			throw new IllegalArgumentException("src height must be >= dst height");

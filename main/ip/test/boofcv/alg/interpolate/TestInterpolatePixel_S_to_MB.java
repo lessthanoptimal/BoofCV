@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -106,7 +106,7 @@ public class TestInterpolatePixel_S_to_MB {
 
 		@Override
 		public ImageType getImageType() {
-			return ImageType.single(ImageUInt8.class);
+			return ImageType.single(GrayU8.class);
 		}
 	}
 }

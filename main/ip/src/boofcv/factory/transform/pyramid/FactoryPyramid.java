@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -47,7 +47,7 @@ public class FactoryPyramid {
 	 * @param radius Radius of the Gaussian kernel.  If < 0 then the radius is selected using sigma. Try 2.
 	 * @return PyramidDiscrete
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	PyramidDiscrete<T> discreteGaussian( int[] scaleFactors , double sigma , int radius ,
 										 boolean saveOriginalReference, Class<T> imageType )
 	{
@@ -68,7 +68,7 @@ public class FactoryPyramid {
 	 * @param imageType Type of image in the pyramid.
 	 * @return PyramidFloat
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	PyramidFloat<T> floatGaussian( double scaleFactors[], double []sigmas , Class<T> imageType ) {
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -84,7 +84,7 @@ public class FactoryPyramid {
 	 * @param imageType Type of image
 	 * @return PyramidFloat
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	PyramidFloat<T> scaleSpacePyramid( double scaleSpace[], Class<T> imageType ) {
 
 		double[] sigmas = new double[ scaleSpace.length ];
@@ -113,7 +113,7 @@ public class FactoryPyramid {
 	 * @param <T> Type of image
 	 * @return Scale-space image pyramid
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	PyramidFloat<T> scaleSpace( double scaleSpace[], Class<T> imageType ) {
 
 		double[] scaleFactors = new double[ scaleSpace.length ];

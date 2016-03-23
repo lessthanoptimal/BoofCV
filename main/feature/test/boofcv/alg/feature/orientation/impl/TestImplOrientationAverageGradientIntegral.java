@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import org.junit.Test;
 
@@ -34,24 +34,24 @@ public class TestImplOrientationAverageGradientIntegral {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
-				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,0,ImageFloat32.class);
+		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
+				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,0,GrayF32.class);
 
-		tests.setup(angleTol, r*2+1+2 , alg,ImageFloat32.class);
+		tests.setup(angleTol, r*2+1+2 , alg,GrayF32.class);
 		tests.checkSubImages();
 		tests.performAll();
 	}
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
-				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,-1,ImageFloat32.class);
+		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
+				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,-1,GrayF32.class);
 
-		tests.setup(angleTol, r*2+1+2 ,alg,ImageFloat32.class);
+		tests.setup(angleTol, r*2+1+2 ,alg,GrayF32.class);
 		tests.performAll();
 	}
 }

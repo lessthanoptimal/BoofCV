@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.edge;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
 
 import java.util.Random;
 
@@ -38,13 +38,13 @@ public class BenchmarkGradientToEdge {
 	final static int width = 640;
 	final static int height = 480;
 
-	static ImageFloat32 derivX_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 derivY_F32 = new ImageFloat32(width,height);
+	static GrayF32 derivX_F32 = new GrayF32(width,height);
+	static GrayF32 derivY_F32 = new GrayF32(width,height);
 
-	static ImageFloat32 intensity_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 orientation_F32 = new ImageFloat32(width,height);
+	static GrayF32 intensity_F32 = new GrayF32(width,height);
+	static GrayF32 orientation_F32 = new GrayF32(width,height);
 
-	static ImageSInt8 direction = new ImageSInt8(width,height);
+	static GrayS8 direction = new GrayS8(width,height);
 
 	public static class Euclidian_F32 extends PerformerBase {
 

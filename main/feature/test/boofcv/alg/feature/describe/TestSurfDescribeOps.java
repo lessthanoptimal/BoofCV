@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.feature.describe.impl.ImplSurfDescribeOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -43,12 +43,12 @@ public class TestSurfDescribeOps {
 	int c_x = width/2;
 	int c_y = height/2;
 
-	ImageFloat32 inputF32;
-	ImageSInt32 inputI32;
+	GrayF32 inputF32;
+	GrayS32 inputI32;
 
 	public TestSurfDescribeOps() {
-		inputF32 = new ImageFloat32(width,height);
-		inputI32 = new ImageSInt32(width,height);
+		inputF32 = new GrayF32(width,height);
+		inputI32 = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(inputF32, rand, 0, 100);
 		GImageMiscOps.fillUniform(inputI32, rand, 0, 100);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,9 @@ import boofcv.gui.tracker.TldVisualizationPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.Rectangle2D_F64;
 
 import java.awt.image.BufferedImage;
@@ -41,7 +41,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSingleBand>
+public class VisualizeTldTrackerApp<T extends ImageGray,D extends ImageGray>
 		implements TldVisualizationPanel.Listener
 {
 
@@ -127,12 +127,12 @@ public class VisualizeTldTrackerApp<T extends ImageSingleBand,D extends ImageSin
 
 
 	public static void main( String args[] ) {
-		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(ImageUInt8.class);
+		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
-		SimpleImageSequence<ImageUInt8> sequence =
-				DefaultMediaManager.INSTANCE.openVideo(fileName,ImageType.single(ImageUInt8.class));
+		SimpleImageSequence<GrayU8> sequence =
+				DefaultMediaManager.INSTANCE.openVideo(fileName,ImageType.single(GrayU8.class));
 
 		app.process(sequence);
 	}

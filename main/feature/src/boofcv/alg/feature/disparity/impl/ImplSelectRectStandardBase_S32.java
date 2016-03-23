@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.SelectRectStandard;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSelectRectStandardBase_S32<T extends ImageSingleBand>
+public abstract class ImplSelectRectStandardBase_S32<T extends ImageGray>
 		extends SelectRectStandard<int[],T>
 {
 	// scores organized for more efficient processing

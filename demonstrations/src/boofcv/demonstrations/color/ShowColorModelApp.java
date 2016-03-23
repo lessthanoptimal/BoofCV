@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,8 +52,8 @@ public class ShowColorModelApp
 	ListDisplayPanel gui = new ListDisplayPanel();
 	boolean processedImage = false;
 
-	MultiSpectral<ImageFloat32> input;
-	MultiSpectral<ImageFloat32> output;
+	Planar<GrayF32> input;
+	Planar<GrayF32> output;
 
 
 	// tells progress monitor the current progress
@@ -68,8 +68,8 @@ public class ShowColorModelApp
 		addAlgorithm(0,"XYZ",3);
 		addAlgorithm(0, "LAB", 4);
 
-		input = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
-		output = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 1, 1 , 3);
+		input = new Planar<GrayF32>(GrayF32.class, 1, 1 , 3);
+		output = new Planar<GrayF32>(GrayF32.class, 1, 1 , 3);
 
 		setMainGUI(gui);
 	}
@@ -80,7 +80,7 @@ public class ShowColorModelApp
 		input.reshape(image.getWidth(),image.getHeight());
 		output.reshape(image.getWidth(),image.getHeight());
 
-		ConvertBufferedImage.convertFromMulti(image, input,true, ImageFloat32.class);
+		ConvertBufferedImage.convertFromMulti(image, input,true, GrayF32.class);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -195,7 +195,7 @@ public class ShowColorModelApp
 		});
 	}
 
-	private void setNaN( ImageFloat32 image ) {
+	private void setNaN( GrayF32 image ) {
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
 				float v = image.unsafe_get(x,y);

@@ -21,9 +21,9 @@ package boofcv.abst.filter.blur;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -38,19 +38,19 @@ public class TestBlurStorageFilter {
 	int height = 25;
 	Random rand = new Random(234);
 
-	Class[] imageTypes = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 
 	@Test
 	public void gaussian() {
 		for( Class c : imageTypes ) {
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand storage = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray storage = GeneralizedImageOps.createSingleBand(c,width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("gaussian",c,-1,2);
+			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("gaussian",c,-1,2);
 
 			GBlurImageOps.gaussian(input,found,-1,2,storage);
 
@@ -63,14 +63,14 @@ public class TestBlurStorageFilter {
 	@Test
 	public void mean() {
 		for( Class c : imageTypes ) {
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand storage = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray storage = GeneralizedImageOps.createSingleBand(c,width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("mean",c,2);
+			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("mean",c,2);
 
 			GBlurImageOps.mean(input,found,2,storage);
 
@@ -83,13 +83,13 @@ public class TestBlurStorageFilter {
 	@Test
 	public void median() {
 		for( Class c : imageTypes ) {
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(c,width,height);
-			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray found = GeneralizedImageOps.createSingleBand(c,width,height);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(c,width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<ImageUInt8>("median",c,2);
+			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("median",c,2);
 
 			GBlurImageOps.median(input,found,2);
 

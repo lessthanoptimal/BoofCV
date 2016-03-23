@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,27 +20,27 @@ package boofcv.abst.filter.transform.fft;
 
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F64;
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.InterleavedF64;
 
 /**
  * @author Peter Abeles
  */
 public class TestGeneralFft_to_DiscreteFourierTransform_F64
-		extends GenericTestDiscreteFourierTransform<ImageFloat64,InterleavedF64> {
+		extends GenericTestDiscreteFourierTransform<GrayF64,InterleavedF64> {
 
 	public TestGeneralFft_to_DiscreteFourierTransform_F64() {
 		super(false,1e-3);
 	}
 
 	@Override
-	public DiscreteFourierTransform<ImageFloat64,InterleavedF64> createAlgorithm() {
+	public DiscreteFourierTransform<GrayF64,InterleavedF64> createAlgorithm() {
 		return new GeneralFft_to_DiscreteFourierTransform_F64();
 	}
 
 	@Override
-	public ImageFloat64 createImage(int width, int height) {
-		return new ImageFloat64(width,height);
+	public GrayF64 createImage(int width, int height) {
+		return new GrayF64(width,height);
 	}
 
 	@Override

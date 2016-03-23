@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -61,9 +61,9 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class<?> paramTypes[] = candidate.getParameterTypes();
 
-		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+		ImageGray src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 		GImageMiscOps.fillUniform(src, rand, 0, 130);
-		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
+		ImageGray dst = ConvolutionTestHelper.createImage(paramTypes[2], width, height);
 
 		if( candidate.getName().compareTo("convolve") != 0 ) {
 			Object[][] ret = new Object[1][paramTypes.length];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.background;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageFloat32;
  * </p>
  * <p>
  * Internally background model is represented by two images; mean and variance, which are stored in
- * {@link ImageFloat32} images.  This allows for the mean and variance of each pixel to be interpolated,
+ * {@link GrayF32} images.  This allows for the mean and variance of each pixel to be interpolated,
  * reducing artifacts along the border of objects.
  * </p>
  *

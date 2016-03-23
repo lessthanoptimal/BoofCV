@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -61,29 +61,29 @@ public class ExampleVideoMosaic {
 		confDetector.radius = 3;
 
 		// Use a KLT tracker
-		PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(new int[]{1,2,4,8},confDetector,3,
-				ImageFloat32.class,ImageFloat32.class);
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(new int[]{1,2,4,8},confDetector,3,
+				GrayF32.class,GrayF32.class);
 
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.
-		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
+		ImageMotion2D<GrayF32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(220,3,2,30,0.6,0.5,false,tracker,new Homography2D_F64());
 
 		// wrap it so it output color images while estimating motion from gray
-		ImageMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64> motion2DColor =
-				new MsToGrayMotion2D<ImageFloat32,Homography2D_F64>(motion2D,ImageFloat32.class);
+		ImageMotion2D<Planar<GrayF32>,Homography2D_F64> motion2DColor =
+				new MsToGrayMotion2D<GrayF32,Homography2D_F64>(motion2D,GrayF32.class);
 
 		// This fuses the images together
-		StitchingFromMotion2D<MultiSpectral<ImageFloat32>,Homography2D_F64>
-				stitch = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, ImageFloat32.class);
+		StitchingFromMotion2D<Planar<GrayF32>,Homography2D_F64>
+				stitch = FactoryMotion2D.createVideoStitchMS(0.5, motion2DColor, GrayF32.class);
 
 		// Load an image sequence
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = UtilIO.pathExample("mosaic/airplane01.mjpeg");
-		SimpleImageSequence<MultiSpectral<ImageFloat32>> video =
-				media.openVideo(fileName, ImageType.ms(3, ImageFloat32.class));
+		SimpleImageSequence<Planar<GrayF32>> video =
+				media.openVideo(fileName, ImageType.ms(3, GrayF32.class));
 
-		MultiSpectral<ImageFloat32> frame = video.next();
+		Planar<GrayF32> frame = video.next();
 
 		// shrink the input image and center it
 		Homography2D_F64 shrink = new Homography2D_F64(0.5,0,frame.width/4,0,0.5,frame.height/4,0,0,1);

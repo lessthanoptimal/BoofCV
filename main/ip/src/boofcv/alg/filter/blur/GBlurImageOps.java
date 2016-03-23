@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,12 +41,12 @@ public class GBlurImageOps {
 	 */
 	public static <T extends ImageBase>
 	T mean(T input, T output, int radius, ImageBase storage ) {
-		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.mean((ImageUInt8)input,(ImageUInt8)output,radius,(ImageUInt8)storage);
-		} else if( input instanceof ImageFloat32) {
-			return (T)BlurImageOps.mean((ImageFloat32)input,(ImageFloat32)output,radius,(ImageFloat32)storage);
-		} else if( input instanceof MultiSpectral ) {
-			return (T)BlurImageOps.mean((MultiSpectral)input,(MultiSpectral)output,radius,(ImageSingleBand)storage);
+		if( input instanceof GrayU8) {
+			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
+		} else if( input instanceof GrayF32) {
+			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radius,(GrayF32)storage);
+		} else if( input instanceof Planar) {
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -63,19 +63,19 @@ public class GBlurImageOps {
 	 */
 	public static <T extends ImageBase>
 	T median(T input, T output, int radius ) {
-		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.median((ImageUInt8) input, (ImageUInt8) output, radius);
-		} else if( input instanceof ImageFloat32) {
-			return (T)BlurImageOps.median((ImageFloat32) input, (ImageFloat32) output, radius);
-		} else if( input instanceof MultiSpectral ) {
-			return (T)BlurImageOps.median((MultiSpectral)input,(MultiSpectral)output,radius);
+		if( input instanceof GrayU8) {
+			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius);
+		} else if( input instanceof GrayF32) {
+			return (T)BlurImageOps.median((GrayF32) input, (GrayF32) output, radius);
+		} else if( input instanceof Planar) {
+			return (T)BlurImageOps.median((Planar)input,(Planar)output,radius);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
 	}
 
 	/**
-	 * Applies Gaussian blur to a {@link ImageSingleBand}
+	 * Applies Gaussian blur to a {@link ImageGray}
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -87,12 +87,12 @@ public class GBlurImageOps {
 	 */
 	public static <T extends ImageBase>
 	T gaussian(T input, T output, double sigma , int radius, T storage ) {
-		if( input instanceof ImageUInt8 ) {
-			return (T)BlurImageOps.gaussian((ImageUInt8)input,(ImageUInt8)output,sigma,radius,(ImageUInt8)storage);
-		} else if( input instanceof ImageFloat32) {
-			return (T)BlurImageOps.gaussian((ImageFloat32)input,(ImageFloat32)output,sigma,radius,(ImageFloat32)storage);
-		} else if( input instanceof MultiSpectral ) {
-			return (T)BlurImageOps.gaussian((MultiSpectral)input,(MultiSpectral)output,sigma,radius,(ImageSingleBand)storage);
+		if( input instanceof GrayU8) {
+			return (T)BlurImageOps.gaussian((GrayU8)input,(GrayU8)output,sigma,radius,(GrayU8)storage);
+		} else if( input instanceof GrayF32) {
+			return (T)BlurImageOps.gaussian((GrayF32)input,(GrayF32)output,sigma,radius,(GrayF32)storage);
+		} else if( input instanceof Planar) {
+			return (T)BlurImageOps.gaussian((Planar)input,(Planar)output,sigma,radius,(ImageGray)storage);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type: "+input.getClass().getSimpleName());
 		}

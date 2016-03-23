@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.FitLine_F64;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
@@ -52,7 +52,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  * @author Peter Abeles
  */
 // TODO specify weight function.  close to A, close to B, even
-public class SnapToEdge<T extends ImageSingleBand>extends BaseIntegralEdge<T> {
+public class SnapToEdge<T extends ImageGray>extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
 	protected int lineSamples;

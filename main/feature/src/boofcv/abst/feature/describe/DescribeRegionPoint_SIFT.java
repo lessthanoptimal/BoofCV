@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.feature.detect.interest.UnrollSiftScaleSpaceGradient;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -35,7 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
+public class DescribeRegionPoint_SIFT <T extends ImageGray>
 	implements DescribeRegionPoint<T,TupleDesc_F64>
 {
 	// expected type of input image.  All image types are converted to floats since that's what
@@ -46,13 +46,13 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 	UnrollSiftScaleSpaceGradient scaleSpace;
 
 	// computes the feature description
-	DescribePointSift<ImageFloat32> describe;
+	DescribePointSift<GrayF32> describe;
 
 	// used as temporary storage for the input image if it needs to be converted
-	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+	GrayF32 imageFloat = new GrayF32(1,1);
 
 	public DescribeRegionPoint_SIFT(SiftScaleSpace scaleSpace,
-									DescribePointSift<ImageFloat32> describe,
+									DescribePointSift<GrayF32> describe,
 									Class<T> imageType ) {
 		this.scaleSpace = new UnrollSiftScaleSpaceGradient(scaleSpace);
 		this.describe = describe;
@@ -62,9 +62,9 @@ public class DescribeRegionPoint_SIFT <T extends ImageSingleBand>
 
 	@Override
 	public void setImage(T image) {
-		ImageFloat32 input;
-		if( image instanceof ImageFloat32 ) {
-			input = (ImageFloat32)image;
+		GrayF32 input;
+		if( image instanceof GrayF32) {
+			input = (GrayF32)image;
 		} else {
 			imageFloat.reshape(image.width,image.height);
 			GConvertImage.convert(image,imageFloat);

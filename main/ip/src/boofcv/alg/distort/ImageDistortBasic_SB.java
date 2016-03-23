@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,15 +19,15 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
- * Most basic implementation of {@link ImageDistort} for {@link ImageSingleBand}. Computes the distortion from the
+ * Most basic implementation of {@link ImageDistort} for {@link ImageGray}. Computes the distortion from the
  * dst to src image for each pixel.  The dst pixel value is then set to the interpolated value of the src image.
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic_SB<Input extends ImageSingleBand,Output extends ImageSingleBand>
+public abstract class ImageDistortBasic_SB<Input extends ImageGray,Output extends ImageGray>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
 
 	/**

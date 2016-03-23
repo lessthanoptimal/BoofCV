@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import georegression.metric.UtilAngle;
 
 import java.awt.event.MouseAdapter;
@@ -69,8 +69,8 @@ public class ExampleSegmentColor {
 	 * can use Gaussian models instead of a uniform distribution, as is done below.
 	 */
 	public static void showSelectedColor( String name , BufferedImage image , float hue , float saturation ) {
-		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
-		MultiSpectral<ImageFloat32> hsv = input.createSameShape();
+		Planar<GrayF32> input = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
+		Planar<GrayF32> hsv = input.createSameShape();
 
 		// Convert into HSV
 		ColorHsv.rgbToHsv_F32(input,hsv);
@@ -79,8 +79,8 @@ public class ExampleSegmentColor {
 		float maxDist2 = 0.4f*0.4f;
 
 		// Extract hue and saturation bands which are independent of intensity
-		ImageFloat32 H = hsv.getBand(0);
-		ImageFloat32 S = hsv.getBand(1);
+		GrayF32 H = hsv.getBand(0);
+		GrayF32 S = hsv.getBand(1);
 
 		// Adjust the relative importance of Hue and Saturation.
 		// Hue has a range of 0 to 2*PI and Saturation from 0 to 1.

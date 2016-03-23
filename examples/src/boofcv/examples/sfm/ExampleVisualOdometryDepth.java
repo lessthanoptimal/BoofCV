@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.VisualDepthParameters;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -64,27 +64,27 @@ public class ExampleVisualOdometryDepth {
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
 
-		PointTrackerTwoPass<ImageUInt8> tracker =
+		PointTrackerTwoPass<GrayU8> tracker =
 				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
-						ImageUInt8.class, ImageSInt16.class);
+						GrayU8.class, GrayS16.class);
 
-		DepthSparse3D<ImageUInt16> sparseDepth = new DepthSparse3D.I<ImageUInt16>(1e-3);
+		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<GrayU16>(1e-3);
 
 		// declares the algorithm
-		DepthVisualOdometry<ImageUInt8,ImageUInt16> visualOdometry =
+		DepthVisualOdometry<GrayU8,GrayU16> visualOdometry =
 				FactoryVisualOdometry.depthDepthPnP(1.5, 120, 2, 200, 50, true,
-				sparseDepth, tracker, ImageUInt8.class, ImageUInt16.class);
+				sparseDepth, tracker, GrayU8.class, GrayU16.class);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(param.visualParam,new DoNothingPixelTransform_F32());
 
 		// Process the video sequence and output the location plus number of inliers
-		SimpleImageSequence<ImageUInt8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(ImageUInt8.class));
-		SimpleImageSequence<ImageUInt16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(ImageUInt16.class));
+		SimpleImageSequence<GrayU8> videoVisual = media.openVideo(directory+"rgb.mjpeg", ImageType.single(GrayU8.class));
+		SimpleImageSequence<GrayU16> videoDepth = media.openVideo(directory + "depth.mpng", ImageType.single(GrayU16.class));
 
 		while( videoVisual.hasNext() ) {
-			ImageUInt8 visual = videoVisual.next();
-			ImageUInt16 depth = videoDepth.next();
+			GrayU8 visual = videoVisual.next();
+			GrayU16 depth = videoDepth.next();
 
 			if( !visualOdometry.process(visual,depth) ) {
 				throw new RuntimeException("VO Failed!");

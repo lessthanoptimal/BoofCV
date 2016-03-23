@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
 
 import java.awt.image.BufferedImage;
@@ -44,13 +44,13 @@ public class ExampleOverheadView {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
 
-		MultiSpectral<ImageUInt8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, ImageUInt8.class);
+		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromMulti(input, null,true, GrayU8.class);
 
 		StereoParameters stereoParam = UtilIO.loadXML(UtilIO.pathExample("road/stereo01.xml"));
 		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));
 
-		CreateSyntheticOverheadView<MultiSpectral<ImageUInt8>> generateOverhead =
-				new CreateSyntheticOverheadViewMS<ImageUInt8>(TypeInterpolate.BILINEAR,3,ImageUInt8.class);
+		CreateSyntheticOverheadView<Planar<GrayU8>> generateOverhead =
+				new CreateSyntheticOverheadViewMS<GrayU8>(TypeInterpolate.BILINEAR,3,GrayU8.class);
 
 		// size of cells in the overhead image in world units
 		double cellSize = 0.05;
@@ -62,8 +62,8 @@ public class ExampleOverheadView {
 		int overheadWidth = selectMapSize.getOverheadWidth();
 		int overheadHeight = selectMapSize.getOverheadHeight();
 
-		MultiSpectral<ImageUInt8> overheadRGB =
-				new MultiSpectral<ImageUInt8>(ImageUInt8.class,overheadWidth,overheadHeight,3);
+		Planar<GrayU8> overheadRGB =
+				new Planar<GrayU8>(GrayU8.class,overheadWidth,overheadHeight,3);
 		generateOverhead.configure(stereoParam.left,groundToLeft,
 				selectMapSize.getCenterX(), selectMapSize.getCenterY(), cellSize,overheadRGB.width,overheadRGB.height);
 

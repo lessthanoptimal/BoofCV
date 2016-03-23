@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.MonoPlaneParameters;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -53,7 +53,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		// load camera description and the video sequence
 		MonoPlaneParameters calibration = UtilIO.loadXML(media.openFile(directory + "mono_plane.xml"));
-		SimpleImageSequence<ImageUInt8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(ImageUInt8.class));
+		SimpleImageSequence<GrayU8> video = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
 		PkltConfig configKlt = new PkltConfig();
@@ -61,18 +61,18 @@ public class ExampleVisualOdometryMonocularPlane {
 		configKlt.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(configKlt, configDetector, ImageUInt8.class, null);
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDetector, GrayU8.class, null);
 
 		// declares the algorithm
-		MonocularPlaneVisualOdometry<ImageUInt8> visualOdometry =
-				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageType.single(ImageUInt8.class));
+		MonocularPlaneVisualOdometry<GrayU8> visualOdometry =
+				FactoryVisualOdometry.monoPlaneInfinity(75, 2, 1.5, 200, tracker, ImageType.single(GrayU8.class));
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
 		visualOdometry.setCalibration(calibration);
 
 		// Process the video sequence and output the location plus number of inliers
 		while( video.hasNext() ) {
-			ImageUInt8 image = video.next();
+			GrayU8 image = video.next();
 
 			if( !visualOdometry.process(image) ) {
 				System.out.println("Fault!");

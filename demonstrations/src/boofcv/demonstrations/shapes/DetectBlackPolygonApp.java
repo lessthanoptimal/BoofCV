@@ -31,10 +31,10 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.Configuration;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonApp<T extends ImageSingleBand> extends DemonstrationBase<T>
+public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBase<T>
 		implements ThresholdControlPanel.Listener
 {
 
@@ -67,7 +67,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 	BufferedImage original;
 	BufferedImage work;
 	T inputPrev;
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
@@ -231,7 +231,7 @@ public class DetectBlackPolygonApp<T extends ImageSingleBand> extends Demonstrat
 		examples.add("calibration/stereo/Bumblebee2_Square/left10.jpg");
 		examples.add("fiducial/square_grid/movie.mp4");
 
-		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,ImageFloat32.class);
+		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,GrayF32.class);
 
 		app.openFile(new File(examples.get(0)));
 

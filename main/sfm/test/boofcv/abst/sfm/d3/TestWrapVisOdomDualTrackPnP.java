@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,33 +25,33 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<ImageFloat32> {
+public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
 	public TestWrapVisOdomDualTrackPnP() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
+	public StereoVisualOdometry<GrayF32> createAlgorithm() {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
 
 		PkltConfig kltConfig = new PkltConfig();
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
 
-		PointTracker<ImageFloat32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector,
-				ImageFloat32.class,ImageFloat32.class);
-		PointTracker<ImageFloat32> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector,
-				ImageFloat32.class,ImageFloat32.class);
+		PointTracker<GrayF32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector,
+				GrayF32.class,GrayF32.class);
+		PointTracker<GrayF32> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector,
+				GrayF32.class,GrayF32.class);
 
-		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, ImageFloat32.class);
+		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);
 
 		return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-				trackerLeft, trackerRight, describe,ImageFloat32.class);
+				trackerLeft, trackerRight, describe,GrayF32.class);
 	}
 }

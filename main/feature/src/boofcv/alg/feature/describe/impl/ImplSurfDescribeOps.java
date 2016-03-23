@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseScaleGradient;
@@ -40,7 +40,7 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageFloat32 ii, double tl_x, double tl_y, double samplePeriod ,
+	public static void gradientInner(GrayF32 ii, double tl_x, double tl_y, double samplePeriod ,
 									 int regionSize, double kernelSize,
 									 float[] derivX, float derivY[])
 	{
@@ -100,7 +100,7 @@ public class ImplSurfDescribeOps {
 	 * Computes the gradient for a using the derivX kernel found in {@link boofcv.alg.transform.ii.DerivativeIntegralImage}.
 	 * Assumes that the entire region, including the surrounding pixels, are inside the image.
 	 */
-	public static void gradientInner(ImageSInt32 ii, double tl_x, double tl_y, double samplePeriod ,
+	public static void gradientInner(GrayS32 ii, double tl_x, double tl_y, double samplePeriod ,
 									 int regionSize, double kernelSize,
 									 int[] derivX, int derivY[])
 	{
@@ -158,7 +158,7 @@ public class ImplSurfDescribeOps {
 	/**
 	 * Simple algorithm for computing the gradient of a region.  Can handle image borders
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void naiveGradient(T ii, double tl_x, double tl_y, double samplePeriod ,
 					   int regionSize, double kernelSize,
 					   boolean useHaar, double[] derivX, double derivY[])

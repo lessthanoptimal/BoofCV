@@ -32,14 +32,14 @@ public class GIntegralImageOps {
 	/**
 	 * Given the input image, return the type of image the integral image should be.
 	 */
-	public static <I extends ImageSingleBand, II extends ImageSingleBand>
+	public static <I extends ImageGray, II extends ImageGray>
 	Class<II> getIntegralType( Class<I> inputType ) {
-		if( inputType == ImageFloat32.class ) {
-			return (Class<II>)ImageFloat32.class;
-		} else if( inputType == ImageUInt8.class ){
-			return (Class<II>)ImageSInt32.class;
-		} else if( inputType == ImageSInt32.class ){
-			return (Class<II>)ImageSInt32.class;
+		if( inputType == GrayF32.class ) {
+			return (Class<II>)GrayF32.class;
+		} else if( inputType == GrayU8.class ){
+			return (Class<II>)GrayS32.class;
+		} else if( inputType == GrayS32.class ){
+			return (Class<II>)GrayS32.class;
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+inputType.getSimpleName());
 		}
@@ -52,18 +52,18 @@ public class GIntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static <I extends ImageSingleBand, T extends ImageSingleBand>
+	public static <I extends ImageGray, T extends ImageGray>
 	T transform( I input , T transformed ) {
-		if( input instanceof ImageFloat32 ) {
-			return (T)IntegralImageOps.transform((ImageFloat32)input,(ImageFloat32)transformed);
-		} else if( input instanceof ImageFloat64) {
-			return (T)IntegralImageOps.transform((ImageFloat64)input,(ImageFloat64)transformed);
-		} else if( input instanceof ImageUInt8) {
-			return (T)IntegralImageOps.transform((ImageUInt8)input,(ImageSInt32)transformed);
-		} else if( input instanceof ImageSInt32) {
-			return (T)IntegralImageOps.transform((ImageSInt32)input,(ImageSInt32)transformed);
-		} else if( input instanceof ImageSInt64) {
-			return (T)IntegralImageOps.transform((ImageSInt64)input,(ImageSInt64)transformed);
+		if( input instanceof GrayF32) {
+			return (T)IntegralImageOps.transform((GrayF32)input,(GrayF32)transformed);
+		} else if( input instanceof GrayF64) {
+			return (T)IntegralImageOps.transform((GrayF64)input,(GrayF64)transformed);
+		} else if( input instanceof GrayU8) {
+			return (T)IntegralImageOps.transform((GrayU8)input,(GrayS32)transformed);
+		} else if( input instanceof GrayS32) {
+			return (T)IntegralImageOps.transform((GrayS32)input,(GrayS32)transformed);
+		} else if( input instanceof GrayS64) {
+			return (T)IntegralImageOps.transform((GrayS64)input,(GrayS64)transformed);
 		} else {
 			throw new IllegalArgumentException("Unknown input type: "+input.getClass().getSimpleName());
 		}
@@ -77,18 +77,18 @@ public class GIntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	T convolve( T integral ,
 				IntegralKernel kernel,
 				T output ) {
-		if( integral instanceof ImageFloat32 ) {
-			return (T)IntegralImageOps.convolve((ImageFloat32)integral,kernel,(ImageFloat32)output);
-		} else if( integral instanceof ImageFloat64) {
-			return (T)IntegralImageOps.convolve((ImageFloat64)integral,kernel,(ImageFloat64)output);
-		} else if( integral instanceof ImageSInt32) {
-			return (T)IntegralImageOps.convolve((ImageSInt32)integral,kernel,(ImageSInt32)output);
-		} else if( integral instanceof ImageSInt64) {
-			return (T)IntegralImageOps.convolve((ImageSInt64)integral,kernel,(ImageSInt64)output);
+		if( integral instanceof GrayF32) {
+			return (T)IntegralImageOps.convolve((GrayF32)integral,kernel,(GrayF32)output);
+		} else if( integral instanceof GrayF64) {
+			return (T)IntegralImageOps.convolve((GrayF64)integral,kernel,(GrayF64)output);
+		} else if( integral instanceof GrayS32) {
+			return (T)IntegralImageOps.convolve((GrayS32)integral,kernel,(GrayS32)output);
+		} else if( integral instanceof GrayS64) {
+			return (T)IntegralImageOps.convolve((GrayS64)integral,kernel,(GrayS64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown input type: "+integral.getClass().getSimpleName());
 		}
@@ -103,18 +103,18 @@ public class GIntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	T convolveBorder( T integral ,
 					  IntegralKernel kernel,
 					  T output , int borderX , int borderY ) {
-		if( integral instanceof ImageFloat32 ) {
-			return (T)IntegralImageOps.convolveBorder((ImageFloat32)integral,kernel,(ImageFloat32)output,borderX,borderY);
-		} else if( integral instanceof ImageFloat64) {
-			return (T)IntegralImageOps.convolveBorder((ImageFloat64)integral,kernel,(ImageFloat64)output,borderX,borderY);
-		} else if( integral instanceof ImageSInt32) {
-			return (T)IntegralImageOps.convolveBorder((ImageSInt32)integral,kernel,(ImageSInt32)output,borderX,borderY);
-		} else if( integral instanceof ImageSInt64) {
-			return (T)IntegralImageOps.convolveBorder((ImageSInt64)integral,kernel,(ImageSInt64)output,borderX,borderY);
+		if( integral instanceof GrayF32) {
+			return (T)IntegralImageOps.convolveBorder((GrayF32)integral,kernel,(GrayF32)output,borderX,borderY);
+		} else if( integral instanceof GrayF64) {
+			return (T)IntegralImageOps.convolveBorder((GrayF64)integral,kernel,(GrayF64)output,borderX,borderY);
+		} else if( integral instanceof GrayS32) {
+			return (T)IntegralImageOps.convolveBorder((GrayS32)integral,kernel,(GrayS32)output,borderX,borderY);
+		} else if( integral instanceof GrayS64) {
+			return (T)IntegralImageOps.convolveBorder((GrayS64)integral,kernel,(GrayS64)output,borderX,borderY);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -129,18 +129,18 @@ public class GIntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	double convolveSparse( T integral ,
 						   IntegralKernel kernel ,
 						   int x , int y ) {
-		if( integral instanceof ImageFloat32 ) {
-			return IntegralImageOps.convolveSparse((ImageFloat32)integral,kernel,x,y);
-		} else if( integral instanceof ImageFloat64) {
-			return IntegralImageOps.convolveSparse((ImageFloat64)integral,kernel,x,y);
-		} else if( integral instanceof ImageSInt32) {
-			return IntegralImageOps.convolveSparse((ImageSInt32)integral,kernel,x,y);
-		} else if( integral instanceof ImageSInt64) {
-			return IntegralImageOps.convolveSparse((ImageSInt64)integral,kernel,x,y);
+		if( integral instanceof GrayF32) {
+			return IntegralImageOps.convolveSparse((GrayF32)integral,kernel,x,y);
+		} else if( integral instanceof GrayF64) {
+			return IntegralImageOps.convolveSparse((GrayF64)integral,kernel,x,y);
+		} else if( integral instanceof GrayS32) {
+			return IntegralImageOps.convolveSparse((GrayS32)integral,kernel,x,y);
+		} else if( integral instanceof GrayS64) {
+			return IntegralImageOps.convolveSparse((GrayS64)integral,kernel,x,y);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -159,17 +159,17 @@ public class GIntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	double block_zero( T integral , int x0 , int y0 , int x1 , int y1 )
 	{
-		if( integral instanceof ImageFloat32 ) {
-			return IntegralImageOps.block_zero((ImageFloat32)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageFloat64) {
-			return IntegralImageOps.block_zero((ImageFloat64)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageSInt32) {
-			return IntegralImageOps.block_zero((ImageSInt32)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageSInt64) {
-			return IntegralImageOps.block_zero((ImageSInt64)integral,x0,y0,x1,y1);
+		if( integral instanceof GrayF32) {
+			return IntegralImageOps.block_zero((GrayF32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayF64) {
+			return IntegralImageOps.block_zero((GrayF64)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayS32) {
+			return IntegralImageOps.block_zero((GrayS32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayS64) {
+			return IntegralImageOps.block_zero((GrayS64)integral,x0,y0,x1,y1);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -188,17 +188,17 @@ public class GIntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	double block_unsafe( T integral , int x0 , int y0 , int x1 , int y1 )
 	{
-		if( integral instanceof ImageFloat32 ) {
-			return IntegralImageOps.block_unsafe((ImageFloat32)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageFloat64) {
-			return IntegralImageOps.block_unsafe((ImageFloat64)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageSInt32) {
-			return IntegralImageOps.block_unsafe((ImageSInt32)integral,x0,y0,x1,y1);
-		} else if( integral instanceof ImageSInt64) {
-			return IntegralImageOps.block_unsafe((ImageSInt64)integral,x0,y0,x1,y1);
+		if( integral instanceof GrayF32) {
+			return IntegralImageOps.block_unsafe((GrayF32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayF64) {
+			return IntegralImageOps.block_unsafe((GrayF64)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayS32) {
+			return IntegralImageOps.block_unsafe((GrayS32)integral,x0,y0,x1,y1);
+		} else if( integral instanceof GrayS64) {
+			return IntegralImageOps.block_unsafe((GrayS64)integral,x0,y0,x1,y1);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}

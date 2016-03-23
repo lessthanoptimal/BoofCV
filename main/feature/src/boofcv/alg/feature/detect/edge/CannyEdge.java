@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
+public class CannyEdge<T extends ImageGray, D extends ImageGray> {
 
 	// blurs the input image
 	private BlurFilter<T> blur;
@@ -58,14 +58,14 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	private D derivY;
 
 	// edge intensity
-	private ImageFloat32 intensity = new ImageFloat32(1,1);
-	protected ImageFloat32 suppressed = new ImageFloat32(1,1);
+	private GrayF32 intensity = new GrayF32(1,1);
+	protected GrayF32 suppressed = new GrayF32(1,1);
 	// edge direction in radians
-	private ImageFloat32 angle = new ImageFloat32(1,1);
+	private GrayF32 angle = new GrayF32(1,1);
 	// quantized direction
-	private ImageSInt8 direction = new ImageSInt8(1,1);
+	private GrayS8 direction = new GrayS8(1,1);
 	// work space
-	private ImageUInt8 work = new ImageUInt8(1,1);
+	private GrayU8 work = new GrayU8(1,1);
 
 	// different algorithms for performing hysteresis thresholding
 	protected HysteresisEdgeTracePoints hysteresisPts; // saves a list of points
@@ -108,7 +108,7 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 	 * @param threshHigh Upper threshold. &ge; 0.
 	 * @param output (Might be option) Output binary image.  Edge pixels are marked with 1 and everything else 0.
 	 */
-	public void process(T input , float threshLow, float threshHigh , ImageUInt8 output ) {
+	public void process(T input , float threshLow, float threshHigh , GrayU8 output ) {
 
 		if( threshLow < 0 || threshHigh < 0 )
 			throw new IllegalArgumentException("Threshold must be >= zero!");
@@ -139,7 +139,7 @@ public class CannyEdge<T extends ImageSingleBand, D extends ImageSingleBand> {
 		performThresholding(threshLow, threshHigh, output);
 	}
 
-	protected void performThresholding(float threshLow, float threshHigh, ImageUInt8 output) {
+	protected void performThresholding(float threshLow, float threshHigh, GrayU8 output) {
 		if( hysteresisPts != null ) {
 			hysteresisPts.process(suppressed,direction,threshLow,threshHigh);
 

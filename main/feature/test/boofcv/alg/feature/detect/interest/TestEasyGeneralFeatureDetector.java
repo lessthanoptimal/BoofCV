@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -35,13 +35,13 @@ public class TestEasyGeneralFeatureDetector {
 	int width = 20;
 	int height = 30;
 
-	ImageUInt8 image = new ImageUInt8(width,height);
+	GrayU8 image = new GrayU8(width,height);
 
 	@Test
 	public void requiresGradient() {
-		Helper<ImageUInt8,ImageSInt16> detector = new Helper<ImageUInt8,ImageSInt16>(true,false);
-		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> alg =
-				new EasyGeneralFeatureDetector<ImageUInt8, ImageSInt16>(detector,ImageUInt8.class,ImageSInt16.class);
+		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(true,false);
+		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
+				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
 
 		assertTrue(alg.derivX != null);
 		assertTrue(alg.derivY != null);
@@ -57,9 +57,9 @@ public class TestEasyGeneralFeatureDetector {
 
 	@Test
 	public void requiresHessian() {
-		Helper<ImageUInt8,ImageSInt16> detector = new Helper<ImageUInt8,ImageSInt16>(false,true);
-		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> alg =
-				new EasyGeneralFeatureDetector<ImageUInt8, ImageSInt16>(detector,ImageUInt8.class,ImageSInt16.class);
+		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(false,true);
+		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
+				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
 
 		// It uses the gradient to compute the hessian faster
 		assertTrue(alg.derivX != null);
@@ -75,16 +75,16 @@ public class TestEasyGeneralFeatureDetector {
 
 	@Test
 	public void checkExclude() {
-		Helper<ImageUInt8,ImageSInt16> detector = new Helper<ImageUInt8,ImageSInt16>(true,true);
-		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> alg =
-				new EasyGeneralFeatureDetector<ImageUInt8, ImageSInt16>(detector,ImageUInt8.class,ImageSInt16.class);
+		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(true,true);
+		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
+				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
 
 		alg.detect(image,new QueueCorner(10));
 
 		assertFalse(detector.excludeIsNull);
 	}
 
-	private static class Helper<I extends ImageSingleBand, D extends ImageSingleBand>
+	private static class Helper<I extends ImageGray, D extends ImageGray>
 			extends GeneralFeatureDetector<I,D> {
 
 		boolean gradient;

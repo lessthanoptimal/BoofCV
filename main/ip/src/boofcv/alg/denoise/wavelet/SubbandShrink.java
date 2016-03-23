@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.DenoiseWavelet;
 import boofcv.alg.denoise.ShrinkThresholdRule;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class SubbandShrink<I extends ImageSingleBand<I>> implements DenoiseWavelet<I> {
+public abstract class SubbandShrink<I extends ImageGray<I>> implements DenoiseWavelet<I> {
 
 	// specifies how the threshold is applied to each pixel in the image
 	protected ShrinkThresholdRule<I> rule;

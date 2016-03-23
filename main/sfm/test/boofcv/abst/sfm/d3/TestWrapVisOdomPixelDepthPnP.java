@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,21 +25,21 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<ImageFloat32> {
+public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<GrayF32> {
 
 	public TestWrapVisOdomPixelDepthPnP() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public StereoVisualOdometry<ImageFloat32> createAlgorithm() {
-		StereoDisparitySparse<ImageFloat32> disparity =
-				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, ImageFloat32.class);
+	public StereoVisualOdometry<GrayF32> createAlgorithm() {
+		StereoDisparitySparse<GrayF32> disparity =
+				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, GrayF32.class);
 
 		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = new int[]{1,2,4,8};
@@ -47,10 +47,10 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<I
 
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTrackerTwoPass<ImageFloat32> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector,
-				ImageFloat32.class, ImageFloat32.class);
+		PointTrackerTwoPass<GrayF32> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector,
+				GrayF32.class, GrayF32.class);
 
-		return FactoryVisualOdometry.stereoDepth(1.5,40,2,200,50,false,disparity,tracker,ImageFloat32.class);
+		return FactoryVisualOdometry.stereoDepth(1.5,40,2,200,50,false,disparity,tracker,GrayF32.class);
 	}
 
 }

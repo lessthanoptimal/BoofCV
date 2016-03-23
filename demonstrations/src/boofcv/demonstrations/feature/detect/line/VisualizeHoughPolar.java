@@ -31,8 +31,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F64;
 
@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class VisualizeHoughPolar<I extends ImageGray, D extends ImageGray> {
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -96,8 +96,8 @@ public class VisualizeHoughPolar<I extends ImageSingleBand, D extends ImageSingl
 	}
 
 	public static void main( String args[] ) {
-		VisualizeHoughPolar<ImageFloat32,ImageFloat32> app =
-				new VisualizeHoughPolar<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		VisualizeHoughPolar<GrayF32,GrayF32> app =
+				new VisualizeHoughPolar<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg"));

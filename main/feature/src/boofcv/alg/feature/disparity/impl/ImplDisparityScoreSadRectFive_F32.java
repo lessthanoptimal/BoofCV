@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,13 +20,13 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
- * images of type {@link ImageFloat32}.
+ * images of type {@link GrayF32}.
  * </p>
  *
  * <p>
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand>
-		extends DisparityScoreWindowFive<ImageFloat32,Disparity>
+public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageGray>
+		extends DisparityScoreWindowFive<GrayF32,Disparity>
 {
 
 	// Computes disparity from scores
@@ -62,7 +62,7 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 	}
 
 	@Override
-	public void _process( ImageFloat32 left , ImageFloat32 right , Disparity disparity ) {
+	public void _process(GrayF32 left , GrayF32 right , Disparity disparity ) {
 		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 			horizontalScore = new float[regionHeight][lengthHorizontal];
 			verticalScore = new float[regionHeight][lengthHorizontal];
@@ -82,7 +82,7 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow( ImageFloat32 left, ImageFloat32 right ) {
+	private void computeFirstRow(GrayF32 left, GrayF32 right ) {
 		float firstRow[] = verticalScore[0];
 		activeVerticalScore = 1;
 
@@ -110,7 +110,7 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows( ImageFloat32 left, ImageFloat32 right )
+	private void computeRemainingRows(GrayF32 left, GrayF32 right )
 	{
 		for( int row = regionHeight; row < left.height; row++ , activeVerticalScore++) {
 			int oldRow = row%regionHeight;
@@ -194,8 +194,8 @@ public class ImplDisparityScoreSadRectFive_F32<Disparity extends ImageSingleBand
 	}
 
 	@Override
-	public Class<ImageFloat32> getInputType() {
-		return ImageFloat32.class;
+	public Class<GrayF32> getInputType() {
+		return GrayF32.class;
 	}
 
 	@Override

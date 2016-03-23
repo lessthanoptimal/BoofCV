@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.pyramid;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteAverage<T extends ImageSingleBand> extends PyramidDiscrete<T> {
+public class PyramidDiscreteAverage<T extends ImageGray> extends PyramidDiscrete<T> {
 
 	/**
 	 *

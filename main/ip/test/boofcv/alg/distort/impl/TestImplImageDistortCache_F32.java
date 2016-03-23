@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,20 +20,20 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<ImageFloat32> {
+public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<GrayF32> {
 
 	public TestImplImageDistortCache_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public ImageDistortCache_SB<ImageFloat32,ImageFloat32> create(InterpolatePixelS<ImageFloat32> interp,
-															   Class<ImageFloat32> imageType) {
+	public ImageDistortCache_SB<GrayF32,GrayF32> create(InterpolatePixelS<GrayF32> interp,
+														Class<GrayF32> imageType) {
 		return new ImplImageDistortCache_F32(interp);
 	}
 }

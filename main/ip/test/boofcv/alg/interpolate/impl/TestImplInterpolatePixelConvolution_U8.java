@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,33 +21,33 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
 public class TestImplInterpolatePixelConvolution_U8 
-		extends GeneralChecksInterpolationPixelS<ImageUInt8>
+		extends GeneralChecksInterpolationPixelS<GrayU8>
 {
 	public TestImplInterpolatePixelConvolution_U8() {
 		exceptionOutside = false;
 	}
 
 	@Override
-	protected ImageUInt8 createImage(int width, int height) {
-		return new ImageUInt8(width, height);
+	protected GrayU8 createImage(int width, int height) {
+		return new GrayU8(width, height);
 	}
 
 	@Override
-	protected InterpolatePixelS<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
-		InterpolatePixelS<ImageUInt8> ret = new ImplInterpolatePixelConvolution_U8(new Dummy(),0,255);
+	protected InterpolatePixelS<GrayU8> wrap(GrayU8 image, int minValue, int maxValue) {
+		InterpolatePixelS<GrayU8> ret = new ImplInterpolatePixelConvolution_U8(new Dummy(),0,255);
 		ret.setImage(image);
 
 		return ret;
 	}
 
 	@Override
-	protected float compute(ImageUInt8 img, float x, float y) {
+	protected float compute(GrayU8 img, float x, float y) {
 		int xx = (int)x;
 		int yy = (int)y;
 

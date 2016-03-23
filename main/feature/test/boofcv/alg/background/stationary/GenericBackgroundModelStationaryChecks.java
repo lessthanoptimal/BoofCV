@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		noise(100,2,frame);
 		GImageMiscOps.fillRectangle(frame, 200, x0, y0, x1 - x0, y1 - y0);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 		alg.segment(frame, segmented);
 
 //		segmented.printBinary();
@@ -113,8 +113,8 @@ public abstract class GenericBackgroundModelStationaryChecks {
 		GImageMiscOps.fill(frame,50);
 		alg.updateBackground(frame);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		// there should be no change
 		// if reset isn't the case then this will fail
@@ -147,8 +147,8 @@ public abstract class GenericBackgroundModelStationaryChecks {
 
 		alg.setUnknownValue(2);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 		ImageMiscOps.fill(expected, 2);
 
 		alg.segment(frame, segmented);
@@ -165,17 +165,17 @@ public abstract class GenericBackgroundModelStationaryChecks {
 	private <T extends ImageBase>
 	void checkSubImage( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		checkSubImage_process(frame, segmented);
-		ImageUInt8 expected = segmented.clone();
+		GrayU8 expected = segmented.clone();
 
 		frame = BoofTesting.createSubImageOf(frame);
 		segmented = BoofTesting.createSubImageOf(segmented);
 		ImageMiscOps.fill(segmented,0);
 
 		checkSubImage_process(frame, segmented);
-		ImageUInt8 found = segmented.clone();
+		GrayU8 found = segmented.clone();
 
 		// see if both produce the same result
 
@@ -183,7 +183,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 	}
 
 	private <T extends ImageBase>
-	void checkSubImage_process( T frame, ImageUInt8 segmented)
+	void checkSubImage_process( T frame, GrayU8 segmented)
 	{
 		rand = new Random(2345);
 
@@ -222,7 +222,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 				alg.updateBackground(frame);
 			}
 
-			ImageUInt8 segmented = new ImageUInt8(width,height);
+			GrayU8 segmented = new GrayU8(width,height);
 
 			// segment with the current frame.  should be no motion
 			alg.segment(frame, segmented);

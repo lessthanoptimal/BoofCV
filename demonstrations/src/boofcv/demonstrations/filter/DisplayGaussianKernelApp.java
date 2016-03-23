@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectAlgorithmPanel {
+public class DisplayGaussianKernelApp<T extends ImageGray> extends SelectAlgorithmPanel {
 	int imageSize = 400;
 
 	T largeImg;
@@ -107,7 +107,7 @@ public class DisplayGaussianKernelApp<T extends ImageSingleBand> extends SelectA
 	}
 
 	public static void main( String args[] ) {
-		DisplayGaussianKernelApp<ImageFloat32> panel = new DisplayGaussianKernelApp<ImageFloat32>(ImageFloat32.class);
+		DisplayGaussianKernelApp<GrayF32> panel = new DisplayGaussianKernelApp<GrayF32>(GrayF32.class);
 //		DisplayGaussianKernelApp<ImageSInt32> panel = new DisplayGaussianKernelApp<ImageSInt32>(ImageSInt32.class);
 
 		panel.setPreferredSize(new Dimension(640,480));

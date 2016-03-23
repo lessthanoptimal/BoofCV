@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.transform.pyramid.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -38,8 +38,8 @@ public class ImplPyramidOps {
 	/**
 	 * Scales an image up using interpolation
 	 */
-	public static void scaleImageUp(ImageFloat32 input , ImageFloat32 output , int scale ,
-					  InterpolatePixelS<ImageFloat32> interp ) {
+	public static void scaleImageUp(GrayF32 input , GrayF32 output , int scale ,
+									InterpolatePixelS<GrayF32> interp ) {
 		output.reshape(input.width*scale,input.height*scale);
 
 		float fdiv = 1/(float)scale;
@@ -60,7 +60,7 @@ public class ImplPyramidOps {
 	/**
 	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
 	 */
-	public static void scaleDown2( ImageFloat32 input , ImageFloat32 output ) {
+	public static void scaleDown2(GrayF32 input , GrayF32 output ) {
 		
 		output.reshape(input.width / 2, input.height / 2);
 
@@ -76,8 +76,8 @@ public class ImplPyramidOps {
 	/**
 	 * Scales an image up using interpolation
 	 */
-	public static void scaleImageUp(ImageUInt8 input , ImageUInt8 output , int scale ,
-					  InterpolatePixelS<ImageUInt8> interp ) {
+	public static void scaleImageUp(GrayU8 input , GrayU8 output , int scale ,
+									InterpolatePixelS<GrayU8> interp ) {
 		output.reshape(input.width*scale,input.height*scale);
 
 		float fdiv = 1/(float)scale;
@@ -98,7 +98,7 @@ public class ImplPyramidOps {
 	/**
 	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
 	 */
-	public static void scaleDown2( ImageUInt8 input , ImageUInt8 output ) {
+	public static void scaleDown2(GrayU8 input , GrayU8 output ) {
 		
 		output.reshape(input.width / 2, input.height / 2);
 

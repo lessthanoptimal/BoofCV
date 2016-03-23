@@ -23,9 +23,9 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseScaleGradient;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class TestImplSurfDescribeOps {
 
 	@Test
 	public void gradientInner_F32() {
-		ImageFloat32 ii = new ImageFloat32(width,height);
+		GrayF32 ii = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		int r = 2;
 		int w = r*2+1;
@@ -76,7 +76,7 @@ public class TestImplSurfDescribeOps {
 
 	@Test
 	public void gradientInner_I32() {
-		ImageSInt32 ii = new ImageSInt32(width,height);
+		GrayS32 ii = new GrayS32(width,height);
 		GImageMiscOps.fillUniform(ii, rand, 0, 100);
 		int r = 2;
 		int w = r*2+1;
@@ -131,9 +131,9 @@ public class TestImplSurfDescribeOps {
 		double derivY[] = new double[w*w];
 
 		for( double theta = -Math.PI; theta <= Math.PI; theta += 0.15 ) {
-			ImageFloat32 img = new ImageFloat32(width,height);
+			GrayF32 img = new GrayF32(width,height);
 			createGradient(theta,img);
-			ImageFloat32 ii = IntegralImageOps.transform(img,null);
+			GrayF32 ii = IntegralImageOps.transform(img,null);
 
 			ImplSurfDescribeOps.naiveGradient(ii,r*2,r*2,scale,w, 4*scale, false, derivX,derivY);
 
@@ -157,7 +157,7 @@ public class TestImplSurfDescribeOps {
 	/**
 	 * Creates an image with a constant gradient in the specified direction
 	 */
-	public static <I extends ImageSingleBand>
+	public static <I extends ImageGray>
 	void createGradient( double theta , I image ) {
 		GImageSingleBand ret = FactoryGImageSingleBand.wrap(image);
 
@@ -173,7 +173,7 @@ public class TestImplSurfDescribeOps {
 		}
 	}
 
-	public static < II extends ImageSingleBand> 
+	public static < II extends ImageGray>
 	SparseScaleGradient<II,?> createGradient( II ii , double scale) {
 		SparseScaleGradient<II,?> ret =
 				SurfDescribeOps.createGradient(false,(Class<II>)ii.getClass());

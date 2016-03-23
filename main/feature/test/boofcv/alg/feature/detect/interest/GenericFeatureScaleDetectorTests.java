@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
@@ -30,9 +30,9 @@ public abstract class GenericFeatureScaleDetectorTests extends GenericFeatureDet
 
 	int r = 2;
 
-	private GeneralFeatureDetector<ImageFloat32, ImageFloat32> createBlobDetector(int maxFeatures) {
+	private GeneralFeatureDetector<GrayF32, GrayF32> createBlobDetector(int maxFeatures) {
 		return FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,
-				new ConfigGeneralDetector(maxFeatures,r,0,0,true,true,true), ImageFloat32.class);
+				new ConfigGeneralDetector(maxFeatures,r,0,0,true,true,true), GrayF32.class);
 	}
 
 	@Override
@@ -40,5 +40,5 @@ public abstract class GenericFeatureScaleDetectorTests extends GenericFeatureDet
 		return createDetector(createBlobDetector(maxFeatures));
 	}
 
-	protected abstract Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector);
+	protected abstract Object createDetector(GeneralFeatureDetector<GrayF32, GrayF32> detector);
 }

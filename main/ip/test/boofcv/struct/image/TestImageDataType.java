@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,34 +29,34 @@ public class TestImageDataType {
 
 	@Test
 	public void classToType() {
-		assertTrue(ImageDataType.U8 == ImageDataType.classToType(ImageUInt8.class));
-		assertTrue(ImageDataType.S8 == ImageDataType.classToType(ImageSInt8.class));
-		assertTrue(ImageDataType.U16 == ImageDataType.classToType(ImageUInt16.class));
-		assertTrue(ImageDataType.S16 == ImageDataType.classToType(ImageSInt16.class));
-		assertTrue(ImageDataType.S32 == ImageDataType.classToType(ImageSInt32.class));
-		assertTrue(ImageDataType.S64 == ImageDataType.classToType(ImageSInt64.class));
-		assertTrue(ImageDataType.F32 == ImageDataType.classToType(ImageFloat32.class));
-		assertTrue(ImageDataType.F64 == ImageDataType.classToType(ImageFloat64.class));
-		assertTrue(ImageDataType.I8 == ImageDataType.classToType(ImageInt8.class));
-		assertTrue(ImageDataType.I16 == ImageDataType.classToType(ImageInt16.class));
-		assertTrue(ImageDataType.I == ImageDataType.classToType(ImageInteger.class));
-		assertTrue(ImageDataType.F == ImageDataType.classToType(ImageFloat.class));
+		assertTrue(ImageDataType.U8 == ImageDataType.classToType(GrayU8.class));
+		assertTrue(ImageDataType.S8 == ImageDataType.classToType(GrayS8.class));
+		assertTrue(ImageDataType.U16 == ImageDataType.classToType(GrayU16.class));
+		assertTrue(ImageDataType.S16 == ImageDataType.classToType(GrayS16.class));
+		assertTrue(ImageDataType.S32 == ImageDataType.classToType(GrayS32.class));
+		assertTrue(ImageDataType.S64 == ImageDataType.classToType(GrayS64.class));
+		assertTrue(ImageDataType.F32 == ImageDataType.classToType(GrayF32.class));
+		assertTrue(ImageDataType.F64 == ImageDataType.classToType(GrayF64.class));
+		assertTrue(ImageDataType.I8 == ImageDataType.classToType(GrayI8.class));
+		assertTrue(ImageDataType.I16 == ImageDataType.classToType(GrayI16.class));
+		assertTrue(ImageDataType.I == ImageDataType.classToType(GrayI.class));
+		assertTrue(ImageDataType.F == ImageDataType.classToType(GrayF.class));
 	}
 
 	@Test
 	public void typeToClass() {
-		assertTrue(ImageUInt8.class == ImageDataType.typeToSingleClass(ImageDataType.U8));
-		assertTrue(ImageSInt8.class == ImageDataType.typeToSingleClass(ImageDataType.S8));
-		assertTrue(ImageUInt16.class == ImageDataType.typeToSingleClass(ImageDataType.U16));
-		assertTrue(ImageSInt16.class == ImageDataType.typeToSingleClass(ImageDataType.S16));
-		assertTrue(ImageSInt32.class == ImageDataType.typeToSingleClass(ImageDataType.S32));
-		assertTrue(ImageSInt64.class == ImageDataType.typeToSingleClass(ImageDataType.S64));
-		assertTrue(ImageFloat32.class == ImageDataType.typeToSingleClass(ImageDataType.F32));
-		assertTrue(ImageFloat64.class == ImageDataType.typeToSingleClass(ImageDataType.F64));
-		assertTrue(ImageInt8.class == ImageDataType.typeToSingleClass(ImageDataType.I8));
-		assertTrue(ImageInt16.class == ImageDataType.typeToSingleClass(ImageDataType.I16));
-		assertTrue(ImageInteger.class == ImageDataType.typeToSingleClass(ImageDataType.I));
-		assertTrue(ImageFloat.class == ImageDataType.typeToSingleClass(ImageDataType.F));
+		assertTrue(GrayU8.class == ImageDataType.typeToSingleClass(ImageDataType.U8));
+		assertTrue(GrayS8.class == ImageDataType.typeToSingleClass(ImageDataType.S8));
+		assertTrue(GrayU16.class == ImageDataType.typeToSingleClass(ImageDataType.U16));
+		assertTrue(GrayS16.class == ImageDataType.typeToSingleClass(ImageDataType.S16));
+		assertTrue(GrayS32.class == ImageDataType.typeToSingleClass(ImageDataType.S32));
+		assertTrue(GrayS64.class == ImageDataType.typeToSingleClass(ImageDataType.S64));
+		assertTrue(GrayF32.class == ImageDataType.typeToSingleClass(ImageDataType.F32));
+		assertTrue(GrayF64.class == ImageDataType.typeToSingleClass(ImageDataType.F64));
+		assertTrue(GrayI8.class == ImageDataType.typeToSingleClass(ImageDataType.I8));
+		assertTrue(GrayI16.class == ImageDataType.typeToSingleClass(ImageDataType.I16));
+		assertTrue(GrayI.class == ImageDataType.typeToSingleClass(ImageDataType.I));
+		assertTrue(GrayF.class == ImageDataType.typeToSingleClass(ImageDataType.F));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,26 +19,26 @@
 package boofcv.alg.feature.detect.line.gridline;
 
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
- * Implementation of {@link GridRansacLineDetector} for {@link ImageFloat32}
+ * Implementation of {@link GridRansacLineDetector} for {@link GrayF32}
  *
  * @author Peter Abeles
  */
-public class ImplGridRansacLineDetector_F32 extends GridRansacLineDetector<ImageFloat32>{
+public class ImplGridRansacLineDetector_F32 extends GridRansacLineDetector<GrayF32>{
 
 	public ImplGridRansacLineDetector_F32(int regionSize, int maxDetectLines, ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher) {
 		super(regionSize, maxDetectLines, robustMatcher);
 	}
 
-	protected void detectEdgels( int index0 , int x0 , int y0 ,
-								 ImageFloat32 derivX , ImageFloat32 derivY ,
-								 ImageUInt8 binaryEdges) {
+	protected void detectEdgels(int index0 , int x0 , int y0 ,
+								GrayF32 derivX , GrayF32 derivY ,
+								GrayU8 binaryEdges) {
 
 		edgels.reset();
 		for( int y = 0; y < regionSize; y++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedF64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 
@@ -62,7 +62,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CirculantTracker<T extends ImageSingleBand> {
+public class CirculantTracker<T extends ImageGray> {
 
 	// --- Tuning parameters
 	// spatial bandwidth (proportional to target)
@@ -84,18 +84,18 @@ public class CirculantTracker<T extends ImageSingleBand> {
 
 	//----- Internal variables
 	// computes the FFT
-	private DiscreteFourierTransform<ImageFloat64,InterleavedF64> fft = DiscreteFourierTransformOps.createTransformF64();
+	private DiscreteFourierTransform<GrayF64,InterleavedF64> fft = DiscreteFourierTransformOps.createTransformF64();
 
 	// storage for subimage of input image
-	protected ImageFloat64 templateNew = new ImageFloat64(1,1);
+	protected GrayF64 templateNew = new GrayF64(1,1);
 	// storage for the subimage of the previous frame
-	protected ImageFloat64 template = new ImageFloat64(1,1);
+	protected GrayF64 template = new GrayF64(1,1);
 
 	// cosine window used to reduce artifacts from FFT
-	protected ImageFloat64 cosine = new ImageFloat64(1,1);
+	protected GrayF64 cosine = new GrayF64(1,1);
 
 	// Storage for the kernel's response
-	private ImageFloat64 k = new ImageFloat64(1,1);
+	private GrayF64 k = new GrayF64(1,1);
 	private InterleavedF64 kf = new InterleavedF64(1,1,2);
 
 	// Learn values.  used to compute weight in linear classifier
@@ -107,15 +107,15 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	protected RectangleLength2D_F32 regionOut = new RectangleLength2D_F32();
 
 	// Used for computing the gaussian kernel
-	protected ImageFloat64 gaussianWeight = new ImageFloat64(1,1);
+	protected GrayF64 gaussianWeight = new GrayF64(1,1);
 	protected InterleavedF64 gaussianWeightDFT = new InterleavedF64(1,1,2);
 
 	// detector response
-	private ImageFloat64 response = new ImageFloat64(1,1);
+	private GrayF64 response = new GrayF64(1,1);
 
 	// storage for storing temporary results
-	private ImageFloat64 tmpReal0 = new ImageFloat64(1,1);
-	private ImageFloat64 tmpReal1 = new ImageFloat64(1,1);
+	private GrayF64 tmpReal0 = new GrayF64(1,1);
+	private GrayF64 tmpReal1 = new GrayF64(1,1);
 
 	private InterleavedF64 tmpFourier0 = new InterleavedF64(1,1,2);
 	private InterleavedF64 tmpFourier1 = new InterleavedF64(1,1,2);
@@ -125,8 +125,8 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	private InterpolatePixelS<T> interp;
 
 	// used to compute sub-pixel location
-	private SearchLocalPeak<ImageFloat64> localPeak =
-			FactorySearchLocalPeak.meanShiftUniform(5, 1e-4f, ImageFloat64.class);
+	private SearchLocalPeak<GrayF64> localPeak =
+			FactorySearchLocalPeak.meanShiftUniform(5, 1e-4f, GrayF64.class);
 
 	// adjustment from sub-pixel
 	protected float offX,offY;
@@ -231,7 +231,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	/**
 	 * Computes the cosine window
 	 */
-	protected static void computeCosineWindow( ImageFloat64 cosine ) {
+	protected static void computeCosineWindow( GrayF64 cosine ) {
 		double cosX[] = new double[ cosine.width ];
 		for( int x = 0; x < cosine.width; x++ ) {
 			cosX[x] = 0.5*(1 - Math.cos( 2.0*Math.PI*x/(cosine.width-1) ));
@@ -413,10 +413,10 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * @param y Input image
 	 * @param k Output containing Gaussian kernel for each element in target region
 	 */
-	public void dense_gauss_kernel( double sigma , ImageFloat64 x , ImageFloat64 y , ImageFloat64 k ) {
+	public void dense_gauss_kernel(double sigma , GrayF64 x , GrayF64 y , GrayF64 k ) {
 
 		InterleavedF64 xf=tmpFourier0,yf,xyf=tmpFourier2;
-		ImageFloat64 xy = tmpReal0;
+		GrayF64 xy = tmpReal0;
 		double yy;
 
 		// find x in Fourier domain
@@ -445,7 +445,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 		gaussianKernel(xx, yy, tmpReal1, sigma, k);
 	}
 
-	public static void circshift( ImageFloat64 a, ImageFloat64 b ) {
+	public static void circshift(GrayF64 a, GrayF64 b ) {
 		int w2 = a.width/2;
 		int h2 = b.height/2;
 
@@ -464,7 +464,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	/**
 	 * Computes the dot product of the image with itself
 	 */
-	public static double imageDotProduct(ImageFloat64 a) {
+	public static double imageDotProduct(GrayF64 a) {
 
 		double total = 0;
 
@@ -531,7 +531,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	 * @param xx ||x||^2
 	 * @param yy ||y||^2
 	 */
-	protected static void gaussianKernel( double xx , double yy , ImageFloat64 xy , double sigma  , ImageFloat64 output ) {
+	protected static void gaussianKernel(double xx , double yy , GrayF64 xy , double sigma  , GrayF64 output ) {
 		double sigma2 = sigma*sigma;
 		double N = xy.width*xy.height;
 
@@ -553,7 +553,7 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	/**
 	 * Copies the target into the output image and applies the cosine window to it.
 	 */
-	protected void get_subwindow( T image , ImageFloat64 output ) {
+	protected void get_subwindow( T image , GrayF64 output ) {
 
 		// copy the target region
 
@@ -594,11 +594,11 @@ public class CirculantTracker<T extends ImageSingleBand> {
 	/**
 	 * Visual appearance of the target
 	 */
-	public ImageFloat64 getTargetTemplate() {
+	public GrayF64 getTargetTemplate() {
 		return template;
 	}
 
-	public ImageFloat64 getResponse() {
+	public GrayF64 getResponse() {
 		return response;
 	}
 }

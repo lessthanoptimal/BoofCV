@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.segmentation.ms;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.segmentation.ConfigSegmentMeanShift;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,16 +33,16 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestSegmentMeanShift {
 
-	ImageSInt32 output = new ImageSInt32(10,15);
+	GrayS32 output = new GrayS32(10,15);
 
 	@Test
 	public void uniformRegion() {
-		ImageUInt8 image = new ImageUInt8(10,15);
+		GrayU8 image = new GrayU8(10,15);
 		ImageMiscOps.fill(image,10);
 
-		SegmentMeanShift<ImageUInt8> alg =
+		SegmentMeanShift<GrayU8> alg =
 				FactorySegmentationAlg.meanShift(
-						new ConfigSegmentMeanShift(2,10,10, false),ImageType.single(ImageUInt8.class));
+						new ConfigSegmentMeanShift(2,10,10, false),ImageType.single(GrayU8.class));
 
 		alg.process(image,output);
 
@@ -61,13 +61,13 @@ public class TestSegmentMeanShift {
 
 	@Test
 	public void obviousSplit() {
-		ImageUInt8 image = new ImageUInt8(10,15);
+		GrayU8 image = new GrayU8(10,15);
 		ImageMiscOps.fill(image,10);
 		ImageMiscOps.fill(image.subimage(0,0,4,15,null),25);
 
-		SegmentMeanShift<ImageUInt8> alg =
+		SegmentMeanShift<GrayU8> alg =
 				FactorySegmentationAlg.meanShift(
-						new ConfigSegmentMeanShift(2,10,10, false),ImageType.single(ImageUInt8.class));
+						new ConfigSegmentMeanShift(2,10,10, false),ImageType.single(GrayU8.class));
 
 		alg.process(image,output);
 

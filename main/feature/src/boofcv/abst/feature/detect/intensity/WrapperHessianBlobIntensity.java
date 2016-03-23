@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+public class WrapperHessianBlobIntensity<I extends ImageGray, D extends ImageGray>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
 
@@ -45,12 +45,12 @@ public class WrapperHessianBlobIntensity<I extends ImageSingleBand, D extends Im
 			switch( type ) {
 				case DETERMINANT:
 					minimum = false;
-					m = HessianBlobIntensity.class.getMethod("determinant",ImageFloat32.class,derivType,derivType,derivType);
+					m = HessianBlobIntensity.class.getMethod("determinant",GrayF32.class,derivType,derivType,derivType);
 					break;
 
 				case TRACE:
 					minimum = true;
-					m = HessianBlobIntensity.class.getMethod("trace",ImageFloat32.class,derivType,derivType);
+					m = HessianBlobIntensity.class.getMethod("trace",GrayF32.class,derivType,derivType);
 					break;
 
 				default:

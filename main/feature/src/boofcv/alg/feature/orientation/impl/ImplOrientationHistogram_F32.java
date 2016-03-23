@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.OrientationHistogram;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -33,15 +33,15 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationHistogram_F32 extends OrientationHistogram<ImageFloat32> {
+public class ImplOrientationHistogram_F32 extends OrientationHistogram<GrayF32> {
 
 	public ImplOrientationHistogram_F32(double objectToSample,int numAngles , boolean isWeighted ) {
 		super(objectToSample,numAngles,isWeighted);
 	}
 
 	@Override
-	public Class<ImageFloat32> getImageType() {
-		return ImageFloat32.class;
+	public Class<GrayF32> getImageType() {
+		return GrayF32.class;
 	}
 
 	@Override

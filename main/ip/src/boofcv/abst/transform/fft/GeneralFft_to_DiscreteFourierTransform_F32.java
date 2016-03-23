@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.transform.fft;
 
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.fft.GeneralPurposeFFT_F32_2D;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.InterleavedF32;
  * @author Peter Abeles
  */
 public class GeneralFft_to_DiscreteFourierTransform_F32
-		implements DiscreteFourierTransform<ImageFloat32,InterleavedF32>
+		implements DiscreteFourierTransform<GrayF32,InterleavedF32>
 {
 	// previous size of input image
 	private int prevWidth = -1;
@@ -45,7 +45,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(ImageFloat32 image, InterleavedF32 transform ) {
+	public void forward(GrayF32 image, InterleavedF32 transform ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() || transform.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -60,7 +60,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32
 	}
 
 	@Override
-	public void inverse(InterleavedF32 transform, ImageFloat32 image ) {
+	public void inverse(InterleavedF32 transform, GrayF32 image ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() || transform.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -89,7 +89,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F32
 	/**
 	 * Declare the algorithm if the image size has changed
 	 */
-	private void checkDeclareAlg(ImageFloat32 image) {
+	private void checkDeclareAlg(GrayF32 image) {
 		if( prevWidth != image.width || prevHeight != image.height ) {
 			prevWidth = image.width;
 			prevHeight = image.height;

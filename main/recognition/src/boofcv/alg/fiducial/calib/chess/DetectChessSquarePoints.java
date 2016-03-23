@@ -20,8 +20,8 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessSquarePoints<T extends ImageSingleBand> {
+public class DetectChessSquarePoints<T extends ImageGray> {
 
 	// detector for squares
 	BinaryPolygonDetector<T> detectorSquare;
@@ -90,7 +90,7 @@ public class DetectChessSquarePoints<T extends ImageSingleBand> {
 	 * @param binary Binary image of chessboard
 	 * @return True if successful.
 	 */
-	public boolean process( T input , ImageUInt8 binary ) {
+	public boolean process( T input , GrayU8 binary ) {
 		boundPolygon.vertexes.reset();
 
 		detectorSquare.process(input, binary);

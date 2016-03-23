@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,12 +27,12 @@ import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundStationaryGaussian} for {@link MultiSpectral}.
+ * Implementation of {@link BackgroundStationaryGaussian} for {@link Planar}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
-		extends BackgroundStationaryGaussian<MultiSpectral<T>>
+public class BackgroundStationaryGaussian_MS<T extends ImageGray>
+		extends BackgroundStationaryGaussian<Planar<T>>
 {
 
 	// wrappers which provide abstraction across image types
@@ -43,7 +43,7 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 	protected float[] inputPixel;
 
 	// background is composed of bands*2 channels.  even = mean, odd = variance
-	MultiSpectral<ImageFloat32> background;
+	Planar<GrayF32> background;
 
 	/**
 	 * Configurations background removal.
@@ -54,13 +54,13 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 	 * @param imageType Type of input image.
 	 */
 	public BackgroundStationaryGaussian_MS(float learnRate, float threshold,
-										   ImageType<MultiSpectral<T>> imageType)
+										   ImageType<Planar<T>> imageType)
 	{
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
 
-		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,2*numBands);
+		background = new Planar<GrayF32>(GrayF32.class,1,1,2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 
@@ -75,7 +75,7 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void updateBackground( MultiSpectral<T> frame) {
+	public void updateBackground( Planar<T> frame) {
 		if( background.width == 1 ) {
 			background.reshape(frame.width, frame.height);
 			// initialize the mean to the current image and the initial variance is whatever it is set to
@@ -102,8 +102,8 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 				inputWrapper.getF(indexInput, inputPixel);
 
 				for (int band = 0; band < numBands; band++) {
-					ImageFloat32 backgroundMean = background.getBand(band*2);
-					ImageFloat32 backgroundVar = background.getBand(band*2+1);
+					GrayF32 backgroundMean = background.getBand(band*2);
+					GrayF32 backgroundVar = background.getBand(band*2+1);
 
 					float inputValue = inputPixel[band];
 					float meanBG = backgroundMean.data[indexBG];
@@ -121,7 +121,7 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void segment(MultiSpectral<T> frame, ImageUInt8 segmented) {
+	public void segment(Planar<T> frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
@@ -144,8 +144,8 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 				float mahalanobis = 0;
 				for (int band = 0; band < numBands; band++) {
 
-					ImageFloat32 backgroundMean = background.getBand(band*2);
-					ImageFloat32 backgroundVar = background.getBand(band*2+1);
+					GrayF32 backgroundMean = background.getBand(band*2);
+					GrayF32 backgroundVar = background.getBand(band*2+1);
 
 					float meanBG = backgroundMean.data[indexBG];
 					float varBG = backgroundVar.data[indexBG];
@@ -162,7 +162,7 @@ public class BackgroundStationaryGaussian_MS<T extends ImageSingleBand>
 					} else {
 						float sumAbsDiff = 0;
 						for (int band = 0; band < numBands; band++) {
-							ImageFloat32 backgroundMean = background.getBand(band*2);
+							GrayF32 backgroundMean = background.getBand(band*2);
 							sumAbsDiff += Math.abs(backgroundMean.data[indexBG] - inputPixel[band]);
 						}
 						if (sumAbsDiff >= adjustedMinimumDifference)

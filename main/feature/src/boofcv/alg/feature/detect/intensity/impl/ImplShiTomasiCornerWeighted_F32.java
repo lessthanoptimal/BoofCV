@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageFloat32;
  * @author Peter Abeles
  */
 public class ImplShiTomasiCornerWeighted_F32 extends ImplSsdCornerWeighted_F32
-		implements ShiTomasiCornerIntensity<ImageFloat32>
+		implements ShiTomasiCornerIntensity<GrayF32>
 {
 	public ImplShiTomasiCornerWeighted_F32(int radius) {
 		super(radius);

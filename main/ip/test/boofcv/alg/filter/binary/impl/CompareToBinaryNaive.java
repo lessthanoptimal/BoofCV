@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -68,8 +68,8 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 
-		ImageUInt8 input = new ImageUInt8(width, height);
-		ImageUInt8 output = new ImageUInt8(width, height);
+		GrayU8 input = new GrayU8(width, height);
+		GrayU8 output = new GrayU8(width, height);
 
 		ImageMiscOps.fillUniform(input, rand, 0, 1);
 

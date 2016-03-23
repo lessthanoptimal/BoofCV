@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -57,7 +57,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
+public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
@@ -391,7 +391,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageSingleBand>
 
 	public static void main( String args[] ) throws FileNotFoundException {
 
-		Class type = ImageFloat32.class;
+		Class type = GrayF32.class;
 //		Class type = ImageUInt8.class;
 
 		VisualizeMonocularPlaneVisualOdometryApp app = new VisualizeMonocularPlaneVisualOdometryApp(type);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -41,7 +41,7 @@ public class TestDescribeRegionPoint_SIFT {
 
 	@Test
 	public void flags() {
-		DescribeRegionPoint_SIFT<ImageFloat32> alg = declare();
+		DescribeRegionPoint_SIFT<GrayF32> alg = declare();
 
 		assertTrue(alg.requiresOrientation());
 		assertTrue(alg.requiresRadius());
@@ -55,10 +55,10 @@ public class TestDescribeRegionPoint_SIFT {
 	@Test
 	public void process() {
 
-		ImageFloat32 image = new ImageFloat32(640,480);
+		GrayF32 image = new GrayF32(640,480);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 
-		DescribeRegionPoint_SIFT<ImageFloat32> alg = declare();
+		DescribeRegionPoint_SIFT<GrayF32> alg = declare();
 		alg.setImage(image);
 
 		TupleDesc_F64 desc0 = alg.createDescription();
@@ -82,11 +82,11 @@ public class TestDescribeRegionPoint_SIFT {
 		assertTrue(alg.process(100,479,0.5,10,desc0));
 	}
 
-	private DescribeRegionPoint_SIFT<ImageFloat32> declare() {
+	private DescribeRegionPoint_SIFT<GrayF32> declare() {
 
 		SiftScaleSpace ss = new SiftScaleSpace(0,4,3,1.6);
-		DescribePointSift<ImageFloat32> desc = FactoryDescribePointAlgs.sift(null,ImageFloat32.class);
+		DescribePointSift<GrayF32> desc = FactoryDescribePointAlgs.sift(null,GrayF32.class);
 
-		return new DescribeRegionPoint_SIFT<ImageFloat32>(ss,desc,ImageFloat32.class);
+		return new DescribeRegionPoint_SIFT<GrayF32>(ss,desc,GrayF32.class);
 	}
 }

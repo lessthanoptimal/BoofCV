@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -39,9 +39,9 @@ import java.util.Random;
  * </p>
  *
  * <p>
- * To start tracking {@link #initialize(boofcv.struct.image.ImageSingleBand, int, int, int, int)} must first be called
+ * To start tracking {@link #initialize(ImageGray, int, int, int, int)} must first be called
  * to specify the region being tracked.  Then each time a new image in the sequences arrives
- * {@link #track(boofcv.struct.image.ImageSingleBand)} is called.  Be sure to check its return value to see if tracking
+ * {@link #track(ImageGray)} is called.  Be sure to check its return value to see if tracking
  * was successful or not.  If tracking fails one frame it can recover.  This is often the case where an object
  * becomes obscured and then visible again.
  * </p>
@@ -61,7 +61,7 @@ import java.util.Random;
  * </p>
  * @author Peter Abeles
  */
-public class TldTracker<T extends ImageSingleBand, D extends ImageSingleBand> {
+public class TldTracker<T extends ImageGray, D extends ImageGray> {
 
 	// specified configuration parameters for the tracker
 	private TldParameters config;

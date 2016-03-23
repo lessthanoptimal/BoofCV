@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.misc;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -35,9 +35,9 @@ public class BenchmarkAverageDownSample {
 	static final int width = 640;
 	static final int height = 480;
 
-	static ImageUInt8 inputU8 = new ImageUInt8(width,height);
-	static ImageSInt8 inputS8 = new ImageSInt8(width,height);
-	static ImageUInt8 out8 = new ImageUInt8(1,1);
+	static GrayU8 inputU8 = new GrayU8(width,height);
+	static GrayS8 inputS8 = new GrayS8(width,height);
+	static GrayU8 out8 = new GrayU8(1,1);
 
 	static int square = 4;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.detect.intensity.DetectorFastNaive;
 import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.DiscretizedCircle;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
@@ -41,9 +41,9 @@ public abstract class GenericImplFastIntensity {
 	int minContinuous;
 	int detectDifference ;
 
-	FastCornerIntensity<ImageUInt8> alg;
+	FastCornerIntensity<GrayU8> alg;
 
-	public GenericImplFastIntensity(FastCornerIntensity<ImageUInt8> alg, int minContinuous, int detectDifference ) {
+	public GenericImplFastIntensity(FastCornerIntensity<GrayU8> alg, int minContinuous, int detectDifference ) {
 		this.alg = alg;
 		this.minContinuous = minContinuous;
 		this.detectDifference = detectDifference;
@@ -52,9 +52,9 @@ public abstract class GenericImplFastIntensity {
 	@Test
 	public void compareToNaiveDetection() {
 
-		ImageUInt8 input = new ImageUInt8(40,50);
+		GrayU8 input = new GrayU8(40,50);
 		GImageMiscOps.fillUniform(input, rand, 0, 50);
-		ImageFloat32 intensity = new ImageFloat32(input.width,input.height);
+		GrayF32 intensity = new GrayF32(input.width,input.height);
 
 		DetectorFastNaive validator = new DetectorFastNaive(3,minContinuous,detectDifference);
 		validator.process(input);
@@ -74,8 +74,8 @@ public abstract class GenericImplFastIntensity {
 
 	@Test
 	public void checkIntensity() {
-		ImageUInt8 input = new ImageUInt8(40,50);
-		ImageFloat32 intensity = new ImageFloat32(input.width,input.height);
+		GrayU8 input = new GrayU8(40,50);
+		GrayF32 intensity = new GrayF32(input.width,input.height);
 
 		int []offsets = DiscretizedCircle.imageOffsets(3, input.stride);
 		createCircle(4,5,offsets,minContinuous,detectDifference+1,input);
@@ -87,7 +87,7 @@ public abstract class GenericImplFastIntensity {
 	}
 
 	private void createCircle( int x , int y , int offsets[] , int n , int b ,
-							   ImageUInt8 image ) {
+							   GrayU8 image ) {
 
 		int index = image.startIndex + y*image.stride + x;
 

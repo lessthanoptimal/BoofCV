@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
 
@@ -41,8 +41,8 @@ public class TestDenseFlowPyramidBase {
 	public void interpolateFlow() {
 		Dummy alg = new Dummy(0.75,1,20);
 
-		ImageFloat32 input = new ImageFloat32(5,7);
-		ImageFloat32 output = new ImageFloat32(8,14);
+		GrayF32 input = new GrayF32(5,7);
+		GrayF32 output = new GrayF32(8,14);
 
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
 
@@ -56,11 +56,11 @@ public class TestDenseFlowPyramidBase {
 
 	@Test
 	public void imageNormalization() {
-		ImageFloat32 input1 = new ImageFloat32(5,7);
-		ImageFloat32 input2 = new ImageFloat32(5,7);
+		GrayF32 input1 = new GrayF32(5,7);
+		GrayF32 input2 = new GrayF32(5,7);
 
-		ImageFloat32 norm1 = new ImageFloat32(5,7);
-		ImageFloat32 norm2 = new ImageFloat32(5,7);
+		GrayF32 norm1 = new GrayF32(5,7);
+		GrayF32 norm2 = new GrayF32(5,7);
 
 		ImageMiscOps.fillUniform(input1, rand, 0, 10);
 		ImageMiscOps.fillUniform(input2, rand, 0, 15);
@@ -78,7 +78,7 @@ public class TestDenseFlowPyramidBase {
 	public static class Dummy extends DenseFlowPyramidBase {
 
 		public Dummy(double scale, double sigma, int maxLayers) {
-			super(scale, sigma, maxLayers, FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED));
+			super(scale, sigma, maxLayers, FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED));
 		}
 
 		@Override

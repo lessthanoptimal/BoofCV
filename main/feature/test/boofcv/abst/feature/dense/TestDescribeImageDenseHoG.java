@@ -42,7 +42,7 @@ public class TestDescribeImageDenseHoG {
 	Random rand = new Random(234);
 
 	ImageType imageTypes[] = new ImageType[]{
-			ImageType.single(ImageUInt8.class), ImageType.single(ImageFloat32.class),
+			ImageType.single(GrayU8.class), ImageType.single(GrayF32.class),
 			ImageType.ms(2, ImageDataType.U8),ImageType.ms(2, ImageDataType.F32) };
 
 	/**

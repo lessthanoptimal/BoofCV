@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.detdesc;
 
 import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Detects and describes different types of features inside an image.  All detected features are described using the
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageSingleBand;
  * <TD> Type of feature descriptor
  * @author Peter Abeles
  */
-public interface DetectDescribeMulti<T extends ImageSingleBand, Desc extends TupleDesc>
+public interface DetectDescribeMulti<T extends ImageGray, Desc extends TupleDesc>
 	extends DescriptorInfo<Desc>
 {
 
@@ -50,9 +50,9 @@ public interface DetectDescribeMulti<T extends ImageSingleBand, Desc extends Tup
 
 	/**
 	 * Returns the most recently detected features for a specific set.  Each time
-	 * {@link #process(boofcv.struct.image.ImageSingleBand)} is called the results are modified.
+	 * {@link #process(ImageGray)} is called the results are modified.
 	 * </p>
-	 * WARNING: The returned data structure is recycled each time {@link #process(boofcv.struct.image.ImageSingleBand)}
+	 * WARNING: The returned data structure is recycled each time {@link #process(ImageGray)}
 	 * is called.  Create a copy if this is a problem.
 	 *
 	 * @param set Which set of detected features.

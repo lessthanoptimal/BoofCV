@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.background.moving;
 import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.point.Point2D_F32;
@@ -91,7 +91,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		GImageMiscOps.fillRectangle(frame,200,x0,y0,x1-x0,y1-y0);
 
 		Homography2D_F32 homeToCurrent = new Homography2D_F32();
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 		alg.segment(homeToCurrent, frame, segmented);
 
 //		segmented.printBinary();
@@ -121,7 +121,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 	private <T extends ImageBase>
 	void currentOutsideBackground( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		BackgroundModelMoving<T, Homography2D_F32> alg = create(frame.getImageType());
 		Homography2D_F32 homeToWorld = new Homography2D_F32();
@@ -150,7 +150,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 		checkTransform(frame, segmented, alg, homeToCurrent, backgroundOutsideTol);
 	}
 
-	private <T extends ImageBase> void checkTransform(T frame, ImageUInt8 segmented,
+	private <T extends ImageBase> void checkTransform(T frame, GrayU8 segmented,
 													  BackgroundModelMoving<T, Homography2D_F32> alg,
 													  Homography2D_F32 homeToCurrent , double tol ) {
 
@@ -167,7 +167,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 	/**
 	 * Checks to see if pixels outside of BG are marked as unknown
 	 */
-	private void checkSegmented( Homography2D_F32 transform , ImageUInt8 segmented , double tol ) {
+	private void checkSegmented(Homography2D_F32 transform , GrayU8 segmented , double tol ) {
 
 		Point2D_F32 p = new Point2D_F32();
 
@@ -204,7 +204,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 	private <T extends ImageBase>
 	void markNoBackgroundAsBackground( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		BackgroundModelMoving<T, Homography2D_F32> alg = create(frame.getImageType());
 		alg.setUnknownValue(2);
@@ -239,7 +239,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 	private <T extends ImageBase>
 	void markUnobservedAsUnknown( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		BackgroundModelMoving<T, Homography2D_F32> alg = create(frame.getImageType());
 		alg.setUnknownValue(2);
@@ -282,8 +282,8 @@ public abstract class GenericBackgroundModelMovingChecks {
 		GImageMiscOps.fill(frame,50);
 		alg.updateBackground(homeToCurrent,frame);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		// there should be no change
 		// if reset isn't the case then this will fail
@@ -308,17 +308,17 @@ public abstract class GenericBackgroundModelMovingChecks {
 	private <T extends ImageBase>
 	void checkSubImage( ImageType<T> imageType ) {
 		T frame = imageType.createImage(width, height);
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		checkSubImage_process(frame, segmented);
-		ImageUInt8 expected = segmented.clone();
+		GrayU8 expected = segmented.clone();
 
 		frame = BoofTesting.createSubImageOf(frame);
 		segmented = BoofTesting.createSubImageOf(segmented);
 		ImageMiscOps.fill(segmented,0);
 
 		checkSubImage_process(frame, segmented);
-		ImageUInt8 found = segmented.clone();
+		GrayU8 found = segmented.clone();
 
 		// see if both produce the same result
 
@@ -326,7 +326,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 	}
 
 	private <T extends ImageBase>
-	void checkSubImage_process( T frame, ImageUInt8 segmented)
+	void checkSubImage_process( T frame, GrayU8 segmented)
 	{
 		rand = new Random(2345);
 

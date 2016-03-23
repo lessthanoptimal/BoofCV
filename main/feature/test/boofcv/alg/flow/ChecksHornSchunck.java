@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.flow;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksHornSchunck<T extends ImageSingleBand, D extends ImageSingleBand> {
+public abstract class ChecksHornSchunck<T extends ImageGray, D extends ImageGray> {
 	Class<T> imageType;
 	Class<D> derivType;
 
@@ -97,7 +97,7 @@ public abstract class ChecksHornSchunck<T extends ImageSingleBand, D extends Ima
 		GImageMiscOps.fillUniform(image2,rand,0,200);
 
 		alg.computeDerivX(image1,image2,found);
-		ImageFloat32 expected = computeExpected(image1,image2,samples,signs);
+		GrayF32 expected = computeExpected(image1,image2,samples,signs);
 
 		BoofTesting.assertEquals(expected, found, 1);
 	}
@@ -125,7 +125,7 @@ public abstract class ChecksHornSchunck<T extends ImageSingleBand, D extends Ima
 		GImageMiscOps.fillUniform(image2,rand,0,200);
 
 		alg.computeDerivY(image1,image2,found);
-		ImageFloat32 expected = computeExpected(image1,image2,samples,signs);
+		GrayF32 expected = computeExpected(image1,image2,samples,signs);
 
 		BoofTesting.assertEquals(expected,found,1);
 	}
@@ -153,14 +153,14 @@ public abstract class ChecksHornSchunck<T extends ImageSingleBand, D extends Ima
 		GImageMiscOps.fillUniform(image2,rand,0,200);
 
 		alg.computeDerivT(image1,image2,found);
-		ImageFloat32 expected = computeExpected(image1,image2,samples,signs);
+		GrayF32 expected = computeExpected(image1,image2,samples,signs);
 
 		BoofTesting.assertEquals(expected,found,1);
 	}
 
-	private ImageFloat32 computeExpected( ImageSingleBand image1, ImageSingleBand image2 ,
-										  Point[] samples , float signs[] ) {
-		ImageFloat32 ret = new ImageFloat32(width,height);
+	private GrayF32 computeExpected(ImageGray image1, ImageGray image2 ,
+									Point[] samples , float signs[] ) {
+		GrayF32 ret = new GrayF32(width,height);
 
 		for (int y = 0; y < image1.height; y++) {
 			for (int x = 0; x < image1.width; x++) {
@@ -185,7 +185,7 @@ public abstract class ChecksHornSchunck<T extends ImageSingleBand, D extends Ima
 		return ret;
 	}
 
-	private float safeGet( ImageSingleBand image , int x , int y ) {
+	private float safeGet(ImageGray image , int x , int y ) {
 		if( x < 0 ) x = 0;
 		if( x >= image.width) x = image.width-1;
 		if( y < 0 ) y = 0;

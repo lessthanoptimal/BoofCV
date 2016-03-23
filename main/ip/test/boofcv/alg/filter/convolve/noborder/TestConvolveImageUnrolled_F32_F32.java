@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -36,7 +36,7 @@ public class TestConvolveImageUnrolled_F32_F32 {
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_F32_F32.class.getMethod("convolve",
-					Kernel2D_F32.class, ImageFloat32.class, ImageFloat32.class );
+					Kernel2D_F32.class, GrayF32.class, GrayF32.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -46,7 +46,7 @@ public class TestConvolveImageUnrolled_F32_F32 {
 	public void horizontal() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_F32_F32.class.getMethod("horizontal",
-					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class);
+					Kernel1D_F32.class, GrayF32.class, GrayF32.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -56,7 +56,7 @@ public class TestConvolveImageUnrolled_F32_F32 {
 	public void vertical() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_F32_F32.class.getMethod("vertical",
-					Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class);
+					Kernel1D_F32.class, GrayF32.class, GrayF32.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

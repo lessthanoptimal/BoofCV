@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class ImplConvertNV21 {
 	/**
 	 * First block contains gray-scale information and UV data can be ignored.
 	 */
-	public static void nv21ToGray(byte[] dataNV, ImageUInt8 output) {
+	public static void nv21ToGray(byte[] dataNV, GrayU8 output) {
 
 		final int yStride = output.width;
 
@@ -51,7 +51,7 @@ public class ImplConvertNV21 {
 	/**
 	 * First block contains gray-scale information and UV data can be ignored.
 	 */
-	public static void nv21ToGray(byte[] dataNV, ImageFloat32 output) {
+	public static void nv21ToGray(byte[] dataNV, GrayF32 output) {
 
 		for( int y = 0; y < output.height; y++ ) {
 			int indexIn = y*output.width;
@@ -63,11 +63,11 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_U8(byte[] dataNV, MultiSpectral<ImageUInt8> output) {
+	public static void nv21ToMultiYuv_U8(byte[] dataNV, Planar<GrayU8> output) {
 
-		ImageUInt8 Y = output.getBand(0);
-		ImageUInt8 U = output.getBand(1);
-		ImageUInt8 V = output.getBand(2);
+		GrayU8 Y = output.getBand(0);
+		GrayU8 U = output.getBand(1);
+		GrayU8 V = output.getBand(2);
 
 		final int uvStride = output.width/2;
 
@@ -88,11 +88,11 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiYuv_F32(byte[] dataNV, MultiSpectral<ImageFloat32> output) {
+	public static void nv21ToMultiYuv_F32(byte[] dataNV, Planar<GrayF32> output) {
 
-		ImageFloat32 Y = output.getBand(0);
-		ImageFloat32 U = output.getBand(1);
-		ImageFloat32 V = output.getBand(2);
+		GrayF32 Y = output.getBand(0);
+		GrayF32 U = output.getBand(1);
+		GrayF32 V = output.getBand(2);
 
 		final int uvStride = output.width/2;
 
@@ -113,11 +113,11 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_U8(byte[] dataNV, MultiSpectral<ImageUInt8> output) {
+	public static void nv21ToMultiRgb_U8(byte[] dataNV, Planar<GrayU8> output) {
 
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;
@@ -189,11 +189,11 @@ public class ImplConvertNV21 {
 		}
 	}
 
-	public static void nv21ToMultiRgb_F32(byte[] dataNV, MultiSpectral<ImageFloat32> output) {
+	public static void nv21ToMultiRgb_F32(byte[] dataNV, Planar<GrayF32> output) {
 
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;

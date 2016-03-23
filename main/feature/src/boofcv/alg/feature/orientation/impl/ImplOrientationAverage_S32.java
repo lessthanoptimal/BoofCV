@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.OrientationAverage;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 
 
 /** 
@@ -33,15 +33,15 @@ import boofcv.struct.image.ImageSInt32;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverage_S32 extends OrientationAverage<ImageSInt32> {
+public class ImplOrientationAverage_S32 extends OrientationAverage<GrayS32> {
 	
 	public ImplOrientationAverage_S32(double objectToSample,boolean weighted) {
 		super(objectToSample,weighted);
 	}
 
 	@Override
-	public Class<ImageSInt32> getImageType() {
-		return ImageSInt32.class;
+	public Class<GrayS32> getImageType() {
+		return GrayS32.class;
 	}
 
 	@Override

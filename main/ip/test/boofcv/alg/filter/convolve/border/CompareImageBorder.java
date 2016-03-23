@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
 
 import java.lang.reflect.Method;
@@ -53,7 +53,7 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		Class<?> e[] = m.getParameterTypes();
 
 		for( Class<?> c : e ) {
-			if( ImageSingleBand.class.isAssignableFrom(c))
+			if( ImageGray.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;
@@ -77,9 +77,9 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 		}
 	}
 
-	protected ImageSingleBand stripBorder( ImageSingleBand a ,
-										   int borderX0 , int borderY0,
-										   int borderX1 , int borderY1 ) {
+	protected ImageGray stripBorder(ImageGray a ,
+									int borderX0 , int borderY0,
+									int borderX1 , int borderY1 ) {
 		return a.subimage(borderX0,borderY0,a.width-borderX1,a.height-borderY1, null);
 	}
 

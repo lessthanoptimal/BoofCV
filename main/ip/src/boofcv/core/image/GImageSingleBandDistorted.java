@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,12 @@ package boofcv.core.image;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * @author Peter Abeles
  */
-public class GImageSingleBandDistorted<T extends ImageSingleBand> implements GImageSingleBand {
+public class GImageSingleBandDistorted<T extends ImageGray> implements GImageSingleBand {
 
 	PixelTransform_F32 transform;
 	InterpolatePixelS<T> interpolate;
@@ -39,7 +39,7 @@ public class GImageSingleBandDistorted<T extends ImageSingleBand> implements GIm
 	}
 
 	@Override
-	public void wrap(ImageSingleBand image) {
+	public void wrap(ImageGray image) {
 		interpolate.setImage((T)image);
 
 		inputWidth = image.getWidth();
@@ -95,7 +95,7 @@ public class GImageSingleBandDistorted<T extends ImageSingleBand> implements GIm
 	}
 
 	@Override
-	public ImageSingleBand getImage() {
+	public ImageGray getImage() {
 		throw new IllegalArgumentException("getImage() is not supported");
 	}
 

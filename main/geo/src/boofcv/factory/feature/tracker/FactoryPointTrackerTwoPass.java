@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import static boofcv.factory.feature.tracker.FactoryPointTracker.createShiTomasi;
@@ -49,7 +49,7 @@ public class FactoryPointTrackerTwoPass {
 	 * @param configExtract Configuration for extracting features
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTrackerTwoPass<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
 							   Class<I> imageType, Class<D> derivType) {
 
@@ -66,7 +66,7 @@ public class FactoryPointTrackerTwoPass {
 				gradient,interpInput,interpDeriv);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 	PointTrackerTwoPass<I> dda(GeneralFeatureDetector<I, D> detector,
 							   DescribeRegionPoint<I, Desc> describe,
 							   AssociateDescription2D<Desc> associate1,
@@ -84,7 +84,7 @@ public class FactoryPointTrackerTwoPass {
 		return new DetectDescribeAssociateTwoPass<I,Desc>(manager,associate1,associate2,false);
 	}
 
-	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, Desc extends TupleDesc>
 	PointTrackerTwoPass<I> dda(DetectDescribePoint<I,Desc> detectDescribe,
 							   AssociateDescription2D<Desc> associate1 ,
 							   AssociateDescription2D<Desc> associate2 ,

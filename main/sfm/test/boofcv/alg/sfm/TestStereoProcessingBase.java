@@ -24,7 +24,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -55,8 +55,8 @@ public class TestStereoProcessingBase {
 		StereoParameters param = createStereoParam(width,height);
 
 		// create input images by rendering the point in both
-		ImageUInt8 left = new ImageUInt8(width,height);
-		ImageUInt8 right = new ImageUInt8(width,height);
+		GrayU8 left = new GrayU8(width,height);
+		GrayU8 right = new GrayU8(width,height);
 
 		// compute the view in pixels of the point in the left and right cameras
 		Point2D_F64 lensLeft = new Point2D_F64();
@@ -68,7 +68,7 @@ public class TestStereoProcessingBase {
 		right.set((int)lensRight.x,(int)lensRight.y,200);
 
 		// test the algorithm
-		StereoProcessingBase<ImageUInt8> alg = new StereoProcessingBase<ImageUInt8>(ImageUInt8.class);
+		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<GrayU8>(GrayU8.class);
 		alg.setCalibration(param);
 
 		alg.setImages(left,right);
@@ -100,7 +100,7 @@ public class TestStereoProcessingBase {
 		Point2D_F64 lensRight = new Point2D_F64();
 		SfmTestHelper.renderPointPixel(param,X,lensLeft,lensRight);
 
-		StereoProcessingBase<ImageUInt8> alg = new StereoProcessingBase<ImageUInt8>(ImageUInt8.class);
+		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<GrayU8>(GrayU8.class);
 		alg.setCalibration(param);
 
 		// Rectify the points
@@ -133,7 +133,7 @@ public class TestStereoProcessingBase {
 	/**
 	 * Finds the mean point in the image weighted by pixel intensity
 	 */
-	public static Point2D_F64 centroid( ImageUInt8 image ) {
+	public static Point2D_F64 centroid( GrayU8 image ) {
 		double meanX = 0;
 		double meanY = 0;
 		double totalPixel = ImageStatistics.sum(image);

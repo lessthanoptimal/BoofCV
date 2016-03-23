@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderIndex1D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.testing.BoofTesting;
@@ -97,7 +97,7 @@ public class CompareToNaiveWavelet {
 		}
 
 		@Override
-		public void applyValidation(WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output) {
+		public void applyValidation(WaveletDescription<?> desc, ImageGray input, ImageGray output) {
 			Method m;
 			Object args[];
 			if( functionName.contains("Inverse")) {

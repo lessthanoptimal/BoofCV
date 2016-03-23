@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class TestImplDescribePointPixelRegion_F32 {
 
 	Random rand = new Random(234);
 
-	ImageFloat32 img = new ImageFloat32(20,30);
+	GrayF32 img = new GrayF32(20,30);
 
 	public TestImplDescribePointPixelRegion_F32() {
 		GImageMiscOps.fillUniform(img, rand, 0, 30);
@@ -48,7 +48,7 @@ public class TestImplDescribePointPixelRegion_F32 {
 		BoofTesting.checkSubImage(this, "checkInner", false, img, 4,6,2,4);
 	}
 
-	public void checkInner( ImageFloat32 image , int c_x , int c_y , int w , int h ) {
+	public void checkInner(GrayF32 image , int c_x , int c_y , int w , int h ) {
 		ImplDescribePointPixelRegion_F32 alg = new ImplDescribePointPixelRegion_F32(w,h);
 
 		TupleDesc_F32 desc = new TupleDesc_F32(alg.getDescriptorLength());
@@ -72,7 +72,7 @@ public class TestImplDescribePointPixelRegion_F32 {
 		BoofTesting.checkSubImage(this, "checkBorder", false, img, 100, 200, 5, 7);
 	}
 
-	public void checkBorder( ImageFloat32 image , int c_x , int c_y , int w , int h ) {
+	public void checkBorder(GrayF32 image , int c_x , int c_y , int w , int h ) {
 		ImplDescribePointPixelRegion_F32 alg = new ImplDescribePointPixelRegion_F32(w,h);
 
 		TupleDesc_F32 desc = new TupleDesc_F32(alg.getDescriptorLength());

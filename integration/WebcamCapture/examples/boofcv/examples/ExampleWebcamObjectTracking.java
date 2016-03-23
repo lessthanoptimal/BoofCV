@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import com.github.sarxos.webcam.Webcam;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -212,10 +212,10 @@ public class ExampleWebcamObjectTracking<T extends ImageBase> extends JPanel
 
 	public static void main(String[] args) {
 
-		ImageType<MultiSpectral<ImageUInt8>> colorType = ImageType.ms(3,ImageUInt8.class);
+		ImageType<Planar<GrayU8>> colorType = ImageType.ms(3,GrayU8.class);
 
 		TrackerObjectQuad tracker =
-				FactoryTrackerObjectQuad.circulant(null, ImageUInt8.class);
+				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
 //				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
 //				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), colorType);

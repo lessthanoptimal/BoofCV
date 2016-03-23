@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.tracker.meanshift;
 
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
 /**
@@ -37,9 +37,9 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  * </p>
  * @author Peter Abeles
  */
-public class LikelihoodHistCoupled_MS_U8 implements PixelLikelihood<MultiSpectral<ImageUInt8>>
+public class LikelihoodHistCoupled_MS_U8 implements PixelLikelihood<Planar<GrayU8>>
 {
-	MultiSpectral<ImageUInt8> image;
+	Planar<GrayU8> image;
 
 	// maximum value a pixel can have.
 	int maxPixelValue;
@@ -53,7 +53,7 @@ public class LikelihoodHistCoupled_MS_U8 implements PixelLikelihood<MultiSpectra
 	}
 
 	@Override
-	public void setImage(MultiSpectral<ImageUInt8> image) {
+	public void setImage(Planar<GrayU8> image) {
 		this.image = image;
 
 		int histElements = 1;
@@ -80,7 +80,7 @@ public class LikelihoodHistCoupled_MS_U8 implements PixelLikelihood<MultiSpectra
 				int indexBin = 0;
 				int binStride = 1;
 				for( int i = 0; i < image.getNumBands(); i++ ) {
-					ImageUInt8 band = image.getBand(i);
+					GrayU8 band = image.getBand(i);
 					int value = band.data[index] & 0xFF;
 					int bin = numBins*value/maxPixelValue;
 
@@ -105,7 +105,7 @@ public class LikelihoodHistCoupled_MS_U8 implements PixelLikelihood<MultiSpectra
 		int indexBin = 0;
 		int binStride = 1;
 		for( int i = 0; i < image.getNumBands(); i++ ) {
-			ImageUInt8 band = image.getBand(i);
+			GrayU8 band = image.getBand(i);
 			int value = band.data[index] & 0xFF;
 			int bin = numBins*value/maxPixelValue;
 

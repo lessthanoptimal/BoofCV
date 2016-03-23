@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.interpolate.impl.BilinearRectangle_F32;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 
 import java.util.Random;
@@ -38,9 +38,9 @@ public class BenchmarkInterpolateRegion {
 	static int imgHeight = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 imgFloat32;
-	static ImageUInt8 imgInt8;
-	static ImageFloat32 outputImage;
+	static GrayF32 imgFloat32;
+	static GrayU8 imgInt8;
+	static GrayF32 outputImage;
 
 	// defines the region its interpolation
 	static float start = 10.1f;
@@ -56,10 +56,10 @@ public class BenchmarkInterpolateRegion {
 	}
 
 	public static void main(String args[]) {
-		imgInt8 = new ImageUInt8(imgWidth, imgHeight);
-		imgFloat32 = new ImageFloat32(imgWidth, imgHeight);
+		imgInt8 = new GrayU8(imgWidth, imgHeight);
+		imgFloat32 = new GrayF32(imgWidth, imgHeight);
 
-		outputImage = new ImageFloat32(regionSize,regionSize);
+		outputImage = new GrayF32(regionSize,regionSize);
 
 		Random rand = new Random(234);
 		ImageMiscOps.fillUniform(imgInt8, rand, 0, 100);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -34,10 +34,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
+public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 
 	public TestPyramidFloatScale() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	/**
@@ -46,25 +46,25 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 	@Test
 	public void update() {
 
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		BoofTesting.checkSubImage(this, "_update", true, input);
 	}
 
-	public void _update(ImageFloat32 input) {
+	public void _update(GrayF32 input) {
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
-		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
+		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<GrayF32>(interp,new double[]{3,5},imageType);
 		alg.process(input);
 
 		// test the first layer
-		ImageFloat32 expected = new ImageFloat32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
+		GrayF32 expected = new GrayF32((int)Math.ceil(width/3.0),(int)Math.ceil(height/3.0));
 		new FDistort(input,expected).scale().apply();
-		ImageFloat32 found = alg.getLayer(0);
+		GrayF32 found = alg.getLayer(0);
 
 		BoofTesting.assertEquals(expected,found,1e-4);
 
 		// test the second layer
-		ImageFloat32 next = new ImageFloat32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
+		GrayF32 next = new GrayF32((int)Math.ceil(width/5.0),(int)Math.ceil(height/5.0));
 		new FDistort(expected,next).scale().apply();
 		found = alg.getLayer(1);
 
@@ -74,10 +74,10 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 
 
 	@Override
-	protected ImagePyramid<ImageFloat32> createPyramid(int... scales) {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		double a[] = BoofMiscOps.convertTo_F64(scales);
-		return new PyramidFloatScale<ImageFloat32>(interp,a,imageType);
+		return new PyramidFloatScale<GrayF32>(interp,a,imageType);
 	}
 
 	/**
@@ -85,8 +85,8 @@ public class TestPyramidFloatScale extends GenericPyramidTests<ImageFloat32> {
 	 */
 	@Test
 	public void checkSigmas() {
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
-		PyramidFloatScale<ImageFloat32> alg = new PyramidFloatScale<ImageFloat32>(interp,new double[]{3,5},imageType);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<GrayF32>(interp,new double[]{3,5},imageType);
 
 		for( int i = 0; i < 2; i++ ) {
 			assertEquals(0,alg.getSigma(0),1e-8);

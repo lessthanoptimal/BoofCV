@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import boofcv.struct.image.ImageSingleBand;
 
 
 /**
@@ -43,7 +43,7 @@ public abstract class GeneralBilinearPixelMultiChecks<T extends ImageInterleaved
 	}
 
 	@Override
-	protected <SB extends ImageSingleBand> InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue) {
+	protected <SB extends ImageGray> InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue) {
 		return FactoryInterpolation.bilinearPixelS(image, null);
 	}
 

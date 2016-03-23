@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -41,8 +41,8 @@ import static org.junit.Assert.assertTrue;
 public class TestRemovePerspectiveDistortion {
 	@Test
 	public void undoDistortion() {
-		ImageFloat32 expected = new ImageFloat32(30,40);
-		ImageFloat32 input = new ImageFloat32(200,150);
+		GrayF32 expected = new GrayF32(30,40);
+		GrayF32 input = new GrayF32(200,150);
 
 		Point2D_F64 topLeft = new Point2D_F64(30,20);
 		Point2D_F64 topRight = new Point2D_F64(80,30);
@@ -56,13 +56,13 @@ public class TestRemovePerspectiveDistortion {
 		applyForwardTransform(expected, input, topLeft, topRight, bottomRight, bottomLeft);
 
 		// now reverse it with the class
-		RemovePerspectiveDistortion<ImageFloat32> alg =
-				new RemovePerspectiveDistortion<ImageFloat32>(30,40, ImageType.single(ImageFloat32.class));
+		RemovePerspectiveDistortion<GrayF32> alg =
+				new RemovePerspectiveDistortion<GrayF32>(30,40, ImageType.single(GrayF32.class));
 
 		assertTrue(alg.apply(input, topLeft, topRight, bottomRight, bottomLeft));
 
-		ImageFloat32 found = alg.getOutput();
-		ImageFloat32 difference = found.createSameShape();
+		GrayF32 found = alg.getOutput();
+		GrayF32 difference = found.createSameShape();
 
 		PixelMath.diffAbs(expected, found, difference);
 		double error = ImageStatistics.sum(difference)/(difference.width*difference.height);
@@ -71,7 +71,7 @@ public class TestRemovePerspectiveDistortion {
 
 	}
 
-	private void applyForwardTransform(ImageFloat32 expected, ImageFloat32 input, Point2D_F64 topLeft, Point2D_F64 topRight, Point2D_F64 bottomRight, Point2D_F64 bottomLeft) {
+	private void applyForwardTransform(GrayF32 expected, GrayF32 input, Point2D_F64 topLeft, Point2D_F64 topRight, Point2D_F64 bottomRight, Point2D_F64 bottomLeft) {
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
 		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();

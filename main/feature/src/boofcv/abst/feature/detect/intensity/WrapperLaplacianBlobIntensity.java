@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,25 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  *
  *
  * @author Peter Abeles
  */
-public class WrapperLaplacianBlobIntensity<I extends ImageSingleBand>
-		extends BaseGeneralFeatureIntensity<I,ImageSingleBand> {
+public class WrapperLaplacianBlobIntensity<I extends ImageGray>
+		extends BaseGeneralFeatureIntensity<I,ImageGray> {
 
 	@Override
-	public void process(I image, ImageSingleBand derivX, ImageSingleBand derivY, ImageSingleBand derivXX, ImageSingleBand derivYY, ImageSingleBand derivXY) {
+	public void process(I image, ImageGray derivX, ImageGray derivY, ImageGray derivXX, ImageGray derivYY, ImageGray derivXY) {
 		init(image.width,image.height);
-		if( image instanceof ImageUInt8 ) {
-			LaplacianEdge.process((ImageUInt8)image,intensity);
-		} else if( image instanceof ImageFloat32 ) {
-			LaplacianEdge.process((ImageFloat32)image,intensity);
+		if( image instanceof GrayU8) {
+			LaplacianEdge.process((GrayU8)image,intensity);
+		} else if( image instanceof GrayF32) {
+			LaplacianEdge.process((GrayF32)image,intensity);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}

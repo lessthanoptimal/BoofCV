@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  *
@@ -37,8 +37,8 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class ConvolveImageStandardSparse {
 
-	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
-								  ImageFloat32 input, int c_x , int c_y, float storage[] )
+	public static float convolve(Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
+								 GrayF32 input, int c_x , int c_y, float storage[] )
 	{
 		int widthH = horizontal.getWidth();
 		int widthV = vertical.getWidth();
@@ -65,8 +65,8 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageUInt8 input, int c_x , int c_y, int storage[] )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		int widthH = horizontal.getWidth();
 		int widthV = vertical.getWidth();
@@ -93,10 +93,10 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageUInt8 input, int c_x , int c_y, int storage[] ,
-								int divisorHorizontal ,
-								int divisorVertical )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayU8 input, int c_x , int c_y, int storage[] ,
+							   int divisorHorizontal ,
+							   int divisorVertical )
 	{
 		int widthH = horizontal.getWidth();
 		int widthV = vertical.getWidth();
@@ -124,8 +124,8 @@ public class ConvolveImageStandardSparse {
 		return (total + divisorVertical/2)/divisorVertical;
 	}
 
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageSInt16 input, int c_x , int c_y, int storage[] )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		int widthH = horizontal.getWidth();
 		int widthV = vertical.getWidth();
@@ -152,10 +152,10 @@ public class ConvolveImageStandardSparse {
 		return total;
 	}
 
-	public static int convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								ImageSInt16 input, int c_x , int c_y, int storage[] ,
-								int divisorHorizontal ,
-								int divisorVertical )
+	public static int convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+							   GrayS16 input, int c_x , int c_y, int storage[] ,
+							   int divisorHorizontal ,
+							   int divisorVertical )
 	{
 		int widthH = horizontal.getWidth();
 		int widthV = vertical.getWidth();

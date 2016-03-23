@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 
@@ -55,21 +55,21 @@ public class ExampleDenseOpticalFlow {
 //		String fileName0 = UtilIO.pathExample("denseflow/Grove2_07.png");
 //		String fileName1 = UtilIO.pathExample("denseflow/Grove2_09.png");
 
-		DenseOpticalFlow<ImageFloat32> denseFlow =
+		DenseOpticalFlow<GrayF32> denseFlow =
 //				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);
 //				FactoryDenseOpticalFlow.region(null,ImageFloat32.class);
 //				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageFloat32.class);
 //				FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class);
-				FactoryDenseOpticalFlow.broxWarping(null, ImageFloat32.class);
+				FactoryDenseOpticalFlow.broxWarping(null, GrayF32.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);
 		BufferedImage buff1 = media.openImage(fileName1);
 
-		ImageFloat32 full = new ImageFloat32(buff0.getWidth(),buff0.getHeight());
+		GrayF32 full = new GrayF32(buff0.getWidth(),buff0.getHeight());
 
 		// Dense optical flow is very computationally expensive.  Just process the image at 1/2 resolution
-		ImageFloat32 previous = new ImageFloat32(full.width/2,full.height/2);
-		ImageFloat32 current = previous.createSameShape();
+		GrayF32 previous = new GrayF32(full.width/2,full.height/2);
+		GrayF32 current = previous.createSameShape();
 		ImageFlow flow = new ImageFlow(previous.width,previous.height);
 
 		ConvertBufferedImage.convertFrom(buff0,full);

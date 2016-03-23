@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(ImageFloat32 input, ImageFloat32 output, int radius) {
+	public static void horizontal(GrayF32 input, GrayF32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
@@ -57,7 +57,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(ImageUInt8 input, ImageInt16 output, int radius) {
+	public static void horizontal(GrayU8 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
@@ -72,7 +72,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(ImageUInt8 input, ImageSInt32 output, int radius) {
+	public static void horizontal(GrayU8 input, GrayS32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
@@ -87,7 +87,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void horizontal(ImageSInt16 input, ImageInt16 output, int radius) {
+	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
@@ -102,7 +102,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageFloat32 input, ImageFloat32 output, int radius) {
+	public static void vertical(GrayF32 input, GrayF32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output );
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
@@ -117,7 +117,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageUInt8 input, ImageInt16 output, int radius) {
+	public static void vertical(GrayU8 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
@@ -132,7 +132,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageUInt8 input, ImageSInt32 output, int radius) {
+	public static void vertical(GrayU8 input, GrayS32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);
@@ -147,7 +147,7 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(ImageSInt16 input, ImageInt16 output, int radius) {
+	public static void vertical(GrayS16 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_I32 kernel = FactoryKernel.table1D_I32(radius);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,29 +53,29 @@ public class DenseFlowApp
 	AnimatePanel animationPanel;
 
 	// converted input image
-	ImageFloat32 unscaled = new ImageFloat32(1,1);
-	ImageFloat32 input0 = new ImageFloat32(1,1);
-	ImageFloat32 input1 = new ImageFloat32(1,1);
+	GrayF32 unscaled = new GrayF32(1,1);
+	GrayF32 input0 = new GrayF32(1,1);
+	GrayF32 input1 = new GrayF32(1,1);
 	ImageFlow flow = new ImageFlow(1,1);
 
 	// if it has processed an image or not
 	boolean processImage = false;
 	boolean hasInputImage = false;
 
-	DenseOpticalFlow<ImageFloat32> denseFlow;
+	DenseOpticalFlow<GrayF32> denseFlow;
 
 	BufferedImage converted0,converted1,visualized;
 
 	public DenseFlowApp() {
 		super(1);
 
-		Class T = ImageFloat32.class;
+		Class T = GrayF32.class;
 
 		addAlgorithm(0, "KLT", FactoryDenseOpticalFlow.flowKlt(null,6,T,T));
 		addAlgorithm(0, "Region", FactoryDenseOpticalFlow.region(null,T));
-		addAlgorithm(0, "Horn-Schunck-Pyramid",FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class));
-		addAlgorithm(0, "Brox",FactoryDenseOpticalFlow.broxWarping(null, ImageFloat32.class));
-		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(null, ImageFloat32.class));
+		addAlgorithm(0, "Horn-Schunck-Pyramid",FactoryDenseOpticalFlow.hornSchunckPyramid(null,GrayF32.class));
+		addAlgorithm(0, "Brox",FactoryDenseOpticalFlow.broxWarping(null, GrayF32.class));
+		addAlgorithm(0, "Horn-Schunck",FactoryDenseOpticalFlow.hornSchunck(null, GrayF32.class));
 
 		animationPanel = new AnimatePanel(200,null);
 		flowPanel = new ImagePanel();
@@ -87,7 +87,7 @@ public class DenseFlowApp
 
 	@Override
 	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		denseFlow = (DenseOpticalFlow<ImageFloat32>)cookie;
+		denseFlow = (DenseOpticalFlow<GrayF32>)cookie;
 		process();
 	}
 

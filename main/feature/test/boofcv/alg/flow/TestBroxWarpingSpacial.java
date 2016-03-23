@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
 import org.junit.Test;
 
@@ -41,26 +41,26 @@ public class TestBroxWarpingSpacial {
 
 	double epsilon = 0.001;
 
-	InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+	InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
 	@Test
 	public void process() {
 		int width = 30;
 		int height = 40;
 
-		ImageFloat32 original1 = new ImageFloat32(width,height);
-		ImageFloat32 original2 = new ImageFloat32(width,height);
+		GrayF32 original1 = new GrayF32(width,height);
+		GrayF32 original2 = new GrayF32(width,height);
 
 		ImageMiscOps.fillRectangle(original1,40,10,0,10,height);
 		ImageMiscOps.fillRectangle(original2,40,15,0,10,height);
 
-		PyramidFloat<ImageFloat32> pyr1 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
-		PyramidFloat<ImageFloat32> pyr2 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
+		PyramidFloat<GrayF32> pyr1 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,GrayF32.class);
+		PyramidFloat<GrayF32> pyr2 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,GrayF32.class);
 
 		pyr1.process(original1);
 		pyr2.process(original2);
 
-		BroxWarpingSpacial<ImageFloat32> alg = new BroxWarpingSpacial<ImageFloat32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
 		alg.process(pyr1,pyr2);
 
 		for( int y = 0; y < height; y++ ) {
@@ -74,23 +74,23 @@ public class TestBroxWarpingSpacial {
 
 	@Test
 	public void computePsiDataPsiGradient() {
-		BroxWarpingSpacial<ImageFloat32> alg = new BroxWarpingSpacial<ImageFloat32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
 		alg.resizeForLayer(width, height);
 
-		ImageFloat32 image1 = new ImageFloat32(width,height);
-		ImageFloat32 image2 = new ImageFloat32(width,height);
-		ImageFloat32 deriv1x = new ImageFloat32(width,height);
-		ImageFloat32 deriv1y = new ImageFloat32(width,height);
-		ImageFloat32 deriv2x = new ImageFloat32(width,height);
-		ImageFloat32 deriv2y = new ImageFloat32(width,height);
-		ImageFloat32 deriv2xx = new ImageFloat32(width,height);
-		ImageFloat32 deriv2yy = new ImageFloat32(width,height);
-		ImageFloat32 deriv2xy = new ImageFloat32(width,height);
-		ImageFloat32 du = new ImageFloat32(width,height);
-		ImageFloat32 dv = new ImageFloat32(width,height);
+		GrayF32 image1 = new GrayF32(width,height);
+		GrayF32 image2 = new GrayF32(width,height);
+		GrayF32 deriv1x = new GrayF32(width,height);
+		GrayF32 deriv1y = new GrayF32(width,height);
+		GrayF32 deriv2x = new GrayF32(width,height);
+		GrayF32 deriv2y = new GrayF32(width,height);
+		GrayF32 deriv2xx = new GrayF32(width,height);
+		GrayF32 deriv2yy = new GrayF32(width,height);
+		GrayF32 deriv2xy = new GrayF32(width,height);
+		GrayF32 du = new GrayF32(width,height);
+		GrayF32 dv = new GrayF32(width,height);
 
-		ImageFloat32 psiData = new ImageFloat32(width,height);
-		ImageFloat32 psiGradient = new ImageFloat32(width,height);
+		GrayF32 psiData = new GrayF32(width,height);
+		GrayF32 psiGradient = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(image1,rand,-1,1);
 		ImageMiscOps.fillUniform(image2,rand,-1,1);
@@ -116,10 +116,10 @@ public class TestBroxWarpingSpacial {
 
 	}
 
-	private float computePsiData( int x, int y ,
-								  ImageFloat32 image1, ImageFloat32 image2,
-								  ImageFloat32 deriv2x, ImageFloat32 deriv2y,
-								  ImageFloat32 du, ImageFloat32 dv ) {
+	private float computePsiData(int x, int y ,
+								 GrayF32 image1, GrayF32 image2,
+								 GrayF32 deriv2x, GrayF32 deriv2y,
+								 GrayF32 du, GrayF32 dv ) {
 
 		float taylor2 = image2.get(x,y) + deriv2x.get(x,y)*du.get(x,y) + deriv2y.get(x,y)*dv.get(x,y);
 
@@ -127,11 +127,11 @@ public class TestBroxWarpingSpacial {
 		return (float)(1.0/(2.0*Math.sqrt(d*d+epsilon*epsilon)));      // in the paper it is 1/2 but not their code
 	}
 
-	private float computePsiGradient( int x, int y ,
-									  ImageFloat32 deriv1x, ImageFloat32 deriv1y,
-									  ImageFloat32 deriv2x, ImageFloat32 deriv2y,
-									  ImageFloat32 deriv2xx, ImageFloat32 deriv2yy, ImageFloat32 deriv2xy,
-									  ImageFloat32 du, ImageFloat32 dv ) {
+	private float computePsiGradient(int x, int y ,
+									 GrayF32 deriv1x, GrayF32 deriv1y,
+									 GrayF32 deriv2x, GrayF32 deriv2y,
+									 GrayF32 deriv2xx, GrayF32 deriv2yy, GrayF32 deriv2xy,
+									 GrayF32 du, GrayF32 dv ) {
 
 		float taylor2x = deriv2x.get(x,y) + deriv2xx.get(x,y)*du.get(x,y) + deriv2xy.get(x,y)*dv.get(x,y);
 		float taylor2y = deriv2y.get(x,y) + deriv2xy.get(x,y)*du.get(x,y) + deriv2yy.get(x,y)*dv.get(x,y);
@@ -144,18 +144,18 @@ public class TestBroxWarpingSpacial {
 
 	@Test
 	public void computeDivUVD_safe() {
-		ImageFloat32 u = new ImageFloat32(width,height);
-		ImageFloat32 v = new ImageFloat32(width,height);
-		ImageFloat32 psi = new ImageFloat32(width,height);
-		ImageFloat32 divU = new ImageFloat32(width,height);
-		ImageFloat32 divV = new ImageFloat32(width,height);
-		ImageFloat32 divD = new ImageFloat32(width,height);
+		GrayF32 u = new GrayF32(width,height);
+		GrayF32 v = new GrayF32(width,height);
+		GrayF32 psi = new GrayF32(width,height);
+		GrayF32 divU = new GrayF32(width,height);
+		GrayF32 divV = new GrayF32(width,height);
+		GrayF32 divD = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(u,rand,-1,1);
 		ImageMiscOps.fillUniform(v,rand,-1,1);
 		ImageMiscOps.fillUniform(psi,rand,-1,1);
 
-		BroxWarpingSpacial<ImageFloat32> alg = new BroxWarpingSpacial<ImageFloat32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
 		alg.resizeForLayer(width,height);
 
 		alg.computeDivUVD_safe(5,6,u,v,psi,divU,divV,divD);
@@ -169,7 +169,7 @@ public class TestBroxWarpingSpacial {
 		assertEquals(expectedDivD,divD.get(5,6),1e-4);
 	}
 
-	private float computeDivU( int x , int y , ImageFloat32 u , ImageFloat32 psi )
+	private float computeDivU(int x , int y , GrayF32 u , GrayF32 psi )
 	{
 		float coef0 = 0.5f*(psi.get(x+1,y) + psi.get(x,y));
 		float coef1 = 0.5f*(psi.get(x-1,y) + psi.get(x,y));
@@ -184,7 +184,7 @@ public class TestBroxWarpingSpacial {
 		return coef0*diff0 + coef1*diff1 + coef2*diff2 + coef3*diff3;
 	}
 
-	private float computeDivD( int x , int y , ImageFloat32 psi )
+	private float computeDivD( int x , int y , GrayF32 psi )
 	{
 		float coef0 = 0.5f*(psi.get(x+1,y) + psi.get(x,y));
 		float coef1 = 0.5f*(psi.get(x-1,y) + psi.get(x,y));
@@ -196,10 +196,10 @@ public class TestBroxWarpingSpacial {
 
 	@Test
 	public void s() {
-		BroxWarpingSpacial<ImageFloat32> alg = new BroxWarpingSpacial<ImageFloat32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
 
 		alg.resizeForLayer(10,13);
-		ImageFloat32 a = alg.warpImage2;
+		GrayF32 a = alg.warpImage2;
 
 		assertEquals(a.getIndex(0,0),alg.s(-1,0),1e-4f);
 		assertEquals(a.getIndex(0,0),alg.s(0,-1),1e-4f);

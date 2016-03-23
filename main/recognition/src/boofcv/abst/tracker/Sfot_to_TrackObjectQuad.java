@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.alg.tracker.sfot.SparseFlowObjectTracker;
 import boofcv.struct.RectangleRotate_F32;
 import boofcv.struct.RectangleRotate_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -32,7 +32,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class Sfot_to_TrackObjectQuad<T extends ImageSingleBand, D extends ImageSingleBand>
+public class Sfot_to_TrackObjectQuad<T extends ImageGray, D extends ImageGray>
 		implements TrackerObjectQuad<T>
 {
 	SparseFlowObjectTracker<T,D> alg;

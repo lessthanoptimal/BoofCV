@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class TestSelectNBestFeatures {
 	@Test
 	public void testExtra() {
 
-		ImageFloat32 intensity = new ImageFloat32(10,20);
+		GrayF32 intensity = new GrayF32(10,20);
 		intensity.set(5,10,-3);
 		intensity.set(4,10,-3.5f);
 		intensity.set(5,11,0);
@@ -73,7 +73,7 @@ public class TestSelectNBestFeatures {
 	@Test
 	public void testTooLittle() {
 
-		ImageFloat32 intensity = new ImageFloat32(10,20);
+		GrayF32 intensity = new GrayF32(10,20);
 		intensity.set(5,10,-3);
 		intensity.set(4,10,-3.5f);
 		intensity.set(5,11,0);

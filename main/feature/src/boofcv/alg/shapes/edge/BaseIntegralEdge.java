@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,14 +26,14 @@ import boofcv.core.image.GImageSingleBandDistorted;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Base class for computing line integrals along lines/edges.
  *
  * @author Peter Abeles
  */
-public class BaseIntegralEdge<T extends ImageSingleBand> {
+public class BaseIntegralEdge<T extends ImageGray> {
 	Class<T> imageType;
 
 	// used when computing the fit for a line at specific points
@@ -60,7 +60,7 @@ public class BaseIntegralEdge<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageSingleBand)} first.
+	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageGray)} first.
 	 */
 	public void setImage(T image) {
 		integralImage.wrap(image);

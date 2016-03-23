@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -38,14 +38,14 @@ public class TestOrientationIntegralToImage {
 		ConfigAverageIntegral config = new ConfigAverageIntegral();
 		config.radius = r;
 		config.objectRadiusToScale = 1/3.0;
-		OrientationIntegral<ImageFloat32> orig = FactoryOrientationAlgs.average_ii(config, ImageFloat32.class);
+		OrientationIntegral<GrayF32> orig = FactoryOrientationAlgs.average_ii(config, GrayF32.class);
 
-		OrientationIntegralToImage<ImageFloat32,ImageFloat32>
-				alg = new OrientationIntegralToImage<ImageFloat32, ImageFloat32>(orig,
-				ImageFloat32.class,ImageFloat32.class);
+		OrientationIntegralToImage<GrayF32,GrayF32>
+				alg = new OrientationIntegralToImage<GrayF32, GrayF32>(orig,
+				GrayF32.class,GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol, r * 2 + 1, alg, ImageFloat32.class);
+		tests.setup(angleTol, r * 2 + 1, alg, GrayF32.class);
 		tests.performAll();
 	}
 }

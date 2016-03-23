@@ -22,8 +22,8 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class TestImplMedianSortNaive {
 	@Test
 	public void trivialTest() {
 
-		ImageUInt8 templateImage = new ImageUInt8(4,4);
+		GrayU8 templateImage = new GrayU8(4,4);
 		for( int i = 0; i < templateImage.width; i++ ) {
 			for( int j = 0; j < templateImage.height; j++ ) {
 				templateImage.set(j,i,i*templateImage.width+j);
@@ -56,8 +56,8 @@ public class TestImplMedianSortNaive {
 
 			Class params[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(params[0], 4, 4);
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(params[1], 4, 4);
+			ImageGray input = GeneralizedImageOps.createSingleBand(params[0], 4, 4);
+			ImageGray found = GeneralizedImageOps.createSingleBand(params[1], 4, 4);
 
 			GConvertImage.convert(templateImage,input);
 
@@ -68,7 +68,7 @@ public class TestImplMedianSortNaive {
 		assertEquals(2,numFound);
 	}
 
-	public void trivialTest( Method m , ImageSingleBand _image, ImageSingleBand _found ) {
+	public void trivialTest(Method m , ImageGray _image, ImageGray _found ) {
 
 		try {
 			m.invoke(null,_image,_found,1,null);

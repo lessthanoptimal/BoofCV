@@ -20,13 +20,13 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeBrief<T extends ImageSingleBand> implements DescribeRegionPoint<T,TupleDesc_B> {
+public class WrapDescribeBrief<T extends ImageGray> implements DescribeRegionPoint<T,TupleDesc_B> {
 
 	int length;
 	DescribePointBrief<T> alg;

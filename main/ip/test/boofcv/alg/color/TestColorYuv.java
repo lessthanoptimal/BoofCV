@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -107,9 +107,9 @@ public class TestColorYuv {
 
 	@Test
 	public void yuvToRgb_F32_MultiSpectral() {
-		MultiSpectral<ImageFloat32> yuv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
-		MultiSpectral<ImageFloat32> found = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
+		Planar<GrayF32> yuv = new Planar<GrayF32>(GrayF32.class,10,15,3);
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,10,15,3);
+		Planar<GrayF32> found = new Planar<GrayF32>(GrayF32.class,10,15,3);
 
 		GImageMiscOps.fillUniform(yuv, rand, 0, 1);
 
@@ -130,8 +130,8 @@ public class TestColorYuv {
 	}
 	@Test
 	public void ycbcrToRgb_U8_MultiSpectral() {
-		MultiSpectral<ImageUInt8> yuv = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,15,3);
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,10,15,3);
+		Planar<GrayU8> yuv = new Planar<GrayU8>(GrayU8.class,10,15,3);
+		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,10,15,3);
 
 		GImageMiscOps.fillUniform(yuv, rand, 0, 255);
 

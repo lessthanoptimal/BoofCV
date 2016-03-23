@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 /**
- * Computes a color SURF descriptor from a {@link boofcv.struct.image.MultiSpectral} image.  Each band in the
+ * Computes a color SURF descriptor from a {@link Planar} image.  Each band in the
  * input image is used to compute its own descriptor, which are then combined together into a single one. The
  * laplacian sign is computed from a gray-scale image.  The descriptor from each band are not individually
  * normalized.  The whole combined descriptor is normalized.
@@ -37,7 +37,7 @@ import boofcv.struct.image.MultiSpectral;
  *
  * @author Peter Abeles
  */
-public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
+public class DescribePointSurfMultiSpectral<II extends ImageGray>
 {
 	// SURF algorithms
 	private DescribePointSurf<II> describe;
@@ -48,7 +48,7 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 	// integral of gray image
 	private II grayII;
 	// integral of multi-band image
-	private MultiSpectral<II> ii;
+	private Planar<II> ii;
 
 	// storage for feature compute in each band
 	private TupleDesc_F64 bandDesc;
@@ -78,7 +78,7 @@ public class DescribePointSurfMultiSpectral<II extends ImageSingleBand>
 		return BrightFeature.class;
 	}
 
-	public void setImage( II grayII , MultiSpectral<II> integralImage ) {
+	public void setImage( II grayII , Planar<II> integralImage ) {
 		this.grayII = grayII;
 		ii = integralImage;
 	}

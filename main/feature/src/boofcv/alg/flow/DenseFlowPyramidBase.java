@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -34,11 +34,11 @@ import boofcv.struct.pyramid.PyramidFloat;
  *
  * @author Peter Abeles
  */
-public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
+public abstract class DenseFlowPyramidBase<T extends ImageGray> {
 
 	// storage for normalized image
-	private ImageFloat32 norm1 = new ImageFloat32(1,1);
-	private ImageFloat32 norm2 = new ImageFloat32(1,1);
+	private GrayF32 norm1 = new GrayF32(1,1);
+	private GrayF32 norm2 = new GrayF32(1,1);
 
 	// parameters used to create pyramid
 	private double scale;
@@ -46,19 +46,19 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	private int maxLayers;
 
 	// image pyramid and its derivative
-	protected PyramidFloat<ImageFloat32> pyr1;
-	protected PyramidFloat<ImageFloat32> pyr2;
+	protected PyramidFloat<GrayF32> pyr1;
+	protected PyramidFloat<GrayF32> pyr2;
 
 	// Used to interpolate values between pixels
-	protected InterpolatePixelS<ImageFloat32> interp;// todo remove
+	protected InterpolatePixelS<GrayF32> interp;// todo remove
 
 	public DenseFlowPyramidBase(double scale, double sigma, int maxLayers,
-								InterpolatePixelS<ImageFloat32> interp ) {
+								InterpolatePixelS<GrayF32> interp ) {
 		this.scale = scale;
 		this.sigma = sigma;
 		this.maxLayers = maxLayers;
 		this.interp = interp;
-		interp.setBorder(FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED));
 	}
 
 	/**
@@ -68,8 +68,8 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	{
 		// declare image data structures
 		if( pyr1 == null || pyr1.getInputWidth() != image1.width || pyr1.getInputHeight() != image1.height ) {
-			pyr1 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, ImageFloat32.class);
-			pyr2 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, ImageFloat32.class);
+			pyr1 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, GrayF32.class);
+			pyr2 = UtilDenseOpticalFlow.standardPyramid(image1.width, image1.height, scale, sigma, 5, maxLayers, GrayF32.class);
 
 			pyr1.initialize(image1.width,image1.height);
 			pyr2.initialize(image1.width,image1.height);
@@ -93,7 +93,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void interpolateFlowScale(ImageFloat32 prev, ImageFloat32 curr) {
+	protected void interpolateFlowScale(GrayF32 prev, GrayF32 curr) {
 		interp.setImage(prev);
 
 		float scaleX = (float)prev.width/(float)curr.width;
@@ -119,7 +119,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void warpImageTaylor(ImageFloat32 before, ImageFloat32 flowX , ImageFloat32 flowY , ImageFloat32 after) {
+	protected void warpImageTaylor(GrayF32 before, GrayF32 flowX , GrayF32 flowY , GrayF32 after) {
 		interp.setBorder(FactoryImageBorder.single(before.getImageType().getImageClass(), BorderType.EXTENDED));
 		interp.setImage(before);
 
@@ -144,13 +144,13 @@ public abstract class DenseFlowPyramidBase<T extends ImageSingleBand> {
 	 * @param image1 Pyramid of first image
 	 * @param image2 Pyramid of second image
 	 */
-	public abstract void process( ImagePyramid<ImageFloat32> image1 , ImagePyramid<ImageFloat32> image2 );
+	public abstract void process(ImagePyramid<GrayF32> image1 , ImagePyramid<GrayF32> image2 );
 
 	/**
 	 * Function to normalize the images between 0 and 255.
 	 **/
-	protected static<T extends ImageSingleBand>
-	void imageNormalization( T image1, T image2, ImageFloat32 normalized1, ImageFloat32 normalized2 )
+	protected static<T extends ImageGray>
+	void imageNormalization(T image1, T image2, GrayF32 normalized1, GrayF32 normalized2 )
 	{
 		// find the max and min of both images
 		float max1 = (float)GImageStatistics.max(image1);

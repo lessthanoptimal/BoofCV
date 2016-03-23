@@ -40,7 +40,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static ImageFloat32 transform( ImageFloat32 input , ImageFloat32 transformed ) {
+	public static GrayF32 transform(GrayF32 input , GrayF32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed);
 
 		ImplIntegralImageOps.transform(input,transformed);
@@ -55,7 +55,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static ImageFloat64 transform( ImageFloat64 input , ImageFloat64 transformed ) {
+	public static GrayF64 transform(GrayF64 input , GrayF64 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input,transformed);
 
 		ImplIntegralImageOps.transform(input,transformed);
@@ -70,8 +70,8 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static ImageSInt32 transform( ImageUInt8 input , ImageSInt32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
+	public static GrayS32 transform(GrayU8 input , GrayS32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS32.class);
 
 		ImplIntegralImageOps.transform(input,transformed);
 
@@ -85,8 +85,8 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static ImageSInt32 transform( ImageSInt32 input , ImageSInt32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt32.class);
+	public static GrayS32 transform(GrayS32 input , GrayS32 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS32.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -100,8 +100,8 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static ImageSInt64 transform( ImageSInt64 input , ImageSInt64 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input,transformed,ImageSInt64.class);
+	public static GrayS64 transform(GrayS64 input , GrayS64 transformed ) {
+		transformed = InputSanityCheck.checkDeclare(input,transformed,GrayS64.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -116,9 +116,9 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static ImageFloat32 convolve( ImageFloat32 integral ,
-										 IntegralKernel kernel ,
-										 ImageFloat32 output )
+	public static GrayF32 convolve(GrayF32 integral ,
+								   IntegralKernel kernel ,
+								   GrayF32 output )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -135,9 +135,9 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static ImageFloat64 convolve( ImageFloat64 integral ,
-										 IntegralKernel kernel ,
-										 ImageFloat64 output )
+	public static GrayF64 convolve(GrayF64 integral ,
+								   IntegralKernel kernel ,
+								   GrayF64 output )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -154,9 +154,9 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static ImageSInt32 convolve( ImageSInt32 integral ,
-										IntegralKernel kernel ,
-										ImageSInt32 output )
+	public static GrayS32 convolve(GrayS32 integral ,
+								   IntegralKernel kernel ,
+								   GrayS32 output )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -173,9 +173,9 @@ public class IntegralImageOps {
 	 * @param output The convolved image. If null a new image will be declared and returned. Modified.
 	 * @return Convolved image.
 	 */
-	public static ImageSInt64 convolve( ImageSInt64 integral ,
-										IntegralKernel kernel ,
-										ImageSInt64 output )
+	public static GrayS64 convolve(GrayS64 integral ,
+								   IntegralKernel kernel ,
+								   GrayS64 output )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -193,9 +193,9 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static ImageFloat32 convolveBorder( ImageFloat32 integral ,
-											   IntegralKernel kernel ,
-											   ImageFloat32 output , int borderX , int borderY )
+	public static GrayF32 convolveBorder(GrayF32 integral ,
+										 IntegralKernel kernel ,
+										 GrayF32 output , int borderX , int borderY )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -213,9 +213,9 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static ImageFloat64 convolveBorder( ImageFloat64 integral ,
-											   IntegralKernel kernel ,
-											   ImageFloat64 output , int borderX , int borderY )
+	public static GrayF64 convolveBorder(GrayF64 integral ,
+										 IntegralKernel kernel ,
+										 GrayF64 output , int borderX , int borderY )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -233,9 +233,9 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static ImageSInt32 convolveBorder( ImageSInt32 integral ,
-											  IntegralKernel kernel ,
-											  ImageSInt32 output , int borderX , int borderY )
+	public static GrayS32 convolveBorder(GrayS32 integral ,
+										 IntegralKernel kernel ,
+										 GrayS32 output , int borderX , int borderY )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -253,9 +253,9 @@ public class IntegralImageOps {
 	 * @param borderX Size of the image border along the horizontal axis.
 	 * @param borderY size of the image border along the vertical axis.
 	 */
-	public static ImageSInt64 convolveBorder( ImageSInt64 integral ,
-											  IntegralKernel kernel ,
-											  ImageSInt64 output , int borderX , int borderY )
+	public static GrayS64 convolveBorder(GrayS64 integral ,
+										 IntegralKernel kernel ,
+										 GrayS64 output , int borderX , int borderY )
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
@@ -273,7 +273,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static float convolveSparse( ImageFloat32 integral , IntegralKernel kernel , int x , int y )
+	public static float convolveSparse(GrayF32 integral , IntegralKernel kernel , int x , int y )
 	{
 		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
 	}
@@ -287,7 +287,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static double convolveSparse( ImageFloat64 integral , IntegralKernel kernel , int x , int y )
+	public static double convolveSparse(GrayF64 integral , IntegralKernel kernel , int x , int y )
 	{
 		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
 	}
@@ -301,7 +301,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static int convolveSparse( ImageSInt32 integral , IntegralKernel kernel , int x , int y )
+	public static int convolveSparse(GrayS32 integral , IntegralKernel kernel , int x , int y )
 	{
 		return ImplIntegralImageOps.convolveSparse(integral, kernel, x, y);
 	}
@@ -315,7 +315,7 @@ public class IntegralImageOps {
 	 * @param y Pixel the convolution is performed at.
 	 * @return Value of the convolution
 	 */
-	public static long convolveSparse( ImageSInt64 integral , IntegralKernel kernel , int x , int y )
+	public static long convolveSparse(GrayS64 integral , IntegralKernel kernel , int x , int y )
 	{
 		return ImplIntegralImageOps.convolveSparse(integral,kernel,x,y);
 	}
@@ -333,7 +333,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static double block_unsafe( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static double block_unsafe(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
 	}
@@ -351,7 +351,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static float block_unsafe( ImageFloat32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static float block_unsafe(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_unsafe(integral,x0,y0,x1,y1);
 	}
@@ -369,7 +369,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static int block_unsafe( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static int block_unsafe(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
@@ -387,7 +387,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static long block_unsafe( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static long block_unsafe(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_unsafe(integral, x0, y0, x1, y1);
 	}
@@ -405,7 +405,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static float block_zero( ImageFloat32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static float block_zero(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
 	}
@@ -423,7 +423,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static double block_zero( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static double block_zero(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
 	}
@@ -441,7 +441,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static int block_zero( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static int block_zero(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
 	}
@@ -459,7 +459,7 @@ public class IntegralImageOps {
 	 * @param y1 Upper bound of the block.  Inclusive.
 	 * @return Value inside the block.
 	 */
-	public static long block_zero( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static long block_zero(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		return ImplIntegralImageOps.block_zero(integral,x0,y0,x1,y1);
 	}

@@ -21,7 +21,7 @@ package boofcv.abst.filter.blur;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<T> {
+public class BlurStorageFilter<T extends ImageGray> implements BlurFilter<T> {
 
 	// Wrapper around performed operation
 	private BlurOperation operation;
@@ -40,7 +40,7 @@ public class BlurStorageFilter<T extends ImageSingleBand> implements BlurFilter<
 	// size of the blur region
 	private int radius;
 	// stores intermediate results
-	private ImageSingleBand storage;
+	private ImageGray storage;
 
 	// type of image it processes
 	Class<T> inputType;

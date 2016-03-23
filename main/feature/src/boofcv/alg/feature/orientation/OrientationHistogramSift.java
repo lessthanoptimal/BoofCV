@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.misc.CircularIndex;
 import boofcv.numerics.InterpolateArray;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -57,7 +57,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class OrientationHistogramSift<Deriv extends ImageSingleBand>
+public class OrientationHistogramSift<Deriv extends ImageGray>
 {
 	// How much does it inflate the scale by
 	private double sigmaEnlarge;
@@ -161,8 +161,8 @@ public class OrientationHistogramSift<Deriv extends ImageSingleBand>
 		bound.x1 = c_x + r + 1;
 		bound.y1 = c_y + r + 1;
 
-		ImageSingleBand rawDX = derivX.getImage();
-		ImageSingleBand rawDY = derivY.getImage();
+		ImageGray rawDX = derivX.getImage();
+		ImageGray rawDY = derivY.getImage();
 
 		// make sure it is contained in the image bounds
 		BoofMiscOps.boundRectangleInside(rawDX,bound);

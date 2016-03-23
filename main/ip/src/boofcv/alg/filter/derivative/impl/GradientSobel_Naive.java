@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
 
 /**
  * <p>
@@ -39,9 +39,9 @@ public class GradientSobel_Naive {
 	/**
 	 * Computes the derivative of 'orig' along the x and y axes
 	 */
-	public static void process( ImageInteger orig,
-								ImageInteger derivX,
-								ImageInteger derivY) {
+	public static void process( GrayI orig,
+								GrayI derivX,
+								GrayI derivY) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 
@@ -65,9 +65,9 @@ public class GradientSobel_Naive {
 	/**
 	 * Computes the derivative of 'orig' along the x and y axes
 	 */
-	public static void process( ImageFloat32 orig,
-								ImageFloat32 derivX,
-								ImageFloat32 derivY) {
+	public static void process( GrayF32 orig,
+								GrayF32 derivX,
+								GrayF32 derivY) {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight();
 

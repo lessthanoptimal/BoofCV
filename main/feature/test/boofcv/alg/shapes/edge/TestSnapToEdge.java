@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.shapes.edge;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.ClosestPoint2D_F64;
@@ -49,13 +49,13 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestSnapToEdge {
 
-	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
 
 	Random rand = new Random(234);
 
 	int width = 400, height = 500;
-	ImageSingleBand work; // original image before affine has been applied
-	ImageSingleBand image; // image after affine applied
+	ImageGray work; // original image before affine has been applied
+	ImageGray image; // image after affine applied
 
 	int x0 = 200, y0 = 160;
 	int x1 = 260, y1 = 400; // that's exclusive
@@ -319,7 +319,7 @@ public class TestSnapToEdge {
 
 		LineSegment2D_F64 segment = new LineSegment2D_F64(10,20,50,-10);
 
-		SnapToEdge alg = new SnapToEdge(10,2, ImageUInt8.class);
+		SnapToEdge alg = new SnapToEdge(10,2, GrayU8.class);
 		alg.center.set(20,23);
 		alg.localScale = 10;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.denoise.wavelet.DenoiseBayesShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -43,14 +43,14 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageSingleBand> DenoiseWavelet<T> bayes( ShrinkThresholdRule<T> rule , Class<T> imageType )
+	public static <T extends ImageGray> DenoiseWavelet<T> bayes(ShrinkThresholdRule<T> rule , Class<T> imageType )
 	{
 		if( rule == null ) {
 			rule = (ShrinkThresholdRule<T>)new ShrinkThresholdSoft_F32();
 		}
 
-		if( imageType == ImageFloat32.class ) {
-			return (DenoiseWavelet<T>)new DenoiseBayesShrink_F32((ShrinkThresholdRule<ImageFloat32>)rule);
+		if( imageType == GrayF32.class ) {
+			return (DenoiseWavelet<T>)new DenoiseBayesShrink_F32((ShrinkThresholdRule<GrayF32>)rule);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 		}
@@ -62,9 +62,9 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageSingleBand> DenoiseWavelet<T> sure( Class<T> imageType )
+	public static <T extends ImageGray> DenoiseWavelet<T> sure(Class<T> imageType )
 	{
-		if( imageType == ImageFloat32.class ) {
+		if( imageType == GrayF32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseSureShrink_F32();
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
@@ -77,9 +77,9 @@ public class FactoryDenoiseWaveletAlg {
 	 * @param imageType Type of image it will process.
 	 * @return Bayes Shrink
 	 */
-	public static <T extends ImageSingleBand> DenoiseWavelet<T> visu( Class<T> imageType )
+	public static <T extends ImageGray> DenoiseWavelet<T> visu(Class<T> imageType )
 	{
-		if( imageType == ImageFloat32.class ) {
+		if( imageType == GrayF32.class ) {
 			return (DenoiseWavelet<T>)new DenoiseVisuShrink_F32();
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);

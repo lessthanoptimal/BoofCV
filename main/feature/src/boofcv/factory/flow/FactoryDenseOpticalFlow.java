@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -56,7 +56,7 @@ public class FactoryDenseOpticalFlow {
 	 * @param <D> Derivative image type.
 	 * @return DenseOpticalFlow
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	DenseOpticalFlow<I> flowKlt( PkltConfig configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
 
 		if( configKlt == null )
@@ -88,17 +88,17 @@ public class FactoryDenseOpticalFlow {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DenseOpticalFlow<T> region( ConfigOpticalFlowBlockPyramid config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigOpticalFlowBlockPyramid();
 
 		DenseOpticalFlowBlockPyramid<T> alg;
-		if( imageType == ImageUInt8.class )
+		if( imageType == GrayU8.class )
 			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.U8(
 					config.searchRadius,config.regionRadius,config.maxPerPixelError);
-		else if( imageType == ImageFloat32.class )
+		else if( imageType == GrayF32.class )
 			alg = (DenseOpticalFlowBlockPyramid)new DenseOpticalFlowBlockPyramid.F32(
 					config.searchRadius,config.regionRadius,config.maxPerPixelError);
 		else
@@ -116,17 +116,17 @@ public class FactoryDenseOpticalFlow {
 	 * @param imageType Type of input gray scale image
 	 * @return dense optical flow
 	 */
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	public static <T extends ImageGray,D extends ImageGray>
 	DenseOpticalFlow<T> hornSchunck( ConfigHornSchunck config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigHornSchunck();
 
 		HornSchunck<T,D> alg;
-		if( imageType == ImageUInt8.class )
+		if( imageType == GrayU8.class )
 			alg = (HornSchunck)new HornSchunck_U8(config.alpha,config.numIterations);
 		else
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			alg = (HornSchunck)new HornSchunck_F32(config.alpha,config.numIterations);
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
@@ -142,28 +142,28 @@ public class FactoryDenseOpticalFlow {
 	 * @param config Configuration parameters.  If null defaults will be used.
 	 * @return Dense optical flow implementation of HornSchunckPyramid
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DenseOpticalFlow<T> hornSchunckPyramid( ConfigHornSchunckPyramid config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigHornSchunckPyramid();
 
-		InterpolatePixelS<ImageFloat32> interpolate =
-				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, ImageFloat32.class);
+		InterpolatePixelS<GrayF32> interpolate =
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, GrayF32.class);
 
 		HornSchunckPyramid<T> alg = new HornSchunckPyramid<T>(config,interpolate);
 
 		return new HornSchunckPyramid_to_DenseOpticalFlow<T>(alg,imageType);
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DenseOpticalFlow<T> broxWarping( ConfigBroxWarping config , Class<T> imageType )
 	{
 		if( config == null )
 			config = new ConfigBroxWarping();
 
-		InterpolatePixelS<ImageFloat32> interpolate =
-				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, ImageFloat32.class);
+		InterpolatePixelS<GrayF32> interpolate =
+				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, GrayF32.class);
 
 		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<T>(config,interpolate);
 

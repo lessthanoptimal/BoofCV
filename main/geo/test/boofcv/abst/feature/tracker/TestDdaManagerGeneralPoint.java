@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,44 +33,44 @@ import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestDdaManagerGeneralPoint extends StandardPointTracker<ImageFloat32> {
+public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 
 	public TestDdaManagerGeneralPoint() {
 		super(true, false);
 	}
 
 	@Override
-	public PointTracker<ImageFloat32> createTracker() {
-		DescribePointBrief<ImageFloat32> brief =
+	public PointTracker<GrayF32> createTracker() {
+		DescribePointBrief<GrayF32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-						FactoryBlurFilter.gaussian(ImageFloat32.class, 0, 4));
+						FactoryBlurFilter.gaussian(GrayF32.class, 0, 4));
 
-		GeneralFeatureDetector<ImageFloat32,ImageFloat32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), false, ImageFloat32.class);
+		GeneralFeatureDetector<GrayF32,GrayF32> corner =
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), false, GrayF32.class);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
 
-		DescribeRegionPoint<ImageFloat32,TupleDesc_B> describe =
-				new WrapDescribeBrief<ImageFloat32>(brief,ImageFloat32.class);
+		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
+				new WrapDescribeBrief<GrayF32>(brief,GrayF32.class);
 
-		EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32> easy = new
-				EasyGeneralFeatureDetector<ImageFloat32,ImageFloat32>(corner,ImageFloat32.class,ImageFloat32.class);
+		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
+				EasyGeneralFeatureDetector<GrayF32,GrayF32>(corner,GrayF32.class,GrayF32.class);
 
-		DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B> manager;
-		manager = new DdaManagerGeneralPoint<ImageFloat32,ImageFloat32,TupleDesc_B>(easy,describe,2);
+		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
+		manager = new DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B>(easy,describe,2);
 
-		DetectDescribeAssociate<ImageFloat32,TupleDesc_B> tracker =
-				new DetectDescribeAssociate<ImageFloat32, TupleDesc_B>(manager,association,false);
+		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
+				new DetectDescribeAssociate<GrayF32, TupleDesc_B>(manager,association,false);
 		return tracker;
 	}
 }

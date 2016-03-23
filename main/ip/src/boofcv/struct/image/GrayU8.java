@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,12 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Image with a pixel type of unsigned 16-bit integer.
+ * Image with a pixel type of unsigned 8-bit integer.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageUInt16 extends ImageInt16<ImageUInt16> {
+public class GrayU8 extends GrayI8<GrayU8> {
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -33,27 +33,28 @@ public class ImageUInt16 extends ImageInt16<ImageUInt16> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageUInt16(int width, int height ) {
+	public GrayU8(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageUInt16() {
+	public GrayU8() {
 	}
 
 	@Override
 	public int unsafe_get(int x, int y) {
-		return data[getIndex(x, y)] & 0xFFFF;
+		return data[getIndex(x, y)] & 0xFF;
 	}
 
 	@Override
 	public ImageDataType getDataType() {
-		return ImageDataType.U16;
+		return ImageDataType.U8;
 	}
 
 	@Override
-	public ImageUInt16 _createNew(int imgWidth, int imgHeight) {
-		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageUInt16();
-		return new ImageUInt16(imgWidth, imgHeight);
+	public GrayU8 _createNew(int imgWidth, int imgHeight) {
+		if (imgWidth == -1 || imgHeight == -1) {
+			return new GrayU8();
+		}
+		return new GrayU8(imgWidth, imgHeight);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.SiftDetector;
 import boofcv.core.image.GConvertImage;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -34,7 +34,7 @@ public class WrapSiftDetector<T extends ImageBase>
 {
 	SiftDetector detector;
 
-	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+	GrayF32 imageFloat = new GrayF32(1,1);
 
 	Class<T> inputType;
 
@@ -46,9 +46,9 @@ public class WrapSiftDetector<T extends ImageBase>
 	@Override
 	public void detect(T image) {
 
-		ImageFloat32 input;
-		if( image instanceof ImageFloat32 ) {
-			input = (ImageFloat32)image;
+		GrayF32 input;
+		if( image instanceof GrayF32) {
+			input = (GrayF32)image;
 		} else {
 			imageFloat.reshape(image.width,image.height);
 			GConvertImage.convert(image,imageFloat);

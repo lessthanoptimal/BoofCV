@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d2;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.se.Se2_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -49,10 +49,10 @@ public class TestImageMotionPointTrackerKey {
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
 
-		ImageUInt8 input = new ImageUInt8(20,30);
+		GrayU8 input = new GrayU8(20,30);
 
-		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg =
-				new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,1000);
+		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg =
+				new ImageMotionPointTrackerKey<GrayU8,Se2_F32>(tracker,matcher,null,model,1000);
 
 		// the first time it processes an image it should always return false since no motion can be estimated
 		assertFalse(alg.process(input));
@@ -96,9 +96,9 @@ public class TestImageMotionPointTrackerKey {
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
 
-		ImageUInt8 input = new ImageUInt8(20,30);
+		GrayU8 input = new GrayU8(20,30);
 
-		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,100);
+		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<GrayU8,Se2_F32>(tracker,matcher,null,model,100);
 
 		// process twice to change the transforms
 		alg.process(input);
@@ -131,9 +131,9 @@ public class TestImageMotionPointTrackerKey {
 		DummyTracker tracker = new DummyTracker();
 		DummyModelMatcher<Se2_F32> matcher = new DummyModelMatcher<Se2_F32>(computed,5);
 
-		ImageUInt8 input = new ImageUInt8(20,30);
+		GrayU8 input = new GrayU8(20,30);
 
-		ImageMotionPointTrackerKey<ImageUInt8,Se2_F32> alg = new ImageMotionPointTrackerKey<ImageUInt8,Se2_F32>(tracker,matcher,null,model,5);
+		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<GrayU8,Se2_F32>(tracker,matcher,null,model,5);
 
 		// create tracks such that only some of them will be dropped
 		alg.totalFramesProcessed = 9;
@@ -153,7 +153,7 @@ public class TestImageMotionPointTrackerKey {
 		assertEquals(6,tracker.numDropped);
 	}
 
-	public static class DummyTracker implements PointTracker<ImageUInt8>
+	public static class DummyTracker implements PointTracker<GrayU8>
 	{
 		public int numSpawn = 0;
 		public int numDropped = 0;
@@ -166,7 +166,7 @@ public class TestImageMotionPointTrackerKey {
 		public void reset() {}
 
 		@Override
-		public void process(ImageUInt8 image) {}
+		public void process(GrayU8 image) {}
 
 		@Override
 		public void spawnTracks() {

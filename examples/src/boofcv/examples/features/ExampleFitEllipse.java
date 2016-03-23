@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.EllipseRotated_F64;
 
 import java.awt.*;
@@ -48,9 +48,9 @@ public class ExampleFitEllipse {
 	public static void main( String args[] ) {
 		// load and convert the image into a usable format
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
-		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
+		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
 
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width,input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
 		double mean = ImageStatistics.mean(input);
@@ -59,7 +59,7 @@ public class ExampleFitEllipse {
 		ThresholdImageOps.threshold(input, binary, (float) mean, true);
 
 		// reduce noise with some filtering
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary, 1, null);
+		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
 		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
 		// Find the contour around the shapes

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.applet;
 
 import boofcv.gui.VisualizeApp;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ public class MediaApplet extends JApplet {
 		}
 
 		final String panelPath = getParameter("panelPath");
-		Class inputType = ImageFloat32.class;
+		Class inputType = GrayF32.class;
 
 		showStatus("Creating GUI component");
 		final JComponent comp = FactoryVisualPanel.create(panelPath,inputType);

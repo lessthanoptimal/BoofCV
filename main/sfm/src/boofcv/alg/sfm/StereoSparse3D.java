@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
@@ -32,7 +32,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public class StereoSparse3D<T extends ImageSingleBand>
+public class StereoSparse3D<T extends ImageGray>
 		extends StereoProcessingBase<T> implements ImagePixelTo3D {
 
 	// computes spare disparity

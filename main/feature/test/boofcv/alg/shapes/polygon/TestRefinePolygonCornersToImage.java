@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -150,7 +150,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 
 	@Test
 	public void pickEndIndex() {
-		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(ImageUInt8.class);
+		RefinePolygonCornersToImage alg = new RefinePolygonCornersToImage(GrayU8.class);
 
 		alg.setPixelsAway(6);
 		alg.contour = new ArrayList();
@@ -178,7 +178,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 	}
 
 	private void findContour( boolean black ) {
-		ImageUInt8 binary = new ImageUInt8(image.width,image.height);
+		GrayU8 binary = new GrayU8(image.width,image.height);
 		GThresholdImageOps.threshold(image,binary,40,black);
 
 		contour = BinaryImageOps.contour(binary, ConnectRule.FOUR,null).get(0).external;
@@ -197,7 +197,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 	 */
 	@Test
 	public void pickEndIndex_bug0() {
-		RefinePolygonCornersToImage<ImageUInt8> alg = new RefinePolygonCornersToImage<ImageUInt8>(ImageUInt8.class);
+		RefinePolygonCornersToImage<GrayU8> alg = new RefinePolygonCornersToImage<GrayU8>(GrayU8.class);
 		alg.setPixelsAway(6);
 		alg.contour = new ArrayList<Point2D_I32>();
 		alg.splits = new GrowQueue_I32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
@@ -52,7 +52,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray> WaveletDenoiseFilter<T>
 	waveletVisu( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);
@@ -71,7 +71,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray> WaveletDenoiseFilter<T>
 	waveletBayes( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);
@@ -90,7 +90,7 @@ public class FactoryImageDenoise {
 	 * @param maxPixelValue Maximum allowed pixel intensity value
 	 * @return filter for image noise removal.
 	 */
-	public static <T extends ImageSingleBand> WaveletDenoiseFilter<T>
+	public static <T extends ImageGray> WaveletDenoiseFilter<T>
 	waveletSure( Class<T> imageType , int numLevels , double minPixelValue , double maxPixelValue )
 	{
 		ImageDataType info = ImageDataType.classToType(imageType);

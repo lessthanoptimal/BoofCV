@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,16 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 
 /**
- * Child of {@link boofcv.core.image.border.ImageBorder} for {@link boofcv.struct.image.ImageFloat64}.
+ * Child of {@link boofcv.core.image.border.ImageBorder} for {@link GrayF64}.
  *
  * @author Peter Abeles
  */
-public abstract class ImageBorder_F64 extends ImageBorder<ImageFloat64> {
+public abstract class ImageBorder_F64 extends ImageBorder<GrayF64> {
 
-	public ImageBorder_F64(ImageFloat64 image) {
+	public ImageBorder_F64(GrayF64 image) {
 		super(image);
 	}
 

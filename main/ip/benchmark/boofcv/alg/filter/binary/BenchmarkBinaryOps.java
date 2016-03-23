@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -34,8 +34,8 @@ public class BenchmarkBinaryOps  {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 
-	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
-	static ImageUInt8 output = new ImageUInt8(imgWidth, imgHeight);
+	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
+	static GrayU8 output = new GrayU8(imgWidth, imgHeight);
 
 	public BenchmarkBinaryOps() {
 		Random rand = new Random(234);

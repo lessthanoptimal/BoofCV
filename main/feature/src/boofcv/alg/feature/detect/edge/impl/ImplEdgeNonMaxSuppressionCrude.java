@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 
 
 /**
@@ -44,7 +44,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image.  Ignoring the border.
 	 */
-	static public void inner4( ImageFloat32 intensity , ImageFloat32 derivX , ImageFloat32 derivY, ImageFloat32 output )
+	static public void inner4(GrayF32 intensity , GrayF32 derivX , GrayF32 derivY, GrayF32 output )
 	{
 		final int w = intensity.width;
 		final int h = intensity.height-1;
@@ -77,7 +77,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image.  Ignoring the border.
 	 */
-	static public void inner4( ImageFloat32 intensity , ImageSInt16 derivX , ImageSInt16 derivY, ImageFloat32 output )
+	static public void inner4(GrayF32 intensity , GrayS16 derivX , GrayS16 derivY, GrayF32 output )
 	{
 		final int w = intensity.width;
 		final int h = intensity.height-1;
@@ -110,7 +110,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image.  Ignoring the border.
 	 */
-	static public void inner4( ImageFloat32 intensity , ImageSInt32 derivX , ImageSInt32 derivY, ImageFloat32 output )
+	static public void inner4(GrayF32 intensity , GrayS32 derivX , GrayS32 derivY, GrayF32 output )
 	{
 		final int w = intensity.width;
 		final int h = intensity.height-1;
@@ -143,7 +143,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Just processes the image border.
 	 */
-	static public void border4( ImageFloat32 _intensity , ImageFloat32 derivX , ImageFloat32 derivY , ImageFloat32 output )
+	static public void border4(GrayF32 _intensity , GrayF32 derivX , GrayF32 derivY , GrayF32 output )
 	{
 		int w = _intensity.width;
 		int h = _intensity.height-1;
@@ -225,7 +225,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	}	/**
 	 * Just processes the image border.
 	 */
-	static public void border4( ImageFloat32 _intensity , ImageInteger derivX , ImageInteger derivY , ImageFloat32 output )
+	static public void border4(GrayF32 _intensity , GrayI derivX , GrayI derivY , GrayF32 output )
 	{
 		int w = _intensity.width;
 		int h = _intensity.height-1;

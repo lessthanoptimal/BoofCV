@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -77,7 +77,7 @@ public class TestDetectChessboardFiducial {
 	}
 
 	public void basicTest(int numRows, int numCols , boolean localThreshold ) {
-		ImageFloat32 gray = renderTarget(numRows, numCols);
+		GrayF32 gray = renderTarget(numRows, numCols);
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
 
@@ -86,15 +86,15 @@ public class TestDetectChessboardFiducial {
 
 		ConfigChessboard configChess = new ConfigChessboard(5, 5, 1);
 
-		BinaryPolygonDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(configChess.square, ImageFloat32.class);
+		BinaryPolygonDetector<GrayF32> detectorSquare =
+				FactoryShapeDetector.polygon(configChess.square, GrayF32.class);
 //		detectorSquare.setVerbose(true);
 
-		InputToBinary<ImageFloat32> inputToBinary;
+		InputToBinary<GrayF32> inputToBinary;
 		if( localThreshold )
-			inputToBinary = FactoryThresholdBinary.localSquareBlockMinMax(10,0.90,true,10,ImageFloat32.class);
+			inputToBinary = FactoryThresholdBinary.localSquareBlockMinMax(10,0.90,true,10,GrayF32.class);
 		else
-			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,ImageFloat32.class);
+			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
 
 		DetectChessboardFiducial alg =
 				new DetectChessboardFiducial(numRows, numCols, 4,detectorSquare,null,null,inputToBinary);
@@ -120,8 +120,8 @@ public class TestDetectChessboardFiducial {
 		}
 	}
 
-	public ImageFloat32 renderTarget(int numRows, int numCols) {
-		ImageFloat32 gray = new ImageFloat32(w,h);
+	public GrayF32 renderTarget(int numRows, int numCols) {
+		GrayF32 gray = new GrayF32(w,h);
 		ImageMiscOps.fill(gray,80f);
 
 		int numCols2 = numCols/2;
@@ -149,7 +149,7 @@ public class TestDetectChessboardFiducial {
 		}
 
 		if( transform != null ) {
-			ImageFloat32 distorted = new ImageFloat32(gray.width,gray.height);
+			GrayF32 distorted = new GrayF32(gray.width,gray.height);
 			FDistort f = new FDistort(gray,distorted);
 			f.border(80f).affine(transform.c,-transform.s,transform.s,transform.c,
 					transform.T.x,transform.T.y).apply();

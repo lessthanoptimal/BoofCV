@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -35,14 +35,14 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class SurfMultiSpectral_to_DetectDescribePoint <T extends ImageSingleBand, II extends ImageSingleBand>
-		implements DetectDescribePoint<MultiSpectral<T>,BrightFeature>
+public class SurfMultiSpectral_to_DetectDescribePoint <T extends ImageGray, II extends ImageGray>
+		implements DetectDescribePoint<Planar<T>,BrightFeature>
 {
 	DetectDescribeSurfMultiSpectral<II> alg;
 
 	T gray;
 	II grayII;
-	MultiSpectral<II> bandII;
+	Planar<II> bandII;
 
 	public SurfMultiSpectral_to_DetectDescribePoint(DetectDescribeSurfMultiSpectral<II> alg ,
 													Class<T> imageType, Class<II> integralType)
@@ -51,11 +51,11 @@ public class SurfMultiSpectral_to_DetectDescribePoint <T extends ImageSingleBand
 
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
-		bandII = new MultiSpectral<II>(integralType,1,1,alg.getDescribe().getNumBands());
+		bandII = new Planar<II>(integralType,1,1,alg.getDescribe().getNumBands());
 	}
 
 	@Override
-	public void detect(MultiSpectral<T> input) {
+	public void detect(Planar<T> input) {
 		gray.reshape(input.width,input.height);
 		grayII.reshape(input.width,input.height);
 		bandII.reshape(input.width,input.height);

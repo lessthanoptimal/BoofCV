@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
 
@@ -86,9 +86,9 @@ Random rand = new Random(0xFF);
 				divW = divH = skip;
 			}
 
-			ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
+			ImageGray src = ConvolutionTestHelper.createImage(paramTypes[1], width, height);
 			GImageMiscOps.fillUniform(src, rand, 0, 130);
-			ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
+			ImageGray dst = ConvolutionTestHelper.createImage(paramTypes[2], width/divW, height/divH);
 
 			Object[][] ret = new Object[1][paramTypes.length];
 
@@ -107,7 +107,7 @@ Random rand = new Random(0xFF);
 			Class<?> e[] = m.getParameterTypes();
 
 			for( Class<?> c : e ) {
-				if( ImageSingleBand.class.isAssignableFrom(c))
+				if( ImageGray.class.isAssignableFrom(c))
 					return true;
 			}
 			return false;
@@ -145,8 +145,8 @@ Random rand = new Random(0xFF);
 
 			int validationParams = targetParam.length-1;
 
-			ImageSingleBand input = (ImageSingleBand)targetParam[1];
-			ImageSingleBand output = (ImageSingleBand)targetParam[2];
+			ImageGray input = (ImageGray)targetParam[1];
+			ImageGray output = (ImageGray)targetParam[2];
 
 			Object[] ret = new Object[ validationParams ];
 
@@ -170,8 +170,8 @@ Random rand = new Random(0xFF);
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageSingleBand) targetParam[2]);
-			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageSingleBand) validationParam[2]);
+			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
+			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
 
 			int ratioWidth = v.getWidth() != t.getWidth() ? skip : 1;
 			int ratioHeight = v.getHeight() != t.getHeight() ? skip : 1;

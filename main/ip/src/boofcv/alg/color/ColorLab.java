@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.color;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 
 /**
  * Conversion between RGB and CIE LAB color space.  LAB color is designed to approximate human vision.
@@ -104,7 +104,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Convert a 3-channel {@link boofcv.struct.image.MultiSpectral} image from RGB into LAB.  RGB is assumed
+	 * Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
 	 * to have a range from 0:255
 	 *
 	 * NOTE: Input and output image can be the same instance.
@@ -112,17 +112,17 @@ public class ColorLab {
 	 * @param rgb (Input) RGB encoded image
 	 * @param lab (Output) LAB encoded image
 	 */
-	public static void rgbToLab_U8( MultiSpectral<ImageUInt8> rgb , MultiSpectral<ImageFloat32> lab ) {
+	public static void rgbToLab_U8(Planar<GrayU8> rgb , Planar<GrayF32> lab ) {
 
 		InputSanityCheck.checkSameShape(lab, rgb);
 
-		ImageUInt8 R = rgb.getBand(0);
-		ImageUInt8 G = rgb.getBand(1);
-		ImageUInt8 B = rgb.getBand(2);
+		GrayU8 R = rgb.getBand(0);
+		GrayU8 G = rgb.getBand(1);
+		GrayU8 B = rgb.getBand(2);
 
-		ImageFloat32 L_ = lab.getBand(0);
-		ImageFloat32 A_ = lab.getBand(1);
-		ImageFloat32 B_ = lab.getBand(2);
+		GrayF32 L_ = lab.getBand(0);
+		GrayF32 A_ = lab.getBand(1);
+		GrayF32 B_ = lab.getBand(2);
 
 		for( int row = 0; row < lab.height; row++ ) {
 			int indexLab = lab.startIndex + row*lab.stride;
@@ -157,7 +157,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Convert a 3-channel {@link boofcv.struct.image.MultiSpectral} image from RGB into LAB.  RGB is assumed
+	 * Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
 	 * to have a range from 0:255
 	 *
 	 * NOTE: Input and output image can be the same instance.
@@ -165,17 +165,17 @@ public class ColorLab {
 	 * @param rgb (Input) RGB encoded image
 	 * @param lab (Output) LAB encoded image
 	 */
-	public static void rgbToLab_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> lab ) {
+	public static void rgbToLab_F32(Planar<GrayF32> rgb , Planar<GrayF32> lab ) {
 
 		InputSanityCheck.checkSameShape(lab, rgb);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
-		ImageFloat32 L_ = lab.getBand(0);
-		ImageFloat32 A_ = lab.getBand(1);
-		ImageFloat32 B_ = lab.getBand(2);
+		GrayF32 L_ = lab.getBand(0);
+		GrayF32 A_ = lab.getBand(1);
+		GrayF32 B_ = lab.getBand(2);
 
 		for( int row = 0; row < lab.height; row++ ) {
 			int indexLab = lab.startIndex + row*lab.stride;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,19 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestHornSchunck_F32 extends ChecksHornSchunck<ImageFloat32,ImageFloat32>{
+public class TestHornSchunck_F32 extends ChecksHornSchunck<GrayF32,GrayF32>{
 
 	public TestHornSchunck_F32() {
-		super(ImageFloat32.class, ImageFloat32.class);
+		super(GrayF32.class, GrayF32.class);
 	}
 
 	@Override
-	public HornSchunck<ImageFloat32, ImageFloat32> createAlg() {
+	public HornSchunck<GrayF32, GrayF32> createAlg() {
 		return new HornSchunck_F32(0.2f,1);
 	}
 }

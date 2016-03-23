@@ -41,10 +41,10 @@ import java.util.List;
 public class BoofTesting {
 
 	public static <T> T convertToGenericType(Class<?> type) {
-		if (type == ImageSInt8.class || type == ImageUInt8.class)
-			return (T) ImageInt8.class;
-		if (type == ImageSInt16.class || type == ImageUInt16.class)
-			return (T) ImageInt16.class;
+		if (type == GrayS8.class || type == GrayU8.class)
+			return (T) GrayI8.class;
+		if (type == GrayS16.class || type == GrayU16.class)
+			return (T) GrayI16.class;
 		return (T) type;
 	}
 
@@ -64,10 +64,10 @@ public class BoofTesting {
 	 * specific image type is returned here.
 	 */
 	public static <T> T convertGenericToSpecificType(Class<?> type) {
-		if (type == ImageInt8.class)
-			return (T) ImageUInt8.class;
-		if (type == ImageInt16.class)
-			return (T) ImageSInt16.class;
+		if (type == GrayI8.class)
+			return (T) GrayU8.class;
+		if (type == GrayI16.class)
+			return (T) GrayS16.class;
 		if (type == InterleavedI8.class)
 			return (T) InterleavedU8.class;
 		if (type == InterleavedI16.class)
@@ -84,10 +84,10 @@ public class BoofTesting {
 	 */
 	@SuppressWarnings({"unchecked"})
 	public static <T extends ImageBase> T createSubImageOf(T input) {
-		if( input instanceof ImageSingleBand ) {
-			return (T)createSubImageOf_S((ImageSingleBand)input);
-		} else if( input instanceof MultiSpectral ) {
-			return (T)createSubImageOf_MS((MultiSpectral) input);
+		if( input instanceof ImageGray) {
+			return (T)createSubImageOf_S((ImageGray)input);
+		} else if( input instanceof Planar) {
+			return (T)createSubImageOf_MS((Planar) input);
 		} else if( input instanceof ImageInterleaved ) {
 			return (T)createSubImageOf_I((ImageInterleaved) input);
 		} else {
@@ -95,7 +95,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static <T extends ImageSingleBand> T createSubImageOf_S(T input) {
+	public static <T extends ImageGray> T createSubImageOf_S(T input) {
 		// create the larger image
 		T ret = (T) input._createNew(input.width + 10, input.height + 12);
 		// create a sub-image of the inner portion
@@ -117,8 +117,8 @@ public class BoofTesting {
 		return ret;
 	}
 
-	public static <T extends MultiSpectral> T createSubImageOf_MS(T input) {
-		T ret = (T)new MultiSpectral(input.type,input.width,input.height,input.getNumBands());
+	public static <T extends Planar> T createSubImageOf_MS(T input) {
+		T ret = (T)new Planar(input.type,input.width,input.height,input.getNumBands());
 
 		for( int i = 0; i < input.getNumBands(); i++ ) {
 			ret.bands[i] = createSubImageOf_S(input.getBand(i));
@@ -194,7 +194,7 @@ public class BoofTesting {
 			return false;
 
 		for (Class<?> p : params) {
-			if (!ImageSingleBand.class.isAssignableFrom(p)) {
+			if (!ImageGray.class.isAssignableFrom(p)) {
 				return false;
 			}
 		}
@@ -205,7 +205,7 @@ public class BoofTesting {
 	/**
 	 * Tests the specified function with the original image provided and with an equivalent
 	 * sub-image.  The two results are then compared. The function being tested must only
-	 * have one input parameter of type {@link boofcv.struct.image.ImageUInt8}.
+	 * have one input parameter of type {@link GrayU8}.
 	 *
 	 * @param testClass   Instance of the class that contains the function being tested.
 	 * @param function    The name of the function being tested.
@@ -448,9 +448,9 @@ public class BoofTesting {
 	public static void assertEquals(ImageBase imgA, ImageBase imgB, double tol ) {
 
 		// if no specialized check exists, use a slower generalized approach
-		if( imgA instanceof ImageSingleBand ) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+		if( imgA instanceof ImageGray) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
 
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
@@ -462,9 +462,9 @@ public class BoofTesting {
 						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
 				}
 			}
-		} else if( imgA instanceof MultiSpectral && imgB instanceof MultiSpectral ){
-			MultiSpectral a = (MultiSpectral)imgA;
-			MultiSpectral b = (MultiSpectral)imgB;
+		} else if( imgA instanceof Planar && imgB instanceof Planar){
+			Planar a = (Planar)imgA;
+			Planar b = (Planar)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -503,9 +503,9 @@ public class BoofTesting {
 										 boolean relative ) {
 
 		// if no specialized check exists, use a slower generalized approach
-		if( imgA instanceof ImageSingleBand ) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+		if( imgA instanceof ImageGray) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
 
 			for( int y = borderY; y < imgA.height-borderY; y++ ) {
 				for( int x = borderX; x < imgA.width-borderX; x++ ) {
@@ -523,9 +523,9 @@ public class BoofTesting {
 						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
 				}
 			}
-		} else if( imgA instanceof MultiSpectral ){
-			MultiSpectral a = (MultiSpectral)imgA;
-			MultiSpectral b = (MultiSpectral)imgB;
+		} else if( imgA instanceof Planar){
+			Planar a = (Planar)imgA;
+			Planar b = (Planar)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -543,9 +543,9 @@ public class BoofTesting {
 										 boolean relative ) {
 
 		// if no specialized check exists, use a slower generalized approach
-		if( imgA instanceof ImageSingleBand ) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+		if( imgA instanceof ImageGray) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
 
 			for( int y = borderY0; y < imgA.height-borderY1; y++ ) {
 				for( int x = borderX0; x < imgA.width-borderX1; x++ ) {
@@ -563,9 +563,9 @@ public class BoofTesting {
 						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
 				}
 			}
-		} else if( imgA instanceof MultiSpectral ){
-			MultiSpectral a = (MultiSpectral)imgA;
-			MultiSpectral b = (MultiSpectral)imgB;
+		} else if( imgA instanceof Planar){
+			Planar a = (Planar)imgA;
+			Planar b = (Planar)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -581,9 +581,9 @@ public class BoofTesting {
 	public static void assertEqualsRelative(ImageBase imgA, ImageBase imgB, double tolFrac ) {
 
 		// if no specialized check exists, use a slower generalized approach
-		if( imgA instanceof ImageSingleBand ) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageSingleBand)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageSingleBand)imgB);
+		if( imgA instanceof ImageGray) {
+			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
+			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
 
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
@@ -598,9 +598,9 @@ public class BoofTesting {
 						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
 				}
 			}
-		} else if( imgA instanceof MultiSpectral ){
-			MultiSpectral a = (MultiSpectral)imgA;
-			MultiSpectral b = (MultiSpectral)imgB;
+		} else if( imgA instanceof Planar){
+			Planar a = (Planar)imgA;
+			Planar b = (Planar)imgB;
 
 			if( a.getNumBands() != b.getNumBands() )
 				throw new RuntimeException("Number of bands not equal");
@@ -616,7 +616,7 @@ public class BoofTesting {
 	/**
 	 * Checks to see if only the image borders are equal to each other within tolerance
 	 */
-	public static void assertEqualsBorder(ImageSingleBand imgA, ImageSingleBand imgB, double tol, int borderX, int borderY) {
+	public static void assertEqualsBorder(ImageGray imgA, ImageGray imgB, double tol, int borderX, int borderY) {
 		if (imgA.getWidth() != imgB.getWidth())
 			throw new RuntimeException("Widths are not equals");
 
@@ -653,15 +653,15 @@ public class BoofTesting {
 	}
 
 	public static void checkEquals(BufferedImage imgA, ImageBase imgB, boolean boofcvBandOrder,double tol ) {
-		if (ImageUInt8.class == imgB.getClass()) {
-			checkEquals(imgA, (ImageUInt8) imgB);
-		} else if (ImageInt16.class.isAssignableFrom(imgB.getClass())) {
-			checkEquals( imgA, (ImageInt16) imgB );
-		} else if (ImageFloat32.class == imgB.getClass()) {
-			checkEquals(imgA, (ImageFloat32) imgB, (float) tol);
+		if (GrayU8.class == imgB.getClass()) {
+			checkEquals(imgA, (GrayU8) imgB);
+		} else if (GrayI16.class.isAssignableFrom(imgB.getClass())) {
+			checkEquals( imgA, (GrayI16) imgB );
+		} else if (GrayF32.class == imgB.getClass()) {
+			checkEquals(imgA, (GrayF32) imgB, (float) tol);
 		} else if (ImageInterleaved.class.isInstance(imgB) ) {
 			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder, (float)tol );
-		} else if (MultiSpectral.class == imgB.getClass()) {
+		} else if (Planar.class == imgB.getClass()) {
 			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder,(float) tol);
 		} else {
 			throw new IllegalArgumentException("Unknown");
@@ -674,7 +674,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageUInt8 imgB) {
+	public static void checkEquals(BufferedImage imgA, GrayU8 imgB) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
 				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
@@ -722,7 +722,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageInt16 imgB) {
+	public static void checkEquals(BufferedImage imgA, GrayI16 imgB) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
 				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED) {
@@ -790,7 +790,7 @@ public class BoofTesting {
 	 * @param imgA BufferedImage
 	 * @param imgB ImageUInt8
 	 */
-	public static void checkEquals(BufferedImage imgA, ImageFloat32 imgB, float tol) {
+	public static void checkEquals(BufferedImage imgA, GrayF32 imgB, float tol) {
 
 		if (imgA.getRaster() instanceof ByteInterleavedRaster &&
 				imgA.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
@@ -1013,7 +1013,7 @@ public class BoofTesting {
 	}
 
 
-	public static void checkBorderZero(ImageSingleBand outputImage, int border) {
+	public static void checkBorderZero(ImageGray outputImage, int border) {
 		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
@@ -1029,7 +1029,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void checkBorderZero(ImageSingleBand outputImage, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+	public static void checkBorderZero(ImageGray outputImage, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
 		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
@@ -1045,7 +1045,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void printDiff(ImageSingleBand imgA, ImageSingleBand imgB) {
+	public static void printDiff(ImageGray imgA, ImageGray imgB) {
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
 		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
@@ -1060,7 +1060,7 @@ public class BoofTesting {
 		}
 	}
 
-	public static void printDiffBinary(ImageUInt8 imgA, ImageUInt8 imgB) {
+	public static void printDiffBinary(GrayU8 imgA, GrayU8 imgB) {
 
 		System.out.println("------- Difference -----------");
 		for (int y = 0; y < imgA.getHeight(); y++) {

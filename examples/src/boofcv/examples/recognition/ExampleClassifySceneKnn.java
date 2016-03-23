@@ -30,7 +30,7 @@ import boofcv.gui.learning.ConfusionMatrixPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.learning.Confusion;
 import org.ddogleg.clustering.AssignCluster;
 import org.ddogleg.clustering.ComputeClusters;
@@ -85,12 +85,12 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	// Algorithms
 	ClusterVisualWords cluster;
-	DescribeImageDense<ImageUInt8,TupleDesc_F64> describeImage;
+	DescribeImageDense<GrayU8,TupleDesc_F64> describeImage;
 	NearestNeighbor<HistogramScene> nn;
 
-	ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64> classifier;
+	ClassifierKNearestNeighborsBow<GrayU8,TupleDesc_F64> classifier;
 
-	public ExampleClassifySceneKnn(final DescribeImageDense<ImageUInt8, TupleDesc_F64> describeImage,
+	public ExampleClassifySceneKnn(final DescribeImageDense<GrayU8, TupleDesc_F64> describeImage,
 								   ComputeClusters<double[]> clusterer,
 								   NearestNeighbor<HistogramScene> nn) {
 		this.describeImage = describeImage;
@@ -139,7 +139,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 			System.out.println("   " + scene);
 
 			for( String path : imagePaths ) {
-				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+				GrayU8 image = UtilImageIO.loadImage(path, GrayU8.class);
 				describeImage.process(image);
 
 				// the descriptions will get recycled on the next call, so create a copy
@@ -173,7 +173,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
 		// Can use this classifier with saved results and avoid the
 
-		classifier = new ClassifierKNearestNeighborsBow<ImageUInt8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
+		classifier = new ClassifierKNearestNeighborsBow<GrayU8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
 		classifier.setClassificationData(memory, getScenes().size());
 		classifier.setNumNeighbors(NUM_NEIGHBORS);
 	}
@@ -195,7 +195,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 			List<String> imagePaths = train.get(scene);
 
 			for (String path : imagePaths) {
-				ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+				GrayU8 image = UtilImageIO.loadImage(path, GrayU8.class);
 
 				// reset before processing a new image
 				featuresToHistogram.reset();
@@ -222,7 +222,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	@Override
 	protected int classify(String path) {
-		ImageUInt8 image = UtilImageIO.loadImage(path, ImageUInt8.class);
+		GrayU8 image = UtilImageIO.loadImage(path, GrayU8.class);
 
 		return classifier.classify(image);
 	}
@@ -234,8 +234,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
 		ConfigDenseHoG hog = new ConfigDenseHoG();
 
-		DescribeImageDense<ImageUInt8,TupleDesc_F64> desc = (DescribeImageDense)
-				FactoryDescribeImageDense.surfFast(surfFast, ImageUInt8.class);
+		DescribeImageDense<GrayU8,TupleDesc_F64> desc = (DescribeImageDense)
+				FactoryDescribeImageDense.surfFast(surfFast, GrayU8.class);
 //				FactoryDescribeImageDense.surfStable(surfStable, ImageUInt8.class);
 //				FactoryDescribeImageDense.sift(sift, ImageUInt8.class);
 //				FactoryDescribeImageDense.hog(hog, ImageType.single(ImageUInt8.class));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -77,8 +77,8 @@ public class FactorySteerable {
 		Kernel2D []basis = new Kernel2D[order+1];
 
 		// convert it into an image which can be rotated
-		ImageSingleBand image = GKernelMath.convertToImage(kernel);
-		ImageSingleBand imageRotated = (ImageSingleBand)image._createNew(image.width,image.height);
+		ImageGray image = GKernelMath.convertToImage(kernel);
+		ImageGray imageRotated = (ImageGray)image._createNew(image.width,image.height);
 
 		basis[0] = kernel;
 

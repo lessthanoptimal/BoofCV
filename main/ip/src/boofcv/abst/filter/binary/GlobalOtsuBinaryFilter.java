@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Computes a threshold using Otsu's equation.
  *
- * @see GThresholdImageOps#computeOtsu(boofcv.struct.image.ImageSingleBand, int, int)
+ * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
  *
  * @author Peter Abeles
  */
-public class GlobalOtsuBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class GlobalOtsuBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
@@ -50,7 +50,7 @@ public class GlobalOtsuBinaryFilter<T extends ImageSingleBand> implements InputT
 	}
 
 	@Override
-	public void process(T input, ImageUInt8 output) {
+	public void process(T input, GrayU8 output) {
 		double threshold = GThresholdImageOps.computeOtsu(input,minValue,maxValue);
 		GThresholdImageOps.threshold(input,output,threshold,down);
 	}
@@ -71,7 +71,7 @@ public class GlobalOtsuBinaryFilter<T extends ImageSingleBand> implements InputT
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getOutputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getOutputType() {
+		return ImageType.single(GrayU8.class);
 	}
 }

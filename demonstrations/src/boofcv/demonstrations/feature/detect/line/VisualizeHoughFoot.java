@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class VisualizeHoughFoot<I extends ImageGray, D extends ImageGray> {
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -76,8 +76,8 @@ public class VisualizeHoughFoot<I extends ImageSingleBand, D extends ImageSingle
 	}
 
 	public static void main( String args[] ) {
-		VisualizeHoughFoot<ImageFloat32,ImageFloat32> app =
-				new VisualizeHoughFoot<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		VisualizeHoughFoot<GrayF32,GrayF32> app =
+				new VisualizeHoughFoot<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
 		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg")));

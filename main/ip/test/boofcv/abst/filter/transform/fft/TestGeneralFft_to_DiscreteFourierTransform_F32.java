@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,27 +20,27 @@ package boofcv.abst.filter.transform.fft;
 
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 
 /**
  * @author Peter Abeles
  */
 public class TestGeneralFft_to_DiscreteFourierTransform_F32
-		extends GenericTestDiscreteFourierTransform<ImageFloat32,InterleavedF32> {
+		extends GenericTestDiscreteFourierTransform<GrayF32,InterleavedF32> {
 
 	public TestGeneralFft_to_DiscreteFourierTransform_F32() {
 		super(false,1e-3);
 	}
 
 	@Override
-	public DiscreteFourierTransform<ImageFloat32,InterleavedF32> createAlgorithm() {
+	public DiscreteFourierTransform<GrayF32,InterleavedF32> createAlgorithm() {
 		return new GeneralFft_to_DiscreteFourierTransform_F32();
 	}
 
 	@Override
-	public ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width,height);
+	public GrayF32 createImage(int width, int height) {
+		return new GrayF32(width,height);
 	}
 
 	@Override

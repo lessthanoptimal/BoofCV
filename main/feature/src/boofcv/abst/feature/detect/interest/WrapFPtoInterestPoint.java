@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.alg.feature.detect.interest.FeaturePyramid;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_F64;
 
@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class WrapFPtoInterestPoint<T extends ImageSingleBand, D extends ImageSingleBand> implements InterestPointDetector<T>{
+public class WrapFPtoInterestPoint<T extends ImageGray, D extends ImageGray> implements InterestPointDetector<T>{
 
 	FeaturePyramid<T,D> detector;
 	List<ScalePoint> location;

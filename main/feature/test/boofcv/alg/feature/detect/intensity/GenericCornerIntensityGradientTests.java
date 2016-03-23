@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.detect.intensity;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.filter.derivative.HessianThree;
 import boofcv.core.image.border.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 
 /**
  * Tests basic properties of a corner detector which use the image gradient
@@ -31,17 +31,17 @@ import boofcv.struct.image.ImageSInt16;
  */
 public abstract class GenericCornerIntensityGradientTests extends GenericCornerIntensityTests {
 
-	protected ImageSInt16 derivX_I16 = new ImageSInt16(width,height);
-	protected ImageSInt16 derivY_I16 = new ImageSInt16(width,height);
-	protected ImageSInt16 derivXX_I16 = new ImageSInt16(width,height);
-	protected ImageSInt16 derivYY_I16 = new ImageSInt16(width,height);
-	protected ImageSInt16 derivXY_I16 = new ImageSInt16(width,height);
+	protected GrayS16 derivX_I16 = new GrayS16(width,height);
+	protected GrayS16 derivY_I16 = new GrayS16(width,height);
+	protected GrayS16 derivXX_I16 = new GrayS16(width,height);
+	protected GrayS16 derivYY_I16 = new GrayS16(width,height);
+	protected GrayS16 derivXY_I16 = new GrayS16(width,height);
 
-	protected ImageFloat32 derivX_F32 = new ImageFloat32(width,height);
-	protected ImageFloat32 derivY_F32 = new ImageFloat32(width,height);
-	protected ImageFloat32 derivXX_F32 = new ImageFloat32(width,height);
-	protected ImageFloat32 derivYY_F32 = new ImageFloat32(width,height);
-	protected ImageFloat32 derivXY_F32 = new ImageFloat32(width,height);
+	protected GrayF32 derivX_F32 = new GrayF32(width,height);
+	protected GrayF32 derivY_F32 = new GrayF32(width,height);
+	protected GrayF32 derivXX_F32 = new GrayF32(width,height);
+	protected GrayF32 derivYY_F32 = new GrayF32(width,height);
+	protected GrayF32 derivXY_F32 = new GrayF32(width,height);
 
 	ImageBorder_F32 borderF32 = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 	ImageBorder_S32 borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);

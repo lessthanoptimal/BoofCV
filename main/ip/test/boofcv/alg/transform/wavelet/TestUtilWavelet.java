@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WlCoef_F32;
 import org.junit.Test;
 
@@ -45,27 +45,27 @@ public class TestUtilWavelet {
 
 	@Test
 	public void checkShape_positive() {
-		ImageFloat32 orig = new ImageFloat32(10,20);
-		ImageFloat32 transformed = new ImageFloat32(10,20);
+		GrayF32 orig = new GrayF32(10,20);
+		GrayF32 transformed = new GrayF32(10,20);
 
 		UtilWavelet.checkShape(orig,transformed);
 
-		orig = new ImageFloat32(9,19);
+		orig = new GrayF32(9,19);
 		UtilWavelet.checkShape(orig,transformed);
 	}
 
 	@Test
 	public void checkShape_negative() {
-		ImageFloat32 orig = new ImageFloat32(9,19);
-		ImageFloat32 transformed = new ImageFloat32(19,19);
+		GrayF32 orig = new GrayF32(9,19);
+		GrayF32 transformed = new GrayF32(19,19);
 
 		try {
 		UtilWavelet.checkShape(orig,transformed);
 			fail("transformed image can't be odd");
 		} catch( IllegalArgumentException e ){}
 
-		orig = new ImageFloat32(12,22);
-		transformed = new ImageFloat32(10,20);
+		orig = new GrayF32(12,22);
+		transformed = new GrayF32(10,20);
 
 		try {
 		UtilWavelet.checkShape(orig,transformed);
@@ -154,11 +154,11 @@ public class TestUtilWavelet {
 	 */
 	@Test
 	public void adjustForDisplay() {
-		adjustForDisplay(ImageFloat32.class);
-		adjustForDisplay(ImageSInt32.class);
+		adjustForDisplay(GrayF32.class);
+		adjustForDisplay(GrayS32.class);
 	}
 
-	public <T extends ImageSingleBand>
+	public <T extends ImageGray>
 	void adjustForDisplay( Class<T> imageType ) {
 		ImageDimension d = UtilWavelet.transformDimension(320, 240, 3);
 		T b = GeneralizedImageOps.createSingleBand(imageType,d.width,d.height);

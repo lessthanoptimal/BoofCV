@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.background;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F32;
 
@@ -43,7 +43,7 @@ import georegression.struct.point.Point2D_F32;
  * The background model is composed of a single fixed sized image.  The background image size is specified in
  * the {@link #initialize(int, int, InvertibleTransform)} function.  After that the background model is updated
  * by calling {@link #updateBackground(InvertibleTransform, ImageBase)}.  To flag pixels as background/motion
- * call {@link #segment(InvertibleTransform, ImageBase, ImageUInt8)}.
+ * call {@link #segment(InvertibleTransform, ImageBase, GrayU8)}.
  * </p>
  *
  * <p>
@@ -163,7 +163,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 	 * @param frame current image
 	 * @param segmented Segmented image. 0 = background, 1 = foreground/moving
 	 */
-	public void segment( MotionModel homeToCurrent , T frame , ImageUInt8 segmented ) {
+	public void segment( MotionModel homeToCurrent , T frame , GrayU8 segmented ) {
 		InputSanityCheck.checkSameShape(frame,segmented);
 
 		worldToHome.concat(homeToCurrent, worldToCurrent);
@@ -172,5 +172,5 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 		_segment(currentToWorld,frame,segmented);
 	}
 
-	protected abstract void _segment( MotionModel currentToWorld , T frame , ImageUInt8 segmented );
+	protected abstract void _segment( MotionModel currentToWorld , T frame , GrayU8 segmented );
 }

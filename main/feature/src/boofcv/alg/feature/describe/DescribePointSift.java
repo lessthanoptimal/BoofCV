@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 
 /**
@@ -52,7 +52,7 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class DescribePointSift<Deriv extends ImageSingleBand> extends DescribeSiftCommon {
+public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftCommon {
 
 	// spacial derivatives of input image
 	GImageSingleBand imageDerivX, imageDerivY;

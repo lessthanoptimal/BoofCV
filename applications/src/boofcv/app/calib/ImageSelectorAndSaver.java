@@ -28,7 +28,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderType;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
@@ -45,17 +45,17 @@ public class ImageSelectorAndSaver {
 
 	public static int LENGTH = 50;
 
-	RemovePerspectiveDistortion<ImageFloat32> removePerspective =
-			new RemovePerspectiveDistortion<ImageFloat32>(LENGTH, LENGTH, ImageType.single(ImageFloat32.class));
+	RemovePerspectiveDistortion<GrayF32> removePerspective =
+			new RemovePerspectiveDistortion<GrayF32>(LENGTH, LENGTH, ImageType.single(GrayF32.class));
 
-	ImageFloat32 templateOriginal = new ImageFloat32(LENGTH, LENGTH);
-	ImageFloat32 template = new ImageFloat32(LENGTH, LENGTH);
-	ImageFloat32 weights = new ImageFloat32(LENGTH, LENGTH);
+	GrayF32 templateOriginal = new GrayF32(LENGTH, LENGTH);
+	GrayF32 template = new GrayF32(LENGTH, LENGTH);
+	GrayF32 weights = new GrayF32(LENGTH, LENGTH);
 	double totalWeight;
 
 
-	ImageFloat32 difference = new ImageFloat32(LENGTH, LENGTH);
-	ImageFloat32 tempImage = new ImageFloat32(LENGTH, LENGTH);
+	GrayF32 difference = new GrayF32(LENGTH, LENGTH);
+	GrayF32 tempImage = new GrayF32(LENGTH, LENGTH);
 
 	BufferedImage bestImage;
 	double bestScore;
@@ -79,7 +79,7 @@ public class ImageSelectorAndSaver {
 	/**
 	 * Creates a template of the fiducial and this is then used to determine how blurred the image is
 	 */
-	public void setTemplate( ImageFloat32 image, List<Point2D_F64> sides) {
+	public void setTemplate(GrayF32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
 
@@ -88,12 +88,12 @@ public class ImageSelectorAndSaver {
 		templateOriginal.setTo(removePerspective.getOutput());
 
 		// blur the image a bit so it doesn't have to be a perfect match
-		ImageFloat32 blurred = new ImageFloat32(LENGTH,LENGTH);
+		GrayF32 blurred = new GrayF32(LENGTH,LENGTH);
 		BlurImageOps.gaussian(templateOriginal,blurred,-1,2,null);
 
 		// place greater importance on pixels which are around edges
-		ImageFloat32 derivX = new ImageFloat32(LENGTH, LENGTH);
-		ImageFloat32 derivY = new ImageFloat32(LENGTH, LENGTH);
+		GrayF32 derivX = new GrayF32(LENGTH, LENGTH);
+		GrayF32 derivY = new GrayF32(LENGTH, LENGTH);
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred,derivX,derivY, BorderType.EXTENDED);
 
 		GGradientToEdgeFeatures.intensityE(derivX,derivY,weights);
@@ -122,7 +122,7 @@ public class ImageSelectorAndSaver {
 	 * @param image Gray scale input image for detector
 	 * @param sides Location of 4 corners on fiducial
 	 */
-	public synchronized void process( ImageFloat32 image, List<Point2D_F64> sides) {
+	public synchronized void process(GrayF32 image, List<Point2D_F64> sides) {
 		if( sides.size() != 4 )
 			throw new IllegalArgumentException("Expected 4 sides");
 
@@ -140,10 +140,10 @@ public class ImageSelectorAndSaver {
 	/**
 	 * Used when you just want to update the score for visualization purposes but not update the best image.
 	 */
-	public synchronized void updateScore(ImageFloat32 image, List<Point2D_F64> sides) {
+	public synchronized void updateScore(GrayF32 image, List<Point2D_F64> sides) {
 		removePerspective.apply(image,sides.get(0),sides.get(1),sides.get(2),sides.get(3));
 
-		ImageFloat32 current = removePerspective.getOutput();
+		GrayF32 current = removePerspective.getOutput();
 		float mean = (float)ImageStatistics.mean(current);
 		PixelMath.divide(current,mean,tempImage);
 
@@ -170,11 +170,11 @@ public class ImageSelectorAndSaver {
 		return currentScore;
 	}
 
-	public ImageFloat32 getTemplate() {
+	public GrayF32 getTemplate() {
 		return templateOriginal;
 	}
 
-	public ImageFloat32 getCurrentView() {
+	public GrayF32 getCurrentView() {
 		return removePerspective.getOutput();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings("Duplicates")
 public class ImplConvertImage {
 
-	public static void convert( ImageUInt8 from, ImageInt8 to ) {
+	public static void convert(GrayU8 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -76,7 +76,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt8 from, ImageInt16 to ) {
+	public static void convert(GrayU8 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -121,7 +121,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt8 from, ImageSInt32 to ) {
+	public static void convert(GrayU8 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -166,7 +166,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt8 from, ImageSInt64 to ) {
+	public static void convert(GrayU8 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -211,7 +211,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt8 from, ImageFloat32 to ) {
+	public static void convert(GrayU8 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -256,7 +256,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt8 from, ImageFloat64 to ) {
+	public static void convert(GrayU8 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -301,7 +301,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedU8 input , MultiSpectral<ImageUInt8> output ) {
+	public static void convert( InterleavedU8 input , Planar<GrayU8> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -316,7 +316,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageUInt8> input , InterleavedU8 output ) {
+	public static void convert(Planar<GrayU8> input , InterleavedU8 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -331,7 +331,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageInt8 to ) {
+	public static void convert(GrayS8 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -372,7 +372,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageInt16 to ) {
+	public static void convert(GrayS8 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -417,7 +417,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageSInt32 to ) {
+	public static void convert(GrayS8 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -462,7 +462,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageSInt64 to ) {
+	public static void convert(GrayS8 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -507,7 +507,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageFloat32 to ) {
+	public static void convert(GrayS8 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -552,7 +552,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt8 from, ImageFloat64 to ) {
+	public static void convert(GrayS8 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -597,7 +597,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedS8 input , MultiSpectral<ImageSInt8> output ) {
+	public static void convert( InterleavedS8 input , Planar<GrayS8> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -612,7 +612,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageSInt8> input , InterleavedS8 output ) {
+	public static void convert(Planar<GrayS8> input , InterleavedS8 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -627,7 +627,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageInt8 to ) {
+	public static void convert(GrayU16 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -672,7 +672,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageInt16 to ) {
+	public static void convert(GrayU16 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -713,7 +713,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageSInt32 to ) {
+	public static void convert(GrayU16 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -758,7 +758,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageSInt64 to ) {
+	public static void convert(GrayU16 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -803,7 +803,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageFloat32 to ) {
+	public static void convert(GrayU16 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -848,7 +848,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageUInt16 from, ImageFloat64 to ) {
+	public static void convert(GrayU16 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -893,7 +893,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedU16 input , MultiSpectral<ImageUInt16> output ) {
+	public static void convert( InterleavedU16 input , Planar<GrayU16> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -908,7 +908,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageUInt16> input , InterleavedU16 output ) {
+	public static void convert(Planar<GrayU16> input , InterleavedU16 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -923,7 +923,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageInt8 to ) {
+	public static void convert(GrayS16 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -968,7 +968,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageInt16 to ) {
+	public static void convert(GrayS16 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1009,7 +1009,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageSInt32 to ) {
+	public static void convert(GrayS16 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1054,7 +1054,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageSInt64 to ) {
+	public static void convert(GrayS16 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1099,7 +1099,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageFloat32 to ) {
+	public static void convert(GrayS16 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1144,7 +1144,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt16 from, ImageFloat64 to ) {
+	public static void convert(GrayS16 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1189,7 +1189,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedS16 input , MultiSpectral<ImageSInt16> output ) {
+	public static void convert( InterleavedS16 input , Planar<GrayS16> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1204,7 +1204,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageSInt16> input , InterleavedS16 output ) {
+	public static void convert(Planar<GrayS16> input , InterleavedS16 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -1219,7 +1219,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageInt8 to ) {
+	public static void convert(GrayS32 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1264,7 +1264,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageInt16 to ) {
+	public static void convert(GrayS32 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1309,7 +1309,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageSInt64 to ) {
+	public static void convert(GrayS32 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1354,7 +1354,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageFloat32 to ) {
+	public static void convert(GrayS32 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1399,7 +1399,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt32 from, ImageFloat64 to ) {
+	public static void convert(GrayS32 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1444,7 +1444,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedS32 input , MultiSpectral<ImageSInt32> output ) {
+	public static void convert( InterleavedS32 input , Planar<GrayS32> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1459,7 +1459,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageSInt32> input , InterleavedS32 output ) {
+	public static void convert(Planar<GrayS32> input , InterleavedS32 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -1474,7 +1474,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt64 from, ImageInt8 to ) {
+	public static void convert(GrayS64 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1519,7 +1519,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt64 from, ImageInt16 to ) {
+	public static void convert(GrayS64 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1564,7 +1564,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt64 from, ImageSInt32 to ) {
+	public static void convert(GrayS64 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1609,7 +1609,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt64 from, ImageFloat32 to ) {
+	public static void convert(GrayS64 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1654,7 +1654,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageSInt64 from, ImageFloat64 to ) {
+	public static void convert(GrayS64 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1699,7 +1699,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedS64 input , MultiSpectral<ImageSInt64> output ) {
+	public static void convert( InterleavedS64 input , Planar<GrayS64> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1714,7 +1714,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageSInt64> input , InterleavedS64 output ) {
+	public static void convert(Planar<GrayS64> input , InterleavedS64 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -1729,7 +1729,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageInt8 to ) {
+	public static void convert(GrayF32 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1774,7 +1774,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageInt16 to ) {
+	public static void convert(GrayF32 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1819,7 +1819,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageSInt32 to ) {
+	public static void convert(GrayF32 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1864,7 +1864,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageSInt64 to ) {
+	public static void convert(GrayF32 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1909,7 +1909,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat32 from, ImageFloat64 to ) {
+	public static void convert(GrayF32 from, GrayF64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -1954,7 +1954,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedF32 input , MultiSpectral<ImageFloat32> output ) {
+	public static void convert( InterleavedF32 input , Planar<GrayF32> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -1969,7 +1969,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageFloat32> input , InterleavedF32 output ) {
+	public static void convert(Planar<GrayF32> input , InterleavedF32 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {
@@ -1984,7 +1984,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageInt8 to ) {
+	public static void convert(GrayF64 from, GrayI8 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2029,7 +2029,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageInt16 to ) {
+	public static void convert(GrayF64 from, GrayI16 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2074,7 +2074,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageSInt32 to ) {
+	public static void convert(GrayF64 from, GrayS32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2119,7 +2119,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageSInt64 to ) {
+	public static void convert(GrayF64 from, GrayS64 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2164,7 +2164,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( ImageFloat64 from, ImageFloat32 to ) {
+	public static void convert(GrayF64 from, GrayF32 to ) {
 
 		if (from.isSubimage() || to.isSubimage()) {
 
@@ -2209,7 +2209,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( InterleavedF64 input , MultiSpectral<ImageFloat64> output ) {
+	public static void convert( InterleavedF64 input , Planar<GrayF64> output ) {
 
 		final int numBands = input.numBands;
 		for (int y = 0; y < input.height; y++) {
@@ -2224,7 +2224,7 @@ public class ImplConvertImage {
 		}
 	}
 
-	public static void convert( MultiSpectral<ImageFloat64> input , InterleavedF64 output ) {
+	public static void convert(Planar<GrayF64> input , InterleavedF64 output ) {
 
 		final int numBands = input.getNumBands();
 		for (int y = 0; y < input.height; y++) {

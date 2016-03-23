@@ -19,20 +19,20 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
 public class TestThresholdSquareBlockMinMax_F32
-		extends GenericThresholdSquareBlockMinMaxChecks<ImageFloat32> {
+		extends GenericThresholdSquareBlockMinMaxChecks<GrayF32> {
 
 	public TestThresholdSquareBlockMinMax_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public ThresholdSquareBlockMinMax<ImageFloat32, ?>
+	public ThresholdSquareBlockMinMax<GrayF32, ?>
 	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
 		return new ThresholdSquareBlockMinMax_F32((float)textureThreshold,requestedBlockWidth,
 				(float)scale,down);

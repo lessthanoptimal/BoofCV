@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -49,7 +49,7 @@ public class ExampleDetectCalibrationPoints {
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
 		BufferedImage orig = UtilImageIO.loadImage(directory+"/left01.jpg");
-		ImageFloat32 input = ConvertBufferedImage.convertFrom(orig,(ImageFloat32)null);
+		GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
 
 		// To select different types of detectors add or remove comments below
 		CalibrationDetector detector;

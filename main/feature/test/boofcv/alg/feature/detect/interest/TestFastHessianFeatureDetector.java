@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -42,9 +42,9 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 
 	@SuppressWarnings({"unchecked"})
 	@Override
-	protected int detectFeature(ImageFloat32 input, Object detector) {
-		FastHessianFeatureDetector<ImageFloat32> alg = (FastHessianFeatureDetector<ImageFloat32>)detector;
-		ImageFloat32 integral = IntegralImageOps.transform(input,null);
+	protected int detectFeature(GrayF32 input, Object detector) {
+		FastHessianFeatureDetector<GrayF32> alg = (FastHessianFeatureDetector<GrayF32>)detector;
+		GrayF32 integral = IntegralImageOps.transform(input,null);
 		alg.detect(integral);
 
 		return alg.getFoundPoints().size();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -44,13 +44,13 @@ public abstract class StandardTupleDescribeTests {
 
 	int radius = 10;
 
-	ImageFloat32 image = new ImageFloat32(width,height);
+	GrayF32 image = new GrayF32(width,height);
 
 	public StandardTupleDescribeTests() {
 		GImageMiscOps.fillUniform(image, rand, 0, 100);
 	}
 
-	public abstract TupleDesc_F64 describe( int x , int y , double theta , ImageFloat32 image );
+	public abstract TupleDesc_F64 describe( int x , int y , double theta , GrayF32 image );
 
 	/**
 	 * Does it produce a the same features when given a subimage?
@@ -59,7 +59,7 @@ public abstract class StandardTupleDescribeTests {
 	public void checkSubImage()
 	{
 		TupleDesc_F64 expected = describe(c_x,c_y,0,image);
-		ImageFloat32 sub = BoofTesting.createSubImageOf(image);
+		GrayF32 sub = BoofTesting.createSubImageOf(image);
 		TupleDesc_F64 found = describe(c_x,c_y,0,sub);
 
 		BoofTesting.assertEquals(expected.value,found.value,1e-8);

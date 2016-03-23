@@ -33,7 +33,7 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
 import boofcv.struct.distort.SequencePointTransform_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -399,7 +399,7 @@ public class RectifyImageOps {
 	 * @param imageType Type of single band image the transform is to be applied to.
 	 * @return ImageDistort for rectifying the image.
 	 */
-	public static <T extends ImageSingleBand> ImageDistort<T,T>
+	public static <T extends ImageGray> ImageDistort<T,T>
 	rectifyImage( DenseMatrix64F rectify , BorderType borderType, Class<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;

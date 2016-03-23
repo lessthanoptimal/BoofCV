@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class ImplFastHelper_U8 implements FastHelper<ImageUInt8> {
-	private ImageUInt8 image;
+public class ImplFastHelper_U8 implements FastHelper<GrayU8> {
+	private GrayU8 image;
 
 	// how similar do the pixel in the circle need to be to the center pixel
 	private int pixelTol;
@@ -42,7 +42,7 @@ public class ImplFastHelper_U8 implements FastHelper<ImageUInt8> {
 	}
 
 	@Override
-	public void setImage(ImageUInt8 image , int offsets[] ) {
+	public void setImage(GrayU8 image , int offsets[] ) {
 		this.image = image;
 		this.offsets = offsets;
 	}

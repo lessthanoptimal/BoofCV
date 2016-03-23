@@ -21,19 +21,19 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt64 extends StandardSingleBandTests<ImageSInt64> {
+public class TestImageSInt64 extends StandardSingleBandTests<GrayS64> {
 
 	public TestImageSInt64() {
 	}
 
 	@Override
-	public ImageSInt64 createImage(int width, int height) {
-		return new ImageSInt64(width, height);
+	public GrayS64 createImage(int width, int height) {
+		return new GrayS64(width, height);
 	}
 
 	@Override
-	public ImageSInt64 createImage() {
-		return new ImageSInt64();
+	public GrayS64 createImage() {
+		return new GrayS64();
 	}
 
 	@Override

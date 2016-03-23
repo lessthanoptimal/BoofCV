@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public class HessianThree {
 
 	/**
 	 * <p>
-	 * Computes the second derivative of an {@link boofcv.struct.image.ImageUInt8} along the x and y axes.
+	 * Computes the second derivative of an {@link GrayU8} along the x and y axes.
 	 * </p>
 	 *
 	 * @param orig   Which which is to be differentiated. Not Modified.
@@ -74,9 +74,9 @@ public class HessianThree {
 	 * @param derivXY Second cross derivative. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process( ImageUInt8 orig,
-								ImageSInt16 derivXX, ImageSInt16 derivYY, ImageSInt16 derivXY ,
-								ImageBorder_S32 border ) {
+	public static void process(GrayU8 orig,
+							   GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY ,
+							   ImageBorder_S32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianThree_Standard.process(orig, derivXX, derivYY,derivXY);
 
@@ -88,7 +88,7 @@ public class HessianThree {
 	}
 
 	/**
-	 * Computes the second derivative of an {@link boofcv.struct.image.ImageUInt8} along the x and y axes.
+	 * Computes the second derivative of an {@link GrayU8} along the x and y axes.
 	 *
 	 * @param orig   Which which is to be differentiated. Not Modified.
 	 * @param derivXX Second derivative along the x-axis. Modified.
@@ -96,9 +96,9 @@ public class HessianThree {
 	 * @param derivXY Second cross derivative. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process( ImageFloat32 orig,
-								ImageFloat32 derivXX, ImageFloat32 derivYY, ImageFloat32 derivXY,
-								ImageBorder_F32 border ) {
+	public static void process(GrayF32 orig,
+							   GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY,
+							   ImageBorder_F32 border ) {
 		InputSanityCheck.checkSameShape(orig, derivXX, derivYY, derivXY);
 		HessianThree_Standard.process(orig, derivXX, derivYY, derivXY);
 

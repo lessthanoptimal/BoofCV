@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,23 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link ImplSelectRectStandardBase_S32} for {@link ImageUInt8}.
+ * Implementation of {@link ImplSelectRectStandardBase_S32} for {@link GrayU8}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplSelectRectStandard_S32_U8 extends ImplSelectRectStandardBase_S32<ImageUInt8>
+public class ImplSelectRectStandard_S32_U8 extends ImplSelectRectStandardBase_S32<GrayU8>
 {
 	public ImplSelectRectStandard_S32_U8(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError, rightToLeftTolerance, texture);
 	}
 
 	@Override
-	public void configure(ImageUInt8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
+	public void configure(GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
 		super.configure(imageDisparity, minDisparity, maxDisparity, radiusX);
 
 		if( rangeDisparity > 254 )
@@ -46,7 +46,7 @@ public class ImplSelectRectStandard_S32_U8 extends ImplSelectRectStandardBase_S3
 	}
 
 	@Override
-	public Class<ImageUInt8> getDisparityType() {
-		return ImageUInt8.class;
+	public Class<GrayU8> getDisparityType() {
+		return GrayU8.class;
 	}
 }

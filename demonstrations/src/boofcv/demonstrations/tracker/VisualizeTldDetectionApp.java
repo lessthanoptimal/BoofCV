@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageSingleBand>
+public class VisualizeTldDetectionApp<T extends ImageGray,D extends ImageGray>
 		extends JPanel implements MouseListener {
 
 	BufferedImage input;
@@ -260,7 +260,7 @@ public class VisualizeTldDetectionApp<T extends ImageSingleBand,D extends ImageS
 	public static void main(String[] args) {
 
 		BufferedImage image = UtilImageIO.loadImage("/home/pja/projects/ValidationBoof/data/track_rect/TLD/01_david/00050.jpg");
-		new VisualizeTldDetectionApp(image,ImageUInt8.class);
+		new VisualizeTldDetectionApp(image,GrayU8.class);
 
 //		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
 

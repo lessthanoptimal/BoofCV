@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,31 +21,31 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestNearestNeighborRectangle_F32 extends GeneralBilinearRectangleChecks<ImageFloat32>{
+public class TestNearestNeighborRectangle_F32 extends GeneralBilinearRectangleChecks<GrayF32>{
 
 
 	public TestNearestNeighborRectangle_F32() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public InterpolatePixelS<ImageFloat32> createPixelInterpolate() {
+	public InterpolatePixelS<GrayF32> createPixelInterpolate() {
 		return FactoryInterpolation.nearestNeighborPixelS(imageType);
 	}
 
 	@Override
-	public InterpolateRectangle<ImageFloat32> createRectangleInterpolate() {
+	public InterpolateRectangle<GrayF32> createRectangleInterpolate() {
 		return FactoryInterpolation.nearestNeighborRectangle(imageType);
 	}
 
 	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width,height);
+	protected GrayF32 createImage(int width, int height) {
+		return new GrayF32(width,height);
 	}
 }

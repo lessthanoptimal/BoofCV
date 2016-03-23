@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -42,20 +42,20 @@ public class TestInterpolatePixel_MS_using_SB {
 
 	@Test
 	public void compareToIndividual() {
-		ImageFloat32 image0 = new ImageFloat32(width,height);
-		ImageFloat32 image1 = new ImageFloat32(width,height);
+		GrayF32 image0 = new GrayF32(width,height);
+		GrayF32 image1 = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(image0,rand,0,100);
 		ImageMiscOps.fillUniform(image1,rand,0,100);
 
-		InterpolatePixelS<ImageFloat32> interpA =
-				FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
-		InterpolatePixelS<ImageFloat32> interpB =
-				FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interpA =
+				FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interpB =
+				FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
-		InterpolatePixelMB<MultiSpectral<ImageFloat32>> alg = new InterpolatePixel_MS_using_SB<ImageFloat32>(interpB);
+		InterpolatePixelMB<Planar<GrayF32>> alg = new InterpolatePixel_MS_using_SB<GrayF32>(interpB);
 
-		MultiSpectral<ImageFloat32> mb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,2);
+		Planar<GrayF32> mb = new Planar<GrayF32>(GrayF32.class,width,height,2);
 		mb.bands[0] = image0;
 		mb.bands[1] = image1;
 

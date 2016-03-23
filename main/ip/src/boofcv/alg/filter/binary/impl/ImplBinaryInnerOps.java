@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class ImplBinaryInnerOps {
 
-	public static void erode4(ImageUInt8 input, ImageUInt8 output) {
+	public static void erode4(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -55,7 +55,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void dilate4(ImageUInt8 input, ImageUInt8 output) {
+	public static void dilate4(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -77,7 +77,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void edge4(ImageUInt8 input, ImageUInt8 output) {
+	public static void edge4(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -98,7 +98,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void erode8(ImageUInt8 input, ImageUInt8 output) {
+	public static void erode8(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -120,7 +120,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void dilate8(ImageUInt8 input, ImageUInt8 output) {
+	public static void dilate8(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -142,7 +142,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void edge8(ImageUInt8 input, ImageUInt8 output) {
+	public static void edge8(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;
@@ -164,7 +164,7 @@ public class ImplBinaryInnerOps {
 		}
 	}
 
-	public static void removePointNoise(ImageUInt8 input, ImageUInt8 output) {
+	public static void removePointNoise(GrayU8 input, GrayU8 output) {
 
 		final int h = input.height - 1;
 		final int w = input.width - 2;

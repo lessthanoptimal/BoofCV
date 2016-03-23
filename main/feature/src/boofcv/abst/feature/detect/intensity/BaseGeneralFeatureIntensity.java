@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Provides some basic functionality for implementing {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */
-public abstract class BaseGeneralFeatureIntensity <I extends ImageSingleBand, D extends ImageSingleBand>
+public abstract class BaseGeneralFeatureIntensity <I extends ImageGray, D extends ImageGray>
 		implements GeneralFeatureIntensity<I,D>
 {
-	ImageFloat32 intensity = new ImageFloat32(1,1);
+	GrayF32 intensity = new GrayF32(1,1);
 
 
 	public void init( int width , int height) {
@@ -42,7 +42,7 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageSingleBand, D 
 	}
 
 	@Override
-	public ImageFloat32 getIntensity() {
+	public GrayF32 getIntensity() {
 		return intensity;
 	}
 }

@@ -22,7 +22,7 @@ import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.misc.CircularIndex;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonCornersToImage<T extends ImageSingleBand> implements RefineBinaryPolygon<T> {
+public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineBinaryPolygon<T> {
 
 	// number of pixels along the contour away should the end point be from the corner
 	private int pixelsAway;

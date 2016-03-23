@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<ImageUInt8> {
+public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<GrayU8> {
 
 	int DOF = 2;
 
@@ -50,25 +50,25 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
      */
     @Test
 	public void compareToBilinear() {
-		ImageUInt8 img = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
+		GrayU8 img = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
+		GrayU8 found = new GrayU8(width,height);
 
 		GImageMiscOps.fillUniform(img, rand, 0, 255);
 
 		Affine2D_F32 tran = new Affine2D_F32(1,0,0,1,0.25f,0.25f);
 
 		// set it up so that it will be equivalent to bilinear interpolation
-		InterpolatePixelS<ImageUInt8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
-		alg.setBorder( FactoryImageBorder.singleValue(ImageUInt8.class, 0));
+		InterpolatePixelS<GrayU8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
+		alg.setBorder( FactoryImageBorder.singleValue(GrayU8.class, 0));
 
-		ImageDistort<ImageUInt8,ImageUInt8> distorter = FactoryDistort.distortSB(false, alg, ImageUInt8.class);
+		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, alg, GrayU8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
-		InterpolatePixelS<ImageUInt8> bilinear = FactoryInterpolation.bilinearPixelS(ImageUInt8.class, BorderType.VALUE);
+		InterpolatePixelS<GrayU8> bilinear = FactoryInterpolation.bilinearPixelS(GrayU8.class, BorderType.VALUE);
 
-		distorter = FactoryDistort.distortSB(false, bilinear, ImageUInt8.class);
+		distorter = FactoryDistort.distortSB(false, bilinear, GrayU8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
         distorter.apply(img, expected);
 
@@ -76,19 +76,19 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
     }
 
 	@Override
-	protected ImageUInt8 createImage(int width, int height) {
-		return new ImageUInt8(width,height);
+	protected GrayU8 createImage(int width, int height) {
+		return new GrayU8(width,height);
 	}
 
 	@Override
-	protected InterpolatePixelS<ImageUInt8> wrap(ImageUInt8 image, int minValue, int maxValue) {
+	protected InterpolatePixelS<GrayU8> wrap(GrayU8 image, int minValue, int maxValue) {
 		InterpolatePixelS ret = new ImplPolynomialPixel_I(DOF,minValue,maxValue);
 		ret.setImage(image);
 		return ret;
 	}
 
 	@Override
-	protected float compute(ImageUInt8 img, float x, float y) {
+	protected float compute(GrayU8 img, float x, float y) {
 		// yes by using the same algorithm for this compute several unit tests are being defeated
 		// polynomial interpolation is more complex and a simple compute alg here is not possible
 		InterpolatePixelS a = new ImplPolynomialPixel_I(DOF,0,255);

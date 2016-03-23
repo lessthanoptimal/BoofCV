@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.struct.sparse;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Interface for {@link SparseImageGradient} whose size can be scaled up and down.
  * 
  * @author Peter Abeles
  */
-public abstract class SparseScaleGradient<T extends ImageSingleBand,G extends GradientValue>
+public abstract class SparseScaleGradient<T extends ImageGray,G extends GradientValue>
 		implements SparseImageGradient<T, G>
 {
 	protected T input;

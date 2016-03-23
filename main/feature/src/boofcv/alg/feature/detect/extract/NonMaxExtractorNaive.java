@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -70,7 +70,7 @@ public class NonMaxExtractorNaive {
 		return useStrictRule;
 	}
 
-	public void process(ImageFloat32 intensityImage, QueueCorner peaks) {
+	public void process(GrayF32 intensityImage, QueueCorner peaks) {
 
 		if (useStrictRule)
 			strictRule(intensityImage, peaks);
@@ -78,7 +78,7 @@ public class NonMaxExtractorNaive {
 			notStrictRule(intensityImage, peaks);
 	}
 
-	private void strictRule(ImageFloat32 intensityImage, QueueCorner corners) {
+	private void strictRule(GrayF32 intensityImage, QueueCorner corners) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
@@ -126,7 +126,7 @@ public class NonMaxExtractorNaive {
 		}
 	}
 
-	private void notStrictRule(ImageFloat32 intensityImage, QueueCorner corners) {
+	private void notStrictRule(GrayF32 intensityImage, QueueCorner corners) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 

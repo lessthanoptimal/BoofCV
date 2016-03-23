@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitSegment;
 import boofcv.struct.PointIndex_I32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
 import georegression.fitting.ellipse.FitEllipseAlgebraic;
 import georegression.fitting.ellipse.RefineEllipseEuclideanLeastSquares;
@@ -42,7 +44,7 @@ import java.util.List;
  * contour or edge.
  *
  * @see boofcv.alg.feature.detect.edge.CannyEdge
- * @see boofcv.alg.filter.binary.BinaryImageOps#contour(boofcv.struct.image.ImageUInt8, boofcv.struct.ConnectRule, boofcv.struct.image.ImageSInt32)
+ * @see boofcv.alg.filter.binary.BinaryImageOps#contour(GrayU8, boofcv.struct.ConnectRule, GrayS32)
  *
  * @author Peter Abeles
  */

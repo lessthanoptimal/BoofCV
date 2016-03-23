@@ -33,7 +33,7 @@ import java.util.Random;
  */
 public class TestImageGradient_MS {
 
-	Class types[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class types[] = new Class[]{GrayU8.class, GrayF32.class};
 
 	Random rand = new Random(234);
 	int width = 50,height=60;
@@ -46,9 +46,9 @@ public class TestImageGradient_MS {
 
 			Class derivType = gradientSB.getDerivativeType().getImageClass();
 
-			MultiSpectral input  = new MultiSpectral(inputType,width,height,3);
-			MultiSpectral derivX = new MultiSpectral(derivType,width,height,3);
-			MultiSpectral derivY = new MultiSpectral(derivType,width,height,3);
+			Planar input  = new Planar(inputType,width,height,3);
+			Planar derivX = new Planar(derivType,width,height,3);
+			Planar derivY = new Planar(derivType,width,height,3);
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
@@ -56,8 +56,8 @@ public class TestImageGradient_MS {
 
 			gradientMS.process(input,derivX,derivY);
 
-			ImageSingleBand sbDerivX = GeneralizedImageOps.createSingleBand(derivType,width,height);
-			ImageSingleBand sbDerivY = GeneralizedImageOps.createSingleBand(derivType,width,height);
+			ImageGray sbDerivX = GeneralizedImageOps.createSingleBand(derivType,width,height);
+			ImageGray sbDerivY = GeneralizedImageOps.createSingleBand(derivType,width,height);
 
 			for (int i = 0; i < 3; i++) {
 				gradientSB.process(input.getBand(i),sbDerivX,sbDerivY);

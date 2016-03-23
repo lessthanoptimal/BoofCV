@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,15 +40,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDenseOpticalFlowKlt {
 
-	ImageFloat32 image0 = new ImageFloat32(30,40);
-	ImageFloat32 image1 = new ImageFloat32(30,40);
+	GrayF32 image0 = new GrayF32(30,40);
+	GrayF32 image1 = new GrayF32(30,40);
 
-	ImagePyramid<ImageFloat32> prev;
-	ImageFloat32[] prevDerivX;
-	ImageFloat32[] prevDerivY;
-	ImagePyramid<ImageFloat32> curr;
+	ImagePyramid<GrayF32> prev;
+	GrayF32[] prevDerivX;
+	GrayF32[] prevDerivY;
+	ImagePyramid<GrayF32> curr;
 
-	ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.sobel(ImageFloat32.class, ImageFloat32.class);
+	ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
 
 	PkltConfig config = new PkltConfig();
 
@@ -57,14 +57,14 @@ public class TestDenseOpticalFlowKlt {
 		config.pyramidScaling = new int[]{1,2};
 		config.config.maxPerPixelError = 15;
 
-		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageFloat32.class);
-		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageFloat32.class);
+		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, GrayF32.class);
+		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, GrayF32.class);
 
 		prev.process(image0);
 		curr.process(image0);
 
-		prevDerivX = PyramidOps.declareOutput(prev,ImageFloat32.class);
-		prevDerivY = PyramidOps.declareOutput(prev,ImageFloat32.class);
+		prevDerivX = PyramidOps.declareOutput(prev,GrayF32.class);
+		prevDerivY = PyramidOps.declareOutput(prev,GrayF32.class);
 	}
 
 	private void processInputImage() {
@@ -74,10 +74,10 @@ public class TestDenseOpticalFlowKlt {
 		PyramidOps.gradient(prev, gradient, prevDerivX,prevDerivY);
 	}
 
-	protected DenseOpticalFlowKlt<ImageFloat32,ImageFloat32> createAlg() {
-		PyramidKltTracker<ImageFloat32, ImageFloat32> tracker =
-				FactoryTrackerAlg.kltPyramid(config.config, ImageFloat32.class, ImageFloat32.class);
-		return new DenseOpticalFlowKlt<ImageFloat32, ImageFloat32>(tracker,config.pyramidScaling.length,3);
+	protected DenseOpticalFlowKlt<GrayF32,GrayF32> createAlg() {
+		PyramidKltTracker<GrayF32, GrayF32> tracker =
+				FactoryTrackerAlg.kltPyramid(config.config, GrayF32.class, GrayF32.class);
+		return new DenseOpticalFlowKlt<GrayF32, GrayF32>(tracker,config.pyramidScaling.length,3);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class TestDenseOpticalFlowKlt {
 
 		processInputImage();
 
-		DenseOpticalFlowKlt<ImageFloat32,ImageFloat32> alg = createAlg();
+		DenseOpticalFlowKlt<GrayF32,GrayF32> alg = createAlg();
 
 		ImageFlow flow = new ImageFlow(image0.width,image0.height);
 		flow.invalidateAll();
@@ -126,7 +126,7 @@ public class TestDenseOpticalFlowKlt {
 
 		processInputImage();
 
-		DenseOpticalFlowKlt<ImageFloat32,ImageFloat32> alg = createAlg();
+		DenseOpticalFlowKlt<GrayF32,GrayF32> alg = createAlg();
 
 		ImageFlow flow = new ImageFlow(image0.width,image0.height);
 

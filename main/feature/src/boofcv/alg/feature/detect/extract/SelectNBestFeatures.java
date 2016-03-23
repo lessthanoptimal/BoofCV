@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelect;
 
@@ -48,7 +48,7 @@ public class SelectNBestFeatures {
 		target = N;
 	}
 
-	public void process(ImageFloat32 intensityImage, QueueCorner origCorners, boolean positive ) {
+	public void process(GrayF32 intensityImage, QueueCorner origCorners, boolean positive ) {
 		bestCorners.reset();
 
 		if (origCorners.size <= target) {

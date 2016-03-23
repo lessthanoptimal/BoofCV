@@ -24,7 +24,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -34,7 +34,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class ScoreLineSegmentEdge<T extends ImageSingleBand> extends BaseIntegralEdge<T> {
+public class ScoreLineSegmentEdge<T extends ImageGray> extends BaseIntegralEdge<T> {
 
 	// how many points along the line it will sample
 	int numSamples;

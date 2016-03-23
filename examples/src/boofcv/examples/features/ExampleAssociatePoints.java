@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleDesc> {
+public class ExampleAssociatePoints<T extends ImageGray, TD extends TupleDesc> {
 
 	// algorithm used to detect and describe interest points
 	DetectDescribePoint<T, TD> detDesc;
@@ -118,7 +118,7 @@ public class ExampleAssociatePoints<T extends ImageSingleBand, TD extends TupleD
 
 	public static void main( String args[] ) {
 
-		Class imageType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
 //		Class imageType = ImageUInt8.class;
 
 		// select which algorithms to use

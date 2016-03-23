@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
 /**
@@ -44,7 +44,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSingleBand>
+public class GeneralFeatureDetector<I extends ImageGray, D extends ImageGray>
 {
 	// list of feature locations found by the extractor
 	protected QueueCorner foundMaximum = new QueueCorner(10);
@@ -106,7 +106,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 	 */
 	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
 		intensity.process(image, derivX, derivY, derivXX, derivYY, derivXY);
-		ImageFloat32 intensityImage = intensity.getIntensity();
+		GrayF32 intensityImage = intensity.getIntensity();
 
 		int numSelectMin = -1;
 		int numSelectMax = -1;
@@ -148,7 +148,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		selectBest(intensityImage, foundMaximum, numSelectMax, true);
 	}
 
-	private void selectBest(ImageFloat32 intensityImage, QueueCorner found , int numSelect, boolean positive) {
+	private void selectBest(GrayF32 intensityImage, QueueCorner found , int numSelect, boolean positive) {
 		if (numSelect > 0) {
 			selectBest.setN(numSelect);
 			selectBest.process(intensityImage, found,positive);
@@ -189,7 +189,7 @@ public class GeneralFeatureDetector<I extends ImageSingleBand, D extends ImageSi
 		return intensity.getRequiresHessian();
 	}
 
-	public ImageFloat32 getIntensity() {
+	public GrayF32 getIntensity() {
 		return intensity.getIntensity();
 	}
 

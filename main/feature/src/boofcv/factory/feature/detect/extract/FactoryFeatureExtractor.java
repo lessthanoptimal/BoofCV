@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.*;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Creates {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} for finding local maximums in feature intensity images.
@@ -41,7 +41,7 @@ public class FactoryFeatureExtractor {
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
 	 * @return General feature detector
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 NonMaxSuppression extractor,
 										 int maxFeatures ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,8 +31,8 @@ import static org.junit.Assert.assertEquals;
 public class TestDistortSupport {
 	@Test
 	public void distortScale() {
-		ImageFloat32 a = new ImageFloat32(25,30);
-		ImageFloat32 b = new ImageFloat32(15,25);
+		GrayF32 a = new GrayF32(25,30);
+		GrayF32 b = new GrayF32(15,25);
 
 		PixelTransform_F32 tran = DistortSupport.transformScale(a, b, null);
 

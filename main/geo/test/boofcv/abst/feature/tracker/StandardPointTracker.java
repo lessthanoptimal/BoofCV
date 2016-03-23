@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.tracker;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,13 +37,13 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointTracker<T extends ImageSingleBand> {
+public abstract class StandardPointTracker<T extends ImageGray> {
 
 	public PointTracker<T> tracker;
 	Random rand = new Random(234);
 	int width = 100;
 	int height = 80;
-	ImageFloat32 image = new ImageFloat32(width,height);
+	GrayF32 image = new GrayF32(width,height);
 	boolean shouldDropTracks;
 	boolean shouldCreateInactive;
 

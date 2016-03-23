@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -61,7 +61,7 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	 * @param regionColor (Input/output) Color of each region. Modified.
 	 * @param modeLocation (Input) Location of each region's mode. Not modified.
 	 */
-	public void process( ImageSInt32 pixelToRegion ,
+	public void process( GrayS32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount,
 						 FastQueue<float[]> regionColor ,
 						 FastQueue<Point2D_I32> modeLocation ) {
@@ -79,7 +79,7 @@ public class MergeRegionMeanShift extends RegionMergeTree {
 	 */
 	protected void markMergeRegions(FastQueue<float[]> regionColor,
 									FastQueue<Point2D_I32> modeLocation,
-									ImageSInt32 pixelToRegion  ) {
+									GrayS32 pixelToRegion  ) {
 		for( int targetId = 0; targetId < modeLocation.size; targetId++ ) {
 
 			float[] color = regionColor.get(targetId);

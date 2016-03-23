@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.SparseImageGradient;
 
 /**
@@ -31,7 +31,7 @@ import boofcv.struct.sparse.SparseImageGradient;
 public class TestGradientSparsePrewitt_F32 extends GeneralGradientSparse {
 
 	public TestGradientSparsePrewitt_F32() {
-		super(ImageFloat32.class, ImageFloat32.class);
+		super(GrayF32.class, GrayF32.class);
 	}
 
 	@Override

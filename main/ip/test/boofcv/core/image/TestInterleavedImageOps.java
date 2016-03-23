@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 
@@ -35,8 +35,8 @@ public class TestInterleavedImageOps {
 		for( int i = 0; i < interleaved.data.length; i++ ) {
 			interleaved.data[i] = i+1;
 		}
-		ImageFloat32 a = new ImageFloat32(2,4);
-		ImageFloat32 b = new ImageFloat32(2,4);
+		GrayF32 a = new GrayF32(2,4);
+		GrayF32 b = new GrayF32(2,4);
 
 		InterleavedImageOps.split2(interleaved,a,b);
 
@@ -50,8 +50,8 @@ public class TestInterleavedImageOps {
 
 	@Test
 	public void merge2() {
-		ImageFloat32 a = new ImageFloat32(2,4);
-		ImageFloat32 b = new ImageFloat32(2,4);
+		GrayF32 a = new GrayF32(2,4);
+		GrayF32 b = new GrayF32(2,4);
 
 		for( int i = 0; i < a.data.length; i++ ) {
 			a.data[i] = i*2+1;

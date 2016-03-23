@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.GrayU16;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TestDepthSparse3D {
 
 	@Test
 	public void basicTest() {
-		ImageUInt16 depth = new ImageUInt16(w,h);
+		GrayU16 depth = new GrayU16(w,h);
 		depth.set(5,6,1000);
 
 		IntrinsicParameters param = new IntrinsicParameters(1,1,0,5,10,w,h).fsetRadial(0,0);
@@ -53,7 +53,7 @@ public class TestDepthSparse3D {
 			}
 		};
 
-		DepthSparse3D<ImageUInt16> alg = new DepthSparse3D.I<ImageUInt16>(2.1);
+		DepthSparse3D<GrayU16> alg = new DepthSparse3D.I<GrayU16>(2.1);
 		alg.configure(param,v2d);
 
 		alg.setDepthImage(depth);

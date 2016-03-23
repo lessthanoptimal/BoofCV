@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class TestGradientToEdgeFeatures {
 
 	Random rand = new Random(4378847);
 
-	ImageFloat32 intensity = new ImageFloat32(width,height);
+	GrayF32 intensity = new GrayF32(width,height);
 
 	@Test
 	public void intensityE()  {
@@ -62,8 +62,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
 		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
@@ -71,7 +71,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityE",true,m,derivX,derivY,intensity);
 	}
 
-	public void intensityE( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 intensity )
+	public void intensityE(Method m , ImageGray derivX , ImageGray derivY , GrayF32 intensity )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
@@ -95,8 +95,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
 		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
@@ -104,7 +104,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"intensityAbs",true,m,derivX,derivY,intensity);
 	}
 
-	public void intensityAbs( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 intensity )
+	public void intensityAbs(Method m , ImageGray derivX , ImageGray derivY , GrayF32 intensity )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,intensity);
 
@@ -129,8 +129,8 @@ public class TestGradientToEdgeFeatures {
 	{
 		Class params[] = m.getParameterTypes();
 
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(params[0], width, height);
 
 		GImageMiscOps.fillUniform(derivX, rand, 0, 10);
 		GImageMiscOps.fillUniform(derivY, rand, 0, 10);
@@ -138,7 +138,7 @@ public class TestGradientToEdgeFeatures {
 		BoofTesting.checkSubImage(this,"direction",true,m,derivX,derivY,intensity);
 	}
 
-	public void direction( Method m , ImageSingleBand derivX , ImageSingleBand derivY , ImageFloat32 direction )
+	public void direction(Method m , ImageGray derivX , ImageGray derivY , GrayF32 direction )
 			throws InvocationTargetException, IllegalAccessException {
 		m.invoke(null,derivX,derivY,direction);
 
@@ -153,7 +153,7 @@ public class TestGradientToEdgeFeatures {
 
 	@Test
 	public void discretizeDirection4() {
-		ImageFloat32 angle = new ImageFloat32(5,5);
+		GrayF32 angle = new GrayF32(5,5);
 		angle.set(0,0,(float)(3*Math.PI/8+0.01));
 		angle.set(1,0,(float)(3*Math.PI/8-0.01));
 		angle.set(2,0,(float)(Math.PI/4));
@@ -162,7 +162,7 @@ public class TestGradientToEdgeFeatures {
 		angle.set(0,1,(float)(-3*Math.PI/8+0.01));
 		angle.set(1,1,(float)(-3*Math.PI/8-0.01));
 
-		ImageSInt8 d = new ImageSInt8(5,5);
+		GrayS8 d = new GrayS8(5,5);
 
 		GradientToEdgeFeatures.discretizeDirection4(angle,d);
 
@@ -177,12 +177,12 @@ public class TestGradientToEdgeFeatures {
 
 	@Test
 	public void discretizeDirection8() {
-		ImageFloat32 angle = new ImageFloat32(5,5);
+		GrayF32 angle = new GrayF32(5,5);
 		for( int i = 0; i < 8; i++ ) {
 			angle.data[i] = (float) UtilAngle.bound(i*Math.PI/4.0);
 		}
 
-		ImageSInt8 d = new ImageSInt8(5,5);
+		GrayS8 d = new GrayS8(5,5);
 
 		GradientToEdgeFeatures.discretizeDirection8(angle,d);
 
@@ -194,15 +194,15 @@ public class TestGradientToEdgeFeatures {
 
 	@Test
 	public void nonMaxSuppression4() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
 	}
 
-	public void nonMaxSuppression4(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void nonMaxSuppression4(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 
 		// compare to naive
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);
@@ -229,15 +229,15 @@ public class TestGradientToEdgeFeatures {
 
 	@Test
 	public void nonMaxSuppression8() {
-		ImageFloat32 intensity = new ImageFloat32(width,height);
-		ImageSInt8 direction = new ImageSInt8(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 intensity = new GrayF32(width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		BoofTesting.checkSubImage(this,"nonMaxSuppression4",true,intensity, direction, expected, found);
 	}
 
-	public void nonMaxSuppression8(ImageFloat32 intensity, ImageSInt8 direction, ImageFloat32 expected, ImageFloat32 found) {
+	public void nonMaxSuppression8(GrayF32 intensity, GrayS8 direction, GrayF32 expected, GrayF32 found) {
 
 		// compare to naive
 		ImageMiscOps.fillUniform(intensity, rand, 0, 100);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.flow.ConfigHornSchunckPyramid;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -44,7 +44,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class HornSchunckPyramid< T extends ImageSingleBand>
+public class HornSchunckPyramid< T extends ImageGray>
 		extends DenseFlowPyramidBase<T>
 {
 	// used to weight the error of image brightness and smoothness of velocity flow
@@ -61,24 +61,24 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	private float convergeTolerance;
 
 	// computes the image gradient
-	private ImageGradient<ImageFloat32, ImageFloat32> gradient = FactoryDerivative.three(ImageFloat32.class, ImageFloat32.class);
+	private ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, GrayF32.class);
 
 	// image gradient second image
-	private ImageFloat32 deriv2X = new ImageFloat32(1,1);
-	private ImageFloat32 deriv2Y = new ImageFloat32(1,1);
+	private GrayF32 deriv2X = new GrayF32(1,1);
+	private GrayF32 deriv2Y = new GrayF32(1,1);
 
 	// found flow for the most recently processed layer.  Final output is stored here
-	protected ImageFloat32 flowX = new ImageFloat32(1,1);
-	protected ImageFloat32 flowY = new ImageFloat32(1,1);
+	protected GrayF32 flowX = new GrayF32(1,1);
+	protected GrayF32 flowY = new GrayF32(1,1);
 
 	// flow estimation at the start of the iteration
-	protected ImageFloat32 initFlowX = new ImageFloat32(1,1);
-	protected ImageFloat32 initFlowY = new ImageFloat32(1,1);
+	protected GrayF32 initFlowX = new GrayF32(1,1);
+	protected GrayF32 initFlowY = new GrayF32(1,1);
 
 	// storage for the warped flow
-	protected ImageFloat32 warpImage2 = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2X = new ImageFloat32(1,1);
-	protected ImageFloat32 warpDeriv2Y = new ImageFloat32(1,1);
+	protected GrayF32 warpImage2 = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2X = new GrayF32(1,1);
+	protected GrayF32 warpDeriv2Y = new GrayF32(1,1);
 
 	/**
 	 * Configures flow estimation
@@ -86,7 +86,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	 * @param config Configuration parameters
 	 * @param interp Interpolation for image flow between image layers and warping.  Overrides selection in config.
 	 */
-	public HornSchunckPyramid(ConfigHornSchunckPyramid config , InterpolatePixelS<ImageFloat32> interp)
+	public HornSchunckPyramid(ConfigHornSchunckPyramid config , InterpolatePixelS<GrayF32> interp)
 	{
 		super(config.pyrScale,config.pyrSigma,config.pyrMaxLayers,interp);
 
@@ -106,15 +106,15 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	 * @param image2 Pyramid of second image
 	 */
 	@Override
-	public void process( ImagePyramid<ImageFloat32> image1 ,
-						 ImagePyramid<ImageFloat32> image2 ) {
+	public void process( ImagePyramid<GrayF32> image1 ,
+						 ImagePyramid<GrayF32> image2 ) {
 
 
 		// Process the pyramid from low resolution to high resolution
 		boolean first = true;
 		for( int i = image1.getNumLayers()-1; i >= 0; i-- ) {
-			ImageFloat32 layer1 = image1.getLayer(i);
-			ImageFloat32 layer2 = image2.getLayer(i);
+			GrayF32 layer1 = image1.getLayer(i);
+			GrayF32 layer2 = image2.getLayer(i);
 
 			// declare memory for this layer
 			deriv2X.reshape(layer1.width,layer1.height);
@@ -172,7 +172,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void interpolateFlowScale(ImageFloat32 prev, ImageFloat32 curr) {
+	protected void interpolateFlowScale(GrayF32 prev, GrayF32 curr) {
 		interp.setImage(prev);
 
 		float scaleX = (float)(prev.width-1)/(float)(curr.width-1)*0.999f;
@@ -192,7 +192,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	 * Takes the flow from the previous lower resolution layer and uses it to initialize the flow
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
-	protected void warpImageTaylor(ImageFloat32 before, ImageFloat32 flowX , ImageFloat32 flowY , ImageFloat32 after) {
+	protected void warpImageTaylor(GrayF32 before, GrayF32 flowX , GrayF32 flowY , GrayF32 after) {
 		interp.setImage(before);
 
 		for( int y = 0; y < before.height; y++ ) {
@@ -218,7 +218,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	 * Computes the flow for a layer using Taylor series expansion and Successive Over-Relaxation linear solver.
 	 * Flow estimates from previous layers are feed into this by setting initFlow and flow to their values.
 	 */
-	protected void processLayer( ImageFloat32 image1 , ImageFloat32 image2 , ImageFloat32 derivX2 , ImageFloat32 derivY2) {
+	protected void processLayer(GrayF32 image1 , GrayF32 image2 , GrayF32 derivX2 , GrayF32 derivY2) {
 
 		float w = SOR_RELAXATION;
 		float uf,vf;
@@ -292,7 +292,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	/**
 	 * SOR iteration for border pixels
 	 */
-	private float iterationSorSafe(ImageFloat32 image1, int x, int y, int pixelIndex) {
+	private float iterationSorSafe(GrayF32 image1, int x, int y, int pixelIndex) {
 		float w = SOR_RELAXATION;
 
 		float uf;
@@ -321,7 +321,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	/**
 	 * See equation 25.  Safe version
 	 */
-	protected static float A_safe( int x , int y , ImageFloat32 flow ) {
+	protected static float A_safe( int x , int y , GrayF32 flow ) {
 		float u0 = safe(x-1,y  ,flow);
 		float u1 = safe(x+1,y  ,flow);
 		float u2 = safe(x  ,y-1,flow);
@@ -338,7 +338,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	/**
 	 * See equation 25.  Fast unsafe version
 	 */
-	protected static float A( int x , int y , ImageFloat32 flow ) {
+	protected static float A( int x , int y , GrayF32 flow ) {
 		int index = flow.getIndex(x,y);
 
 		float u0 = flow.data[index-1];
@@ -357,7 +357,7 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 	/**
 	 * Ensures pixel values are inside the image.  If output it is assigned to the nearest pixel inside the image
 	 */
-	protected static float safe( int x , int y , ImageFloat32 image ) {
+	protected static float safe( int x , int y , GrayF32 image ) {
 		if( x < 0 ) x = 0;
 		else if( x >= image.width ) x = image.width-1;
 		if( y < 0 ) y = 0;
@@ -366,11 +366,11 @@ public class HornSchunckPyramid< T extends ImageSingleBand>
 		return image.unsafe_get(x,y);
 	}
 
-	public ImageFloat32 getFlowX() {
+	public GrayF32 getFlowX() {
 		return flowX;
 	}
 
-	public ImageFloat32 getFlowY() {
+	public GrayF32 getFlowY() {
 		return flowY;
 	}
 }

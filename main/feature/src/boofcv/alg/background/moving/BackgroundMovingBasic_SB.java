@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,26 +27,26 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransformModel_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 
 /**
- * Implementation of {@link BackgroundMovingBasic} for {@link ImageSingleBand}.
+ * Implementation of {@link BackgroundMovingBasic} for {@link ImageGray}.
  *
  * @author Peter Abeles
  */
-public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends InvertibleTransform<Motion>>
+public class BackgroundMovingBasic_SB<T extends ImageGray, Motion extends InvertibleTransform<Motion>>
 	extends BackgroundMovingBasic<T,Motion>
 {
 	// storage for background image
-	protected ImageFloat32 background = new ImageFloat32(1,1);
+	protected GrayF32 background = new GrayF32(1,1);
 	// interpolates the input image
 	protected InterpolatePixelS<T> interpolateInput;
 	// interpolates the background image
-	protected InterpolatePixelS<ImageFloat32> interpolationBG;
+	protected InterpolatePixelS<GrayF32> interpolationBG;
 
 	// wrapper which provides abstraction across image types
 	protected GImageSingleBand inputWrapper;
@@ -59,8 +59,8 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, ImageFloat32.class);
-		this.interpolationBG.setBorder(FactoryImageBorder.single(ImageFloat32.class, BorderType.EXTENDED));
+		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, GrayF32.class);
+		this.interpolationBG.setBorder(FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED));
 		this.interpolationBG.setImage(background);
 
 		inputWrapper = FactoryGImageSingleBand.create(imageType);
@@ -71,7 +71,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	 *
 	 * @return background image.
 	 */
-	public ImageFloat32 getBackground() {
+	public GrayF32 getBackground() {
 		return background;
 	}
 
@@ -119,7 +119,7 @@ public class BackgroundMovingBasic_SB<T extends ImageSingleBand, Motion extends 
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, ImageUInt8 segmented) {
+	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -68,12 +68,12 @@ public class ExampleStereoDisparity3D {
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");
 		BufferedImage origRight = UtilImageIO.loadImage(imageDir , "chair01_right.jpg");
 
-		ImageUInt8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);
-		ImageUInt8 distRight = ConvertBufferedImage.convertFrom(origRight,(ImageUInt8)null);
+		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8) null);
+		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight,(GrayU8)null);
 
 		// re-scale input images
-		ImageUInt8 scaledLeft = new ImageUInt8((int)(distLeft.width*scale),(int)(distLeft.height*scale));
-		ImageUInt8 scaledRight = new ImageUInt8((int)(distRight.width*scale),(int)(distRight.height*scale));
+		GrayU8 scaledLeft = new GrayU8((int)(distLeft.width*scale),(int)(distLeft.height*scale));
+		GrayU8 scaledRight = new GrayU8((int)(distRight.width*scale),(int)(distRight.height*scale));
 
 		new FDistort(distLeft,scaledLeft).scaleExt().apply();
 		new FDistort(distRight,scaledRight).scaleExt().apply();
@@ -83,13 +83,13 @@ public class ExampleStereoDisparity3D {
 		PerspectiveOps.scaleIntrinsic(param.right,scale);
 
 		// rectify images and compute disparity
-		ImageUInt8 rectLeft = new ImageUInt8(scaledLeft.width,scaledLeft.height);
-		ImageUInt8 rectRight = new ImageUInt8(scaledRight.width,scaledRight.height);
+		GrayU8 rectLeft = new GrayU8(scaledLeft.width,scaledLeft.height);
+		GrayU8 rectRight = new GrayU8(scaledRight.width,scaledRight.height);
 
 		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(scaledLeft,scaledRight,param,rectLeft,rectRight);
 
 //		ImageUInt8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, maxDisparity);
-		ImageFloat32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(rectLeft, rectRight, 3, minDisparity, maxDisparity);
+		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(rectLeft, rectRight, 3, minDisparity, maxDisparity);
 
 		// ------------- Convert disparity image into a 3D point cloud
 

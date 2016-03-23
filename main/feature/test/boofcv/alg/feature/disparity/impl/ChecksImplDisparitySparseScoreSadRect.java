@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.util.Random;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageSingleBand,ArrayData> {
+public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageGray,ArrayData> {
 	Random rand = new Random(234);
 
 	DisparitySparseSelect<ArrayData> selectAlg;
@@ -45,15 +45,15 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageS
 	public ChecksImplDisparitySparseScoreSadRect(Class<Image> imageType) {
 		this.imageType = imageType;
 
-		if( imageType == ImageFloat32.class ) {
+		if( imageType == GrayF32.class ) {
 			selectAlg = (DisparitySparseSelect)new ImplSelectSparseBasicWta_F32();
 		} else {
 			selectAlg = (DisparitySparseSelect)new ImplSelectSparseBasicWta_S32();
 		}
 	}
 
-	public abstract DisparityScoreSadRect<Image,ImageUInt8> createDense( int minDisparity , int maxDisparity,
-																		 int radiusX, int radiusY );
+	public abstract DisparityScoreSadRect<Image,GrayU8> createDense(int minDisparity , int maxDisparity,
+																	int radiusX, int radiusY );
 
 	public abstract DisparitySparseScoreSadRect<ArrayData,Image> createSparse(int minDisparity , int maxDisparity,
 																			  int radiusX, int radiusY );
@@ -86,10 +86,10 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<Image extends ImageS
 		int radiusX = 3;
 		int radiusY = 2;
 
-		DisparityScoreSadRect<Image,ImageUInt8> denseAlg = createDense(minDisparity,maxDisparity,radiusX,radiusY);
+		DisparityScoreSadRect<Image,GrayU8> denseAlg = createDense(minDisparity,maxDisparity,radiusX,radiusY);
 		DisparitySparseScoreSadRect<ArrayData,Image> alg = createSparse(minDisparity,maxDisparity,radiusX,radiusY);
 
-		ImageUInt8 expected = new ImageUInt8(w,h);
+		GrayU8 expected = new GrayU8(w,h);
 		denseAlg.process(left, right, expected);
 		alg.setImages(left,right);
 

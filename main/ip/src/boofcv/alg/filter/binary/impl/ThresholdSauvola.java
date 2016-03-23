@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -50,13 +50,13 @@ public class ThresholdSauvola {
 	boolean down;
 
 	// storage for intermediate results
-	ImageFloat32 inputPow2 = new ImageFloat32(1,1); // I^2
-	ImageFloat32 inputMean = new ImageFloat32(1,1); // local mean of I
-	ImageFloat32 inputMeanPow2 = new ImageFloat32(1,1); // pow2 of local mean of I
-	ImageFloat32 inputPow2Mean = new ImageFloat32(1,1); // local mean of I^2
-	ImageFloat32 stdev = new ImageFloat32(1,1); // computed standard deviation
+	GrayF32 inputPow2 = new GrayF32(1,1); // I^2
+	GrayF32 inputMean = new GrayF32(1,1); // local mean of I
+	GrayF32 inputMeanPow2 = new GrayF32(1,1); // pow2 of local mean of I
+	GrayF32 inputPow2Mean = new GrayF32(1,1); // local mean of I^2
+	GrayF32 stdev = new GrayF32(1,1); // computed standard deviation
 
-	ImageFloat32 tmp = new ImageFloat32(1,1); // work space
+	GrayF32 tmp = new GrayF32(1,1); // work space
 
 	/**
 	 * Configures the algorithm.
@@ -76,7 +76,7 @@ public class ThresholdSauvola {
 	 * @param input Input image.  Not modified.
 	 * @param output Output binary image.  Modified.
 	 */
-	public void process( ImageFloat32 input , ImageUInt8 output ) {
+	public void process(GrayF32 input , GrayU8 output ) {
 		inputPow2.reshape(input.width,input.height);
 		inputMean.reshape(input.width,input.height);
 		inputMeanPow2.reshape(input.width,input.height);

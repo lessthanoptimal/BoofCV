@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	 * @param regionColor (Output) Storage for mean color throughout the region.  Internal array must be fully
 	 *                    declared.
 	 */
-	public void process( T image , ImageSInt32 pixelToRegion ,
+	public void process( T image , GrayS32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount ,
 						 FastQueue<float[]> regionColor  )  {
 
@@ -106,9 +106,9 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	protected abstract void addPixelValue(int index , float[] sum );
 
 	/**
-	 * Implementation for {@link ImageUInt8}
+	 * Implementation for {@link GrayU8}
 	 */
-	public static class U8 extends ComputeRegionMeanColor<ImageUInt8> {
+	public static class U8 extends ComputeRegionMeanColor<GrayU8> {
 		public U8() {super(1);}
 
 		@Override
@@ -118,9 +118,9 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link boofcv.struct.image.ImageFloat32}
+	 * Implementation for {@link GrayF32}
 	 */
-	public static class F32 extends ComputeRegionMeanColor<ImageFloat32> {
+	public static class F32 extends ComputeRegionMeanColor<GrayF32> {
 		public F32() {super(1);}
 
 		@Override
@@ -130,9 +130,9 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link MultiSpectral}
+	 * Implementation for {@link Planar}
 	 */
-	public static class MS_U8 extends ComputeRegionMeanColor<MultiSpectral<ImageUInt8>> {
+	public static class MS_U8 extends ComputeRegionMeanColor<Planar<GrayU8>> {
 		public MS_U8( int numBands ) {super(numBands);}
 
 		@Override
@@ -144,9 +144,9 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	}
 
 	/**
-	 * Implementation for {@link MultiSpectral}
+	 * Implementation for {@link Planar}
 	 */
-	public static class MS_F32 extends ComputeRegionMeanColor<MultiSpectral<ImageFloat32>> {
+	public static class MS_F32 extends ComputeRegionMeanColor<Planar<GrayF32>> {
 		public MS_F32( int numBands ) {super(numBands);}
 
 		@Override

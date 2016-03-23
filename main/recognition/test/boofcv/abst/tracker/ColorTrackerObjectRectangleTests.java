@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.abst.tracker;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_I32;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -33,18 +33,18 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<MultiSpectral<ImageUInt8>> {
+public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<Planar<GrayU8>> {
 
-	MultiSpectral<ImageUInt8> original = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+	Planar<GrayU8> original = new Planar<GrayU8>(GrayU8.class,width,height,3);
 
 	boolean multiColor;
 
 	public ColorTrackerObjectRectangleTests( boolean multiColor ) {
-		super(new ImageType<MultiSpectral<ImageUInt8>>(ImageType.Family.MULTI_SPECTRAL, ImageDataType.U8,3));
+		super(new ImageType<Planar<GrayU8>>(ImageType.Family.MULTI_SPECTRAL, ImageDataType.U8,3));
 
 		this.multiColor = multiColor;
 
-		input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		input = new Planar<GrayU8>(GrayU8.class,width,height,3);
 	}
 
 	@Override

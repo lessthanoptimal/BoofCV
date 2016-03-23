@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineSegment2D_F32;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO update description in FactoryDetectLineAlgs
-public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectLineSegmentsGridRansac<T extends ImageGray, D extends ImageGray>
 		implements DetectLineSegment<T>
 {
 	GridRansacLineDetector<D> detectorGrid;
@@ -46,8 +46,8 @@ public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends I
 
 	D derivX;
 	D derivY;
-	ImageFloat32 edgeIntensity;
-	ImageUInt8 detected;
+	GrayF32 edgeIntensity;
+	GrayU8 detected;
 
 	ImageGradient<T,D> gradient;
 
@@ -65,8 +65,8 @@ public class DetectLineSegmentsGridRansac<T extends ImageSingleBand, D extends I
 
 		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
-		edgeIntensity = new ImageFloat32(1,1);
-		detected = new ImageUInt8(1,1);
+		edgeIntensity = new GrayF32(1,1);
+		detected = new GrayU8(1,1);
 	}
 
 	@Override

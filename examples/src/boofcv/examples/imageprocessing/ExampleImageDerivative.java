@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 
@@ -42,29 +42,29 @@ public class ExampleImageDerivative {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		// We will use floating point images here, but ImageUInt8 with ImageSInt16 for derivatives also works
-		ImageFloat32 grey = new ImageFloat32(input.getWidth(),input.getHeight());
+		GrayF32 grey = new GrayF32(input.getWidth(),input.getHeight());
 		ConvertBufferedImage.convertFrom(input, grey);
 
 		// First order derivative, also known as the gradient
-		ImageFloat32 derivX = new ImageFloat32(grey.width,grey.height);
-		ImageFloat32 derivY = new ImageFloat32(grey.width,grey.height);
+		GrayF32 derivX = new GrayF32(grey.width,grey.height);
+		GrayF32 derivY = new GrayF32(grey.width,grey.height);
 
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL, grey, derivX, derivY, BorderType.EXTENDED);
 
 		// Second order derivative, also known as the Hessian
-		ImageFloat32 derivXX = new ImageFloat32(grey.width,grey.height);
-		ImageFloat32 derivXY = new ImageFloat32(grey.width,grey.height);
-		ImageFloat32 derivYY = new ImageFloat32(grey.width,grey.height);
+		GrayF32 derivXX = new GrayF32(grey.width,grey.height);
+		GrayF32 derivXY = new GrayF32(grey.width,grey.height);
+		GrayF32 derivYY = new GrayF32(grey.width,grey.height);
 
 		GImageDerivativeOps.hessian(DerivativeType.SOBEL, derivX, derivY, derivXX, derivXY, derivYY, BorderType.EXTENDED);
 
 		// There's also a built in function for computing arbitrary derivatives
-		AnyImageDerivative<ImageFloat32,ImageFloat32> derivative =
-				GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL, ImageFloat32.class, ImageFloat32.class);
+		AnyImageDerivative<GrayF32,GrayF32> derivative =
+				GImageDerivativeOps.createAnyDerivatives(DerivativeType.SOBEL, GrayF32.class, GrayF32.class);
 
 		// the boolean sequence indicates if its an X or Y derivative
 		derivative.setInput(grey);
-		ImageFloat32 derivXYX = derivative.getDerivative(true, false, true);
+		GrayF32 derivXYX = derivative.getDerivative(true, false, true);
 
 		// Visualize the results
 		ListDisplayPanel gui = new ListDisplayPanel();

@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.calib.FactoryCalibrationTarget;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -64,11 +64,11 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	}
 
 	@Override
-	public void renderTarget(ImageFloat32 original, List<CalibrationObservation> solutions) {
+	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
 		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
 		renderer.squareWidth = 50;
 
-		ImageFloat32 rendered = renderer.generate(numRows,numCols);
+		GrayF32 rendered = renderer.generate(numRows,numCols);
 
 		original.subimage(0,0,rendered.width,rendered.height).setTo(rendered);
 

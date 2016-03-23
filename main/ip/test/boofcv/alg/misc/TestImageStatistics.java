@@ -20,7 +20,7 @@ package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -223,7 +223,7 @@ public class TestImageStatistics {
 
 	private void testVariance( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		if( inputA.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(inputA, rand, -20,20);
@@ -317,7 +317,7 @@ public class TestImageStatistics {
 
 	private void testHistogram(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
-		ImageSingleBand inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		int histogram[] = new int[ 100 ];
 		// it should be zeroed

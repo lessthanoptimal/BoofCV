@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
@@ -53,12 +53,12 @@ public class TestThresholdSquareBlockMinMax {
 		}
 
 		@Override
-		protected void thresholdBlock(int blockX0, int blockY0, ImageSingleBand input, ImageUInt8 output) {
+		protected void thresholdBlock(int blockX0, int blockY0, ImageGray input, GrayU8 output) {
 
 		}
 
 		@Override
-		protected void computeMinMaxBlock(int x0, int y0, int width, int height, int indexMinMax, ImageSingleBand input) {
+		protected void computeMinMaxBlock(int x0, int y0, int width, int height, int indexMinMax, ImageGray input) {
 
 		}
 	}

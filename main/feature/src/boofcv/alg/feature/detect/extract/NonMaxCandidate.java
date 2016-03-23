@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 
 /**
@@ -38,7 +38,7 @@ public abstract class NonMaxCandidate {
 	// does not process pixels this close to the image border
 	int ignoreBorder;
 
-	protected ImageFloat32 input;
+	protected GrayF32 input;
 
 	// upper bound on detectable extremes in the image
 	int endBorderX, endBorderY;
@@ -53,7 +53,7 @@ public abstract class NonMaxCandidate {
 	 * Checks to see if the specified candidates are local minimums or maximums.  If a candidate list is
 	 * null then that test is skipped.
 	 */
-	public void process(ImageFloat32 intensityImage,
+	public void process(GrayF32 intensityImage,
 						QueueCorner candidatesMin, QueueCorner candidatesMax,
 						QueueCorner foundMin , QueueCorner foundMax ) {
 
@@ -70,7 +70,7 @@ public abstract class NonMaxCandidate {
 
 	}
 
-	protected void examineMinimum( ImageFloat32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMinimum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
@@ -95,7 +95,7 @@ public abstract class NonMaxCandidate {
 		}
 	}
 
-	protected void examineMaximum( ImageFloat32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMaximum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 
 	Random rand = new Random(234);
 
-	ImageUInt8 img = new ImageUInt8(20,30);
+	GrayU8 img = new GrayU8(20,30);
 
 	public TestImplDescribePointPixelRegionNCC_U8() {
 		GImageMiscOps.fillUniform(img, rand, 0, 30);
@@ -48,7 +48,7 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 		BoofTesting.checkSubImage(this, "checkInner", false, img, 4,6,2,4);
 	}
 
-	public void checkInner( ImageUInt8 image , int c_x , int c_y , int w , int h ) {
+	public void checkInner(GrayU8 image , int c_x , int c_y , int w , int h ) {
 		ImplDescribePointPixelRegionNCC_U8 alg = new ImplDescribePointPixelRegionNCC_U8(w,h);
 
 		NccFeature desc = new NccFeature(alg.getDescriptorLength());
@@ -91,7 +91,7 @@ public class TestImplDescribePointPixelRegionNCC_U8 {
 		BoofTesting.checkSubImage(this, "checkBorder", false, img, 100,200,5,7);
 	}
 
-	public void checkBorder( ImageUInt8 image , int c_x , int c_y , int w , int h ) {
+	public void checkBorder(GrayU8 image , int c_x , int c_y , int w , int h ) {
 		ImplDescribePointPixelRegionNCC_U8 alg = new ImplDescribePointPixelRegionNCC_U8(w,h);
 
 		NccFeature desc = new NccFeature(alg.getDescriptorLength());

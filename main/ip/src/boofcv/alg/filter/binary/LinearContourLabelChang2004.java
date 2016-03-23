@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -60,7 +60,7 @@ public class LinearContourLabelChang2004 {
 	private ContourTracer tracer;
 
 	// binary image with a border of zero.
-	private ImageUInt8 border = new ImageUInt8(1,1);
+	private GrayU8 border = new GrayU8(1,1);
 
 	// predeclared/recycled data structures
 	private FastQueue<Point2D_I32> storagePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
@@ -85,7 +85,7 @@ public class LinearContourLabelChang2004 {
 	 * @param binary Input binary image. Not modified.
 	 * @param labeled Output. Labeled image.  Modified.
 	 */
-	public void process( ImageUInt8 binary , ImageSInt32 labeled ) {
+	public void process(GrayU8 binary , GrayS32 labeled ) {
 		// initialize data structures
 
 		// ensure that the image border pixels are filled with zero by enlarging the image
@@ -156,7 +156,7 @@ public class LinearContourLabelChang2004 {
 	 * Step 2: If the pixel below is unmarked and white then it must be an internal contour
 	 *         Same behavior it the pixel in question has been labeled or not already
 	 */
-	private void handleStep2(ImageSInt32 labeled, int label) {
+	private void handleStep2(GrayS32 labeled, int label) {
 		// if the blob is not labeled and in this state it cannot be against the left side of the image
 		if( label == 0 )
 			label = labeled.data[indexOut-1];
@@ -172,7 +172,7 @@ public class LinearContourLabelChang2004 {
 	 * Step 3: Must not be part of the contour but an inner pixel and the pixel to the left must be
 	 *         labeled
 	 */
-	private void handleStep3(ImageSInt32 labeled) {
+	private void handleStep3(GrayS32 labeled) {
 		if( labeled.data[indexOut] == 0 )
 			labeled.data[indexOut] = labeled.data[indexOut-1];
 	}

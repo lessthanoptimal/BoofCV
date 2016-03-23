@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.binary;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -95,10 +95,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test1_4() {
-		ImageUInt8 input = new ImageUInt8(13,8);
+		GrayU8 input = new GrayU8(13,8);
 		input.data = TEST1;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input, labeled);
 
@@ -108,10 +108,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test1_8() {
-		ImageUInt8 input = new ImageUInt8(13,8);
+		GrayU8 input = new GrayU8(13,8);
 		input.data = TEST1;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
@@ -121,10 +121,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test2_4() {
-		ImageUInt8 input = new ImageUInt8(13,8);
+		GrayU8 input = new GrayU8(13,8);
 		input.data = TEST2;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input,labeled);
 
@@ -134,10 +134,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test2_8() {
-		ImageUInt8 input = new ImageUInt8(13,8);
+		GrayU8 input = new GrayU8(13,8);
 		input.data = TEST2;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input,labeled);
 
@@ -147,10 +147,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test3_4() {
-		ImageUInt8 input = new ImageUInt8(7,8);
+		GrayU8 input = new GrayU8(7,8);
 		input.data = TEST4;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.FOUR);
 		alg.process(input,labeled);
 
@@ -160,10 +160,10 @@ public class TestLinearContourLabelChang2004 {
 
 	@Test
 	public void test3_8() {
-		ImageUInt8 input = new ImageUInt8(7,8);
+		GrayU8 input = new GrayU8(7,8);
 		input.data = TEST4;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input, labeled);
 
@@ -176,10 +176,10 @@ public class TestLinearContourLabelChang2004 {
 	 */
 	@Test
 	public void checkInnerOuterContour() {
-		ImageUInt8 input = new ImageUInt8(5,7);
+		GrayU8 input = new GrayU8(5,7);
 		input.data = TEST3;
 
-		ImageSInt32 labeled = new ImageSInt32(input.width,input.height);
+		GrayS32 labeled = new GrayS32(input.width,input.height);
 		LinearContourLabelChang2004 alg = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 		alg.process(input,labeled);
 
@@ -198,7 +198,7 @@ public class TestLinearContourLabelChang2004 {
 	 *
 	 * @param rule Which connectivity rule is being tested
 	 */
-	private void checkContour(LinearContourLabelChang2004 alg, ImageSInt32 labeled , int rule ) {
+	private void checkContour(LinearContourLabelChang2004 alg, GrayS32 labeled , int rule ) {
 
 		FastQueue<Contour> contours = alg.getContours();
 
@@ -242,10 +242,10 @@ public class TestLinearContourLabelChang2004 {
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
-	private List<Point2D_I32> findContour8(ImageSInt32 labeled, int target) {
+	private List<Point2D_I32> findContour8(GrayS32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
 
-		ImageBorder<ImageSInt32> border = FactoryImageBorder.singleValue(labeled, 0);
+		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {
@@ -279,7 +279,7 @@ public class TestLinearContourLabelChang2004 {
 		return list;
 	}
 
-	private float get( ImageBorder<ImageSInt32> border , int x , int y ) {
+	private float get(ImageBorder<GrayS32> border , int x , int y ) {
 		double tmp0[] = new double[1];
 		border.getGeneral(x, y, tmp0);
 		return (float)tmp0[0];
@@ -288,10 +288,10 @@ public class TestLinearContourLabelChang2004 {
 	/**
 	 * Create an unordered list of all points in the internal and external contour
 	 */
-	private List<Point2D_I32> findContour4(ImageSInt32 labeled, int target) {
+	private List<Point2D_I32> findContour4(GrayS32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
 
-		ImageBorder<ImageSInt32> border = FactoryImageBorder.singleValue(labeled, 0);
+		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {

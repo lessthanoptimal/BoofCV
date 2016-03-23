@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 
@@ -48,10 +48,10 @@ public class IntensityFastHessianApp {
 	public static void main( String args[] ) {
 
 		BufferedImage input = UtilImageIO.loadImage(fileName);
-		ImageFloat32 inputF32 = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
 
-		ImageFloat32 integral = IntegralImageOps.transform(inputF32,null);
-		ImageFloat32 intensity = new ImageFloat32(integral.width,integral.height);
+		GrayF32 integral = IntegralImageOps.transform(inputF32,null);
+		GrayF32 intensity = new GrayF32(integral.width,integral.height);
 
 		ListDisplayPanel guiIntensity = new ListDisplayPanel();
 		guiIntensity.addImage(input,"Original");

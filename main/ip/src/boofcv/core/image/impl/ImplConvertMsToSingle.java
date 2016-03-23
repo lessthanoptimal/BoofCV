@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.core.image.impl;
 import boofcv.struct.image.*;
 
 /**
- * Low level implementations of different methods for converting {@link MultiSpectral} into
- * {@link boofcv.struct.image.ImageSingleBand}.
+ * Low level implementations of different methods for converting {@link Planar} into
+ * {@link ImageGray}.
  * 
  * <ul>
  * <li>Average computes the average value of each pixel across the bands.
@@ -36,15 +36,15 @@ import boofcv.struct.image.*;
  */
 public class ImplConvertMsToSingle {
 
-	public static void average( MultiSpectral<ImageUInt8> from , ImageUInt8 to ) {
+	public static void average(Planar<GrayU8> from , GrayU8 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageUInt8 band0 = from.getBand(0);
-			ImageUInt8 band1 = from.getBand(1);
-			ImageUInt8 band2 = from.getBand(2);
+			GrayU8 band0 = from.getBand(0);
+			GrayU8 band1 = from.getBand(1);
+			GrayU8 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -74,15 +74,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageSInt8> from , ImageSInt8 to ) {
+	public static void average(Planar<GrayS8> from , GrayS8 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageSInt8 band0 = from.getBand(0);
-			ImageSInt8 band1 = from.getBand(1);
-			ImageSInt8 band2 = from.getBand(2);
+			GrayS8 band0 = from.getBand(0);
+			GrayS8 band1 = from.getBand(1);
+			GrayS8 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -112,15 +112,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageUInt16> from , ImageUInt16 to ) {
+	public static void average(Planar<GrayU16> from , GrayU16 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageUInt16 band0 = from.getBand(0);
-			ImageUInt16 band1 = from.getBand(1);
-			ImageUInt16 band2 = from.getBand(2);
+			GrayU16 band0 = from.getBand(0);
+			GrayU16 band1 = from.getBand(1);
+			GrayU16 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -150,15 +150,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageSInt16> from , ImageSInt16 to ) {
+	public static void average(Planar<GrayS16> from , GrayS16 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageSInt16 band0 = from.getBand(0);
-			ImageSInt16 band1 = from.getBand(1);
-			ImageSInt16 band2 = from.getBand(2);
+			GrayS16 band0 = from.getBand(0);
+			GrayS16 band1 = from.getBand(1);
+			GrayS16 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -188,15 +188,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageSInt32> from , ImageSInt32 to ) {
+	public static void average(Planar<GrayS32> from , GrayS32 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageSInt32 band0 = from.getBand(0);
-			ImageSInt32 band1 = from.getBand(1);
-			ImageSInt32 band2 = from.getBand(2);
+			GrayS32 band0 = from.getBand(0);
+			GrayS32 band1 = from.getBand(1);
+			GrayS32 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -226,15 +226,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageSInt64> from , ImageSInt64 to ) {
+	public static void average(Planar<GrayS64> from , GrayS64 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageSInt64 band0 = from.getBand(0);
-			ImageSInt64 band1 = from.getBand(1);
-			ImageSInt64 band2 = from.getBand(2);
+			GrayS64 band0 = from.getBand(0);
+			GrayS64 band1 = from.getBand(1);
+			GrayS64 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -264,15 +264,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageFloat32> from , ImageFloat32 to ) {
+	public static void average(Planar<GrayF32> from , GrayF32 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageFloat32 band0 = from.getBand(0);
-			ImageFloat32 band1 = from.getBand(1);
-			ImageFloat32 band2 = from.getBand(2);
+			GrayF32 band0 = from.getBand(0);
+			GrayF32 band1 = from.getBand(1);
+			GrayF32 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
@@ -302,15 +302,15 @@ public class ImplConvertMsToSingle {
 		}
 	}
 
-	public static void average( MultiSpectral<ImageFloat64> from , ImageFloat64 to ) {
+	public static void average(Planar<GrayF64> from , GrayF64 to ) {
 		int numBands = from.getNumBands();
 
 		if( numBands == 1 ) {
 			to.setTo(from.getBand(0));
 		} else if( numBands == 3 ) {
-			ImageFloat64 band0 = from.getBand(0);
-			ImageFloat64 band1 = from.getBand(1);
-			ImageFloat64 band2 = from.getBand(2);
+			GrayF64 band0 = from.getBand(0);
+			GrayF64 band1 = from.getBand(1);
+			GrayF64 band2 = from.getBand(2);
 
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);

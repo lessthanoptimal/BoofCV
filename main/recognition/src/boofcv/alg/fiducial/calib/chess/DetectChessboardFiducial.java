@@ -22,8 +22,8 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -48,13 +48,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardFiducial<T extends ImageSingleBand> {
+public class DetectChessboardFiducial<T extends ImageGray> {
 
 	// detects the chess board
 	private DetectChessSquarePoints<T> findSeeds;
 	// binary images used to detect chess board
-	private ImageUInt8 binary = new ImageUInt8(1, 1);
-	private ImageUInt8 eroded = new ImageUInt8(1, 1);
+	private GrayU8 binary = new GrayU8(1, 1);
+	private GrayU8 eroded = new GrayU8(1, 1);
 
 	// description of the grid its detecting
 	private int numRows,numCols;
@@ -112,7 +112,7 @@ public class DetectChessboardFiducial<T extends ImageSingleBand> {
 		return findSeeds.getCalibrationPoints().toList();
 	}
 
-	public ImageUInt8 getBinary() {
+	public GrayU8 getBinary() {
 			return eroded;
 	}
 

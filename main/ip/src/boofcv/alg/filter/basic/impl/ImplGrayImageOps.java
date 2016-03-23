@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  */
 public class ImplGrayImageOps {
 
-	public static void invert(ImageFloat32 input, float max , ImageFloat32 output) {
+	public static void invert(GrayF32 input, float max , GrayF32 output) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -43,7 +43,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void brighten(ImageFloat32 input, float beta, float max , ImageFloat32 output ) {
+	public static void brighten(GrayF32 input, float beta, float max , GrayF32 output ) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -58,7 +58,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void stretch(ImageFloat32 input, double gamma, float beta, float max , ImageFloat32 output ) {
+	public static void stretch(GrayF32 input, double gamma, float beta, float max , GrayF32 output ) {
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
 			int indexDst = output.startIndex + output.stride*y;
@@ -72,7 +72,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void invert(ImageUInt8 input, int max , ImageUInt8 output) {
+	public static void invert(GrayU8 input, int max , GrayU8 output) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -84,7 +84,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void brighten(ImageUInt8 input, int beta, int max , ImageUInt8 output ) {
+	public static void brighten(GrayU8 input, int beta, int max , GrayU8 output ) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -99,7 +99,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void stretch(ImageUInt8 input, double gamma, int beta, int max , ImageUInt8 output ) {
+	public static void stretch(GrayU8 input, double gamma, int beta, int max , GrayU8 output ) {
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
 			int indexDst = output.startIndex + output.stride*y;
@@ -113,7 +113,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void invert(ImageSInt16 input, int max , ImageSInt16 output) {
+	public static void invert(GrayS16 input, int max , GrayS16 output) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -125,7 +125,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void brighten(ImageSInt16 input, int beta, int max , ImageSInt16 output ) {
+	public static void brighten(GrayS16 input, int beta, int max , GrayS16 output ) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -140,7 +140,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void stretch(ImageSInt16 input, double gamma, int beta, int max , ImageSInt16 output ) {
+	public static void stretch(GrayS16 input, double gamma, int beta, int max , GrayS16 output ) {
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
 			int indexDst = output.startIndex + output.stride*y;
@@ -154,7 +154,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void invert(ImageUInt16 input, int max , ImageUInt16 output) {
+	public static void invert(GrayU16 input, int max , GrayU16 output) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -166,7 +166,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void brighten(ImageUInt16 input, int beta, int max , ImageUInt16 output ) {
+	public static void brighten(GrayU16 input, int beta, int max , GrayU16 output ) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -181,7 +181,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void stretch(ImageUInt16 input, double gamma, int beta, int max , ImageUInt16 output ) {
+	public static void stretch(GrayU16 input, double gamma, int beta, int max , GrayU16 output ) {
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
 			int indexDst = output.startIndex + output.stride*y;
@@ -195,7 +195,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void invert(ImageSInt32 input, int max , ImageSInt32 output) {
+	public static void invert(GrayS32 input, int max , GrayS32 output) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -207,7 +207,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void brighten(ImageSInt32 input, int beta, int max , ImageSInt32 output ) {
+	public static void brighten(GrayS32 input, int beta, int max , GrayS32 output ) {
 
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
@@ -222,7 +222,7 @@ public class ImplGrayImageOps {
 		}
 	}
 
-	public static void stretch(ImageSInt32 input, double gamma, int beta, int max , ImageSInt32 output ) {
+	public static void stretch(GrayS32 input, double gamma, int beta, int max , GrayS32 output ) {
 		for (int y = 0; y < input.height; y++) {
 			int indexSrc = input.startIndex + input.stride*y;
 			int indexDst = output.startIndex + output.stride*y;

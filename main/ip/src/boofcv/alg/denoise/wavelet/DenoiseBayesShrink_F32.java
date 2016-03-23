@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.denoise.wavelet;
 
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -42,16 +42,16 @@ import boofcv.struct.image.ImageFloat32;
  *
  * @author Peter Abeles
  */
-public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
+public class DenoiseBayesShrink_F32 extends SubbandShrink<GrayF32> {
 
 	float noiseVariance;
 
-	public DenoiseBayesShrink_F32( ShrinkThresholdRule<ImageFloat32> rule ) {
+	public DenoiseBayesShrink_F32( ShrinkThresholdRule<GrayF32> rule ) {
 		super(rule);
 	}
 
 	@Override
-	protected Number computeThreshold( ImageFloat32 subband )
+	protected Number computeThreshold( GrayF32 subband )
 	{
 		// the maximum magnitude coefficient is used to normalize all the other coefficients
 		// and reduce numerical round-off error
@@ -80,7 +80,7 @@ public class DenoiseBayesShrink_F32 extends SubbandShrink<ImageFloat32> {
 	}
 
 	@Override
-	public void denoise( ImageFloat32 transform , int numLevels ) {
+	public void denoise(GrayF32 transform , int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;

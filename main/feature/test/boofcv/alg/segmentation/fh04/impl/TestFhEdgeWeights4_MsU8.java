@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,26 +20,26 @@ package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * @author Peter Abeles
  */
-public class TestFhEdgeWeights4_MsU8 extends GenericFhEdgeWeightsChecks<MultiSpectral<ImageUInt8>>{
+public class TestFhEdgeWeights4_MsU8 extends GenericFhEdgeWeightsChecks<Planar<GrayU8>>{
 
 	public TestFhEdgeWeights4_MsU8() {
-		super(ImageType.ms(3, ImageUInt8.class), ConnectRule.FOUR);
+		super(ImageType.ms(3, GrayU8.class), ConnectRule.FOUR);
 	}
 
 	@Override
-	public FhEdgeWeights<MultiSpectral<ImageUInt8>> createAlg() {
+	public FhEdgeWeights<Planar<GrayU8>> createAlg() {
 		return new FhEdgeWeights4_MsU8(3);
 	}
 
 	@Override
-	public float weight(MultiSpectral<ImageUInt8> input, int indexA, int indexB) {
+	public float weight(Planar<GrayU8> input, int indexA, int indexB) {
 
 		int total = 0;
 		for( int i = 0; i < 3; i++ ) {

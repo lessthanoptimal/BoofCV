@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 
 import java.awt.image.BufferedImage;
@@ -46,16 +46,16 @@ public class ExampleFourierTransform {
 	 * Demonstration of how to apply a box filter in the frequency domain and compares the results
 	 * to a box filter which has been applied in the spatial domain
 	 */
-	public static void applyBoxFilter( ImageFloat32 input ) {
+	public static void applyBoxFilter( GrayF32 input ) {
 
 		// declare storage
-		ImageFloat32 boxImage = new ImageFloat32(input.width, input.height);
+		GrayF32 boxImage = new GrayF32(input.width, input.height);
 		InterleavedF32 boxTransform = new InterleavedF32(input.width,input.height,2);
 		InterleavedF32 transform = new InterleavedF32(input.width,input.height,2);
-		ImageFloat32 blurredImage = new ImageFloat32(input.width, input.height);
-		ImageFloat32 spatialBlur = new ImageFloat32(input.width, input.height);
+		GrayF32 blurredImage = new GrayF32(input.width, input.height);
+		GrayF32 spatialBlur = new GrayF32(input.width, input.height);
 
-		DiscreteFourierTransform<ImageFloat32,InterleavedF32> dft =
+		DiscreteFourierTransform<GrayF32,InterleavedF32> dft =
 				DiscreteFourierTransformOps.createTransformF32();
 
 
@@ -115,8 +115,8 @@ public class ExampleFourierTransform {
 	public static void displayTransform( InterleavedF32 transform , String name ) {
 
 		// declare storage
-		ImageFloat32 magnitude = new ImageFloat32(transform.width,transform.height);
-		ImageFloat32 phase = new ImageFloat32(transform.width,transform.height);
+		GrayF32 magnitude = new GrayF32(transform.width,transform.height);
+		GrayF32 phase = new GrayF32(transform.width,transform.height);
 
 		// Make a copy so that you don't modify the input
 		transform = transform.clone();
@@ -141,7 +141,7 @@ public class ExampleFourierTransform {
 
 	public static void main( String args[] ) {
 
-		ImageFloat32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"), ImageFloat32.class);
+		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"), GrayF32.class);
 
 		applyBoxFilter(input.clone());
 	}

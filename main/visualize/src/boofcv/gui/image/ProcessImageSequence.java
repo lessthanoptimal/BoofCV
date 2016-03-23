@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public abstract class ProcessImageSequence<T extends ImageSingleBand> implements MouseListener, KeyListener {
+public abstract class ProcessImageSequence<T extends ImageGray> implements MouseListener, KeyListener {
 	private SimpleImageSequence<T> sequence;
 
 	private T image;

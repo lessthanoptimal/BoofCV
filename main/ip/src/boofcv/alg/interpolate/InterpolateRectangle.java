@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Performs interpolation across a whole rectangular region inside the image.  This can be significantly faster than
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface InterpolateRectangle<T extends ImageSingleBand> {
+public interface InterpolateRectangle<T extends ImageGray> {
 
 	/**
 	 * Change the image that is being interpolated.
@@ -51,6 +51,6 @@ public interface InterpolateRectangle<T extends ImageSingleBand> {
 	 * @param tl_y	  upper left corner of the region in the image.
 	 * @param dest Where the interpolated region is to be copied into
 	 */
-	public void region(float tl_x, float tl_y, ImageFloat32 dest );
+	public void region(float tl_x, float tl_y, GrayF32 dest );
 //	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
 }

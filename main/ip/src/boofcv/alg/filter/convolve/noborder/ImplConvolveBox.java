@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  */
 public class ImplConvolveBox {
 
-	public static void horizontal( ImageUInt8 input , ImageInt16 output , int radius ) {
+	public static void horizontal(GrayU8 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -57,7 +57,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageUInt8 input , ImageInt16 output , int radius ) {
+	public static void vertical(GrayU8 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -89,7 +89,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageUInt8 input , ImageSInt32 output , int radius ) {
+	public static void horizontal(GrayU8 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -115,7 +115,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageUInt8 input , ImageSInt32 output , int radius ) {
+	public static void vertical(GrayU8 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -147,7 +147,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageSInt16 input , ImageInt16 output , int radius ) {
+	public static void horizontal(GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -173,7 +173,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageSInt16 input , ImageInt16 output , int radius ) {
+	public static void vertical(GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -205,7 +205,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageSInt32 input , ImageSInt32 output , int radius ) {
+	public static void horizontal(GrayS32 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -231,7 +231,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageSInt32 input , ImageSInt32 output , int radius ) {
+	public static void vertical(GrayS32 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -263,7 +263,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageFloat32 input , ImageFloat32 output , int radius ) {
+	public static void horizontal(GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -289,7 +289,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageFloat32 input , ImageFloat32 output , int radius ) {
+	public static void vertical(GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
@@ -321,7 +321,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void horizontal( ImageFloat64 input , ImageFloat64 output , int radius ) {
+	public static void horizontal(GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		for( int y = 0; y < input.height; y++ ) {
@@ -347,7 +347,7 @@ public class ImplConvolveBox {
 		}
 	}
 
-	public static void vertical( ImageFloat64 input , ImageFloat64 output , int radius ) {
+	public static void vertical(GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;

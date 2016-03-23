@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.factory.filter.kernel;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
@@ -315,14 +315,14 @@ public class FactoryKernel {
 			return (Class<K1>)Kernel1D_I32.class;
 	}
 
-	public static <K extends KernelBase, T extends ImageSingleBand>
+	public static <K extends KernelBase, T extends ImageGray>
 	Class<K> getKernelType( Class<T> imageType , int DOF ) {
-		if( imageType == ImageFloat32.class ) {
+		if( imageType == GrayF32.class ) {
 			if( DOF == 1 )
 				return (Class)Kernel1D_F32.class;
 			else
 				return (Class)Kernel2D_F32.class;
-		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+		} else if( GrayI.class.isAssignableFrom(imageType) ) {
 			if( DOF == 1 )
 				return (Class)Kernel1D_I32.class;
 			else

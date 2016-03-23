@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 	int value = 43;
 
 	public TestImageBorderValue() {
-		super(ImageType.single(ImageUInt8.class),
-				ImageType.single(ImageUInt16.class),
-				ImageType.single(ImageSInt32.class),
-				ImageType.single(ImageSInt64.class),
-				ImageType.single(ImageFloat32.class),
-				ImageType.single(ImageFloat64.class),
+		super(ImageType.single(GrayU8.class),
+				ImageType.single(GrayU16.class),
+				ImageType.single(GrayS32.class),
+				ImageType.single(GrayS64.class),
+				ImageType.single(GrayF32.class),
+				ImageType.single(GrayF64.class),
 				ImageType.il(2,InterleavedU8.class),
 				ImageType.il(2,InterleavedU16.class),
 				ImageType.il(2,InterleavedS32.class),
@@ -49,8 +49,8 @@ public class TestImageBorderValue extends GenericImageBorderTests {
 
 	@Override
 	public ImageBorder<ImageBase> wrap(ImageBase image) {
-		if( image instanceof ImageSingleBand)
-			return ImageBorderValue.wrap((ImageSingleBand)image,value);
+		if( image instanceof ImageGray)
+			return ImageBorderValue.wrap((ImageGray)image,value);
 		else if( image instanceof ImageInterleaved )
 			return ImageBorderValue.wrap((ImageInterleaved)image,value);
 		else

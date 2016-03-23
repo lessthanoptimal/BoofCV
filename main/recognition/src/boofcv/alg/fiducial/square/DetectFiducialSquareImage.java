@@ -28,9 +28,9 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.core.image.ConvertImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ import java.util.List;
  * </p>
  * @author Peter Abeles
  */
-public class DetectFiducialSquareImage<T extends ImageSingleBand>
+public class DetectFiducialSquareImage<T extends ImageGray>
 		extends BaseDetectFiducialSquare<T> {
 
 	// Width of black border (units = pixels)
@@ -67,7 +67,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	private final static int DESC_LENGTH = squareLength*squareLength/16;
 
 	// converts the input image into a binary one
-	private ImageUInt8 binary = new ImageUInt8(squareLength,squareLength);
+	private GrayU8 binary = new GrayU8(squareLength,squareLength);
 
 	// list of all known targets
 	private List<FiducialDef> targets = new ArrayList<FiducialDef>();
@@ -76,7 +76,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	private  short squareDef[] = new short[DESC_LENGTH];
 
 	// storage for no border sub-image
-	private ImageFloat32 grayNoBorder = new ImageFloat32();
+	private GrayF32 grayNoBorder = new GrayF32();
 
 	// if the hamming score is better than this it is considered to be a good match
 	private int hammingThreshold;
@@ -111,7 +111,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	 * @param lengthSide How long one of the sides of the target is in world units.
 	 * @return The ID of the provided image
 	 */
-	public int addPattern(ImageUInt8 inputBinary, double lengthSide) {
+	public int addPattern(GrayU8 inputBinary, double lengthSide) {
 		if( inputBinary == null ) {
 			throw new IllegalArgumentException("Input image is null.");
 		} else if( lengthSide <= 0 ) {
@@ -122,11 +122,11 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 		// see if it needs to be resized
 		if ( inputBinary.width != squareLength || inputBinary.height != squareLength ) {
 			// need to create a new image and rescale it to better handle the resizing
-			ImageFloat32 inputGray = new ImageFloat32(inputBinary.width,inputBinary.height);
+			GrayF32 inputGray = new GrayF32(inputBinary.width,inputBinary.height);
 			ConvertImage.convert(inputBinary,inputGray);
 			PixelMath.multiply(inputGray,255,inputGray);
 
-			ImageFloat32 scaled = new ImageFloat32(squareLength,squareLength);
+			GrayF32 scaled = new GrayF32(squareLength,squareLength);
 
 			// See if it can use the better algorithm for scaling down the image
 			if( inputBinary.width > squareLength && inputBinary.height > squareLength ) {
@@ -160,7 +160,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	/**
 	 * Converts a binary image into the compressed bit format
 	 */
-	protected static void binaryToDef( ImageUInt8 binary , short[] desc ) {
+	protected static void binaryToDef(GrayU8 binary , short[] desc ) {
 		for (int i = 0; i < binary.data.length; i+=16) {
 			int value = 0;
 			for (int j = 0; j < 16; j++) {
@@ -171,7 +171,7 @@ public class DetectFiducialSquareImage<T extends ImageSingleBand>
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result, double edgeInside, double edgeOutside) {
+	protected boolean processSquare(GrayF32 gray, Result result, double edgeInside, double edgeOutside) {
 
 		int off = (gray.width-binary.width)/2;
 		gray.subimage(off,off,off+binary.width,off+binary.width,grayNoBorder);

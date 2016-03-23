@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DescribeRegionPoint<T,BrightFeature> surfFast(ConfigSurfDescribe.Speed config , Class<T> imageType) {
 
 
@@ -74,7 +74,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF color description extractor
 	 */
-	public static <T extends ImageMultiBand, II extends ImageSingleBand>
+	public static <T extends ImageMultiBand, II extends ImageGray>
 	DescribeRegionPoint<T,BrightFeature> surfColorFast(ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
@@ -104,7 +104,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF description extractor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DescribeRegionPoint<T,BrightFeature> surfStable(ConfigSurfDescribe.Stability config, Class<T> imageType) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -123,7 +123,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of input image.
 	 * @return SURF color description extractor
 	 */
-	public static <T extends ImageBase, II extends ImageSingleBand>
+	public static <T extends ImageBase, II extends ImageGray>
 	DescribeRegionPoint<T,BrightFeature> surfColorStable(ConfigSurfDescribe.Stability config, ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
@@ -154,7 +154,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param configDescribe SIFT descriptor configuration.  Pass in null for default options.
 	 * @return SIFT descriptor
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DescribeRegionPoint<T,TupleDesc_F64> sift(
 			ConfigSiftScaleSpace configSS, ConfigSiftDescribe configDescribe, Class<T> imageType)
 	{
@@ -165,7 +165,7 @@ public class FactoryDescribeRegionPoint {
 		SiftScaleSpace ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales,
 				configSS.sigma0);
 
-		DescribePointSift<ImageFloat32> alg = FactoryDescribePointAlgs.sift(configDescribe,ImageFloat32.class);
+		DescribePointSift<GrayF32> alg = FactoryDescribePointAlgs.sift(configDescribe,GrayF32.class);
 
 		return new DescribeRegionPoint_SIFT<T>(ss,alg,imageType);
 	}
@@ -182,7 +182,7 @@ public class FactoryDescribeRegionPoint {
 	 * @param imageType Type of gray scale image it processes.
 	 * @return BRIEF descriptor
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DescribeRegionPoint<T,TupleDesc_B> brief( ConfigBrief config , Class<T> imageType)
 	{
 		if( config == null )
@@ -212,7 +212,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageSingleBand, D extends TupleDesc>
+	public static <T extends ImageGray, D extends TupleDesc>
 	DescribeRegionPoint<T,D> pixel( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegion(
 				FactoryDescribePointAlgs.pixelRegion(regionWidth,regionHeight,imageType),imageType);
@@ -230,7 +230,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return Pixel region descriptor
 	 */
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DescribeRegionPoint<T,NccFeature> pixelNCC( int regionWidth , int regionHeight , Class<T> imageType ) {
 		return new WrapDescribePixelRegionNCC(
 				FactoryDescribePointAlgs.pixelRegionNCC(regionWidth,regionHeight,imageType),imageType);

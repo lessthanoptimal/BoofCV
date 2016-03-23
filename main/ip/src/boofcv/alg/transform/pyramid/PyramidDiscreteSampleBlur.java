@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.convolve.GenericConvolveDown;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolveDown;
 import boofcv.struct.convolve.Kernel1D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -44,7 +44,7 @@ import boofcv.struct.pyramid.PyramidDiscrete;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class PyramidDiscreteSampleBlur<T extends ImageSingleBand> extends PyramidDiscrete<T> {
+public class PyramidDiscreteSampleBlur<T extends ImageGray> extends PyramidDiscrete<T> {
 
 	// stores the results from the first convolution
 	private T temp;

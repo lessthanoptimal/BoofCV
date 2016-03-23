@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class WrapDescribePixelRegionNCC<T extends ImageSingleBand>
+public class WrapDescribePixelRegionNCC<T extends ImageGray>
 		implements DescribeRegionPoint<T,NccFeature>
 {
 	DescribePointPixelRegionNCC<T> alg;

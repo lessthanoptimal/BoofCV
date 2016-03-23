@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import org.ddogleg.util.UtilDouble;
 import org.junit.Test;
 
@@ -43,12 +43,12 @@ public class TestTrackerMeanShiftComaniciu2003 {
 
 	@Test
 	public void track() {
-		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMS(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,0.0f,0.1f,calcHistogram);
 
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,100,150,3);
 
 		// odd width and height so samples land on pixels
 		render(image,50,40,21,31);
@@ -77,12 +77,12 @@ public class TestTrackerMeanShiftComaniciu2003 {
 
 	@Test
 	public void updateLocation() {
-		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMS(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,0.0f,0.1f,calcHistogram);
 
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,100,150,3);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,100,150,3);
 
 		// odd width and height so samples land on pixels
 		render(image,50,40,21,31);
@@ -142,7 +142,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		assertTrue(foundDifferent > 0.05);
 	}
 
-	private void render( MultiSpectral<ImageFloat32> image , int cx , int cy , int w , int h ) {
+	private void render(Planar<GrayF32> image , int cx , int cy , int w , int h ) {
 		GImageMiscOps.fill(image,0);
 
 		int tl_x = cx-w/2;

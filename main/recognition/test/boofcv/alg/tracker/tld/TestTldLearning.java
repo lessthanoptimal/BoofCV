@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -160,7 +160,7 @@ public class TestTldLearning {
 
 	}
 
-	protected static class DummyDetection extends TldDetection<ImageUInt8> {
+	protected static class DummyDetection extends TldDetection<GrayU8> {
 
 		int calledDetection = 0;
 

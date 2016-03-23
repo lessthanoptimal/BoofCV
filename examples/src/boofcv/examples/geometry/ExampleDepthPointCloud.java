@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.VisualDepthParameters;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
@@ -56,9 +56,9 @@ public class ExampleDepthPointCloud {
 		VisualDepthParameters param = UtilIO.loadXML(nameCalib);
 
 		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
-		MultiSpectral<ImageUInt8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,ImageUInt8.class);
-		ImageUInt16 depth =
-				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,ImageUInt16.class);
+		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromMulti(buffered,null,true,GrayU8.class);
+		GrayU16 depth =
+				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
 		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);

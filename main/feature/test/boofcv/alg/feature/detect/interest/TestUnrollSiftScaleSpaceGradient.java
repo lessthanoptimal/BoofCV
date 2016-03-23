@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestUnrollSiftScaleSpaceGradient {
 	 */
 	@Test
 	public void setImage() {
-		ImageFloat32 image = new ImageFloat32(640,480);
+		GrayF32 image = new GrayF32(640,480);
 		GImageMiscOps.fillUniform(image,rand,0,200);
 
 
@@ -52,13 +52,13 @@ public class TestUnrollSiftScaleSpaceGradient {
 		SiftScaleSpace ss = new SiftScaleSpace(-1,3,3,2);
 		ss.initialize(image);
 
-		ImageFloat32 derivX = new ImageFloat32(640,480);
-		ImageFloat32 derivY = new ImageFloat32(640,480);
+		GrayF32 derivX = new GrayF32(640,480);
+		GrayF32 derivY = new GrayF32(640,480);
 
 		int total = 0;
 		do {
 			for (int i = 0; i < ss.getNumScales(); i++, total++ ) {
-				ImageFloat32 scaleImage = ss.getImageScale(i);
+				GrayF32 scaleImage = ss.getImageScale(i);
 
 				derivX.reshape(scaleImage.width,scaleImage.height);
 				derivY.reshape(scaleImage.width,scaleImage.height);
@@ -83,7 +83,7 @@ public class TestUnrollSiftScaleSpaceGradient {
 
 		UnrollSiftScaleSpaceGradient alg = new UnrollSiftScaleSpaceGradient(ss);
 
-		alg.setImage(new ImageFloat32(640,480));
+		alg.setImage(new GrayF32(640,480));
 
 		assertEquals(ss.computeSigmaScale(-1,0),alg.lookup(0).sigma,1e-8);
 		assertEquals(ss.computeSigmaScale( 0,0),alg.lookup(2).sigma,1e-8);

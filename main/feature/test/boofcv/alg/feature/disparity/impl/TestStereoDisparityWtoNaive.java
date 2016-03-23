@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 /**
@@ -29,14 +29,14 @@ public class TestStereoDisparityWtoNaive {
 
 	@Test
 	public void basicTest() {
-		BasicDisparityTests<ImageUInt8,ImageFloat32> alg =
-				new BasicDisparityTests<ImageUInt8,ImageFloat32>(ImageUInt8.class) {
+		BasicDisparityTests<GrayU8,GrayF32> alg =
+				new BasicDisparityTests<GrayU8,GrayF32>(GrayU8.class) {
 
-					StereoDisparityWtoNaive<ImageUInt8> alg;
+					StereoDisparityWtoNaive<GrayU8> alg;
 
 					@Override
-					public ImageFloat32 computeDisparity(ImageUInt8 left, ImageUInt8 right ) {
-						ImageFloat32 ret = new ImageFloat32(left.width,left.height);
+					public GrayF32 computeDisparity(GrayU8 left, GrayU8 right ) {
+						GrayF32 ret = new GrayF32(left.width,left.height);
 
 						alg.process(left,right,ret);
 
@@ -45,7 +45,7 @@ public class TestStereoDisparityWtoNaive {
 
 					@Override
 					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new StereoDisparityWtoNaive<ImageUInt8>(minDisparity,maxDisparity,2,3);
+						alg = new StereoDisparityWtoNaive<GrayU8>(minDisparity,maxDisparity,2,3);
 					}
 
 					@Override public int getBorderX() { return 2; }

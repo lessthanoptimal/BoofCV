@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Random;
 
@@ -41,7 +41,7 @@ public class BenchmarkExtractors {
 	static long TEST_TIME = 1000;
 
 
-	static ImageFloat32 intensity;
+	static GrayF32 intensity;
 	static QueueCorner corners;
 
 	static Random rand = new Random(33456);
@@ -71,7 +71,7 @@ public class BenchmarkExtractors {
 	}
 
 	public static void main(String args[]) {
-		intensity = new ImageFloat32(imgWidth, imgHeight);
+		intensity = new GrayF32(imgWidth, imgHeight);
 		corners = new QueueCorner(imgWidth * imgHeight);
 
 		// have about 1/20 the image below threshold

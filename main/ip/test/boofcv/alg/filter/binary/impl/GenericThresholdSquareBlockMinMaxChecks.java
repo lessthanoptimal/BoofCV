@@ -22,8 +22,8 @@ import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GenericThresholdSquareBlockMinMaxChecks
-		<T extends ImageSingleBand>
+		<T extends ImageGray>
 {
 
 	Class<T> imageType;
@@ -58,7 +58,7 @@ public abstract class GenericThresholdSquareBlockMinMaxChecks
 
 		ThresholdSquareBlockMinMax<T,?> alg = createAlg(10,6,1.0,true);
 
-		ImageUInt8 output = new ImageUInt8(input.width,input.height);
+		GrayU8 output = new GrayU8(input.width,input.height);
 
 		alg.process(input,output);
 
@@ -81,8 +81,8 @@ public abstract class GenericThresholdSquareBlockMinMaxChecks
 		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 
-		ImageUInt8 down = new ImageUInt8(100,120);
-		ImageUInt8 up = new ImageUInt8(100,120);
+		GrayU8 down = new GrayU8(100,120);
+		GrayU8 up = new GrayU8(100,120);
 
 		// turn off texture so that the output's can be the inverse of each other
 		createAlg(-1,6,1.0,true).process(input,down);
@@ -98,7 +98,7 @@ public abstract class GenericThresholdSquareBlockMinMaxChecks
 	@Test(expected=IllegalArgumentException.class)
 	public void widthLargerThanImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
-		ImageUInt8 output = new ImageUInt8(10,12);
+		GrayU8 output = new GrayU8(10,12);
 
 		ThresholdSquareBlockMinMax<T,?> alg = createAlg(10,20,1.0,true);
 		alg.process(input,output);
@@ -109,10 +109,10 @@ public abstract class GenericThresholdSquareBlockMinMaxChecks
 		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 
-		ImageUInt8 expected = new ImageUInt8(100,120);
+		GrayU8 expected = new GrayU8(100,120);
 
 		T sub_input = BoofTesting.createSubImageOf(input);
-		ImageUInt8 sub_output = BoofTesting.createSubImageOf(expected);
+		GrayU8 sub_output = BoofTesting.createSubImageOf(expected);
 
 		ThresholdSquareBlockMinMax<T,?> alg = createAlg(10,14,1.0,true);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.List;
@@ -47,13 +47,13 @@ public class TestCannyEdgeDynamic {
 	 */
 	@Test
 	public void canHandleNoTexture() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output = new GrayU8(width,height);
 
 		ImageMiscOps.fill(output,2);
 
-		CannyEdge<ImageUInt8,ImageSInt16> alg =
-				FactoryEdgeDetectors.canny(2, false, true, ImageUInt8.class, ImageSInt16.class);
+		CannyEdge<GrayU8,GrayS16> alg =
+				FactoryEdgeDetectors.canny(2, false, true, GrayU8.class, GrayS16.class);
 
 		alg.process(input,0.075f,0.3f,output);
 
@@ -62,7 +62,7 @@ public class TestCannyEdgeDynamic {
 		}
 
 		// try it with a trace now
-		alg = FactoryEdgeDetectors.canny(2, true, true, ImageUInt8.class, ImageSInt16.class);
+		alg = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
 		ImageMiscOps.fill(output,2);
 		alg.process(input,0.075f,0.3f,output);
 
@@ -79,14 +79,14 @@ public class TestCannyEdgeDynamic {
 	@Test
 	public void basicTestPoints() {
 
-		ImageUInt8 input = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
 
 		ImageMiscOps.fillRectangle(input, 50, 20, 30, 40, 50);
 
-		BlurFilter<ImageUInt8> blur = FactoryBlurFilter.gaussian(ImageUInt8.class, -1, 1);
-		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class, ImageSInt16.class);
+		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
+		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
-		CannyEdgeDynamic<ImageUInt8,ImageSInt16> alg = new CannyEdgeDynamic<ImageUInt8, ImageSInt16>(blur,gradient,true);
+		CannyEdgeDynamic<GrayU8,GrayS16> alg = new CannyEdgeDynamic<GrayU8, GrayS16>(blur,gradient,true);
 
 		alg.process(input,0.2f,0.4f,null);
 

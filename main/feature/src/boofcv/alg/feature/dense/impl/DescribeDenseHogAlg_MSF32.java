@@ -19,24 +19,24 @@
 package boofcv.alg.feature.dense.impl;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 import javax.annotation.Generated;
 
 /**
- * Implementation pf {@link DescribeDenseHogAlg} for {@link ImageFloat32}.
+ * Implementation pf {@link DescribeDenseHogAlg} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
 @Generated("")
 public class DescribeDenseHogAlg_MSF32 extends DescribeDenseHogAlg
-		<MultiSpectral<ImageFloat32>,MultiSpectral<ImageFloat32>>
+		<Planar<GrayF32>,Planar<GrayF32>>
 {
 	int numBands;
 	public DescribeDenseHogAlg_MSF32(int orientationBins, int widthCell, int widthBlock, int stepBlock, int numBands ) {
-		super(orientationBins, widthCell, widthBlock, stepBlock , ImageType.ms(numBands,ImageFloat32.class));
+		super(orientationBins, widthCell, widthBlock, stepBlock , ImageType.ms(numBands,GrayF32.class));
 		this.numBands = numBands;
 	}
 

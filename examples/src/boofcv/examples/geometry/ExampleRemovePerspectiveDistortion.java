@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.image.BufferedImage;
@@ -44,10 +44,10 @@ public class ExampleRemovePerspectiveDistortion {
 
 		// load a color image
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
-		MultiSpectral<ImageFloat32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, ImageFloat32.class);
+		Planar<GrayF32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, GrayF32.class);
 
-		RemovePerspectiveDistortion<MultiSpectral<ImageFloat32>> removePerspective =
-				new RemovePerspectiveDistortion<MultiSpectral<ImageFloat32>>(400,500, ImageType.ms(3,ImageFloat32.class));
+		RemovePerspectiveDistortion<Planar<GrayF32>> removePerspective =
+				new RemovePerspectiveDistortion<Planar<GrayF32>>(400,500, ImageType.ms(3,GrayF32.class));
 
 		// Specify the corners in the input image of the region.
 		// Order matters! top-left, top-right, bottom-right, bottom-left
@@ -57,7 +57,7 @@ public class ExampleRemovePerspectiveDistortion {
 			throw new RuntimeException("Failed!?!?");
 		}
 
-		MultiSpectral<ImageFloat32> output = removePerspective.getOutput();
+		Planar<GrayF32> output = removePerspective.getOutput();
 
 		BufferedImage flat = ConvertBufferedImage.convertTo_F32(output,null,true);
 		ShowImages.showWindow(buffered,"Original Image",true);

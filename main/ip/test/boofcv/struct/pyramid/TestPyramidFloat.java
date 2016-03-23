@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.struct.pyramid;
 
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class TestPyramidFloat {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		PyramidFloat<ImageUInt8> pyramid = new DummyFloat<ImageUInt8>(ImageUInt8.class);
+		PyramidFloat<GrayU8> pyramid = new DummyFloat<GrayU8>(GrayU8.class);
 
 		pyramid.setScaleFactors(1,2,5.5);
 		pyramid.initialize(width,height);
@@ -58,7 +58,7 @@ public class TestPyramidFloat {
 		assertEquals(height / 4, pyramid.getLayer(1).height);
 	}
 
-	private static class DummyFloat<T extends ImageSingleBand> extends PyramidFloat<T> {
+	private static class DummyFloat<T extends ImageGray> extends PyramidFloat<T> {
 
 		public DummyFloat(Class<T> imageType) {
 			super(imageType);

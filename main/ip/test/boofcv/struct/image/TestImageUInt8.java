@@ -21,19 +21,19 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageUInt8 extends StandardImageIntegerTests<ImageUInt8> {
+public class TestImageUInt8 extends StandardImageIntegerTests<GrayU8> {
 	public TestImageUInt8() {
 		super(false);
 	}
 
 	@Override
-	public ImageUInt8 createImage(int width, int height) {
-		return new ImageUInt8(width, height);
+	public GrayU8 createImage(int width, int height) {
+		return new GrayU8(width, height);
 	}
 
 	@Override
-	public ImageUInt8 createImage() {
-		return new ImageUInt8();
+	public GrayU8 createImage() {
+		return new GrayU8();
 	}
 
 	@Override

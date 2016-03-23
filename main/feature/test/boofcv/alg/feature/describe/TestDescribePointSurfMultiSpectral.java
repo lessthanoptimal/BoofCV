@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -45,14 +45,14 @@ public class TestDescribePointSurfMultiSpectral {
 	 */
 	@Test
 	public void compareToSingleBand() {
-		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,width,height,3);
 
 		GImageMiscOps.addUniform(input,rand,0,200);
 
-		DescribePointSurf<ImageFloat32> desc = new DescribePointSurf<ImageFloat32>(ImageFloat32.class);
-		DescribePointSurfMultiSpectral<ImageFloat32> alg = new DescribePointSurfMultiSpectral<ImageFloat32>(desc,3);
+		DescribePointSurf<GrayF32> desc = new DescribePointSurf<GrayF32>(GrayF32.class);
+		DescribePointSurfMultiSpectral<GrayF32> alg = new DescribePointSurfMultiSpectral<GrayF32>(desc,3);
 
-		ImageFloat32 gray = ConvertImage.average(input,null);
+		GrayF32 gray = ConvertImage.average(input,null);
 
 		// input isn't an integral image, but I just want to see if it produces the expected results
 		alg.setImage(gray,input);

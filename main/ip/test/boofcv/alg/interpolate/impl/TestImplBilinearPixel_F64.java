@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,17 +18,17 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplBilinearPixel_F64 extends GeneralBilinearPixelSingleChecks<ImageFloat64>
+public class TestImplBilinearPixel_F64 extends GeneralBilinearPixelSingleChecks<GrayF64>
 {
 
 	@Override
-	protected ImageFloat64 createImage(int width, int height) {
-		return new ImageFloat64(width, height);
+	protected GrayF64 createImage(int width, int height) {
+		return new GrayF64(width, height);
 	}
 }

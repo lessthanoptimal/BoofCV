@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -42,7 +42,7 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 		public Max() { super(false, true); }
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
 
 			int numPeaks = 0;
 			float peakVal = thresholdMax;
@@ -75,7 +75,7 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 		public Min() { super(true, false); }
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
 
 			int numPeaks = 0;
 			float peakVal = thresholdMin;
@@ -108,7 +108,7 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 		public MinMax() { super(true, true); }
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 img ) {
+		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
 
 			int numMinPeaks = 0;
 			float peakMinVal = thresholdMin;
@@ -154,7 +154,7 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 		}
 	}
 
-	protected void checkLocalMax( int x_c , int y_c , float peakVal , ImageFloat32 img ) {
+	protected void checkLocalMax( int x_c , int y_c , float peakVal , GrayF32 img ) {
 		int x0 = x_c-radius;
 		int x1 = x_c+radius;
 		int y0 = y_c-radius;
@@ -180,7 +180,7 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 		localMax.add(x_c,y_c);
 	}
 
-	protected void checkLocalMin( int x_c , int y_c , float peakVal , ImageFloat32 img ) {
+	protected void checkLocalMin( int x_c , int y_c , float peakVal , GrayF32 img ) {
 		int x0 = x_c-radius;
 		int x1 = x_c+radius;
 		int y0 = y_c-radius;

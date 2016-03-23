@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.peak;
 
 
 import boofcv.alg.weights.WeightPixelGaussian_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestMeanShiftPeak {
 
-	ImageFloat32 image = new ImageFloat32(30,40);
+	GrayF32 image = new GrayF32(30,40);
 
 	@Test
 	public void setRegion_inside() {
@@ -64,7 +64,7 @@ public class TestMeanShiftPeak {
 
 	public static class Helper extends MeanShiftPeak {
 		public Helper(int maxIterations, float convergenceTol) {
-			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),ImageFloat32.class);
+			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),GrayF32.class);
 		}
 
 		@Override

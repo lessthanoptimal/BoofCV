@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 
 /**
  * Base class which implements common elements
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageFloat32;
 public abstract class BaseTemplateIntensity<T extends ImageBase>
 		implements TemplateMatchingIntensity<T> {
 	// Match intensity image
-	private ImageFloat32 intensity = new ImageFloat32(1, 1);
+	private GrayF32 intensity = new GrayF32(1, 1);
 
 	// references to the input
 	protected T image;
@@ -116,7 +116,7 @@ public abstract class BaseTemplateIntensity<T extends ImageBase>
 	protected abstract float evaluateMask(int tl_x, int tl_y);
 
 	@Override
-	public ImageFloat32 getIntensity() {
+	public GrayF32 getIntensity() {
 		return intensity;
 	}
 

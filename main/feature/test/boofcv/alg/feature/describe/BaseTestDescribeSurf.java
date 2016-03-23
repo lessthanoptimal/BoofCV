@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseImageGradient;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class BaseTestDescribeSurf<I extends ImageSingleBand,II extends ImageSingleBand> {
+public abstract class BaseTestDescribeSurf<I extends ImageGray,II extends ImageGray> {
 	Random rand = new Random(234);
 	int width = 50;
 	int height = 60;

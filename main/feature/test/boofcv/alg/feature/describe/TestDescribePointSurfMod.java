@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,20 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<ImageFloat32,ImageFloat32> {
+public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<GrayF32,GrayF32> {
 
 	public TestDescribePointSurfMod() {
-		super(ImageFloat32.class,ImageFloat32.class);
+		super(GrayF32.class,GrayF32.class);
 	}
 
 	@Override
-	public DescribePointSurf<ImageFloat32> createAlg() {
-		return new DescribePointSurfMod<ImageFloat32>(ImageFloat32.class);
+	public DescribePointSurf<GrayF32> createAlg() {
+		return new DescribePointSurfMod<GrayF32>(GrayF32.class);
 	}
 }

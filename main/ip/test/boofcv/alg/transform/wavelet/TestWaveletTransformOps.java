@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class TestWaveletTransformOps {
 
    Class<?> typeInput;
 
-	Class<?> types[]={ImageFloat32.class,ImageSInt32.class};
+	Class<?> types[]={GrayF32.class,GrayS32.class};
 
 	/**
 	 * See if it is possible to overflow the image
@@ -58,7 +58,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageSingleBand> void checkOverflow1( Class<T> typeInput ) {
+	public <T extends ImageGray> void checkOverflow1(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -85,7 +85,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageSingleBand> void testSmallImage1( Class<T> typeInput ) {
+	public <T extends ImageGray> void testSmallImage1(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -134,17 +134,17 @@ public class TestWaveletTransformOps {
 		for( int adjust = 0; adjust < 5; adjust++ ) {
 			int w = width+adjust;
 			int h = height+adjust;
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(typeInput, w, h);
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(typeInput, w, h);
+			ImageGray input = GeneralizedImageOps.createSingleBand(typeInput, w, h);
+			ImageGray found = GeneralizedImageOps.createSingleBand(typeInput, w, h);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
 			for( int level = 1; level <= 5; level++ ) {
 				ImageDimension dim = UtilWavelet.transformDimension(w,h,level);
-				ImageSingleBand output = GeneralizedImageOps.createSingleBand(typeInput, dim.width, dim.height);
+				ImageGray output = GeneralizedImageOps.createSingleBand(typeInput, dim.width, dim.height);
 //				System.out.println("adjust "+adjust+" level "+level+" scale "+ div);
 
-				invokeTransformN(desc, (ImageSingleBand)input.clone(), output, found, level, 0, 255);
+				invokeTransformN(desc, (ImageGray)input.clone(), output, found, level, 0, 255);
 
 				BoofTesting.assertEquals(input, found, 1e-4f);
 			}
@@ -161,7 +161,7 @@ public class TestWaveletTransformOps {
 		}
 	}
 
-	public <T extends ImageSingleBand> void checkOverflowN( Class<T> typeInput ) {
+	public <T extends ImageGray> void checkOverflowN(Class<T> typeInput ) {
 		this.typeInput = typeInput;
 		WaveletDescription<?> desc = createDesc(typeInput);
 
@@ -181,49 +181,49 @@ public class TestWaveletTransformOps {
 		checkBounds(found,100,150);
 	}
 
-	private void invokeTransform( WaveletDescription desc,
-								  ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
-								  double minValue , double maxValue ) {
+	private void invokeTransform(WaveletDescription desc,
+								 ImageGray input, ImageGray output, ImageGray found,
+								 double minValue , double maxValue ) {
 		if( input != null ) {
 			if( input.getDataType().isInteger() ) {
-				WaveletTransformOps.transform1(desc, (ImageSInt32) input, (ImageSInt32) output, null);
+				WaveletTransformOps.transform1(desc, (GrayS32) input, (GrayS32) output, null);
 			} else {
-				WaveletTransformOps.transform1(desc, (ImageFloat32) input, (ImageFloat32) output, null);
+				WaveletTransformOps.transform1(desc, (GrayF32) input, (GrayF32) output, null);
 			}
 		}
 
 		if( output.getDataType().isInteger() ) {
-			WaveletTransformOps.inverse1(desc,(ImageSInt32)output,(ImageSInt32)found,null,
+			WaveletTransformOps.inverse1(desc,(GrayS32)output,(GrayS32)found,null,
 					(int)minValue,(int)maxValue);
 		} else {
-			WaveletTransformOps.inverse1(desc,(ImageFloat32)output,(ImageFloat32)found,null,
+			WaveletTransformOps.inverse1(desc,(GrayF32)output,(GrayF32)found,null,
 					(float)minValue,(float)maxValue);
 		}
 	}
 
-	private void invokeTransformN( WaveletDescription desc,
-								   ImageSingleBand input, ImageSingleBand output, ImageSingleBand found,
-								   int numLevels ,
-								   double minValue , double maxValue ) {
+	private void invokeTransformN(WaveletDescription desc,
+								  ImageGray input, ImageGray output, ImageGray found,
+								  int numLevels ,
+								  double minValue , double maxValue ) {
 		if( input != null ) {
 			if( input.getDataType().isInteger() ) {
-				WaveletTransformOps.transformN(desc, (ImageSInt32) input, (ImageSInt32) output, null, numLevels);
+				WaveletTransformOps.transformN(desc, (GrayS32) input, (GrayS32) output, null, numLevels);
 			} else {
-				WaveletTransformOps.transformN(desc, (ImageFloat32) input, (ImageFloat32) output, null, numLevels);
+				WaveletTransformOps.transformN(desc, (GrayF32) input, (GrayF32) output, null, numLevels);
 			}
 		}
 
 		if( output.getDataType().isInteger() ) {
-			WaveletTransformOps.inverseN(desc, (ImageSInt32) output, (ImageSInt32) found, null, numLevels,
+			WaveletTransformOps.inverseN(desc, (GrayS32) output, (GrayS32) found, null, numLevels,
 					(int) minValue, (int) maxValue);
 		} else {
-			WaveletTransformOps.inverseN(desc, (ImageFloat32) output, (ImageFloat32) found, null, numLevels,
+			WaveletTransformOps.inverseN(desc, (GrayF32) output, (GrayF32) found, null, numLevels,
 					(float) minValue, (float) maxValue);
 		}
 	}
 
 
-	private void checkBounds( ImageSingleBand image , double low , double upper ) {
+	private void checkBounds(ImageGray image , double low , double upper ) {
 		for( int y = 0; y < image.height; y++ ) {
 			for( int x = 0; x < image.width; x++ ) {
 				double v = GeneralizedImageOps.get(image,x,y);

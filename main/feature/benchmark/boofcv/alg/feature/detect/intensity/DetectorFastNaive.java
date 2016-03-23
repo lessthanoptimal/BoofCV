@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * A slow but easy to understand correct implementations.  Has been compared against the
@@ -45,7 +45,7 @@ public class DetectorFastNaive {
 		this.b = b;
 	}
 
-	public void process( ImageUInt8 image ) {
+	public void process( GrayU8 image ) {
 		candidates.reset();
 
 		// relative offsets of pixel locations in a circle

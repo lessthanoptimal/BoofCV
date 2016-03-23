@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -42,12 +42,12 @@ public class TestDescribePointBrief {
 	 */
 	@Test
 	public void basicSanityCheck() {
-		ImageUInt8 input = new ImageUInt8(30,40);
+		GrayU8 input = new GrayU8(30,40);
 		GImageMiscOps.fillUniform(input,rand,0,100);
 
-		BlurFilter<ImageUInt8> filterBlur = FactoryBlurFilter.gaussian(ImageUInt8.class, -1, 1);
+		BlurFilter<GrayU8> filterBlur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
 		Helper helper = new Helper();
-		DescribePointBrief<ImageUInt8> alg = new DescribePointBrief<ImageUInt8>(helper,filterBlur);
+		DescribePointBrief<GrayU8> alg = new DescribePointBrief<GrayU8>(helper,filterBlur);
 
 		alg.setImage(input);
 		alg.process(15,20,null);
@@ -60,7 +60,7 @@ public class TestDescribePointBrief {
 
 	}
 
-	protected static class Helper extends DescribePointBinaryCompare<ImageUInt8> {
+	protected static class Helper extends DescribePointBinaryCompare<GrayU8> {
 
 		int numInside = 0;
 		int numOutside = 0;

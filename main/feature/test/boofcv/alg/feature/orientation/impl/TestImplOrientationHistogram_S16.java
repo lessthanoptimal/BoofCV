@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import org.junit.Test;
 
 
@@ -33,7 +33,7 @@ public class TestImplOrientationHistogram_S16 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<ImageSInt16> tests = new GenericOrientationGradientTests<ImageSInt16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
 
 		ImplOrientationHistogram_S16 alg = new ImplOrientationHistogram_S16(r,N,false);
 		alg.setObjectToSample(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationHistogram_S16 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<ImageSInt16> tests = new GenericOrientationGradientTests<ImageSInt16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
 
 		ImplOrientationHistogram_S16 alg = new ImplOrientationHistogram_S16(1.0/2.0,N,false);
 		alg.setObjectToSample(r);

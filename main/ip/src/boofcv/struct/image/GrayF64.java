@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageFloat64 extends ImageFloat<ImageFloat64> {
+public class GrayF64 extends GrayF<GrayF64> {
 
 	public double data[];
 
@@ -35,14 +35,14 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageFloat64(int width, int height) {
+	public GrayF64(int width, int height) {
 		super(width, height);
 	}
 
 	/**
 	 * Creates an image with no data declared and the width/height set to zero.
 	 */
-	public ImageFloat64() {
+	public GrayF64() {
 	}
 
 	/**
@@ -110,10 +110,10 @@ public class ImageFloat64 extends ImageFloat<ImageFloat64> {
 	}
 
 	@Override
-	public ImageFloat64 _createNew(int imgWidth, int imgHeight) {
+	public GrayF64 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageFloat64();
-		return new ImageFloat64(imgWidth, imgHeight);
+			return new GrayF64();
+		return new GrayF64(imgWidth, imgHeight);
 	}
 
 	@Override

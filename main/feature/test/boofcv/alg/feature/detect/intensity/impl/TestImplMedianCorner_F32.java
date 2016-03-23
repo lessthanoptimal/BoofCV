@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
 import boofcv.alg.feature.detect.intensity.MedianCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -29,7 +29,7 @@ import org.junit.Test;
  */
 public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 {
-	ImageFloat32 median = new ImageFloat32(width,height);
+	GrayF32 median = new GrayF32(width,height);
 
 	@Test
 	public void genericTests() {
@@ -37,12 +37,12 @@ public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 	}
 
 	@Override
-	public void computeIntensity( ImageFloat32 intensity ) {
+	public void computeIntensity( GrayF32 intensity ) {
 		MedianCornerIntensity.process(intensity,imageF,median);
 	}
 
 	@Override
 	protected void computeDerivatives() {
-		FactoryBlurFilter.median(ImageFloat32.class,2).process(imageF,median);
+		FactoryBlurFilter.median(GrayF32.class,2).process(imageF,median);
 	}
 }

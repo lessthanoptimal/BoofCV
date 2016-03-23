@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DescribeRegionPointConvert<T extends ImageSingleBand,In extends TupleDesc,Out extends TupleDesc>
+public class DescribeRegionPointConvert<T extends ImageGray,In extends TupleDesc,Out extends TupleDesc>
 	implements DescribeRegionPoint<T,Out>
 {
 	// Computers the description

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,20 +18,20 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageBorder1D_S32 extends GenericImageBorder1DTests<ImageSInt32> {
+public class TestImageBorder1D_S32 extends GenericImageBorder1DTests<GrayS32> {
 
 	public TestImageBorder1D_S32() {
-		super(ImageType.single(ImageSInt32.class));
+		super(ImageType.single(GrayS32.class));
 	}
 
 	@Override
-	public ImageBorder<ImageSInt32> wrap(ImageSInt32 image) {
+	public ImageBorder<GrayS32> wrap(GrayS32 image) {
 		ImageBorder1D_S32 ret = new ImageBorder1D_S32(BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;

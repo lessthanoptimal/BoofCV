@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F64;
 import org.junit.Test;
 
@@ -28,18 +28,18 @@ import org.junit.Test;
  * @author Peter Abeles
  */
 public class TestSparseIntegralGradientKernel
-		extends GeneralSparseGradientTests<ImageFloat32,ImageFloat32,GradientValue_F64>
+		extends GeneralSparseGradientTests<GrayF32,GrayF32,GradientValue_F64>
 {
 	final static int size = 5;
 	final static int radius = size/2;
 
 	public TestSparseIntegralGradientKernel() {
-		super(ImageFloat32.class, ImageFloat32.class,-radius-1,-radius-1,radius,radius);
+		super(GrayF32.class, GrayF32.class,-radius-1,-radius-1,radius,radius);
 
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 
-		alg = new SparseIntegralGradientKernel<ImageFloat32>(kernelX,kernelY);
+		alg = new SparseIntegralGradientKernel<GrayF32>(kernelX,kernelY);
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class TestSparseIntegralGradientKernel
 
 
 	@Override
-	protected void imageGradient(ImageFloat32 input, ImageFloat32 derivX, ImageFloat32 derivY) {
+	protected void imageGradient(GrayF32 input, GrayF32 derivX, GrayF32 derivY) {
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 

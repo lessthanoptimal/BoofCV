@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class WaveletVisualizeApp
-		<T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
+		<T extends ImageGray, W extends ImageGray, C extends WlCoef>
 		extends SelectAlgorithmAndInputPanel
 {
 	int numLevels = 3;
@@ -140,7 +140,7 @@ public class WaveletVisualizeApp
 
 	public static void main( String args[] ) {
 		BufferedImage in = UtilImageIO.loadImage("data/standard/lena512.bmp");
-		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageFloat32.class);
+		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();

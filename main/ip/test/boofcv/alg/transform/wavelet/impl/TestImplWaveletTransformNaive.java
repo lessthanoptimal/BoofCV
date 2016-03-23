@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.transform.wavelet.impl;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -74,19 +74,19 @@ public class TestImplWaveletTransformNaive {
 
 	private void testEncodeDecode_F32( int widthOrig , int heightOrig ,
 									   int widthOut , int heightOut ) {
-		ImageFloat32 orig = new ImageFloat32(widthOrig, heightOrig);
+		GrayF32 orig = new GrayF32(widthOrig, heightOrig);
 		ImageMiscOps.fillUniform(orig,rand,0,30);
 
-		ImageFloat32 transformed = new ImageFloat32(widthOut,heightOut);
-		ImageFloat32 reconstructed = new ImageFloat32(widthOrig, heightOrig);
+		GrayF32 transformed = new GrayF32(widthOut,heightOut);
+		GrayF32 reconstructed = new GrayF32(widthOrig, heightOrig);
 
 		BoofTesting.checkSubImage(this,"checkTransforms_F32",true,
 				orig, transformed, reconstructed );
 	}
 
-	public void checkTransforms_F32(ImageFloat32 orig,
-									ImageFloat32 transformed,
-									ImageFloat32 reconstructed ) {
+	public void checkTransforms_F32(GrayF32 orig,
+									GrayF32 transformed,
+									GrayF32 reconstructed ) {
 		// Test horizontal transformation
 		ImplWaveletTransformNaive.horizontal(desc_F32.getBorder(),desc_F32.getForward(),orig,transformed);
 		ImplWaveletTransformNaive.horizontalInverse(desc_F32.getBorder(),desc_F32.getInverse(),transformed,reconstructed);
@@ -100,19 +100,19 @@ public class TestImplWaveletTransformNaive {
 
 	private void testEncodeDecode_I32( int widthOrig , int heightOrig ,
 									   int widthOut , int heightOut ) {
-		ImageUInt8 orig = new ImageUInt8(widthOrig, heightOrig);
+		GrayU8 orig = new GrayU8(widthOrig, heightOrig);
 		ImageMiscOps.fillUniform(orig,rand,0,10);
 
-		ImageSInt32 transformed = new ImageSInt32(widthOut,heightOut);
-		ImageUInt8 reconstructed = new ImageUInt8(widthOrig, heightOrig);
+		GrayS32 transformed = new GrayS32(widthOut,heightOut);
+		GrayU8 reconstructed = new GrayU8(widthOrig, heightOrig);
 
 		BoofTesting.checkSubImage(this,"checkTransforms_I",true,
 				orig, transformed, reconstructed );
 	}
 
-	public void checkTransforms_I(ImageUInt8 orig,
-								  ImageSInt32 transformed,
-								  ImageUInt8 reconstructed ) {
+	public void checkTransforms_I(GrayU8 orig,
+								  GrayS32 transformed,
+								  GrayU8 reconstructed ) {
 		// Test horizontal transformation
 		ImplWaveletTransformNaive.horizontal(desc_I32.getBorder(),desc_I32.getForward(),orig,transformed);
 		ImplWaveletTransformNaive.horizontalInverse(desc_I32.getBorder(),desc_I32.getInverse(),transformed,reconstructed);

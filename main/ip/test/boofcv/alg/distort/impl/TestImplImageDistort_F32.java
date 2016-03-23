@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,23 +22,23 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistort_F32 extends GeneralImageDistortTests<ImageFloat32>{
+public class TestImplImageDistort_F32 extends GeneralImageDistortTests<GrayF32>{
 
 	public TestImplImageDistort_F32() {
-		super(ImageType.single(ImageFloat32.class));
+		super(ImageType.single(GrayF32.class));
 	}
 
 	@Override
-	public ImageDistort<ImageFloat32,ImageFloat32> createDistort(PixelTransform_F32 dstToSrc,
-																 InterpolatePixel<ImageFloat32> interp) {
-		ImageDistort<ImageFloat32,ImageFloat32> ret = new ImplImageDistort_F32((InterpolatePixelS)interp);
+	public ImageDistort<GrayF32,GrayF32> createDistort(PixelTransform_F32 dstToSrc,
+													   InterpolatePixel<GrayF32> interp) {
+		ImageDistort<GrayF32,GrayF32> ret = new ImplImageDistort_F32((InterpolatePixelS)interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

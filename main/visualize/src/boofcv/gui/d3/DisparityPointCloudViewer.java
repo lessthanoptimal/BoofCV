@@ -20,10 +20,10 @@ package boofcv.gui.d3;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -122,14 +122,14 @@ public class DisparityPointCloudViewer extends JPanel {
 	 * @param disparity Disparity image
 	 * @param color Color image of left camera
 	 */
-	public void process( ImageSingleBand disparity , BufferedImage color ) {
-		if( disparity instanceof ImageUInt8 )
-			process((ImageUInt8)disparity,color);
+	public void process(ImageGray disparity , BufferedImage color ) {
+		if( disparity instanceof GrayU8)
+			process((GrayU8)disparity,color);
 		else
-			process((ImageFloat32)disparity,color);
+			process((GrayF32)disparity,color);
 	}
 
-	private void process( ImageUInt8 disparity , BufferedImage color ) {
+	private void process(GrayU8 disparity , BufferedImage color ) {
 
 		cloud.reset();
 
@@ -160,7 +160,7 @@ public class DisparityPointCloudViewer extends JPanel {
 		}
 	}
 
-	private void process( ImageFloat32 disparity , BufferedImage color ) {
+	private void process(GrayF32 disparity , BufferedImage color ) {
 
 		cloud.reset();
 

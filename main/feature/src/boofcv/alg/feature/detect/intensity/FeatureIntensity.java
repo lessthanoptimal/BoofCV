@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,19 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
  * Base interface for classes which extract intensity images for image feature detection. In the
  * intensity image higher values indicate that a pixel is more "feature like".  All intensity
- * images are {@link ImageFloat32}.
+ * images are {@link GrayF32}.
  * </p>
  *
  * @author Peter Abeles
  */
-public interface FeatureIntensity<T extends ImageSingleBand> {
+public interface FeatureIntensity<T extends ImageGray> {
 
 	/**
 	 * Returns the radius of the feature being computed.  Features are square in shape with a width = 2*radius+1.

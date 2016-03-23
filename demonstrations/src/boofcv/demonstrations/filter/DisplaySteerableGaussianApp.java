@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.factory.filter.kernel.FactorySteerable;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.*;
 
@@ -33,7 +33,7 @@ import java.awt.*;
 /**
  * @author Peter Abeles
  */
-public class DisplaySteerableGaussianApp <T extends ImageSingleBand, K extends Kernel2D>
+public class DisplaySteerableGaussianApp <T extends ImageGray, K extends Kernel2D>
 	extends DisplaySteerableBase<T,K>
 {
 	public DisplaySteerableGaussianApp(Class<T> imageType) {
@@ -49,8 +49,8 @@ public class DisplaySteerableGaussianApp <T extends ImageSingleBand, K extends K
 //		DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32> app =
 //				new DisplaySteerableGaussianApp<ImageFloat32,Kernel2D_F32>(ImageFloat32.class);
 
-		DisplaySteerableGaussianApp<ImageSInt32, Kernel2D_I32> app =
-				new DisplaySteerableGaussianApp<ImageSInt32,Kernel2D_I32>(ImageSInt32.class);
+		DisplaySteerableGaussianApp<GrayS32, Kernel2D_I32> app =
+				new DisplaySteerableGaussianApp<GrayS32,Kernel2D_I32>(GrayS32.class);
 
 		app.setPreferredSize(new Dimension(1000,480));
 

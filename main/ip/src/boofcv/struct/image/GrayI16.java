@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,26 +20,20 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Base class for images with 8-bit pixels.
+ * Base class for images with 16-bit pixels.
  * </p>
  *
  * @author Peter Abeles
  */
-public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
+public abstract class GrayI16<T extends GrayI16> extends GrayI<T> {
 
-	public byte data[];
+	public short data[];
 
-	/**
-	 * Creates a new gray scale (single band/color) image.
-	 *
-	 * @param width  number of columns in the image.
-	 * @param height number of rows in the image.
-	 */
-	public ImageInt8(int width, int height) {
+	protected GrayI16(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageInt8() {
+	protected GrayI16() {
 	}
 
 	/**
@@ -52,14 +46,21 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
+			throw new ImageAccessException("Requested pixel is out of bounds");
 
-		data[getIndex(x, y)] = (byte) value;
+		data[getIndex(x, y)] = (short) value;
 	}
 
+	/**
+	 * Sets the value of the specified pixel.
+	 *
+	 * @param x	 pixel coordinate.
+	 * @param y	 pixel coordinate.
+	 * @param value The pixel's new value.
+	 */
 	@Override
 	public void unsafe_set(int x, int y, int value) {
-		data[getIndex(x,y)] = (byte)value;
+		data[getIndex(x, y)] = (short) value;
 	}
 
 	@Override
@@ -69,19 +70,19 @@ public abstract class ImageInt8<T extends ImageInt8> extends ImageInteger<T> {
 
 	@Override
 	protected void _setData(Object data) {
-		this.data = (byte[]) data;
+		this.data = (short[]) data;
 	}
 
 	@Override
 	public ImageDataType getDataType() {
-		return ImageDataType.I8;
+		return ImageDataType.I16;
 	}
 
-	public byte[] getData() {
+	public short[] getData() {
 		return data;
 	}
 
-	public void setData(byte[] data) {
+	public void setData(short[] data) {
 		this.data = data;
 	}
 }

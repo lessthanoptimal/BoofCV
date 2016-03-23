@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d2;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TestImageMotionPtkSmartRespawn {
 
 	Random rand = new Random(234);
 
-	ImageFloat32 input = new ImageFloat32(50,60);
+	GrayF32 input = new GrayF32(50,60);
 
 	// the found feature match set
 	List<AssociatedPair> matchSet = new ArrayList<AssociatedPair>();
@@ -51,8 +51,8 @@ public class TestImageMotionPtkSmartRespawn {
 	public void nominal() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64>(motion,10,0.5,0.5);
+		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,10,0.5,0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -86,8 +86,8 @@ public class TestImageMotionPtkSmartRespawn {
 	public void absoluteMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64>(motion,20,0.5,0.5);
+		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -116,8 +116,8 @@ public class TestImageMotionPtkSmartRespawn {
 	public void relativeMinimumTracks() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64>(motion,20,0.5,0.5);
+		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -143,8 +143,8 @@ public class TestImageMotionPtkSmartRespawn {
 	public void relativeCoverageArea() {
 		DummyMotion motion = new DummyMotion();
 
-		ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<ImageFloat32,Affine2D_F64>(motion,20,0.5,0.5);
+		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
+				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -198,7 +198,7 @@ public class TestImageMotionPtkSmartRespawn {
 		return p;
 	}
 
-	private class DummyMotion extends ImageMotionPointTrackerKey<ImageFloat32,Affine2D_F64>
+	private class DummyMotion extends ImageMotionPointTrackerKey<GrayF32,Affine2D_F64>
 	{
 		int numReset = 0;
 		int numProcess = 0;
@@ -214,7 +214,7 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 
 		@Override
-		public boolean process(ImageFloat32 frame) {
+		public boolean process(GrayF32 frame) {
 			numProcess++;
 			return true;
 		}
@@ -230,7 +230,7 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 
 		@Override
-		public PointTracker<ImageFloat32> getTracker() {
+		public PointTracker<GrayF32> getTracker() {
 			return new Tracker();
 		}
 
@@ -274,11 +274,11 @@ public class TestImageMotionPtkSmartRespawn {
 		public int getMinimumSize() {return 0;}
 	}
 
-	private class Tracker implements PointTracker<ImageFloat32>
+	private class Tracker implements PointTracker<GrayF32>
 	{
 
 		@Override
-		public void process(ImageFloat32 image) {}
+		public void process(GrayF32 image) {}
 
 		@Override
 		public void reset() {}

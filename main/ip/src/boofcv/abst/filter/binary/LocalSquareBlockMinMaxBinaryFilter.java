@@ -21,17 +21,17 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.ThresholdSquareBlockMinMax;
 import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_F32;
 import boofcv.alg.filter.binary.impl.ThresholdSquareBlockMinMax_U8;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Wrapper around {@link ThresholdSquareBlockMinMax}.
  *
  * @author Peter Abeles
  */
-public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
+public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageGray>
 		implements InputToBinary<T>
 {
 	ThresholdSquareBlockMinMax alg;
@@ -39,9 +39,9 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
 
 	public LocalSquareBlockMinMaxBinaryFilter(double minimumSpread, int requestedBlockWidth, double scale , boolean down, Class<T> imageType ) {
 
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			this.alg = new ThresholdSquareBlockMinMax_F32((float)minimumSpread,requestedBlockWidth,(float)scale,down);
-		else if( imageType == ImageUInt8.class )
+		else if( imageType == GrayU8.class )
 			this.alg = new ThresholdSquareBlockMinMax_U8(minimumSpread,requestedBlockWidth,scale,down);
 		else
 			throw new IllegalArgumentException("Unsupported image type");
@@ -50,7 +50,7 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void process(T input, ImageUInt8 output) {
+	public void process(T input, GrayU8 output) {
 		alg.process(input,output);
 	}
 
@@ -70,7 +70,7 @@ public class LocalSquareBlockMinMaxBinaryFilter<T extends ImageSingleBand>
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getOutputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getOutputType() {
+		return ImageType.single(GrayU8.class);
 	}
 }

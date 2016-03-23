@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -44,7 +44,7 @@ import static boofcv.factory.filter.derivative.FactoryDerivative.*;
  *
  * @author Peter Abeles
  */
-public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingleBand>
+public class ShowImageDerivative<T extends ImageGray, D extends ImageGray>
 	extends SelectAlgorithmAndInputPanel
 {
 	Class<T> imageType;
@@ -161,8 +161,8 @@ public class ShowImageDerivative<T extends ImageSingleBand, D extends ImageSingl
 
 	public static void main(String args[]) {
 
-		ShowImageDerivative<ImageFloat32,ImageFloat32> app
-				= new ShowImageDerivative<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		ShowImageDerivative<GrayF32,GrayF32> app
+				= new ShowImageDerivative<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 //		ShowImageDerivative<ImageUInt8, ImageSInt16> app
 //				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
 

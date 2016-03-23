@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.tracker.klt;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -52,7 +52,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 @SuppressWarnings({"SuspiciousNameCombination"})
-public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
+public class KltTracker<InputImage extends ImageGray, DerivativeImage extends ImageGray> {
 
 	// input image
 	protected InputImage image;
@@ -76,10 +76,10 @@ public class KltTracker<InputImage extends ImageSingleBand, DerivativeImage exte
 	// length of the feature description
 	protected int lengthFeature;
 	// the feature in the current image
-	protected ImageFloat32 currDesc = new ImageFloat32(1,1);
+	protected GrayF32 currDesc = new GrayF32(1,1);
 
 	// storage for sub-region used when computing interpolation
-	protected ImageFloat32 subimage = new ImageFloat32();
+	protected GrayF32 subimage = new GrayF32();
 
 	// destination image for current feature data in border case
 	int dstX0,dstY0,dstX1,dstY1;

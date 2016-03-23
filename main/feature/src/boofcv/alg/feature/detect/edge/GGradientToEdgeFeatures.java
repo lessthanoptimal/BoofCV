@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.feature.detect.edge;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -38,15 +38,15 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public <D extends ImageSingleBand>
-	void intensityE( D derivX , D derivY , ImageFloat32 intensity )
+	static public <D extends ImageGray>
+	void intensityE( D derivX , D derivY , GrayF32 intensity )
 	{
-		if( derivX instanceof ImageFloat32 ) {
-			GradientToEdgeFeatures.intensityE((ImageFloat32)derivX,(ImageFloat32)derivY,intensity);
-		} else if( derivX instanceof ImageSInt16) {
-			GradientToEdgeFeatures.intensityE((ImageSInt16)derivX,(ImageSInt16)derivY,intensity);
-		} else if( derivX instanceof ImageSInt32) {
-			GradientToEdgeFeatures.intensityE((ImageSInt32)derivX,(ImageSInt32)derivY,intensity);
+		if( derivX instanceof GrayF32) {
+			GradientToEdgeFeatures.intensityE((GrayF32)derivX,(GrayF32)derivY,intensity);
+		} else if( derivX instanceof GrayS16) {
+			GradientToEdgeFeatures.intensityE((GrayS16)derivX,(GrayS16)derivY,intensity);
+		} else if( derivX instanceof GrayS32) {
+			GradientToEdgeFeatures.intensityE((GrayS32)derivX,(GrayS32)derivY,intensity);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -59,15 +59,15 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param intensity Edge intensity.
 	 */
-	static public <D extends ImageSingleBand>
-	void intensityAbs( D derivX , D derivY , ImageFloat32 intensity )
+	static public <D extends ImageGray>
+	void intensityAbs( D derivX , D derivY , GrayF32 intensity )
 	{
-		if( derivX instanceof ImageFloat32 ) {
-			GradientToEdgeFeatures.intensityAbs((ImageFloat32)derivX,(ImageFloat32)derivY,intensity);
-		} else if( derivX instanceof ImageSInt16) {
-			GradientToEdgeFeatures.intensityAbs((ImageSInt16)derivX,(ImageSInt16)derivY,intensity);
-		} else if( derivX instanceof ImageSInt32) {
-			GradientToEdgeFeatures.intensityAbs((ImageSInt32)derivX,(ImageSInt32)derivY,intensity);
+		if( derivX instanceof GrayF32) {
+			GradientToEdgeFeatures.intensityAbs((GrayF32)derivX,(GrayF32)derivY,intensity);
+		} else if( derivX instanceof GrayS16) {
+			GradientToEdgeFeatures.intensityAbs((GrayS16)derivX,(GrayS16)derivY,intensity);
+		} else if( derivX instanceof GrayS32) {
+			GradientToEdgeFeatures.intensityAbs((GrayS32)derivX,(GrayS32)derivY,intensity);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -80,15 +80,15 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi/2 to pi/2).
 	 */
-	static public <D extends ImageSingleBand>
-	void direction( D derivX , D derivY , ImageFloat32 angle )
+	static public <D extends ImageGray>
+	void direction( D derivX , D derivY , GrayF32 angle )
 	{
-		if( derivX instanceof ImageFloat32 ) {
-			GradientToEdgeFeatures.direction((ImageFloat32)derivX,(ImageFloat32)derivY,angle);
-		} else if( derivX instanceof ImageSInt16) {
-			GradientToEdgeFeatures.direction((ImageSInt16)derivX,(ImageSInt16)derivY,angle);
-		} else if( derivX instanceof ImageSInt32) {
-			GradientToEdgeFeatures.direction((ImageSInt32)derivX,(ImageSInt32)derivY,angle);
+		if( derivX instanceof GrayF32) {
+			GradientToEdgeFeatures.direction((GrayF32)derivX,(GrayF32)derivY,angle);
+		} else if( derivX instanceof GrayS16) {
+			GradientToEdgeFeatures.direction((GrayS16)derivX,(GrayS16)derivY,angle);
+		} else if( derivX instanceof GrayS32) {
+			GradientToEdgeFeatures.direction((GrayS32)derivX,(GrayS32)derivY,angle);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -101,15 +101,15 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Derivative along y-axis. Not modified.
 	 * @param angle Edge orientation in radians (-pi to pi).
 	 */
-	static public <D extends ImageSingleBand>
-	void direction2( D derivX , D derivY , ImageFloat32 angle )
+	static public <D extends ImageGray>
+	void direction2( D derivX , D derivY , GrayF32 angle )
 	{
-		if( derivX instanceof ImageFloat32 ) {
-			GradientToEdgeFeatures.direction2((ImageFloat32)derivX,(ImageFloat32)derivY,angle);
-		} else if( derivX instanceof ImageSInt16) {
-			GradientToEdgeFeatures.direction2((ImageSInt16)derivX,(ImageSInt16)derivY,angle);
-		} else if( derivX instanceof ImageSInt32) {
-			GradientToEdgeFeatures.direction2((ImageSInt32)derivX,(ImageSInt32)derivY,angle);
+		if( derivX instanceof GrayF32) {
+			GradientToEdgeFeatures.direction2((GrayF32)derivX,(GrayF32)derivY,angle);
+		} else if( derivX instanceof GrayS16) {
+			GradientToEdgeFeatures.direction2((GrayS16)derivX,(GrayS16)derivY,angle);
+		} else if( derivX instanceof GrayS32) {
+			GradientToEdgeFeatures.direction2((GrayS32)derivX,(GrayS32)derivY,angle);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}
@@ -127,15 +127,15 @@ public class GGradientToEdgeFeatures {
 	 * @param derivY Image derivative along y-axis.
 	 * @param output Filtered intensity. Modified.
 	 */
-	static public <D extends ImageSingleBand>
-	void nonMaxSuppressionCrude4( ImageFloat32 intensity , D derivX , D derivY , ImageFloat32 output )
+	static public <D extends ImageGray>
+	void nonMaxSuppressionCrude4(GrayF32 intensity , D derivX , D derivY , GrayF32 output )
 	{
-		if( derivX instanceof ImageFloat32 ) {
-			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageFloat32) derivX, (ImageFloat32) derivY,output);
-		} else if( derivX instanceof ImageSInt16) {
-			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageSInt16) derivX, (ImageSInt16) derivY,output);
-		} else if( derivX instanceof ImageSInt32) {
-			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (ImageSInt32) derivX, (ImageSInt32) derivY,output);
+		if( derivX instanceof GrayF32) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (GrayF32) derivX, (GrayF32) derivY,output);
+		} else if( derivX instanceof GrayS16) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (GrayS16) derivX, (GrayS16) derivY,output);
+		} else if( derivX instanceof GrayS32) {
+			GradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity, (GrayS32) derivX, (GrayS32) derivY,output);
 		} else {
 			throw new IllegalArgumentException("Unknown input type");
 		}

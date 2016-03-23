@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.gui;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
@@ -40,7 +40,7 @@ import java.io.Reader;
  *
  * @author Peter Abeles
  */
-public abstract class StereoVideoAppBase <I extends ImageSingleBand>
+public abstract class StereoVideoAppBase <I extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener
 {
 	protected StereoParameters config;

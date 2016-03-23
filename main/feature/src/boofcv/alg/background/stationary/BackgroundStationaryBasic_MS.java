@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,15 +26,15 @@ import boofcv.core.image.GImageMultiBand;
 import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundStationaryBasic} for {@link ImageSingleBand}.
+ * Implementation of {@link BackgroundStationaryBasic} for {@link ImageGray}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
-	extends BackgroundStationaryBasic<MultiSpectral<T>>
+public class BackgroundStationaryBasic_MS<T extends ImageGray>
+	extends BackgroundStationaryBasic<Planar<T>>
 {
 	// storage for background image
-	protected MultiSpectral<ImageFloat32> background;
+	protected Planar<GrayF32> background;
 
 	// wrapper which provides abstraction across image types
 	protected GImageMultiBand inputWrapper;
@@ -42,12 +42,12 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 	protected float inputPixels[];
 
 	public BackgroundStationaryBasic_MS(float learnRate, float threshold,
-										ImageType<MultiSpectral<T>> imageType) {
+										ImageType<Planar<T>> imageType) {
 		super(learnRate, threshold, imageType);
 
 		int numBands = imageType.getNumBands();
 
-		background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,numBands);
+		background = new Planar<GrayF32>(GrayF32.class,1,1,numBands);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 
@@ -59,7 +59,7 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 	 *
 	 * @return background image.
 	 */
-	public MultiSpectral<ImageFloat32> getBackground() {
+	public Planar<GrayF32> getBackground() {
 		return background;
 	}
 
@@ -69,7 +69,7 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void updateBackground( MultiSpectral<T> frame) {
+	public void updateBackground( Planar<T> frame) {
 		if( background.width == 1 ) {
 			background.reshape(frame.width, frame.height);
 			GConvertImage.convert(frame, background);
@@ -91,7 +91,7 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 				inputWrapper.getF(indexInput, inputPixels);
 
 				for (int band = 0; band < numBands; band++) {
-					ImageFloat32 backgroundBand = background.getBand(band);
+					GrayF32 backgroundBand = background.getBand(band);
 					backgroundBand.data[indexBG] = minusLearn*backgroundBand.data[indexBG] + learnRate*inputPixels[band];
 				}
 
@@ -102,7 +102,7 @@ public class BackgroundStationaryBasic_MS<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void segment(MultiSpectral<T> frame, ImageUInt8 segmented) {
+	public void segment(Planar<T> frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented,unknownValue);
 			return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.segmentation;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Before;
@@ -34,14 +34,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestComputeRegionMeanColor {
 	int w = 5, h = 4;
-	ImageSInt32 segments;
+	GrayS32 segments;
 	GrowQueue_I32 regionMemberCount;
 	FastQueue<float[]> regionColor;
 
 
 	@Before
 	public void before() {
-		segments = new ImageSInt32(w,h);
+		segments = new GrayS32(w,h);
 	    segments.data = new int[]{
 				0,0,0,0,0,
 				1,1,1,1,1,
@@ -70,7 +70,7 @@ public class TestComputeRegionMeanColor {
 
 		assertEquals(2,alg.numBands);
 
-		ImageFloat32 image = new ImageFloat32(w,h);
+		GrayF32 image = new GrayF32(w,h);
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 
@@ -84,7 +84,7 @@ public class TestComputeRegionMeanColor {
 	@Test
 	public void specific_U8() {
 		createRegionColor(1);
-		ImageUInt8 image = new ImageUInt8(w,h);
+		GrayU8 image = new GrayU8(w,h);
 		byte a = 1,b=2,c=3,d=10;
 		byte[] expected = new byte[]{a,b,c,d};
 		image.data = new byte[]{
@@ -93,7 +93,7 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		ComputeRegionMeanColor<ImageUInt8> alg = new ComputeRegionMeanColor.U8();
+		ComputeRegionMeanColor<GrayU8> alg = new ComputeRegionMeanColor.U8();
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 
@@ -105,7 +105,7 @@ public class TestComputeRegionMeanColor {
 	@Test
 	public void specific_F32() {
 		createRegionColor(1);
-		ImageFloat32 image = new ImageFloat32(w,h);
+		GrayF32 image = new GrayF32(w,h);
 		float a = 1.1f,b=2.2f,c=3.3f,d=10.7f;
 		float[] expected = new float[]{a,b,c,d};
 		image.data = new float[]{
@@ -114,7 +114,7 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		ComputeRegionMeanColor<ImageFloat32> alg = new ComputeRegionMeanColor.F32();
+		ComputeRegionMeanColor<GrayF32> alg = new ComputeRegionMeanColor.F32();
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 
@@ -126,7 +126,7 @@ public class TestComputeRegionMeanColor {
 	@Test
 	public void specific_MS_U8() {
 		createRegionColor(2);
-		ImageUInt8 band = new ImageUInt8(w,h);
+		GrayU8 band = new GrayU8(w,h);
 		byte a = 1,b=2,c=3,d=10;
 		byte[] expected = new byte[]{a,b,c,d};
 		band.data = new byte[]{
@@ -135,11 +135,11 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,w,h,2);
+		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,w,h,2);
 		image.bands[0] = band;
 		image.bands[1] = band;
 
-		ComputeRegionMeanColor<MultiSpectral<ImageUInt8>> alg = new ComputeRegionMeanColor.MS_U8(2);
+		ComputeRegionMeanColor<Planar<GrayU8>> alg = new ComputeRegionMeanColor.MS_U8(2);
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 
@@ -153,7 +153,7 @@ public class TestComputeRegionMeanColor {
 	@Test
 	public void specific_MS_F32() {
 		createRegionColor(2);
-		ImageFloat32 band = new ImageFloat32(w,h);
+		GrayF32 band = new GrayF32(w,h);
 		float a = 1.1f,b=2.2f,c=3.3f,d=10.7f;
 		float[] expected = new float[]{a,b,c,d};
 		band.data = new float[]{
@@ -162,11 +162,11 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,w,h,2);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,w,h,2);
 		image.bands[0] = band;
 		image.bands[1] = band;
 
-		ComputeRegionMeanColor<MultiSpectral<ImageFloat32>> alg = new ComputeRegionMeanColor.MS_F32(2);
+		ComputeRegionMeanColor<Planar<GrayF32>> alg = new ComputeRegionMeanColor.MS_F32(2);
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 

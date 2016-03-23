@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.transform.wavelet.impl;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 import boofcv.testing.BoofTesting;
@@ -66,8 +66,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkHorizontal( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
-									   ImageSingleBand expected, ImageSingleBand found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageGray input,
+									   ImageGray expected, ImageGray found ) {
 				equalsTranHorizontal(desc,input,expected,found );
 			}
 		};
@@ -78,8 +78,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkVertical( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
-									   ImageSingleBand expected, ImageSingleBand found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageGray input,
+									   ImageGray expected, ImageGray found ) {
 				equalsTranVertical(desc,input,expected,found );
 			}
 		};
@@ -90,8 +90,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkHorizontalInverse( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
-									   ImageSingleBand expected, ImageSingleBand found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageGray input,
+									   ImageGray expected, ImageGray found ) {
 //				BoofTesting.printDiff(expected,found);
 				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
 				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getWidth());
@@ -114,8 +114,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	public void checkVerticalInverse( Method m ) {
 		PermuteWaveletCompare test = new InnerCompare() {
 			@Override
-			public void compareResults(WaveletDescription<?> desc, ImageSingleBand input,
-									   ImageSingleBand expected, ImageSingleBand found ) {
+			public void compareResults(WaveletDescription<?> desc, ImageGray input,
+									   ImageGray expected, ImageGray found ) {
 				int lowerBorder = UtilWavelet.borderInverseLower(desc.getInverse(),desc.getBorder());
 				int upperBorder = UtilWavelet.borderInverseUpper(desc.getInverse(),desc.getBorder(),found.getHeight());
 
@@ -137,9 +137,9 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
-	private void equalsTranHorizontal( WaveletDescription<?> desc,
-									   ImageSingleBand input ,
-									   ImageSingleBand expected , ImageSingleBand found ) {
+	private void equalsTranHorizontal(WaveletDescription<?> desc,
+									  ImageGray input ,
+									  ImageGray expected , ImageGray found ) {
 		int w = expected.width;
 		int h = expected.height;
 
@@ -154,8 +154,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 	 * Compares two wavelet transformations while ignoring the input image borders.  Input borders
 	 * affect the borders of internal segments inside the transformation.
 	 */
-	private void equalsTranHorizontal( ImageSingleBand expected , ImageSingleBand found ,
-									   int begin , int end , String quad ) {
+	private void equalsTranHorizontal(ImageGray expected , ImageGray found ,
+									  int begin , int end , String quad ) {
 
 		GImageSingleBand e = FactoryGImageSingleBand.wrap(expected);
 		GImageSingleBand f = FactoryGImageSingleBand.wrap(found);
@@ -172,9 +172,9 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		}
 	}
 
-	private void equalsTranVertical( WaveletDescription<?> desc,
-									 ImageSingleBand input ,
-									 ImageSingleBand expected , ImageSingleBand found ) {
+	private void equalsTranVertical(WaveletDescription<?> desc,
+									ImageGray input ,
+									ImageGray expected , ImageGray found ) {
 		int w = expected.width;
 		int h = expected.height;
 
@@ -185,8 +185,8 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 		equalsTranVertical(expected.subimage(0,h/2,w,h, null),found.subimage(0,h/2,w,h, null),lowerBorder/2,upperBorder/2,"bottom");
 	}
 
-	private void equalsTranVertical( ImageSingleBand expected , ImageSingleBand found ,
-									 int begin , int end , String quad ) {
+	private void equalsTranVertical(ImageGray expected , ImageGray found ,
+									int begin , int end , String quad ) {
 
 		GImageSingleBand e = FactoryGImageSingleBand.wrap(expected);
 		GImageSingleBand f = FactoryGImageSingleBand.wrap(found);
@@ -208,12 +208,12 @@ public class TestImplWaveletTransformInner extends CompareToNaiveWavelet {
 
 	private abstract class InnerCompare extends BaseCompare {
 		@Override
-		public void applyTransform(WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output) {
+		public void applyTransform(WaveletDescription<?> desc, ImageGray input, ImageGray output) {
 			applyInnerMethod(functionName,desc, input, output);
 		}
 	}
 
-	public static void applyInnerMethod( String functionName , WaveletDescription<?> desc, ImageSingleBand input, ImageSingleBand output ) {
+	public static void applyInnerMethod(String functionName , WaveletDescription<?> desc, ImageGray input, ImageGray output ) {
 
 		Method m;
 		Object args[];

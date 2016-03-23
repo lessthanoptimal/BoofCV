@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.junit.Test;
 
@@ -47,14 +47,14 @@ public class TestDetectFiducialSquareGrid {
 		ConfigFiducialBinary configBinary = new ConfigFiducialBinary(1);
 		configBinary.gridWidth = 3;
 
-		BaseDetectFiducialSquare<ImageFloat32> detector =
-				FactoryFiducial.squareBinary(configBinary, ConfigThreshold.fixed(125),ImageFloat32.class).
+		BaseDetectFiducialSquare<GrayF32> detector =
+				FactoryFiducial.squareBinary(configBinary, ConfigThreshold.fixed(125),GrayF32.class).
 						getAlgorithm();
-		DetectFiducialSquareGrid<ImageFloat32> alg = new DetectFiducialSquareGrid<ImageFloat32>(3,2,
+		DetectFiducialSquareGrid<GrayF32> alg = new DetectFiducialSquareGrid<GrayF32>(3,2,
 				new long[]{0,1,2,3,4,5},detector);
 
 		RenderSquareBinaryGridFiducial render = new RenderSquareBinaryGridFiducial();
-		ImageFloat32 image = render.generate(3, 2);
+		GrayF32 image = render.generate(3, 2);
 
 		assertTrue(alg.detect(image));
 

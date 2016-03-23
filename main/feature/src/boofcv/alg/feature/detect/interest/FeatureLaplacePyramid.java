@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_I16;
 
@@ -52,7 +52,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
 @SuppressWarnings({"unchecked"})
-public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSingleBand>
+public class FeatureLaplacePyramid<T extends ImageGray, D extends ImageGray>
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// used to compute feature intensity across scale space
@@ -189,7 +189,7 @@ public class FeatureLaplacePyramid<T extends ImageSingleBand, D extends ImageSin
 
 		for (Point2D_I16 c : candidates) {
 
-			ImageFloat32 intensity = detector.getIntensity();
+			GrayF32 intensity = detector.getIntensity();
 
 			float target = intensity.unsafe_get(c.x,c.y);
 			float fx,fy;

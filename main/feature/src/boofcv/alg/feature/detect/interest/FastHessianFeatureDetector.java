@@ -25,8 +25,8 @@ import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastQueue;
 
@@ -82,7 +82,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FastHessianFeatureDetector<II extends ImageSingleBand> {
+public class FastHessianFeatureDetector<II extends ImageGray> {
 
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
@@ -92,7 +92,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	private int maxFeaturesPerScale;
 
 	// local sub-space
-	private ImageFloat32 intensity[];
+	private GrayF32 intensity[];
 	private int spaceIndex = 0;
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
@@ -155,9 +155,9 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 	 */
 	public void detect( II integral ) {
 		if( intensity == null ) {
-			intensity = new ImageFloat32[3];
+			intensity = new GrayF32[3];
 			for( int i = 0; i < intensity.length; i++ ) {
-				intensity[i] = new ImageFloat32(integral.width,integral.height);
+				intensity[i] = new GrayF32(integral.width,integral.height);
 			}
 		}
 		foundPoints.reset();
@@ -233,7 +233,7 @@ public class FastHessianFeatureDetector<II extends ImageSingleBand> {
 		int index2 = (spaceIndex + 2) % 3;
 
 		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensity[index0], 0);
-		ImageFloat32 inten1 = intensity[index1];
+		GrayF32 inten1 = intensity[index1];
 		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensity[index2], 0);
 
 		// find local maximums in image 2D space.  Borders need to be ignored since

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 
 import java.util.Random;
 
@@ -38,18 +38,18 @@ public class BenchmarkSsdCornerIntensity {
 	static int windowRadius = 2;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 intensity = new ImageFloat32(imgWidth,imgHeight);
+	static GrayF32 intensity = new GrayF32(imgWidth,imgHeight);
 
-	static ImageFloat32 derivX_F32;
-	static ImageFloat32 derivY_F32;
-	static ImageFloat32 derivXX_F32;
-	static ImageFloat32 derivYY_F32;
-	static ImageFloat32 derivXY_F32;
-	static ImageSInt16 derivX_I16;
-	static ImageSInt16 derivY_I16;
-	static ImageSInt16 derivXX_I16;
-	static ImageSInt16 derivYY_I16;
-	static ImageSInt16 derivXY_I16;
+	static GrayF32 derivX_F32;
+	static GrayF32 derivY_F32;
+	static GrayF32 derivXX_F32;
+	static GrayF32 derivYY_F32;
+	static GrayF32 derivXY_F32;
+	static GrayS16 derivX_I16;
+	static GrayS16 derivY_I16;
+	static GrayS16 derivXX_I16;
+	static GrayS16 derivYY_I16;
+	static GrayS16 derivXY_I16;
 
 	static Random rand = new Random(234);
 
@@ -132,16 +132,16 @@ public class BenchmarkSsdCornerIntensity {
 
 
 	public static void main(String args[]) {
-		derivX_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivXX_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivYY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivXY_F32 = new ImageFloat32(imgWidth, imgHeight);
-		derivX_I16 = new ImageSInt16(imgWidth, imgHeight);
-		derivY_I16 = new ImageSInt16(imgWidth, imgHeight);
-		derivXX_I16 = new ImageSInt16(imgWidth, imgHeight);
-		derivYY_I16 = new ImageSInt16(imgWidth, imgHeight);
-		derivXY_I16 = new ImageSInt16(imgWidth, imgHeight);
+		derivX_F32 = new GrayF32(imgWidth, imgHeight);
+		derivY_F32 = new GrayF32(imgWidth, imgHeight);
+		derivXX_F32 = new GrayF32(imgWidth, imgHeight);
+		derivYY_F32 = new GrayF32(imgWidth, imgHeight);
+		derivXY_F32 = new GrayF32(imgWidth, imgHeight);
+		derivX_I16 = new GrayS16(imgWidth, imgHeight);
+		derivY_I16 = new GrayS16(imgWidth, imgHeight);
+		derivXX_I16 = new GrayS16(imgWidth, imgHeight);
+		derivYY_I16 = new GrayS16(imgWidth, imgHeight);
+		derivXY_I16 = new GrayS16(imgWidth, imgHeight);
 
 		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 255);
 		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 255);

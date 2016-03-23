@@ -25,8 +25,8 @@ import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating implementations of {@link RegionOrientation} that are used to estimate
@@ -44,7 +44,7 @@ public class FactoryOrientation {
 	 * @param imageType Type of input image it will process
 	 * @return Wrapped version which can process images as its raw input.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationImage<T> convertImage( RegionOrientation algorithm , Class<T> imageType ) {
 		if( algorithm instanceof OrientationGradient ) {
 			Class derivType = ((OrientationGradient) algorithm).getImageType();
@@ -66,13 +66,13 @@ public class FactoryOrientation {
 	 * @param imageType Type of input image
 	 * @return SIFT orientation image
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationImage<T> sift(ConfigSiftScaleSpace configSS , ConfigSiftOrientation configOri, Class<T> imageType ) {
 		if( configSS == null )
 			configSS = new ConfigSiftScaleSpace();
 		configSS.checkValidity();
 
-		OrientationHistogramSift<ImageFloat32> ori = FactoryOrientationAlgs.sift(configOri,ImageFloat32.class);
+		OrientationHistogramSift<GrayF32> ori = FactoryOrientationAlgs.sift(configOri,GrayF32.class);
 
 		SiftScaleSpace ss = new SiftScaleSpace(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);

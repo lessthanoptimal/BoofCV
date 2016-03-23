@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.edge;
 
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -30,7 +30,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class PolygonEdgeIntensity<T extends ImageSingleBand>  {
+public class PolygonEdgeIntensity<T extends ImageGray>  {
 
 	// distance away from corner that sampling will start and end
 	private double cornerOffset;

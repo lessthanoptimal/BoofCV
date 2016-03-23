@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.denoise.wavelet;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Arrays;
 
@@ -41,7 +41,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
+public class DenoiseSureShrink_F32 extends SubbandShrink<GrayF32> {
 
 	float noiseSigma;
 
@@ -50,7 +50,7 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 	}
 
 	@Override
-	protected Number computeThreshold( ImageFloat32 subband  )
+	protected Number computeThreshold( GrayF32 subband  )
 	{
 		float coef[] = new float[ subband.width*subband.height ];
 		UtilDenoiseWavelet.subbandAbsVal(subband,coef);
@@ -83,7 +83,7 @@ public class DenoiseSureShrink_F32 extends SubbandShrink<ImageFloat32> {
 	}
 
 	@Override
-	public void denoise( ImageFloat32 transform , int numLevels ) {
+	public void denoise(GrayF32 transform , int numLevels ) {
 
 		int w = transform.width;
 		int h = transform.height;

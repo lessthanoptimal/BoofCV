@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.feature.detect.intensity.FastCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating various types of interest point intensity algorithms.
@@ -45,14 +45,14 @@ public class FactoryIntensityPointAlg {
 	 * @param imageType Type of input image it is computed form.
 	 * @return Fast corner
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	FastCornerIntensity<T> fast(int pixelTol, int minCont, Class<T> imageType)
 	{
 		FastHelper<T> helper;
 
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			helper = (FastHelper)new ImplFastHelper_F32(pixelTol);
-		else if( imageType == ImageUInt8.class )
+		else if( imageType == GrayU8.class )
 			helper = (FastHelper)new ImplFastHelper_U8(pixelTol);
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
@@ -79,16 +79,16 @@ public class FactoryIntensityPointAlg {
 	 * @param weighted Is the gradient weighted using a Gaussian distribution?  Weighted is much slower than unweighted.
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
-	public static <D extends ImageSingleBand>
+	public static <D extends ImageGray>
 	HarrisCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
 	{
-		if( derivType == ImageFloat32.class ) {
+		if( derivType == GrayF32.class ) {
 			if( weighted )
 				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
 			else
 				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_F32(windowRadius,kappa);
 
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			if( weighted )
 				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
 			else
@@ -107,15 +107,15 @@ public class FactoryIntensityPointAlg {
 	 * @param derivType Image derivative type it is computed from.
 	 * @return KLT corner
 	 */
-	public static <D extends ImageSingleBand>
+	public static <D extends ImageGray>
 	ShiTomasiCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
 	{
-		if( derivType == ImageFloat32.class ) {
+		if( derivType == GrayF32.class ) {
 			if( weighted )
 				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_F32(windowRadius);
 			else
 				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCorner_F32(windowRadius);
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			if( weighted )
 				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_S16(windowRadius);
 			else

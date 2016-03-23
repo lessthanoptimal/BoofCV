@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -63,7 +63,7 @@ public class RegionMergeTree {
 	 * @param pixelToRegion (Input/Output) Image used to convert pixel location in region ID.  Modified.
 	 * @param regionMemberCount (Input/Output) List containing how many pixels belong to each region.  Modified.
 	 */
-	public void performMerge( ImageSInt32 pixelToRegion ,
+	public void performMerge( GrayS32 pixelToRegion ,
 							  GrowQueue_I32 regionMemberCount ) {
 		// update member counts
 		flowIntoRootNode(regionMemberCount);

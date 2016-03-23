@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayI16;
+import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
@@ -35,8 +35,8 @@ import boofcv.struct.image.ImageSInt16;
  * @author Peter Abeles
  */
 public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
-	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest , int skip, int divisor) {
+	public static boolean horizontal(Kernel1D_I32 kernel ,
+									 GrayS16 image, GrayI16 dest , int skip, int divisor) {
 		switch( kernel.width ) {
 			case 3:
 				horizontal3(kernel,image,dest,skip,divisor);
@@ -64,8 +64,8 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest , int skip, int divisor) {
+	public static boolean vertical(Kernel1D_I32 kernel ,
+								   GrayS16 image, GrayI16 dest , int skip, int divisor) {
 		switch( kernel.width ) {
 			case 3:
 				vertical3(kernel,image,dest,skip,divisor);
@@ -93,8 +93,8 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageSInt16 image, ImageInt16 dest , int skip , int divisor ) {
+	public static boolean convolve(Kernel2D_I32 kernel ,
+								   GrayS16 image, GrayI16 dest , int skip , int divisor ) {
 		switch( kernel.width ) {
 			case 3:
 				convolve3(kernel,image,dest,skip,divisor);
@@ -122,9 +122,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_I32 kernel ,
-									ImageSInt16 input, ImageInt16 output ,
-									int skip , int divisor ) {
+	public static void horizontal3(Kernel1D_I32 kernel ,
+								   GrayS16 input, GrayI16 output ,
+								   int skip , int divisor ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -157,9 +157,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_I32 kernel ,
-									ImageSInt16 input, ImageInt16 output ,
-									int skip , int divisor ) {
+	public static void horizontal5(Kernel1D_I32 kernel ,
+								   GrayS16 input, GrayI16 output ,
+								   int skip , int divisor ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -196,9 +196,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_I32 kernel ,
-									ImageSInt16 input, ImageInt16 output ,
-									int skip , int divisor ) {
+	public static void horizontal7(Kernel1D_I32 kernel ,
+								   GrayS16 input, GrayI16 output ,
+								   int skip , int divisor ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -239,9 +239,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_I32 kernel ,
-									ImageSInt16 input, ImageInt16 output ,
-									int skip , int divisor ) {
+	public static void horizontal9(Kernel1D_I32 kernel ,
+								   GrayS16 input, GrayI16 output ,
+								   int skip , int divisor ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -286,8 +286,8 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_I32 kernel ,
-									ImageSInt16 input, ImageInt16 output ,
+	public static void horizontal11(Kernel1D_I32 kernel ,
+									GrayS16 input, GrayI16 output ,
 									int skip , int divisor ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
@@ -337,9 +337,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void vertical3( Kernel1D_I32 kernel,
-								 ImageSInt16 input, ImageInt16 output,
-									int skip , int divisor) {
+	public static void vertical3(Kernel1D_I32 kernel,
+								 GrayS16 input, GrayI16 output,
+								 int skip , int divisor) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -373,9 +373,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void vertical5( Kernel1D_I32 kernel,
-								 ImageSInt16 input, ImageInt16 output,
-									int skip , int divisor) {
+	public static void vertical5(Kernel1D_I32 kernel,
+								 GrayS16 input, GrayI16 output,
+								 int skip , int divisor) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -415,9 +415,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void vertical7( Kernel1D_I32 kernel,
-								 ImageSInt16 input, ImageInt16 output,
-									int skip , int divisor) {
+	public static void vertical7(Kernel1D_I32 kernel,
+								 GrayS16 input, GrayI16 output,
+								 int skip , int divisor) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -463,9 +463,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void vertical9( Kernel1D_I32 kernel,
-								 ImageSInt16 input, ImageInt16 output,
-									int skip , int divisor) {
+	public static void vertical9(Kernel1D_I32 kernel,
+								 GrayS16 input, GrayI16 output,
+								 int skip , int divisor) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -517,9 +517,9 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void vertical11( Kernel1D_I32 kernel,
-								 ImageSInt16 input, ImageInt16 output,
-									int skip , int divisor) {
+	public static void vertical11(Kernel1D_I32 kernel,
+								  GrayS16 input, GrayI16 output,
+								  int skip , int divisor) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 
@@ -577,7 +577,7 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
+	public static void convolve3(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output, int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
@@ -636,7 +636,7 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
+	public static void convolve5(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output, int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
@@ -703,7 +703,7 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
+	public static void convolve7(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output, int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
@@ -778,7 +778,7 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
+	public static void convolve9(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output, int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
@@ -861,7 +861,7 @@ public class ConvolveDownNoBorderUnrolled_S16_I16_Div {
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output, int skip , int divisor )
+	public static void convolve11(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output, int skip , int divisor )
 	{
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;

@@ -30,7 +30,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -67,14 +67,14 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// load the video file
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");
-		SimpleImageSequence<ImageFloat32> video =
-				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(ImageFloat32.class));
+		SimpleImageSequence<GrayF32> video =
+				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(GrayF32.class));
 //				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(ImageFloat32.class));
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
-		CalibrationFiducialDetector<ImageFloat32> detector =
-				FactoryFiducial.calibChessboard(new ConfigChessboard(4, 5, 0.03),ImageFloat32.class);
+		CalibrationFiducialDetector<GrayF32> detector =
+				FactoryFiducial.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
 
 		detector.setIntrinsic(intrinsic);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.awt.*;
@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class ImagePyramidPanel<T extends ImageSingleBand> extends ListDisplayPanel {
+public class ImagePyramidPanel<T extends ImageGray> extends ListDisplayPanel {
 
 	// the image pyramid.
 	ImagePyramid<T> pyramid;

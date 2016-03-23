@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,12 +37,12 @@ public class TestConvertNV21 {
 
 	@Test
 	public void testGray() {
-		Class types[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+		Class types[] = new Class[]{GrayU8.class, GrayF32.class};
 
 		byte[] data = random(width,height);
 
 		for( Class type : types ) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type, width, height);
+			ImageGray image = GeneralizedImageOps.createSingleBand(type, width, height);
 			ConvertYV12.yu12ToBoof(data,width,height,image);
 
 			for (int y = 0; y < height; y++) {
@@ -62,8 +62,8 @@ public class TestConvertNV21 {
 				ImageType.il(3, ImageDataType.U8),ImageType.il(3, ImageDataType.F32)};
 
 		byte[] data = random(width,height);
-		MultiSpectral<ImageUInt8> yuv = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+		Planar<GrayU8> yuv = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,width,height,3);
 
 		nv21ToMulti(data, width, height, yuv);
 		ColorYuv.ycbcrToRgb_U8(yuv, rgb);
@@ -93,7 +93,7 @@ public class TestConvertNV21 {
 		return data;
 	}
 
-	public void nv21ToMulti( byte[] data , int width , int height , MultiSpectral<ImageUInt8> yuv ) {
+	public void nv21ToMulti( byte[] data , int width , int height , Planar<GrayU8> yuv ) {
 		yuv.reshape(width, height);
 
 		int size = width*height;

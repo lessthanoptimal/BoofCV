@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import georegression.struct.affine.Affine2D_F64;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
  */
 public class TestStitchingFromMotion2D {
 
-	ImageFloat32 image = new ImageFloat32(100,150);
+	GrayF32 image = new GrayF32(100,150);
 	Affine2D_F64 translation = new Affine2D_F64(1,0,0,1,1,-2);
 	Affine2D_F64 motion0 = new Affine2D_F64(1,2,3,4,5,6);
 
@@ -53,8 +53,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -99,8 +99,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,motion0);
 		assertTrue(alg.process(image));
@@ -123,8 +123,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -145,8 +145,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -164,8 +164,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -189,13 +189,13 @@ public class TestStitchingFromMotion2D {
 	public void resizeStitchImage_Transform() {
 		HelperMotion motion = new HelperMotion();
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.EXTENDED, ImageFloat32.class);
-		ImageDistort distorter = FactoryDistort.distortSB(false, interp, ImageFloat32.class);
+				TypeInterpolate.BILINEAR, BorderType.EXTENDED, GrayF32.class);
+		ImageDistort distorter = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distorter,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distorter,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -216,7 +216,7 @@ public class TestStitchingFromMotion2D {
 		assertEquals(-2+4,found.ty,1e-5);
 	}
 
-	private void checkBlock( int x0 , int y0 , int x1 , int y1 , ImageFloat32 image ) {
+	private void checkBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 image ) {
 
 		for( int y = 0; y < image.height; y++ ) {
 			for (int x = 0; x < image.width; x++) {
@@ -237,8 +237,8 @@ public class TestStitchingFromMotion2D {
 
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
-		StitchingFromMotion2D<ImageFloat32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<ImageFloat32,Affine2D_F64>(motion,distort,trans,0.3);
+		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
+				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -257,7 +257,7 @@ public class TestStitchingFromMotion2D {
 		assertEquals(2+h,corners.p3.y,1e-5);
 	}
 
-	private class HelperMotion implements ImageMotion2D<ImageFloat32,Affine2D_F64> {
+	private class HelperMotion implements ImageMotion2D<GrayF32,Affine2D_F64> {
 
 		int numProcess = 0;
 		int numReset = 0;
@@ -265,7 +265,7 @@ public class TestStitchingFromMotion2D {
 		Affine2D_F64 found = translation;
 
 		@Override
-		public boolean process(ImageFloat32 input) {
+		public boolean process(GrayF32 input) {
 			numProcess++;
 			return true;
 		}

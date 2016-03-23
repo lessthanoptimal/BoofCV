@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class TestHysteresisEdgeTracePoints extends CommonHysteresisEdgeTrace {
 
 	@Test
 	public void test2() {
-		ImageSInt8 dir = direction(2);
+		GrayS8 dir = direction(2);
 
 		HysteresisEdgeTracePoints alg = new HysteresisEdgeTracePoints();
 
@@ -69,19 +69,19 @@ public class TestHysteresisEdgeTracePoints extends CommonHysteresisEdgeTrace {
 	}
 
 	private void standardTest( int which ) {
-		ImageFloat32 inten = intensity(which);
-		ImageSInt8 dir = direction(which);
+		GrayF32 inten = intensity(which);
+		GrayS8 dir = direction(which);
 
 		HysteresisEdgeTracePoints alg = new HysteresisEdgeTracePoints();
 
 		alg.process(inten,dir,2,5);
-		ImageUInt8 out = convert(alg.getContours(),inten.width,inten.height);
+		GrayU8 out = convert(alg.getContours(),inten.width,inten.height);
 
 		BoofTesting.assertEquals(expected(which), out, 0);
 	}
 
-	private ImageUInt8 convert( List<EdgeContour> contour , int w , int h ) {
-		ImageUInt8 out = new ImageUInt8(w,h);
+	private GrayU8 convert(List<EdgeContour> contour , int w , int h ) {
+		GrayU8 out = new GrayU8(w,h);
 		for( EdgeContour e : contour ) {
 			for( EdgeSegment s : e.segments ) {
 				for(Point2D_I32 p : s.points ) {

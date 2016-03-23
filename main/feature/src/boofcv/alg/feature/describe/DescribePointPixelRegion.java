@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.describe;
 
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Describes a rectangular region using its raw pixel intensities. Score between two regions of this type is typically
@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegion<T extends ImageSingleBand, D extends TupleDesc>
+public abstract class DescribePointPixelRegion<T extends ImageGray, D extends TupleDesc>
 		extends DescribePointRectangleRegion<T>
 {
 

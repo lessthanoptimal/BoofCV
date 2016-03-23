@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -261,18 +261,18 @@ public class BoofMiscOps {
 		}
 	}
 
-	public static void print(ImageSingleBand a) {
+	public static void print(ImageGray a) {
 
 		if( a.getDataType().isInteger() ) {
-			print((ImageInteger)a);
-		} else if( a instanceof ImageFloat32) {
-			print((ImageFloat32)a);
+			print((GrayI)a);
+		} else if( a instanceof GrayF32) {
+			print((GrayF32)a);
 		} else {
-			print((ImageFloat64)a);
+			print((GrayF64)a);
 		}
 	}
 
-	public static void print(ImageFloat64 a) {
+	public static void print(GrayF64 a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%6.2f ", a.get(x, y));
@@ -282,7 +282,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static void print(ImageFloat32 a) {
+	public static void print(GrayF32 a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%6.2f ", a.get(x, y));
@@ -307,7 +307,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static void print(ImageInteger a) {
+	public static void print(GrayI a) {
 		for (int y = 0; y < a.height; y++) {
 			for (int x = 0; x < a.width; x++) {
 				System.out.printf("%4d ", a.get(x, y));

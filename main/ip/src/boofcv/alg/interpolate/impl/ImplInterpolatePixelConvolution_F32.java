@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -37,14 +37,14 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<ImageFloat32>  {
+public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<GrayF32>  {
 
 	// used to read outside the image border
 	private ImageBorder_F32 border;
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
-	private ImageFloat32 image;
+	private GrayF32 image;
 	// minimum and maximum allowed pixel values
 	private float min,max;
 
@@ -55,19 +55,19 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Im
 	}
 
 	@Override
-	public void setBorder(ImageBorder<ImageFloat32> border) {
+	public void setBorder(ImageBorder<GrayF32> border) {
 		this.border = (ImageBorder_F32)border;
 	}
 
 	@Override
-	public void setImage(ImageFloat32 image ) {
+	public void setImage(GrayF32 image ) {
 		if( border != null )
 			border.setImage(image);
 		this.image = image;
 	}
 
 	@Override
-	public ImageFloat32 getImage() {
+	public GrayF32 getImage() {
 		return image;
 	}
 
@@ -202,12 +202,12 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Im
 		return kernel.getRadius();
 	}
 	@Override
-	public ImageBorder<ImageFloat32> getBorder() {
+	public ImageBorder<GrayF32> getBorder() {
 		return border;
 	}
 	@Override
-	public ImageType<ImageFloat32> getImageType() {
-		return ImageType.single(ImageFloat32.class);
+	public ImageType<GrayF32> getImageType() {
+		return ImageType.single(GrayF32.class);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.background;
 
 import boofcv.alg.distort.PointTransformHomography_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.Homography2D_F32;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class TestBackgroundModelMoving
 		Helper helper = new Helper();
 
 		helper.initialize(400,600,new Homography2D_F32(1,0,100,0,1,150,0,0,1));
-		helper.updateBackground(new Homography2D_F32(1,0,-10,0,1,-15,0,0,1),new ImageUInt8(100,120));
+		helper.updateBackground(new Homography2D_F32(1,0,-10,0,1,-15,0,0,1),new GrayU8(100,120));
 		// tests are contained in helper
 	}
 
@@ -47,16 +47,16 @@ public class TestBackgroundModelMoving
 
 		helper.initialize(400, 600, new Homography2D_F32(1, 0, 100, 0, 1, 150, 0, 0, 1));
 		helper.segment(new Homography2D_F32(1,0,-10,0,1,-15,0,0,1),
-				new ImageUInt8(100,120),new ImageUInt8(100,120));
+				new GrayU8(100,120),new GrayU8(100,120));
 	}
 
 
-	public class Helper extends BackgroundModelMoving<ImageUInt8,Homography2D_F32> {
+	public class Helper extends BackgroundModelMoving<GrayU8,Homography2D_F32> {
 
-		ImageUInt8 background = new ImageUInt8(1,1);
+		GrayU8 background = new GrayU8(1,1);
 
 		public Helper() {
-			super(new PointTransformHomography_F32(), ImageType.single(ImageUInt8.class));
+			super(new PointTransformHomography_F32(), ImageType.single(GrayU8.class));
 		}
 
 		@Override
@@ -72,7 +72,7 @@ public class TestBackgroundModelMoving
 		@Override public void reset() {}
 
 		@Override
-		protected void updateBackground(int x0, int y0, int x1, int y1, ImageUInt8 frame) {
+		protected void updateBackground(int x0, int y0, int x1, int y1, GrayU8 frame) {
 			assertEquals(110,x0);
 			assertEquals(165,y0);
 			assertEquals(210,x1);
@@ -85,7 +85,7 @@ public class TestBackgroundModelMoving
 		}
 
 		@Override
-		protected void _segment(Homography2D_F32 currentToWorld, ImageUInt8 frame, ImageUInt8 segmented) {
+		protected void _segment(Homography2D_F32 currentToWorld, GrayU8 frame, GrayU8 segmented) {
 
 			Homography2D_F32 expected = new Homography2D_F32(1,0,110,0,1,165,0,0,1);
 			checkEquals(expected,currentToWorld,1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 	/**
 	 * Creates the equivalent single band interpolation algorithm. If none exist then return null
 	 */
-	protected abstract<SB extends ImageSingleBand>
+	protected abstract<SB extends ImageGray>
 	InterpolatePixelS<SB> wrapSingle(SB image, int minValue, int maxValue);
 
 	/**
@@ -348,8 +348,8 @@ public abstract class GeneralChecksInterpolationPixelMB< T extends ImageMultiBan
 		GImageMiscOps.fillUniform(origMB, rand, 0, 100);
 
 		ImageDataType dataType = origMB.getImageType().getDataType();
-		ImageSingleBand band0 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
-		ImageSingleBand band1 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
+		ImageGray band0 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
+		ImageGray band1 = GeneralizedImageOps.createSingleBand(dataType,origMB.width,origMB.height);
 
 		for (int y = 0; y < origMB.height; y++) {
 			for (int x = 0; x < origMB.width; x++) {

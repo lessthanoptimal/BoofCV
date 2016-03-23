@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -137,14 +137,14 @@ public class ExampleFundamentalMatrix {
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left , BufferedImage right ) {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, ImageFloat32.class);
+				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
 		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
 
-		ExampleAssociatePoints<ImageFloat32,BrightFeature> findMatches =
-				new ExampleAssociatePoints<ImageFloat32,BrightFeature> (detDesc, associate, ImageFloat32.class);
+		ExampleAssociatePoints<GrayF32,BrightFeature> findMatches =
+				new ExampleAssociatePoints<GrayF32,BrightFeature> (detDesc, associate, GrayF32.class);
 
 		findMatches.associate(left,right);
 

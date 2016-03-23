@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,10 +38,10 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.MatrixOfList;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
@@ -58,7 +58,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class VisualizeLineRansac<I extends ImageGray, D extends ImageGray> {
 
 	Class<I> imageType;
 	Class<D> derivType;
@@ -74,11 +74,11 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, image.getWidth(), image.getHeight());
-		ImageFloat32 edgeIntensity =  new ImageFloat32(input.width,input.height);
-		ImageFloat32 suppressed =  new ImageFloat32(input.width,input.height);
-		ImageFloat32 orientation =  new ImageFloat32(input.width,input.height);
-		ImageSInt8 direction = new ImageSInt8(input.width,input.height);
-		ImageUInt8 detected = new ImageUInt8(input.width,input.height);
+		GrayF32 edgeIntensity =  new GrayF32(input.width,input.height);
+		GrayF32 suppressed =  new GrayF32(input.width,input.height);
+		GrayF32 orientation =  new GrayF32(input.width,input.height);
+		GrayS8 direction = new GrayS8(input.width,input.height);
+		GrayU8 detected = new GrayU8(input.width,input.height);
 
 		ModelManager<LinePolar2D_F32> manager = new ModelManagerLinePolar2D_F32();
 		GridLineModelDistance distance = new GridLineModelDistance((float)(Math.PI*0.75));
@@ -102,9 +102,9 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 
 		GThresholdImageOps.threshold(edgeIntensity,detected,30,false);
 
-		GridRansacLineDetector<ImageFloat32> alg = new ImplGridRansacLineDetector_F32(40,10,matcher);
+		GridRansacLineDetector<GrayF32> alg = new ImplGridRansacLineDetector_F32(40,10,matcher);
 
-		alg.process((ImageFloat32) derivX, (ImageFloat32) derivY, detected);
+		alg.process((GrayF32) derivX, (GrayF32) derivY, detected);
 
 		MatrixOfList<LineSegment2D_F32> gridLine = alg.getFoundLines();
 
@@ -129,8 +129,8 @@ public class VisualizeLineRansac<I extends ImageSingleBand, D extends ImageSingl
 	}
 
 	public static void main( String args[] ) {
-		VisualizeLineRansac<ImageFloat32,ImageFloat32> app =
-				new VisualizeLineRansac<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		VisualizeLineRansac<GrayF32,GrayF32> app =
+				new VisualizeLineRansac<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes01.png"));

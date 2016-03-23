@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class GDiscreteFourierTransformOps {
 	 * @param type Image data type
 	 * @return {@link boofcv.abst.transform.fft.DiscreteFourierTransform}
 	 */
-	public static <T extends ImageFloat, W extends ImageInterleaved>
+	public static <T extends GrayF, W extends ImageInterleaved>
 	DiscreteFourierTransform<T,W> createTransform( ImageDataType type ) {
 		switch( type ) {
 			case F32: return (DiscreteFourierTransform)createTransformF32();
@@ -70,11 +70,11 @@ public class GDiscreteFourierTransformOps {
 	 * @param transform (Input)  Complex interleaved image
 	 * @param magnitude (Output) Magnitude of image
 	 */
-	public static void magnitude( ImageInterleaved transform , ImageFloat magnitude ) {
+	public static void magnitude( ImageInterleaved transform , GrayF magnitude ) {
 		if( transform instanceof InterleavedF32 ) {
-			DiscreteFourierTransformOps.magnitude((InterleavedF32) transform, (ImageFloat32) magnitude);
+			DiscreteFourierTransformOps.magnitude((InterleavedF32) transform, (GrayF32) magnitude);
 		} else if( transform instanceof InterleavedF64 ) {
-			DiscreteFourierTransformOps.magnitude((InterleavedF64) transform, (ImageFloat64) magnitude);
+			DiscreteFourierTransformOps.magnitude((InterleavedF64) transform, (GrayF64) magnitude);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
@@ -86,11 +86,11 @@ public class GDiscreteFourierTransformOps {
 	 * @param transform (Input) Complex interleaved image
 	 * @param phase (output) Phase of image
 	 */
-	public static void phase( ImageInterleaved transform , ImageFloat phase ) {
+	public static void phase( ImageInterleaved transform , GrayF phase ) {
 		if( transform instanceof InterleavedF32 ) {
-			DiscreteFourierTransformOps.phase((InterleavedF32) transform, (ImageFloat32) phase);
+			DiscreteFourierTransformOps.phase((InterleavedF32) transform, (GrayF32) phase);
 		} else if( transform instanceof InterleavedF64 ) {
-			DiscreteFourierTransformOps.phase((InterleavedF64) transform, (ImageFloat64) phase);
+			DiscreteFourierTransformOps.phase((InterleavedF64) transform, (GrayF64) phase);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
@@ -102,11 +102,11 @@ public class GDiscreteFourierTransformOps {
 	 * @param real (Input) Regular image.
 	 * @param complex (Output) Equivalent complex image.
 	 */
-	public static void realToComplex( ImageFloat real , ImageInterleaved complex ) {
+	public static void realToComplex(GrayF real , ImageInterleaved complex ) {
 		if( complex instanceof InterleavedF32 ) {
-			DiscreteFourierTransformOps.realToComplex((ImageFloat32) real, (InterleavedF32) complex);
+			DiscreteFourierTransformOps.realToComplex((GrayF32) real, (InterleavedF32) complex);
 		} else if( complex instanceof InterleavedF64 ) {
-			DiscreteFourierTransformOps.realToComplex((ImageFloat64) real, (InterleavedF64) complex);
+			DiscreteFourierTransformOps.realToComplex((GrayF64) real, (InterleavedF64) complex);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
@@ -119,12 +119,12 @@ public class GDiscreteFourierTransformOps {
 	 * @param complexB (Input) Complex image
 	 * @param complexC (Output) Complex image
 	 */
-	public static void multiplyRealComplex( ImageFloat realA ,
+	public static void multiplyRealComplex( GrayF realA ,
 											ImageInterleaved complexB , ImageInterleaved complexC ) {
 		if( complexB instanceof InterleavedF32 ) {
-			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat32) realA, (InterleavedF32) complexB, (InterleavedF32) complexC);
+			DiscreteFourierTransformOps.multiplyRealComplex((GrayF32) realA, (InterleavedF32) complexB, (InterleavedF32) complexC);
 		} else if( complexB instanceof InterleavedF64 ) {
-			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat64) realA, (InterleavedF64) complexB, (InterleavedF64) complexC);
+			DiscreteFourierTransformOps.multiplyRealComplex((GrayF64) realA, (InterleavedF64) complexB, (InterleavedF64) complexC);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}

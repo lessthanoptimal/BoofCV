@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.struct.pyramid;
 
 import boofcv.core.image.ImageGenerator;
 import boofcv.core.image.inst.FactoryImageGenerator;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImagePyramidBase<T extends ImageSingleBand>
+public abstract class ImagePyramidBase<T extends ImageGray>
 	implements ImagePyramid<T>
 {
 	// shape of full resolution input image

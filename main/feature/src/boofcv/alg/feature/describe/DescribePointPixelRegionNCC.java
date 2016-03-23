@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Describes a rectangular region using its raw pixel intensities which have been normalized for intensity.  This
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointPixelRegionNCC<T extends ImageSingleBand>
+public abstract class DescribePointPixelRegionNCC<T extends ImageGray>
 		extends DescribePointRectangleRegion<T>
 {
 	protected DescribePointPixelRegionNCC(int regionWidth, int regionHeight) {

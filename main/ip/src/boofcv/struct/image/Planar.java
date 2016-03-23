@@ -24,9 +24,9 @@ import java.lang.reflect.Array;
 
 /**
  * <p>
- * An image class for images with multiple bands/colors where each band is stored as an independent 
- * {@link ImageSingleBand}. MultiSpectral image fully supports all functions inside of 
- * {@link ImageBase}. Each internal image has the same width, height, startIndex, and stride. 
+ * Multi-band image composed of discontinuous planar images for each band.  The bands are discontinuous in that
+ * each one is an independent memory and are of type {@link ImageGray}.  Planar images fully supports all
+ * functions inside of {@link ImageBase}. Each internal image has the same width, height, startIndex, and stride.
  * </p>
  * 
  * <p>
@@ -48,7 +48,7 @@ import java.lang.reflect.Array;
  * 
  * <p>
  * May image processing operations can be run independently on each color band. This is useful since many
- * operations have been written for {@link ImageSingleBand}, but not MultiSpectral yet.
+ * operations have been written for {@link ImageGray}, but not MultiSpectral yet.
  * <pre>
  * for( int i = 0; i < image.numBands(); i++ ) {
  *     SomeGrayImageFilter.process( image.getBand(0) );
@@ -58,8 +58,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-// TODO Rename to ImagePlanar ?
-public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<MultiSpectral<T>>{
+public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Type of image in each band
@@ -79,7 +78,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * @param height Height of the image.
 	 * @param numBands Total number of bands.
 	 */
-	public MultiSpectral(Class<T> type, int width, int height, int numBands) {
+	public Planar(Class<T> type, int width, int height, int numBands) {
 		this.type = type;
 		this.stride = width;
 		this.width = width;
@@ -98,7 +97,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * @param type The type of image which each band is stored as. 
 	 * @param numBands Number of bands in the image.
 	 */
-	public MultiSpectral(Class<T> type, int numBands) {
+	public Planar(Class<T> type, int numBands) {
 		this.type = type;
 		this.bands = (T[]) Array.newInstance(type, numBands);
 		this.imageType = ImageType.ms(numBands,type);
@@ -151,7 +150,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public MultiSpectral<T> subimage(int x0, int y0, int x1, int y1, MultiSpectral<T> subimage) {
+	public Planar<T> subimage(int x0, int y0, int x1, int y1, Planar<T> subimage) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -159,7 +158,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 		if (x1 > width || y1 > height)
 			throw new IllegalArgumentException("x1 or y1 is more than the width or height respectively");
 
-		MultiSpectral<T> ret = new MultiSpectral<T>(type,bands.length);
+		Planar<T> ret = new Planar<T>(type,bands.length);
 		ret.stride = Math.max(width, stride);
 		ret.width = x1 - x0;
 		ret.height = y1 - y0;
@@ -180,7 +179,7 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * @param orig The original image whose value is to be copied into this one
 	 */
 	@Override
-	public void setTo( MultiSpectral<T> orig) {
+	public void setTo( Planar<T> orig) {
 		if (orig.width != width || orig.height != height)
 			reshape(orig.width,orig.height);
 		if( orig.getNumBands() != getNumBands() )
@@ -222,18 +221,18 @@ public class MultiSpectral<T extends ImageSingleBand> extends ImageMultiBand<Mul
 	 * @return new image
 	 */
 	@Override
-	public MultiSpectral<T> _createNew(int imgWidth, int imgHeight) {
-		return new MultiSpectral<T>(type,imgWidth,imgHeight,bands.length);
+	public Planar<T> _createNew(int imgWidth, int imgHeight) {
+		return new Planar<T>(type,imgWidth,imgHeight,bands.length);
 	}
 
 	/**
-	 * Returns a new {@link MultiSpectral} which references the same internal single band images at this one.
+	 * Returns a new {@link Planar} which references the same internal single band images at this one.
 	 *
 	 * @param which List of bands which will comprise the new image
 	 * @return New image
 	 */
-	public MultiSpectral<T> partialSpectrum( int ...which ) {
-		MultiSpectral<T> out = new MultiSpectral<T>(getBandType(),which.length);
+	public Planar<T> partialSpectrum(int ...which ) {
+		Planar<T> out = new Planar<T>(getBandType(),which.length);
 
 		out.setWidth(width);
 		out.setHeight(height);

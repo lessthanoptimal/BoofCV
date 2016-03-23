@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSingleBand>
+public class VideoDisplayLinesApp<I extends ImageGray, D extends ImageGray>
 		extends VideoProcessAppBase<I> implements MouseListener
 {
 	I blur;
@@ -151,12 +151,12 @@ public class VideoDisplayLinesApp<I extends ImageSingleBand, D extends ImageSing
 	protected void handleRunningStatus(int status) {}
 
 	@Override
-	protected void updateAlgGUI(ImageSingleBand frame, BufferedImage imageGUI, double fps) {
+	protected void updateAlgGUI(ImageGray frame, BufferedImage imageGUI, double fps) {
 		gui.setBackground(imageGUI);
 	}
 
 	public static void main( String args[] ) {
-		VideoDisplayLinesApp app = new VideoDisplayLinesApp(ImageFloat32.class, ImageFloat32.class);
+		VideoDisplayLinesApp app = new VideoDisplayLinesApp(GrayF32.class, GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));

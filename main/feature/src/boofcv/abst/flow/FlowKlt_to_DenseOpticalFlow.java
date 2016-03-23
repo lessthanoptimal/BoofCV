@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.flow.DenseOpticalFlowKlt;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 
@@ -34,7 +34,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class FlowKlt_to_DenseOpticalFlow<I extends ImageSingleBand, D extends ImageSingleBand>
+public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray, D extends ImageGray>
 	implements DenseOpticalFlow<I>
 {
 	DenseOpticalFlowKlt<I,D> flowKlt;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class TestContourTracer {
 
 	@Test
 	public void single() {
-		ImageUInt8 pattern = new ImageUInt8(1,1);
+		GrayU8 pattern = new GrayU8(1,1);
 		ImageMiscOps.fill(pattern,1);
 
 		shiftContourCheck(pattern,1,ConnectRule.FOUR);
@@ -58,7 +58,7 @@ public class TestContourTracer {
 
 	@Test
 	public void two_horizontal() {
-		ImageUInt8 pattern = new ImageUInt8(2,1);
+		GrayU8 pattern = new GrayU8(2,1);
 		ImageMiscOps.fill(pattern,1);
 
 		shiftContourCheck(pattern,2,ConnectRule.FOUR);
@@ -67,7 +67,7 @@ public class TestContourTracer {
 
 	@Test
 	public void two_vertical() {
-		ImageUInt8 pattern = new ImageUInt8(1,2);
+		GrayU8 pattern = new GrayU8(1,2);
 		ImageMiscOps.fill(pattern,1);
 
 		shiftContourCheck(pattern,2,ConnectRule.FOUR);
@@ -76,7 +76,7 @@ public class TestContourTracer {
 
 	@Test
 	public void square() {
-		ImageUInt8 pattern = new ImageUInt8(2,2);
+		GrayU8 pattern = new GrayU8(2,2);
 		ImageMiscOps.fill(pattern,1);
 
 		shiftContourCheck(pattern,4,ConnectRule.FOUR);
@@ -90,7 +90,7 @@ public class TestContourTracer {
 				"01\n"+
 				"10\n";
 
-		ImageUInt8 pattern = stringToImage(s);
+		GrayU8 pattern = stringToImage(s);
 
 		shiftContourCheck(pattern,4,ConnectRule.EIGHT);
 	}
@@ -102,7 +102,7 @@ public class TestContourTracer {
 				"0110\n"+
 				"1001\n";
 
-		ImageUInt8 pattern = stringToImage(s);
+		GrayU8 pattern = stringToImage(s);
 
 		shiftContourCheck(pattern,8,ConnectRule.EIGHT);
 	}
@@ -114,8 +114,8 @@ public class TestContourTracer {
 				"0110\n"+
 				"1101\n";
 
-		ImageUInt8 input = stringToImage(s);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayU8 input = stringToImage(s);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
@@ -134,7 +134,7 @@ public class TestContourTracer {
 				"111\n"+
 				"101\n";
 
-		ImageUInt8 pattern = stringToImage(s);
+		GrayU8 pattern = stringToImage(s);
 
 		shiftContourCheck(pattern,12,ConnectRule.FOUR);
 	}
@@ -146,8 +146,8 @@ public class TestContourTracer {
 				"01101\n"+
 				"11110\n";
 
-		ImageUInt8 input = stringToImage(s);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayU8 input = stringToImage(s);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
@@ -166,8 +166,8 @@ public class TestContourTracer {
 				"01101\n"+
 				"11111\n";
 
-		ImageUInt8 input = stringToImage(s);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayU8 input = stringToImage(s);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.FOUR);
 
@@ -195,9 +195,9 @@ public class TestContourTracer {
 				"022120\n"+
 				"002220\n";
 
-		ImageUInt8 before = stringToImage(b);
-		ImageUInt8 after = stringToImage(a);
-		ImageSInt32 label = new ImageSInt32(before.width,before.height);
+		GrayU8 before = stringToImage(b);
+		GrayU8 after = stringToImage(a);
+		GrayS32 label = new GrayS32(before.width,before.height);
 
 		ContourTracer alg = new ContourTracer(ConnectRule.EIGHT);
 
@@ -219,17 +219,17 @@ public class TestContourTracer {
 	 * Given a pattern that is only a contour, it sees if it has the expected results when the pattern
 	 * is shifted to every possible location in the image
 	 */
-	public void shiftContourCheck( ImageUInt8 pattern , int expectedSize , ConnectRule rule ) {
+	public void shiftContourCheck(GrayU8 pattern , int expectedSize , ConnectRule rule ) {
 		ContourTracer alg = new ContourTracer(rule);
-		ImageUInt8 input = new ImageUInt8(4,5);
-		ImageSInt32 label = new ImageSInt32(input.width,input.height);
+		GrayU8 input = new GrayU8(4,5);
+		GrayS32 label = new GrayS32(input.width,input.height);
 
 		// exhaustively try all initial locations
 		for( int y = 0; y < input.height-pattern.height+1; y++ ) {
 			for( int x = 0; x < input.width-pattern.width+1; x++ ) {
 				// paste the pattern in to the larger image
 				ImageMiscOps.fill(input,0);
-				ImageUInt8 sub = input.subimage(x,y,x+pattern.width,y+pattern.height, null);
+				GrayU8 sub = input.subimage(x,y,x+pattern.width,y+pattern.height, null);
 				sub.setTo(pattern);
 
 				// reset other data structures
@@ -262,18 +262,18 @@ public class TestContourTracer {
 		}
 	}
 
-	private ImageUInt8 addBorder( ImageUInt8 original ) {
-		ImageUInt8 border = new ImageUInt8(original.width+2,original.height+2);
+	private GrayU8 addBorder(GrayU8 original ) {
+		GrayU8 border = new GrayU8(original.width+2,original.height+2);
 		border.subimage(1,1,border.width-1,border.height-1, null).setTo(original);
 		ImageMiscOps.fillBorder(border,0,1);
 		return border;
 	}
 
-	private ImageUInt8 stringToImage( String s ) {
+	private GrayU8 stringToImage(String s ) {
 		int numCols = s.indexOf('\n');
 		int numRows = s.length()/(numCols+1);
 
-		ImageUInt8 out = new ImageUInt8(numCols,numRows);
+		GrayU8 out = new GrayU8(numCols,numRows);
 		for( int y = 0; y < numRows; y++ ) {
 			for( int x = 0; x < numCols; x++ ) {
 				out.set(x,y, Integer.parseInt(""+s.charAt(y*(numCols+1)+x)));

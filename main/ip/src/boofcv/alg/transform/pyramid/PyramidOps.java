@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.lang.reflect.Array;
@@ -48,7 +48,7 @@ public class PyramidOps {
 	 * @param <O> Output image type
 	 * @return An array of images
 	 */
-	public static <O extends ImageSingleBand>
+	public static <O extends ImageGray>
 	O[] declareOutput( ImagePyramid<?> pyramid , Class<O> outputType ) {
 		O[] ret = (O[])Array.newInstance(outputType,pyramid.getNumLayers());
 
@@ -67,7 +67,7 @@ public class PyramidOps {
 	 * @param output (Output) List of images which is to be resized
 	 * @param <O> Image type
 	 */
-	public static <O extends ImageSingleBand>
+	public static <O extends ImageGray>
 	void reshapeOutput( ImagePyramid<?> pyramid , O[] output ) {
 
 		for( int i = 0; i < output.length; i++ ) {
@@ -92,7 +92,7 @@ public class PyramidOps {
 	 * @param filter Filter being applied to the pyramid.
 	 * @param output Output pyramid where filter results are saved.
 	 */
-	public static <I extends ImageSingleBand, O extends ImageSingleBand>
+	public static <I extends ImageGray, O extends ImageGray>
 	void filter(ImagePyramid<I> input, FilterImageInterface<I, O> filter, O[] output )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
@@ -117,7 +117,7 @@ public class PyramidOps {
 	 * @param derivX Pyramid where x-derivative is stored.
 	 * @param derivY Pyramid where y-derivative is stored.
 	 */
-	public static <I extends ImageSingleBand, O extends ImageSingleBand>
+	public static <I extends ImageGray, O extends ImageGray>
 	void gradient(ImagePyramid<I> input, ImageGradient<I, O> gradient, O[] derivX, O[] derivY )
 	{
 		for( int i = 0; i < input.getNumLayers(); i++ ) {
@@ -138,7 +138,7 @@ public class PyramidOps {
 	 * @param derivYY (Output) Second derivative YY
 	 * @param derivXY (Output) Second derivative XY
 	 */
-	public static <I extends ImageSingleBand, O extends ImageSingleBand>
+	public static <I extends ImageGray, O extends ImageGray>
 	void hessian(O[] derivX, O[] derivY , ImageHessian<O> hessian , O[] derivXX, O[] derivYY , O[] derivXY )
 	{
 		for( int i = 0; i < derivX.length; i++ ) {
@@ -149,12 +149,12 @@ public class PyramidOps {
 	/**
 	 * Scales down the input by a factor of 2.  Every other pixel along both axises is skipped.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void scaleDown2(T input , T output ) {
-		if( input instanceof ImageFloat32 ) {
-			ImplPyramidOps.scaleDown2((ImageFloat32)input,(ImageFloat32)output);
-		} else if( input instanceof ImageUInt8 ) {
-			ImplPyramidOps.scaleDown2((ImageUInt8)input,(ImageUInt8)output);
+		if( input instanceof GrayF32) {
+			ImplPyramidOps.scaleDown2((GrayF32)input,(GrayF32)output);
+		} else if( input instanceof GrayU8) {
+			ImplPyramidOps.scaleDown2((GrayU8)input,(GrayU8)output);
 		} else {
 			throw new IllegalArgumentException("Image type not yet supported");
 		}
@@ -165,14 +165,14 @@ public class PyramidOps {
 	 *
 	 * @param scale How much larger the output image will be.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void scaleImageUp(T input , T output , int scale, InterpolatePixelS<T> interp ) {
 		if( scale <= 1 )
 			throw new IllegalArgumentException("Scale must be >= 2");
-		if( input instanceof ImageFloat32 ) {
-			ImplPyramidOps.scaleImageUp((ImageFloat32)input,(ImageFloat32)output,scale,(InterpolatePixelS)interp);
-		} else if( input instanceof ImageUInt8 ) {
-			ImplPyramidOps.scaleImageUp((ImageUInt8)input,(ImageUInt8)output,scale,(InterpolatePixelS)interp);
+		if( input instanceof GrayF32) {
+			ImplPyramidOps.scaleImageUp((GrayF32)input,(GrayF32)output,scale,(InterpolatePixelS)interp);
+		} else if( input instanceof GrayU8) {
+			ImplPyramidOps.scaleImageUp((GrayU8)input,(GrayU8)output,scale,(InterpolatePixelS)interp);
 		} else {
 			throw new IllegalArgumentException("Image type not yet supported");
 		}

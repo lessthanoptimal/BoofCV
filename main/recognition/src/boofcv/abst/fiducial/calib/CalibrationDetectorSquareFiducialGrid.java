@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.DetectFiducialSquareGrid;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -47,16 +47,16 @@ public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetecto
 	List<Point2D_F64> layoutPoints;
 
 	// square binary fiducial detector
-	DetectFiducialSquareGrid<ImageFloat32> detector;
+	DetectFiducialSquareGrid<GrayF32> detector;
 
 	// storage for observations
 	CalibrationObservation observations;
 
 	public CalibrationDetectorSquareFiducialGrid(ConfigSquareGridBinary config) {
 
-		DetectFiducialSquareBinary<ImageFloat32> fiducialDetector = FactoryFiducial.
-				squareBinary(config.configDetector, config.configThreshold, ImageFloat32.class).getAlgorithm();
-		detector = new DetectFiducialSquareGrid<ImageFloat32>(config.numRows,config.numCols,config.ids,fiducialDetector);
+		DetectFiducialSquareBinary<GrayF32> fiducialDetector = FactoryFiducial.
+				squareBinary(config.configDetector, config.configThreshold, GrayF32.class).getAlgorithm();
+		detector = new DetectFiducialSquareGrid<GrayF32>(config.numRows,config.numCols,config.ids,fiducialDetector);
 
 		numRows = config.numRows;
 		numCols = config.numCols;
@@ -68,7 +68,7 @@ public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetecto
 	}
 
 	@Override
-	public boolean process(ImageFloat32 input) {
+	public boolean process(GrayF32 input) {
 		if( !detector.detect(input) ) {
 			return false;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public class ImplMedianHistogramInner {
 	 * @param offset Array used to store relative pixel offsets.
 	 * @param histogram Saves the image histogram.  Must be at least 256 elements.
 	 */
-	public static void process(ImageUInt8 input, ImageUInt8 output , int radius, int offset[], int histogram[] ) {
+	public static void process(GrayU8 input, GrayU8 output , int radius, int offset[], int histogram[] ) {
 
 		if( histogram == null )
 			histogram = new int[ 256 ];

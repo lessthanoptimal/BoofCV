@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
@@ -98,7 +98,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	 * @param regionColor (Output) Storage for colors of each region. Will contains the color of each region on output.
 	 */
 	public void process( T image,
-						 ImageSInt32 pixelToRegion ,
+						 GrayS32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount,
 						 FastQueue<float[]> regionColor ) {
 
@@ -157,7 +157,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	 * the pixels is in a region that is to be pruned mark them as neighbors. The image is traversed such that
 	 * the number of comparisons is minimized.
 	 */
-	protected void findAdjacentRegions(ImageSInt32 pixelToRegion) {
+	protected void findAdjacentRegions(GrayS32 pixelToRegion) {
 		// -------- Do the inner pixels first
 		if( connect.length == 4 )
 			adjacentInner4(pixelToRegion);
@@ -168,7 +168,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 		adjacentBorder(pixelToRegion);
 	}
 
-	protected void adjacentInner4(ImageSInt32 pixelToRegion) {
+	protected void adjacentInner4(GrayS32 pixelToRegion) {
 		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
 			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y;
 			for( int x = 0; x < pixelToRegion.width-1; x++ , indexImg++ ) {
@@ -210,7 +210,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 		}
 	}
 
-	protected void adjacentInner8(ImageSInt32 pixelToRegion) {
+	protected void adjacentInner8(GrayS32 pixelToRegion) {
 		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
 			int indexImg = pixelToRegion.startIndex + pixelToRegion.stride*y+1;
 			for( int x = 1; x < pixelToRegion.width-1; x++ , indexImg++ ) {
@@ -283,7 +283,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 		}
 	}
 
-	protected void adjacentBorder(ImageSInt32 pixelToRegion) {
+	protected void adjacentBorder(GrayS32 pixelToRegion) {
 
 		for( int y = 0; y < pixelToRegion.height-1; y++ ) {
 			int x = pixelToRegion.width-1;
@@ -306,7 +306,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 		}
 	}
 
-	private void checkAdjacentAround(int x, int y, int indexImg ,ImageSInt32 pixelToRegion ) {
+	private void checkAdjacentAround(int x, int y, int indexImg ,GrayS32 pixelToRegion ) {
 		int regionA = pixelToRegion.data[indexImg];
 
 		for( int i = 0; i < connect.length; i++ ) {

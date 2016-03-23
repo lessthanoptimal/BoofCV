@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.tracker.klt.KltTracker;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DenseOpticalFlowKlt<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class DenseOpticalFlowKlt<I extends ImageGray, D extends ImageGray> {
 
 	// Amount it adjusts the score for the center of a region.
 	// Visually this looks better, but only makes a small difference in benchmark performance

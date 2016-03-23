@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.gui.edge;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.GrayU8;
 import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.*;
@@ -31,7 +31,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeEdgeFeatures {
-	public static BufferedImage renderOrientation( ImageUInt8 direction , BufferedImage out ) {
+	public static BufferedImage renderOrientation(GrayU8 direction , BufferedImage out ) {
 
 		if( out == null ) {
 			out = new BufferedImage(direction.getWidth(),direction.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -64,7 +64,7 @@ public class VisualizeEdgeFeatures {
 		return out;
 	}
 
-	public static BufferedImage renderOrientation4( ImageSInt8 direction , ImageFloat32 intensity , float threshold , BufferedImage out ) {
+	public static BufferedImage renderOrientation4(GrayS8 direction , GrayF32 intensity , float threshold , BufferedImage out ) {
 
 		if( out == null ) {
 			out = new BufferedImage(direction.getWidth(),direction.getHeight(),BufferedImage.TYPE_INT_RGB);

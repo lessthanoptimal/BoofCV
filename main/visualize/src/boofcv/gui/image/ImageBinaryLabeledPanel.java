@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,10 +40,10 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 
 	// the image being displayed
 	protected BufferedImage img;
-	protected ImageSInt32 labelImage;
+	protected GrayS32 labelImage;
 	int colors[];
 
-	public ImageBinaryLabeledPanel( ImageSInt32 labelImage, int maxValues , long randSeed ) {
+	public ImageBinaryLabeledPanel(GrayS32 labelImage, int maxValues , long randSeed ) {
 		this();
 		this.labelImage = labelImage;
 		img = new BufferedImage(labelImage.getWidth(), labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -69,7 +69,7 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 			g.drawImage(img, 0, 0, this);
 	}
 
-	public void setImage(ImageSInt32 binaryImage) {
+	public void setImage(GrayS32 binaryImage) {
 		this.labelImage = binaryImage;
 	}
 

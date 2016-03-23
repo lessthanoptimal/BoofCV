@@ -23,7 +23,7 @@ import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDenseSift<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DescribeImageDenseSift<T extends ImageGray, D extends ImageGray>
 		implements DescribeImageDense<T,TupleDesc_F64>
 {
 	// dense SIFT implementation

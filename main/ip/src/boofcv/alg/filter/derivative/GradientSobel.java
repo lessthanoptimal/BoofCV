@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -88,7 +88,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageUInt8 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_S32<ImageUInt8> border ) {
+	public static void process(GrayU8 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
@@ -107,7 +107,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageSInt16 orig, ImageSInt16 derivX, ImageSInt16 derivY, ImageBorder_S32<ImageSInt16> border ) {
+	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayS16> border ) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
 
@@ -126,7 +126,7 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(ImageFloat32 orig, ImageFloat32 derivX, ImageFloat32 derivY, ImageBorder_F32 border) {
+	public static void process(GrayF32 orig, GrayF32 derivX, GrayF32 derivY, ImageBorder_F32 border) {
 		InputSanityCheck.checkSameShape(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);

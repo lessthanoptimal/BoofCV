@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.core.image.border.BorderIndex1D;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.*;
 import boofcv.testing.BoofTesting;
 
@@ -76,9 +76,9 @@ public abstract class PermuteWaveletCompare {
 			heightOut = t;
 		}
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, widthIn, heightIn);
-		ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
-		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType, widthIn, heightIn);
+		ImageGray found = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
+		ImageGray expected = GeneralizedImageOps.createSingleBand(outputType, widthOut, heightOut);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 50);
 
@@ -103,21 +103,21 @@ public abstract class PermuteWaveletCompare {
 		}
 	}
 
-	public void innerTest(ImageSingleBand input, ImageSingleBand found, ImageSingleBand expected,
+	public void innerTest(ImageGray input, ImageGray found, ImageGray expected,
 						  WaveletDescription<?> desc) {
 		applyTransform(desc,input,found);
 //		BoofTesting.printDiff(found,expected);
 		compareResults(desc, input , expected , found);
 	}
 
-	public abstract void applyValidation( WaveletDescription<?> desc , ImageSingleBand input , ImageSingleBand output );
+	public abstract void applyValidation(WaveletDescription<?> desc , ImageGray input , ImageGray output );
 
-	public abstract void applyTransform( WaveletDescription<?> desc , ImageSingleBand input , ImageSingleBand output );
+	public abstract void applyTransform(WaveletDescription<?> desc , ImageGray input , ImageGray output );
 
-	public abstract void compareResults( WaveletDescription<?> desc, ImageSingleBand input , ImageSingleBand expected, ImageSingleBand found );
+	public abstract void compareResults(WaveletDescription<?> desc, ImageGray input , ImageGray expected, ImageGray found );
 
 	private WaveletDescription<?> createDesc(int offset, int length, BorderType type ) {
-		if( inputType == ImageFloat32.class ) {
+		if( inputType == GrayF32.class ) {
 			return createDesc_F32(offset,length,type);
 		} else {
 			return createDesc_I32(offset,length,type);

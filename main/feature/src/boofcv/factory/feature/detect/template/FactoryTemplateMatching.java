@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.feature.detect.template.TemplateDiffSquared;
 import boofcv.alg.feature.detect.template.TemplateMatching;
 import boofcv.alg.feature.detect.template.TemplateMatchingIntensity;
 import boofcv.alg.feature.detect.template.TemplateNCC;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating template matching algorithms.
@@ -42,22 +42,22 @@ public class FactoryTemplateMatching {
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatchingIntensity} of the specified type.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	TemplateMatchingIntensity<T> createIntensity(TemplateScoreType type, Class<T> imageType) {
 		switch (type) {
 			case SUM_DIFF_SQ:
-				if (imageType == ImageUInt8.class) {
+				if (imageType == GrayU8.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.U8();
-				} else if (imageType == ImageFloat32.class) {
+				} else if (imageType == GrayF32.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}
 
 			case NCC:
-				if (imageType == ImageUInt8.class) {
+				if (imageType == GrayU8.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateNCC.U8();
-				} else if (imageType == ImageFloat32.class) {
+				} else if (imageType == GrayF32.class) {
 					return (TemplateMatchingIntensity<T>) new TemplateNCC.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
@@ -73,7 +73,7 @@ public class FactoryTemplateMatching {
 	 * @param imageType Image type being processed
 	 * @return {@link TemplateMatching} of the specified type.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	TemplateMatching<T> createMatcher(TemplateScoreType type, Class<T> imageType) {
 		TemplateMatchingIntensity<T> intensity = createIntensity(type, imageType);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,19 @@
 package boofcv.abst.flow;
 
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public class TestFlowKlt_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks<ImageFloat32> {
+public class TestFlowKlt_to_DenseOpticalFlow extends GeneralDenseOpticalFlowChecks<GrayF32> {
 
 	public TestFlowKlt_to_DenseOpticalFlow() {
-		super(ImageFloat32.class);
+		super(GrayF32.class);
 	}
 
 	@Override
-	public DenseOpticalFlow<ImageFloat32> createAlg(Class<ImageFloat32> imageType) {
+	public DenseOpticalFlow<GrayF32> createAlg(Class<GrayF32> imageType) {
 		return (DenseOpticalFlow)FactoryDenseOpticalFlow.flowKlt(null,2,imageType,null);
 	}
 }

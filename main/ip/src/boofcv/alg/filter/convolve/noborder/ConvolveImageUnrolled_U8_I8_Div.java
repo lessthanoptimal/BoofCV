@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayI8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -40,8 +40,8 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public class ConvolveImageUnrolled_U8_I8_Div {
-	public static boolean horizontal( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest, int divisor ) {
+	public static boolean horizontal(Kernel1D_I32 kernel ,
+									 GrayU8 image, GrayI8 dest, int divisor ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -74,8 +74,8 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest, int divisor ) {
+	public static boolean vertical(Kernel1D_I32 kernel ,
+								   GrayU8 image, GrayI8 dest, int divisor ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -108,8 +108,8 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_I32 kernel ,
-								   ImageUInt8 image, ImageInt8 dest, int divisor ) {
+	public static boolean convolve(Kernel2D_I32 kernel ,
+								   GrayU8 image, GrayI8 dest, int divisor ) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -142,7 +142,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void horizontal3(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -172,7 +172,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void horizontal5(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -206,7 +206,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void horizontal7(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -244,7 +244,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void horizontal9(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -286,7 +286,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void horizontal11(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -332,7 +332,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void vertical3( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void vertical3(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -368,7 +368,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void vertical5( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void vertical5(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -410,7 +410,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void vertical7( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void vertical7(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -458,7 +458,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void vertical9( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void vertical9(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -512,7 +512,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void vertical11( Kernel1D_I32 kernel , ImageUInt8 image, ImageInt8 dest , int divisor )
+	public static void vertical11(Kernel1D_I32 kernel , GrayU8 image, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = image.data;
 		final byte[] dataDst = dest.data;
@@ -572,7 +572,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void convolve3( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve3(Kernel2D_I32 kernel, GrayU8 src, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -629,7 +629,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void convolve5( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve5(Kernel2D_I32 kernel, GrayU8 src, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -694,7 +694,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void convolve7( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve7(Kernel2D_I32 kernel, GrayU8 src, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -767,7 +767,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void convolve9( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve9(Kernel2D_I32 kernel, GrayU8 src, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -848,7 +848,7 @@ public class ConvolveImageUnrolled_U8_I8_Div {
 		}
 	}
 
-	public static void convolve11( Kernel2D_I32 kernel, ImageUInt8 src, ImageInt8 dest , int divisor )
+	public static void convolve11(Kernel2D_I32 kernel, GrayU8 src, GrayI8 dest , int divisor )
 	{
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;

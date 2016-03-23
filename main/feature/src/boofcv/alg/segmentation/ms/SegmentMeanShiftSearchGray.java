@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.segmentation.ms;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.feature.ColorQueue_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
@@ -34,7 +34,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-public class SegmentMeanShiftSearchGray<T extends ImageSingleBand> extends SegmentMeanShiftSearch<T> {
+public class SegmentMeanShiftSearchGray<T extends ImageGray> extends SegmentMeanShiftSearch<T> {
 
 	// Interpolation routine used to get sub-pixel samples
 	protected InterpolatePixelS<T> interpolate;

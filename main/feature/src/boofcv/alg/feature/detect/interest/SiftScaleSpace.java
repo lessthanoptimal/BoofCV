@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  *<p>
@@ -50,9 +50,9 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class SiftScaleSpace {
 	// all the scale images across an octave
-	ImageFloat32 octaveImages[];
+	GrayF32 octaveImages[];
 	// images which are the difference between the scales
-	ImageFloat32 differenceOfGaussian[];
+	GrayF32 differenceOfGaussian[];
 
 	// Blur factor for first image in the scale pyramid
 	// The sigma for the first image in each octave is sigma0*(2**octave)
@@ -75,21 +75,21 @@ public class SiftScaleSpace {
 	Kernel1D_F32 kernelSigmaToK[];
 
 	// the input image
-	ImageFloat32 input;
+	GrayF32 input;
 
 	// the current octave being examined
 	int currentOctave;
 
 	// temporary storage used when applying gaussian blur
-	ImageFloat32 tempBlur;
+	GrayF32 tempBlur;
 
 	// internal work space used when computing octaves
-	ImageFloat32 tempImage0;
-	ImageFloat32 tempImage1;
+	GrayF32 tempImage0;
+	GrayF32 tempImage1;
 
 	// interpolation used when scaling an image up
-	InterpolatePixelS<ImageFloat32> interp =
-			FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+	InterpolatePixelS<GrayF32> interp =
+			FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
 	/**
 	 * Configures the scale-space
@@ -113,21 +113,21 @@ public class SiftScaleSpace {
 		this.numScales = numScales;
 		this.sigma0 = sigma0;
 
-		octaveImages = new ImageFloat32[numScales + 3];
-		differenceOfGaussian = new ImageFloat32[numScales + 2];
+		octaveImages = new GrayF32[numScales + 3];
+		differenceOfGaussian = new GrayF32[numScales + 2];
 		for (int i = 1; i < octaveImages.length; i++) {
-			octaveImages[i] = new ImageFloat32(1,1);
-			differenceOfGaussian[i-1] = new ImageFloat32(1,1);
+			octaveImages[i] = new GrayF32(1,1);
+			differenceOfGaussian[i-1] = new GrayF32(1,1);
 		}
-		tempImage0 = new ImageFloat32(1,1);
-		tempImage1 = new ImageFloat32(1,1);
-		tempBlur = new ImageFloat32(1,1);
+		tempImage0 = new GrayF32(1,1);
+		tempImage1 = new GrayF32(1,1);
+		tempBlur = new GrayF32(1,1);
 
 		// each scale is K has a sigma that is K times larger than the previous
 		levelK = Math.pow(2,1.0/numScales);
 
 		// create all the convolution kernels
-		Class kernelType = FactoryKernel.getKernelType(ImageFloat32.class, 1);
+		Class kernelType = FactoryKernel.getKernelType(GrayF32.class, 1);
 		kernelSigma0 = (Kernel1D_F32) FactoryKernelGaussian.gaussian(kernelType, sigma0, -1);
 
 		kernelSigmaToK = new Kernel1D_F32[numScales+2];
@@ -167,7 +167,7 @@ public class SiftScaleSpace {
 	 *
 	 * @param input Input image.  No prior blur should be applied to this image. Not modified.
 	 */
-	public void initialize( ImageFloat32 input ) {
+	public void initialize( GrayF32 input ) {
 		this.input = input;
 		currentOctave = firstOctave;
 
@@ -227,18 +227,18 @@ public class SiftScaleSpace {
 		}
 	}
 
-	public ImageFloat32 getImageScale( int scaleIndex ) {
+	public GrayF32 getImageScale(int scaleIndex ) {
 		return octaveImages[scaleIndex];
 	}
 
-	public ImageFloat32 getDifferenceOfGaussian( int dogIndex ) {
+	public GrayF32 getDifferenceOfGaussian(int dogIndex ) {
 		return differenceOfGaussian[dogIndex];
 	}
 
 	/**
 	 * Applies the separable kernel to the input image and stores the results in the output image.
 	 */
-	void applyGaussian(ImageFloat32 input, ImageFloat32 output, Kernel1D kernel) {
+	void applyGaussian(GrayF32 input, GrayF32 output, Kernel1D kernel) {
 		tempBlur.reshape(input.width, input.height);
 		GConvolveImageOps.horizontalNormalized(kernel, input, tempBlur);
 		GConvolveImageOps.verticalNormalized(kernel, tempBlur,output);

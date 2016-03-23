@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat32> {
+public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
 	PkltConfig config;
 
@@ -41,10 +41,10 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 	}
 
 	@Override
-	public PointTracker<ImageFloat32> createTracker() {
+	public PointTracker<GrayF32> createTracker() {
 		config = new PkltConfig();
 		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
-				ImageFloat32.class, ImageFloat32.class);
+				GrayF32.class, GrayF32.class);
 	}
 
 	/**
@@ -52,8 +52,8 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 	 */
 	@Test
 	public void checkRecycle_Process_Spawn() {
-		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
-				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
+				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
 		alg.process(image);
 		alg.spawnTracks();
@@ -74,8 +74,8 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 
 	@Test
 	public void checkRecycleDropAll() {
-		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
-				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
+				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
 		alg.process(image);
 		alg.spawnTracks();
@@ -92,8 +92,8 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 
 	@Test
 	public void checkRecycleDropTrack() {
-		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
-				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
+				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
 		assertEquals(0,alg.unused.size());
 
@@ -113,8 +113,8 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 
 	@Test
 	public void addTrack() {
-		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
-				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
+				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
 		alg.process(image);
 		PointTrack track = alg.addTrack(10,20.5);
@@ -136,8 +136,8 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<ImageFloat3
 	 */
 	@Test
 	public void process_allPointsInside() {
-		PointTrackerKltPyramid<ImageFloat32,ImageFloat32> alg =
-				(PointTrackerKltPyramid<ImageFloat32,ImageFloat32>)createTracker();
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
+				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
 		alg.process(image);
 		alg.spawnTracks();

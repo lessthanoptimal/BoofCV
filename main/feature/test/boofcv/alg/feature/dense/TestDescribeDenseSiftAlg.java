@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.dense;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
@@ -47,8 +47,8 @@ public class TestDescribeDenseSiftAlg {
 	 */
 	@Test
 	public void process() {
-		ImageFloat32 derivX = new ImageFloat32(100,102);
-		ImageFloat32 derivY = new ImageFloat32(100,102);
+		GrayF32 derivX = new GrayF32(100,102);
+		GrayF32 derivY = new GrayF32(100,102);
 
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
@@ -57,8 +57,8 @@ public class TestDescribeDenseSiftAlg {
 		BoofTesting.checkSubImage(this,"process",true,derivX,derivY);
 	}
 
-	public void process(ImageFloat32 derivX, ImageFloat32 derivY) {
-		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+	public void process(GrayF32 derivX, GrayF32 derivY) {
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -96,13 +96,13 @@ public class TestDescribeDenseSiftAlg {
 
 	@Test
 	public void precomputeAngles() {
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
+		GrayF32 derivX = new GrayF32(width,height);
+		GrayF32 derivY = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -125,14 +125,14 @@ public class TestDescribeDenseSiftAlg {
 	 */
 	@Test
 	public void computeDescriptor() {
-		ImageFloat32 derivX = new ImageFloat32(100,102);
-		ImageFloat32 derivY = new ImageFloat32(100,102);
+		GrayF32 derivX = new GrayF32(100,102);
+		GrayF32 derivY = new GrayF32(100,102);
 
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSiftAlg<ImageFloat32> alg = new DescribeDenseSiftAlg<ImageFloat32>(4,4,8,0.5,0.2,10,10,ImageFloat32.class);
-		DescribePointSift<ImageFloat32> algTest = new DescribePointSift<ImageFloat32>(4,4,8,1,0.5,0.2,ImageFloat32.class);
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
+		DescribePointSift<GrayF32> algTest = new DescribePointSift<GrayF32>(4,4,8,1,0.5,0.2,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 		algTest.setImageGradient(derivX,derivY);

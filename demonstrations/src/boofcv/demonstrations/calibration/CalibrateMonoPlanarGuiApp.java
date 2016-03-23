@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -100,7 +100,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 			final File file = new File(images.get(i));
 			final BufferedImage orig = media.openImage(images.get(i));
 			if( orig != null ) {
-				ImageFloat32 input = ConvertBufferedImage.convertFrom(orig,(ImageFloat32)null);
+				GrayF32 input = ConvertBufferedImage.convertFrom(orig,(GrayF32)null);
 				if( calibrator.addImage(input) ) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {

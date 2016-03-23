@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.struct.gss;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public interface GaussianScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand> {
+public interface GaussianScaleSpace<T extends ImageGray, D extends ImageGray> {
 
 	/**
 	 * Sets the scales/blur magnitudes for which the scale-space should be computed over.
@@ -59,7 +59,7 @@ public interface GaussianScaleSpace<T extends ImageSingleBand, D extends ImageSi
 	public void setImage( T input );
 
 	/**
-	 * Sets the active scale.  Must call {@link #setImage(boofcv.struct.image.ImageSingleBand)}
+	 * Sets the active scale.  Must call {@link #setImage(ImageGray)}
 	 * before this function.
 	 *
 	 * @param index Index of active scale

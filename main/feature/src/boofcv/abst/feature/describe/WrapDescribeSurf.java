@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 
 /**
  * @author Peter Abeles
  */
-public class WrapDescribeSurf<T extends ImageSingleBand, II extends ImageSingleBand>
+public class WrapDescribeSurf<T extends ImageGray, II extends ImageGray>
 		implements DescribeRegionPoint<T,BrightFeature> {
 
 	// computes SURF feature descriptor

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.impl.ImplKitRosCornerIntensity;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
@@ -38,9 +38,9 @@ import boofcv.struct.image.ImageSInt16;
  */
 public class KitRosCornerIntensity {
 
-	public static void process( ImageFloat32 featureIntensity,
-								ImageFloat32 derivX, ImageFloat32 derivY,
-								ImageFloat32 hessianXX, ImageFloat32 hessianYY , ImageFloat32 hessianXY )
+	public static void process(GrayF32 featureIntensity,
+							   GrayF32 derivX, GrayF32 derivY,
+							   GrayF32 hessianXX, GrayF32 hessianYY , GrayF32 hessianXY )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
 		InputSanityCheck.checkSameShape(derivX,featureIntensity);
@@ -48,9 +48,9 @@ public class KitRosCornerIntensity {
 		ImplKitRosCornerIntensity.process(featureIntensity,derivX,derivY,hessianXX,hessianYY,hessianXY);
 	}
 
-	public static void process( ImageFloat32 featureIntensity,
-								ImageSInt16 derivX, ImageSInt16 derivY,
-								ImageSInt16 hessianXX, ImageSInt16 hessianYY , ImageSInt16 hessianXY )
+	public static void process(GrayF32 featureIntensity,
+							   GrayS16 derivX, GrayS16 derivY,
+							   GrayS16 hessianXX, GrayS16 hessianYY , GrayS16 hessianXY )
 	{
 		InputSanityCheck.checkSameShape(derivX,derivY,hessianXX,hessianYY,hessianXY);
 		InputSanityCheck.checkSameShape(derivX,featureIntensity);

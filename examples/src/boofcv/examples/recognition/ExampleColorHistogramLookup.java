@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -67,8 +67,8 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> coupledHueSat( List<File> images  ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
+		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
@@ -80,7 +80,7 @@ public class ExampleColorHistogramLookup {
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
 			ColorHsv.rgbToHsv_F32(rgb, hsv);
 
-			MultiSpectral<ImageFloat32> hs = hsv.partialSpectrum(0,1);
+			Planar<GrayF32> hs = hsv.partialSpectrum(0,1);
 
 			// The number of bins is an important parameter.  Try adjusting it
 			Histogram_F64 histogram = new Histogram_F64(12,12);
@@ -112,8 +112,8 @@ public class ExampleColorHistogramLookup {
 		List<TupleDesc_F64> histogramList = new ArrayList<TupleDesc_F64>();
 		histogramList.add(histogramHue); histogramList.add(histogramValue);
 
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
+		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
@@ -145,7 +145,7 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> coupledRGB( List<File> images ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
@@ -177,7 +177,7 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> histogramGray( List<File> images ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		ImageUInt8 gray = new ImageUInt8(1,1);
+		GrayU8 gray = new GrayU8(1,1);
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
 			if( buffered == null ) throw new RuntimeException("Can't load image!");

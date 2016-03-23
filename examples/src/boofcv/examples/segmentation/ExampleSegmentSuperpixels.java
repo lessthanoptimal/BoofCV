@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class ExampleSegmentSuperpixels {
 
 		// Storage for segmented image.  Each pixel will be assigned a label from 0 to N-1, where N is the number
 		// of segments in the image
-		ImageSInt32 pixelToSegment = new ImageSInt32(color.width,color.height);
+		GrayS32 pixelToSegment = new GrayS32(color.width,color.height);
 
 		// Segmentation magic happens here
 		alg.segment(color,pixelToSegment);
@@ -74,7 +74,7 @@ public class ExampleSegmentSuperpixels {
 	 * between regions.
 	 */
 	public static <T extends ImageBase>
-	void visualize( ImageSInt32 pixelToRegion , T color , int numSegments  )
+	void visualize(GrayS32 pixelToRegion , T color , int numSegments  )
 	{
 		// Computes the mean color inside each region
 		ImageType<T> type = color.getImageType();
@@ -118,7 +118,7 @@ public class ExampleSegmentSuperpixels {
 		image = ConvertBufferedImage.stripAlphaChannel(image);
 
 		// Select input image type.  Some algorithms behave different depending on image type
-		ImageType<MultiSpectral<ImageFloat32>> imageType = ImageType.ms(3, ImageFloat32.class);
+		ImageType<Planar<GrayF32>> imageType = ImageType.ms(3, GrayF32.class);
 //		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
 //		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
 //		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);

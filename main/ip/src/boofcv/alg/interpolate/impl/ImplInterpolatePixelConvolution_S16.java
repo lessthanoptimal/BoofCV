@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -37,14 +37,14 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<ImageSInt16>  {
+public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<GrayS16>  {
 
 	// used to read outside the image border
 	private ImageBorder_S32 border;
 	// kernel used to perform interpolation
 	private KernelContinuous1D_F32 kernel;
 	// input image
-	private ImageSInt16 image;
+	private GrayS16 image;
 	// minimum and maximum allowed pixel values
 	private float min,max;
 
@@ -55,19 +55,19 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 	}
 
 	@Override
-	public void setBorder(ImageBorder<ImageSInt16> border) {
+	public void setBorder(ImageBorder<GrayS16> border) {
 		this.border = (ImageBorder_S32)border;
 	}
 
 	@Override
-	public void setImage(ImageSInt16 image ) {
+	public void setImage(GrayS16 image ) {
 		if( border != null )
 			border.setImage(image);
 		this.image = image;
 	}
 
 	@Override
-	public ImageSInt16 getImage() {
+	public GrayS16 getImage() {
 		return image;
 	}
 
@@ -202,12 +202,12 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Im
 		return kernel.getRadius();
 	}
 	@Override
-	public ImageBorder<ImageSInt16> getBorder() {
+	public ImageBorder<GrayS16> getBorder() {
 		return border;
 	}
 	@Override
-	public ImageType<ImageSInt16> getImageType() {
-		return ImageType.single(ImageSInt16.class);
+	public ImageType<GrayS16> getImageType() {
+		return ImageType.single(GrayS16.class);
 	}
 
 }

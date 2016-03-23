@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
 import boofcv.alg.shapes.polygon.RefinePolygonLineToImage;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for detecting higher level shapes
@@ -41,7 +41,7 @@ public class FactoryShapeDetector {
 	 * @param imageType Input image type
 	 * @return Detector
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	BinaryPolygonDetector<T> polygon( ConfigPolygonDetector config, Class<T> imageType)
 	{
 		config.checkValidity();
@@ -68,7 +68,7 @@ public class FactoryShapeDetector {
 				config.minimumEdgeIntensity,imageType);
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
 		return new RefinePolygonLineToImage<T>(
 				config.cornerOffset, config.lineSamples,
@@ -77,7 +77,7 @@ public class FactoryShapeDetector {
 				imageType);
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonCornersToImage config , Class<T> imageType ) {
 		return new RefinePolygonCornersToImage<T>(
 				config.endPointDistance,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.binary.impl;
 
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -80,9 +80,9 @@ public class BinaryThinning {
 			new Mask4(), new Mask5(), new Mask6(), new Mask7() };
 
 	// reference to input image
-	ImageUInt8 binary;
+	GrayU8 binary;
 	// all pixels outside the image are set to 0
-	ImageBorder_S32<ImageUInt8> inputBorder = ImageBorderValue.wrap(binary, 0);
+	ImageBorder_S32<GrayU8> inputBorder = ImageBorderValue.wrap(binary, 0);
 	// list of one valued pixels, input
 	GrowQueue_I32 ones0 = new GrowQueue_I32();
 	GrowQueue_I32 ones1 = new GrowQueue_I32();
@@ -96,7 +96,7 @@ public class BinaryThinning {
 	 * @param binary Input binary image which is to be thinned.  This is modified
 	 * @param maxLoops Maximum number of thinning loops.  Set to -1 to run until the image is no longer modified.
 	 */
-	public void apply( ImageUInt8 binary , int maxLoops) {
+	public void apply(GrayU8 binary , int maxLoops) {
 		this.binary = binary;
 		inputBorder.setImage(binary);
 

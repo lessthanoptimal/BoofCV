@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ public class TestMultiSpectral {
 
 	@Test
 	public void constructor() {
-		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth, imgHeight, 3);
+		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,imgWidth, imgHeight, 3);
 
-		assertTrue(ImageUInt8.class == img.getBandType());
+		assertTrue(GrayU8.class == img.getBandType());
 		assertTrue(3 == img.bands.length);
 		assertTrue(3 == img.getNumBands());
 		assertTrue(imgWidth == img.width);
@@ -52,7 +52,7 @@ public class TestMultiSpectral {
 
 	@Test
 	public void getBand() {
-		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth, imgHeight, 3);
+		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,imgWidth, imgHeight, 3);
 
 		assertTrue(img.getBand(0) != null);
 
@@ -72,10 +72,10 @@ public class TestMultiSpectral {
 
 	@Test
 	public void subimage() {
-		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 		assertFalse(img.isSubimage());
 
-		MultiSpectral<ImageUInt8> sub = img.subimage(2,3,4,6, null);
+		Planar<GrayU8> sub = img.subimage(2,3,4,6, null);
 		
 		assertEquals(3,sub.getNumBands());
 		assertEquals(2,sub.getWidth());
@@ -88,7 +88,7 @@ public class TestMultiSpectral {
 
 	@Test
 	public void reshape() {
-		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 
 		// reshape to something smaller
 		img.reshape(5,4);
@@ -103,7 +103,7 @@ public class TestMultiSpectral {
 
 	@Test
 	public void reshape_subimage() {
-		MultiSpectral<ImageUInt8> img = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 		img = img.subimage(0,0,2,2, null);
 
 		try {
@@ -114,18 +114,18 @@ public class TestMultiSpectral {
 
 	@Test
 	public void setTo() {
-		MultiSpectral<ImageUInt8> a = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> a = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 		a.getBand(0).set(1,2,3);
 		a.getBand(1).set(2,1,4);
 		a.getBand(2).set(2,2,5);
 
-		MultiSpectral<ImageUInt8> b = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> b = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 		b.setTo(a);
 
 		BoofTesting.assertEquals(a,b,1e-8);
 
 		// try a sub-image now
-		MultiSpectral<ImageUInt8> c = new MultiSpectral<ImageUInt8>(ImageUInt8.class,20, 20, 3);
+		Planar<GrayU8> c = new Planar<GrayU8>(GrayU8.class,20, 20, 3);
 		c = c.subimage(7,8,12,18, null);
 		c.setTo(a);
 
@@ -137,8 +137,8 @@ public class TestMultiSpectral {
 	 */
 	@Test
 	public void setTo_mismatch() {
-		MultiSpectral<ImageUInt8> a = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
-		MultiSpectral<ImageUInt8> b = new MultiSpectral<ImageUInt8>(ImageUInt8.class,6, 11, 3);
+		Planar<GrayU8> a = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> b = new Planar<GrayU8>(GrayU8.class,6, 11, 3);
 
 		a.setTo(b);
 
@@ -150,11 +150,11 @@ public class TestMultiSpectral {
 	public void serialize() throws IOException, ClassNotFoundException {
 
 		// randomly fill the image
-		MultiSpectral<ImageUInt8> imgA = new MultiSpectral<ImageUInt8>(ImageUInt8.class,5, 10, 3);
+		Planar<GrayU8> imgA = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
 		GImageMiscOps.fillUniform(imgA, rand, -10, 10);
 
 		// make a copy of the original
-		MultiSpectral<ImageUInt8> imgB = imgA.clone();
+		Planar<GrayU8> imgB = imgA.clone();
 
 
 		ByteArrayOutputStream streamOut = new ByteArrayOutputStream(1000);
@@ -166,7 +166,7 @@ public class TestMultiSpectral {
 		ByteArrayInputStream streamIn = new ByteArrayInputStream(streamOut.toByteArray());
 		ObjectInputStream in = new ObjectInputStream(streamIn);
 
-		MultiSpectral<ImageUInt8> found = (MultiSpectral)in.readObject();
+		Planar<GrayU8> found = (Planar)in.readObject();
 
 		// see if everything is equals
 		BoofTesting.assertEquals(imgA, imgB, 1e-8);

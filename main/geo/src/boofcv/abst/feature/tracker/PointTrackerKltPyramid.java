@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_I16;
 
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSingleBand>
+public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 		implements PointTracker<I>
 {
 	// reference to input image
@@ -129,7 +129,7 @@ public class PointTrackerKltPyramid<I extends ImageSingleBand,D extends ImageSin
 
 	/**
 	 * Creates a new feature track at the specified location. Must only be called after
-	 * {@link #process(boofcv.struct.image.ImageSingleBand)} has been called.  It can fail if there
+	 * {@link #process(ImageGray)} has been called.  It can fail if there
 	 * is insufficient texture
 	 *
 	 * @param x x-coordinate

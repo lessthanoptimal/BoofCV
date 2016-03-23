@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.core.image.border.ImageBorder_F64;
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,12 +35,12 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_F64 extends BilinearPixelS<ImageFloat64> {
+public class ImplBilinearPixel_F64 extends BilinearPixelS<GrayF64> {
 
 	public ImplBilinearPixel_F64() {
 	}
 
-	public ImplBilinearPixel_F64(ImageFloat64 orig) {
+	public ImplBilinearPixel_F64(GrayF64 orig) {
 
 		setImage(orig);
 	}
@@ -90,8 +90,8 @@ public class ImplBilinearPixel_F64 extends BilinearPixelS<ImageFloat64> {
 	}
 
 	@Override
-	public ImageType<ImageFloat64> getImageType() {
-		return ImageType.single(ImageFloat64.class);
+	public ImageType<GrayF64> getImageType() {
+		return ImageType.single(GrayF64.class);
 	}
 
 }

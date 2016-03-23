@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class TestAnyImageDerivative {
 	int width = 20;
 	int height = 30;
 
-	ImageFloat32 original = new ImageFloat32(width,height);
+	GrayF32 original = new GrayF32(width,height);
 
 	/**
 	 * See if changing the input image size causes an exception to be thrown.
@@ -45,11 +45,11 @@ public class TestAnyImageDerivative {
 	@Test
 	public void changeInputImageSize() {
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
-		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,ImageFloat32.class);
+		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<GrayF32,GrayF32>(kernelX,GrayF32.class,GrayF32.class);
 		alg.setInput(original);
 		alg.getDerivative(true);
 
-		ImageFloat32 smaller = new ImageFloat32(width-5,height-5);
+		GrayF32 smaller = new GrayF32(width-5,height-5);
 		GImageMiscOps.fillUniform(smaller, rand, 0, 40);
 
 		// assume that if it can't handle variable sized inputs then an exception is thrown
@@ -59,16 +59,16 @@ public class TestAnyImageDerivative {
 
 	@Test
 	public void test() {
-		ImageGradient<ImageFloat32,ImageFloat32> g =  FactoryDerivative.three_F32();
+		ImageGradient<GrayF32,GrayF32> g =  FactoryDerivative.three_F32();
 
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
-		ImageFloat32 derivXX = new ImageFloat32(width,height);
-		ImageFloat32 derivYY = new ImageFloat32(width,height);
-		ImageFloat32 derivXY = new ImageFloat32(width,height);
-		ImageFloat32 derivYX = new ImageFloat32(width,height);
-		ImageFloat32 derivYYX = new ImageFloat32(width,height);
-		ImageFloat32 derivYYY = new ImageFloat32(width,height);
+		GrayF32 derivX = new GrayF32(width,height);
+		GrayF32 derivY = new GrayF32(width,height);
+		GrayF32 derivXX = new GrayF32(width,height);
+		GrayF32 derivYY = new GrayF32(width,height);
+		GrayF32 derivXY = new GrayF32(width,height);
+		GrayF32 derivYX = new GrayF32(width,height);
+		GrayF32 derivYYX = new GrayF32(width,height);
+		GrayF32 derivYYY = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(original, rand, 0, 40);
 		g.process(original,derivX,derivY);
@@ -78,7 +78,7 @@ public class TestAnyImageDerivative {
 
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
 
-		AnyImageDerivative<ImageFloat32,ImageFloat32> alg = new AnyImageDerivative<ImageFloat32,ImageFloat32>(kernelX,ImageFloat32.class,ImageFloat32.class);
+		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<GrayF32,GrayF32>(kernelX,GrayF32.class,GrayF32.class);
 		alg.setInput(original);
 
 		// do one out of order which will force it to meet all the dependencies

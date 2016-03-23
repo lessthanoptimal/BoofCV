@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
 
@@ -52,7 +52,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFoot <I extends ImageSingleBand, D extends ImageSingleBand> implements DetectLine<I> {
+public class DetectLineHoughFoot <I extends ImageGray, D extends ImageGray> implements DetectLine<I> {
 
 	// transform algorithm
 	HoughTransformLineFootOfNorm alg;
@@ -68,10 +68,10 @@ public class DetectLineHoughFoot <I extends ImageSingleBand, D extends ImageSing
 	D derivY;
 
 	// edge intensity image
-	ImageFloat32 intensity = new ImageFloat32(1,1);
+	GrayF32 intensity = new GrayF32(1,1);
 
 	// detected edge image
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
 	// the maximum number of lines it will return
 	int maxLines;
@@ -159,11 +159,11 @@ public class DetectLineHoughFoot <I extends ImageSingleBand, D extends ImageSing
 		return derivY;
 	}
 
-	public ImageFloat32 getEdgeIntensity() {
+	public GrayF32 getEdgeIntensity() {
 		return intensity;
 	}
 
-	public ImageUInt8 getBinary() {
+	public GrayU8 getBinary() {
 		return binary;
 	}
 }

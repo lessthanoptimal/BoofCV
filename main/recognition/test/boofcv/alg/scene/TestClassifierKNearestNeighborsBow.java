@@ -21,9 +21,9 @@ package boofcv.alg.scene;
 import boofcv.abst.feature.dense.DescribeImageDense;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -59,7 +59,7 @@ public class TestClassifierKNearestNeighborsBow {
 		bow.setNumNeighbors(6);
 		bow.setClassificationData(memory, 3);
 
-		assertEquals(2, bow.classify(new ImageUInt8(2, 3)));
+		assertEquals(2, bow.classify(new GrayU8(2, 3)));
 
 		assertEquals(NUM_WORDS, nn.initDimension);
 		assertTrue(nn.setPoints);
@@ -69,7 +69,7 @@ public class TestClassifierKNearestNeighborsBow {
 
 
 		// call one more time and see if stuff blows up
-		assertEquals(2, bow.classify(new ImageUInt8(2, 3)));
+		assertEquals(2, bow.classify(new GrayU8(2, 3)));
 
 		assertEquals(NUM_WORDS, nn.initDimension);
 		assertTrue(nn.setPoints);

@@ -19,9 +19,9 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -52,7 +52,7 @@ import boofcv.struct.image.ImageUInt8;
  * @author Peter Abeles
  */
 public abstract class ThresholdSquareBlockMinMax
-		<T extends ImageSingleBand, I extends ImageInterleaved>
+		<T extends ImageGray, I extends ImageInterleaved>
 {
 	// interleaved image which stores min and max values inside each block
 	protected I minmax;
@@ -83,7 +83,7 @@ public abstract class ThresholdSquareBlockMinMax
 	 * @param input Input image
 	 * @param output Output binary image
 	 */
-	public void process(T input , ImageUInt8 output ) {
+	public void process(T input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input,output);
 
 		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
@@ -146,7 +146,7 @@ public abstract class ThresholdSquareBlockMinMax
 	/**
 	 * Applies the dynamically computed threshold to each pixel in the image, one block at a time
 	 */
-	private void applyThreshold( T input, ImageUInt8 output ) {
+	private void applyThreshold( T input, GrayU8 output ) {
 		for (int blockY = 0; blockY < minmax.height; blockY++) {
 			for (int blockX = 0; blockX < minmax.width; blockX++) {
 				thresholdBlock(blockX,blockY,input,output);
@@ -162,7 +162,7 @@ public abstract class ThresholdSquareBlockMinMax
 	 * @param output Output image
 	 */
 	protected abstract void thresholdBlock(int blockX0 , int blockY0 ,
-										   T input, ImageUInt8 output );
+										   T input, GrayU8 output );
 
 	/**
 	 * Computes the min-max value inside a block

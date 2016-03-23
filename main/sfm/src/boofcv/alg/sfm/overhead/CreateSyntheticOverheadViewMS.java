@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,17 +24,17 @@ import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 
 /**
- * Implementation of {@link CreateSyntheticOverheadView} for {@link MultiSpectral}.
+ * Implementation of {@link CreateSyntheticOverheadView} for {@link Planar}.
  *
  * @author Peter Abeles
  */
-public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
-		extends CreateSyntheticOverheadView<MultiSpectral<T>>
+public class CreateSyntheticOverheadViewMS<T extends ImageGray>
+		extends CreateSyntheticOverheadView<Planar<T>>
 {
 	// computes interpolated pixel value.
 	// have one for each band so that you don't need to constantly change the image it's set to
@@ -74,7 +74,7 @@ public class CreateSyntheticOverheadViewMS<T extends ImageSingleBand>
 	 * @param input (Input) Camera image.
 	 * @param output (Output) Image containing overhead view.
 	 */
-	public void process(MultiSpectral<T> input, MultiSpectral<T> output) {
+	public void process(Planar<T> input, Planar<T> output) {
 
 		int N = input.getNumBands();
 		for( int i = 0; i < N; i++ ) {

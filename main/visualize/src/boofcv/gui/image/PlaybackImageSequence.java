@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.image.BufferedImage;
 
@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class PlaybackImageSequence<T extends ImageSingleBand> extends ProcessImageSequence<T> {
+public class PlaybackImageSequence<T extends ImageGray> extends ProcessImageSequence<T> {
 
 	ImagePanel panel;
 

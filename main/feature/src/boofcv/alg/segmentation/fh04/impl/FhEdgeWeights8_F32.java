@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
@@ -34,10 +34,10 @@ import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edg
  *
  * @author Peter Abeles
  */
-public class FhEdgeWeights8_F32 implements FhEdgeWeights<ImageFloat32> {
+public class FhEdgeWeights8_F32 implements FhEdgeWeights<GrayF32> {
 
 	@Override
-	public void process(ImageFloat32 input,
+	public void process(GrayF32 input,
 						FastQueue<Edge> edges) {
 
 		int w = input.width-1;
@@ -90,7 +90,7 @@ public class FhEdgeWeights8_F32 implements FhEdgeWeights<ImageFloat32> {
 		}
 	}
 	private void checkAround( int x , int y ,
-							  ImageFloat32 input ,
+							  GrayF32 input ,
 							  FastQueue<Edge> edges )
 	{
 		int indexSrc = input.startIndex + y*input.stride + x;
@@ -105,7 +105,7 @@ public class FhEdgeWeights8_F32 implements FhEdgeWeights<ImageFloat32> {
 	}
 
 	private void check( int x , int y , float color0 , int indexA,
-						ImageFloat32 input ,
+						GrayF32 input ,
 						FastQueue<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
 			return;
@@ -123,8 +123,8 @@ public class FhEdgeWeights8_F32 implements FhEdgeWeights<ImageFloat32> {
 	}
 
 	@Override
-	public ImageType<ImageFloat32> getInputType() {
-		return ImageType.single(ImageFloat32.class);
+	public ImageType<GrayF32> getInputType() {
+		return ImageType.single(GrayF32.class);
 	}
 
 }

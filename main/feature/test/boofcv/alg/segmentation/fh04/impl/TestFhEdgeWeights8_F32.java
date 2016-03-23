@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,25 @@ package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
 * @author Peter Abeles
 */
-public class TestFhEdgeWeights8_F32 extends GenericFhEdgeWeightsChecks<ImageFloat32> {
+public class TestFhEdgeWeights8_F32 extends GenericFhEdgeWeightsChecks<GrayF32> {
 
 	public TestFhEdgeWeights8_F32() {
-		super(ImageType.single(ImageFloat32.class), ConnectRule.EIGHT);
+		super(ImageType.single(GrayF32.class), ConnectRule.EIGHT);
 	}
 
 	@Override
-	public FhEdgeWeights<ImageFloat32> createAlg() {
+	public FhEdgeWeights<GrayF32> createAlg() {
 		return new FhEdgeWeights8_F32();
 	}
 
 	@Override
-	public float weight( ImageFloat32 input , int indexA, int indexB) {
+	public float weight(GrayF32 input , int indexA, int indexB) {
 		return Math.abs(input.data[indexA] - input.data[indexB]);
 	}
 }

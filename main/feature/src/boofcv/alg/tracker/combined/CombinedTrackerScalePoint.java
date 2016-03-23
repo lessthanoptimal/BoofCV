@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -43,7 +43,7 @@ import java.util.Stack;
  */
 // TODO Two versions.  One for InterestPointDetector and one for corners
 public class CombinedTrackerScalePoint
-		<I extends ImageSingleBand , D extends ImageSingleBand, TD extends TupleDesc> {
+		<I extends ImageGray, D extends ImageGray, TD extends TupleDesc> {
 
 	// current image in sequence
 	private I input;

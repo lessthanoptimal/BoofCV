@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.gui.image;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class DiscretePyramidPanel<T extends ImageSingleBand> extends JPanel {
+public class DiscretePyramidPanel<T extends ImageGray> extends JPanel {
 
 	BufferedImage img;
 	ImagePyramid<T> pyramid;

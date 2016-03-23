@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -47,7 +47,7 @@ import java.util.List;
  */
 // TODO add support for color again
 // TODO comment and clean up code
-public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
+public class VideoMosaicSequentialPointApp<I extends ImageGray, D extends ImageGray,
 		IT extends InvertibleTransform>
 		extends VideoStitchBaseApp<I,IT>
 {
@@ -130,7 +130,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageSingleBand, D extends 
 	}
 
 	public static void main( String args[] ) {
-		Class type = ImageFloat32.class;
+		Class type = GrayF32.class;
 		Class derivType = type;
 
 //		Class type = ImageUInt8.class;

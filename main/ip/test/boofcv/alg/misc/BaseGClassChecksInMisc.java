@@ -20,9 +20,9 @@ package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import boofcv.testing.CompareEquivalentFunctions;
 
 import java.lang.reflect.Method;
@@ -91,12 +91,12 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 	}
 
 	protected ImageBase createImage( Class imageType , Class bandType) {
-		if( ImageSingleBand.class.isAssignableFrom(imageType) ) {
+		if( ImageGray.class.isAssignableFrom(imageType) ) {
 			return GeneralizedImageOps.createSingleBand(imageType, width, height);
 		} else if( ImageInterleaved.class.isAssignableFrom(imageType) ) {
 			return GeneralizedImageOps.createInterleaved(imageType, width, height, 3);
 		} else if( bandType != null ) {
-			return new MultiSpectral(bandType,width,height,3);
+			return new Planar(bandType,width,height,3);
 		}
 		return null;
 	}
@@ -106,8 +106,8 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 			return;
 
 		boolean isSigned = false;
-		if( img instanceof ImageSingleBand ) {
-			if( ((ImageSingleBand)img).getDataType().isSigned() ) {
+		if( img instanceof ImageGray) {
+			if( ((ImageGray)img).getDataType().isSigned() ) {
 				isSigned = true;
 			}
 		} else if( img instanceof ImageInterleaved ) {
@@ -115,7 +115,7 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 				isSigned = true;
 			}
 		} else {
-			if( ((MultiSpectral)img).getBand(0).getDataType().isSigned() ) {
+			if( ((Planar)img).getBand(0).getDataType().isSigned() ) {
 				isSigned = true;
 			}
 		}

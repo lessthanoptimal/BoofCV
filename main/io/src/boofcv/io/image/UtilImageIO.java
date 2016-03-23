@@ -114,7 +114,7 @@ public class UtilImageIO {
 	 * @param imageType Type of image that should be returned.
 	 * @return The image or null if the image could not be loaded.
 	 */
-	public static <T extends ImageSingleBand> T loadImage(String fileName, Class<T> imageType ) {
+	public static <T extends ImageGray> T loadImage(String fileName, Class<T> imageType ) {
 		BufferedImage img = loadImage(fileName);
 		if( img == null )
 			return null;
@@ -122,7 +122,7 @@ public class UtilImageIO {
 		return ConvertBufferedImage.convertFromSingle(img, (T) null, imageType);
 	}
 
-	public static <T extends ImageSingleBand> T loadImage( String directory , String fileName, Class<T> imageType ) {
+	public static <T extends ImageGray> T loadImage(String directory , String fileName, Class<T> imageType ) {
 		return loadImage(new File(directory,fileName).getPath(),imageType);
 	}
 
@@ -156,10 +156,10 @@ public class UtilImageIO {
 
 			if( !ImageIO.write(img, type, new File(fileName)) ) {
 				if( fileName.endsWith("ppm") || fileName.endsWith("PPM") ) {
-					MultiSpectral<ImageUInt8> color = ConvertBufferedImage.convertFromMulti(img,null,true,ImageUInt8.class);
+					Planar<GrayU8> color = ConvertBufferedImage.convertFromMulti(img,null,true,GrayU8.class);
 					savePPM(color, fileName, null);
 				} else if( fileName.endsWith("pgm") || fileName.endsWith("PGM") ) {
-					ImageUInt8 gray = ConvertBufferedImage.convertFrom(img, (ImageUInt8) null);
+					GrayU8 gray = ConvertBufferedImage.convertFrom(img, (GrayU8) null);
 					savePGM(gray, fileName);
 				}else
 					throw new IllegalArgumentException("No writer appropriate found");
@@ -348,7 +348,7 @@ public class UtilImageIO {
 	 * @return The image.
 	 * @throws IOException
 	 */
-	public static MultiSpectral<ImageUInt8> loadPPM_U8( String fileName , MultiSpectral<ImageUInt8> storage , GrowQueue_I8 temp )
+	public static Planar<GrayU8> loadPPM_U8(String fileName , Planar<GrayU8> storage , GrowQueue_I8 temp )
 			throws IOException
 	{
 		return loadPPM_U8(new FileInputStream(fileName),storage,temp);
@@ -365,7 +365,7 @@ public class UtilImageIO {
 	 * @return The image.
 	 * @throws IOException
 	 */
-	public static MultiSpectral<ImageUInt8> loadPPM_U8( InputStream inputStream, MultiSpectral<ImageUInt8> storage , GrowQueue_I8 temp )
+	public static Planar<GrayU8> loadPPM_U8(InputStream inputStream, Planar<GrayU8> storage , GrowQueue_I8 temp )
 			throws IOException
 	{
 		DataInputStream in = new DataInputStream(inputStream);
@@ -380,7 +380,7 @@ public class UtilImageIO {
 		readLine(in);
 
 		if( storage == null || storage.getNumBands() != 3 )
-			storage = new MultiSpectral<ImageUInt8>(ImageUInt8.class,w,h,3 );
+			storage = new Planar<GrayU8>(GrayU8.class,w,h,3 );
 		else
 			storage.reshape(w,h);
 
@@ -392,9 +392,9 @@ public class UtilImageIO {
 		byte data[] = temp.data;
 		in.read(data,0,length);
 
-		ImageUInt8 band0 = storage.getBand(0);
-		ImageUInt8 band1 = storage.getBand(1);
-		ImageUInt8 band2 = storage.getBand(2);
+		GrayU8 band0 = storage.getBand(0);
+		GrayU8 band1 = storage.getBand(1);
+		GrayU8 band2 = storage.getBand(2);
 
 		int indexIn = 0;
 		for( int y = 0; y < storage.height; y++ ) {
@@ -418,7 +418,7 @@ public class UtilImageIO {
 	 * @return The read in image
 	 * @throws IOException
 	 */
-	public static ImageUInt8 loadPGM_U8( String fileName , ImageUInt8 storage )
+	public static GrayU8 loadPGM_U8(String fileName , GrayU8 storage )
 			throws IOException
 	{
 		return loadPGM_U8(new FileInputStream(fileName),storage);
@@ -433,7 +433,7 @@ public class UtilImageIO {
 	 * @return The read in image
 	 * @throws IOException
 	 */
-	public static ImageUInt8 loadPGM_U8( InputStream inputStream , ImageUInt8 storage ) throws IOException {
+	public static GrayU8 loadPGM_U8(InputStream inputStream , GrayU8 storage ) throws IOException {
 		DataInputStream in = new DataInputStream(inputStream);
 
 		readLine(in);
@@ -446,7 +446,7 @@ public class UtilImageIO {
 		readLine(in);
 
 		if( storage == null )
-			storage = new ImageUInt8(w,h);
+			storage = new GrayU8(w,h);
 
 		in.read(storage.data,0,w*h);
 
@@ -461,7 +461,7 @@ public class UtilImageIO {
 	 * @param temp (Optional) Used internally to store the image.  Can be null.
 	 * @throws IOException
 	 */
-	public static void savePPM( MultiSpectral<ImageUInt8> rgb , String fileName , GrowQueue_I8 temp ) throws IOException {
+	public static void savePPM(Planar<GrayU8> rgb , String fileName , GrowQueue_I8 temp ) throws IOException {
 		File out = new File(fileName);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
@@ -473,9 +473,9 @@ public class UtilImageIO {
 		temp.resize(rgb.width*rgb.height*3);
 		byte data[] = temp.data;
 
-		ImageUInt8 band0 = rgb.getBand(0);
-		ImageUInt8 band1 = rgb.getBand(1);
-		ImageUInt8 band2 = rgb.getBand(2);
+		GrayU8 band0 = rgb.getBand(0);
+		GrayU8 band1 = rgb.getBand(1);
+		GrayU8 band2 = rgb.getBand(2);
 
 		int indexOut = 0;
 		for( int y = 0; y < rgb.height; y++ ) {
@@ -499,7 +499,7 @@ public class UtilImageIO {
 	 * @param fileName Location where the image is to be written to.
 	 * @throws IOException
 	 */
-	public static void savePGM(  ImageUInt8 gray , String fileName ) throws IOException {
+	public static void savePGM(GrayU8 gray , String fileName ) throws IOException {
 		File out = new File(fileName);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 

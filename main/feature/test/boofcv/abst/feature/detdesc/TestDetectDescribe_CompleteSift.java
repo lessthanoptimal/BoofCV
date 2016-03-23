@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.abst.feature.detdesc;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.junit.Test;
 
 /**
@@ -32,7 +32,7 @@ import org.junit.Test;
 @SuppressWarnings("ALL")
 public class TestDetectDescribe_CompleteSift
 {
-	Class types[] = new Class[]{ImageFloat32.class,ImageUInt8.class};
+	Class types[] = new Class[]{GrayF32.class,GrayU8.class};
 
 	@Test
 	public void allTypes() {

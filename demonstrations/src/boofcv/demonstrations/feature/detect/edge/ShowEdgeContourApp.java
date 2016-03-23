@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class ShowEdgeContourApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
 {
 	// shows panel for displaying input image
@@ -61,8 +61,8 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	Class<D> derivType;
 	boolean processedImage = false;
 
-	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageSInt32 labeled = new ImageSInt32(1,1);
+	GrayU8 binary = new GrayU8(1,1);
+	GrayS32 labeled = new GrayS32(1,1);
 
 	CannyControlBar barCanny;
 	SelectHistogramThresholdPanel barBinary;
@@ -210,8 +210,8 @@ public class ShowEdgeContourApp<T extends ImageSingleBand, D extends ImageSingle
 	}
 
 	public static void main( String args[] ) {
-		ShowEdgeContourApp<ImageFloat32,ImageFloat32> app =
-				new ShowEdgeContourApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
+		ShowEdgeContourApp<GrayF32,GrayF32> app =
+				new ShowEdgeContourApp<GrayF32, GrayF32>(GrayF32.class, GrayF32.class);
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);
 

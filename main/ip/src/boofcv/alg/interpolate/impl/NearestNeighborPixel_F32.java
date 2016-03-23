@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixelS;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,18 +35,18 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<ImageFloat32> {
+public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<GrayF32> {
 
 	private float data[];
 	public NearestNeighborPixel_F32() {
 	}
 
-	public NearestNeighborPixel_F32(ImageFloat32 orig) {
+	public NearestNeighborPixel_F32(GrayF32 orig) {
 
 		setImage(orig);
 	}
 	@Override
-	public void setImage(ImageFloat32 image) {
+	public void setImage(GrayF32 image) {
 		super.setImage(image);
 		this.data = orig.data;
 	}
@@ -71,8 +71,8 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<ImageFloat32
 	}
 
 	@Override
-	public ImageType<ImageFloat32> getImageType() {
-		return ImageType.single(ImageFloat32.class);
+	public ImageType<GrayF32> getImageType() {
+		return ImageType.single(GrayF32.class);
 	}
 
 }

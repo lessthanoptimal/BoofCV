@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.describe;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -38,7 +38,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public abstract class DescribePointBinaryCompare<T extends ImageSingleBand> {
+public abstract class DescribePointBinaryCompare<T extends ImageGray> {
 	// describes where points are sampled and how they are compared
 	protected BinaryCompareDefinition_I32 definition;
 

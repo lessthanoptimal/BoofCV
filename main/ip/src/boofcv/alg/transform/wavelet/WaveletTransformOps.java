@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformBorder;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformInner;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -65,9 +65,9 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 */
-	public static void transform1( WaveletDescription<WlCoef_F32> desc ,
-								   ImageFloat32 input , ImageFloat32 output ,
-								   ImageFloat32 storage )
+	public static void transform1(WaveletDescription<WlCoef_F32> desc ,
+								  GrayF32 input , GrayF32 output ,
+								  GrayF32 storage )
 	{
 		UtilWavelet.checkShape(input,output);
 
@@ -107,10 +107,10 @@ public class WaveletTransformOps {
 	 * an image is declared internally.
 	 * @param numLevels Number of levels which should be computed in the transform.
 	 */
-	public static void transformN( WaveletDescription<WlCoef_F32> desc ,
-								   ImageFloat32 input , ImageFloat32 output ,
-								   ImageFloat32 storage ,
-								   int numLevels )
+	public static void transformN(WaveletDescription<WlCoef_F32> desc ,
+								  GrayF32 input , GrayF32 output ,
+								  GrayF32 storage ,
+								  int numLevels )
 	{
 		if( numLevels == 1 ) {
 			transform1(desc,input,output, storage);
@@ -155,9 +155,9 @@ public class WaveletTransformOps {
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
 	 */
-	public static void inverse1( WaveletDescription<WlCoef_F32> desc ,
-								 ImageFloat32 input , ImageFloat32 output ,
-								 ImageFloat32 storage , float minValue , float maxValue )
+	public static void inverse1(WaveletDescription<WlCoef_F32> desc ,
+								GrayF32 input , GrayF32 output ,
+								GrayF32 storage , float minValue , float maxValue )
 	{
 		UtilWavelet.checkShape(output,input);
 		WlCoef_F32 coef = desc.getForward();
@@ -198,11 +198,11 @@ public class WaveletTransformOps {
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
 	 */
-	public static void inverseN( WaveletDescription<WlCoef_F32> desc ,
-								 ImageFloat32 input , ImageFloat32 output ,
-								 ImageFloat32 storage,
-								 int numLevels ,
-								 float minValue , float maxValue)
+	public static void inverseN(WaveletDescription<WlCoef_F32> desc ,
+								GrayF32 input , GrayF32 output ,
+								GrayF32 storage,
+								int numLevels ,
+								float minValue , float maxValue)
 	{
 		if( numLevels == 1 ) {
 			inverse1(desc,input,output, storage,minValue,maxValue);
@@ -224,8 +224,8 @@ public class WaveletTransformOps {
 		width += width%2;
 		height += height%2;
 
-		ImageFloat32 levelIn = input.subimage(0,0,width,height, null);
-		ImageFloat32 levelOut = output.subimage(0,0,width,height, null);
+		GrayF32 levelIn = input.subimage(0,0,width,height, null);
+		GrayF32 levelOut = output.subimage(0,0,width,height, null);
 		storage.reshape(width,height);
 		inverse1(desc,levelIn,levelOut, storage,-Float.MAX_VALUE,Float.MAX_VALUE);
 
@@ -266,9 +266,9 @@ public class WaveletTransformOps {
 	 * @param storage Optional storage image.  Should be the same size as output image. If null then
 	 * an image is declared internally.
 	 */
-	public static void transform1( WaveletDescription<WlCoef_I32> desc ,
-								   ImageSInt32 input , ImageSInt32 output ,
-								   ImageSInt32 storage )
+	public static void transform1(WaveletDescription<WlCoef_I32> desc ,
+								  GrayS32 input , GrayS32 output ,
+								  GrayS32 storage )
 	{
 		UtilWavelet.checkShape(input,output);
 
@@ -308,10 +308,10 @@ public class WaveletTransformOps {
 	 * an image is declared internally.
 	 * @param numLevels Number of levels which should be computed in the transform.
 	 */
-	public static void transformN( WaveletDescription<WlCoef_I32> desc ,
-								   ImageSInt32 input , ImageSInt32 output ,
-								   ImageSInt32 storage ,
-								   int numLevels )
+	public static void transformN(WaveletDescription<WlCoef_I32> desc ,
+								  GrayS32 input , GrayS32 output ,
+								  GrayS32 storage ,
+								  int numLevels )
 	{
 		if( numLevels == 1 ) {
 			transform1(desc,input,output, storage);
@@ -356,9 +356,9 @@ public class WaveletTransformOps {
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
 	 */
-	public static void inverse1( WaveletDescription<WlCoef_I32> desc ,
-								 ImageSInt32 input , ImageSInt32 output ,
-								 ImageSInt32 storage , int minValue , int maxValue )
+	public static void inverse1(WaveletDescription<WlCoef_I32> desc ,
+								GrayS32 input , GrayS32 output ,
+								GrayS32 storage , int minValue , int maxValue )
 	{
 		UtilWavelet.checkShape(output,input);
 		WlCoef_I32 coef = desc.getForward();
@@ -399,11 +399,11 @@ public class WaveletTransformOps {
 	 * @param minValue Minimum allowed pixel value
 	 * @param maxValue Maximum allowed pixel value
 	 */
-	public static void inverseN( WaveletDescription<WlCoef_I32> desc ,
-								 ImageSInt32 input , ImageSInt32 output ,
-								 ImageSInt32 storage,
-								 int numLevels ,
-								 int minValue , int maxValue)
+	public static void inverseN(WaveletDescription<WlCoef_I32> desc ,
+								GrayS32 input , GrayS32 output ,
+								GrayS32 storage,
+								int numLevels ,
+								int minValue , int maxValue)
 	{
 		if( numLevels == 1 ) {
 			inverse1(desc,input,output, storage,minValue,maxValue);
@@ -425,8 +425,8 @@ public class WaveletTransformOps {
 		width += width%2;
 		height += height%2;
 
-		ImageSInt32 levelIn = input.subimage(0,0,width,height, null);
-		ImageSInt32 levelOut = output.subimage(0,0,width,height, null);
+		GrayS32 levelIn = input.subimage(0,0,width,height, null);
+		GrayS32 levelOut = output.subimage(0,0,width,height, null);
 		storage.reshape(width,height);
 		inverse1(desc,levelIn,levelOut, storage,Integer.MIN_VALUE,Integer.MAX_VALUE);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.awt.image.BufferedImage;
 
@@ -54,11 +54,11 @@ public class ExampleImageFilter {
 
 	private static int blurRadius = 10;
 
-	public static void procedural( ImageUInt8 input )
+	public static void procedural( GrayU8 input )
 	{
-		ImageUInt8 blurred = new ImageUInt8(input.width,input.height);
-		ImageSInt16 derivX = new ImageSInt16(input.width,input.height);
-		ImageSInt16 derivY = new ImageSInt16(input.width,input.height);
+		GrayU8 blurred = new GrayU8(input.width,input.height);
+		GrayS16 derivX = new GrayS16(input.width,input.height);
+		GrayS16 derivY = new GrayS16(input.width,input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		BlurImageOps.gaussian(input,blurred,-1,blurRadius,null);
@@ -71,7 +71,7 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Procedural Fixed Type");
 	}
 
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	void generalized( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -92,7 +92,7 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	void filter( T input )
 	{
 		Class<T> inputType = (Class<T>)input.getClass();
@@ -115,14 +115,14 @@ public class ExampleImageFilter {
 		ShowImages.showWindow(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
-	public static void nogenerics( ImageSingleBand input )
+	public static void nogenerics( ImageGray input )
 	{
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageSingleBand blurred = (ImageSingleBand)input.createSameShape();
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		ImageGray blurred = (ImageGray)input.createSameShape();
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		GBlurImageOps.gaussian(input, blurred, -1, blurRadius, null);
@@ -140,12 +140,12 @@ public class ExampleImageFilter {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"));
 
 		// produces the same results
-		procedural(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
-		generalized(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
-		filter(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
-		nogenerics(ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class));
+		procedural(ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class));
+		generalized(ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class));
+		filter(ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class));
+		nogenerics(ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class));
 
 		// try another image data type
-		generalized(ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class));
+		generalized(ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class));
 	}
 }

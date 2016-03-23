@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
@@ -47,7 +47,7 @@ public class AreGenericsSlower {
 	static int height = 480;
 	static long TEST_TIME = 1000;
 
-	ImageFloat32 image = new ImageFloat32(width,height);
+	GrayF32 image = new GrayF32(width,height);
 
 	static int r = 2;
 
@@ -75,9 +75,9 @@ public class AreGenericsSlower {
 
 	private static class RawType
 	{
-		ImageFloat32 image;
+		GrayF32 image;
 
-		public void setImage(ImageFloat32 image) {
+		public void setImage(GrayF32 image) {
 			this.image = image;
 		}
 
@@ -103,7 +103,7 @@ public class AreGenericsSlower {
 		}
 	}
 
-	private static class Derived extends BaseGeneric<ImageFloat32>
+	private static class Derived extends BaseGeneric<GrayF32>
 	{
 
 		@Override
@@ -129,7 +129,7 @@ public class AreGenericsSlower {
 		}
 	}
 
-	private static abstract class BaseGeneric <T extends ImageSingleBand>
+	private static abstract class BaseGeneric <T extends ImageGray>
 	{
 		protected T image;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.BoofDefaults;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -39,14 +39,14 @@ public class TestImplSsdCorner_F32 {
 	
 	int radius=4;
 
-	ImageFloat32 input = new ImageFloat32(width,height);
+	GrayF32 input = new GrayF32(width,height);
 
-	ImageFloat32 derivX = new ImageFloat32(width,height);
-	ImageFloat32 derivY = new ImageFloat32(width,height);
+	GrayF32 derivX = new GrayF32(width,height);
+	GrayF32 derivY = new GrayF32(width,height);
 
-	ImageFloat32 derivXX = new ImageFloat32(width,height);
-	ImageFloat32 derivXY = new ImageFloat32(width,height);
-	ImageFloat32 derivYY = new ImageFloat32(width,height);
+	GrayF32 derivXX = new GrayF32(width,height);
+	GrayF32 derivXY = new GrayF32(width,height);
+	GrayF32 derivYY = new GrayF32(width,height);
 
 	/**
 	 * Manually compute intensity values and see if they are the same
@@ -70,10 +70,10 @@ public class TestImplSsdCorner_F32 {
 
 		Sdd alg = new Sdd(radius);
 
-		alg.process(derivX,derivY, new ImageFloat32(width,height));
+		alg.process(derivX,derivY, new GrayF32(width,height));
 	}
 	
-	public float sum( int x , int y , ImageFloat32 img ) {
+	public float sum( int x , int y , GrayF32 img ) {
 		float ret = 0;
 		
 		for( int i = -radius; i <= radius; i++ ) {

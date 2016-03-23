@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detdesc;
 
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -34,8 +34,8 @@ public class TestDetectDescribeSingleToMulti {
 	public void basic() {
 		Helper helper = new Helper();
 
-		DetectDescribeSingleToMulti<ImageFloat32,TupleDesc_F64> alg =
-				new DetectDescribeSingleToMulti<ImageFloat32,TupleDesc_F64>(helper);
+		DetectDescribeSingleToMulti<GrayF32,TupleDesc_F64> alg =
+				new DetectDescribeSingleToMulti<GrayF32,TupleDesc_F64>(helper);
 
 		assertFalse(helper.calledDetect);
 		alg.process(null);
@@ -50,7 +50,7 @@ public class TestDetectDescribeSingleToMulti {
 		assertTrue(null != alg.getFeatureSet(0).getDescription(0));
 	}
 
-	protected static class Helper implements DetectDescribePoint<ImageFloat32,TupleDesc_F64> {
+	protected static class Helper implements DetectDescribePoint<GrayF32,TupleDesc_F64> {
 
 		boolean calledDetect = false;
 
@@ -70,7 +70,7 @@ public class TestDetectDescribeSingleToMulti {
 		}
 
 		@Override
-		public void detect(ImageFloat32 input) {
+		public void detect(GrayF32 input) {
 			calledDetect = true;
 		}
 

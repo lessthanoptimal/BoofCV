@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.interest;
 
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.gss.GaussianScaleSpace;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface InterestPointScaleSpace<T extends ImageSingleBand, D extends ImageSingleBand> {
+public interface InterestPointScaleSpace<T extends ImageGray, D extends ImageGray> {
 
 	/**
 	 * Detect features in the scale space image

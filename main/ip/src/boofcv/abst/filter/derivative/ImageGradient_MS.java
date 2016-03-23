@@ -19,21 +19,21 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
- * Wrapper for applying image gradients to {@link MultiSpectral} images.
+ * Wrapper for applying image gradients to {@link Planar} images.
  *
  * @author Peter Abeles
  */
-public class ImageGradient_MS<T extends ImageSingleBand, D extends ImageSingleBand>
-		implements ImageGradient<MultiSpectral<T>,MultiSpectral<D>>
+public class ImageGradient_MS<T extends ImageGray, D extends ImageGray>
+		implements ImageGradient<Planar<T>,Planar<D>>
 {
 	ImageGradient<T,D> bandGradient;
 
-	ImageType<MultiSpectral<D>> derivType;
+	ImageType<Planar<D>> derivType;
 
 	public ImageGradient_MS(ImageGradient<T, D> bandGradient , int numBands ) {
 		this.bandGradient = bandGradient;
@@ -42,7 +42,7 @@ public class ImageGradient_MS<T extends ImageSingleBand, D extends ImageSingleBa
 	}
 
 	@Override
-	public void process(MultiSpectral<T> inputImage, MultiSpectral<D> derivX, MultiSpectral<D> derivY) {
+	public void process(Planar<T> inputImage, Planar<D> derivX, Planar<D> derivY) {
 		for (int i = 0; i < inputImage.getNumBands(); i++) {
 			bandGradient.process(inputImage.getBand(i), derivX.getBand(i), derivY.getBand(i));
 		}
@@ -64,7 +64,7 @@ public class ImageGradient_MS<T extends ImageSingleBand, D extends ImageSingleBa
 	}
 
 	@Override
-	public ImageType<MultiSpectral<D>> getDerivativeType() {
+	public ImageType<Planar<D>> getDerivativeType() {
 		return derivType;
 	}
 }

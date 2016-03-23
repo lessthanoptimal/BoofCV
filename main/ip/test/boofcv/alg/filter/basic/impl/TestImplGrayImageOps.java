@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -51,9 +51,9 @@ public class TestImplGrayImageOps {
 
 	public void invert( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(param[0], width, height);
 
 		m.invoke(null,input, 255, output);
 
@@ -75,8 +75,8 @@ public class TestImplGrayImageOps {
 
 	public void brighten(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(param[0], width, height);
 		GImageMiscOps.fill(input, 23);
 
 		m.invoke(null,input, 10,255, output);
@@ -106,8 +106,8 @@ public class TestImplGrayImageOps {
 
 	public void stretch(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class param[] = m.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(param[0], width, height);
 		GImageMiscOps.fill(input, 23);
 
 		m.invoke(null,input, 2.5,10,255, output);

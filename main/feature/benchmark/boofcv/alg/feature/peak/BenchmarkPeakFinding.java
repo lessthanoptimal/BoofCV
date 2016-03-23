@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkPeakFinding<T extends ImageSingleBand> {
+public class BenchmarkPeakFinding<T extends ImageGray> {
 
 	Random rand = new Random(234);
 	long TEST_TIME = 2000;
@@ -113,13 +113,13 @@ public class BenchmarkPeakFinding<T extends ImageSingleBand> {
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkPeakFinding<ImageUInt8>
-				benchmark_U8 = new BenchmarkPeakFinding<ImageUInt8>(ImageUInt8.class);
+		BenchmarkPeakFinding<GrayU8>
+				benchmark_U8 = new BenchmarkPeakFinding<GrayU8>(GrayU8.class);
 
 		benchmark_U8.evaluateAll();
 
-		BenchmarkPeakFinding<ImageFloat32>
-				benchmark_F32 = new BenchmarkPeakFinding<ImageFloat32>(ImageFloat32.class);
+		BenchmarkPeakFinding<GrayF32>
+				benchmark_F32 = new BenchmarkPeakFinding<GrayF32>(GrayF32.class);
 
 		benchmark_F32.evaluateAll();
 	}

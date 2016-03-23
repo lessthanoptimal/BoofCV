@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -85,8 +85,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 			final BufferedImage leftOrig = media.openImage(leftImages.get(i));
 			final BufferedImage rightOrig = media.openImage(rightImages.get(i));
 			if( leftOrig != null && rightOrig != null ) {
-				ImageFloat32 leftInput = ConvertBufferedImage.convertFrom(leftOrig, (ImageFloat32) null);
-				ImageFloat32 rightInput = ConvertBufferedImage.convertFrom(rightOrig, (ImageFloat32) null);
+				GrayF32 leftInput = ConvertBufferedImage.convertFrom(leftOrig, (GrayF32) null);
+				GrayF32 rightInput = ConvertBufferedImage.convertFrom(rightOrig, (GrayF32) null);
 				if( calibrator.addPair(leftInput,rightInput ) ) {
 					final int number = i;
 					SwingUtilities.invokeLater(new Runnable() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
 import org.ddogleg.sorting.QuickSelect;
 
 /**
@@ -40,7 +40,7 @@ import org.ddogleg.sorting.QuickSelect;
  */
 public class ImplMedianSortEdgeNaive {
 
-	public static void process(ImageFloat32 input, ImageFloat32 output, int radius , float storage[] )
+	public static void process(GrayF32 input, GrayF32 output, int radius , float storage[] )
 	{
 		int w = 2*radius+1;
 		if( storage == null ) {
@@ -156,7 +156,7 @@ public class ImplMedianSortEdgeNaive {
 		}
 	}
 
-	public static void process(ImageInteger input, ImageInteger output, int radius , int storage[] )
+	public static void process(GrayI input, GrayI output, int radius , int storage[] )
 	{
 		int w = 2*radius+1;
 		if( storage == null ) {

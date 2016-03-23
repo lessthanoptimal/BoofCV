@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public class ImageSInt8 extends ImageInt8<ImageSInt8> {
+public class GrayS8 extends GrayI8<GrayS8> {
 
 	/**
 	 * Creates a new gray scale (single band/color) image.
@@ -33,11 +33,11 @@ public class ImageSInt8 extends ImageInt8<ImageSInt8> {
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageSInt8(int width, int height) {
+	public GrayS8(int width, int height) {
 		super(width, height);
 	}
 
-	public ImageSInt8() {
+	public GrayS8() {
 	}
 
 	@Override
@@ -51,10 +51,10 @@ public class ImageSInt8 extends ImageInt8<ImageSInt8> {
 	}
 
 	@Override
-	public ImageSInt8 _createNew(int imgWidth, int imgHeight) {
+	public GrayS8 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1) {
-			return new ImageSInt8();
+			return new GrayS8();
 		}
-		return new ImageSInt8(imgWidth, imgHeight);
+		return new GrayS8(imgWidth, imgHeight);
 	}
 }

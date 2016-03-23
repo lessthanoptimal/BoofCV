@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -51,8 +51,8 @@ public class TestDetectFiducialSquareImage {
 
 	Random rand = new Random(234);
 	BinaryPolygonDetector squareDetector = FactoryShapeDetector.
-			polygon(new ConfigPolygonDetector(false, 4,4), ImageUInt8.class);
-	InputToBinary<ImageUInt8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, ImageUInt8.class);
+			polygon(new ConfigPolygonDetector(false, 4,4), GrayU8.class);
+	InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 
 	/**
 	 * Makes sure the found rotation matrix is correct
@@ -62,15 +62,15 @@ public class TestDetectFiducialSquareImage {
 		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
 
 		int w = DetectFiducialSquareBinary.w;
-		ImageFloat32 rendered_F32 = TestDetectFiducialSquareBinary.create(w, 314);
-		ImageUInt8 rendered = new ImageUInt8(rendered_F32.width,rendered_F32.height);
+		GrayF32 rendered_F32 = TestDetectFiducialSquareBinary.create(w, 314);
+		GrayU8 rendered = new GrayU8(rendered_F32.width,rendered_F32.height);
 		ConvertImage.convert(rendered_F32, rendered);
-		ImageUInt8 input = new ImageUInt8(640,480);
+		GrayU8 input = new GrayU8(640,480);
 
-		ImageUInt8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
+		GrayU8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
 
-		DetectFiducialSquareImage<ImageUInt8> alg = new DetectFiducialSquareImage<ImageUInt8>(
-				inputToBinary,squareDetector,0.25,0.65,0.1,ImageUInt8.class);
+		DetectFiducialSquareImage<GrayU8> alg = new DetectFiducialSquareImage<GrayU8>(
+				inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
 
@@ -107,14 +107,14 @@ public class TestDetectFiducialSquareImage {
 	@Test
 	public void processSquare() {
 		// randomly create a pattern
-		ImageUInt8 pattern = new ImageUInt8(16*4,16*4);
+		GrayU8 pattern = new GrayU8(16*4,16*4);
 		ImageMiscOps.fillUniform(pattern, rand, 0, 2);
 		PixelMath.multiply(pattern,255,pattern);
 
 		// add a border around it
-		ImageUInt8 border = new ImageUInt8(16*8,16*8);
+		GrayU8 border = new GrayU8(16*8,16*8);
 		border.subimage(16*2,16*2,16*6,16*6,null).setTo(pattern);
-		ImageFloat32 input = new ImageFloat32(border.width,border.height);
+		GrayF32 input = new GrayF32(border.width,border.height);
 		ConvertImage.convert(border,input);
 
 //		BufferedImage foo = ConvertBufferedImage.convertTo(input,null);
@@ -123,15 +123,15 @@ public class TestDetectFiducialSquareImage {
 //		BoofMiscOps.pause(10000);
 
 		// process it in different orientations
-		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.25,0.65,0.1,ImageUInt8.class);
+		DetectFiducialSquareImage<GrayU8> alg =
+				new DetectFiducialSquareImage<GrayU8>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 
 		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 		assertTrue(alg.processSquare(input, result,0,0));
 		assertEquals(0,result.which);
 		assertEquals(0,result.rotation);
-		ImageFloat32 input2 = new ImageFloat32(input.width,input.height);
+		GrayF32 input2 = new GrayF32(input.width,input.height);
 		ImageMiscOps.rotateCCW(input,input2);
 		assertTrue(alg.processSquare(input2, result,0,0));
 		assertEquals(0,result.which);
@@ -155,7 +155,7 @@ public class TestDetectFiducialSquareImage {
 
 	@Test
 	public void addPattern() {
-		ImageUInt8 image = new ImageUInt8(16*8,16*4);
+		GrayU8 image = new GrayU8(16*8,16*4);
 
 		// fill just one square
 		for (int y = 0; y < 1; y++) {
@@ -164,8 +164,8 @@ public class TestDetectFiducialSquareImage {
 			}
 		}
 
-		DetectFiducialSquareImage<ImageUInt8> alg =
-				new DetectFiducialSquareImage<ImageUInt8>(inputToBinary,squareDetector,0.25,0.65,0.1,ImageUInt8.class);
+		DetectFiducialSquareImage<GrayU8> alg =
+				new DetectFiducialSquareImage<GrayU8>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 
 		alg.addPattern(threshold(image, 100), 1.0);
 
@@ -199,7 +199,7 @@ public class TestDetectFiducialSquareImage {
 
 	@Test
 	public void binaryToDef() {
-		ImageUInt8 image = new ImageUInt8(8,4);
+		GrayU8 image = new GrayU8(8,4);
 
 		ImageMiscOps.fillUniform(image,rand,0,2);
 
@@ -233,7 +233,7 @@ public class TestDetectFiducialSquareImage {
 			expected += valA != valB ? 1 : 0;
 		}
 
-		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,0.25,0.65,0.1,ImageFloat32.class);
+		DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,0.25,0.65,0.1,GrayF32.class);
 		int found = alg.hamming(a, b);
 
 		assertEquals(expected, found);
@@ -248,27 +248,27 @@ public class TestDetectFiducialSquareImage {
 
 		for( double border : borderWidths ) {
 			// randomly create a pattern
-			ImageUInt8 pattern = new ImageUInt8(16*4,16*4);
+			GrayU8 pattern = new GrayU8(16*4,16*4);
 			ImageMiscOps.fillUniform(pattern, rand, 0, 2);
 			PixelMath.multiply(pattern,255,pattern);
 
 			// add a border around it
 			int w = (int)Math.round(16*4/(1.0-2.0*border));
 			int r = (w-pattern.width)/2;
-			ImageUInt8 bordered = new ImageUInt8(w,w);
+			GrayU8 bordered = new GrayU8(w,w);
 			bordered.subimage(r, r, r + 16 * 4, r + 16 * 4, null).setTo(pattern);
-			ImageFloat32 input = new ImageFloat32(bordered.width,bordered.height);
+			GrayF32 input = new GrayF32(bordered.width,bordered.height);
 			ConvertImage.convert(bordered,input);
 
-			DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,border,0.65,0.1,ImageFloat32.class);
+			DetectFiducialSquareImage alg = new DetectFiducialSquareImage(inputToBinary,squareDetector,border,0.65,0.1,GrayF32.class);
 			alg.addPattern(threshold(pattern, 125), 1.0);
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
 			assertTrue(alg.processSquare(input, result,0,0));
 		}
 	}
 
-	private ImageUInt8 threshold( ImageSingleBand image , double threshold ) {
-		ImageUInt8 out = new ImageUInt8(image.width,image.height);
+	private GrayU8 threshold(ImageGray image , double threshold ) {
+		GrayU8 out = new GrayU8(image.width,image.height);
 		GThresholdImageOps.threshold(image,out,threshold,false);
 		return out;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.geometry.UtilPoint2D_F32;
@@ -45,7 +45,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class TldRegionTracker< Image extends ImageSingleBand , Derivative extends ImageSingleBand> {
+public class TldRegionTracker< Image extends ImageGray, Derivative extends ImageGray> {
 
 	// maximum allowed median forwards-backwards error in pixels squared
 	private double maxErrorFB;

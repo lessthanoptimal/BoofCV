@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,12 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class LocalSauvolaBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class LocalSauvolaBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
 	ThresholdSauvola alg;
-	ImageFloat32 input;
+	GrayF32 input;
 
 	/**
 	 * @see ThresholdSauvola
@@ -45,16 +45,16 @@ public class LocalSauvolaBinaryFilter<T extends ImageSingleBand> implements Inpu
 		this.inputType = inputType;
 
 		if( inputType.getDataType() != ImageDataType.F32 ) {
-			input = new ImageFloat32(1,1);
+			input = new GrayF32(1,1);
 		}
 
 		alg = new ThresholdSauvola(radius,k, down);
 	}
 
 	@Override
-	public void process(T input, ImageUInt8 output) {
+	public void process(T input, GrayU8 output) {
 		if( this.input == null )
-			alg.process((ImageFloat32)input,output);
+			alg.process((GrayF32)input,output);
 		else {
 			this.input.reshape(input.width,input.height);
 			GConvertImage.convert(input,this.input);
@@ -78,7 +78,7 @@ public class LocalSauvolaBinaryFilter<T extends ImageSingleBand> implements Inpu
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getOutputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getOutputType() {
+		return ImageType.single(GrayU8.class);
 	}
 }

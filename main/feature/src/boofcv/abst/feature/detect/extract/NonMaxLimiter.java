@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
@@ -59,7 +59,7 @@ public class NonMaxLimiter {
 	 * only the most intense ones will be returned
 	 * @param intensity Feature image intensity
 	 */
-	public void process(ImageFloat32 intensity ) {
+	public void process(GrayF32 intensity ) {
 
 		originalMin.reset();
 		originalMax.reset();

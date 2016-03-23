@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.feature.SurfFeatureQueue;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -45,7 +45,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class WrapDetectDescribeSurf
-		<T extends ImageSingleBand, II extends ImageSingleBand>
+		<T extends ImageGray, II extends ImageGray>
 	implements DetectDescribePoint<T,BrightFeature>
 {
 	// SURF algorithms

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -31,19 +31,19 @@ import boofcv.struct.pyramid.PyramidFloat;
 public class TestFeaturePyramid extends GenericFeatureScaleDetectorTests {
 
 	@Override
-	protected Object createDetector(GeneralFeatureDetector<ImageFloat32, ImageFloat32> detector) {
-		AnyImageDerivative<ImageFloat32, ImageFloat32> deriv =
-				GImageDerivativeOps.derivativeForScaleSpace(ImageFloat32.class, ImageFloat32.class);
+	protected Object createDetector(GeneralFeatureDetector<GrayF32, GrayF32> detector) {
+		AnyImageDerivative<GrayF32, GrayF32> deriv =
+				GImageDerivativeOps.derivativeForScaleSpace(GrayF32.class, GrayF32.class);
 
-		return new FeaturePyramid<ImageFloat32, ImageFloat32>(detector, deriv, 1);
+		return new FeaturePyramid<GrayF32, GrayF32>(detector, deriv, 1);
 	}
 
 	@Override
-	protected int detectFeature(ImageFloat32 input, Object detector) {
-		PyramidFloat<ImageFloat32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8, 16}, ImageFloat32.class);
+	protected int detectFeature(GrayF32 input, Object detector) {
+		PyramidFloat<GrayF32> ss = FactoryPyramid.scaleSpacePyramid(new double[]{1, 2, 4, 8, 16}, GrayF32.class);
 		ss.process(input);
 
-		FeaturePyramid<ImageFloat32, ImageFloat32> alg = (FeaturePyramid<ImageFloat32, ImageFloat32>) detector;
+		FeaturePyramid<GrayF32, GrayF32> alg = (FeaturePyramid<GrayF32, GrayF32>) detector;
 		alg.detect(ss);
 
 		return alg.getInterestPoints().size();

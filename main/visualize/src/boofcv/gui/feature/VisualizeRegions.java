@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.gui.feature;
 
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
@@ -40,7 +40,7 @@ public class VisualizeRegions {
 	 * @param radius Thickness of watershed.  0 is 1 pixel wide. 1 is 3 pixels wide.
 	 * @return Output image.
 	 */
-	public static BufferedImage watersheds( ImageSInt32 segments , BufferedImage output , int radius ) {
+	public static BufferedImage watersheds(GrayS32 segments , BufferedImage output , int radius ) {
 		if( output == null )
 			output = new BufferedImage(segments.width,segments.height,BufferedImage.TYPE_INT_RGB);
 
@@ -82,7 +82,7 @@ public class VisualizeRegions {
 	 * @param output Storage for output image.  Can be null.
 	 * @return Output image.
 	 */
-	public static BufferedImage regions( ImageSInt32 pixelToRegion , int numRegions , BufferedImage output ) {
+	public static BufferedImage regions(GrayS32 pixelToRegion , int numRegions , BufferedImage output ) {
 		return VisualizeBinaryData.renderLabeled(pixelToRegion,numRegions,output);
 	}
 
@@ -93,7 +93,7 @@ public class VisualizeRegions {
 	 * @param output Storage for output image.  Can be null.
 	 * @return Output image.
 	 */
-	public static BufferedImage regionsColor( ImageSInt32 pixelToRegion ,
+	public static BufferedImage regionsColor( GrayS32 pixelToRegion ,
 											  FastQueue<float[]> segmentColor ,
 											  BufferedImage output ) {
 		if( output == null )
@@ -131,13 +131,13 @@ public class VisualizeRegions {
 	 * @param output Storage for output image.  Can be null.
 	 * @return Output image.
 	 */
-	public static BufferedImage regionBorders( ImageSInt32 pixelToRegion ,
+	public static BufferedImage regionBorders( GrayS32 pixelToRegion ,
 											   int borderColor ,
 											   BufferedImage output ) {
 		if( output == null )
 			output = new BufferedImage(pixelToRegion.width,pixelToRegion.height,BufferedImage.TYPE_INT_RGB);
 
-		ImageUInt8 binary = new ImageUInt8(pixelToRegion.width,pixelToRegion.height);
+		GrayU8 binary = new GrayU8(pixelToRegion.width,pixelToRegion.height);
 		ImageSegmentationOps.markRegionBorders(pixelToRegion, binary);
 		for( int y = 0; y < binary.height; y++ ) {
 			for( int x = 0; x < binary.width; x++ ) {

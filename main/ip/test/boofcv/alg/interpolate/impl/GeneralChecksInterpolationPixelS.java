@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralChecksInterpolationPixelS< T extends ImageSingleBand> {
+public abstract class GeneralChecksInterpolationPixelS< T extends ImageGray> {
 	protected Random rand = new Random(0xff34);
 
 	protected int width = 320;

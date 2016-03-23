@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -38,8 +38,8 @@ public class GradientThree_Share {
 	/**
 	 * Can only be used with images that are NOT sub-images.
 	 */
-	public static void derivX_F32(ImageFloat32 orig,
-								  ImageFloat32 derivX) {
+	public static void derivX_F32(GrayF32 orig,
+								  GrayF32 derivX) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 

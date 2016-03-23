@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.meanshift;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class TestLikelihoodHistCoupled_SB_U8 {
 	public void singleColor() {
 		LikelihoodHistCoupled_SB_U8 alg = new LikelihoodHistCoupled_SB_U8(255,11);
 
-		ImageUInt8 image = new ImageUInt8(30,40);
+		GrayU8 image = new GrayU8(30,40);
 
 		RectangleLength2D_I32 r = new RectangleLength2D_I32(3,4,12,8);
 		setColor(image, r, 100);
@@ -52,7 +52,7 @@ public class TestLikelihoodHistCoupled_SB_U8 {
 	public void multipleColors() {
 		LikelihoodHistCoupled_SB_U8 alg = new LikelihoodHistCoupled_SB_U8(255,11);
 
-		ImageUInt8 image = new ImageUInt8(30,40);
+		GrayU8 image = new GrayU8(30,40);
 
 		RectangleLength2D_I32 r0 = new RectangleLength2D_I32(3,4,8,8);
 		RectangleLength2D_I32 r1 = new RectangleLength2D_I32(11,4,4,8);
@@ -72,7 +72,7 @@ public class TestLikelihoodHistCoupled_SB_U8 {
 		assertTrue(v0>v1);
 	}
 
-	public static void setColor(ImageUInt8 image , RectangleLength2D_I32 rect , int value ) {
+	public static void setColor(GrayU8 image , RectangleLength2D_I32 rect , int value ) {
 
 		for( int y = 0; y < rect.height; y++ ) {
 			for( int x = 0; x < rect.width; x++ ) {

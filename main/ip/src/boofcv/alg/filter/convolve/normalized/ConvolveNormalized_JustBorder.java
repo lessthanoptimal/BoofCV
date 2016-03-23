@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ConvolveNormalized_JustBorder {
 
-	public static void horizontal(Kernel1D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
+	public static void horizontal(Kernel1D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
@@ -88,7 +88,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
+	public static void vertical(Kernel1D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
@@ -147,7 +147,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 input, ImageFloat32 output ) {
+	public static void convolve(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
@@ -259,7 +259,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -309,7 +309,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayU8 input, GrayI8 output ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -368,7 +368,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 input, ImageInt8 output ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayU8 input, GrayI8 output ) {
 		final byte[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -480,7 +480,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -530,7 +530,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayS16 input, GrayI16 output ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -589,7 +589,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 input, ImageInt16 output ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayS16 input, GrayI16 output ) {
 		final short[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -701,7 +701,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayS32 input, GrayS32 output ) {
 		final int[] dataSrc = input.data;
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -751,7 +751,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayS32 input, GrayS32 output ) {
 		final int[] dataSrc = input.data;
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -810,7 +810,7 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt32 input, ImageSInt32 output ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayS32 input, GrayS32 output ) {
 		final int[] dataSrc = input.data;
 		final int[] dataDst = output.data;
 		final int[] dataKer = kernel.data;
@@ -922,8 +922,8 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY,
-								ImageUInt16 input, ImageInt8 output ) {
+	public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+								GrayU16 input, GrayI8 output ) {
 		final short[] dataSrc = input.data;
 		final byte[] dataDst = output.data;
 		final int[] dataKer = kernelY.data;
@@ -1043,8 +1043,8 @@ public class ConvolveNormalized_JustBorder {
 		}
 	}
 
-	public static void vertical(Kernel1D_I32 kernelX,Kernel1D_I32 kernelY,
-								ImageSInt32 input, ImageInt16 output ) {
+	public static void vertical(Kernel1D_I32 kernelX, Kernel1D_I32 kernelY,
+								GrayS32 input, GrayI16 output ) {
 		final int[] dataSrc = input.data;
 		final short[] dataDst = output.data;
 		final int[] dataKer = kernelY.data;

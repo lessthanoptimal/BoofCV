@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.GrayS64;
 
 
 /**
@@ -44,7 +44,7 @@ public class ImageBorder1D_S64 extends ImageBorder_S64 {
 		this.colWrap = colWrap;
 	}
 
-	public ImageBorder1D_S64(ImageSInt64 image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
+	public ImageBorder1D_S64(GrayS64 image, BorderIndex1D rowWrap, BorderIndex1D colWrap) {
 		super(image);
 		this.rowWrap = rowWrap;
 		this.colWrap = colWrap;
@@ -59,7 +59,7 @@ public class ImageBorder1D_S64 extends ImageBorder_S64 {
 	}
 
 	@Override
-	public void setImage( ImageSInt64 image ) {
+	public void setImage( GrayS64 image ) {
 		super.setImage(image);
 		colWrap.setLength(image.width);
 		rowWrap.setLength(image.height);

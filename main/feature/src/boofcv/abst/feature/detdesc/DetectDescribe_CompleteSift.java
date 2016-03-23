@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.feature.detdesc;
 import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -30,11 +30,11 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribe_CompleteSift<In extends ImageSingleBand>
+public class DetectDescribe_CompleteSift<In extends ImageGray>
 		implements DetectDescribePoint<In,BrightFeature> {
 
 	CompleteSift alg;
-	ImageFloat32 imageFloat = new ImageFloat32(1,1);
+	GrayF32 imageFloat = new GrayF32(1,1);
 
 	public DetectDescribe_CompleteSift(CompleteSift alg) {
 		this.alg = alg;
@@ -57,8 +57,8 @@ public class DetectDescribe_CompleteSift<In extends ImageSingleBand>
 
 	@Override
 	public void detect(In input) {
-		if( input instanceof ImageFloat32 )
-			alg.process((ImageFloat32)input);
+		if( input instanceof GrayF32)
+			alg.process((GrayF32)input);
 		else {
 			imageFloat.reshape(input.width,input.height);
 			GConvertImage.convert(input,imageFloat);

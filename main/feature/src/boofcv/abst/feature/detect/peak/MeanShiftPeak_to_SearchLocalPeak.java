@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,14 @@
 package boofcv.abst.feature.detect.peak;
 
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.peak.MeanShiftPeak} for {@link SearchLocalPeak}
  *
  * @author Peter Abeles
  */
-public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageSingleBand> implements SearchLocalPeak<T> {
+public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageGray> implements SearchLocalPeak<T> {
 
 	MeanShiftPeak<T> search;
 

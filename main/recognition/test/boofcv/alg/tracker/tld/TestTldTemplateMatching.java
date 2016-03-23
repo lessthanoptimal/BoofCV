@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -46,9 +46,9 @@ public class TestTldTemplateMatching {
 
 	Random rand = new Random(234);
 
-	ImageUInt8 input = new ImageUInt8(width,height);
+	GrayU8 input = new GrayU8(width,height);
 
-	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(ImageUInt8.class, BorderType.EXTENDED);
+	InterpolatePixelS<GrayU8> interpolate = FactoryInterpolation.bilinearPixelS(GrayU8.class, BorderType.EXTENDED);
 
 	public TestTldTemplateMatching() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
@@ -94,7 +94,7 @@ public class TestTldTemplateMatching {
 		alg.computeNccDescriptor(found,2,3,17,18);
 
 		NccFeature expected = alg.createDescriptor();
-		DescribePointPixelRegionNCC descriptor = FactoryDescribePointAlgs.pixelRegionNCC(15,15,ImageUInt8.class);
+		DescribePointPixelRegionNCC descriptor = FactoryDescribePointAlgs.pixelRegionNCC(15,15,GrayU8.class);
 	    descriptor.setImage(input);
 		descriptor.process(7+2,7+3,expected);
 

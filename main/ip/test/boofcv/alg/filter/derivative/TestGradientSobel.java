@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -47,15 +47,15 @@ public class TestGradientSobel {
 	public void compareToConvolve_I8() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientSobel.class.getMethod("process",
-				ImageUInt8.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_S32.class ));
+				GrayU8.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
 
-		ImageUInt8 input = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
-		ImageSInt16 derivX = new ImageSInt16(width,height);
-		ImageSInt16 derivY = new ImageSInt16(width,height);
+		GrayS16 derivX = new GrayS16(width,height);
+		GrayS16 derivY = new GrayS16(width,height);
 
 		validator.compare(input,derivX,derivY);
 	}
@@ -64,15 +64,15 @@ public class TestGradientSobel {
 	public void compareToConvolve_I16() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientSobel.class.getMethod("process",
-				ImageSInt16.class, ImageSInt16.class, ImageSInt16.class, ImageBorder_S32.class ));
+				GrayS16.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
 
-		ImageSInt16 input = new ImageSInt16(width,height);
+		GrayS16 input = new GrayS16(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
-		ImageSInt16 derivX = new ImageSInt16(width,height);
-		ImageSInt16 derivY = new ImageSInt16(width,height);
+		GrayS16 derivX = new GrayS16(width,height);
+		GrayS16 derivY = new GrayS16(width,height);
 
 		validator.compare(input,derivX,derivY);
 	}
@@ -81,15 +81,15 @@ public class TestGradientSobel {
 	public void compareToConvolve_F32() throws NoSuchMethodException {
 		CompareDerivativeToConvolution validator = new CompareDerivativeToConvolution();
 		validator.setTarget(GradientSobel.class.getMethod("process",
-				ImageFloat32.class, ImageFloat32.class, ImageFloat32.class, ImageBorder_F32.class));
+				GrayF32.class, GrayF32.class, GrayF32.class, ImageBorder_F32.class));
 
 		validator.setKernel(0,GradientSobel.kernelDerivX_F32);
 		validator.setKernel(1,GradientSobel.kernelDerivY_F32);
 
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
+		GrayF32 derivX = new GrayF32(width,height);
+		GrayF32 derivY = new GrayF32(width,height);
 
 		validator.compare(input,derivX,derivY);
 	}

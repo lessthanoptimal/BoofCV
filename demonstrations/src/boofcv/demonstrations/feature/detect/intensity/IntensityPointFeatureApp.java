@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +48,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class IntensityPointFeatureApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 {
 	// displays intensity image
@@ -105,7 +105,7 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 
 		intensity.process(workImage,derivX,derivY,derivXX,derivYY,derivXY);
 
-		ImageFloat32 featureImg = intensity.getIntensity();
+		GrayF32 featureImg = intensity.getIntensity();
 		VisualizeImageData.colorizeSign(featureImg,temp, ImageStatistics.maxAbs(featureImg));
 		gui.setBufferedImage(temp);
 		gui.repaint();
@@ -151,8 +151,8 @@ public class IntensityPointFeatureApp<T extends ImageSingleBand, D extends Image
 //		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
 //				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
 
-		IntensityPointFeatureApp<ImageUInt8, ImageSInt16> app =
-				new IntensityPointFeatureApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+		IntensityPointFeatureApp<GrayU8, GrayS16> app =
+				new IntensityPointFeatureApp<GrayU8,GrayS16>(GrayU8.class,GrayS16.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

@@ -38,9 +38,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -60,7 +60,7 @@ import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel_F64;
  *
  * @author Peter Abeles
  */
-public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends ImageSingleBand>
+public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 	implements DisparityDisplayPanel.Listener
 {
@@ -313,20 +313,20 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 				case 2:
 					changeGuiActive(false,false);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+							maxDisparity, r, r, -1, -1, -1, GrayU8.class);
 
 				case 1:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
 							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-							ImageUInt8.class);
+							GrayU8.class);
 
 				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
 							minDisparity, maxDisparity, r, r,
 							control.pixelError, control.reverseTol, control.texture,
-							ImageUInt8.class);
+							GrayU8.class);
 
 				default:
 					throw new RuntimeException("Unknown selection");
@@ -336,20 +336,20 @@ public class VisualizeStereoDisparity <T extends ImageSingleBand, D extends Imag
 				case 2:
 					changeGuiActive(false,false);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, -1, -1, -1, ImageUInt8.class);
+							maxDisparity, r, r, -1, -1, -1, GrayU8.class);
 
 				case 1:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
 							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-							ImageUInt8.class);
+							GrayU8.class);
 
 				case 0:
 					changeGuiActive(true,true);
 					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
 							minDisparity, maxDisparity, r, r,
 							control.pixelError, control.reverseTol, control.texture,
-							ImageUInt8.class);
+							GrayU8.class);
 
 				default:
 					throw new RuntimeException("Unknown selection");

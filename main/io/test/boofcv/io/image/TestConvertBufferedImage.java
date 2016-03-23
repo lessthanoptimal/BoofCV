@@ -47,23 +47,23 @@ public class TestConvertBufferedImage {
 	public void checkInputs() {
 		BufferedImage found;
 
-		found = ConvertBufferedImage.checkInputs(new ImageUInt8(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new GrayU8(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
-		found = ConvertBufferedImage.checkInputs(new ImageSInt8(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new GrayS8(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
-		found = ConvertBufferedImage.checkInputs(new ImageUInt16(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new GrayU16(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
-		found = ConvertBufferedImage.checkInputs(new ImageSInt16(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new GrayS16(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
 
 		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
 		// gray input image with pixel values from 0 to 255
-		found = ConvertBufferedImage.checkInputs(new ImageFloat32(10, 10), null);
+		found = ConvertBufferedImage.checkInputs(new GrayF32(10, 10), null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
-		found = ConvertBufferedImage.checkInputs(new ImageFloat64(10,10),null);
+		found = ConvertBufferedImage.checkInputs(new GrayF64(10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
 
-		found = ConvertBufferedImage.checkInputs(new MultiSpectral(ImageUInt8.class,3,10,10),null);
+		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,10),null);
 		assertTrue(found.getType() == BufferedImage.TYPE_INT_RGB);
 	}
 
@@ -116,7 +116,7 @@ public class TestConvertBufferedImage {
 	public void extractImageUInt8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
-		ImageUInt8 found = ConvertBufferedImage.extractImageUInt8(origImg);
+		GrayU8 found = ConvertBufferedImage.extractImageUInt8(origImg);
 
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
@@ -179,7 +179,7 @@ public class TestConvertBufferedImage {
 	@Test
 	public void extractBuffered_Int8() {
 		// use a signed image because it is checked against a byte array
-		ImageUInt8 srcImg = new ImageUInt8(imgWidth, imgHeight);
+		GrayU8 srcImg = new GrayU8(imgWidth, imgHeight);
 		ImageMiscOps.fillUniform(srcImg, rand, 0, 100);
 
 		BufferedImage img = ConvertBufferedImage.extractBuffered(srcImg);
@@ -192,7 +192,7 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertFrom_ms_orderRgb() {
-		Class []bandTypes = new Class[]{ImageUInt8.class,ImageFloat32.class};
+		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
 			convertFrom_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertFrom_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
@@ -213,7 +213,7 @@ public class TestConvertBufferedImage {
 
 		int numBands = input.getRaster().getNumBands();
 
-		MultiSpectral output = new MultiSpectral(bandType,imgWidth,imgHeight,numBands);
+		Planar output = new Planar(bandType,imgWidth,imgHeight,numBands);
 
 		ConvertBufferedImage.convertFrom(input, output, reorder);
 
@@ -274,12 +274,12 @@ public class TestConvertBufferedImage {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 				}
 
-				ImageUInt8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageUInt8.class);
+				GrayU8 imgInt8 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayU8.class);
 				assertEquals(origImg.getWidth(), imgInt8.width);
 				assertEquals(origImg.getHeight(), imgInt8.height);
 				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
 
-				ImageFloat32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageFloat32.class);
+				GrayF32 imgF32 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayF32.class);
 				assertEquals(origImg.getWidth(), imgF32.width);
 				assertEquals(origImg.getHeight(), imgF32.height);
 				BoofTesting.checkEquals(origImg, imgF32, false, 1);
@@ -299,12 +299,12 @@ public class TestConvertBufferedImage {
 				origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 			}
 
-			ImageUInt16 imgU16 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageUInt16.class);
+			GrayU16 imgU16 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayU16.class);
 			assertEquals(origImg.getWidth(), imgU16.width);
 			assertEquals(origImg.getHeight(), imgU16.height);
 			BoofTesting.checkEquals(origImg, imgU16, false, 1);
 
-			ImageSInt16 imgS16 = ConvertBufferedImage.convertFromSingle(origImg, null, ImageSInt16.class);
+			GrayS16 imgS16 = ConvertBufferedImage.convertFromSingle(origImg, null, GrayS16.class);
 			assertEquals(origImg.getWidth(), imgS16.width);
 			assertEquals(origImg.getHeight(), imgS16.height);
 			BoofTesting.checkEquals(origImg, imgS16, false, 1);
@@ -332,12 +332,12 @@ public class TestConvertBufferedImage {
 				if( j == 1 ) {
 					origImg = origImg.getSubimage(1,2,imgWidth-1,imgHeight-2);
 				}
-				MultiSpectral<ImageUInt8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, false, ImageUInt8.class);
+				Planar<GrayU8> imgInt8 = ConvertBufferedImage.convertFromMulti(origImg, null, false, GrayU8.class);
 				assertEquals(origImg.getWidth(), imgInt8.width);
 				assertEquals(origImg.getHeight(), imgInt8.height);
 				BoofTesting.checkEquals(origImg, imgInt8, false, 1);
 
-				MultiSpectral<ImageFloat32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, false,ImageFloat32.class);
+				Planar<GrayF32> imgF32 = ConvertBufferedImage.convertFromMulti(origImg, null, false,GrayF32.class);
 				assertEquals(origImg.getWidth(), imgF32.width);
 				assertEquals(origImg.getHeight(), imgF32.height);
 				BoofTesting.checkEquals(origImg, imgF32,false,  1);
@@ -393,7 +393,7 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertTo_SB() {
-		Class[] types = new Class[]{ImageUInt8.class, ImageUInt16.class, ImageFloat32.class};
+		Class[] types = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class};
 
 		for (Class t : types) {
 			ImageBase image = GeneralizedImageOps.createSingleBand(t, imgWidth, imgHeight);
@@ -405,10 +405,10 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void convertTo_MS() {
-		Class[] types = new Class[]{ImageUInt8.class, ImageFloat32.class};
+		Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
 		for (Class t : types) {
-			ImageBase image = new MultiSpectral(t, imgWidth, imgHeight, 3);
+			ImageBase image = new Planar(t, imgWidth, imgHeight, 3);
 			GImageMiscOps.fillUniform(image, rand, 0, 100);
 
 			BoofTesting.checkSubImage(this, "convertTo", false, image);
@@ -448,7 +448,7 @@ public class TestConvertBufferedImage {
 	 */
 	@Test
 	public void convertTo_ms_orderRgb() {
-		Class []bandTypes = new Class[]{ImageUInt8.class,ImageFloat32.class};
+		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
 			convertTo_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertTo_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
@@ -469,7 +469,7 @@ public class TestConvertBufferedImage {
 
 		int numBands = output.getRaster().getNumBands();
 
-		MultiSpectral input = new MultiSpectral(bandType,imgWidth,imgHeight,numBands);
+		Planar input = new Planar(bandType,imgWidth,imgHeight,numBands);
 
 		double pixel[] = new double[numBands];
 		for (int i = 0; i < numBands; i++) {
@@ -586,11 +586,11 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void orderBandsIntoRGB() {
-		MultiSpectral<ImageUInt8> input = new MultiSpectral<ImageUInt8>(ImageUInt8.class, 10, 10, 3);
+		Planar<GrayU8> input = new Planar<GrayU8>(GrayU8.class, 10, 10, 3);
 
-		ImageUInt8 band0 = input.getBand(0);
-		ImageUInt8 band1 = input.getBand(1);
-		ImageUInt8 band2 = input.getBand(2);
+		GrayU8 band0 = input.getBand(0);
+		GrayU8 band1 = input.getBand(1);
+		GrayU8 band2 = input.getBand(2);
 
 		// test no swap first
 		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
@@ -613,12 +613,12 @@ public class TestConvertBufferedImage {
 		assertTrue(band2 == input.getBand(2));
 
 		// 4-band images
-		input = new MultiSpectral<ImageUInt8>(ImageUInt8.class, 10, 10, 4);
+		input = new Planar<GrayU8>(GrayU8.class, 10, 10, 4);
 
 		band0 = input.getBand(0);
 		band1 = input.getBand(1);
 		band2 = input.getBand(2);
-		ImageUInt8 band3 = input.getBand(3);
+		GrayU8 band3 = input.getBand(3);
 
 		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
 		ConvertBufferedImage.orderBandsIntoRGB(input, orig);

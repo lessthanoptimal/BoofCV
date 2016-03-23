@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,78 +18,78 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageFloat64;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.GrayI;
 
 /**
  * @author Peter Abeles
  */
 public class FactoryImageBorderAlgs {
 
-	public static ImageBorder1D_F64 extend( ImageFloat64 image ) {
+	public static ImageBorder1D_F64 extend( GrayF64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_F64 reflect( ImageFloat64 image ) {
+	public static ImageBorder1D_F64 reflect( GrayF64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Reflect.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_F64 wrap( ImageFloat64 image ) {
+	public static ImageBorder1D_F64 wrap( GrayF64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder_F64 value( ImageFloat64 image , double value ) {
+	public static ImageBorder_F64 value(GrayF64 image , double value ) {
 		return ImageBorderValue.wrap(image,value);
 	}
 
-	public static ImageBorder1D_F32 extend( ImageFloat32 image ) {
+	public static ImageBorder1D_F32 extend( GrayF32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_F32 reflect( ImageFloat32 image ) {
+	public static ImageBorder1D_F32 reflect( GrayF32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Reflect.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder1D_F32 wrap( ImageFloat32 image ) {
+	public static ImageBorder1D_F32 wrap( GrayF32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder_F32 value( ImageFloat32 image , float value ) {
+	public static ImageBorder_F32 value(GrayF32 image , float value ) {
 		return ImageBorderValue.wrap(image,value);
 	}
 
-	public static <T extends ImageInteger> ImageBorder1D_S32<T> extend( T image ) {
+	public static <T extends GrayI> ImageBorder1D_S32<T> extend(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<T>((Class)BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends ImageInteger> ImageBorder1D_S32<T> reflect( T image ) {
+	public static <T extends GrayI> ImageBorder1D_S32<T> reflect(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<T>((Class)BorderIndex1D_Reflect.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static <T extends ImageInteger> ImageBorder1D_S32<T> wrap( T image ) {
+	public static <T extends GrayI> ImageBorder1D_S32<T> wrap(T image ) {
 		ImageBorder1D_S32<T> ret = new ImageBorder1D_S32<T>((Class)BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}
 
-	public static ImageBorder_S32 value( ImageInteger image , int value ) {
+	public static ImageBorder_S32 value(GrayI image , int value ) {
 		return ImageBorderValue.wrap(image,value);
 	}
 }

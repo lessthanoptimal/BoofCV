@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,20 +19,20 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 
 /**
  * @author Peter Abeles
  */
-public class TestNearestNeighborPixel_S32 extends GeneralChecksInterpolationPixelS<ImageSInt32>
+public class TestNearestNeighborPixel_S32 extends GeneralChecksInterpolationPixelS<GrayS32>
 {
 	@Override
-	protected ImageSInt32 createImage(int width, int height) {
-		return new ImageSInt32(width, height);
+	protected GrayS32 createImage(int width, int height) {
+		return new GrayS32(width, height);
 	}
 
 	@Override
-	protected InterpolatePixelS<ImageSInt32> wrap(ImageSInt32 image, int minValue, int maxValue) {
+	protected InterpolatePixelS<GrayS32> wrap(GrayS32 image, int minValue, int maxValue) {
 		return new NearestNeighborPixel_S32(image);
 	}
 
@@ -40,7 +40,7 @@ public class TestNearestNeighborPixel_S32 extends GeneralChecksInterpolationPixe
 	 * Compute a bilinear interpolation manually
 	 */
 	@Override
-	protected float compute(ImageSInt32 img, float x, float y) {
+	protected float compute(GrayS32 img, float x, float y) {
 		return img.get((int)x,(int)y);
 	}
 }

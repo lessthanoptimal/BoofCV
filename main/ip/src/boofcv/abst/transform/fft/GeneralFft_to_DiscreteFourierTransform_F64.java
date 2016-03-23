@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.transform.fft;
 
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.fft.GeneralPurposeFFT_F64_2D;
-import boofcv.struct.image.ImageFloat64;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.InterleavedF64;
 
 /**
@@ -29,7 +29,7 @@ import boofcv.struct.image.InterleavedF64;
  * @author Peter Abeles
  */
 public class GeneralFft_to_DiscreteFourierTransform_F64
-		implements DiscreteFourierTransform<ImageFloat64,InterleavedF64>
+		implements DiscreteFourierTransform<GrayF64,InterleavedF64>
 {
 	// previous size of input image
 	private int prevWidth = -1;
@@ -45,7 +45,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 	private boolean modifyInputs = false;
 
 	@Override
-	public void forward(ImageFloat64 image, InterleavedF64 transform ) {
+	public void forward(GrayF64 image, InterleavedF64 transform ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -60,7 +60,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 	}
 
 	@Override
-	public void inverse(InterleavedF64 transform, ImageFloat64 image ) {
+	public void inverse(InterleavedF64 transform, GrayF64 image ) {
 		DiscreteFourierTransformOps.checkImageArguments(image,transform);
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Subimages are not supported");
@@ -89,7 +89,7 @@ public class GeneralFft_to_DiscreteFourierTransform_F64
 	/**
 	 * Declare the algorithm if the image size has changed
 	 */
-	private void checkDeclareAlg(ImageFloat64 image) {
+	private void checkDeclareAlg(GrayF64 image) {
 		if( prevWidth != image.width || prevHeight != image.height ) {
 			prevWidth = image.width;
 			prevHeight = image.height;

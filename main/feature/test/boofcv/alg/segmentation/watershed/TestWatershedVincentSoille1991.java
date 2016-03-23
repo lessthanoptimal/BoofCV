@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.segmentation.watershed;
 
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,14 +33,14 @@ public class TestWatershedVincentSoille1991 {
 	public void sortPixels() {
 		WatershedVincentSoille1991 alg = new Dummy();
 
-		ImageUInt8 image = new ImageUInt8(3,4);
+		GrayU8 image = new GrayU8(3,4);
 		image.data = new byte[]
 				{1,2,3,
 				 2,2,2,
 				 5,6,1,
 				 3,3,(byte)255};
 
-		alg.output = new ImageSInt32(4,5);
+		alg.output = new GrayS32(4,5);
 
 		alg.sortPixels(image);
 

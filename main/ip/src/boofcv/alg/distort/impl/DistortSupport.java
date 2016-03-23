@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
@@ -97,8 +97,8 @@ public class DistortSupport {
 	 * @param dstToSrc Transform from dst to src image.
 	 * @param interp Which interpolation algorithm should be used.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
-	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
+	public static <Input extends ImageGray,Output extends ImageGray>
+	ImageDistort<Planar<Input>,Planar<Output>>
 	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )
 	{

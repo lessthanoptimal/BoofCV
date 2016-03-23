@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 import java.util.Collections;
@@ -102,8 +102,8 @@ public class ExampleCalibrateStereo {
 			BufferedImage l = UtilImageIO.loadImage(left.get(i));
 			BufferedImage r = UtilImageIO.loadImage(right.get(i));
 
-			ImageFloat32 imageLeft = ConvertBufferedImage.convertFrom(l,(ImageFloat32)null);
-			ImageFloat32 imageRight = ConvertBufferedImage.convertFrom(r,(ImageFloat32)null);
+			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l,(GrayF32)null);
+			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r,(GrayF32)null);
 
 			if( !calibratorAlg.addPair(imageLeft, imageRight) )
 				System.out.println("Failed to detect target in "+left.get(i)+" and/or "+right.get(i));

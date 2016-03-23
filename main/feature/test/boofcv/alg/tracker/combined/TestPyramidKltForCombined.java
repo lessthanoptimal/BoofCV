@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,40 +47,40 @@ public class TestPyramidKltForCombined {
 
 	int scales[] = new int[]{1,2,4};
 
-	PyramidDiscrete<ImageFloat32> pyramid;
-	ImageFloat32[] derivX;
-	ImageFloat32[] derivY;
+	PyramidDiscrete<GrayF32> pyramid;
+	GrayF32[] derivX;
+	GrayF32[] derivY;
 
 
-	public PyramidKltForCombined<ImageFloat32,ImageFloat32> createAlg()
+	public PyramidKltForCombined<GrayF32,GrayF32> createAlg()
 	{
 		KltConfig config = new KltConfig();
 
-		return new PyramidKltForCombined<ImageFloat32,ImageFloat32>(config,5,scales,
-				ImageFloat32.class,ImageFloat32.class);
+		return new PyramidKltForCombined<GrayF32,GrayF32>(config,5,scales,
+				GrayF32.class,GrayF32.class);
 	}
 
 	@Before
 	public void init() {
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,ImageFloat32.class);
+		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false,GrayF32.class);
 
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,100);
 
 		// do a real update so that it can track a feature
-		ImageGradient<ImageFloat32,ImageFloat32> gradient =
-				FactoryDerivative.sobel(ImageFloat32.class, ImageFloat32.class);
+		ImageGradient<GrayF32,GrayF32> gradient =
+				FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
 
 		pyramid.process(input);
-		derivX = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
-		derivY = PyramidOps.declareOutput(pyramid,ImageFloat32.class);
+		derivX = PyramidOps.declareOutput(pyramid,GrayF32.class);
+		derivY = PyramidOps.declareOutput(pyramid,GrayF32.class);
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 	}
 
 	@Test
 	public void setDescription() {
-		PyramidKltForCombined<ImageFloat32,ImageFloat32> alg = createAlg();
+		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);
 
@@ -104,7 +104,7 @@ public class TestPyramidKltForCombined {
 
 	@Test
 	public void performTracking() {
-		PyramidKltForCombined<ImageFloat32,ImageFloat32> alg = createAlg();
+		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);
 

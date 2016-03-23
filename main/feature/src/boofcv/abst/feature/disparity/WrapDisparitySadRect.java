@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,12 @@ package boofcv.abst.feature.disparity;
 import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDisparitySadRect <T extends ImageSingleBand, D extends ImageSingleBand>
+public class WrapDisparitySadRect <T extends ImageGray, D extends ImageGray>
 		implements StereoDisparity<T,D>
 {
 	DisparityScoreRowFormat<T,D> alg;

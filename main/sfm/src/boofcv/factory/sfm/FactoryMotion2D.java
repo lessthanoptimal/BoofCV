@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.affine.ModelManagerAffine2D_F64;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
@@ -132,7 +132,7 @@ public class FactoryMotion2D {
 	 * @param <IT> Model model
 	 * @return StitchingFromMotion2D
 	 */
-	public static <I extends ImageSingleBand, IT extends InvertibleTransform>
+	public static <I extends ImageGray, IT extends InvertibleTransform>
 	StitchingFromMotion2D<I, IT> createVideoStitch( double maxJumpFraction ,
 													ImageMotion2D<I,IT> motion2D , Class<I> imageType ) {
 		StitchingTransform transform;
@@ -162,9 +162,9 @@ public class FactoryMotion2D {
 	 * @param <IT> Model model
 	 * @return StitchingFromMotion2D
 	 */
-	public static <I extends ImageSingleBand, IT extends InvertibleTransform>
-	StitchingFromMotion2D<MultiSpectral<I>, IT> createVideoStitchMS( double maxJumpFraction ,
-																	 ImageMotion2D<MultiSpectral<I>,IT> motion2D , Class<I> imageType ) {
+	public static <I extends ImageGray, IT extends InvertibleTransform>
+	StitchingFromMotion2D<Planar<I>, IT> createVideoStitchMS(double maxJumpFraction ,
+															 ImageMotion2D<Planar<I>,IT> motion2D , Class<I> imageType ) {
 		StitchingTransform transform;
 
 		if( motion2D.getTransformType() == Affine2D_F64.class ) {
@@ -174,10 +174,10 @@ public class FactoryMotion2D {
 		}
 
 		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
-		ImageDistort<MultiSpectral<I>,MultiSpectral<I>> distorter =
+		ImageDistort<Planar<I>,Planar<I>> distorter =
 				FactoryDistort.distortMS(false,interp, imageType);
 		distorter.setRenderAll(false);
 
-		return new StitchingFromMotion2D<MultiSpectral<I>, IT>(motion2D,distorter,transform,maxJumpFraction );
+		return new StitchingFromMotion2D<Planar<I>, IT>(motion2D,distorter,transform,maxJumpFraction );
 	}
 }

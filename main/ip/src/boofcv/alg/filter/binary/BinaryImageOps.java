@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
 import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -63,7 +63,7 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static ImageUInt8 logicAnd( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	public static GrayU8 logicAnd(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
 	{
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
@@ -91,7 +91,7 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static ImageUInt8 logicOr( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	public static GrayU8 logicOr(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
 	{
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
@@ -119,7 +119,7 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as either input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static ImageUInt8 logicXor( ImageUInt8 inputA , ImageUInt8 inputB , ImageUInt8 output )
+	public static GrayU8 logicXor(GrayU8 inputA , GrayU8 inputB , GrayU8 output )
 	{
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
@@ -145,7 +145,7 @@ public class BinaryImageOps {
 	 * @param output Output image. Can be same as input.  If null a new instance will be declared, Modified.
 	 * @return Output of logical operation.
 	 */
-	public static ImageUInt8 invert( ImageUInt8 input , ImageUInt8 output)
+	public static GrayU8 invert(GrayU8 input , GrayU8 output)
 	{
 		output = InputSanityCheck.checkDeclare(input, output);
 
@@ -173,7 +173,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 erode4(ImageUInt8 input, int numTimes, ImageUInt8 output) {
+	public static GrayU8 erode4(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		if( numTimes <= 0 )
@@ -183,14 +183,14 @@ public class BinaryImageOps {
 		ImplBinaryBorderOps.erode4(input, output);
 
 		if( numTimes > 1 ) {
-			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
-			ImageUInt8 tmp2 = output;
+			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
 				ImplBinaryInnerOps.erode4(tmp2, tmp1);
 				ImplBinaryBorderOps.erode4(tmp2, tmp1);
 
-				ImageUInt8 a = tmp1;
+				GrayU8 a = tmp1;
 				tmp1 = tmp2;
 				tmp2 = a;
 			}
@@ -214,21 +214,21 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 dilate4(ImageUInt8 input, int numTimes, ImageUInt8 output) {
+	public static GrayU8 dilate4(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.dilate4(input, output);
 		ImplBinaryBorderOps.dilate4(input, output);
 
 		if( numTimes > 1 ) {
-			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
-			ImageUInt8 tmp2 = output;
+			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
 				ImplBinaryInnerOps.dilate4(tmp2, tmp1);
 				ImplBinaryBorderOps.dilate4(tmp2, tmp1);
 
-				ImageUInt8 a = tmp1;
+				GrayU8 a = tmp1;
 				tmp1 = tmp2;
 				tmp2 = a;
 			}
@@ -255,7 +255,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 edge4(ImageUInt8 input, ImageUInt8 output) {
+	public static GrayU8 edge4(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.edge4(input, output);
@@ -275,21 +275,21 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 erode8(ImageUInt8 input, int numTimes, ImageUInt8 output) {
+	public static GrayU8 erode8(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.erode8(input, output);
 		ImplBinaryBorderOps.erode8(input, output);
 
 		if( numTimes > 1 ) {
-			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
-			ImageUInt8 tmp2 = output;
+			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
 				ImplBinaryInnerOps.erode8(tmp2, tmp1);
 				ImplBinaryBorderOps.erode8(tmp2, tmp1);
 
-				ImageUInt8 a = tmp1;
+				GrayU8 a = tmp1;
 				tmp1 = tmp2;
 				tmp2 = a;
 			}
@@ -313,21 +313,21 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 dilate8(ImageUInt8 input, int numTimes, ImageUInt8 output) {
+	public static GrayU8 dilate8(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.dilate8(input, output);
 		ImplBinaryBorderOps.dilate8(input, output);
 
 		if( numTimes > 1 ) {
-			ImageUInt8 tmp1 = new ImageUInt8(input.width,input.height);
-			ImageUInt8 tmp2 = output;
+			GrayU8 tmp1 = new GrayU8(input.width,input.height);
+			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
 				ImplBinaryInnerOps.dilate8(tmp2, tmp1);
 				ImplBinaryBorderOps.dilate8(tmp2, tmp1);
 
-				ImageUInt8 a = tmp1;
+				GrayU8 a = tmp1;
 				tmp1 = tmp2;
 				tmp2 = a;
 			}
@@ -354,7 +354,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 edge8(ImageUInt8 input, ImageUInt8 output) {
+	public static GrayU8 edge8(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.edge8(input, output);
@@ -372,7 +372,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 removePointNoise(ImageUInt8 input, ImageUInt8 output) {
+	public static GrayU8 removePointNoise(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		ImplBinaryInnerOps.removePointNoise(input, output);
@@ -391,7 +391,7 @@ public class BinaryImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static ImageUInt8 thin( ImageUInt8 input , int maxIterations, ImageUInt8 output ) {
+	public static GrayU8 thin(GrayU8 input , int maxIterations, GrayU8 output ) {
 
 		output = InputSanityCheck.checkDeclare(input, output);
 
@@ -425,9 +425,9 @@ public class BinaryImageOps {
 	 * @param output (Optional) Output labeled image. If null, an image will be declared internally.  Modified.
 	 * @return List of found contours for each blob.
 	 */
-	public static List<Contour> contour(ImageUInt8 input, ConnectRule rule, ImageSInt32 output) {
+	public static List<Contour> contour(GrayU8 input, ConnectRule rule, GrayS32 output) {
 		if( output == null ) {
-			output = new ImageSInt32(input.width,input.height);
+			output = new GrayS32(input.width,input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input,output);
 		}
@@ -443,7 +443,7 @@ public class BinaryImageOps {
 	 * @param input Labeled binary image.
 	 * @param labels Look up table where the indexes are the current label and the value are its new value.
 	 */
-	public static void relabel( ImageSInt32 input , int labels[] ) {
+	public static void relabel(GrayS32 input , int labels[] ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index+input.width;
@@ -462,8 +462,8 @@ public class BinaryImageOps {
 	 * @param binaryImage Output image. Modified.
 	 * @return The binary image.
 	 */
-	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ) {
-		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, ImageUInt8.class);
+	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ) {
+		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
 		for( int y = 0; y < labelImage.height; y++ ) {
 
@@ -493,10 +493,10 @@ public class BinaryImageOps {
 	 *                      size is the number of found clusters + 1.
 	 * @return The binary image.
 	 */
-	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ,
-											boolean selectedBlobs[] )
+	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ,
+									   boolean selectedBlobs[] )
 	{
-		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, ImageUInt8.class);
+		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
 		for( int y = 0; y < labelImage.height; y++ ) {
 
@@ -521,7 +521,7 @@ public class BinaryImageOps {
 
 	/**
 	 * Only converts the specified blobs over into the binary image.  Easier to use version of
-	 * {@link #labelToBinary(ImageSInt32, ImageUInt8, boolean[])}.
+	 * {@link #labelToBinary(GrayS32, GrayU8, boolean[])}.
 	 *
 	 * @param labelImage Input image. Not modified.
 	 * @param binaryImage Output image. If null a new one will be declared. Modified.
@@ -529,8 +529,8 @@ public class BinaryImageOps {
 	 * @param selected The index of labels which will be marked as 1 in the output binary image.
 	 * @return The binary image.
 	 */
-	public static ImageUInt8 labelToBinary( ImageSInt32 labelImage , ImageUInt8 binaryImage ,
-											int numLabels, int ...selected )
+	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ,
+									   int numLabels, int ...selected )
 	{
 		boolean selectedBlobs[] = new boolean[numLabels];
 		for (int i = 0; i < selected.length; i++) {
@@ -549,7 +549,7 @@ public class BinaryImageOps {
 	 * @param queue (Optional) Storage for pixel coordinates.  Improves runtime performance. Can be null.
 	 * @return List of pixels in each cluster.
 	 */
-	public static List<List<Point2D_I32>> labelToClusters( ImageSInt32 labelImage ,
+	public static List<List<Point2D_I32>> labelToClusters( GrayS32 labelImage ,
 														   int numLabels ,
 														   FastQueue<Point2D_I32> queue )
 	{
@@ -589,7 +589,7 @@ public class BinaryImageOps {
 	 * @param binary Output
 	 */
 	public static void clusterToBinary( List<List<Point2D_I32>> clusters ,
-										ImageUInt8 binary )
+										GrayU8 binary )
 	{
 		ImageMiscOps.fill(binary, 0);
 		

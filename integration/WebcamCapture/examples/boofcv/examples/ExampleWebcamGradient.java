@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
 import java.awt.*;
@@ -50,14 +50,14 @@ public class ExampleWebcamGradient {
 		gui.setPreferredSize(viewSize);
 
 		// Predeclare storage for the gradient
-		ImageFloat32 derivX = new ImageFloat32((int)viewSize.getWidth(),(int)viewSize.getHeight());
-		ImageFloat32 derivY = new ImageFloat32((int)viewSize.getWidth(),(int)viewSize.getHeight());
+		GrayF32 derivX = new GrayF32((int)viewSize.getWidth(),(int)viewSize.getHeight());
+		GrayF32 derivY = new GrayF32((int)viewSize.getWidth(),(int)viewSize.getHeight());
 
 		ShowImages.showWindow(gui,"Gradient",true);
 
 		for(;;) {
 			BufferedImage image = webcam.getImage();
-			ImageFloat32 gray = ConvertBufferedImage.convertFrom(image,(ImageFloat32)null);
+			GrayF32 gray = ConvertBufferedImage.convertFrom(image,(GrayF32)null);
 
 			// compute the gradient
 			GImageDerivativeOps.gradient(DerivativeType.SOBEL, gray, derivX, derivY, BorderType.EXTENDED);

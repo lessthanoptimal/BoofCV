@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
 
 
 /**
@@ -35,14 +35,14 @@ import boofcv.struct.image.ImageSInt16;
  *
  * @author Peter Abeles
  */
-public class BilinearRectangle_S16 implements InterpolateRectangle<ImageSInt16> {
+public class BilinearRectangle_S16 implements InterpolateRectangle<GrayS16> {
 
-	private ImageSInt16 orig;
+	private GrayS16 orig;
 
 	private short data[];
 	private int stride;
 
-	public BilinearRectangle_S16(ImageSInt16 image) {
+	public BilinearRectangle_S16(GrayS16 image) {
 		setImage(image);
 	}
 
@@ -50,19 +50,19 @@ public class BilinearRectangle_S16 implements InterpolateRectangle<ImageSInt16> 
 	}
 
 	@Override
-	public void setImage(ImageSInt16 image) {
+	public void setImage(GrayS16 image) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
 	}
 
 	@Override
-	public ImageSInt16 getImage() {
+	public GrayS16 getImage() {
 		return orig;
 	}
 
 	@Override
-	public void region(float tl_x, float tl_y, ImageFloat32 output ) {
+	public void region(float tl_x, float tl_y, GrayF32 output ) {
 		if( tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height ) {
 			throw new IllegalArgumentException("Region is outside of the image");
 		}
@@ -126,7 +126,7 @@ public class BilinearRectangle_S16 implements InterpolateRectangle<ImageSInt16> 
 			handleBorder(output, xt, yt, ax, ay, bx, by, regWidth, regHeight, results, borderRight, borderBottom);
 	}
 
-	private void handleBorder( ImageFloat32 output,
+	private void handleBorder( GrayF32 output,
 							  int xt, int yt,
 							  float ax, float ay, float bx, float by,
 							  int regWidth, int regHeight, float[] results,

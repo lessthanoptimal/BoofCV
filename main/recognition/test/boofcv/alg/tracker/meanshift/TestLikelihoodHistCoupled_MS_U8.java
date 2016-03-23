@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.tracker.meanshift;
 
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.shapes.RectangleLength2D_I32;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class TestLikelihoodHistCoupled_MS_U8 {
 	public void numBins() {
 		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,30);
 
-		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
+		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,30,40,3);
 
 		// make sure the upper limit is handled correctly
 		setColor(image,5,6,255,255,255);
@@ -51,7 +51,7 @@ public class TestLikelihoodHistCoupled_MS_U8 {
 	public void singleColor() {
 		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,11);
 
-		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
+		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,30,40,3);
 
 		RectangleLength2D_I32 r = new RectangleLength2D_I32(3,4,12,8);
 		setColor(image,r,100,105,12);
@@ -69,7 +69,7 @@ public class TestLikelihoodHistCoupled_MS_U8 {
 	public void multipleColors() {
 		LikelihoodHistCoupled_MS_U8 alg = new LikelihoodHistCoupled_MS_U8(255,11);
 
-		MultiSpectral<ImageUInt8> image = new MultiSpectral<ImageUInt8>(ImageUInt8.class,30,40,3);
+		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,30,40,3);
 
 		RectangleLength2D_I32 r0 = new RectangleLength2D_I32(3,4,8,8);
 		RectangleLength2D_I32 r1 = new RectangleLength2D_I32(11,4,4,8);
@@ -89,7 +89,7 @@ public class TestLikelihoodHistCoupled_MS_U8 {
 		assertTrue(v0>v1);
 	}
 
-	public static void setColor(MultiSpectral<ImageUInt8> image , RectangleLength2D_I32 rect , int r , int g , int b ) {
+	public static void setColor(Planar<GrayU8> image , RectangleLength2D_I32 rect , int r , int g , int b ) {
 
 		for( int y = 0; y < rect.height; y++ ) {
 			for( int x = 0; x < rect.width; x++ ) {
@@ -99,7 +99,7 @@ public class TestLikelihoodHistCoupled_MS_U8 {
 
 	}
 
-	public static void setColor( MultiSpectral<ImageUInt8> image , int x , int y , int r , int g , int b ) {
+	public static void setColor(Planar<GrayU8> image , int x , int y , int r , int g , int b ) {
 		image.getBand(0).set(x,y,r);
 		image.getBand(1).set(x,y,g);
 		image.getBand(2).set(x,y,b);

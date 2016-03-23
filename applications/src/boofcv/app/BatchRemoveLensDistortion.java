@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -109,8 +109,8 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("Found a total of "+files.size()+" matching files");
 
-		MultiSpectral<ImageFloat32> distoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
-		MultiSpectral<ImageFloat32> undistoredImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,param.width,param.height,3);
+		Planar<GrayF32> distoredImg = new Planar<GrayF32>(GrayF32.class,param.width,param.height,3);
+		Planar<GrayF32> undistoredImg = new Planar<GrayF32>(GrayF32.class,param.width,param.height,3);
 
 		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, BorderType.VALUE, param, paramAdj,
 				(ImageType) distoredImg.getImageType());
@@ -131,7 +131,7 @@ public class BatchRemoveLensDistortion {
 				System.exit(-1);
 			}
 
-			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, ImageFloat32.class);
+			ConvertBufferedImage.convertFromMulti(orig, distoredImg, true, GrayF32.class);
 			distort.apply(distoredImg,undistoredImg);
 			ConvertBufferedImage.convertTo(undistoredImg,out,true);
 

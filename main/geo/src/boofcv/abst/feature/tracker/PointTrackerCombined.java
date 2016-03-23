@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.List;
  */
 // TODO drop after no associate after X detections
 // TODO Speed up combination of respawn and spawn
-public class PointTrackerCombined<I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
 	CombinedTrackerScalePoint<I,D, Desc> tracker;

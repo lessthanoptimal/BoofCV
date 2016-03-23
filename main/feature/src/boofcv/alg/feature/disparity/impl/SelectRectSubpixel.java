@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ public class SelectRectSubpixel {
 	/**
 	 * For scores of type int[]
 	 */
-	public static class S32_F32 extends ImplSelectRectStandardBase_S32<ImageFloat32> {
+	public static class S32_F32 extends ImplSelectRectStandardBase_S32<GrayF32> {
 		public S32_F32(int maxError, int rightToLeftTolerance, double texture) {
 			super(maxError, rightToLeftTolerance, texture);
 		}
@@ -64,15 +64,15 @@ public class SelectRectSubpixel {
 		}
 
 		@Override
-		public Class<ImageFloat32> getDisparityType() {
-			return ImageFloat32.class;
+		public Class<GrayF32> getDisparityType() {
+			return GrayF32.class;
 		}
 	}
 
 	/**
 	 * For scores of type float[]
 	 */
-	public static class F32_F32 extends ImplSelectRectStandardBase_F32<ImageFloat32> {
+	public static class F32_F32 extends ImplSelectRectStandardBase_F32<GrayF32> {
 		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
 			super(maxError, rightToLeftTolerance, texture);
 		}
@@ -94,8 +94,8 @@ public class SelectRectSubpixel {
 		}
 
 		@Override
-		public Class<ImageFloat32> getDisparityType() {
-			return ImageFloat32.class;
+		public Class<GrayF32> getDisparityType() {
+			return GrayF32.class;
 		}
 	}
 }

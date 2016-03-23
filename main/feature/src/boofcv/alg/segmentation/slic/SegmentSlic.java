@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.alg.segmentation.ms.MergeSmallRegions;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -88,7 +88,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	protected T input;
 
 	// Initial segmentation before connectivity is enforced
-	private ImageSInt32 initialSegments = new ImageSInt32(1,1);
+	private GrayS32 initialSegments = new GrayS32(1,1);
 	// number of members in each region
 	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 	// color of each region
@@ -134,7 +134,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		};
 	}
 
-	public void process( T input , ImageSInt32 output ) {
+	public void process( T input , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(input,output);
 		if( input.width < 2*BORDER || input.height < 2*BORDER)
 			throw new IllegalArgumentException(
@@ -335,7 +335,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	/**
 	 * Selects which region each pixel belongs to based on which cluster it is the closest to
 	 */
-	public void assignLabelsToPixels( ImageSInt32 pixelToRegions ,
+	public void assignLabelsToPixels( GrayS32 pixelToRegions ,
 									  GrowQueue_I32 regionMemberCount ,
 									  FastQueue<float[]> regionColor ) {
 

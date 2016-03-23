@@ -28,9 +28,9 @@ import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -67,7 +67,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryPolygonDetector<T extends ImageSingleBand> {
+public class BinaryPolygonDetector<T extends ImageGray> {
 
 	// minimum size of a shape's contour as a fraction of the image width
 	private double minContourFraction;
@@ -78,7 +78,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	private boolean convex;
 
 	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
-	private ImageSInt32 labeled = new ImageSInt32(1,1);
+	private GrayS32 labeled = new GrayS32(1,1);
 
 	// finds the initial polygon around a target candidate
 	private SplitMergeLineFitLoop fitPolygon;
@@ -218,7 +218,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 *
 	 * @param gray Input image
 	 */
-	public void process(T gray, ImageUInt8 binary) {
+	public void process(T gray, GrayU8 binary) {
 		if( verbose ) System.out.println("ENTER  BinaryPolygonDetector.process()");
 		InputSanityCheck.checkSameShape(binary, gray);
 
@@ -258,7 +258,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 	 * Finds blobs in the binary image.  Then looks for blobs that meet size and shape requirements.  See code
 	 * below for the requirements.  Those that remain are considered to be target candidates.
 	 */
-	private void findCandidateShapes( T gray , ImageUInt8 binary ) {
+	private void findCandidateShapes( T gray , GrayU8 binary ) {
 
 		int maxSidesConsider = (int)Math.ceil(maxSides*1.5);
 
@@ -523,7 +523,7 @@ public class BinaryPolygonDetector<T extends ImageSingleBand> {
 		this.convex = convex;
 	}
 
-	public ImageSInt32 getLabeled() {
+	public GrayS32 getLabeled() {
 		return labeled;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
@@ -95,7 +95,7 @@ public class FactoryPointTracker {
 	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
 		PkltConfig config = new PkltConfig();
@@ -114,7 +114,7 @@ public class FactoryPointTracker {
 	 * @param configExtract Configuration for extracting features
 	 * @return KLT based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
 						Class<I> imageType, Class<D> derivType ) {
 
@@ -156,7 +156,7 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
-	public static <I extends ImageSingleBand>
+	public static <I extends ImageGray>
 	PointTracker<I> dda_FH_SURF_Fast(
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Speed configDescribe ,
@@ -191,7 +191,7 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	// TODO remove maxTracks?  Use number of detected instead
-	public static <I extends ImageSingleBand>
+	public static <I extends ImageGray>
 	PointTracker<I> dda_FH_SURF_Stable(
 											ConfigFastHessian configDetector ,
 											ConfigSurfDescribe.Stability configDescribe ,
@@ -224,7 +224,7 @@ public class FactoryPointTracker {
 	 * @param imageType           Type of image being processed.
 	 * @param derivType Type of image used to store the image derivative. null == use default
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> dda_ST_BRIEF(int maxAssociationError,
 									  ConfigGeneralDetector configExtract,
 									  Class<I> imageType, Class<D> derivType)
@@ -261,7 +261,7 @@ public class FactoryPointTracker {
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param imageType           Type of image being processed.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> dda_FAST_BRIEF(ConfigFast configFast,
 								   ConfigGeneralDetector configExtract,
 								   int maxAssociationError,
@@ -296,7 +296,7 @@ public class FactoryPointTracker {
 	 * @param describeRadius Radius of the region being described.  Try 2.
 	 * @param imageType      Type of image being processed.
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
 									Class<I> imageType, Class<D> derivType) {
 
@@ -334,7 +334,7 @@ public class FactoryPointTracker {
 	 * @param <Desc> Type of region description
 	 * @return tracker
 	 */
-	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, Desc extends TupleDesc>
 	DetectDescribeAssociate<I,Desc> dda(InterestPointDetector<I> detector,
 										OrientationImage<I> orientation ,
 										DescribeRegionPoint<I, Desc> describe,
@@ -353,7 +353,7 @@ public class FactoryPointTracker {
 		return dat;
 	}
 
-	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, Desc extends TupleDesc>
 	DetectDescribeAssociate<I,Desc> dda( DetectDescribePoint<I, Desc> detDesc,
 										AssociateDescription2D<Desc> associate ,
 										boolean updateDescription ) {
@@ -382,7 +382,7 @@ public class FactoryPointTracker {
 	 * @param <I>            Input image type.
 	 * @return SURF based tracker.
 	 */
-	public static <I extends ImageSingleBand>
+	public static <I extends ImageGray>
 	PointTracker<I> combined_FH_SURF_KLT( PkltConfig kltConfig ,
 										  int reactivateThreshold ,
 										  ConfigFastHessian configDetector ,
@@ -417,7 +417,7 @@ public class FactoryPointTracker {
 	 * @param imageType      Type of image the input is.
 	 * @param derivType      Image derivative type.        @return SURF based tracker.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
 										 PkltConfig kltConfig,
 										 int reactivateThreshold,
@@ -465,7 +465,7 @@ public class FactoryPointTracker {
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
-	public static <I extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, Desc extends TupleDesc>
 	PointTracker<I> combined(InterestPointDetector<I> detector,
 							 OrientationImage<I> orientation,
 							 DescribeRegionPoint<I, Desc> describe,
@@ -490,7 +490,7 @@ public class FactoryPointTracker {
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
 	 * @param imageType Input image type.     @return Feature tracker
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 	PointTracker<I> combined(DetectDescribePoint<I, Desc> detector,
 							 AssociateDescription<Desc> associate,
 							 PkltConfig kltConfig ,
@@ -509,7 +509,7 @@ public class FactoryPointTracker {
 	}
 
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 	PointTracker<I> dda(GeneralFeatureDetector<I, D> detector,
 						DescribeRegionPoint<I, Desc> describe,
 						AssociateDescription2D<Desc> associate,
@@ -529,7 +529,7 @@ public class FactoryPointTracker {
 	 * Variable detectRadius to control the number of features.  When larger features are used weighting should
 	 * be set to true, but because this is so small, it is set to false
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureDetector<I, D> createShiTomasi(ConfigGeneralDetector config ,
 												 Class<D> derivType)
 	{

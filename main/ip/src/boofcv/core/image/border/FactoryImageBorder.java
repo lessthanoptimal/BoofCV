@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
 
-	public static <T extends ImageSingleBand> ImageBorder<T> single(T image, BorderType borderType) {
+	public static <T extends ImageGray> ImageBorder<T> single(T image, BorderType borderType) {
 		ImageBorder<T> ret = single((Class) image.getClass(), borderType);
 		ret.setImage(image);
 		return ret;
@@ -47,14 +47,14 @@ public class FactoryImageBorder {
 	 * @param imageType Type of image which is being processed.
 	 * @return The ImageBorder for processing the image type.
 	 */
-	public static Class<ImageBorder> lookupBorderClassType( Class<ImageSingleBand> imageType ) {
-		if( (Class)imageType == ImageFloat32.class )
+	public static Class<ImageBorder> lookupBorderClassType( Class<ImageGray> imageType ) {
+		if( (Class)imageType == GrayF32.class )
 			return (Class)ImageBorder1D_F32.class;
-		if( (Class)imageType == ImageFloat64.class )
+		if( (Class)imageType == GrayF64.class )
 			return (Class)ImageBorder1D_F64.class;
-		else if( ImageInteger.class.isAssignableFrom(imageType) )
+		else if( GrayI.class.isAssignableFrom(imageType) )
 			return (Class)ImageBorder1D_S32.class;
-		else if( (Class)imageType == ImageSInt64.class )
+		else if( (Class)imageType == GrayS64.class )
 			return (Class)ImageBorder1D_S64.class;
 		else
 			throw new IllegalArgumentException("Unknown image type");
@@ -95,7 +95,7 @@ public class FactoryImageBorder {
 	}
 
 	/**
-	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageSingleBand}.  If type
+	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageGray}.  If type
 	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
 	 * use {@link #singleValue(Class, double)} instead.
 	 *
@@ -103,7 +103,7 @@ public class FactoryImageBorder {
 	 * @param borderType Which border algorithm should it use.
 	 * @return The requested {@link ImageBorder).
 	 */
-	public static <T extends ImageSingleBand> ImageBorder<T>
+	public static <T extends ImageGray> ImageBorder<T>
 	single(Class<T> imageType, BorderType borderType)
 	{
 		Class<?> borderClass;
@@ -137,13 +137,13 @@ public class FactoryImageBorder {
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
 
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (ImageBorder<T>)new ImageBorder1D_F32(borderClass);
-		if( imageType == ImageFloat64.class )
+		if( imageType == GrayF64.class )
 			return (ImageBorder<T>)new ImageBorder1D_F64(borderClass);
-		else if( ImageInteger.class.isAssignableFrom(imageType) )
+		else if( GrayI.class.isAssignableFrom(imageType) )
 			return (ImageBorder<T>)new ImageBorder1D_S32((Class)borderClass);
-		else if( imageType == ImageSInt64.class )
+		else if( imageType == GrayS64.class )
 			return (ImageBorder<T>)new ImageBorder1D_S64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
@@ -213,7 +213,7 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageSingleBand> ImageBorder<T> singleValue(T image, double value) {
+	public static <T extends ImageGray> ImageBorder<T> singleValue(T image, double value) {
 		ImageBorder border = singleValue(image.getClass(), value);
 		border.setImage(image);
 		return border;
@@ -228,12 +228,12 @@ public class FactoryImageBorder {
 	 * @param value The value which will be returned.
 	 * @return An {@link ImageBorder}
 	 */
-	public static <T extends ImageSingleBand> ImageBorder<T> singleValue(Class<T> imageType, double value) {
-		if( imageType == ImageFloat32.class ) {
+	public static <T extends ImageGray> ImageBorder<T> singleValue(Class<T> imageType, double value) {
+		if( imageType == GrayF32.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F32((float)value);
-		} else if( imageType == ImageFloat64.class ) {
+		} else if( imageType == GrayF64.class ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
-		} else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+		} else if( GrayI.class.isAssignableFrom(imageType) ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());

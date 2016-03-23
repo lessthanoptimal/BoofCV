@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.StabilitySquareFiducialEstimate;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -31,7 +31,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public abstract class BaseSquare_FiducialDetector<T extends ImageSingleBand,Detector extends BaseDetectFiducialSquare<T>>
+public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector extends BaseDetectFiducialSquare<T>>
 	implements FiducialDetector<T>
 {
 	Detector alg;

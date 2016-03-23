@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,10 +100,10 @@ public class TestConvolveWithBorderSparse {
 		Class inputType = borderToInputType(borderType);
 		Class outputType = borderToOutputType(borderType);
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType, width, height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
+		ImageGray expected = GeneralizedImageOps.createSingleBand(outputType, width, height);
 		Object kernel = createKernel(kernelType,2);
 		ImageBorder border = createBorder(borderType);
 
@@ -124,13 +124,13 @@ public class TestConvolveWithBorderSparse {
 	protected static ImageBorder createBorder(Class<?> borderType ) {
 		ImageBorder ret;
 		if (ImageBorder_F32.class == borderType) {
-			ret = FactoryImageBorder.single(ImageFloat32.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(GrayF32.class, BorderType.REFLECT);
 		} else if (ImageBorder_F64.class == borderType) {
-			ret = FactoryImageBorder.single(ImageFloat64.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(GrayF64.class, BorderType.REFLECT);
 		} else if (ImageBorder_S32.class == borderType) {
-			ret =FactoryImageBorder.single(ImageSInt32.class, BorderType.REFLECT);
+			ret =FactoryImageBorder.single(GrayS32.class, BorderType.REFLECT);
 		} else if (ImageBorder_S64.class == borderType) {
-			ret = FactoryImageBorder.single(ImageSInt64.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(GrayS64.class, BorderType.REFLECT);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}
@@ -139,13 +139,13 @@ public class TestConvolveWithBorderSparse {
 
 	protected static Class borderToInputType(Class<?> borderType ) {
 		if (ImageBorder_F32.class == borderType) {
-			return ImageFloat32.class;
+			return GrayF32.class;
 		} else if (ImageBorder_F64.class == borderType) {
-			return ImageFloat64.class;
+			return GrayF64.class;
 		} else if (ImageBorder_S32.class == borderType) {
-			return ImageUInt8.class;
+			return GrayU8.class;
 		} else if (ImageBorder_S64.class == borderType) {
-			return ImageSInt64.class;
+			return GrayS64.class;
 		} else {
 			throw new RuntimeException("Unknown border type");
 		}
@@ -153,13 +153,13 @@ public class TestConvolveWithBorderSparse {
 
 	protected static Class<?> borderToOutputType(Class<?> borderType ) {
 		if (ImageBorder_F32.class == borderType) {
-			return ImageFloat32.class;
+			return GrayF32.class;
 		} else if (ImageBorder_F64.class == borderType) {
-			return ImageFloat64.class;
+			return GrayF64.class;
 		} else if (ImageBorder_S32.class == borderType) {
-			return ImageSInt16.class;
+			return GrayS16.class;
 		} else if (ImageBorder_S64.class == borderType) {
-			return ImageSInt64.class;
+			return GrayS64.class;
 		} else {
 			throw new RuntimeException("Unknown border type");
 		}

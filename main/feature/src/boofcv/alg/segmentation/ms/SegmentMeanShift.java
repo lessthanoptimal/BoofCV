@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -93,7 +93,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	 * @param image Image
 	 * @param output Storage for output image.  Each pixel is set to the region it belongs to.
 	 */
-	public void process( T image , ImageSInt32 output ) {
+	public void process( T image , GrayS32 output ) {
 		InputSanityCheck.checkSameShape(image,output);
 
 //		long time0 = System.currentTimeMillis();
@@ -103,7 +103,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 //		long time1 = System.currentTimeMillis();
 
 		FastQueue<float[]> regionColor = search.getModeColor();
-		ImageSInt32 pixelToRegion = search.getPixelToRegion();
+		GrayS32 pixelToRegion = search.getPixelToRegion();
 		GrowQueue_I32 regionPixelCount = search.getRegionMemberCount();
 		FastQueue<Point2D_I32> modeLocation = search.getModeLocation();
 

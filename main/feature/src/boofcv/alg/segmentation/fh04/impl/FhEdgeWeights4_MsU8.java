@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 
 /**
- * <p>Computes edge weight as the F-norm different in pixel value for {@link MultiSpectral} images.
+ * <p>Computes edge weight as the F-norm different in pixel value for {@link Planar} images.
  * A 4-connect neighborhood is considered.</p>
  *
  * <p>
@@ -35,7 +35,7 @@ import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edg
  *
  * @author Peter Abeles
  */
-public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUInt8>> {
+public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<Planar<GrayU8>> {
 
 	int pixelColor[];
 	int numBands;
@@ -46,7 +46,7 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 	}
 
 	@Override
-	public void process(MultiSpectral<ImageUInt8> input,
+	public void process(Planar<GrayU8> input,
 						FastQueue<Edge> edges) {
 
 		edges.reset();
@@ -63,7 +63,7 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 				int weight1=0,weight2=0;
 
 				for( int i = 0; i < numBands; i++ ) {
-					ImageUInt8 band = input.getBand(i);
+					GrayU8 band = input.getBand(i);
 
 					int color0 = band.data[indexSrc]& 0xFF;                       // (x,y)
 					int color1 = band.data[indexSrc+1]& 0xFF;                     // (x+1,y)
@@ -99,14 +99,14 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 	}
 
 	private void checkAround( int x , int y ,
-							  MultiSpectral<ImageUInt8> input ,
+							  Planar<GrayU8> input ,
 							  FastQueue<Edge> edges )
 	{
 		int indexSrc = input.startIndex + y*input.stride + x;
 		int indexA =                      y*input.width  + x;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageUInt8 band = input.getBand(i);
+			GrayU8 band = input.getBand(i);
 			pixelColor[i] =  band.data[indexSrc]& 0xFF;
 		}
 
@@ -115,7 +115,7 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 	}
 
 	private void check( int x , int y , int color0[] , int indexA,
-						MultiSpectral<ImageUInt8> input ,
+						Planar<GrayU8> input ,
 						FastQueue<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
 			return;
@@ -126,7 +126,7 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 		float weight = 0;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageUInt8 band = input.getBand(i);
+			GrayU8 band = input.getBand(i);
 
 			int color = band.data[indexSrc]& 0xFF;
 			int diff = color0[i]-color;
@@ -141,8 +141,8 @@ public class FhEdgeWeights4_MsU8 implements FhEdgeWeights<MultiSpectral<ImageUIn
 	}
 
 	@Override
-	public ImageType<MultiSpectral<ImageUInt8>> getInputType() {
-		return ImageType.ms(3,ImageUInt8.class);
+	public ImageType<Planar<GrayU8>> getInputType() {
+		return ImageType.ms(3,GrayU8.class);
 	}
 
 }

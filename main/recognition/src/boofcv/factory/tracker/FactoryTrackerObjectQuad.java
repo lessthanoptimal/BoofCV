@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -53,7 +53,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <D> Image derivative type
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	public static <T extends ImageGray,D extends ImageGray>
 	TrackerObjectQuad<T> tld(ConfigTld config , Class<T> imageType ) {
 		if( config == null )
 			config = new ConfigTld();
@@ -76,7 +76,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param <D> Image derivative type.  Null for default.
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	public static <T extends ImageGray,D extends ImageGray>
 	TrackerObjectQuad<T> sparseFlow(SfotConfig config, Class<T> imageType , Class<D> derivType ) {
 
 		if( derivType == null )
@@ -170,7 +170,7 @@ public class FactoryTrackerObjectQuad {
 	 * @param config Configuration
 	 * @return CirculantTracker
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config , Class<T> imageType ) {
 
 		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);

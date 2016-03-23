@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.enhance.impl;
 
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ public class ImplEnhanceFilter {
 	public static Kernel2D_I32 kernelEnhance8_I32 = new Kernel2D_I32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 
-	public static void sharpenInner4( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+	public static void sharpenInner4(GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -63,7 +63,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenBorder4( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+	public static void sharpenBorder4(GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
 		int value;
 
 		int b = input.height-1;
@@ -119,7 +119,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenInner4( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+	public static void sharpenInner4(GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -140,7 +140,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenBorder4( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+	public static void sharpenBorder4(GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
 		float value;
 
 		int b = input.height-1;
@@ -196,7 +196,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenInner8( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+	public static void sharpenInner8(GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -225,7 +225,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenBorder8( ImageUInt8 input , ImageUInt8 output , int minValue , int maxValue ) {
+	public static void sharpenBorder8(GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
 		int value;
 
 		int b = input.height-1;
@@ -323,7 +323,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenInner8( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+	public static void sharpenInner8(GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
 		for( int y = 1; y < input.height-1; y++ ) {
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
@@ -352,7 +352,7 @@ public class ImplEnhanceFilter {
 		}
 	}
 
-	public static void sharpenBorder8( ImageFloat32 input , ImageFloat32 output , float minValue , float maxValue ) {
+	public static void sharpenBorder8(GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
 		float value;
 
 		int b = input.height-1;
@@ -453,7 +453,7 @@ public class ImplEnhanceFilter {
 	/**
 	 * Handle outside image pixels by extending the image.
 	 */
-	public static int safeGet( ImageInteger input , int x , int y ) {
+	public static int safeGet(GrayI input , int x , int y ) {
 		if( x < 0 )
 			x = 0;
 		else if( x >= input.width )
@@ -469,7 +469,7 @@ public class ImplEnhanceFilter {
 	/**
 	 * Handle outside image pixels by extending the image.
 	 */
-	public static float safeGet( ImageFloat32 input , int x , int y ) {
+	public static float safeGet(GrayF32 input , int x , int y ) {
 		if( x < 0 )
 			x = 0;
 		else if( x >= input.width )

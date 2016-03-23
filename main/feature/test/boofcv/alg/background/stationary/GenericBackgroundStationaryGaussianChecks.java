@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.alg.background.stationary;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,8 +51,8 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		BackgroundStationaryGaussian<T> alg = (BackgroundStationaryGaussian)create(imageType);
 		alg.setThreshold(10);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 		T frame = imageType.createImage(width,height);
 
 		GImageMiscOps.fill(frame,20);
@@ -111,8 +111,8 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 			alg.updateBackground(frame);
 		}
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		alg.segment(frame,segmented);
 		ImageMiscOps.fill(expected, 1);
@@ -137,8 +137,8 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 			alg.updateBackground(frame);
 		}
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		alg.segment(frame,segmented);
 		ImageMiscOps.fill(expected, 0);
@@ -157,8 +157,8 @@ public abstract class GenericBackgroundStationaryGaussianChecks extends GenericB
 		alg.setThreshold(10);
 		alg.setInitialVariance(0);
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 		T frame = imageType.createImage(width,height);
 
 		GImageMiscOps.fill(frame, 20);

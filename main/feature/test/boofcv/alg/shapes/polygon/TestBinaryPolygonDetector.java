@@ -32,9 +32,9 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
@@ -65,18 +65,18 @@ public class TestBinaryPolygonDetector {
 	int width = 400,height=450;
 	boolean showRendered = false;
 
-	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageSingleBand orig;
-	ImageSingleBand dist;
+	GrayU8 binary = new GrayU8(1,1);
+	ImageGray orig;
+	ImageGray dist;
 
-	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
 
 	List<Rectangle2D_I32> rectangles = new ArrayList<Rectangle2D_I32>();
 	List<Polygon2D_F64> distorted = new ArrayList<Polygon2D_F64>();
 
 	Affine2D_F64 transform = new Affine2D_F64();
 
-	InputToBinary<ImageUInt8> inputToBinary_U8 = FactoryThresholdBinary.globalFixed(100, true, ImageUInt8.class);
+	InputToBinary<GrayU8> inputToBinary_U8 = FactoryThresholdBinary.globalFixed(100, true, GrayU8.class);
 
 	@Before
 	public void before() {
@@ -199,7 +199,7 @@ public class TestBinaryPolygonDetector {
 		}
 	}
 
-	private <T extends ImageSingleBand> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
+	private <T extends ImageGray> BinaryPolygonDetector<T> createDetector(Class<T> imageType, boolean useLines, int minSides, int maxSides) {
 		ConfigPolygonDetector config = new ConfigPolygonDetector(minSides,maxSides);
 
 		if( useLines ) {
@@ -269,7 +269,7 @@ public class TestBinaryPolygonDetector {
 		}
 
 		dist = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		binary = new ImageUInt8(width,height);
+		binary = new GrayU8(width,height);
 
 		ConvertBufferedImage.convertFrom(work,dist,true);
 
@@ -334,12 +334,12 @@ public class TestBinaryPolygonDetector {
 		g2.setColor(Color.BLACK);
 		g2.fillOval(30, 30, 90, 100);
 
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(work,(GrayU8)null);
 		binary.reshape(gray.width,gray.height);
 		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, i,i);
+			BinaryPolygonDetector alg = createDetector(GrayU8.class, true, i,i);
 
 			alg.process(gray,binary);
 			assertEquals("num sides = "+i,0,alg.getFoundPolygons().size());
@@ -355,12 +355,12 @@ public class TestBinaryPolygonDetector {
 		g2.setColor(Color.BLACK);
 		g2.fillPolygon(new int[]{10, 50, 30}, new int[]{10, 10, 40}, 3);
 
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(work,(ImageUInt8)null);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(work,(GrayU8)null);
 		binary.reshape(gray.width,gray.height);
 		inputToBinary_U8.process(gray,binary);
 
 		for (int i = 3; i <= 6; i++) {
-			BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, i, i);
+			BinaryPolygonDetector alg = createDetector(GrayU8.class, true, i, i);
 
 			alg.process(gray,binary);
 			if( i == 3 ) {
@@ -442,7 +442,7 @@ public class TestBinaryPolygonDetector {
 	public void touchesBorder_false() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 
-		BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.getLabeled().reshape(20,30);
 		assertFalse(alg.touchesBorder(contour));
 
@@ -460,7 +460,7 @@ public class TestBinaryPolygonDetector {
 	public void touchesBorder_true() {
 		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
 
-		BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.getLabeled().reshape(20,30);
 
 		contour.add(new Point2D_I32(10,0));
@@ -485,7 +485,7 @@ public class TestBinaryPolygonDetector {
 		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
 		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
-		BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.setLensDistortion(width, height, tranTo, tranFrom);
 		try {
 			// this should cause it to go outside the image
@@ -500,14 +500,14 @@ public class TestBinaryPolygonDetector {
 	 */
 	@Test
 	public void snapToBrightObject() {
-		ImageUInt8 gray = new ImageUInt8(200,200);
-		ImageUInt8 binary = new ImageUInt8(200,200);
+		GrayU8 gray = new GrayU8(200,200);
+		GrayU8 binary = new GrayU8(200,200);
 
 		ImageMiscOps.fillRectangle(gray,200,40,40,40,40);
 		ImageMiscOps.fillRectangle(binary,1,38,38,44,44);
 		ImageMiscOps.fillRectangle(binary,0,40,40,40,40);
 
-		BinaryPolygonDetector<ImageUInt8> alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector<GrayU8> alg = createDetector(GrayU8.class, true, 4,4);
 
 		// edge threshold test will only fail now if the sign is reversed
 		alg.edgeThreshold = 0;
@@ -519,7 +519,7 @@ public class TestBinaryPolygonDetector {
 
 	@Test
 	public void determineCornersOnBorder() {
-		BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.getLabeled().reshape(width,height);
 
 		Polygon2D_F64 poly = new Polygon2D_F64(0,0, 10,0, 10,10, 0,10);
@@ -544,7 +544,7 @@ public class TestBinaryPolygonDetector {
 		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
 		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
-		BinaryPolygonDetector alg = createDetector(ImageUInt8.class, true, 4,4);
+		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.undistToDist = tranFrom;
 		alg.distToUndist = tranTo;
 		alg.getLabeled().reshape(width,height);

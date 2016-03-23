@@ -22,7 +22,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseScaleGradient;
 
@@ -34,7 +34,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
-public abstract class OrientationIntegralBase<II extends ImageSingleBand,G extends GradientValue>
+public abstract class OrientationIntegralBase<II extends ImageGray,G extends GradientValue>
 		implements OrientationIntegral<II>
 {
 	// integral image transform of input image

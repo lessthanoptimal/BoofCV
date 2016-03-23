@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,17 +33,17 @@ import boofcv.struct.image.*;
 @SuppressWarnings({"unchecked"})
 public class FactoryOrientationAlgs {
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationHistogram<T> histogram( double objectToSample, int numAngles , int radius , boolean weighted ,
 									   Class<T> derivType )
 	{
 		OrientationHistogram<T> ret;
 
-		if( derivType == ImageFloat32.class ) {
+		if( derivType == GrayF32.class ) {
 			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_F32(objectToSample,numAngles,weighted);
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S16(objectToSample,numAngles,weighted);
-		} else if( derivType == ImageSInt32.class ) {
+		} else if( derivType == GrayS32.class ) {
 			ret = (OrientationHistogram<T>)new ImplOrientationHistogram_S32(objectToSample,numAngles,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
@@ -54,14 +54,14 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationImageAverage<T> nogradient( double objectToSample , int radius , Class<T> imageType )
 	{
 		OrientationImageAverage<T> ret;
 
-		if( imageType == ImageFloat32.class ) {
+		if( imageType == GrayF32.class ) {
 			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_F32(objectToSample,radius);
-		} else if( imageType == ImageUInt8.class ) {
+		} else if( imageType == GrayU8.class ) {
 			ret = (OrientationImageAverage<T>)new ImplOrientationImageAverage_U8(objectToSample,radius);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
@@ -72,16 +72,16 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationAverage<T> average( double objectToSample, int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationAverage<T> ret;
 
-		if( derivType == ImageFloat32.class ) {
+		if( derivType == GrayF32.class ) {
 			ret = (OrientationAverage<T>)new ImplOrientationAverage_F32(objectToSample,weighted);
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			ret = (OrientationAverage<T>)new ImplOrientationAverage_S16(objectToSample,weighted);
-		} else if( derivType == ImageSInt32.class ) {
+		} else if( derivType == GrayS32.class ) {
 			ret = (OrientationAverage<T>)new ImplOrientationAverage_S32(objectToSample,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
@@ -92,17 +92,17 @@ public class FactoryOrientationAlgs {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	OrientationSlidingWindow<T> sliding( double objectRadiusToScale, int numAngles, double windowSize ,
 										 int radius , boolean weighted , Class<T> derivType )
 	{
 		OrientationSlidingWindow<T> ret;
 
-		if( derivType == ImageFloat32.class ) {
+		if( derivType == GrayF32.class ) {
 			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_F32(objectRadiusToScale,numAngles,windowSize,weighted);
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S16(objectRadiusToScale,numAngles,windowSize,weighted);
-		} else if( derivType == ImageSInt32.class ) {
+		} else if( derivType == GrayS32.class ) {
 			ret = (OrientationSlidingWindow<T>)new ImplOrientationSlidingWindow_S32(objectRadiusToScale,numAngles,windowSize,weighted);
 		} else {
 			throw new IllegalArgumentException("Unknown image type.");
@@ -121,7 +121,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralType Type of image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageSingleBand>
+	public static <II extends ImageGray>
 	OrientationIntegral<II> average_ii( ConfigAverageIntegral config , Class<II> integralType)
 	{
 		if( config == null )
@@ -145,7 +145,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralImage Type of image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageSingleBand>
+	public static <II extends ImageGray>
 	OrientationIntegral<II> image_ii( double objectRadiusToScale,
 									  int sampleRadius , double samplePeriod , int sampleWidth,
 									 double weightSigma , Class<II> integralImage)
@@ -165,7 +165,7 @@ public class FactoryOrientationAlgs {
 	 * @param integralType Type of integral image being processed.
 	 * @return OrientationIntegral
 	 */
-	public static <II extends ImageSingleBand>
+	public static <II extends ImageGray>
 	OrientationIntegral<II> sliding_ii( ConfigSlidingIntegral config , Class<II> integralType)
 	{
 		if( config == null )
@@ -184,7 +184,7 @@ public class FactoryOrientationAlgs {
 	 * @param derivType Type of derivative image it takes as input
 	 * @return OrientationHistogramSift
 	 */
-	public static <D extends ImageSingleBand>
+	public static <D extends ImageGray>
 	OrientationHistogramSift<D> sift(ConfigSiftOrientation config , Class<D> derivType ) {
 		if( config == null )
 			config = new ConfigSiftOrientation();

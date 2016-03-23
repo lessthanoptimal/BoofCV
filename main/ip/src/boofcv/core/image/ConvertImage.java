@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
@@ -42,16 +43,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayU8} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageUInt8 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayU8 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -84,16 +85,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayU8} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageUInt8 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayU8 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -126,16 +127,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayU8} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageUInt8 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayU8 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -168,16 +169,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayU8} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageUInt8 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayU8 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -210,16 +211,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayU8} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageUInt8 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayU8 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -252,16 +253,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayU8} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageUInt8 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayU8 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -294,16 +295,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt8} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayU8} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageUInt8 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayU8 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -335,16 +336,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 average( MultiSpectral<ImageUInt8> input , ImageUInt8 output ) {
+	public static GrayU8 average(Planar<GrayU8> input , GrayU8 output ) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -355,13 +356,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedU8}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedU8}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedU8 convert( MultiSpectral<ImageUInt8> input , InterleavedU8 output ) {
+	public static InterleavedU8 convert(Planar<GrayU8> input , InterleavedU8 output ) {
 		if (output == null) {
 			output = new InterleavedU8(input.width, input.height,input.getNumBands());
 		} else {
@@ -374,16 +375,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedU8} into a {@link ImageUInt8} by computing the average value of each pixel
+	 * Converts a {@link InterleavedU8} into a {@link GrayU8} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 average( InterleavedU8 input , ImageUInt8 output ) {
+	public static GrayU8 average(InterleavedU8 input , GrayU8 output ) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -394,15 +395,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedU8} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedU8} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageUInt8> convert( InterleavedU8 input , MultiSpectral<ImageUInt8> output ) {
+	public static Planar<GrayU8> convert(InterleavedU8 input , Planar<GrayU8> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageUInt8>(ImageUInt8.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayU8>(GrayU8.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -421,10 +422,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageUInt8 input , int min , int max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayU8 input , int min , int max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -448,16 +449,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayS8} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageSInt8 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayS8 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -490,16 +491,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayS8} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageSInt8 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayS8 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -532,16 +533,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayS8} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageSInt8 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayS8 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -574,16 +575,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayS8} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageSInt8 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayS8 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -616,16 +617,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayS8} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageSInt8 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayS8 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -658,16 +659,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayS8} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageSInt8 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayS8 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -700,16 +701,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt8} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayS8} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageSInt8 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayS8 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -741,16 +742,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 average( MultiSpectral<ImageSInt8> input , ImageSInt8 output ) {
+	public static GrayS8 average(Planar<GrayS8> input , GrayS8 output ) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -761,13 +762,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedS8}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedS8}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedS8 convert( MultiSpectral<ImageSInt8> input , InterleavedS8 output ) {
+	public static InterleavedS8 convert(Planar<GrayS8> input , InterleavedS8 output ) {
 		if (output == null) {
 			output = new InterleavedS8(input.width, input.height,input.getNumBands());
 		} else {
@@ -780,16 +781,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS8} into a {@link ImageSInt8} by computing the average value of each pixel
+	 * Converts a {@link InterleavedS8} into a {@link GrayS8} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 average( InterleavedS8 input , ImageSInt8 output ) {
+	public static GrayS8 average(InterleavedS8 input , GrayS8 output ) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -800,15 +801,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS8} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedS8} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageSInt8> convert( InterleavedS8 input , MultiSpectral<ImageSInt8> output ) {
+	public static Planar<GrayS8> convert(InterleavedS8 input , Planar<GrayS8> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageSInt8>(ImageSInt8.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayS8>(GrayS8.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -827,10 +828,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageSInt8 input , int min , int max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayS8 input , int min , int max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -854,16 +855,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayU16} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageUInt16 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayU16 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -896,16 +897,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayU16} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageUInt16 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayU16 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -938,16 +939,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayU16} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageUInt16 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayU16 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -980,16 +981,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayU16} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageUInt16 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayU16 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1022,16 +1023,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayU16} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageUInt16 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayU16 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1064,16 +1065,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayU16} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageUInt16 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayU16 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1106,16 +1107,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageUInt16} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayU16} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageUInt16 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayU16 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1147,16 +1148,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 average( MultiSpectral<ImageUInt16> input , ImageUInt16 output ) {
+	public static GrayU16 average(Planar<GrayU16> input , GrayU16 output ) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1167,13 +1168,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedU16}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedU16}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedU16 convert( MultiSpectral<ImageUInt16> input , InterleavedU16 output ) {
+	public static InterleavedU16 convert(Planar<GrayU16> input , InterleavedU16 output ) {
 		if (output == null) {
 			output = new InterleavedU16(input.width, input.height,input.getNumBands());
 		} else {
@@ -1186,16 +1187,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedU16} into a {@link ImageUInt16} by computing the average value of each pixel
+	 * Converts a {@link InterleavedU16} into a {@link GrayU16} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 average( InterleavedU16 input , ImageUInt16 output ) {
+	public static GrayU16 average(InterleavedU16 input , GrayU16 output ) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1206,15 +1207,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedU16} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedU16} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageUInt16> convert( InterleavedU16 input , MultiSpectral<ImageUInt16> output ) {
+	public static Planar<GrayU16> convert(InterleavedU16 input , Planar<GrayU16> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageUInt16>(ImageUInt16.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayU16>(GrayU16.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1233,10 +1234,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageUInt16 input , int min , int max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayU16 input , int min , int max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1260,16 +1261,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayS16} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageSInt16 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayS16 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1302,16 +1303,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayS16} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageSInt16 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayS16 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1344,16 +1345,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayS16} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageSInt16 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayS16 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1386,16 +1387,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayS16} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageSInt16 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayS16 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1428,16 +1429,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayS16} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageSInt16 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayS16 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1470,16 +1471,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayS16} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageSInt16 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayS16 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1512,16 +1513,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt16} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayS16} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageSInt16 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayS16 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1553,16 +1554,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 average( MultiSpectral<ImageSInt16> input , ImageSInt16 output ) {
+	public static GrayS16 average(Planar<GrayS16> input , GrayS16 output ) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1573,13 +1574,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedS16}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedS16}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedS16 convert( MultiSpectral<ImageSInt16> input , InterleavedS16 output ) {
+	public static InterleavedS16 convert(Planar<GrayS16> input , InterleavedS16 output ) {
 		if (output == null) {
 			output = new InterleavedS16(input.width, input.height,input.getNumBands());
 		} else {
@@ -1592,16 +1593,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS16} into a {@link ImageSInt16} by computing the average value of each pixel
+	 * Converts a {@link InterleavedS16} into a {@link GrayS16} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 average( InterleavedS16 input , ImageSInt16 output ) {
+	public static GrayS16 average(InterleavedS16 input , GrayS16 output ) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1612,15 +1613,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS16} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedS16} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageSInt16> convert( InterleavedS16 input , MultiSpectral<ImageSInt16> output ) {
+	public static Planar<GrayS16> convert(InterleavedS16 input , Planar<GrayS16> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageSInt16>(ImageSInt16.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayS16>(GrayS16.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1639,10 +1640,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageSInt16 input , int min , int max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayS16 input , int min , int max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1666,16 +1667,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayS32} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageSInt32 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayS32 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1708,16 +1709,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayS32} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageSInt32 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayS32 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1750,16 +1751,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayS32} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageSInt32 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayS32 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1792,16 +1793,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayS32} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageSInt32 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayS32 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1834,16 +1835,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayS32} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageSInt32 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayS32 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1876,16 +1877,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayS32} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageSInt32 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayS32 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1918,16 +1919,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt32} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayS32} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageSInt32 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayS32 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1959,16 +1960,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 average( MultiSpectral<ImageSInt32> input , ImageSInt32 output ) {
+	public static GrayS32 average(Planar<GrayS32> input , GrayS32 output ) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -1979,13 +1980,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedS32}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedS32}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedS32 convert( MultiSpectral<ImageSInt32> input , InterleavedS32 output ) {
+	public static InterleavedS32 convert(Planar<GrayS32> input , InterleavedS32 output ) {
 		if (output == null) {
 			output = new InterleavedS32(input.width, input.height,input.getNumBands());
 		} else {
@@ -1998,16 +1999,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS32} into a {@link ImageSInt32} by computing the average value of each pixel
+	 * Converts a {@link InterleavedS32} into a {@link GrayS32} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 average( InterleavedS32 input , ImageSInt32 output ) {
+	public static GrayS32 average(InterleavedS32 input , GrayS32 output ) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2018,15 +2019,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS32} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedS32} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageSInt32> convert( InterleavedS32 input , MultiSpectral<ImageSInt32> output ) {
+	public static Planar<GrayS32> convert(InterleavedS32 input , Planar<GrayS32> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageSInt32>(ImageSInt32.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayS32>(GrayS32.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2045,10 +2046,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageSInt32 input , int min , int max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayS32 input , int min , int max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2072,16 +2073,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayS64} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageSInt64 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayS64 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2114,16 +2115,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayS64} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageSInt64 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayS64 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2156,16 +2157,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayS64} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageSInt64 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayS64 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2198,16 +2199,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayS64} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageSInt64 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayS64 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2240,16 +2241,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayS64} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageSInt64 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayS64 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2282,16 +2283,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayS64} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageSInt64 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayS64 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2324,16 +2325,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageSInt64} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayS64} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageSInt64 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayS64 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2365,16 +2366,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 average( MultiSpectral<ImageSInt64> input , ImageSInt64 output ) {
+	public static GrayS64 average(Planar<GrayS64> input , GrayS64 output ) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2385,13 +2386,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedS64}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedS64}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedS64 convert( MultiSpectral<ImageSInt64> input , InterleavedS64 output ) {
+	public static InterleavedS64 convert(Planar<GrayS64> input , InterleavedS64 output ) {
 		if (output == null) {
 			output = new InterleavedS64(input.width, input.height,input.getNumBands());
 		} else {
@@ -2404,16 +2405,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS64} into a {@link ImageSInt64} by computing the average value of each pixel
+	 * Converts a {@link InterleavedS64} into a {@link GrayS64} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 average( InterleavedS64 input , ImageSInt64 output ) {
+	public static GrayS64 average(InterleavedS64 input , GrayS64 output ) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2424,15 +2425,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedS64} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedS64} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageSInt64> convert( InterleavedS64 input , MultiSpectral<ImageSInt64> output ) {
+	public static Planar<GrayS64> convert(InterleavedS64 input , Planar<GrayS64> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageSInt64>(ImageSInt64.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayS64>(GrayS64.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2451,10 +2452,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageSInt64 input , long min , long max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayS64 input , long min , long max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2478,16 +2479,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayF32} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageFloat32 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayF32 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2520,16 +2521,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayF32} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageFloat32 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayF32 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2562,16 +2563,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayF32} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageFloat32 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayF32 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2604,16 +2605,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayF32} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageFloat32 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayF32 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2646,16 +2647,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayF32} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageFloat32 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayF32 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2688,16 +2689,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayF32} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageFloat32 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayF32 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2730,16 +2731,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat32} into a {@link boofcv.struct.image.ImageFloat64}.
+	 * Converts an {@link GrayF32} into a {@link GrayF64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 convert(ImageFloat32 input, ImageFloat64 output) {
+	public static GrayF64 convert(GrayF32 input, GrayF64 output) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2771,16 +2772,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 average( MultiSpectral<ImageFloat32> input , ImageFloat32 output ) {
+	public static GrayF32 average(Planar<GrayF32> input , GrayF32 output ) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2791,13 +2792,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedF32}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedF32}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedF32 convert( MultiSpectral<ImageFloat32> input , InterleavedF32 output ) {
+	public static InterleavedF32 convert(Planar<GrayF32> input , InterleavedF32 output ) {
 		if (output == null) {
 			output = new InterleavedF32(input.width, input.height,input.getNumBands());
 		} else {
@@ -2810,16 +2811,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedF32} into a {@link ImageFloat32} by computing the average value of each pixel
+	 * Converts a {@link InterleavedF32} into a {@link GrayF32} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 average( InterleavedF32 input , ImageFloat32 output ) {
+	public static GrayF32 average(InterleavedF32 input , GrayF32 output ) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2830,15 +2831,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedF32} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedF32} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageFloat32> convert( InterleavedF32 input , MultiSpectral<ImageFloat32> output ) {
+	public static Planar<GrayF32> convert(InterleavedF32 input , Planar<GrayF32> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayF32>(GrayF32.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2857,10 +2858,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageFloat32 input , float min , float max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayF32 input , float min , float max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2884,16 +2885,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageUInt8}.
+	 * Converts an {@link GrayF64} into a {@link GrayU8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt8 convert(ImageFloat64 input, ImageUInt8 output) {
+	public static GrayU8 convert(GrayF64 input, GrayU8 output) {
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2926,16 +2927,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt8}.
+	 * Converts an {@link GrayF64} into a {@link GrayS8}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt8 convert(ImageFloat64 input, ImageSInt8 output) {
+	public static GrayS8 convert(GrayF64 input, GrayS8 output) {
 		if (output == null) {
-			output = new ImageSInt8(input.width, input.height);
+			output = new GrayS8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2968,16 +2969,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageUInt16}.
+	 * Converts an {@link GrayF64} into a {@link GrayU16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageUInt16 convert(ImageFloat64 input, ImageUInt16 output) {
+	public static GrayU16 convert(GrayF64 input, GrayU16 output) {
 		if (output == null) {
-			output = new ImageUInt16(input.width, input.height);
+			output = new GrayU16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3010,16 +3011,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt16}.
+	 * Converts an {@link GrayF64} into a {@link GrayS16}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt16 convert(ImageFloat64 input, ImageSInt16 output) {
+	public static GrayS16 convert(GrayF64 input, GrayS16 output) {
 		if (output == null) {
-			output = new ImageSInt16(input.width, input.height);
+			output = new GrayS16(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3052,16 +3053,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt32}.
+	 * Converts an {@link GrayF64} into a {@link GrayS32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt32 convert(ImageFloat64 input, ImageSInt32 output) {
+	public static GrayS32 convert(GrayF64 input, GrayS32 output) {
 		if (output == null) {
-			output = new ImageSInt32(input.width, input.height);
+			output = new GrayS32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3094,16 +3095,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageSInt64}.
+	 * Converts an {@link GrayF64} into a {@link GrayS64}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageSInt64 convert(ImageFloat64 input, ImageSInt64 output) {
+	public static GrayS64 convert(GrayF64 input, GrayS64 output) {
 		if (output == null) {
-			output = new ImageSInt64(input.width, input.height);
+			output = new GrayS64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3136,16 +3137,16 @@ public class ConvertImage {
 
 	/**
 	 * <p>
-	 * Converts an {@link boofcv.struct.image.ImageFloat64} into a {@link boofcv.struct.image.ImageFloat32}.
+	 * Converts an {@link GrayF64} into a {@link GrayF32}.
 	 * </p>
 	 *
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat32 convert(ImageFloat64 input, ImageFloat32 output) {
+	public static GrayF32 convert(GrayF64 input, GrayF32 output) {
 		if (output == null) {
-			output = new ImageFloat32(input.width, input.height);
+			output = new GrayF32(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3177,16 +3178,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 average( MultiSpectral<ImageFloat64> input , ImageFloat64 output ) {
+	public static GrayF64 average(Planar<GrayF64> input , GrayF64 output ) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3197,13 +3198,13 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into the equivalent {@link InterleavedF64}
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedF64}
 	 *
 	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static InterleavedF64 convert( MultiSpectral<ImageFloat64> input , InterleavedF64 output ) {
+	public static InterleavedF64 convert(Planar<GrayF64> input , InterleavedF64 output ) {
 		if (output == null) {
 			output = new InterleavedF64(input.width, input.height,input.getNumBands());
 		} else {
@@ -3216,16 +3217,16 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedF64} into a {@link ImageFloat64} by computing the average value of each pixel
+	 * Converts a {@link InterleavedF64} into a {@link GrayF64} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
 	 * @param input (Input) The ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static ImageFloat64 average( InterleavedF64 input , ImageFloat64 output ) {
+	public static GrayF64 average(InterleavedF64 input , GrayF64 output ) {
 		if (output == null) {
-			output = new ImageFloat64(input.width, input.height);
+			output = new GrayF64(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3236,15 +3237,15 @@ public class ConvertImage {
 	}
 
 	/**
-	 * Converts a {@link InterleavedF64} into the equivalent {@link MultiSpectral}
+	 * Converts a {@link InterleavedF64} into the equivalent {@link Planar}
 	 * 
 	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static MultiSpectral<ImageFloat64> convert( InterleavedF64 input , MultiSpectral<ImageFloat64> output ) {
+	public static Planar<GrayF64> convert(InterleavedF64 input , Planar<GrayF64> output ) {
 		if (output == null) {
-			output = new MultiSpectral<ImageFloat64>(ImageFloat64.class,input.width, input.height,input.numBands);
+			output = new Planar<GrayF64>(GrayF64.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -3263,10 +3264,10 @@ public class ConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageFloat64 input , double min , double max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(GrayF64 input , double min , double max , int numValues , GrayU8 output )
 	{
 		if (output == null) {
-			output = new ImageUInt8(input.width, input.height);
+			output = new GrayU8(input.width, input.height);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}

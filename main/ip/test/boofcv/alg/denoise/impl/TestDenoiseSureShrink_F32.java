@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,18 +20,18 @@ package boofcv.alg.denoise.impl;
 
 import boofcv.alg.denoise.wavelet.DenoiseSureShrink_F32;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestDenoiseSureShrink_F32 extends GenericWaveletDenoiseTests<ImageFloat32> {
+public class TestDenoiseSureShrink_F32 extends GenericWaveletDenoiseTests<GrayF32> {
 
 	public TestDenoiseSureShrink_F32() {
-		super(ImageFloat32.class, 20, FactoryWaveletDaub.daubJ_F32(4), 3);
+		super(GrayF32.class, 20, FactoryWaveletDaub.daubJ_F32(4), 3);
 	}
 
 	@Test
@@ -40,8 +40,8 @@ public class TestDenoiseSureShrink_F32 extends GenericWaveletDenoiseTests<ImageF
 	}
 
 	@Override
-	public void denoiseWavelet(ImageSingleBand transformedImg, int numLevels ) {
+	public void denoiseWavelet(ImageGray transformedImg, int numLevels ) {
 		DenoiseSureShrink_F32 alg = new DenoiseSureShrink_F32();
-		alg.denoise((ImageFloat32)transformedImg,numLevels);
+		alg.denoise((GrayF32)transformedImg,numLevels);
 	}
 }

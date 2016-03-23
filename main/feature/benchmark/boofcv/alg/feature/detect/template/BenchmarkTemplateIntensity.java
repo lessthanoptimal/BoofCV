@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,16 +24,16 @@ import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
 import boofcv.factory.feature.detect.template.TemplateScoreType;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkTemplateIntensity<T extends ImageSingleBand> {
+public class BenchmarkTemplateIntensity<T extends ImageGray> {
 
 	Random rand = new Random(234);
 	long TEST_TIME = 2000;
@@ -84,13 +84,13 @@ public class BenchmarkTemplateIntensity<T extends ImageSingleBand> {
 	}
 
 	public static void main( String args[] ) {
-		BenchmarkTemplateIntensity<ImageUInt8>
-				benchmark_U8 = new BenchmarkTemplateIntensity<ImageUInt8>(ImageUInt8.class);
+		BenchmarkTemplateIntensity<GrayU8>
+				benchmark_U8 = new BenchmarkTemplateIntensity<GrayU8>(GrayU8.class);
 
 		benchmark_U8.evaluateAll();
 
-		BenchmarkTemplateIntensity<ImageFloat32>
-				benchmark_F32 = new BenchmarkTemplateIntensity<ImageFloat32>(ImageFloat32.class);
+		BenchmarkTemplateIntensity<GrayF32>
+				benchmark_F32 = new BenchmarkTemplateIntensity<GrayF32>(GrayF32.class);
 
 		benchmark_F32.evaluateAll();
 	}

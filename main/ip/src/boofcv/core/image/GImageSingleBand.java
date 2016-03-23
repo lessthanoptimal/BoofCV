@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.core.image;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Generalized interface for single banded images.  Setters and getters which use Number will be much slower than
@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageSingleBand;
  */
 public interface GImageSingleBand {
 
-	void wrap( ImageSingleBand image );
+	void wrap( ImageGray image );
 
 	int getWidth();
 
@@ -62,7 +62,7 @@ public interface GImageSingleBand {
 
 	float getF( int index );
 
-	ImageSingleBand getImage();
+	ImageGray getImage();
 
 	Class getImageType();
 }

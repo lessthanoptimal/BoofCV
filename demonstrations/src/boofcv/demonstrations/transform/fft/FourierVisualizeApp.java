@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayF;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageFloat;
 import boofcv.struct.image.ImageInterleaved;
 
 import javax.swing.*;
@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class FourierVisualizeApp
-		<T extends ImageFloat, W extends ImageInterleaved>
+		<T extends GrayF, W extends ImageInterleaved>
 		extends SelectInputPanel
 {
 	DiscreteFourierTransform<T,W> fft;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,9 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -65,7 +65,7 @@ public class FactoryDetectDescribe {
 	 * @param config Configuration for the SIFT detector and descriptor.
 	 * @return SIFT
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	DetectDescribePoint<T,BrightFeature> sift(ConfigCompleteSift config )
 	{
 		if( config == null )
@@ -78,12 +78,12 @@ public class FactoryDetectDescribe {
 
 		SiftScaleSpace scaleSpace = new SiftScaleSpace(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		OrientationHistogramSift<ImageFloat32> orientation = new OrientationHistogramSift<ImageFloat32>(
-				configOri.histogramSize,configOri.sigmaEnlarge,ImageFloat32.class);
-		DescribePointSift<ImageFloat32> describe = new DescribePointSift<ImageFloat32>(
+		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<GrayF32>(
+				configOri.histogramSize,configOri.sigmaEnlarge,GrayF32.class);
+		DescribePointSift<GrayF32> describe = new DescribePointSift<GrayF32>(
 				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
-				configDesc.maxDescriptorElementValue,ImageFloat32.class);
+				configDesc.maxDescriptorElementValue,GrayF32.class);
 
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
 		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
@@ -111,7 +111,7 @@ public class FactoryDetectDescribe {
 	 * @param configOrientation		Configuration for orientation
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DetectDescribePoint<T,BrightFeature> surfFast(ConfigFastHessian configDetector ,
 												  ConfigSurfDescribe.Speed configDesc,
 												  ConfigAverageIntegral configOrientation,
@@ -142,7 +142,7 @@ public class FactoryDetectDescribe {
 	 * @param configOrientation		Configuration for orientation
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DetectDescribePoint<T,BrightFeature> surfColorFast(ConfigFastHessian configDetector ,
 													   ConfigSurfDescribe.Speed configDesc,
 													   ConfigAverageIntegral configOrientation,
@@ -189,7 +189,7 @@ public class FactoryDetectDescribe {
 	 * @param imageType Specify type of input image.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageSingleBand, II extends ImageSingleBand>
+	public static <T extends ImageGray, II extends ImageGray>
 	DetectDescribePoint<T,BrightFeature> surfStable(ConfigFastHessian configDetector,
 													ConfigSurfDescribe.Stability configDescribe,
 													ConfigSlidingIntegral configOrientation,
@@ -221,7 +221,7 @@ public class FactoryDetectDescribe {
 	 * @param imageType Specify type of color input image.
 	 * @return SURF detector and descriptor
 	 */
-	public static <T extends ImageMultiBand, II extends ImageSingleBand>
+	public static <T extends ImageMultiBand, II extends ImageGray>
 	DetectDescribePoint<T,BrightFeature> surfColorStable(ConfigFastHessian configDetector,
 														 ConfigSurfDescribe.Stability configDescribe,
 														 ConfigSlidingIntegral configOrientation,
@@ -256,7 +256,7 @@ public class FactoryDetectDescribe {
 	 * @param describe Feature descriptor
 	 * @return {@link DetectDescribePoint}.
 	 */
-	public static <T extends ImageSingleBand, D extends TupleDesc>
+	public static <T extends ImageGray, D extends TupleDesc>
 	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
 										   OrientationImage<T> orientation,
 										   DescribeRegionPoint<T, D> describe) {

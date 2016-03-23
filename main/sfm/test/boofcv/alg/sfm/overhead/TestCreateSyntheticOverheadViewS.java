@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -56,15 +56,15 @@ public class TestCreateSyntheticOverheadViewS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
-		CreateSyntheticOverheadViewS<ImageFloat32> alg = new CreateSyntheticOverheadViewS<ImageFloat32>(interp);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		CreateSyntheticOverheadViewS<GrayF32> alg = new CreateSyntheticOverheadViewS<GrayF32>(interp);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fill(input,10);
 
-		ImageFloat32 output = new ImageFloat32(overheadW,overheadH);
+		GrayF32 output = new GrayF32(overheadW,overheadH);
 
 		alg.process(input,output);
 

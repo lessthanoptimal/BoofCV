@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -46,7 +46,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleBand, II extends ImageSingleBand> {
+public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II extends ImageGray> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
@@ -56,7 +56,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 	final static int height = 480;
 
 	I gray;
-	MultiSpectral<I> colorMS;
+	Planar<I> colorMS;
 
 	Point2D_I32 pts[];
 	double scales[];
@@ -73,7 +73,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		colorMS = new MultiSpectral<I>(imageType,width,height,3);
+		colorMS = new Planar<I>(imageType,width,height,3);
 		GImageMiscOps.fillUniform(colorMS, rand, 0, 100);
 
 		gray = GConvertImage.average(colorMS,gray);
@@ -179,7 +179,7 @@ public class BenchmarkDescribe<I extends ImageSingleBand, D extends ImageSingleB
 	}
 
 	public static void main( String arg[ ] ) {
-		BenchmarkDescribe<ImageFloat32,?,?> alg = new BenchmarkDescribe(ImageFloat32.class);
+		BenchmarkDescribe<GrayF32,?,?> alg = new BenchmarkDescribe(GrayF32.class);
 //		BenchmarkDescribe<ImageUInt8,?,?> alg = new BenchmarkDescribe(ImageUInt8.class);
 
 		alg.perform();

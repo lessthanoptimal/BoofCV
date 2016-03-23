@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.util.Random;
@@ -43,13 +43,13 @@ public class TestFactoryDerivativeSparse {
 
 	@Test
 	public void laplacian_F32() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		LaplacianEdge.process(input,expected);
 
-		ImageFunctionSparse<ImageFloat32> func = FactoryDerivativeSparse.createLaplacian(ImageFloat32.class,null);
+		ImageFunctionSparse<GrayF32> func = FactoryDerivativeSparse.createLaplacian(GrayF32.class,null);
 
 		func.setImage(input);
 		double found = func.compute(6,8);
@@ -59,13 +59,13 @@ public class TestFactoryDerivativeSparse {
 
 	@Test
 	public void laplacian_I() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageSInt16 expected = new ImageSInt16(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayS16 expected = new GrayS16(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		LaplacianEdge.process(input,expected);
 
-		ImageFunctionSparse<ImageUInt8> func = FactoryDerivativeSparse.createLaplacian(ImageUInt8.class,null);
+		ImageFunctionSparse<GrayU8> func = FactoryDerivativeSparse.createLaplacian(GrayU8.class,null);
 
 		func.setImage(input);
 		double found = func.compute(6,8);

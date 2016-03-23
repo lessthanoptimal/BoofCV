@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		if( params.length != 3)
 			return false;
 
-		return ImageSingleBand.class.isAssignableFrom(params[0]);
+		return ImageGray.class.isAssignableFrom(params[0]);
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 		Class c[] = candidate.getParameterTypes();
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(c[0], width, height);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(c[1], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(c[0], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
@@ -99,7 +99,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		int radius = (Integer)targetParam[2];
 		Object kernel = createTableKernel(params[0],radius);
 
-		ImageSingleBand output = (ImageSingleBand)((ImageSingleBand)targetParam[1]).clone();
+		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
 		return new Object[]{kernel, targetParam[0], output};
 	}
@@ -108,13 +108,13 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
 		if (validationParam.length == 3) {
-			ImageSingleBand expected = (ImageSingleBand) validationParam[2];
-			ImageSingleBand found = (ImageSingleBand) targetParam[1];
+			ImageGray expected = (ImageGray) validationParam[2];
+			ImageGray found = (ImageGray) targetParam[1];
 
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		} else {
-			ImageSingleBand expected = (ImageSingleBand) validationParam[3];
-			ImageSingleBand found = (ImageSingleBand) targetParam[1];
+			ImageGray expected = (ImageGray) validationParam[3];
+			ImageGray found = (ImageGray) targetParam[1];
 
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		}

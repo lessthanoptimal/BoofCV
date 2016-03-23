@@ -68,7 +68,7 @@ public class TestConvertImage {
 					checkConvert(m, inputType, outputType);
 				}
 			} else {
-				if( inputType == MultiSpectral.class )
+				if( inputType == Planar.class )
 					checkMultiAverage(m, inputType, outputType);
 				else
 					checkInterleavedAverage(m, inputType, outputType);
@@ -80,7 +80,7 @@ public class TestConvertImage {
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {
-		if( ImageSingleBand.class.isAssignableFrom(inputType) ) {
+		if( ImageGray.class.isAssignableFrom(inputType) ) {
 			checkConvertSingle(m, inputType, outputType);
 		} else if( ImageInterleaved.class.isAssignableFrom(inputType)) {
 			if( ImageInterleaved.class.isAssignableFrom(outputType) )
@@ -96,12 +96,12 @@ public class TestConvertImage {
 
 		Class inputType = types[0];
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
-		ImageUInt8 output = new ImageUInt8(imgWidth,imgHeight);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
+		GrayU8 output = new GrayU8(imgWidth,imgHeight);
 
 		boolean inputSigned = true;
 
-		if( ImageInteger.class.isAssignableFrom(inputType) )
+		if( GrayI.class.isAssignableFrom(inputType) )
 			inputSigned = input.getDataType().isSigned();
 
 	   // only provide signed numbers of both data types can handle them
@@ -114,9 +114,9 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this,"checkConvertIntegerRange",true,m,input,output);
 	}
 
-	public void checkConvertIntegerRange( Method m , ImageSingleBand<?> input , ImageUInt8 output ) {
+	public void checkConvertIntegerRange(Method m , ImageGray<?> input , GrayU8 output ) {
 		try {
-			ImageUInt8 ret;
+			GrayU8 ret;
 			double tol = selectTolerance(input,output);
 
 			// check it with a non-null output
@@ -135,18 +135,18 @@ public class TestConvertImage {
 		}
 	}
 
-	private ImageUInt8 invokeConvertIntegerRange(Method m, ImageSingleBand<?> input, ImageUInt8 output) throws IllegalAccessException, InvocationTargetException {
-		ImageUInt8 ret;
+	private GrayU8 invokeConvertIntegerRange(Method m, ImageGray<?> input, GrayU8 output) throws IllegalAccessException, InvocationTargetException {
+		GrayU8 ret;
 		if( input.getDataType().isInteger() )
-			ret = (ImageUInt8)m.invoke(null,input,-10,20,8,output);
+			ret = (GrayU8)m.invoke(null,input,-10,20,8,output);
 		else if( input.getDataType().getNumBits() == 32 )
-			ret = (ImageUInt8)m.invoke(null,input,-10.0f,20.0f,8,output);
+			ret = (GrayU8)m.invoke(null,input,-10.0f,20.0f,8,output);
 		else
-			ret = (ImageUInt8)m.invoke(null,input,-10.0,20.0,8,output);
+			ret = (GrayU8)m.invoke(null,input,-10.0,20.0,8,output);
 		return ret;
 	}
 
-	private void checkResultsIntegerRange( ImageUInt8 output ) {
+	private void checkResultsIntegerRange( GrayU8 output ) {
 		int notZero = 0;
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
@@ -160,15 +160,15 @@ public class TestConvertImage {
 	}
 
 	private void checkConvertSingle( Method m , Class inputType , Class outputType ) {
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType, imgWidth, imgHeight);
+		ImageGray output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
 		boolean inputSigned = true;
 		boolean outputSigned = true;
 
-		if( ImageInteger.class.isAssignableFrom(inputType) )
+		if( GrayI.class.isAssignableFrom(inputType) )
 			inputSigned = input.getDataType().isSigned();
-		if( ImageInteger.class.isAssignableFrom(outputType) )
+		if( GrayI.class.isAssignableFrom(outputType) )
 			outputSigned = output.getDataType().isSigned();
 
 	   // only provide signed numbers of both data types can handle them
@@ -203,17 +203,17 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this, "checkConvertInterleaved", true, m, input, output);
 	}
 
-	public void checkConvertSingle( Method m , ImageSingleBand<?> input , ImageSingleBand<?> output ) {
+	public void checkConvertSingle(Method m , ImageGray<?> input , ImageGray<?> output ) {
 		try {
 			double tol = selectTolerance(input,output);
 
 			// check it with a non-null output
-			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			ImageGray<?> ret = (ImageGray<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
 			BoofTesting.assertEquals(input, ret, tol);
 
 			// check it with a null output
-			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			ret = (ImageGray<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
 		} catch (IllegalAccessException e) {
@@ -247,7 +247,7 @@ public class TestConvertImage {
 		ImageInterleaved input = GeneralizedImageOps.createInterleaved(inputType, imgWidth, imgHeight,2);
 
 		Class bandType = ImageDataType.typeToSingleClass(input.getDataType());
-		MultiSpectral output = new MultiSpectral(bandType,imgWidth, imgHeight, 2);
+		Planar output = new Planar(bandType,imgWidth, imgHeight, 2);
 
 		boolean inputSigned = true;
 
@@ -262,17 +262,17 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this, "checkConvertInterleavedToMulti", true, m, input, output);
 	}
 
-	public void checkConvertInterleavedToMulti( Method m , ImageInterleaved<?> input , MultiSpectral<?> output ) {
+	public void checkConvertInterleavedToMulti( Method m , ImageInterleaved<?> input , Planar<?> output ) {
 		try {
 			double tol = 1e-4;
 
 			// check it with a non-null output
-			MultiSpectral<?> ret = (MultiSpectral<?>)m.invoke(null,input,output);
+			Planar<?> ret = (Planar<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
 			BoofTesting.assertEquals(input, ret, tol);
 
 			// check it with a null output
-			ret = (MultiSpectral<?>)m.invoke(null,input,null);
+			ret = (Planar<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
 		} catch (IllegalAccessException e) {
@@ -286,7 +286,7 @@ public class TestConvertImage {
 		ImageInterleaved output = GeneralizedImageOps.createInterleaved(outputType, imgWidth, imgHeight,2);
 
 		Class bandType = ImageDataType.typeToSingleClass(output.getDataType());
-		MultiSpectral input = new MultiSpectral(bandType,imgWidth, imgHeight, 2);
+		Planar input = new Planar(bandType,imgWidth, imgHeight, 2);
 
 		boolean signed = true;
 
@@ -301,7 +301,7 @@ public class TestConvertImage {
 		BoofTesting.checkSubImage(this, "checkConvertMultiToInterleaved", true, m, input, output);
 	}
 
-	public void checkConvertMultiToInterleaved( Method m , MultiSpectral<?> input , ImageInterleaved<?> output ) {
+	public void checkConvertMultiToInterleaved(Method m , Planar<?> input , ImageInterleaved<?> output ) {
 		try {
 			double tol = 1e-4;
 
@@ -322,18 +322,18 @@ public class TestConvertImage {
 	}
 
 	private void checkMultiAverage(Method m, Class inputType, Class outputType) {
-		if( inputType != MultiSpectral.class )
+		if( inputType != Planar.class )
 			fail("Expected MultiSpectral image");
 
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+		ImageGray output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
 		boolean signed = true;
 
-		if( ImageInteger.class.isAssignableFrom(outputType) )
+		if( GrayI.class.isAssignableFrom(outputType) )
 			signed = output.getDataType().isSigned();
 
 		for( int numBands = 1; numBands <= 3; numBands++ ) {
-			MultiSpectral input = new MultiSpectral(outputType,imgWidth,imgHeight,numBands);
+			Planar input = new Planar(outputType,imgWidth,imgHeight,numBands);
 
 			// only provide signed numbers of both data types can handle them
 			if( signed ) {
@@ -346,15 +346,15 @@ public class TestConvertImage {
 		}
 	}
 
-	public void checkMultiAverage(Method m, MultiSpectral<?> input, ImageSingleBand<?> output) {
+	public void checkMultiAverage(Method m, Planar<?> input, ImageGray<?> output) {
 		try {
 			// check it with a non-null output
-			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			ImageGray<?> ret = (ImageGray<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
 			checkMultiAverage(input, ret);
 
 			// check it with a null output
-			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			ret = (ImageGray<?>)m.invoke(null,input,null);
 			checkMultiAverage(input, ret);
 
 		} catch (IllegalAccessException e) {
@@ -364,7 +364,7 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkMultiAverage(MultiSpectral<?> input, ImageSingleBand<?> found) {
+	private void checkMultiAverage(Planar<?> input, ImageGray<?> found) {
 		int numBands = input.getNumBands();
 		for( int y = 0; y < imgHeight; y++ ){
 			for( int x = 0; x < imgWidth; x++ ) {
@@ -381,11 +381,11 @@ public class TestConvertImage {
 		if( inputType.isAssignableFrom(ImageInterleaved.class) )
 			fail("Expected ImageInterleaved image");
 
-		ImageSingleBand output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
+		ImageGray output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 
 		boolean signed = true;
 
-		if( ImageInteger.class.isAssignableFrom(outputType) )
+		if( GrayI.class.isAssignableFrom(outputType) )
 			signed = output.getDataType().isSigned();
 
 		for( int numBands = 1; numBands <= 3; numBands++ ) {
@@ -402,15 +402,15 @@ public class TestConvertImage {
 		}
 	}
 
-	public void checkInterleavedAverage(Method m, ImageInterleaved input, ImageSingleBand<?> output) {
+	public void checkInterleavedAverage(Method m, ImageInterleaved input, ImageGray<?> output) {
 		try {
 			// check it with a non-null output
-			ImageSingleBand<?> ret = (ImageSingleBand<?>)m.invoke(null,input,output);
+			ImageGray<?> ret = (ImageGray<?>)m.invoke(null,input,output);
 			assertTrue(ret == output);
 			checkInterleavedAverage(input, ret);
 
 			// check it with a null output
-			ret = (ImageSingleBand<?>)m.invoke(null,input,null);
+			ret = (ImageGray<?>)m.invoke(null,input,null);
 			checkInterleavedAverage(input, ret);
 
 		} catch (IllegalAccessException e) {
@@ -420,7 +420,7 @@ public class TestConvertImage {
 		}
 	}
 
-	private void checkInterleavedAverage(ImageInterleaved input, ImageSingleBand<?> found) {
+	private void checkInterleavedAverage(ImageInterleaved input, ImageGray<?> found) {
 		int numBands = input.getNumBands();
 		for( int y = 0; y < imgHeight; y++ ){
 			for( int x = 0; x < imgWidth; x++ ) {
@@ -436,7 +436,7 @@ public class TestConvertImage {
 	/**
 	 * If the two images are both int or float then set a low tolerance, otherwise set the tolerance to one pixel
 	 */
-	private double selectTolerance( ImageSingleBand a , ImageSingleBand b ) {
+	private double selectTolerance(ImageGray a , ImageGray b ) {
 		if( a.getDataType().isInteger() == b.getDataType().isInteger() )
 			return 1e-4;
 		else

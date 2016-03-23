@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,15 @@
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
 
 /**
- * <p>Computes edge weight as the F-norm different in pixel value for {@link MultiSpectral} images.
+ * <p>Computes edge weight as the F-norm different in pixel value for {@link Planar} images.
  * A 4-connect neighborhood is considered.</p>
  *
  * <p>
@@ -35,7 +35,7 @@ import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edg
  *
  * @author Peter Abeles
  */
-public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFloat32>> {
+public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<Planar<GrayF32>> {
 
 	float pixelColor[];
 	int numBands;
@@ -46,7 +46,7 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 	}
 
 	@Override
-	public void process(MultiSpectral<ImageFloat32> input,
+	public void process(Planar<GrayF32> input,
 						FastQueue<Edge> edges) {
 
 		edges.reset();
@@ -63,7 +63,7 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 				float weight1=0,weight2=0;
 
 				for( int i = 0; i < numBands; i++ ) {
-					ImageFloat32 band = input.getBand(i);
+					GrayF32 band = input.getBand(i);
 
 					float color0 = band.data[indexSrc];                       // (x,y)
 					float color1 = band.data[indexSrc+1];                     // (x+1,y)
@@ -99,14 +99,14 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 	}
 
 	private void checkAround( int x , int y ,
-							  MultiSpectral<ImageFloat32> input ,
+							  Planar<GrayF32> input ,
 							  FastQueue<Edge> edges )
 	{
 		int indexSrc = input.startIndex + y*input.stride + x;
 		int indexA =                      y*input.width  + x;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageFloat32 band = input.getBand(i);
+			GrayF32 band = input.getBand(i);
 			pixelColor[i] =  band.data[indexSrc];
 		}
 
@@ -115,7 +115,7 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 	}
 
 	private void check( int x , int y , float color0[] , int indexA,
-						MultiSpectral<ImageFloat32> input ,
+						Planar<GrayF32> input ,
 						FastQueue<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
 			return;
@@ -126,7 +126,7 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 		float weight = 0;
 
 		for( int i = 0; i < numBands; i++ ) {
-			ImageFloat32 band = input.getBand(i);
+			GrayF32 band = input.getBand(i);
 
 			float color = band.data[indexSrc];
 			float diff = color0[i]-color;
@@ -141,8 +141,8 @@ public class FhEdgeWeights4_MsF32 implements FhEdgeWeights<MultiSpectral<ImageFl
 	}
 
 	@Override
-	public ImageType<MultiSpectral<ImageFloat32>> getInputType() {
-		return ImageType.ms(3,ImageFloat32.class);
+	public ImageType<Planar<GrayF32>> getInputType() {
+		return ImageType.ms(3,GrayF32.class);
 	}
 
 }

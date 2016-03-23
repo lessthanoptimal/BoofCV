@@ -28,9 +28,9 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -54,7 +54,7 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends DemonstrationBase<ImageFloat32>
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF32>
 		implements ChessboardPanel.Listener
 {
 	boolean success;
@@ -64,10 +64,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	VisualizePanel imagePanel = new VisualizePanel();
 	BufferedImage input;
 	BufferedImage binary;
-	ImageFloat32 grayPrev = new ImageFloat32(1,1);
+	GrayF32 grayPrev = new GrayF32(1,1);
 
 	public CommonDetectCalibrationApp( int numRows , int numColumns , List<String> exampleInputs ) {
-		super(exampleInputs, ImageType.single(ImageFloat32.class));
+		super(exampleInputs, ImageType.single(GrayF32.class));
 		controlPanel = new ChessboardPanel(numRows,numColumns,true);
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
@@ -87,9 +87,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 
 	protected abstract void declareDetector();
 
-	protected abstract boolean process( ImageFloat32 image );
+	protected abstract boolean process( GrayF32 image );
 
-	protected abstract ImageUInt8 getBinaryImage();
+	protected abstract GrayU8 getBinaryImage();
 
 	protected abstract java.util.List<java.util.List<SquareNode>> getClusters();
 
@@ -102,7 +102,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<Image
 	protected abstract java.util.List<SquareGrid> getGrids();
 
 	@Override
-	public void processImage( final BufferedImage buffered , ImageFloat32 gray ) {
+	public void processImage( final BufferedImage buffered , GrayF32 gray ) {
 		this.input = buffered;
 
 		synchronized ( this ) {

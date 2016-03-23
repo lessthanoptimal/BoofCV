@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -77,10 +77,10 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 			index++;
 		}
 
-		ImageSingleBand src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+		ImageGray src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index++] = src;
 		GImageMiscOps.fillUniform(src, rand, 0, 120);
-		ImageSingleBand dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+		ImageGray dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index] = dst;
 
 

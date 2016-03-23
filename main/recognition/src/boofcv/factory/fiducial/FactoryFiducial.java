@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.
@@ -52,7 +52,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SquareBinary_to_FiducialDetector<T> squareBinary( ConfigFiducialBinary configFiducial,
 													  ConfigThreshold configThreshold,
 													  Class<T> imageType ) {
@@ -90,7 +90,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static  <T extends ImageSingleBand>
+	public static  <T extends ImageGray>
 	SquareImage_to_FiducialDetector<T> squareImage( ConfigFiducialImage configFiducial,
 													ConfigThreshold configThreshold,
 													Class<T> imageType ) {
@@ -119,7 +119,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
@@ -135,7 +135,7 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
 
 		config.refineWithCorners = false;
@@ -143,7 +143,7 @@ public class FactoryFiducial {
 		return new CalibrationFiducialDetector<T>(config,imageType);
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
 
 		return new CalibrationFiducialDetector<T>(config,imageType);

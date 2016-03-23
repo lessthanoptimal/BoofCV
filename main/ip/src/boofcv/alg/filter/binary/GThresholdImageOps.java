@@ -35,7 +35,7 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Computes the variance based threshold using Otsu's method from an input image. Internally it uses
-	 * {@link #computeOtsu(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(boofcv.struct.image.ImageSingleBand, int, int[])}
+	 * {@link #computeOtsu(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])}
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
@@ -43,7 +43,7 @@ public class GThresholdImageOps {
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static int computeOtsu( ImageSingleBand input , int minValue , int maxValue ) {
+	public static int computeOtsu(ImageGray input , int minValue , int maxValue ) {
 
 		int range = 1+maxValue - minValue;
 		int histogram[] = new int[ range ];
@@ -113,14 +113,14 @@ public class GThresholdImageOps {
 	 * {@link #computeEntropy(int[], int, int)} for more details.
 	 * </p>
 	 *
-	 * @see boofcv.alg.misc.GImageStatistics#histogram(boofcv.struct.image.ImageSingleBand, int, int[])
+	 * @see boofcv.alg.misc.GImageStatistics#histogram(ImageGray, int, int[])
 	 *
 	 * @param input Input gray-scale image
 	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
 	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
 	 * @return Selected threshold.
 	 */
-	public static int computeEntropy( ImageSingleBand input , int minValue , int maxValue ) {
+	public static int computeEntropy(ImageGray input , int minValue , int maxValue ) {
 
 		int range = 1 + maxValue - minValue;
 		int histogram[] = new int[ range ];
@@ -210,22 +210,22 @@ public class GThresholdImageOps {
 	 * @param down If true then the inequality &le; is used, otherwise if false then &gt; is used.
 	 * @return binary image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageUInt8 threshold( T input , ImageUInt8 output ,
-						  double threshold , boolean down )
+	public static <T extends ImageGray>
+	GrayU8 threshold(T input , GrayU8 output ,
+					 double threshold , boolean down )
 	{
-		if( input instanceof ImageFloat32 ) {
-			return ThresholdImageOps.threshold((ImageFloat32)input,output,(float)threshold,down);
-		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.threshold((ImageUInt8)input,output,(int)threshold,down);
-		} else if( input instanceof ImageUInt16) {
-			return ThresholdImageOps.threshold((ImageUInt16)input,output,(int)threshold,down);
-		} else if( input instanceof ImageSInt16) {
-			return ThresholdImageOps.threshold((ImageSInt16)input,output,(int)threshold,down);
-		} else if( input instanceof ImageSInt32 ) {
-			return ThresholdImageOps.threshold((ImageSInt32)input,output,(int)threshold,down);
-		} else if( input instanceof ImageFloat64 ) {
-			return ThresholdImageOps.threshold((ImageFloat64)input,output,threshold,down);
+		if( input instanceof GrayF32) {
+			return ThresholdImageOps.threshold((GrayF32)input,output,(float)threshold,down);
+		} else if( input instanceof GrayU8) {
+			return ThresholdImageOps.threshold((GrayU8)input,output,(int)threshold,down);
+		} else if( input instanceof GrayU16) {
+			return ThresholdImageOps.threshold((GrayU16)input,output,(int)threshold,down);
+		} else if( input instanceof GrayS16) {
+			return ThresholdImageOps.threshold((GrayS16)input,output,(int)threshold,down);
+		} else if( input instanceof GrayS32) {
+			return ThresholdImageOps.threshold((GrayS32)input,output,(int)threshold,down);
+		} else if( input instanceof GrayF64) {
+			return ThresholdImageOps.threshold((GrayF64)input,output,threshold,down);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -253,16 +253,16 @@ public class GThresholdImageOps {
 	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return binary image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageUInt8 localSquare(T input, ImageUInt8 output,
-						   int radius, double scale, boolean down, T work1, T work2)
+	public static <T extends ImageGray>
+	GrayU8 localSquare(T input, GrayU8 output,
+					   int radius, double scale, boolean down, T work1, T work2)
 	{
-		if( input instanceof ImageFloat32 ) {
-			return ThresholdImageOps.localSquare((ImageFloat32) input, output, radius, (float) scale, down,
-					(ImageFloat32) work1, (ImageFloat32) work2);
-		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.localSquare((ImageUInt8) input, output, radius, (float) scale, down,
-					(ImageUInt8) work1, (ImageUInt8) work2);
+		if( input instanceof GrayF32) {
+			return ThresholdImageOps.localSquare((GrayF32) input, output, radius, (float) scale, down,
+					(GrayF32) work1, (GrayF32) work2);
+		} else if( input instanceof GrayU8) {
+			return ThresholdImageOps.localSquare((GrayU8) input, output, radius, (float) scale, down,
+					(GrayU8) work1, (GrayU8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -290,17 +290,17 @@ public class GThresholdImageOps {
 	 * @param work2 (Optional) Internal workspace.  Can be null
 	 * @return binary image.
 	 */
-	public static <T extends ImageSingleBand>
-	ImageUInt8 localGaussian(T input, ImageUInt8 output,
-							 int radius, double scale, boolean down,
-							 T work1, ImageSingleBand work2)
+	public static <T extends ImageGray>
+	GrayU8 localGaussian(T input, GrayU8 output,
+						 int radius, double scale, boolean down,
+						 T work1, ImageGray work2)
 	{
-		if( input instanceof ImageFloat32 ) {
-			return ThresholdImageOps.localGaussian((ImageFloat32) input, output, radius, (float) scale, down,
-					(ImageFloat32) work1, (ImageFloat32) work2);
-		} else if( input instanceof ImageUInt8 ) {
-			return ThresholdImageOps.localGaussian((ImageUInt8) input, output, radius, (float) scale, down,
-					(ImageUInt8) work1, (ImageUInt8) work2);
+		if( input instanceof GrayF32) {
+			return ThresholdImageOps.localGaussian((GrayF32) input, output, radius, (float) scale, down,
+					(GrayF32) work1, (GrayF32) work2);
+		} else if( input instanceof GrayU8) {
+			return ThresholdImageOps.localGaussian((GrayU8) input, output, radius, (float) scale, down,
+					(GrayU8) work1, (GrayU8) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -319,18 +319,18 @@ public class GThresholdImageOps {
 	 * @param down Should it threshold up or down.
 	 * @return binary image
 	 */
-	public static <T extends ImageSingleBand>
-	ImageUInt8 localSauvola(T input, ImageUInt8 output, int radius, float k, boolean down)
+	public static <T extends ImageGray>
+	GrayU8 localSauvola(T input, GrayU8 output, int radius, float k, boolean down)
 	{
 		ThresholdSauvola alg = new ThresholdSauvola(radius,k, down);
 
 		if( output == null )
-			output = new ImageUInt8(input.width,input.height);
+			output = new GrayU8(input.width,input.height);
 
-		if( input instanceof ImageFloat32 ) {
-			alg.process((ImageFloat32)input,output);
+		if( input instanceof GrayF32) {
+			alg.process((GrayF32)input,output);
 		} else {
-			ImageFloat32 conv = new ImageFloat32(input.width,input.height);
+			GrayF32 conv = new GrayF32(input.width,input.height);
 			GConvertImage.convert(input, conv);
 			alg.process(conv,output);
 		}
@@ -350,14 +350,14 @@ public class GThresholdImageOps {
 	 * @param textureThreshold If the min and max values are within this threshold the pixel will be set to 1.
 	 * @return Binary image
 	 */
-	public static <T extends ImageSingleBand>
-	ImageUInt8 localBlockMinMax(T input, ImageUInt8 output, int radius, double scale , boolean down, double textureThreshold)
+	public static <T extends ImageGray>
+	GrayU8 localBlockMinMax(T input, GrayU8 output, int radius, double scale , boolean down, double textureThreshold)
 	{
 		LocalSquareBlockMinMaxBinaryFilter<T> alg = new LocalSquareBlockMinMaxBinaryFilter<T>(textureThreshold,radius*2+1,scale,down,
 				(Class<T>)input.getClass());
 
 		if( output == null )
-			output = new ImageUInt8(input.width,input.height);
+			output = new GrayU8(input.width,input.height);
 
 		alg.process(input,output);
 

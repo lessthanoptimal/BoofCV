@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageInt8;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayI8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -37,7 +37,7 @@ public class TestConvolveImageUnrolled_U8_I8_Div {
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_U8_I8_Div.class.getMethod("convolve",
-					Kernel2D_I32.class, ImageUInt8.class, ImageInt8.class , int.class);
+					Kernel2D_I32.class, GrayU8.class, GrayI8.class , int.class);
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -48,7 +48,7 @@ public class TestConvolveImageUnrolled_U8_I8_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_U8_I8_Div.class.getMethod("horizontal",
-					Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class, int.class);
+					Kernel1D_I32.class, GrayU8.class, GrayI8.class, int.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -59,7 +59,7 @@ public class TestConvolveImageUnrolled_U8_I8_Div {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_U8_I8_Div.class.getMethod("vertical",
-					Kernel1D_I32.class, ImageUInt8.class, ImageInt8.class, int.class);
+					Kernel1D_I32.class, GrayU8.class, GrayI8.class, int.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

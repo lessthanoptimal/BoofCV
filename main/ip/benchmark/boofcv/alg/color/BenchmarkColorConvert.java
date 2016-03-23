@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.color;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 import java.util.Random;
 
@@ -36,8 +36,8 @@ public class BenchmarkColorConvert {
 
 	public static final int TEST_TIME = 1000;
 
-	public static MultiSpectral<ImageFloat32> src_F32;
-	public static MultiSpectral<ImageFloat32> dst_F32;
+	public static Planar<GrayF32> src_F32;
+	public static Planar<GrayF32> dst_F32;
 
 	public static class RGB_to_HSV_F32 extends PerformerBase {
 
@@ -75,8 +75,8 @@ public class BenchmarkColorConvert {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		src_F32 = new MultiSpectral<ImageFloat32>(ImageFloat32.class,imgWidth,imgHeight,3);
-		dst_F32 = new MultiSpectral<ImageFloat32>(ImageFloat32.class,imgWidth,imgHeight,3);
+		src_F32 = new Planar<GrayF32>(GrayF32.class,imgWidth,imgHeight,3);
+		dst_F32 = new Planar<GrayF32>(GrayF32.class,imgWidth,imgHeight,3);
 
 		GImageMiscOps.addUniform(src_F32,rand,0,255);
 

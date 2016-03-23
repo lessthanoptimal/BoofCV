@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.filter.derivative;
 
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -40,13 +40,13 @@ public class TestImageGradient_Reflection {
 	 */
 	@Test
 	public void testNoException() throws NoSuchMethodException {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 derivX = new ImageFloat32(width,height);
-		ImageFloat32 derivY = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 derivX = new GrayF32(width,height);
+		GrayF32 derivY = new GrayF32(width,height);
 
-		Method m = GradientSobel.class.getMethod("process",ImageFloat32.class,ImageFloat32.class,ImageFloat32.class, ImageBorder_F32.class);
+		Method m = GradientSobel.class.getMethod("process",GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
 
-		ImageGradient_Reflection<ImageFloat32,ImageFloat32> alg = new ImageGradient_Reflection<ImageFloat32,ImageFloat32>(m);
+		ImageGradient_Reflection<GrayF32,GrayF32> alg = new ImageGradient_Reflection<GrayF32,GrayF32>(m);
 
 		alg.process(input,derivX,derivY);
 	}

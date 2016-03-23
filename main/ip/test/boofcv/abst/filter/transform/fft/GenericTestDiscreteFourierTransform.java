@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
-import boofcv.struct.image.ImageSingleBand;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericTestDiscreteFourierTransform<T extends ImageSingleBand, I extends ImageInterleaved> {
+public abstract class GenericTestDiscreteFourierTransform<T extends ImageGray, I extends ImageInterleaved> {
 
 	protected Random rand = new Random(234);
 

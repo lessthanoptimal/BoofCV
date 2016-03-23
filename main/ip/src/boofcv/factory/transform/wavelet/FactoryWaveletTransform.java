@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.factory.transform.wavelet;
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.abst.transform.wavelet.impl.WaveletTransformFloat32;
 import boofcv.abst.transform.wavelet.impl.WaveletTransformInt;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 import boofcv.struct.wavelet.WlCoef_F32;
@@ -41,7 +41,7 @@ public class FactoryWaveletTransform {
 
 
 	@SuppressWarnings({"unchecked"})
-	public static <T extends ImageSingleBand, W extends ImageSingleBand, C extends WlCoef>
+	public static <T extends ImageGray, W extends ImageGray, C extends WlCoef>
 	WaveletTransform<T,W,C> create( Class<T> imageType , WaveletDescription<C> waveletDesc , int numLevels ,
 									double minPixelValue , double maxPixelValue)
 	{
@@ -57,7 +57,7 @@ public class FactoryWaveletTransform {
 	}
 
 	/**
-	 * Creates a wavelet transform for images that are derived from {@link ImageInteger}.
+	 * Creates a wavelet transform for images that are derived from {@link GrayI}.
 	 *
 	 * @param waveletDesc Description of the wavelet.
 	 * @param numLevels Number of levels in the multi-level transform.
@@ -65,8 +65,8 @@ public class FactoryWaveletTransform {
 	 * @param maxPixelValue Maximum pixel intensity value
 	 * @return The transform class.
 	 */
-	public static <T extends ImageInteger>
-	WaveletTransform<T, ImageSInt32,WlCoef_I32>
+	public static <T extends GrayI>
+	WaveletTransform<T, GrayS32,WlCoef_I32>
 	create_I( WaveletDescription<WlCoef_I32> waveletDesc ,
 			  int numLevels , int minPixelValue , int maxPixelValue ,
 			  Class<T> imageType )
@@ -75,7 +75,7 @@ public class FactoryWaveletTransform {
 	}
 
 	/**
-	 * Creates a wavelet transform for images that are of type {@link ImageFloat32}.
+	 * Creates a wavelet transform for images that are of type {@link GrayF32}.
 	 *
 	 * @param waveletDesc Description of the wavelet.
 	 * @param numLevels Number of levels in the multi-level transform.
@@ -84,7 +84,7 @@ public class FactoryWaveletTransform {
 	 * @return The transform class.
 	 */
 	public static
-	WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32>
+	WaveletTransform<GrayF32, GrayF32,WlCoef_F32>
 	create_F32( WaveletDescription<WlCoef_F32> waveletDesc ,
 				int numLevels, float minPixelValue , float maxPixelValue )
 	{

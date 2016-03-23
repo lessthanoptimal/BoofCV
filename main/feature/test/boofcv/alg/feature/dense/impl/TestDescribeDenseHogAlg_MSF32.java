@@ -19,21 +19,21 @@
 package boofcv.alg.feature.dense.impl;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribeDenseHogAlg_MSF32 extends GenericDescribeDenseHogAlgChecks<MultiSpectral<ImageFloat32>>
+public class TestDescribeDenseHogAlg_MSF32 extends GenericDescribeDenseHogAlgChecks<Planar<GrayF32>>
 {
 	public TestDescribeDenseHogAlg_MSF32() {
-		super(ImageType.ms(3, ImageFloat32.class));
+		super(ImageType.ms(3, GrayF32.class));
 	}
 
 	@Override
-	public DescribeDenseHogAlg<MultiSpectral<ImageFloat32>,?>
+	public DescribeDenseHogAlg<Planar<GrayF32>,?>
 	createAlg(int orientationBins, int widthCell, int widthBlock , int stepBlock)
 	{
 		return new DescribeDenseHogAlg_MSF32(orientationBins,widthCell,widthBlock,stepBlock,3);

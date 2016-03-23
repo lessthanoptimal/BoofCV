@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.filter.convolve;
 
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.KernelBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class GenericConvolveDown<Input extends ImageSingleBand, Output extends ImageSingleBand>
+public class GenericConvolveDown<Input extends ImageGray, Output extends ImageGray>
 	implements ConvolveInterface<Input,Output>
 {
 	Method m;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,18 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Applies a fixed threshold to an image.
  *
- * @see boofcv.alg.filter.binary.GThresholdImageOps#threshold(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, double, boolean)
+ * @see boofcv.alg.filter.binary.GThresholdImageOps#threshold(ImageGray, GrayU8, double, boolean)
  *
  * @author Peter Abeles
  */
-public class GlobalFixedBinaryFilter<T extends ImageSingleBand> implements InputToBinary<T> {
+public class GlobalFixedBinaryFilter<T extends ImageGray> implements InputToBinary<T> {
 
 	ImageType<T> inputType;
 
@@ -47,7 +47,7 @@ public class GlobalFixedBinaryFilter<T extends ImageSingleBand> implements Input
 	}
 
 	@Override
-	public void process(T input, ImageUInt8 output) {
+	public void process(T input, GrayU8 output) {
 		GThresholdImageOps.threshold(input,output,threshold,down);
 	}
 
@@ -67,7 +67,7 @@ public class GlobalFixedBinaryFilter<T extends ImageSingleBand> implements Input
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getOutputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getOutputType() {
+		return ImageType.single(GrayU8.class);
 	}
 }

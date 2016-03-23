@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import org.junit.Test;
 
@@ -37,28 +37,28 @@ public class TestImplOrientationImageAverageIntegral {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
 
 		double scale = 1.0/radiusToScale;
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg = 
-				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,ImageFloat32.class);
+		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
+				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,GrayF32.class);
 
-		tests.setup(angleTol, (int)Math.round(scale*period+r) , alg,ImageFloat32.class);
+		tests.setup(angleTol, (int)Math.round(scale*period+r) , alg,GrayF32.class);
 		tests.checkSubImages();
 		tests.performAll();
 	}
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<ImageFloat32> tests = new GenericOrientationIntegralTests<ImageFloat32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
 
 		double scale = 1.0/radiusToScale;
 
-		OrientationIntegralBase<ImageFloat32,GradientValue_F32> alg =
-				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,ImageFloat32.class);
+		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
+				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,GrayF32.class);
 
-		tests.setup(angleTol, (int)Math.round(scale*period+r) ,alg,ImageFloat32.class);
+		tests.setup(angleTol, (int)Math.round(scale*period+r) ,alg,GrayF32.class);
 		tests.performAll();
 	}
 }

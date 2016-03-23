@@ -53,9 +53,9 @@ public class GConvertImage {
 	 */
 	public static void convert( ImageBase input , ImageBase output ) {
 
-		if( input instanceof ImageSingleBand ) {
-			ImageSingleBand sb = (ImageSingleBand)input;
-			if( output instanceof ImageSingleBand ) {
+		if( input instanceof ImageGray) {
+			ImageGray sb = (ImageGray)input;
+			if( output instanceof ImageGray) {
 				if (input.getClass() == output.getClass()) {
 					output.setTo(input);
 				} else {
@@ -66,8 +66,8 @@ public class GConvertImage {
 						throw new IllegalArgumentException("Unknown conversion");
 					}
 				}
-			} else if( output instanceof MultiSpectral ) {
-				MultiSpectral ms = (MultiSpectral)output;
+			} else if( output instanceof Planar) {
+				Planar ms = (Planar)output;
 				for (int i = 0; i < ms.getNumBands(); i++) {
 					convert(input,ms.getBand(i));
 				}
@@ -88,29 +88,29 @@ public class GConvertImage {
 					throw new IllegalArgumentException("Unknown conversion");
 				}
 			}
-		} else if( input instanceof MultiSpectral && output instanceof ImageSingleBand )  {
-			MultiSpectral mi = (MultiSpectral)input;
-			ImageSingleBand so = (ImageSingleBand)output;
+		} else if( input instanceof Planar && output instanceof ImageGray)  {
+			Planar mi = (Planar)input;
+			ImageGray so = (ImageGray)output;
 
 			if( mi.getImageType().getDataType() != so.getDataType() ) {
 				int w = output.width;
 				int h = output.height;
-				ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
+				ImageGray tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
 				average(mi,tmp);
 				convert(tmp,so);
 			} else {
 				average(mi,so);
 			}
-		} else if( input instanceof MultiSpectral && output instanceof ImageInterleaved )  {
+		} else if( input instanceof Planar && output instanceof ImageInterleaved )  {
 			try {
 				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Unknown conversion");
 			}
-		} else if( input instanceof MultiSpectral && output instanceof MultiSpectral ) {
-			MultiSpectral mi = (MultiSpectral) input;
-			MultiSpectral mo = (MultiSpectral) output;
+		} else if( input instanceof Planar && output instanceof Planar) {
+			Planar mi = (Planar) input;
+			Planar mo = (Planar) output;
 
 			if (mi.getBandType() == mo.getBandType()) {
 				mo.setTo(mi);
@@ -119,21 +119,21 @@ public class GConvertImage {
 					convert(mi.getBand(i), mo.getBand(i));
 				}
 			}
-		} else if( input instanceof ImageInterleaved && output instanceof MultiSpectral )  {
+		} else if( input instanceof ImageInterleaved && output instanceof Planar)  {
 			try {
 				Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Unknown conversion");
 			}
-		} else if( input instanceof ImageInterleaved && output instanceof ImageSingleBand )  {
+		} else if( input instanceof ImageInterleaved && output instanceof ImageGray)  {
 			ImageInterleaved mb = (ImageInterleaved)input;
-			ImageSingleBand so = (ImageSingleBand)output;
+			ImageGray so = (ImageGray)output;
 
 			if( mb.getImageType().getDataType() != so.getDataType() ) {
 				int w = output.width;
 				int h = output.height;
-				ImageSingleBand tmp = GeneralizedImageOps.createSingleBand(mb.getImageType().getDataType(),w,h);
+				ImageGray tmp = GeneralizedImageOps.createSingleBand(mb.getImageType().getDataType(),w,h);
 				average(mb,tmp);
 				convert(tmp,so);
 			} else {
@@ -147,62 +147,62 @@ public class GConvertImage {
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 *
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageSingleBand>T average( MultiSpectral<T> input , T output ) {
+	public static <T extends ImageGray>T average(Planar<T> input , T output ) {
 		Class type = input.getBandType();
-		if( type == ImageUInt8.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageUInt8>)input,(ImageUInt8)output);
-		} else if( type == ImageSInt8.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageSInt8>)input,(ImageSInt8)output);
-		} else if( type == ImageUInt16.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageUInt16>)input,(ImageUInt16)output);
-		} else if( type == ImageSInt16.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageSInt16>)input,(ImageSInt16)output);
-		} else if( type == ImageSInt32.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageSInt32>)input,(ImageSInt32)output);
-		} else if( type == ImageSInt64.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageSInt64>)input,(ImageSInt64)output);
-		} else if( type == ImageFloat32.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageFloat32>)input,(ImageFloat32)output);
-		} else if( type == ImageFloat64.class ) {
-			return (T)ConvertImage.average((MultiSpectral<ImageFloat64>)input,(ImageFloat64)output);
+		if( type == GrayU8.class ) {
+			return (T)ConvertImage.average((Planar<GrayU8>)input,(GrayU8)output);
+		} else if( type == GrayS8.class ) {
+			return (T)ConvertImage.average((Planar<GrayS8>)input,(GrayS8)output);
+		} else if( type == GrayU16.class ) {
+			return (T)ConvertImage.average((Planar<GrayU16>)input,(GrayU16)output);
+		} else if( type == GrayS16.class ) {
+			return (T)ConvertImage.average((Planar<GrayS16>)input,(GrayS16)output);
+		} else if( type == GrayS32.class ) {
+			return (T)ConvertImage.average((Planar<GrayS32>)input,(GrayS32)output);
+		} else if( type == GrayS64.class ) {
+			return (T)ConvertImage.average((Planar<GrayS64>)input,(GrayS64)output);
+		} else if( type == GrayF32.class ) {
+			return (T)ConvertImage.average((Planar<GrayF32>)input,(GrayF32)output);
+		} else if( type == GrayF64.class ) {
+			return (T)ConvertImage.average((Planar<GrayF64>)input,(GrayF64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+type.getSimpleName());
 		}
 	}
 
 	/**
-	 * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel
+	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 *
 	 * @param input Input MultiSpectral image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageSingleBand>T average( ImageInterleaved input , T output ) {
+	public static <T extends ImageGray>T average(ImageInterleaved input , T output ) {
 		ImageDataType type = input.getImageType().getDataType();
 		if( type == ImageDataType.U8) {
-			return (T)ConvertImage.average((InterleavedU8)input,(ImageUInt8)output);
+			return (T)ConvertImage.average((InterleavedU8)input,(GrayU8)output);
 		} else if( type == ImageDataType.S8) {
-			return (T)ConvertImage.average((InterleavedS8)input,(ImageSInt8)output);
+			return (T)ConvertImage.average((InterleavedS8)input,(GrayS8)output);
 		} else if( type == ImageDataType.U16 ) {
-			return (T)ConvertImage.average((InterleavedU16)input,(ImageUInt16)output);
+			return (T)ConvertImage.average((InterleavedU16)input,(GrayU16)output);
 		} else if( type == ImageDataType.S16 ) {
-			return (T)ConvertImage.average((InterleavedS16)input,(ImageSInt16)output);
+			return (T)ConvertImage.average((InterleavedS16)input,(GrayS16)output);
 		} else if( type == ImageDataType.S32 ) {
-			return (T)ConvertImage.average((InterleavedS32)input,(ImageSInt32)output);
+			return (T)ConvertImage.average((InterleavedS32)input,(GrayS32)output);
 		} else if( type == ImageDataType.S64 ) {
-			return (T)ConvertImage.average((InterleavedS64)input,(ImageSInt64)output);
+			return (T)ConvertImage.average((InterleavedS64)input,(GrayS64)output);
 		} else if( type == ImageDataType.F32 ) {
-			return (T)ConvertImage.average((InterleavedF32)input,(ImageFloat32)output);
+			return (T)ConvertImage.average((InterleavedF32)input,(GrayF32)output);
 		} else if( type == ImageDataType.F64 ) {
-			return (T)ConvertImage.average((InterleavedF64)input,(ImageFloat64)output);
+			return (T)ConvertImage.average((InterleavedF64)input,(GrayF64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}
@@ -217,33 +217,33 @@ public class GConvertImage {
 	 * @param output (Optional) Storage for the output image.  Can be null.
 	 * @return The converted output image.
 	 */
-	public static ImageUInt8 convert(ImageSingleBand input , double min , double max , int numValues , ImageUInt8 output )
+	public static GrayU8 convert(ImageGray input , double min , double max , int numValues , GrayU8 output )
 	{
 		// see if it can use the faster straight forward convert
 		if( min == 0 && max == 255 && numValues == 256 ) {
 			if( output == null )
-				output = new ImageUInt8(input.width,input.height);
+				output = new GrayU8(input.width,input.height);
 			convert(input,output);
 			return output;
 		}
 
 		ImageDataType type = input.getImageType().getDataType();
 		if( type == ImageDataType.U8) {
-			return ConvertImage.convert((ImageUInt8)input,(int)min,(int)max,numValues,output);
+			return ConvertImage.convert((GrayU8)input,(int)min,(int)max,numValues,output);
 		} else if( type == ImageDataType.S8) {
-			return ConvertImage.convert((ImageSInt8)input,(int)min,(int)max,numValues,output);
+			return ConvertImage.convert((GrayS8)input,(int)min,(int)max,numValues,output);
 		} else if( type == ImageDataType.U16 ) {
-			return ConvertImage.convert((ImageUInt16)input,(int)min,(int)max,numValues,output);
+			return ConvertImage.convert((GrayU16)input,(int)min,(int)max,numValues,output);
 		} else if( type == ImageDataType.S16 ) {
-			return ConvertImage.convert((ImageSInt16)input,(int)min,(int)max,numValues,output);
+			return ConvertImage.convert((GrayS16)input,(int)min,(int)max,numValues,output);
 		} else if( type == ImageDataType.S32 ) {
-			return ConvertImage.convert((ImageSInt32)input,(int)min,(int)max,numValues,output);
+			return ConvertImage.convert((GrayS32)input,(int)min,(int)max,numValues,output);
 		} else if( type == ImageDataType.S64 ) {
-			return ConvertImage.convert((ImageSInt64)input,(long)min,(long)max,numValues,output);
+			return ConvertImage.convert((GrayS64)input,(long)min,(long)max,numValues,output);
 		} else if( type == ImageDataType.F32 ) {
-			return ConvertImage.convert((ImageFloat32)input,(float)min,(float)max,numValues,output);
+			return ConvertImage.convert((GrayF32)input,(float)min,(float)max,numValues,output);
 		} else if( type == ImageDataType.F64 ) {
-			return ConvertImage.convert((ImageFloat64)input,min,max,numValues,output);
+			return ConvertImage.convert((GrayF64)input,min,max,numValues,output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}

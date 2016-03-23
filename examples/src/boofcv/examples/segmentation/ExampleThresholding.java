@@ -26,8 +26,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -47,8 +47,8 @@ public class ExampleThresholding {
 		BufferedImage image = UtilImageIO.loadImage(imageName);
 
 		// convert into a usable format
-		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
-		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
+		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
+		GrayU8 binary = new GrayU8(input.width,input.height);
 
 		// Display multiple images in the same window
 		ListDisplayPanel gui = new ListDisplayPanel();

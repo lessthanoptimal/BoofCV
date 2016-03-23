@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.transform.wavelet;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;
 import boofcv.core.image.border.BorderIndex1D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
@@ -57,9 +57,9 @@ public class CommonFactoryWavelet {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
-			ImageFloat32 orig = new ImageFloat32(width-makeOdd,height-makeOdd);
-			ImageFloat32 tran = new ImageFloat32(width,height);
-			ImageFloat32 rev = new ImageFloat32(width-makeOdd,height-makeOdd);
+			GrayF32 orig = new GrayF32(width-makeOdd,height-makeOdd);
+			GrayF32 tran = new GrayF32(width,height);
+			GrayF32 rev = new GrayF32(width-makeOdd,height-makeOdd);
 
 			ImageMiscOps.fillUniform(orig,rand,0,50);
 
@@ -96,9 +96,9 @@ public class CommonFactoryWavelet {
 
 		// test both even and odd images
 		for( int makeOdd = 0; makeOdd <= 1; makeOdd++ ) {
-			ImageSInt32 orig = new ImageSInt32(width-makeOdd,height-makeOdd);
-			ImageSInt32 tran = new ImageSInt32(width,height);
-			ImageSInt32 rev = new ImageSInt32(width-makeOdd,height-makeOdd);
+			GrayS32 orig = new GrayS32(width-makeOdd,height-makeOdd);
+			GrayS32 tran = new GrayS32(width,height);
+			GrayS32 rev = new GrayS32(width-makeOdd,height-makeOdd);
 
 			ImageMiscOps.fillUniform(orig,rand,-50,50);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,23 +19,24 @@
 package boofcv.alg.flow;
 
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation of {@link HornSchunck} for {@link boofcv.struct.image.ImageFloat32}.
+ * Implementation of {@link HornSchunck} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
+public class HornSchunck_U8 extends HornSchunck<GrayU8,GrayS16> {
 
 	public HornSchunck_U8(float alpha, int numIterations) {
-		super(alpha,numIterations, ImageType.single(ImageSInt16.class));
+		super(alpha,numIterations, ImageType.single(GrayS16.class));
 	}
 
 	@Override
-	protected void computeDerivX(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 derivX) {
+	protected void computeDerivX(GrayU8 image1, GrayU8 image2, GrayS16 derivX) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -67,7 +68,7 @@ public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 	}
 
 	@Override
-	protected void computeDerivY(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 derivY) {
+	protected void computeDerivY(GrayU8 image1, GrayU8 image2, GrayS16 derivY) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -99,7 +100,7 @@ public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 	}
 
 	@Override
-	protected void computeDerivT(ImageUInt8 image1, ImageUInt8 image2, ImageSInt16 difference) {
+	protected void computeDerivT(GrayU8 image1, GrayU8 image2, GrayS16 difference) {
 		int w = image1.width-1;
 		int h = image1.height-1;
 
@@ -127,8 +128,8 @@ public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 		}
 	}
 
-	protected static void borderDerivT(ImageUInt8 imageA , ImageUInt8 imageB ,
-									   ImageSInt16 difference, int x, int y) {
+	protected static void borderDerivT(GrayU8 imageA , GrayU8 imageB ,
+									   GrayS16 difference, int x, int y) {
 		float d0 = getBorderT(imageA, imageB, x    , y    );
 		float d1 = getBorderT(imageA, imageB, x + 1, y    );
 		float d2 = getBorderT(imageA, imageB, x    , y + 1);
@@ -137,7 +138,7 @@ public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 		difference.unsafe_set(x,y, (short)((d0+d1+d2+d3)/4));
 	}
 
-	protected static float getBorderT(ImageUInt8 imageA, ImageUInt8 imageB, int x, int y) {
+	protected static float getBorderT(GrayU8 imageA, GrayU8 imageB, int x, int y) {
 		if( x < 0 ) x = 0;
 		else if( x >= imageA.width ) x = imageA.width-1;
 		if( y < 0 ) y = 0;
@@ -147,8 +148,8 @@ public class HornSchunck_U8 extends HornSchunck<ImageUInt8,ImageSInt16> {
 	}
 
 	@Override
-	protected void findFlow( ImageSInt16 derivX , ImageSInt16 derivY ,
-							 ImageSInt16 derivT , ImageFlow output) {
+	protected void findFlow(GrayS16 derivX , GrayS16 derivY ,
+							GrayS16 derivT , ImageFlow output) {
 
 		int N = output.width*output.height;
 

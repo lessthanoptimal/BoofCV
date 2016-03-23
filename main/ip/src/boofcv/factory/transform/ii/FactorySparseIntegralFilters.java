@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.factory.transform.ii;
 
 import boofcv.alg.transform.ii.impl.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.SparseScaleGradient;
 import boofcv.struct.sparse.SparseScaleSample_F64;
 
@@ -33,31 +33,31 @@ import boofcv.struct.sparse.SparseScaleSample_F64;
  */
 public class FactorySparseIntegralFilters {
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SparseScaleSample_F64<T> sample( Class<T> imageType ) {
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (SparseScaleSample_F64<T>)new SparseIntegralSample_F32();
-		else if( imageType == ImageSInt32.class )
+		else if( imageType == GrayS32.class )
 			return (SparseScaleSample_F64<T>)new SparseIntegralSample_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SparseScaleGradient<T,?> gradient( Class<T> imageType ) {
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_F32();
-		else if( imageType == ImageSInt32.class )
+		else if( imageType == GrayS32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralGradient_NoBorder_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	SparseScaleGradient<T,?> haar( Class<T> imageType ) {
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_F32();
-		else if( imageType == ImageSInt32.class )
+		else if( imageType == GrayS32.class )
 			return (SparseScaleGradient<T,?>)new SparseIntegralHaar_NoBorder_I32();
 		else
 			throw new IllegalArgumentException("Unsupported image type: "+imageType.getSimpleName());

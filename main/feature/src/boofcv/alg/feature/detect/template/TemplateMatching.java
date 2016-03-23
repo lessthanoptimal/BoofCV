@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.feature.Match;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
@@ -105,7 +105,7 @@ public class TemplateMatching<T extends ImageBase> {
 		else
 			match.process(image,template,mask);
 
-		ImageFloat32 intensity = match.getIntensity();
+		GrayF32 intensity = match.getIntensity();
 		int offsetX = 0;
 		int offsetY = 0;
 

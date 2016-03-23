@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
@@ -45,10 +45,10 @@ public class TestTldFernClassifier {
 
 	Random rand = new Random(234);
 
-	ImageUInt8 input = new ImageUInt8(width,height);
+	GrayU8 input = new GrayU8(width,height);
 
-	InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(
-			ImageUInt8.class, BorderType.EXTENDED);
+	InterpolatePixelS<GrayU8> interpolate = FactoryInterpolation.bilinearPixelS(
+			GrayU8.class, BorderType.EXTENDED);
 
 	public TestTldFernClassifier() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
@@ -57,7 +57,7 @@ public class TestTldFernClassifier {
 
 	@Test
 	public void learnFern() {
-		TldFernClassifier<ImageUInt8> alg = createAlg();
+		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.setImage(input);
 		alg.learnFern(true, new ImageRectangle(10,12,30,45));
@@ -81,7 +81,7 @@ public class TestTldFernClassifier {
 
 	@Test
 	public void learnFernNoise() {
-		TldFernClassifier<ImageUInt8> alg = createAlg();
+		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.setImage(input);
 		alg.learnFernNoise(true, new ImageRectangle(10,12,30,45));
@@ -127,7 +127,7 @@ public class TestTldFernClassifier {
 			expected[9-i] = valA < valB;
 		}
 
-		TldFernClassifier<ImageUInt8> alg = createAlg();
+		TldFernClassifier<GrayU8> alg = createAlg();
 		alg.setImage(input);
 
 		int found = alg.computeFernValue(cx,cy,r.getWidth(),r.getHeight(),fern);
@@ -159,7 +159,7 @@ public class TestTldFernClassifier {
 			expected[9-i] = valA < valB;
 		}
 
-		TldFernClassifier<ImageUInt8> alg = createAlg();
+		TldFernClassifier<GrayU8> alg = createAlg();
 		alg.setImage(input);
 
 		int found = alg.computeFernValueRand(cx,cy,w,h,fern);
@@ -177,7 +177,7 @@ public class TestTldFernClassifier {
 
 		@Test
 	public void renormalizeP() {
-			TldFernClassifier<ImageUInt8> alg = createAlg();
+			TldFernClassifier<GrayU8> alg = createAlg();
 
 			alg.maxP = 1000;
 			alg.managers[2].table[1] = new TldFernFeature();
@@ -192,7 +192,7 @@ public class TestTldFernClassifier {
 
 	@Test
 	public void renormalizeN() {
-		TldFernClassifier<ImageUInt8> alg = createAlg();
+		TldFernClassifier<GrayU8> alg = createAlg();
 
 		alg.maxN = 1000;
 		alg.managers[2].table[1] = new TldFernFeature();
@@ -205,10 +205,10 @@ public class TestTldFernClassifier {
 		assertEquals(expected,alg.managers[2].table[1].numN);
 	}
 
-	private TldFernClassifier<ImageUInt8> createAlg() {
-		InterpolatePixelS<ImageUInt8> interpolate = FactoryInterpolation.bilinearPixelS(
-				ImageUInt8.class, BorderType.EXTENDED);
-		return new TldFernClassifier<ImageUInt8>(rand,numFerns,8,numLearnRandom,10,interpolate);
+	private TldFernClassifier<GrayU8> createAlg() {
+		InterpolatePixelS<GrayU8> interpolate = FactoryInterpolation.bilinearPixelS(
+				GrayU8.class, BorderType.EXTENDED);
+		return new TldFernClassifier<GrayU8>(rand,numFerns,8,numLearnRandom,10,interpolate);
 	}
 
 	private int countNum( boolean positive , TldFernManager manager ) {

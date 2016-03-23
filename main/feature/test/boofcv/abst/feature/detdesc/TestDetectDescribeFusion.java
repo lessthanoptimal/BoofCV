@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class TestDetectDescribeFusion {
 
 		DetectDescribeFusion alg = new DetectDescribeFusion(detector,null,describe);
 
-		alg.detect(new ImageFloat32(2,2));
+		alg.detect(new GrayF32(2,2));
 
 		// one feature should not be inside the image
 		assertEquals(9, alg.getNumberOfFeatures());
@@ -66,12 +66,12 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithOrientation() {
-		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,ImageFloat32.class);
-		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
+		final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
+		final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+				FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 
-		new GenericTestsDetectDescribePoint(true,true, ImageType.single(ImageFloat32.class),BrightFeature.class) {
+		new GenericTestsDetectDescribePoint(true,true, ImageType.single(GrayF32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
@@ -82,11 +82,11 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithoutOrientation() {
-		final InterestPointDetector<ImageFloat32> detector = FactoryInterestPoint.fastHessian(null);
-		final DescribeRegionPoint<ImageFloat32,BrightFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, ImageFloat32.class);
+		final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+		final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+				FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 
-		new GenericTestsDetectDescribePoint(true,false, ImageType.single(ImageFloat32.class),BrightFeature.class) {
+		new GenericTestsDetectDescribePoint(true,false, ImageType.single(GrayF32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {

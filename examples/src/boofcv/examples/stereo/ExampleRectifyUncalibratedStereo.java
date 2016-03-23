@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;
@@ -67,14 +67,14 @@ public class ExampleRectifyUncalibratedStereo {
 	public static void rectify( DenseMatrix64F F , List<AssociatedPair> inliers ,
 								BufferedImage origLeft , BufferedImage origRight ) {
 		// Unrectified images
-		MultiSpectral<ImageFloat32> unrectLeft =
-				ConvertBufferedImage.convertFromMulti(origLeft, null,true, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> unrectRight =
-				ConvertBufferedImage.convertFromMulti(origRight, null,true, ImageFloat32.class);
+		Planar<GrayF32> unrectLeft =
+				ConvertBufferedImage.convertFromMulti(origLeft, null,true, GrayF32.class);
+		Planar<GrayF32> unrectRight =
+				ConvertBufferedImage.convertFromMulti(origRight, null,true, GrayF32.class);
 
 		// storage for rectified images
-		MultiSpectral<ImageFloat32> rectLeft = unrectLeft.createSameShape();
-		MultiSpectral<ImageFloat32> rectRight = unrectRight.createSameShape();
+		Planar<GrayF32> rectLeft = unrectLeft.createSameShape();
+		Planar<GrayF32> rectRight = unrectRight.createSameShape();
 
 		// Compute rectification
 		RectifyFundamental rectifyAlg = RectifyImageOps.createUncalibrated();
@@ -90,10 +90,10 @@ public class ExampleRectifyUncalibratedStereo {
 //		RectifyImageOps.allInsideLeft(origLeft.getWidth(),origLeft.getHeight(), rect1, rect2 );
 
 		// undistorted and rectify images
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(rect1, BorderType.SKIP, ImageFloat32.class);
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
-				RectifyImageOps.rectifyImage(rect2, BorderType.SKIP, ImageFloat32.class);
+		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
+				RectifyImageOps.rectifyImage(rect1, BorderType.SKIP, GrayF32.class);
+		ImageDistort<GrayF32,GrayF32> imageDistortRight =
+				RectifyImageOps.rectifyImage(rect2, BorderType.SKIP, GrayF32.class);
 
 		DistortImageOps.distortMS(unrectLeft, rectLeft, imageDistortLeft);
 		DistortImageOps.distortMS(unrectRight, rectRight, imageDistortRight);

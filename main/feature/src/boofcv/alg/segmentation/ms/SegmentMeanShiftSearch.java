@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.segmentation.ms;
 
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -84,11 +84,11 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	protected float maxColorDistanceSq;
 
 	// converts a pixel location into the index of the mode that mean-shift converged to
-	protected ImageSInt32 pixelToMode = new ImageSInt32(1,1);
+	protected GrayS32 pixelToMode = new GrayS32(1,1);
 
 	// Quick look up for the index of a mode from an image pixel.  It is possible for a pixel that is a mode
 	// to have mean-shift converge to a different pixel
-	protected ImageSInt32 quickMode = new ImageSInt32(1,1);
+	protected GrayS32 quickMode = new GrayS32(1,1);
 
 	// location of each peak in image pixel indexes
 	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
@@ -198,7 +198,7 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase> {
 	/**
 	 * From peak index to pixel index
 	 */
-	public ImageSInt32 getPixelToRegion() {
+	public GrayS32 getPixelToRegion() {
 		return pixelToMode;
 	}
 

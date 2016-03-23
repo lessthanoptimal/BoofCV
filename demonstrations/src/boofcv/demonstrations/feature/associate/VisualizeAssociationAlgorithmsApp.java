@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
+public class VisualizeAssociationAlgorithmsApp<T extends ImageGray>
 		extends SelectAlgorithmAndInputPanel
 {
 
@@ -75,7 +75,7 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
 		this.imageType = imageType;
 
 		detector = (DetectDescribePoint) FactoryDetectDescribe.surfStable(
-				new ConfigFastHessian(5, 4, 200, 1, 9, 4, 4), null, null, ImageFloat32.class);
+				new ConfigFastHessian(5, 4, 200, 1, 9, 4, 4), null, null, GrayF32.class);
 //		detector = (DetectDescribePoint) FactoryDetectDescribe.sift(4,1,false,200);
 
 		int DOF = detector.createDescription().size();
@@ -176,7 +176,7 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageSingleBand>
 	}
 
 	public static void main(String args[]) {
-		Class imageType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
 
 		VisualizeAssociationAlgorithmsApp app = new VisualizeAssociationAlgorithmsApp(imageType);
 

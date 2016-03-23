@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.feature.detect.interest.WrapFLPtoInterestPoint;
 import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.pyramid.PyramidFloat;
 
 /**
@@ -32,8 +32,8 @@ import boofcv.struct.pyramid.PyramidFloat;
 @SuppressWarnings("unchecked")
 public class TestWrapFLPtoInterestPoint extends GeneralInterestPointDetectorChecks {
 
-	Class imageType = ImageUInt8.class;
-	Class derivType = ImageSInt16.class;
+	Class imageType = GrayU8.class;
+	Class derivType = GrayS16.class;
 
 	double scales[] = new double[]{1.0,2.0,3.0,4.0};
 

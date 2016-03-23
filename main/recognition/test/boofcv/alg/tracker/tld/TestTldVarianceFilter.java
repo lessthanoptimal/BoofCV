@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.tracker.tld;
 
 import boofcv.alg.misc.ImageMiscOps;
@@ -21,10 +39,10 @@ public class TestTldVarianceFilter {
 
 	@Test
 	public void selectThreshold() {
-		ImageUInt8 image = new ImageUInt8(50,80);
+		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		TldVarianceFilter alg = new TldVarianceFilter(ImageUInt8.class);
+		TldVarianceFilter alg = new TldVarianceFilter(GrayU8.class);
 		alg.setImage(image);
 
 		alg.selectThreshold(new ImageRectangle(10,8,21,33));
@@ -37,10 +55,10 @@ public class TestTldVarianceFilter {
 
 	@Test
 	public void computeVariance() {
-		ImageUInt8 image = new ImageUInt8(50,80);
+		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		TldVarianceFilter alg = new TldVarianceFilter(ImageUInt8.class);
+		TldVarianceFilter alg = new TldVarianceFilter(GrayU8.class);
 		alg.setImage(image);
 
 		double found = alg.computeVariance(10,8,21,33);
@@ -52,7 +70,7 @@ public class TestTldVarianceFilter {
 
 	@Test
 	public void transformSq_U8() {
-		ImageUInt8 image = new ImageUInt8(50,80);
+		GrayU8 image = new GrayU8(50,80);
 		ImageMiscOps.fillUniform(image,rand,0,200);
 
 		// test a regular image and a sub-image
@@ -60,8 +78,8 @@ public class TestTldVarianceFilter {
 		transformSq_U8(BoofTesting.createSubImageOf(image));
 	}
 
-	public void transformSq_U8( ImageUInt8 image ) {
-		ImageSInt64 ii = new ImageSInt64(50,80);
+	public void transformSq_U8( GrayU8 image ) {
+		GrayS64 ii = new GrayS64(50,80);
 
 		TldVarianceFilter.transformSq(image,ii);
 
@@ -73,7 +91,7 @@ public class TestTldVarianceFilter {
 
 	@Test
 	public void transformSq_F32() {
-		ImageFloat32 image = new ImageFloat32(50,80);
+		GrayF32 image = new GrayF32(50,80);
 		ImageMiscOps.fillUniform(image,rand,0,100);
 
 		// test a regular image and a sub-image
@@ -81,8 +99,8 @@ public class TestTldVarianceFilter {
 		transformSq_F32(BoofTesting.createSubImageOf(image));
 	}
 
-	public void transformSq_F32( ImageFloat32 image ) {
-		ImageFloat64 ii = new ImageFloat64(50,80);
+	public void transformSq_F32( GrayF32 image ) {
+		GrayF64 ii = new GrayF64(50,80);
 
 		TldVarianceFilter.transformSq(image,ii);
 
@@ -92,7 +110,7 @@ public class TestTldVarianceFilter {
 		assertEquals(expected, found, 0.01);
 	}
 
-	public double computeSumSq( ImageSingleBand image , int x0 , int y0 , int x1 , int y1 ) {
+	public double computeSumSq(ImageGray image , int x0 , int y0 , int x1 , int y1 ) {
 
 		double total = 0;
 		for( int y = y0; y < y1; y++ ) {
@@ -106,7 +124,7 @@ public class TestTldVarianceFilter {
 		return total;
 	}
 
-	public double computeVariance( ImageSingleBand image , int x0 , int y0 , int x1 , int y1 ) {
+	public double computeVariance(ImageGray image , int x0 , int y0 , int x1 , int y1 ) {
 
 		double area = (x1-x0)*(y1-y0);
 

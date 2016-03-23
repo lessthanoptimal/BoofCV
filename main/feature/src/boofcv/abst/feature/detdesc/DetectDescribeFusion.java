@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -38,7 +38,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  *
  * @author Peter Abeles
  */
-public class DetectDescribeFusion<T extends ImageSingleBand, TD extends TupleDesc>
+public class DetectDescribeFusion<T extends ImageGray, TD extends TupleDesc>
 	implements DetectDescribePoint<T, TD>
 {
 	// detects interest points

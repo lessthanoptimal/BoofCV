@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * Alternative ordering for box vertical convolve
@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageFloat32;
  */
 public class ConvolveBoxAlt {
 
-	public static void vertical( ImageFloat32 input , ImageFloat32 output , int radius , boolean includeBorder ) {
+	public static void vertical(GrayF32 input , GrayF32 output , int radius , boolean includeBorder ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int startX = includeBorder ? 0 : radius;

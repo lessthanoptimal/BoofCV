@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.fiducial.square;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Arrays;
 
@@ -58,16 +58,16 @@ import java.util.Arrays;
  * @author Peter Abeles Original author/maintainer
  * @author Nathan Pahucki  Added the ability to use more than 4x4 grid for Capta360, <a href="mailto:npahucki@gmail.com"> npahucki@gmail.com</a>
  */
-public class DetectFiducialSquareBinary<T extends ImageSingleBand>
+public class DetectFiducialSquareBinary<T extends ImageGray>
 		extends BaseDetectFiducialSquare<T> {
 
 	// helper data structures for computing the value of each grid element
 	int[] counts, classified, tmp;
 
 	// converts the input image into a binary one
-	private ImageUInt8 binaryInner = new ImageUInt8(1,1);
+	private GrayU8 binaryInner = new GrayU8(1,1);
 	// storage for no border sub-image
-	private ImageFloat32 grayNoBorder = new ImageFloat32();
+	private GrayF32 grayNoBorder = new GrayF32();
 
 	// number of rows/columns in the encoded binary pattern
 	private int gridWidth;
@@ -116,7 +116,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result, double edgeInside, double edgeOutside) {
+	protected boolean processSquare(GrayF32 gray, Result result, double edgeInside, double edgeOutside) {
 		int off = (gray.width - binaryInner.width) / 2;
 		gray.subimage(off, off, off + binaryInner.width, off + binaryInner.width, grayNoBorder);
 
@@ -242,7 +242,7 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	/**
 	 * Converts the gray scale image into a binary number
 	 */
-	protected void findBitCounts(ImageFloat32 gray , double threshold ) {
+	protected void findBitCounts(GrayF32 gray , double threshold ) {
 		// compute binary image using an adaptive algorithm to handle shadows
 		ThresholdImageOps.threshold(gray,binaryInner,(float)threshold,true);
 
@@ -301,9 +301,9 @@ public class DetectFiducialSquareBinary<T extends ImageSingleBand>
 	}
 
 	// For troubleshooting.
-	public ImageFloat32 getGrayNoBorder() { return grayNoBorder; }
+	public GrayF32 getGrayNoBorder() { return grayNoBorder; }
 
-	public ImageUInt8 getBinaryInner() {
+	public GrayU8 getBinaryInner() {
 		return binaryInner;
 	}
 

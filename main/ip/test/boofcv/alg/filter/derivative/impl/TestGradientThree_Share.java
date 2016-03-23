@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -37,14 +37,14 @@ public class TestGradientThree_Share {
 
 	@Test
 	public void derivX_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
+		GrayF32 img = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
-		ImageFloat32 derivX = new ImageFloat32(width, height);
+		GrayF32 derivX = new GrayF32(width, height);
 
-		ImageFloat32 derivX2 = new ImageFloat32(width, height);
+		GrayF32 derivX2 = new GrayF32(width, height);
 
-		GradientThree_Standard.process(img, derivX2,new ImageFloat32(width,height));
+		GradientThree_Standard.process(img, derivX2,new GrayF32(width,height));
 		GradientThree_Share.derivX_F32(img, derivX);
 
 		BoofTesting.assertEqualsInner(derivX2, derivX, 1e-4f, 1, 1, true);

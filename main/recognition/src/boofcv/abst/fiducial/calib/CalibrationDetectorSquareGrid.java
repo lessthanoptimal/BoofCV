@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.List;
 public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 
 
-	DetectSquareGridFiducial<ImageFloat32> detect;
+	DetectSquareGridFiducial<GrayF32> detect;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -54,20 +54,20 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 
 		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
 
-		InputToBinary<ImageFloat32> inputToBinary =
-				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
+		InputToBinary<GrayF32> inputToBinary =
+				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
 
-		BinaryPolygonDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
+		BinaryPolygonDetector<GrayF32> detectorSquare =
+				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
-		detect = new DetectSquareGridFiducial<ImageFloat32>(config.numRows,config.numCols,
+		detect = new DetectSquareGridFiducial<GrayF32>(config.numRows,config.numCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
 		layoutPoints = createLayout(config.numRows, config.numCols, config.squareWidth,config.spaceWidth);
 	}
 
 	@Override
-	public boolean process(ImageFloat32 input) {
+	public boolean process(GrayF32 input) {
 
 		if( detect.process(input) )  {
 			detected = new CalibrationObservation();
@@ -134,7 +134,7 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 		return layoutPoints;
 	}
 
-	public DetectSquareGridFiducial<ImageFloat32> getAlgorithm() {
+	public DetectSquareGridFiducial<GrayF32> getAlgorithm() {
 		return detect;
 	}
 

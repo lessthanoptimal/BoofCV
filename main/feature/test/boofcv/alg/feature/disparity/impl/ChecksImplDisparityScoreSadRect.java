@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageSingleBand,Disparity extends ImageSingleBand> {
+public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Disparity extends ImageGray> {
 
 	Random rand = new Random(234);
 
@@ -46,7 +46,7 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageSingleB
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 
-		if( imageType == ImageUInt8.class || imageType == ImageSInt16.class ) {
+		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
 			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_S32_U8();
 		} else {
 			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_F32_U8();
@@ -126,7 +126,7 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageSingleB
 				new StereoDisparityWtoNaive<Image>(minDisparity,maxDisparity,radiusX,radiusY);
 
 		Disparity found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
-		ImageFloat32 expected = new ImageFloat32(w,h);
+		GrayF32 expected = new GrayF32(w,h);
 
 		alg.process(left,right,found);
 		naive.process(left,right,expected);

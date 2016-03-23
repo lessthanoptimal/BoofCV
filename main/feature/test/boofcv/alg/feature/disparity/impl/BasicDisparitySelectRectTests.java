@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.disparity.impl;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class BasicDisparitySelectRectTests <ArrayData , D extends ImageSingleBand> {
+public abstract class BasicDisparitySelectRectTests <ArrayData , D extends ImageGray> {
 
 	Class<ArrayData> arrayType;
 

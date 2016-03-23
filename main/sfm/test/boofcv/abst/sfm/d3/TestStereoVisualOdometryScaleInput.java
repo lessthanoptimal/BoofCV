@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -39,9 +39,9 @@ public class TestStereoVisualOdometryScaleInput {
 	int height = 320;
 
 	StereoParameters parameters;
-	ImageFloat32 leftImage;
-	ImageFloat32 rightImage;
-	ImageType<ImageFloat32> type = ImageType.single(ImageFloat32.class);
+	GrayF32 leftImage;
+	GrayF32 rightImage;
+	ImageType<GrayF32> type = ImageType.single(GrayF32.class);
 	boolean result;
 	boolean resetCalled = false;
 
@@ -51,7 +51,7 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<ImageFloat32> alg = new StereoVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 		alg.setCalibration(p);
 
 		assertEquals(320, parameters.left.width);
@@ -65,11 +65,11 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<ImageFloat32> alg = new StereoVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 		alg.setCalibration(p);
 
-		ImageFloat32 left = new ImageFloat32(width,height);
-		ImageFloat32 right = new ImageFloat32(width,height);
+		GrayF32 left = new GrayF32(width,height);
+		GrayF32 right = new GrayF32(width,height);
 
 		alg.process(left,right);
 
@@ -88,7 +88,7 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<ImageFloat32> alg = new StereoVisualOdometryScaleInput<ImageFloat32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
 
 		assertTrue(type == alg.getImageType());
 	}
@@ -106,7 +106,7 @@ public class TestStereoVisualOdometryScaleInput {
 		return ret;
 	}
 
-	protected class Dummy implements StereoVisualOdometry<ImageFloat32> {
+	protected class Dummy implements StereoVisualOdometry<GrayF32> {
 
 		@Override
 		public void setCalibration(StereoParameters p) {
@@ -114,14 +114,14 @@ public class TestStereoVisualOdometryScaleInput {
 		}
 
 		@Override
-		public boolean process(ImageFloat32 l, ImageFloat32 r) {
+		public boolean process(GrayF32 l, GrayF32 r) {
 			leftImage = l;
 			rightImage = r;
 			return result;
 		}
 
 		@Override
-		public ImageType<ImageFloat32> getImageType() {
+		public ImageType<GrayF32> getImageType() {
 			return type;
 		}
 

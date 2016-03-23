@@ -60,29 +60,29 @@ public class FactoryDistort {
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */
-	public static <Input extends ImageSingleBand, Output extends ImageSingleBand>
+	public static <Input extends ImageGray, Output extends ImageGray>
 	ImageDistort<Input, Output> distortSB(boolean cached, InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		if( cached ) {
-			if( outputType == ImageFloat32.class ) {
+			if( outputType == GrayF32.class ) {
 				return (ImageDistort<Input,Output>)new ImplImageDistortCache_F32(interp);
-			} else if( ImageSInt32.class.isAssignableFrom(outputType) ) {
+			} else if( GrayS32.class.isAssignableFrom(outputType) ) {
 				return (ImageDistort<Input,Output>)new ImplImageDistortCache_S32(interp);
-			} else if( ImageInt16.class.isAssignableFrom(outputType) ) {
+			} else if( GrayI16.class.isAssignableFrom(outputType) ) {
 				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I16(interp);
-			} else if( ImageInt8.class.isAssignableFrom(outputType) ) {
+			} else if( GrayI8.class.isAssignableFrom(outputType) ) {
 				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I8(interp);
 			} else {
 				throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
 			}
 		} else {
-			if (outputType == ImageFloat32.class) {
+			if (outputType == GrayF32.class) {
 				return (ImageDistort<Input, Output>) new ImplImageDistort_F32(interp);
-			} else if (ImageSInt32.class.isAssignableFrom(outputType)) {
+			} else if (GrayS32.class.isAssignableFrom(outputType)) {
 				return (ImageDistort<Input, Output>) new ImplImageDistort_S32(interp);
-			} else if (ImageInt16.class.isAssignableFrom(outputType)) {
+			} else if (GrayI16.class.isAssignableFrom(outputType)) {
 				return (ImageDistort<Input, Output>) new ImplImageDistort_I16(interp);
-			} else if (ImageInt8.class.isAssignableFrom(outputType)) {
+			} else if (GrayI8.class.isAssignableFrom(outputType)) {
 				return (ImageDistort<Input, Output>) new ImplImageDistort_I8(interp);
 			} else {
 				throw new IllegalArgumentException("Output type not supported: " + outputType.getSimpleName());
@@ -98,8 +98,8 @@ public class FactoryDistort {
 	 * @param interp Which interpolation algorithm should be used.
 	 * @param outputType Type of output image.
 	 */
-	public static <Input extends ImageSingleBand,Output extends ImageSingleBand>
-	ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>>
+	public static <Input extends ImageGray,Output extends ImageGray>
+	ImageDistort<Planar<Input>,Planar<Output>>
 	distortMS( boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		ImageDistort<Input, Output> distortSingle = distortSB(cached, interp, outputType);

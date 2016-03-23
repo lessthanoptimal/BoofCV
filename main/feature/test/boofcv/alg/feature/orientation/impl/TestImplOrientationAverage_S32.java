@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import org.junit.Test;
 
 
@@ -33,7 +33,7 @@ public class TestImplOrientationAverage_S32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
 
 		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,false);
 		alg.setSampleRadius(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationAverage_S32 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<ImageSInt32> tests = new GenericOrientationGradientTests<ImageSInt32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
 
 		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,true);
 		alg.setSampleRadius(r);

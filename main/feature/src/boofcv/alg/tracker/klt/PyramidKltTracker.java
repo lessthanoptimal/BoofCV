@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.klt;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -34,7 +34,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class PyramidKltTracker<InputImage extends ImageSingleBand, DerivativeImage extends ImageSingleBand> {
+public class PyramidKltTracker<InputImage extends ImageGray, DerivativeImage extends ImageGray> {
 
 	// basic KLT tracker which works on a single image
 	protected KltTracker<InputImage, DerivativeImage> tracker;

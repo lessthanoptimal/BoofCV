@@ -43,10 +43,10 @@ import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DenseMatrix64F;
@@ -83,8 +83,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		BufferedImage origRight = UtilImageIO.loadImage(imageDir, "mono_wall_02.jpg");
 
 		// Input images with lens distortion
-		ImageUInt8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (ImageUInt8) null);
-		ImageUInt8 distortedRight = ConvertBufferedImage.convertFrom(origRight, (ImageUInt8) null);
+		GrayU8 distortedLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8) null);
+		GrayU8 distortedRight = ConvertBufferedImage.convertFrom(origRight, (GrayU8) null);
 
 		// matched features between the two images
 		List<AssociatedPair> matchedFeatures = ExampleFundamentalMatrix.computeMatches(origLeft, origRight);
@@ -100,25 +100,25 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// Rectify and remove lens distortion for stereo processing
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3, 3);
-		ImageUInt8 rectifiedLeft = distortedLeft.createSameShape();
-		ImageUInt8 rectifiedRight = distortedRight.createSameShape();
+		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
+		GrayU8 rectifiedRight = distortedRight.createSameShape();
 
 		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic, rectifiedLeft, rectifiedRight, rectifiedK);
 
 		// compute disparity
-		StereoDisparity<ImageSInt16, ImageFloat32> disparityAlg =
+		StereoDisparity<GrayS16, GrayF32> disparityAlg =
 				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, ImageSInt16.class);
+						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, GrayS16.class);
 
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		ImageSInt16 derivLeft = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
-		ImageSInt16 derivRight = new ImageSInt16(rectifiedLeft.width,rectifiedLeft.height);
+		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
+		GrayS16 derivRight = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
 		LaplacianEdge.process(rectifiedLeft, derivLeft);
 		LaplacianEdge.process(rectifiedRight,derivRight);
 
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);
-		ImageFloat32 disparity = disparityAlg.getDisparity();
+		GrayF32 disparity = disparityAlg.getDisparity();
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
@@ -190,12 +190,12 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param rectifiedRight Output rectified image for right camera.
 	 * @param rectifiedK     Output camera calibration matrix for rectified camera
 	 */
-	public static void rectifyImages(ImageUInt8 distortedLeft,
-									 ImageUInt8 distortedRight,
+	public static void rectifyImages(GrayU8 distortedLeft,
+									 GrayU8 distortedRight,
 									 Se3_F64 leftToRight,
 									 IntrinsicParameters intrinsic,
-									 ImageUInt8 rectifiedLeft,
-									 ImageUInt8 rectifiedRight,
+									 GrayU8 rectifiedLeft,
+									 GrayU8 rectifiedRight,
 									 DenseMatrix64F rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
@@ -215,9 +215,9 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageUInt8,ImageUInt8> distortLeft =
+		ImageDistort<GrayU8,GrayU8> distortLeft =
 				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.SKIP, distortedLeft.getImageType());
-		ImageDistort<ImageUInt8,ImageUInt8> distortRight =
+		ImageDistort<GrayU8,GrayU8> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.SKIP, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft);
@@ -253,7 +253,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	/**
 	 * Show results as a point cloud
 	 */
-	public static void showPointCloud(ImageSingleBand disparity, BufferedImage left,
+	public static void showPointCloud(ImageGray disparity, BufferedImage left,
 									  Se3_F64 motion, DenseMatrix64F rectifiedK ,
 									  int minDisparity, int maxDisparity) {
 		PointCloudTiltPanel gui = new PointCloudTiltPanel();

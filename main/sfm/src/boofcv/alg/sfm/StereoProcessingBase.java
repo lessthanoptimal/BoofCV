@@ -26,7 +26,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
@@ -39,7 +39,7 @@ import org.ejml.data.DenseMatrix64F;
  *
  * @author Peter Abeles
  */
-public class StereoProcessingBase<T extends ImageSingleBand> {
+public class StereoProcessingBase<T extends ImageGray> {
 
 	// applied rectification to input images
 	private ImageDistort<T,T> distortLeftRect;

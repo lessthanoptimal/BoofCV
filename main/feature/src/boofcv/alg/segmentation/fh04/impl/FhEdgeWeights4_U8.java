@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.alg.segmentation.fh04.FhEdgeWeights;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
 import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edge;
@@ -34,10 +34,10 @@ import static boofcv.alg.segmentation.fh04.SegmentFelzenszwalbHuttenlocher04.Edg
  *
  * @author Peter Abeles
  */
-public class FhEdgeWeights4_U8 implements FhEdgeWeights<ImageUInt8> {
+public class FhEdgeWeights4_U8 implements FhEdgeWeights<GrayU8> {
 
 	@Override
-	public void process(ImageUInt8 input,
+	public void process(GrayU8 input,
 						FastQueue<Edge> edges) {
 
 		int w = input.width-1;
@@ -75,7 +75,7 @@ public class FhEdgeWeights4_U8 implements FhEdgeWeights<ImageUInt8> {
 		}
 	}
 	private void checkAround( int x , int y ,
-							  ImageUInt8 input ,
+							  GrayU8 input ,
 							  FastQueue<Edge> edges )
 	{
 		int indexSrc = input.startIndex + y*input.stride + x;
@@ -88,7 +88,7 @@ public class FhEdgeWeights4_U8 implements FhEdgeWeights<ImageUInt8> {
 	}
 
 	private void check( int x , int y , int color0 , int indexA,
-						ImageUInt8 input ,
+						GrayU8 input ,
 						FastQueue<Edge> edges ) {
 		if( !input.isInBounds(x,y) )
 			return;
@@ -106,8 +106,8 @@ public class FhEdgeWeights4_U8 implements FhEdgeWeights<ImageUInt8> {
 	}
 
 	@Override
-	public ImageType<ImageUInt8> getInputType() {
-		return ImageType.single(ImageUInt8.class);
+	public ImageType<GrayU8> getInputType() {
+		return ImageType.single(GrayU8.class);
 	}
 
 }

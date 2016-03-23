@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,8 @@ import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 
 import java.awt.*;
@@ -134,7 +134,7 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 	public static void main( String args[] ) {
 
-		ImageType type = ImageType.ms(3,ImageFloat32.class);
+		ImageType type = ImageType.ms(3,GrayF32.class);
 //		ImageType type = ImageType.ms(3,ImageUInt8.class);
 //		ImageType type = ImageType.single(ImageUInt8.class);
 //		ImageType type = ImageType.il(3, InterleavedF32.class);

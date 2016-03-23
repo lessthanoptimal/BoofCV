@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Converts an implementation of {@link OrientationIntegral} into {@link OrientationImage}.
  *
  * @author Peter Abeles
  */
-public class OrientationIntegralToImage<T extends ImageSingleBand, II extends ImageSingleBand>
+public class OrientationIntegralToImage<T extends ImageGray, II extends ImageGray>
 	implements OrientationImage<T>
 {
 	// algorithm which is being wrapped around

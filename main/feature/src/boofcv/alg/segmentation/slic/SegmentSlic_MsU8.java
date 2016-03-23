@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,19 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
- * Implementation of {@link SegmentSlic} for image of type {@link MultiSpectral} of type {@link ImageUInt8}.
+ * Implementation of {@link SegmentSlic} for image of type {@link Planar} of type {@link GrayU8}.
  *
  * @author Peter Abeles
  */
-public class SegmentSlic_MsU8 extends SegmentSlic<MultiSpectral<ImageUInt8>> {
+public class SegmentSlic_MsU8 extends SegmentSlic<Planar<GrayU8>> {
 	public SegmentSlic_MsU8(int numberOfRegions, float m, int totalIterations,
 							ConnectRule connectRule , int numBands) {
-		super(numberOfRegions, m , totalIterations, connectRule,ImageType.ms(numBands, ImageUInt8.class));
+		super(numberOfRegions, m , totalIterations, connectRule,ImageType.ms(numBands, GrayU8.class));
 	}
 
 	@Override

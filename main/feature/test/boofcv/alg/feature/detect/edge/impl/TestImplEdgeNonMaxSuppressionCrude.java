@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -55,10 +55,10 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 	{
 		Class derivType = m.getParameterTypes()[1];
 
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output = new GrayF32(width,height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		input.set(2,2,20);
 		input.set(1,1,30);
@@ -112,8 +112,8 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		BoofTesting.checkSubImage(this, "inner", true, m, input, derivX, derivY, output, false);
 	}
 
-	public static <D extends ImageSingleBand>
-	void inner( Method m , ImageFloat32 input , D derivX , D derivY , ImageFloat32 output , Boolean suppressed )
+	public static <D extends ImageGray>
+	void inner(Method m , GrayF32 input , D derivX , D derivY , GrayF32 output , Boolean suppressed )
 	{
 		try {
 			m.invoke(null,input,derivX,derivY,output);
@@ -138,16 +138,16 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 	{
 		Class derivType = m.getParameterTypes()[1];
 
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 output = new ImageFloat32(width,height);
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output = new GrayF32(width,height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
 		BoofTesting.checkSubImage(this, "border", true, m, input, derivX, derivY, output );
 	}
 
-	public static <D extends ImageSingleBand>
-	void border( Method m , ImageFloat32 input , D derivX , D derivY , ImageFloat32 output )
+	public static <D extends ImageGray>
+	void border(Method m , GrayF32 input , D derivX , D derivY , GrayF32 output )
 	{
 		Random rand = new Random(123);
 		GImageMiscOps.fillUniform(input, rand, 0, 30);

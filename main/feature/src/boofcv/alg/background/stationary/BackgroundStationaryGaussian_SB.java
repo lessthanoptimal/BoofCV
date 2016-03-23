@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,18 +28,18 @@ import boofcv.core.image.GImageSingleBand;
 import boofcv.struct.image.*;
 
 /**
- * Implementation of {@link BackgroundMovingGaussian} for {@link ImageSingleBand}.
+ * Implementation of {@link BackgroundMovingGaussian} for {@link ImageGray}.
  *
  * @author Peter Abeles
  */
-public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
+public class BackgroundStationaryGaussian_SB<T extends ImageGray>
 		extends BackgroundStationaryGaussian<T>
 {
 	// wrappers which provide abstraction across image types
 	protected GImageSingleBand inputWrapper;
 
 	// background is composed of two channels.  0 = mean, 1 = variance
-	MultiSpectral<ImageFloat32> background = new MultiSpectral<ImageFloat32>(ImageFloat32.class,1,1,2);
+	Planar<GrayF32> background = new Planar<GrayF32>(GrayF32.class,1,1,2);
 
 	/**
 	 * Configurations background removal.
@@ -75,8 +75,8 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 
 		float minusLearn = 1.0f - learnRate;
 
-		ImageFloat32 backgroundMean = background.getBand(0);
-		ImageFloat32 backgroundVar = background.getBand(1);
+		GrayF32 backgroundMean = background.getBand(0);
+		GrayF32 backgroundVar = background.getBand(1);
 
 		int indexBG = 0;
 		for (int y = 0; y < background.height; y++) {
@@ -99,7 +99,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 	}
 
 	@Override
-	public void segment( T frame, ImageUInt8 segmented) {
+	public void segment( T frame, GrayU8 segmented) {
 		if( background.width == 1 ) {
 			ImageMiscOps.fill(segmented, unknownValue);
 			return;
@@ -107,8 +107,8 @@ public class BackgroundStationaryGaussian_SB<T extends ImageSingleBand>
 		InputSanityCheck.checkSameShape(background,frame,segmented);
 		inputWrapper.wrap(frame);
 
-		ImageFloat32 backgroundMean = background.getBand(0);
-		ImageFloat32 backgroundVar = background.getBand(1);
+		GrayF32 backgroundMean = background.getBand(0);
+		GrayF32 backgroundVar = background.getBand(1);
 
 		int indexBG = 0;
 		for (int y = 0; y < frame.height; y++) {

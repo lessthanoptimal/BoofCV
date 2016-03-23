@@ -19,17 +19,17 @@
 package boofcv.alg.feature.dense.impl;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation pf {@link DescribeDenseHogAlg} for {@link ImageFloat32}.
+ * Implementation pf {@link DescribeDenseHogAlg} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogAlg_F32 extends DescribeDenseHogAlg<ImageFloat32,ImageFloat32> {
+public class DescribeDenseHogAlg_F32 extends DescribeDenseHogAlg<GrayF32,GrayF32> {
 	public DescribeDenseHogAlg_F32(int orientationBins, int widthCell, int widthBlock, int stepBlock) {
-		super(orientationBins, widthCell, widthBlock, stepBlock, ImageType.single(ImageFloat32.class));
+		super(orientationBins, widthCell, widthBlock, stepBlock, ImageType.single(GrayF32.class));
 	}
 
 	@Override

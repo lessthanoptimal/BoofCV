@@ -6,6 +6,11 @@ Date Format: year/month/day
 Date    : 2016/
 Version : 0.23
 
+- Refactored image data structure names for consistency and brevity
+  * Sorry for the massive refactoring
+  * ImageUInt8 -> GrayU8
+  * MultiSpectral -> Planar
+  * Interleaved is unchanged
 - Removed Alpha from version name since it was pointless and non-informative
   * Will hit 1.0 once a (good) face detector is added
 - Updated dense descriptor configurations to include a default sampling period

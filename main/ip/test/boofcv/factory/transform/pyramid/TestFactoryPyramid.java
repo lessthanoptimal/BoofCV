@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.factory.transform.pyramid;
 
 import boofcv.alg.transform.pyramid.PyramidFloatGaussianScale;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class TestFactoryPyramid {
 	public void scaleSpace() {
 		double ss[] = new double[]{1,2,4,6,8,10};
 
-		PyramidFloat<ImageFloat32> pyramid = FactoryPyramid.scaleSpacePyramid(ss, ImageFloat32.class);
+		PyramidFloat<GrayF32> pyramid = FactoryPyramid.scaleSpacePyramid(ss, GrayF32.class);
 
 		for( int i = 0; i < ss.length; i++ ) {
 			assertEquals(ss[i],pyramid.getSigma(i),1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -40,10 +40,10 @@ public class TestSiftScaleSpace {
 	@Test
 	public void checkOctaveBlur() {
 
-		ImageFloat32 original = new ImageFloat32(300,340);
+		GrayF32 original = new GrayF32(300,340);
 		GImageMiscOps.fillUniform(original,rand,0,100);
 
-		ImageFloat32 expected = new ImageFloat32(300,340);
+		GrayF32 expected = new GrayF32(300,340);
 
 		float sigma0 = 1.6f;
 
@@ -72,10 +72,10 @@ public class TestSiftScaleSpace {
 	 */
 	@Test
 	public void checkScaleBlur() {
-		ImageFloat32 original = new ImageFloat32(300,340);
+		GrayF32 original = new GrayF32(300,340);
 		GImageMiscOps.fillUniform(original,rand,0,100);
 
-		ImageFloat32 expected = new ImageFloat32(300,340);
+		GrayF32 expected = new GrayF32(300,340);
 
 		float sigma0 = 1.6f;
 		SiftScaleSpace alg = new SiftScaleSpace(0,3,2,sigma0);
@@ -97,7 +97,7 @@ public class TestSiftScaleSpace {
 	@Test
 	public void computeSigmaScale() {
 		SiftScaleSpace alg = new SiftScaleSpace(-1,4,3,1.6);
-		alg.initialize(new ImageFloat32(60,50));
+		alg.initialize(new GrayF32(60,50));
 
 		double k = Math.pow(2.0,1.0/3.0);
 		for (int i = 0; i < 5; i++) {
@@ -118,7 +118,7 @@ public class TestSiftScaleSpace {
 	 * @param octave Which octave its at
 	 * @return average error across the smaller image
 	 */
-	private double compareImage(ImageFloat32 expected, ImageFloat32 found, int octave) {
+	private double compareImage(GrayF32 expected, GrayF32 found, int octave) {
 		double averageError = 0;
 		if( found.width > expected.width ) {
 			int scale = (int)Math.pow(2,-octave);
@@ -153,7 +153,7 @@ public class TestSiftScaleSpace {
 	public void checkImageTooSmallForOctaves() {
 		SiftScaleSpace alg = new SiftScaleSpace(0,5,3,1.6);
 
-		alg.initialize(new ImageFloat32(20,20));
+		alg.initialize(new GrayF32(20,20));
 
 		assertTrue(alg.computeNextOctave());
 		assertTrue(alg.computeNextOctave());

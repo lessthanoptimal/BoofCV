@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.alg.fiducial.calib.grid;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectSquareGridFiducial<T extends ImageSingleBand> {
+public class DetectSquareGridFiducial<T extends ImageGray> {
 
 	// dimension of square grid.  This only refers to black squares and not the white space
 	int numCols;
@@ -72,7 +72,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 	SquareGridTools tools = new SquareGridTools();
 
 	// storage for binary image
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
 	List<List<SquareNode>> clusters;
 
@@ -206,7 +206,7 @@ public class DetectSquareGridFiducial<T extends ImageSingleBand> {
 		return c2g;
 	}
 
-	public ImageUInt8 getBinary() {
+	public GrayU8 getBinary() {
 		return binary;
 	}
 

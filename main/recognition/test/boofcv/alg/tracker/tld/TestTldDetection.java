@@ -1,7 +1,25 @@
+/*
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.tracker.tld;
 
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +32,7 @@ public class TestTldDetection {
 
 	@Test
 	public void computeTemplateConfidence() {
-		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
+		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
 		alg.config = new TldParameters();
 		alg.config.confidenceThresholdUpper = 0.6;
 		alg.template = new HelperTemplate();
@@ -40,7 +58,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_largerN() {
-		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
+		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
@@ -62,7 +80,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_smaller() {
-		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
+		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
@@ -83,7 +101,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_larger() {
-		TldDetection<ImageUInt8> alg = new TldDetection<ImageUInt8>();
+		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 

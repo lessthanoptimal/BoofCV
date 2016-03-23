@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -39,9 +39,9 @@ public class BenchmarkBinaryBlobLabeling {
 	static int imgWidth = 640;
 	static int imgHeight = 480;
 
-	static ImageUInt8 original = new ImageUInt8(imgWidth, imgHeight);
-	static ImageUInt8 input = new ImageUInt8(imgWidth, imgHeight);
-	static ImageSInt32 output = new ImageSInt32(imgWidth, imgHeight);
+	static GrayU8 original = new GrayU8(imgWidth, imgHeight);
+	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
+	static GrayS32 output = new GrayS32(imgWidth, imgHeight);
 
 	public static class NewAlg8 extends PerformerBase {
 

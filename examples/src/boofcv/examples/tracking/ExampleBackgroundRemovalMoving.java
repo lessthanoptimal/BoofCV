@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.homography.UtilHomography;
@@ -63,7 +63,7 @@ public class ExampleBackgroundRemovalMoving {
 //		String fileName = UtilIO.pathExample("background/horse_jitter.mp4");
 
 		// Comment/Uncomment to switch input image type
-		ImageType imageType = ImageType.single(ImageFloat32.class);
+		ImageType imageType = ImageType.single(GrayF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedF32.class);
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
@@ -75,10 +75,10 @@ public class ExampleBackgroundRemovalMoving {
 
 		// Use a KLT tracker
 		PointTracker tracker = FactoryPointTracker.klt(new int[]{1, 2, 4, 8}, confDetector, 3,
-				ImageFloat32.class, null);
+				GrayF32.class, null);
 
 		// This estimates the 2D image motion
-		ImageMotion2D<ImageFloat32,Homography2D_F64> motion2D =
+		ImageMotion2D<GrayF32,Homography2D_F64> motion2D =
 				FactoryMotion2D.createMotion2D(500, 0.5, 3, 100, 0.6, 0.5, false, tracker, new Homography2D_F64());
 
 		ConfigBackgroundBasic configBasic = new ConfigBackgroundBasic(30, 0.005f);
@@ -103,9 +103,9 @@ public class ExampleBackgroundRemovalMoving {
 		//====== Initialize Images
 
 		// storage for segmented image.  Background = 0, Foreground = 1
-		ImageUInt8 segmented = new ImageUInt8(video.getNextWidth(),video.getNextHeight());
+		GrayU8 segmented = new GrayU8(video.getNextWidth(),video.getNextHeight());
 		// Grey scale image that's the input for motion estimation
-		ImageFloat32 grey = new ImageFloat32(segmented.width,segmented.height);
+		GrayF32 grey = new GrayF32(segmented.width,segmented.height);
 
 		// coordinate frames
 		Homography2D_F32 firstToCurrent32 = new Homography2D_F32();

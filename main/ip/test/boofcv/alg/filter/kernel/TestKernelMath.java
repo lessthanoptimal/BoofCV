@@ -22,8 +22,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.convolve.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -339,7 +339,7 @@ public class TestKernelMath {
 	@Test
 	public void convertToImage_F32() {
 		Kernel2D_F32 kernel = FactoryKernel.random2D_F32(7,3,-10,10,rand);
-		ImageFloat32 image = KernelMath.convertToImage(kernel);
+		GrayF32 image = KernelMath.convertToImage(kernel);
 
 		assertEquals(kernel.width,image.width);
 		assertEquals(kernel.width,image.height);
@@ -354,7 +354,7 @@ public class TestKernelMath {
 	@Test
 	public void convertToImage_I32() {
 		Kernel2D_I32 kernel = FactoryKernel.random2D_I32(7,3,-10,10,rand);
-		ImageSInt32 image = KernelMath.convertToImage(kernel);
+		GrayS32 image = KernelMath.convertToImage(kernel);
 
 		assertEquals(kernel.width,image.width);
 		assertEquals(kernel.width,image.height);
@@ -368,7 +368,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convertToKernel_F32() {
-		ImageFloat32 image = new ImageFloat32(7,7);
+		GrayF32 image = new GrayF32(7,7);
 		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_F32 kernel = KernelMath.convertToKernel(image);
 
@@ -384,7 +384,7 @@ public class TestKernelMath {
 
 	@Test
 	public void convertToKernel_I32() {
-		ImageSInt32 image = new ImageSInt32(7,7);
+		GrayS32 image = new GrayS32(7,7);
 		ImageMiscOps.fillUniform(image,rand,-10,10);
 		Kernel2D_I32 kernel = KernelMath.convertToKernel(image);
 

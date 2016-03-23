@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
 
 /**
  * <p>
@@ -71,7 +71,7 @@ public interface TemplateMatchingIntensity<T extends ImageBase> {
 	 *
 	 * @return Feature intensity
 	 */
-	public ImageFloat32 getIntensity();
+	public GrayF32 getIntensity();
 
 	/**
 	 * Does this algorithm process the image's border.  If it does not process the border

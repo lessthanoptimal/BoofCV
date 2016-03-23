@@ -24,7 +24,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -92,7 +92,7 @@ public class AssistedCalibration {
 	int padding;
 
 	// input image
-	ImageFloat32 input;
+	GrayF32 input;
 
 	// detects the calibration target
 	CalibrationDetector detector;
@@ -155,7 +155,7 @@ public class AssistedCalibration {
 		MAGNET_RADIUS = Math.max(5,(int)(Math.min(imageWidth,imageHeight)/30.0));
 	}
 
-	public void process( ImageFloat32 gray , BufferedImage image ) {
+	public void process(GrayF32 gray , BufferedImage image ) {
 
 		this.input = gray;
 		imageWidth = gray.width;

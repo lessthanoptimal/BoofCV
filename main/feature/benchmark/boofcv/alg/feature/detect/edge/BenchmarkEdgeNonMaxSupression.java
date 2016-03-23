@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
 
 import java.util.Random;
 
@@ -39,10 +39,10 @@ public class BenchmarkEdgeNonMaxSupression {
 	final static int width = 640;
 	final static int height = 480;
 
-	static ImageFloat32 intensity = new ImageFloat32(width,height);
-	static ImageFloat32 output = new ImageFloat32(width,height);
-	static ImageSInt8 direction4 = new ImageSInt8(width,height);
-	static ImageSInt8 direction8 = new ImageSInt8(width,height);
+	static GrayF32 intensity = new GrayF32(width,height);
+	static GrayF32 output = new GrayF32(width,height);
+	static GrayS8 direction4 = new GrayS8(width,height);
+	static GrayS8 direction8 = new GrayS8(width,height);
 
 
 	public static class Naive4_F32 extends PerformerBase {

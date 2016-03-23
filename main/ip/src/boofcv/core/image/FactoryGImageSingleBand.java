@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,67 +32,67 @@ import boofcv.struct.image.*;
 public class FactoryGImageSingleBand {
 
 	public static GImageSingleBand create( Class imageType ) {
-		if( imageType == ImageUInt8.class )
+		if( imageType == GrayU8.class )
 			return new GSingle_U8(null);
-		else if( imageType == ImageSInt8.class )
+		else if( imageType == GrayS8.class )
 			return new GSingle_S8( null );
-		else if( imageType == ImageUInt16.class )
+		else if( imageType == GrayU16.class )
 			return new GSingle_U16( null );
-		else if( imageType == ImageSInt16.class )
+		else if( imageType == GrayS16.class )
 			return new GSingle_S16( null );
-		else if( imageType == ImageSInt32.class )
+		else if( imageType == GrayS32.class )
 			return new GSingle_S32( null );
-		else if( imageType == ImageSInt64.class )
+		else if( imageType == GrayS64.class )
 			return new GSingle_I64( null );
-		else if( imageType == ImageFloat32.class )
+		else if( imageType == GrayF32.class )
 			return new GSingle_F32( null );
-		else if( imageType == ImageFloat64.class )
+		else if( imageType == GrayF64.class )
 			return new GSingle_F64( null );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType);
 	}
 
-	public static GImageSingleBand wrap( ImageSingleBand image ) {
-		if( image.getClass() == ImageUInt8.class )
-			return new GSingle_U8( (ImageUInt8)image );
-		else if( image.getClass() == ImageSInt8.class )
-			return new GSingle_S8( (ImageSInt8)image );
-		else if( image.getClass() == ImageUInt16.class )
-			return new GSingle_U16( (ImageUInt16)image );
-		else if( image.getClass() == ImageSInt16.class )
-			return new GSingle_S16( (ImageSInt16)image );
-		else if( image.getClass() == ImageSInt32.class )
-			return new GSingle_S32( (ImageSInt32)image );
-		else if( image.getClass() == ImageSInt64.class )
-			return new GSingle_I64( (ImageSInt64)image );
-		else if( image.getClass() == ImageFloat32.class )
-			return new GSingle_F32( (ImageFloat32)image );
-		else if( image.getClass() == ImageFloat64.class )
-			return new GSingle_F64( (ImageFloat64)image );
+	public static GImageSingleBand wrap( ImageGray image ) {
+		if( image.getClass() == GrayU8.class )
+			return new GSingle_U8( (GrayU8)image );
+		else if( image.getClass() == GrayS8.class )
+			return new GSingle_S8( (GrayS8)image );
+		else if( image.getClass() == GrayU16.class )
+			return new GSingle_U16( (GrayU16)image );
+		else if( image.getClass() == GrayS16.class )
+			return new GSingle_S16( (GrayS16)image );
+		else if( image.getClass() == GrayS32.class )
+			return new GSingle_S32( (GrayS32)image );
+		else if( image.getClass() == GrayS64.class )
+			return new GSingle_I64( (GrayS64)image );
+		else if( image.getClass() == GrayF32.class )
+			return new GSingle_F32( (GrayF32)image );
+		else if( image.getClass() == GrayF64.class )
+			return new GSingle_F64( (GrayF64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static GImageSingleBand wrap( ImageSingleBand image , GImageSingleBand output ) {
+	public static GImageSingleBand wrap(ImageGray image , GImageSingleBand output ) {
 		if( output == null )
 			return wrap(image);
 
-		if( image.getClass() == ImageUInt8.class )
-			((GSingle_U8)output).image = (ImageUInt8)image;
-		else if( image.getClass() == ImageSInt8.class )
-			((GSingle_S8)output).image = (ImageSInt8)image;
-		else if( image.getClass() == ImageUInt16.class )
-			((GSingle_U16)output).image = (ImageUInt16)image;
-		else if( image.getClass() == ImageSInt16.class )
-			((GSingle_S16)output).image = (ImageSInt16)image;
-		else if( image.getClass() == ImageSInt32.class )
-			((GSingle_S32)output).image = (ImageSInt32)image;
-		else if( image.getClass() == ImageSInt64.class )
-			((GSingle_I64)output).image = (ImageSInt64)image;
-		else if( image.getClass() == ImageFloat32.class )
-			((GSingle_F32)output).image = (ImageFloat32)image;
-		else if( image.getClass() == ImageFloat64.class )
-			((GSingle_F64)output).image = (ImageFloat64)image;
+		if( image.getClass() == GrayU8.class )
+			((GSingle_U8)output).image = (GrayU8)image;
+		else if( image.getClass() == GrayS8.class )
+			((GSingle_S8)output).image = (GrayS8)image;
+		else if( image.getClass() == GrayU16.class )
+			((GSingle_U16)output).image = (GrayU16)image;
+		else if( image.getClass() == GrayS16.class )
+			((GSingle_S16)output).image = (GrayS16)image;
+		else if( image.getClass() == GrayS32.class )
+			((GSingle_S32)output).image = (GrayS32)image;
+		else if( image.getClass() == GrayS64.class )
+			((GSingle_I64)output).image = (GrayS64)image;
+		else if( image.getClass() == GrayF32.class )
+			((GSingle_F32)output).image = (GrayF32)image;
+		else if( image.getClass() == GrayF64.class )
+			((GSingle_F64)output).image = (GrayF64)image;
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 
@@ -100,11 +100,11 @@ public class FactoryGImageSingleBand {
 	}
 
 	public static GImageSingleBand wrap( ImageBorder image ) {
-		if( ImageInteger.class.isAssignableFrom(image.getImage().getClass()) )
+		if( GrayI.class.isAssignableFrom(image.getImage().getClass()) )
 			return new Border_I32( (ImageBorder_S32)image );
-		else if( image.getImage().getClass() == ImageFloat32.class )
+		else if( image.getImage().getClass() == GrayF32.class )
 			return new Border_F32( (ImageBorder_F32)image );
-		else if( image.getImage().getClass() == ImageFloat64.class )
+		else if( image.getImage().getClass() == GrayF64.class )
 			return new Border_F64( (ImageBorder_F64)image );
 		else
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
@@ -200,7 +200,7 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageFloat32.class;
+			return GrayF32.class;
 		}
 	}
 
@@ -247,13 +247,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageFloat64.class;
+			return GrayF64.class;
 		}
 	}
 
-	public static class GSingle_U8 extends GSingleBaseInt<ImageUInt8>
+	public static class GSingle_U8 extends GSingleBaseInt<GrayU8>
 	{
-		public GSingle_U8(ImageUInt8 image) {
+		public GSingle_U8(GrayU8 image) {
 			super(image);
 		}
 
@@ -289,13 +289,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageUInt8.class;
+			return GrayU8.class;
 		}
 	}
 
-	public static class GSingle_S8 extends GSingleBaseInt<ImageSInt8>
+	public static class GSingle_S8 extends GSingleBaseInt<GrayS8>
 	{
-		public GSingle_S8(ImageSInt8 image) {
+		public GSingle_S8(GrayS8 image) {
 			super(image);
 		}
 
@@ -332,13 +332,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageSInt8.class;
+			return GrayS8.class;
 		}
 	}
 
-	public static class GSingle_U16 extends GSingleBaseInt<ImageUInt16>
+	public static class GSingle_U16 extends GSingleBaseInt<GrayU16>
 	{
-		public GSingle_U16(ImageUInt16 image) {
+		public GSingle_U16(GrayU16 image) {
 			super(image);
 		}
 
@@ -374,13 +374,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageUInt16.class;
+			return GrayU16.class;
 		}
 	}
 
-	public static class GSingle_S16 extends GSingleBaseInt<ImageSInt16>
+	public static class GSingle_S16 extends GSingleBaseInt<GrayS16>
 	{
-		public GSingle_S16(ImageSInt16 image) {
+		public GSingle_S16(GrayS16 image) {
 			super(image);
 		}
 
@@ -416,13 +416,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageSInt16.class;
+			return GrayS16.class;
 		}
 	}
 
-	public static class GSingle_S32 extends GSingleBaseInt<ImageSInt32>
+	public static class GSingle_S32 extends GSingleBaseInt<GrayS32>
 	{
-		public GSingle_S32(ImageSInt32 image) {
+		public GSingle_S32(GrayS32 image) {
 			super(image);
 		}
 
@@ -458,13 +458,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageSInt32.class;
+			return GrayS32.class;
 		}
 	}
 
-	public static class GSingle_I64 extends GSingleBaseInt<ImageSInt64>
+	public static class GSingle_I64 extends GSingleBaseInt<GrayS64>
 	{
-		public GSingle_I64(ImageSInt64 image) {
+		public GSingle_I64(GrayS64 image) {
 			super(image);
 		}
 
@@ -500,13 +500,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageSInt64.class;
+			return GrayS64.class;
 		}
 	}
 
-	public static class GSingle_F32 extends GSingleBase<ImageFloat32>
+	public static class GSingle_F32 extends GSingleBase<GrayF32>
 	{
-		public GSingle_F32(ImageFloat32 image) {
+		public GSingle_F32(GrayF32 image) {
 			super(image);
 		}
 
@@ -547,13 +547,13 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageFloat32.class;
+			return GrayF32.class;
 		}
 	}
 
-	public static class GSingle_F64 extends GSingleBase<ImageFloat64>
+	public static class GSingle_F64 extends GSingleBase<GrayF64>
 	{
-		public GSingle_F64(ImageFloat64 image) {
+		public GSingle_F64(GrayF64 image) {
 			super(image);
 		}
 
@@ -594,11 +594,11 @@ public class FactoryGImageSingleBand {
 
 		@Override
 		public Class getImageType() {
-			return ImageFloat64.class;
+			return GrayF64.class;
 		}
 	}
 
-	public static abstract class GSingleBaseInt<T extends ImageSingleBand> extends GSingleBase<T>
+	public static abstract class GSingleBaseInt<T extends ImageGray> extends GSingleBase<T>
 	{
 		public GSingleBaseInt(T image) {
 			super(image);
@@ -610,7 +610,7 @@ public class FactoryGImageSingleBand {
 		}
 	}
 
-	public static abstract class GSingleBase<T extends ImageSingleBand> implements GImageSingleBand {
+	public static abstract class GSingleBase<T extends ImageGray> implements GImageSingleBand {
 
 		protected T image;
 
@@ -619,7 +619,7 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
-		public void wrap(ImageSingleBand image) {
+		public void wrap(ImageGray image) {
 			this.image = (T)image;
 		}
 
@@ -634,7 +634,7 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
-		public ImageSingleBand getImage() {
+		public ImageGray getImage() {
 			return image;
 		}
 	}
@@ -648,7 +648,7 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
-		public void wrap(ImageSingleBand image) {
+		public void wrap(ImageGray image) {
 			this.image.setImage(image);
 		}
 
@@ -663,8 +663,8 @@ public class FactoryGImageSingleBand {
 		}
 
 		@Override
-		public ImageSingleBand getImage() {
-			return (ImageSingleBand)image.getImage();
+		public ImageGray getImage() {
+			return (ImageGray)image.getImage();
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.filter;
 
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 
@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
 /**
  * Turns functions into implementations of {@link FilterImageInterface} Wraps around any function which has two images as input and output.
  */
-public class FilterImageReflection<Input extends ImageSingleBand, Output extends ImageSingleBand>
+public class FilterImageReflection<Input extends ImageGray, Output extends ImageGray>
 		implements FilterImageInterface<Input, Output> {
 
 	// method being invoke for the filter
@@ -56,7 +56,7 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 		Class param[] = m.getParameterTypes();
 		if (param.length != 2 && param.length != 3 )
 			throw new IllegalArgumentException("Input method must have two or three inputs");
-		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
+		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
 			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
 
@@ -72,7 +72,7 @@ public class FilterImageReflection<Input extends ImageSingleBand, Output extends
 		Class param[] = m.getParameterTypes();
 		if (param.length != 2 && param.length != 3 )
 			throw new IllegalArgumentException("Input method must have two or three inputs");
-		if (!ImageSingleBand.class.isAssignableFrom(param[0]) || !ImageSingleBand.class.isAssignableFrom(param[0]))
+		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
 			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
 	}
 

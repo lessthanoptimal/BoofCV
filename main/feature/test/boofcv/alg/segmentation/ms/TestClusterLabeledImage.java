@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
@@ -52,8 +52,8 @@ public class TestClusterLabeledImage {
 	@Test
 	public void uniform() {
 
-		ImageSInt32 input = new ImageSInt32(5,7);
-		ImageSInt32 output = new ImageSInt32(5,7);
+		GrayS32 input = new GrayS32(5,7);
+		GrayS32 output = new GrayS32(5,7);
 
 		for( int value = 0; value < 3; value++ ) {
 			GImageMiscOps.fill(input,value);
@@ -79,7 +79,7 @@ public class TestClusterLabeledImage {
 	 */
 	@Test
 	public void sameColorIslands() {
-		ImageSInt32 input = new ImageSInt32(5,5);
+		GrayS32 input = new GrayS32(5,5);
 
 		input.data = new int[]{
 				1,1,0,0,0,
@@ -96,7 +96,7 @@ public class TestClusterLabeledImage {
 				1,1,2,2,2};
 
 		for( int i = 0; i < rules.length; i++ ) {
-			ImageSInt32 output = new ImageSInt32(5,5);
+			GrayS32 output = new GrayS32(5,5);
 
 			ClusterLabeledImage alg = new ClusterLabeledImage(rules[i]);
 			alg.process(input, output, counts);
@@ -120,7 +120,7 @@ public class TestClusterLabeledImage {
 	@Test
 	public void case0_connect4() {
 
-		ImageSInt32 input = new ImageSInt32(5,5);
+		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;
 
 		int expected[] = new int[] {
@@ -130,7 +130,7 @@ public class TestClusterLabeledImage {
 				5,6,1,1,7,
 				5,5,7,7,7};
 
-		ImageSInt32 output = new ImageSInt32(5,5);
+		GrayS32 output = new GrayS32(5,5);
 
 		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.FOUR);
 		alg.process(input,output,counts);
@@ -160,12 +160,12 @@ public class TestClusterLabeledImage {
 	@Test
 	public void case0_connect8() {
 
-		ImageSInt32 input = new ImageSInt32(5,5);
+		GrayS32 input = new GrayS32(5,5);
 		input.data = case0;
 
 		int expected[] = case0;
 
-		ImageSInt32 output = new ImageSInt32(5,5);
+		GrayS32 output = new GrayS32(5,5);
 
 		ClusterLabeledImage alg = new ClusterLabeledImage(ConnectRule.EIGHT);
 		alg.process(input,output,counts);

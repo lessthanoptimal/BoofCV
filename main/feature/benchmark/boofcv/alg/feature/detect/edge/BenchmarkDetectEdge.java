@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -38,7 +38,7 @@ public class BenchmarkDetectEdge {
 
 	Random rand = new Random(234);
 
-	ImageFloat32 input = new ImageFloat32(width,height);
+	GrayF32 input = new GrayF32(width,height);
 
 	public void createImage() {
 		for( int i = 0; i < 1000; i++ ) {
@@ -62,8 +62,8 @@ public class BenchmarkDetectEdge {
 
 	public class CannyMark extends PerformerBase {
 
-		CannyEdge<ImageFloat32,ImageFloat32> alg = FactoryEdgeDetectors.canny(2,false, false, ImageFloat32.class, ImageFloat32.class);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		CannyEdge<GrayF32,GrayF32> alg = FactoryEdgeDetectors.canny(2,false, false, GrayF32.class, GrayF32.class);
+		GrayU8 output = new GrayU8(width,height);
 
 		@Override
 		public void process() {
@@ -73,8 +73,8 @@ public class BenchmarkDetectEdge {
 
 	public class CannyTrace extends PerformerBase {
 
-		CannyEdge<ImageFloat32,ImageFloat32> alg = FactoryEdgeDetectors.canny(2,true, false, ImageFloat32.class, ImageFloat32.class);
-		ImageUInt8 output = new ImageUInt8(width,height);
+		CannyEdge<GrayF32,GrayF32> alg = FactoryEdgeDetectors.canny(2,true, false, GrayF32.class, GrayF32.class);
+		GrayU8 output = new GrayU8(width,height);
 
 		@Override
 		public void process() {

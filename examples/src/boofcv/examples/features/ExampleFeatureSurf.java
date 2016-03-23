@@ -36,8 +36,8 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +55,10 @@ public class ExampleFeatureSurf {
 	 * 
 	 *  @param image Input image type. DOES NOT NEED TO BE ImageFloat32, ImageUInt8 works too
 	 */
-	public static void easy( ImageFloat32 image ) {
+	public static void easy( GrayF32 image ) {
 		// create the detector and descriptors
-		DetectDescribePoint<ImageFloat32,BrightFeature> surf = FactoryDetectDescribe.
-				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,ImageFloat32.class);
+		DetectDescribePoint<GrayF32,BrightFeature> surf = FactoryDetectDescribe.
+				surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null,GrayF32.class);
 
 		 // specify the image to process
 		surf.detect(image);
@@ -75,9 +75,9 @@ public class ExampleFeatureSurf {
 	 * 
 	 * @param image Input image type. DOES NOT NEED TO BE ImageFloat32, ImageUInt8 works too
 	 */
-	public static <II extends ImageSingleBand> void harder( ImageFloat32 image ) {
+	public static <II extends ImageGray> void harder(GrayF32 image ) {
 		// SURF works off of integral images
-		Class<II> integralType = GIntegralImageOps.getIntegralType(ImageFloat32.class);
+		Class<II> integralType = GIntegralImageOps.getIntegralType(GrayF32.class);
 		
 		// define the feature detection algorithm
 		NonMaxSuppression extractor =
@@ -124,7 +124,7 @@ public class ExampleFeatureSurf {
 
 	public static void main( String args[] ) {
 		
-		ImageFloat32 image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"), ImageFloat32.class);
+		GrayF32 image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"), GrayF32.class);
 		
 		// run each example
 		ExampleFeatureSurf.easy(image);

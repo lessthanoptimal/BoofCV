@@ -23,8 +23,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -42,19 +42,19 @@ public class BenchmarkDisparityAlgs {
 	static final int radiusX=2;
 	static final int radiusY=2;
 
-	static final ImageUInt8 left = new ImageUInt8(width,height);
-	static final ImageUInt8 right = new ImageUInt8(width,height);
+	static final GrayU8 left = new GrayU8(width,height);
+	static final GrayU8 right = new GrayU8(width,height);
 
-	static final ImageFloat32 left_F32 = new ImageFloat32(width,height);
-	static final ImageFloat32 right_F32 = new ImageFloat32(width,height);
+	static final GrayF32 left_F32 = new GrayF32(width,height);
+	static final GrayF32 right_F32 = new GrayF32(width,height);
 
-	static final ImageUInt8 outU8 = new ImageUInt8(width,height);
-	static final ImageFloat32 out_F32 = new ImageFloat32(width,height);
+	static final GrayU8 outU8 = new GrayU8(width,height);
+	static final GrayF32 out_F32 = new GrayF32(width,height);
 
 	public static class Naive extends PerformerBase {
 
-		StereoDisparityWtoNaive<ImageUInt8> alg =
-				new StereoDisparityWtoNaive<ImageUInt8> (0,max,radiusX,radiusY);
+		StereoDisparityWtoNaive<GrayU8> alg =
+				new StereoDisparityWtoNaive<GrayU8> (0,max,radiusX,radiusY);
 
 		@Override
 		public void process() {
@@ -66,10 +66,10 @@ public class BenchmarkDisparityAlgs {
 
 //		DisparitySelect<int[],ImageUInt8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
-		DisparitySelect<int[],ImageUInt8> compDisp =
+		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);
-		ImplDisparityScoreSadRect_U8<ImageUInt8> alg =
-				new ImplDisparityScoreSadRect_U8<ImageUInt8>(min,max,radiusX,radiusY,compDisp);
+		ImplDisparityScoreSadRect_U8<GrayU8> alg =
+				new ImplDisparityScoreSadRect_U8<GrayU8>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -81,10 +81,10 @@ public class BenchmarkDisparityAlgs {
 
 		//		DisparitySelect<int[],ImageUInt8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
-		DisparitySelect<float[],ImageUInt8> compDisp =
+		DisparitySelect<float[],GrayU8> compDisp =
 				new ImplSelectRectStandard_F32_U8(250,2,0.1);
-		ImplDisparityScoreSadRect_F32<ImageUInt8> alg =
-				new ImplDisparityScoreSadRect_F32<ImageUInt8>(min,max,radiusX,radiusY,compDisp);
+		ImplDisparityScoreSadRect_F32<GrayU8> alg =
+				new ImplDisparityScoreSadRect_F32<GrayU8>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -94,10 +94,10 @@ public class BenchmarkDisparityAlgs {
 
 	public static class EfficientSubpixelSad extends PerformerBase {
 
-		DisparitySelect<int[],ImageFloat32> compDisp =
+		DisparitySelect<int[],GrayF32> compDisp =
 				new SelectRectSubpixel.S32_F32(250,2,0.1);
-		ImplDisparityScoreSadRect_U8<ImageFloat32> alg =
-				new ImplDisparityScoreSadRect_U8<ImageFloat32>(min,max,radiusX,radiusY,compDisp);
+		ImplDisparityScoreSadRect_U8<GrayF32> alg =
+				new ImplDisparityScoreSadRect_U8<GrayF32>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -109,10 +109,10 @@ public class BenchmarkDisparityAlgs {
 
 		//		DisparitySelect<int[],ImageUInt8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
-		DisparitySelect<int[],ImageUInt8> compDisp =
+		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);
-		ImplDisparityScoreSadRectFive_U8<ImageUInt8> alg =
-				new ImplDisparityScoreSadRectFive_U8<ImageUInt8>(min,max,radiusX,radiusY,compDisp);
+		ImplDisparityScoreSadRectFive_U8<GrayU8> alg =
+				new ImplDisparityScoreSadRectFive_U8<GrayU8>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.io.jcodec;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.jcodec.common.model.ColorSpace;
 import org.jcodec.common.model.Picture;
 
@@ -31,7 +31,7 @@ public class ImplConvertJCodecPicture {
 	/**
 	 * Converts a picture in JCodec RGB into RGB BoofCV
 	 */
-	public static void RGB_to_MSU8(Picture input, MultiSpectral<ImageUInt8> output) {
+	public static void RGB_to_MSU8(Picture input, Planar<GrayU8> output) {
 		if( input.getColor() != ColorSpace.RGB )
 			throw new RuntimeException("Unexpected input color space!");
 		if( output.getNumBands() != 3 )
@@ -41,9 +41,9 @@ public class ImplConvertJCodecPicture {
 
 		int dataIn[] = input.getData()[0];
 
-		ImageUInt8 out0 = output.getBand(0);
-		ImageUInt8 out1 = output.getBand(1);
-		ImageUInt8 out2 = output.getBand(2);
+		GrayU8 out0 = output.getBand(0);
+		GrayU8 out1 = output.getBand(1);
+		GrayU8 out2 = output.getBand(2);
 
 		int indexIn = 0;
 		int indexOut = 0;
@@ -61,15 +61,15 @@ public class ImplConvertJCodecPicture {
 	}
 
 
-	public static void yuv420_to_MsRgb_U8(Picture input, MultiSpectral<ImageUInt8> output) {
+	public static void yuv420_to_MsRgb_U8(Picture input, Planar<GrayU8> output) {
 
 		int[] Y = input.getPlaneData(0);
 		int[] U = input.getPlaneData(1);
 		int[] V = input.getPlaneData(2);
 
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;
@@ -103,15 +103,15 @@ public class ImplConvertJCodecPicture {
 		}
 	}
 
-	public static void yuv420_to_MsRgb_F32(Picture input, MultiSpectral<ImageFloat32> output) {
+	public static void yuv420_to_MsRgb_F32(Picture input, Planar<GrayF32> output) {
 
 		int[] Y = input.getPlaneData(0);
 		int[] U = input.getPlaneData(1);
 		int[] V = input.getPlaneData(2);
 
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
 
 		final int yStride = output.width;
 		final int uvStride = output.width/2;
@@ -145,7 +145,7 @@ public class ImplConvertJCodecPicture {
 		}
 	}
 
-	public static void yuv420_to_U8(Picture input, ImageUInt8 output) {
+	public static void yuv420_to_U8(Picture input, GrayU8 output) {
 
 		int[] Y = input.getPlaneData(0);
 
@@ -167,7 +167,7 @@ public class ImplConvertJCodecPicture {
 		}
 	}
 
-	public static void yuv420_to_F32(Picture input, ImageFloat32 output) {
+	public static void yuv420_to_F32(Picture input, GrayF32 output) {
 
 		int[] Y = input.getPlaneData(0);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -37,8 +37,8 @@ public class TestColorLab {
 
 	@Test
 	public void rgbToLab_U8() {
-		MultiSpectral<ImageUInt8> input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,20,25,3);
-		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,3);
+		Planar<GrayU8> input = new Planar<GrayU8>(GrayU8.class,20,25,3);
+		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorLab.rgbToLab_U8(input, output);
@@ -66,8 +66,8 @@ public class TestColorLab {
 
 	@Test
 	public void rgbToLab_F32() {
-		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,3);
-		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,20,25,3);
+		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,20,25,3);
+		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorLab.rgbToLab_F32(input,output);

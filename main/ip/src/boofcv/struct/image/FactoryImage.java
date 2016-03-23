@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,20 +27,20 @@ package boofcv.struct.image;
 @SuppressWarnings({"unchecked"})
 public class FactoryImage {
 
-	public static <T extends ImageSingleBand> T create( Class<T> type , int width , int height )
+	public static <T extends ImageGray> T create(Class<T> type , int width , int height )
 	{
-		if( type == ImageUInt8.class) {
-			return (T)new ImageUInt8(width,height);
-		} else if( type == ImageSInt8.class) {
-			return (T)new ImageSInt8(width,height);
-		} else if( type == ImageUInt16.class) {
-			return (T)new ImageUInt16(width,height);
-		} else if( type == ImageSInt16.class) {
-			return (T)new ImageSInt16(width,height);
-		} else if( type == ImageSInt32.class) {
-			return (T)new ImageSInt32(width,height);
-		} else if( type == ImageFloat32.class) {
-			return (T)new ImageFloat32(width,height);
+		if( type == GrayU8.class) {
+			return (T)new GrayU8(width,height);
+		} else if( type == GrayS8.class) {
+			return (T)new GrayS8(width,height);
+		} else if( type == GrayU16.class) {
+			return (T)new GrayU16(width,height);
+		} else if( type == GrayS16.class) {
+			return (T)new GrayS16(width,height);
+		} else if( type == GrayS32.class) {
+			return (T)new GrayS32(width,height);
+		} else if( type == GrayF32.class) {
+			return (T)new GrayF32(width,height);
 		} else{
 			throw new IllegalArgumentException("Unknown image type: "+type);
 		}

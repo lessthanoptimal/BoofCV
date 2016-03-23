@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,19 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowBlockPyramid_F32 extends ChecksDenseOpticalFlowBlockPyramid<ImageUInt8> {
+public class TestDenseOpticalFlowBlockPyramid_F32 extends ChecksDenseOpticalFlowBlockPyramid<GrayU8> {
 
 	public TestDenseOpticalFlowBlockPyramid_F32() {
-		super(ImageUInt8.class);
+		super(GrayU8.class);
 	}
 
 	@Override
-	public DenseOpticalFlowBlockPyramid<ImageUInt8> createAlg(int searchRadius, int regionRadius, int maxPerPixelError) {
+	public DenseOpticalFlowBlockPyramid<GrayU8> createAlg(int searchRadius, int regionRadius, int maxPerPixelError) {
 		return new DenseOpticalFlowBlockPyramid.U8(searchRadius,regionRadius,maxPerPixelError);
 	}
 }

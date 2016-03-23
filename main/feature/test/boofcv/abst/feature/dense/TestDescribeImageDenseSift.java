@@ -24,9 +24,9 @@ import boofcv.factory.feature.dense.ConfigDenseSift;
 import boofcv.factory.feature.dense.DenseSampling;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
@@ -46,12 +46,12 @@ public class TestDescribeImageDenseSift {
 
 	Random rand = new Random(234);
 
-	Class imageTypes[] = new Class[]{ImageUInt8.class, ImageFloat32.class};
+	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
 
 	int widthScaleOne;
 
 	public TestDescribeImageDenseSift() {
-		DescribeImageDenseSift alg = createAlg(ImageUInt8.class,5,5);
+		DescribeImageDenseSift alg = createAlg(GrayU8.class,5,5);
 		widthScaleOne = alg.getAlg().getCanonicalRadius()*2;
 	}
 
@@ -61,7 +61,7 @@ public class TestDescribeImageDenseSift {
 	@Test
 	public void checkSampleLocations() {
 		for( Class type : imageTypes ) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type,width,height);
+			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
 			DescribeImageDense alg = createAlg(type,8,9);
@@ -89,7 +89,7 @@ public class TestDescribeImageDenseSift {
 	@Test
 	public void checkBorder() {
 		for( Class type : imageTypes ) {
-			ImageSingleBand image = GeneralizedImageOps.createSingleBand(type,width,height);
+			ImageGray image = GeneralizedImageOps.createSingleBand(type,width,height);
 			GImageMiscOps.fillUniform(image,rand,0,200);
 
 			DescribeImageDense alg = createAlg(type,8,9);
@@ -119,7 +119,7 @@ public class TestDescribeImageDenseSift {
 		return (T)FactoryDescribeImageDense.sift(config,imageType);
 	}
 
-	private TupleDesc_F64 describe( int x , int y , ImageSingleBand image , DescribeImageDense alg ) {
+	private TupleDesc_F64 describe(int x , int y , ImageGray image , DescribeImageDense alg ) {
 		DescribeImageDenseSift sift = (DescribeImageDenseSift)alg;
 
 		TupleDesc_F64 output = sift.createDescription();

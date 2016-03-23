@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -38,8 +38,8 @@ public class BenchmarkCalibrationDetectors {
 
 	public static final int TEST_TIME = 1000;
 
-	public static ImageFloat32 imageChess;
-	public static ImageFloat32 imageSquare;
+	public static GrayF32 imageChess;
+	public static GrayF32 imageSquare;
 
 	public static class Chessboard extends PerformerBase {
 		CalibrationDetector detector = FactoryCalibrationTarget.
@@ -63,7 +63,7 @@ public class BenchmarkCalibrationDetectors {
 		}
 	}
 
-	public static ImageFloat32 loadImage(String fileName) {
+	public static GrayF32 loadImage(String fileName) {
 		BufferedImage img;
 		try {
 			img = ImageIO.read(new File(fileName));
@@ -71,7 +71,7 @@ public class BenchmarkCalibrationDetectors {
 			return null;
 		}
 
-		return ConvertBufferedImage.convertFrom(img, (ImageFloat32) null);
+		return ConvertBufferedImage.convertFrom(img, (GrayF32) null);
 	}
 
 	public static void main(String[] args) {

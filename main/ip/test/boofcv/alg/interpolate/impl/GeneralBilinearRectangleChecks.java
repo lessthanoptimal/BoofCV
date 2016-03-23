@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> {
+public abstract class GeneralBilinearRectangleChecks<T extends ImageGray> {
 	Class<T> imageType;
 
 	Random rand = new Random(0xff34);
@@ -88,7 +88,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		ImageFloat32 out = new ImageFloat32(20,20);
+		GrayF32 out = new GrayF32(20,20);
 		interp.region(width-1, height-1, out );
 	}
 
@@ -98,7 +98,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		ImageFloat32 out = new ImageFloat32(20,25);
+		GrayF32 out = new GrayF32(20,25);
 		interp.region(-0.1f, -0.1f, out );
 	}
 
@@ -108,7 +108,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		ImageFloat32 out = new ImageFloat32(20,25);
+		GrayF32 out = new GrayF32(20,25);
 		interp.region(0.1f, 0.1f, out );
 	}
 
@@ -125,11 +125,11 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		regionHeight = 25;
 
 		InterpolateRectangle<T> interpA = createRectangleInterpolate();
-		ImageFloat32 outA = new ImageFloat32(regionWidth,regionHeight);
+		GrayF32 outA = new GrayF32(regionWidth,regionHeight);
 
 		T imgB = BoofTesting.createSubImageOf(imgA);
 		InterpolateRectangle<T> interpB = createRectangleInterpolate();
-		ImageFloat32 outB = new ImageFloat32(regionWidth,regionHeight);
+		GrayF32 outB = new GrayF32(regionWidth,regionHeight);
 
 		interpA.setImage(imgA);
 		interpB.setImage(imgB);
@@ -163,7 +163,7 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageSingleBand> 
 		interp.setImage(img);
 		interpPt.setImage(img);
 
-		ImageFloat32 out = new ImageFloat32(regionWidth,regionHeight);
+		GrayF32 out = new GrayF32(regionWidth,regionHeight);
 
 		interp.region(tl_x, tl_y, out );
 

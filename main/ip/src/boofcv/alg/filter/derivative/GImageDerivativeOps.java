@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,12 +34,12 @@ import boofcv.struct.image.*;
  */
 public class GImageDerivativeOps {
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	void laplace( I input , D output ) {
-		if( input instanceof ImageFloat32 ) {
-			LaplacianEdge.process((ImageFloat32)input,(ImageFloat32)output);
-		} else if( input instanceof ImageUInt8 ) {
-			LaplacianEdge.process((ImageUInt8)input,(ImageSInt16)output);
+		if( input instanceof GrayF32) {
+			LaplacianEdge.process((GrayF32)input,(GrayF32)output);
+		} else if( input instanceof GrayU8) {
+			LaplacianEdge.process((GrayU8)input,(GrayS16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 
@@ -51,14 +51,14 @@ public class GImageDerivativeOps {
 	 * @param imageType Input image type.
 	 * @return Appropriate output image type.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 		Class<D> getDerivativeType( Class<I> imageType ) {
-		if( imageType == ImageFloat32.class ) {
-			return (Class<D>) ImageFloat32.class;
-		} else if( imageType == ImageUInt8.class ) {
-			return (Class<D>) ImageSInt16.class;
-		} else if( imageType == ImageUInt16.class ) {
-			return (Class<D>) ImageSInt32.class;
+		if( imageType == GrayF32.class ) {
+			return (Class<D>) GrayF32.class;
+		} else if( imageType == GrayU8.class ) {
+			return (Class<D>) GrayS16.class;
+		} else if( imageType == GrayU16.class ) {
+			return (Class<D>) GrayS32.class;
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+imageType.getSimpleName());
 		}
@@ -75,63 +75,63 @@ public class GImageDerivativeOps {
 	 * @param <I> Input image type
 	 * @param <D> Output image type
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	void gradient( DerivativeType type , I input , D derivX , D derivY , BorderType borderType ) {
 
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
 
 		switch( type ) {
 			case PREWITT:
-				if( input instanceof ImageFloat32 ) {
-					GradientPrewitt.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
-				} else if( input instanceof ImageUInt8 ) {
-					GradientPrewitt.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
-				} else if( input instanceof ImageSInt16 ) {
-					GradientPrewitt.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
+				if( input instanceof GrayF32) {
+					GradientPrewitt.process((GrayF32)input,(GrayF32)derivX,(GrayF32)derivY,(ImageBorder_F32)border);
+				} else if( input instanceof GrayU8) {
+					GradientPrewitt.process((GrayU8)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
+				} else if( input instanceof GrayS16) {
+					GradientPrewitt.process((GrayS16)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
 				break;
 			case SOBEL:
-				if( input instanceof ImageFloat32 ) {
-					GradientSobel.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
-				} else if( input instanceof ImageUInt8 ) {
-					GradientSobel.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
-				} else if( input instanceof ImageSInt16 ) {
-					GradientSobel.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
+				if( input instanceof GrayF32) {
+					GradientSobel.process((GrayF32)input,(GrayF32)derivX,(GrayF32)derivY,(ImageBorder_F32)border);
+				} else if( input instanceof GrayU8) {
+					GradientSobel.process((GrayU8)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
+				} else if( input instanceof GrayS16) {
+					GradientSobel.process((GrayS16)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
 				break;
 			case THREE:
-				if( input instanceof ImageFloat32 ) {
-					GradientThree.process((ImageFloat32)input,(ImageFloat32)derivX,(ImageFloat32)derivY,(ImageBorder_F32)border);
-				} else if( input instanceof ImageUInt8 ) {
-					GradientThree.process((ImageUInt8)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
-				} else if( input instanceof ImageSInt16 ) {
-					GradientThree.process((ImageSInt16)input,(ImageSInt16)derivX,(ImageSInt16)derivY,(ImageBorder_S32)border);
+				if( input instanceof GrayF32) {
+					GradientThree.process((GrayF32)input,(GrayF32)derivX,(GrayF32)derivY,(ImageBorder_F32)border);
+				} else if( input instanceof GrayU8) {
+					GradientThree.process((GrayU8)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
+				} else if( input instanceof GrayS16) {
+					GradientThree.process((GrayS16)input,(GrayS16)derivX,(GrayS16)derivY,(ImageBorder_S32)border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
 				break;
 			case TWO_0:
-				if( input instanceof ImageFloat32 ) {
-					GradientTwo0.process((ImageFloat32) input, (ImageFloat32) derivX, (ImageFloat32) derivY, (ImageBorder_F32) border);
-				} else if( input instanceof ImageUInt8 ) {
-					GradientTwo0.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
-				} else if( input instanceof ImageSInt16 ) {
-					GradientTwo0.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
+				if( input instanceof GrayF32) {
+					GradientTwo0.process((GrayF32) input, (GrayF32) derivX, (GrayF32) derivY, (ImageBorder_F32) border);
+				} else if( input instanceof GrayU8) {
+					GradientTwo0.process((GrayU8) input, (GrayS16) derivX, (GrayS16) derivY, (ImageBorder_S32) border);
+				} else if( input instanceof GrayS16) {
+					GradientTwo0.process((GrayS16) input, (GrayS16) derivX, (GrayS16) derivY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
 				break;
 			case TWO_1:
-				if( input instanceof ImageFloat32 ) {
-					GradientTwo1.process((ImageFloat32) input, (ImageFloat32) derivX, (ImageFloat32) derivY, (ImageBorder_F32) border);
-				} else if( input instanceof ImageUInt8 ) {
-					GradientTwo1.process((ImageUInt8) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
-				} else if( input instanceof ImageSInt16 ) {
-					GradientTwo1.process((ImageSInt16) input, (ImageSInt16) derivX, (ImageSInt16) derivY, (ImageBorder_S32) border);
+				if( input instanceof GrayF32) {
+					GradientTwo1.process((GrayF32) input, (GrayF32) derivX, (GrayF32) derivY, (ImageBorder_F32) border);
+				} else if( input instanceof GrayU8) {
+					GradientTwo1.process((GrayU8) input, (GrayS16) derivX, (GrayS16) derivY, (ImageBorder_S32) border);
+				} else if( input instanceof GrayS16) {
+					GradientTwo1.process((GrayS16) input, (GrayS16) derivX, (GrayS16) derivY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -154,26 +154,26 @@ public class GImageDerivativeOps {
 	 * @param <I> Input image type
 	 * @param <D> Output image type
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	void hessian( DerivativeType type , I input , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(input, borderType);
 
 		switch( type ) {
 			case SOBEL:
-				if( input instanceof ImageFloat32 ) {
-					HessianSobel.process((ImageFloat32) input, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
-				} else if( input instanceof ImageUInt8 ) {
-					HessianSobel.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
+				if( input instanceof GrayF32) {
+					HessianSobel.process((GrayF32) input, (GrayF32) derivXX, (GrayF32) derivYY, (GrayF32) derivXY, (ImageBorder_F32) border);
+				} else if( input instanceof GrayU8) {
+					HessianSobel.process((GrayU8) input, (GrayS16) derivXX, (GrayS16) derivYY, (GrayS16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
 				break;
 
 			case THREE:
-				if( input instanceof ImageFloat32 ) {
-					HessianThree.process((ImageFloat32) input, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
-				} else if( input instanceof ImageUInt8 ) {
-					HessianThree.process((ImageUInt8) input, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
+				if( input instanceof GrayF32) {
+					HessianThree.process((GrayF32) input, (GrayF32) derivXX, (GrayF32) derivYY, (GrayF32) derivXY, (ImageBorder_F32) border);
+				} else if( input instanceof GrayU8) {
+					HessianThree.process((GrayU8) input, (GrayS16) derivXX, (GrayS16) derivYY, (GrayS16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 				}
@@ -195,36 +195,36 @@ public class GImageDerivativeOps {
 	 * @param derivXY Output. Derivative XY
 	 * @param borderType How it should handle borders.  null == skip border
 	 */
-	public static <D extends ImageSingleBand>
+	public static <D extends ImageGray>
 	void hessian( DerivativeType type , D derivX , D derivY , D derivXX , D derivYY , D derivXY , BorderType borderType ) {
 		ImageBorder<D> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.single(derivX, borderType);
 
 		switch( type ) {
 			case PREWITT:
-				if( derivX instanceof ImageFloat32 ) {
-					HessianFromGradient.hessianPrewitt((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
-				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianPrewitt((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
+				if( derivX instanceof GrayF32) {
+					HessianFromGradient.hessianPrewitt((GrayF32) derivX, (GrayF32) derivY, (GrayF32) derivXX, (GrayF32) derivYY, (GrayF32) derivXY, (ImageBorder_F32) border);
+				} else if( derivX instanceof GrayS16) {
+					HessianFromGradient.hessianPrewitt((GrayS16) derivX, (GrayS16) derivY, (GrayS16) derivXX, (GrayS16) derivYY, (GrayS16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}
 				break;
 
 			case SOBEL:
-				if( derivX instanceof ImageFloat32 ) {
-					HessianFromGradient.hessianSobel((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
-				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianSobel((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
+				if( derivX instanceof GrayF32) {
+					HessianFromGradient.hessianSobel((GrayF32) derivX, (GrayF32) derivY, (GrayF32) derivXX, (GrayF32) derivYY, (GrayF32) derivXY, (ImageBorder_F32) border);
+				} else if( derivX instanceof GrayS16) {
+					HessianFromGradient.hessianSobel((GrayS16) derivX, (GrayS16) derivY, (GrayS16) derivXX, (GrayS16) derivYY, (GrayS16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}
 				break;
 
 			case THREE:
-				if( derivX instanceof ImageFloat32 ) {
-					HessianFromGradient.hessianThree((ImageFloat32) derivX, (ImageFloat32) derivY, (ImageFloat32) derivXX, (ImageFloat32) derivYY, (ImageFloat32) derivXY, (ImageBorder_F32) border);
-				} else if( derivX instanceof ImageSInt16 ) {
-					HessianFromGradient.hessianThree((ImageSInt16) derivX, (ImageSInt16) derivY, (ImageSInt16) derivXX, (ImageSInt16) derivYY, (ImageSInt16) derivXY, (ImageBorder_S32) border);
+				if( derivX instanceof GrayF32) {
+					HessianFromGradient.hessianThree((GrayF32) derivX, (GrayF32) derivY, (GrayF32) derivXX, (GrayF32) derivYY, (GrayF32) derivXY, (ImageBorder_F32) border);
+				} else if( derivX instanceof GrayS16) {
+					HessianFromGradient.hessianThree((GrayS16) derivX, (GrayS16) derivY, (GrayS16) derivXX, (GrayS16) derivYY, (GrayS16) derivXY, (ImageBorder_S32) border);
 				} else {
 					throw new IllegalArgumentException("Unknown input image type: "+derivX.getClass().getSimpleName());
 				}
@@ -276,7 +276,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	AnyImageDerivative<I,D> createAnyDerivatives( DerivativeType type , Class<I> inputType , Class<D> derivType ) {
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(inputType);
@@ -299,7 +299,7 @@ public class GImageDerivativeOps {
 	 * @param <D> Image derivative type.
 	 * @return AnyImageDerivative
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	AnyImageDerivative<I,D> derivativeForScaleSpace( Class<I> inputType , Class<D> derivType ) {
 		return createAnyDerivatives(DerivativeType.THREE,inputType,derivType);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.segmentation.fh04;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.sorting.ApproximateSort_F32;
 import org.ddogleg.sorting.QuickSortObj_F32;
@@ -88,7 +88,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 
 	// Storage for the disjoint-set forest.  Same data structure as 'output', but renamed for convenience.
 	// Value stored in each pixel refers to the parent vertex.  A root vertex contains a reference to itself
-	protected ImageSInt32 graph;
+	protected GrayS32 graph;
 
 	// Function that computes the weight for each edge
 	private FhEdgeWeights<T> computeWeights;
@@ -140,7 +140,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	 * @param input Input image.  Not modified.
 	 * @param output Output segmented image.  Modified.
 	 */
-	public void process( T input , ImageSInt32 output ) {
+	public void process( T input , GrayS32 output ) {
 		if( output.isSubimage() )
 			throw new IllegalArgumentException("Output can't be a sub-image");
 		InputSanityCheck.checkSameShape(input, output);
@@ -167,7 +167,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	/**
 	 * Predeclares all memory required and sets data structures to their initial values
 	 */
-	protected void initialize(T input , ImageSInt32 output ) {
+	protected void initialize(T input , GrayS32 output ) {
 		this.graph = output;
 		final int N = input.width*input.height;
 

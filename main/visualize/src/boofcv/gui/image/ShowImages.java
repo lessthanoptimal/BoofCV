@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.gui.image;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -117,7 +117,7 @@ public class ShowImages {
 		return frame;
 	}
 
-	public static ImagePanel showWindow( ImageSingleBand img , String title , boolean showMagnitude) {
+	public static ImagePanel showWindow(ImageGray img , String title , boolean showMagnitude) {
 		double max = GImageStatistics.maxAbs(img);
 		BufferedImage buff;
 		if( showMagnitude )

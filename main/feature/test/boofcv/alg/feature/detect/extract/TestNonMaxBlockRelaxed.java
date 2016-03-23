@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -32,7 +32,7 @@ public class TestNonMaxBlockRelaxed {
 		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,false,true) {
 
 			@Override
-			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+			public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 									 QueueCorner foundMinimum, QueueCorner foundMaximum)
 			{
 				NonMaxBlockRelaxed alg = new NonMaxBlockRelaxed.Max();
@@ -51,7 +51,7 @@ public class TestNonMaxBlockRelaxed {
 		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,true,false) {
 
 			@Override
-			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+			public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 									 QueueCorner foundMinimum, QueueCorner foundMaximum)
 			{
 				NonMaxBlockRelaxed alg = new NonMaxBlockRelaxed.Min();
@@ -70,7 +70,7 @@ public class TestNonMaxBlockRelaxed {
 		GenericNonMaxAlgorithmTests checks = new GenericNonMaxAlgorithmTests(false,true,true) {
 
 			@Override
-			public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+			public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 									 QueueCorner foundMinimum, QueueCorner foundMaximum)
 			{
 				NonMaxBlockRelaxed alg = new NonMaxBlockRelaxed.MinMax();

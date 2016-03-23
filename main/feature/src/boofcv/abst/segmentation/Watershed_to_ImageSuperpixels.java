@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,10 @@ import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
 import boofcv.core.image.GConvertImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.feature.ColorQueue_F32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -45,9 +45,9 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements Image
 	private WatershedVincentSoille1991 alg;
 	private ConnectRule rule;
 
-	private ImageUInt8 converted = new ImageUInt8(1,1);
+	private GrayU8 converted = new GrayU8(1,1);
 
-	private MergeSmallRegions<ImageUInt8> pruneSmall;
+	private MergeSmallRegions<GrayU8> pruneSmall;
 
 	private GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 	private FastQueue<float[]> regionColor = new ColorQueue_F32(1);
@@ -63,11 +63,11 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements Image
 		this.rule = rule;
 
 		if( minimumSize > 0 )
-			pruneSmall = new MergeSmallRegions<ImageUInt8>(minimumSize,rule,new ComputeRegionMeanColor.U8());
+			pruneSmall = new MergeSmallRegions<GrayU8>(minimumSize,rule,new ComputeRegionMeanColor.U8());
 	}
 
 	@Override
-	public void segment(T input, ImageSInt32 output) {
+	public void segment(T input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input,output);
 		converted.reshape(input.width,input.height);
 
@@ -78,7 +78,7 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements Image
 		alg.removeWatersheds();
 
 		numRegions = alg.getTotalRegions();
-		ImageSInt32 pixelToRegion = alg.getOutput();
+		GrayS32 pixelToRegion = alg.getOutput();
 
 		// Merge small regions together
 		if( pruneSmall != null ) {

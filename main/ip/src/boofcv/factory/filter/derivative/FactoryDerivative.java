@@ -46,7 +46,7 @@ public class FactoryDerivative {
 	 * @param <D> Derivative image
 	 * @return gradient filter
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> gradientSB( DerivativeType type , Class<I> inputType , Class<D> derivType )
 	{
 		if( derivType == null )
@@ -84,7 +84,7 @@ public class FactoryDerivative {
 	}
 
 	/**
-	 * Filters for computing the gradient of {@link MultiSpectral} images.
+	 * Filters for computing the gradient of {@link Planar} images.
 	 *
 	 * @param type Which gradient to compute
 	 * @param numBands Number of bands in the image
@@ -94,8 +94,8 @@ public class FactoryDerivative {
 	 * @param <D> Derivative type
 	 * @return the filter
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
-	ImageGradient<MultiSpectral<I>,MultiSpectral<D>>
+	public static <I extends ImageGray, D extends ImageGray>
+	ImageGradient<Planar<I>,Planar<D>>
 	gradientMS(DerivativeType type , int numBands , Class<I> inputType , Class<D> derivType )
 	{
 		ImageGradient<I,D> g = gradientSB(type,inputType,derivType);
@@ -132,7 +132,7 @@ public class FactoryDerivative {
 		}
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> prewitt( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -142,7 +142,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> sobel( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -152,7 +152,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> three( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -161,7 +161,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> two0(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -170,7 +170,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> two1(Class<I> inputType, Class<D> derivType)
 	{
 		if( derivType == null )
@@ -179,7 +179,7 @@ public class FactoryDerivative {
 		return new ImageGradient_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageHessianDirect<I,D> hessianDirectThree( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -188,7 +188,7 @@ public class FactoryDerivative {
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageHessianDirect<I,D> hessianDirectSobel( Class<I> inputType , Class<D> derivType)
 	{
 		if( derivType == null )
@@ -197,82 +197,82 @@ public class FactoryDerivative {
 		return new ImageHessianDirect_Reflection<I,D>(m);
 	}
 
-	public static <D extends ImageSingleBand>
+	public static <D extends ImageGray>
 	ImageHessian<D> hessian( Class<?> gradientType , Class<D> derivType ) {
 		Method m = findHessianFromGradient(gradientType,derivType);
 		return new ImageHessian_Reflection<D>(m);
 	}
 
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<I,D> gaussian( double sigma , int radius , Class<I> inputType , Class<D> derivType) {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}
 
-	public static ImageGradient<ImageFloat32,ImageFloat32> gaussian_F32( double sigma , int radius ) {
-		return gaussian(sigma,radius, ImageFloat32.class,ImageFloat32.class);
+	public static ImageGradient<GrayF32,GrayF32> gaussian_F32(double sigma , int radius ) {
+		return gaussian(sigma,radius, GrayF32.class,GrayF32.class);
 	}
 
-	public static ImageGradient<ImageFloat32,ImageFloat32> sobel_F32() {
-		return sobel(ImageFloat32.class,ImageFloat32.class);
+	public static ImageGradient<GrayF32,GrayF32> sobel_F32() {
+		return sobel(GrayF32.class,GrayF32.class);
 	}
 
-	public static ImageGradient<ImageFloat32,ImageFloat32> three_F32() {
-		return three(ImageFloat32.class,ImageFloat32.class);
+	public static ImageGradient<GrayF32,GrayF32> three_F32() {
+		return three(GrayF32.class,GrayF32.class);
 	}
 
-	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectThree_F32() {
-		return hessianDirectThree(ImageFloat32.class,ImageFloat32.class);
+	public static ImageHessianDirect<GrayF32,GrayF32> hessianDirectThree_F32() {
+		return hessianDirectThree(GrayF32.class,GrayF32.class);
 	}
 
-	public static ImageHessianDirect<ImageFloat32,ImageFloat32> hessianDirectSobel_F32() {
-		return hessianDirectSobel(ImageFloat32.class,ImageFloat32.class);
+	public static ImageHessianDirect<GrayF32,GrayF32> hessianDirectSobel_F32() {
+		return hessianDirectSobel(GrayF32.class,GrayF32.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> gaussian_U8(double sigma, int radius) {
-		return gaussian(sigma,radius,ImageUInt8.class,ImageSInt16.class);
+	public static ImageGradient<GrayU8, GrayS16> gaussian_U8(double sigma, int radius) {
+		return gaussian(sigma,radius,GrayU8.class,GrayS16.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> sobel_U8() {
-		return sobel(ImageUInt8.class,ImageSInt16.class);
+	public static ImageGradient<GrayU8, GrayS16> sobel_U8() {
+		return sobel(GrayU8.class,GrayS16.class);
 	}
 
-	public static ImageGradient<ImageUInt8, ImageSInt16> three_U8() {
-		return three(ImageUInt8.class,ImageSInt16.class);
+	public static ImageGradient<GrayU8, GrayS16> three_U8() {
+		return three(GrayU8.class,GrayS16.class);
 	}
 
-	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectThree_U8() {
-		return hessianDirectThree(ImageUInt8.class,ImageSInt16.class);
+	public static ImageHessianDirect<GrayU8, GrayS16> hessianDirectThree_U8() {
+		return hessianDirectThree(GrayU8.class,GrayS16.class);
 	}
 
-	public static ImageHessianDirect<ImageUInt8, ImageSInt16> hessianDirectSobel_U8() {
-		return hessianDirectSobel(ImageUInt8.class,ImageSInt16.class);
+	public static ImageHessianDirect<GrayU8, GrayS16> hessianDirectSobel_U8() {
+		return hessianDirectSobel(GrayU8.class,GrayS16.class);
 	}
 
-	public static <D extends ImageSingleBand> ImageHessian<D> hessianSobel( Class<D> derivType ) {
-		if( derivType == ImageFloat32.class )
-			return (ImageHessian<D>)hessian(GradientSobel.class,ImageFloat32.class);
-		else if( derivType == ImageSInt16.class )
-			return (ImageHessian<D>)hessian(GradientSobel.class,ImageSInt16.class);
+	public static <D extends ImageGray> ImageHessian<D> hessianSobel(Class<D> derivType ) {
+		if( derivType == GrayF32.class )
+			return (ImageHessian<D>)hessian(GradientSobel.class,GrayF32.class);
+		else if( derivType == GrayS16.class )
+			return (ImageHessian<D>)hessian(GradientSobel.class,GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageSingleBand> ImageHessian<D> hessianPrewitt( Class<D> derivType ) {
-		if( derivType == ImageFloat32.class )
-			return (ImageHessian<D>)hessian(GradientPrewitt.class,ImageFloat32.class);
-		else if( derivType == ImageSInt16.class )
-			return (ImageHessian<D>)hessian(GradientPrewitt.class,ImageSInt16.class);
+	public static <D extends ImageGray> ImageHessian<D> hessianPrewitt(Class<D> derivType ) {
+		if( derivType == GrayF32.class )
+			return (ImageHessian<D>)hessian(GradientPrewitt.class,GrayF32.class);
+		else if( derivType == GrayS16.class )
+			return (ImageHessian<D>)hessian(GradientPrewitt.class,GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}
 
-	public static <D extends ImageSingleBand> ImageHessian<D> hessianThree( Class<D> derivType ) {
-		if( derivType == ImageFloat32.class )
-			return (ImageHessian<D>)hessian(GradientThree.class,ImageFloat32.class);
-		else if( derivType == ImageSInt16.class )
-			return (ImageHessian<D>)hessian(GradientThree.class,ImageSInt16.class);
+	public static <D extends ImageGray> ImageHessian<D> hessianThree(Class<D> derivType ) {
+		if( derivType == GrayF32.class )
+			return (ImageHessian<D>)hessian(GradientThree.class,GrayF32.class);
+		else if( derivType == GrayS16.class )
+			return (ImageHessian<D>)hessian(GradientThree.class,GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
 	}

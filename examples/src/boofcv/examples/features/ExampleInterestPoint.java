@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -47,7 +47,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleInterestPoint {
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void detect( BufferedImage image , Class<T> imageType ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 
@@ -63,7 +63,7 @@ public class ExampleInterestPoint {
 		displayResults(image, detector);
 	}
 
-	private static <T extends ImageSingleBand>
+	private static <T extends ImageGray>
 	void displayResults(BufferedImage image, InterestPointDetector<T> detector)
 	{
 		Graphics2D g2 = image.createGraphics();
@@ -91,6 +91,6 @@ public class ExampleInterestPoint {
 
 	public static void main( String args[] ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
-		detect(image, ImageFloat32.class);
+		detect(image, GrayF32.class);
 	}
 }

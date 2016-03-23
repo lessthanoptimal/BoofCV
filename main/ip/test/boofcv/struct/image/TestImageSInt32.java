@@ -21,20 +21,20 @@ package boofcv.struct.image;
 /**
  * @author Peter Abeles
  */
-public class TestImageSInt32 extends StandardImageIntegerTests<ImageSInt32> {
+public class TestImageSInt32 extends StandardImageIntegerTests<GrayS32> {
 
 	public TestImageSInt32() {
 		super(true);
 	}
 
 	@Override
-	public ImageSInt32 createImage(int width, int height) {
-		return new ImageSInt32(width, height);
+	public GrayS32 createImage(int width, int height) {
+		return new GrayS32(width, height);
 	}
 
 	@Override
-	public ImageSInt32 createImage() {
-		return new ImageSInt32();
+	public GrayS32 createImage() {
+		return new GrayS32();
 	}
 
 	@Override

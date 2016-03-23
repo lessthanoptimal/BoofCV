@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.core.image.inst;
 
 import boofcv.core.image.ImageGenerator;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Peter Abeles
  */
-public class SingleBandGenerator<T extends ImageSingleBand> implements ImageGenerator<T> {
+public class SingleBandGenerator<T extends ImageGray> implements ImageGenerator<T> {
 
 	Class<T> type;
 

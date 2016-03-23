@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,9 +42,9 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -79,7 +79,7 @@ public class ExampleImageStitching {
 	 * Using abstracted code, find a transform which minimizes the difference between corresponding features
 	 * in both images.  This code is completely model independent and is the core algorithms.
 	 */
-	public static<T extends ImageSingleBand, FD extends TupleDesc> Homography2D_F64
+	public static<T extends ImageGray, FD extends TupleDesc> Homography2D_F64
 	computeTransform( T imageA , T imageB ,
 					  DetectDescribePoint<T,FD> detDesc ,
 					  AssociateDescription<FD> associate ,
@@ -124,7 +124,7 @@ public class ExampleImageStitching {
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private static <T extends ImageSingleBand, FD extends TupleDesc>
+	private static <T extends ImageGray, FD extends TupleDesc>
 	void describeImage(T image,
 					   DetectDescribePoint<T,FD> detDesc,
 					   List<Point2D_F64> points,
@@ -141,7 +141,7 @@ public class ExampleImageStitching {
 	/**
 	 * Given two input images create and display an image where the two have been overlayed on top of each other.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void stitch( BufferedImage imageA , BufferedImage imageB , Class<T> imageType )
 	{
 		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
@@ -172,13 +172,13 @@ public class ExampleImageStitching {
 		double scale = 0.5;
 
 		// Convert into a BoofCV color format
-		MultiSpectral<ImageFloat32> colorA =
-				ConvertBufferedImage.convertFromMulti(imageA, null, true, ImageFloat32.class);
-		MultiSpectral<ImageFloat32> colorB =
-				ConvertBufferedImage.convertFromMulti(imageB, null,true, ImageFloat32.class);
+		Planar<GrayF32> colorA =
+				ConvertBufferedImage.convertFromMulti(imageA, null, true, GrayF32.class);
+		Planar<GrayF32> colorB =
+				ConvertBufferedImage.convertFromMulti(imageB, null,true, GrayF32.class);
 
 		// Where the output images are rendered into
-		MultiSpectral<ImageFloat32> work = colorA.createSameShape();
+		Planar<GrayF32> work = colorA.createSameShape();
 
 		// Adjust the transform so that the whole image can appear inside of it
 		Homography2D_F64 fromAToWork = new Homography2D_F64(scale,0,colorA.width/4,0,scale,colorA.height/4,0,0,1);
@@ -186,9 +186,9 @@ public class ExampleImageStitching {
 
 		// Used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.VALUE);
-		ImageDistort<MultiSpectral<ImageFloat32>,MultiSpectral<ImageFloat32>> distort =
-				DistortSupport.createDistortMS(ImageFloat32.class, model, interp, false);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.VALUE);
+		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distort =
+				DistortSupport.createDistortMS(GrayF32.class, model, interp, false);
 		distort.setRenderAll(false);
 
 		// Render first image
@@ -236,12 +236,12 @@ public class ExampleImageStitching {
 		BufferedImage imageA,imageB;
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));
-		stitch(imageA,imageB, ImageFloat32.class);
+		stitch(imageA,imageB, GrayF32.class);
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
-		stitch(imageA,imageB, ImageFloat32.class);
+		stitch(imageA,imageB, GrayF32.class);
 		imageA = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_01.jpg"));
 		imageB = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_02.jpg"));
-		stitch(imageA,imageB, ImageFloat32.class);
+		stitch(imageA,imageB, GrayF32.class);
 	}
 }

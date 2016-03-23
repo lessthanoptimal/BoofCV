@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,36 +23,36 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<ImageUInt8> {
+public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<GrayU8> {
 
 	public TestMonoOverhead_to_MonocularPlaneVisualOdometry() {
-		super(ImageUInt8.class,-20,0.04);
+		super(GrayU8.class,-20,0.04);
 
 		setAlgorithm(createAlgorithm());
 	}
 
-	protected MonocularPlaneVisualOdometry<ImageUInt8> createAlgorithm() {
+	protected MonocularPlaneVisualOdometry<GrayU8> createAlgorithm() {
 
 		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
-		PointTracker<ImageUInt8> tracker = FactoryPointTracker.klt(config, configDetector,
-				ImageUInt8.class,ImageSInt16.class);
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, configDetector,
+				GrayU8.class,GrayS16.class);
 
 		double cellSize = 0.015;
 		double ransacTol = 0.2;
 
 		return FactoryVisualOdometry.monoPlaneOverhead(
-				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker, ImageType.single(ImageUInt8.class));
+				cellSize, 25,0.5, ransacTol,300,2,30,0.5,0.3, tracker, ImageType.single(GrayU8.class));
 
 	}
 

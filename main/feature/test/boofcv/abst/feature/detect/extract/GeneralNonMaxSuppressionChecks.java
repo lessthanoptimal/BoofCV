@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public abstract class GeneralNonMaxSuppressionChecks {
 
 	NonMaxSuppression alg;
 
-	ImageFloat32 image = new ImageFloat32(width,height);
+	GrayF32 image = new GrayF32(width,height);
 	QueueCorner candidatesMin = new QueueCorner(10);
 	QueueCorner candidatesMax = new QueueCorner(10);
 
@@ -277,7 +277,7 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		int origMax = foundMax.size;
 
 		// if sub-images are correctly handled this should produce identical results
-		ImageFloat32 sub = BoofTesting.createSubImageOf(image);
+		GrayF32 sub = BoofTesting.createSubImageOf(image);
 		foundMin.reset(); foundMax.reset();
 		alg.process(sub, candidatesMin, candidatesMax, foundMin, foundMax);
 		int subMin = foundMin.size;

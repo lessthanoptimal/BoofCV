@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.color;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 
 /**
  * <p>
@@ -132,22 +132,22 @@ public class ColorYuv {
 	}
 
 	/**
-	 * Convert a 3-channel {@link MultiSpectral} image from YUV into RGB.
+	 * Convert a 3-channel {@link Planar} image from YUV into RGB.
 	 *
 	 * @param rgb (Input) RGB encoded image
 	 * @param yuv (Output) YUV encoded image
 	 */
-	public static void yuvToRgb_F32( MultiSpectral<ImageFloat32> yuv , MultiSpectral<ImageFloat32> rgb ) {
+	public static void yuvToRgb_F32(Planar<GrayF32> yuv , Planar<GrayF32> rgb ) {
 
 		InputSanityCheck.checkSameShape(yuv,rgb);
 
-		ImageFloat32 Y = yuv.getBand(0);
-		ImageFloat32 U = yuv.getBand(1);
-		ImageFloat32 V = yuv.getBand(2);
+		GrayF32 Y = yuv.getBand(0);
+		GrayF32 U = yuv.getBand(1);
+		GrayF32 V = yuv.getBand(2);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
 		for( int row = 0; row < yuv.height; row++ ) {
 			int indexYuv = yuv.startIndex + row*yuv.stride;
@@ -166,24 +166,24 @@ public class ColorYuv {
 	}
 
 	/**
-	 * Convert a 3-channel {@link MultiSpectral} image from RGB into YUV.
+	 * Convert a 3-channel {@link Planar} image from RGB into YUV.
 	 *
 	 * NOTE: Input and output image can be the same instance.
 	 *
 	 * @param rgb (Input) RGB encoded image
 	 * @param yuv (Output) YUV encoded image
 	 */
-	public static void rgbToYuv_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> yuv ) {
+	public static void rgbToYuv_F32(Planar<GrayF32> rgb , Planar<GrayF32> yuv ) {
 
 		InputSanityCheck.checkSameShape(yuv,rgb);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
-		ImageFloat32 Y = yuv.getBand(0);
-		ImageFloat32 U = yuv.getBand(1);
-		ImageFloat32 V = yuv.getBand(2);
+		GrayF32 Y = yuv.getBand(0);
+		GrayF32 U = yuv.getBand(1);
+		GrayF32 V = yuv.getBand(2);
 
 		for( int row = 0; row < yuv.height; row++ ) {
 			int indexYuv = yuv.startIndex + row*yuv.stride;
@@ -211,15 +211,15 @@ public class ColorYuv {
 	 * @param yuv YCbCr encoded 8-bit image
 	 * @param rgb RGB encoded 8-bit image
 	 */
-	public static void ycbcrToRgb_U8( MultiSpectral<ImageUInt8> yuv , MultiSpectral<ImageUInt8> rgb ) {
+	public static void ycbcrToRgb_U8(Planar<GrayU8> yuv , Planar<GrayU8> rgb ) {
 
-		ImageUInt8 Y = yuv.getBand(0);
-		ImageUInt8 U = yuv.getBand(1);
-		ImageUInt8 V = yuv.getBand(2);
+		GrayU8 Y = yuv.getBand(0);
+		GrayU8 U = yuv.getBand(1);
+		GrayU8 V = yuv.getBand(2);
 
-		ImageUInt8 R = rgb.getBand(0);
-		ImageUInt8 G = rgb.getBand(1);
-		ImageUInt8 B = rgb.getBand(2);
+		GrayU8 R = rgb.getBand(0);
+		GrayU8 G = rgb.getBand(1);
+		GrayU8 B = rgb.getBand(2);
 
 		for( int row = 0; row < yuv.height; row++ ) {
 			int indexYuv = yuv.startIndex + row*yuv.stride;

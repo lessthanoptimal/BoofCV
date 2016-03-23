@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -85,7 +85,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Declares lookup tables for neighbors
 	 */
-	protected void setUpEdges( ImageSInt32 input , ImageSInt32 output  ) {
+	protected void setUpEdges(GrayS32 input , GrayS32 output  ) {
 		if( connectRule == ConnectRule.EIGHT ) {
 			setUpEdges8(input,edgesIn);
 			setUpEdges8(output,edgesOut);
@@ -103,14 +103,14 @@ public class ClusterLabeledImage extends RegionMergeTree {
 		}
 	}
 
-	protected void setUpEdges8( ImageSInt32 image , int edges[] )  {
+	protected void setUpEdges8(GrayS32 image , int edges[] )  {
 		edges[0] =  1;
 		edges[1] =  1 + image.stride;
 		edges[2] =    + image.stride;
 		edges[3] = -1 + image.stride;
 	}
 
-	protected void setUpEdges4( ImageSInt32 image , int edges[] )  {
+	protected void setUpEdges4(GrayS32 image , int edges[] )  {
 		edges[0] =  1;
 		edges[1] =    + image.stride;
 	}
@@ -122,7 +122,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	 * @param output Labeled output image.
 	 * @param regionMemberCount (Input/Output) Number of pixels which belong to each group.
 	 */
-	public void process( ImageSInt32 input , ImageSInt32 output , GrowQueue_I32 regionMemberCount ) {
+	public void process(GrayS32 input , GrayS32 output , GrowQueue_I32 regionMemberCount ) {
 		// initialize data structures
 		this.regionMemberCount = regionMemberCount;
 		regionMemberCount.reset();
@@ -145,7 +145,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels inside the image without the need for bounds checking
 	 */
-	protected void connectInner(ImageSInt32 input, ImageSInt32 output) {
+	protected void connectInner(GrayS32 input, GrayS32 output) {
 
 		int startX = connectRule == ConnectRule.EIGHT ? 1 : 0;
 
@@ -180,7 +180,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels along the left and right border
 	 */
-	protected void connectLeftRight(ImageSInt32 input, ImageSInt32 output) {
+	protected void connectLeftRight(GrayS32 input, GrayS32 output) {
 		for( int y = 0; y < input.height; y++ ) {
 			int x = input.width-1;
 
@@ -253,7 +253,7 @@ public class ClusterLabeledImage extends RegionMergeTree {
 	/**
 	 * Examines pixels along the bottom border
 	 */
-	protected void connectBottom(ImageSInt32 input, ImageSInt32 output) {
+	protected void connectBottom(GrayS32 input, GrayS32 output) {
 		for( int x = 0; x < input.width-1; x++ ) {
 			int y = input.height-1;
 

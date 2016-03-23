@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 
@@ -57,8 +57,8 @@ public class DenoiseAccuracyStudyApp {
 	float noiseSigma = 20;
 
 	Random rand = new Random(2234);
-	ImageFloat32 image;
-	ImageFloat32 imageNoisy;
+	GrayF32 image;
+	GrayF32 imageNoisy;
 
 	public void process( List<TestItem> filters , List<String> images ) {
 
@@ -68,8 +68,8 @@ public class DenoiseAccuracyStudyApp {
 			loadImage(imagePath);
 			addNoiseToImage();
 
-			ImageFloat32 originalImage = image.clone();
-			ImageFloat32 imageDenoised = new ImageFloat32(image.width,image.height);
+			GrayF32 originalImage = image.clone();
+			GrayF32 imageDenoised = new GrayF32(image.width,image.height);
 
 			System.out.println("  Noise MSE:  "+computeMSE(imageNoisy));
 
@@ -121,16 +121,16 @@ public class DenoiseAccuracyStudyApp {
 	{
 		List<TestItem> ret = new ArrayList<TestItem>();
 
-		WaveletTransform<ImageFloat32, ImageFloat32,WlCoef_F32> waveletTran =
+		WaveletTransform<GrayF32, GrayF32,WlCoef_F32> waveletTran =
 				FactoryWaveletTransform.create_F32(waveletDesc,numLevels,0,255);
 
 
-		FilterImageInterface<ImageFloat32,ImageFloat32> filter;
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,FactoryDenoiseWaveletAlg.visu(ImageFloat32.class));
+		FilterImageInterface<GrayF32,GrayF32> filter;
+		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran,FactoryDenoiseWaveletAlg.visu(GrayF32.class));
 		ret.add( new TestItem(filter,"Visu "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran, FactoryDenoiseWaveletAlg.bayes(null,ImageFloat32.class));
+		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran, FactoryDenoiseWaveletAlg.bayes(null,GrayF32.class));
 		ret.add( new TestItem(filter,"Bayes "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<ImageFloat32>(waveletTran,FactoryDenoiseWaveletAlg.sure(ImageFloat32.class));
+		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran,FactoryDenoiseWaveletAlg.sure(GrayF32.class));
 		ret.add( new TestItem(filter,"Sure "+waveletName+" L = "+numLevels));
 
 		return ret;
@@ -140,29 +140,29 @@ public class DenoiseAccuracyStudyApp {
 	{
 		List<TestItem> ret = new ArrayList<TestItem>();
 
-		FilterImageInterface<ImageFloat32,ImageFloat32> filter;
-		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,2);
+		FilterImageInterface<GrayF32,GrayF32> filter;
+		filter = FactoryBlurFilter.gaussian(GrayF32.class,-1,2);
 		ret.add( new TestItem(filter,"Gaussian "+2));
-		filter = FactoryBlurFilter.gaussian(ImageFloat32.class,-1,3);
+		filter = FactoryBlurFilter.gaussian(GrayF32.class,-1,3);
 		ret.add( new TestItem(filter,"Gaussian "+3));
-		filter = FactoryBlurFilter.mean(ImageFloat32.class,2);
+		filter = FactoryBlurFilter.mean(GrayF32.class,2);
 		ret.add( new TestItem(filter,"Mean "+2));
-		filter = FactoryBlurFilter.mean(ImageFloat32.class,3);
+		filter = FactoryBlurFilter.mean(GrayF32.class,3);
 		ret.add( new TestItem(filter,"Mean "+3));
-		filter = FactoryBlurFilter.median(ImageFloat32.class,2);
+		filter = FactoryBlurFilter.median(GrayF32.class,2);
 		ret.add( new TestItem(filter,"Median "+2));
-		filter = FactoryBlurFilter.median(ImageFloat32.class,3);
+		filter = FactoryBlurFilter.median(GrayF32.class,3);
 		ret.add( new TestItem(filter,"Median "+3));
 
 		return ret;
 	}
 
-	private double computeMSE(ImageFloat32 imageInv) {
+	private double computeMSE(GrayF32 imageInv) {
 		return ImageStatistics.meanDiffSq(imageInv,image);
 	}
 
-	private double computeEdgeMSE(ImageFloat32 imageInv) {
-		ImageFloat32 edge = new ImageFloat32(imageInv.width,imageInv.height);
+	private double computeEdgeMSE(GrayF32 imageInv) {
+		GrayF32 edge = new GrayF32(imageInv.width,imageInv.height);
 		LaplacianEdge.process(image,edge);
 		PixelMath.abs(edge,edge);
 		float max = ImageStatistics.maxAbs(edge);
@@ -182,7 +182,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private void loadImage( String imagePath ) {
 		BufferedImage in = UtilImageIO.loadImage(imagePath);
-		image = ConvertBufferedImage.convertFrom(in,(ImageFloat32)null);
+		image = ConvertBufferedImage.convertFrom(in,(GrayF32)null);
 	}
 
 
@@ -209,11 +209,11 @@ public class DenoiseAccuracyStudyApp {
 
 	public static class TestItem
 	{
-		public FilterImageInterface<ImageFloat32,ImageFloat32> filter;
+		public FilterImageInterface<GrayF32,GrayF32> filter;
 		public String name;
 		public double opsPerSecond;
 
-		public TestItem(FilterImageInterface<ImageFloat32, ImageFloat32> filter, String name) {
+		public TestItem(FilterImageInterface<GrayF32, GrayF32> filter, String name) {
 			this.filter = filter;
 			this.name = name;
 		}

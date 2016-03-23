@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -38,17 +38,17 @@ public class TestOrientationGradientToImage {
 	 */
 	@Test
 	public void generic() {
-		OrientationGradient<ImageFloat32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, ImageFloat32.class);
+		OrientationGradient<GrayF32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, GrayF32.class);
 
-		ImageGradient<ImageFloat32,ImageFloat32> gradient =
+		ImageGradient<GrayF32,GrayF32> gradient =
 				FactoryDerivative.sobel_F32();
 
-		OrientationGradientToImage<ImageFloat32,ImageFloat32>
-				alg = new OrientationGradientToImage<ImageFloat32, ImageFloat32>(orig,gradient,
-				ImageFloat32.class,ImageFloat32.class);
+		OrientationGradientToImage<GrayF32,GrayF32>
+				alg = new OrientationGradientToImage<GrayF32, GrayF32>(orig,gradient,
+				GrayF32.class,GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol,r*2+1,alg,ImageFloat32.class);
+		tests.setup(angleTol,r*2+1,alg,GrayF32.class);
 		tests.performAll();
 	}
 }

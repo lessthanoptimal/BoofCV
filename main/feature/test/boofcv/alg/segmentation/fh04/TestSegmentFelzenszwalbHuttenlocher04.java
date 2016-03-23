@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.segmentation.fh04;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.segmentation.fh04.impl.FhEdgeWeights4_U8;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -44,9 +44,9 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 	 */
 	@Test
 	public void process() {
-		ImageUInt8 image = new ImageUInt8(20,25);
+		GrayU8 image = new GrayU8(20,25);
 		ImageMiscOps.fillRectangle(image,100,0,0,10,25);
-		ImageSInt32 output = new ImageSInt32(20,25);
+		GrayS32 output = new GrayS32(20,25);
 
 		// normal images
 		process(image, output);
@@ -55,11 +55,11 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		process(BoofTesting.createSubImageOf(image), output);
 	}
 
-	private void process(ImageUInt8 image, ImageSInt32 output) {
+	private void process(GrayU8 image, GrayS32 output) {
 		ImageMiscOps.fillUniform(output,rand,0,100);
 
-		FhEdgeWeights<ImageUInt8> edgeWeights = new FhEdgeWeights4_U8();
-		SegmentFelzenszwalbHuttenlocher04<ImageUInt8> alg = new SegmentFelzenszwalbHuttenlocher04<ImageUInt8>(200,10,edgeWeights);
+		FhEdgeWeights<GrayU8> edgeWeights = new FhEdgeWeights4_U8();
+		SegmentFelzenszwalbHuttenlocher04<GrayU8> alg = new SegmentFelzenszwalbHuttenlocher04<GrayU8>(200,10,edgeWeights);
 
 		alg.process(image,output);
 
@@ -97,7 +97,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		// NOTE the order after sorting is undefined.  So the checks below could be incorrect if they are processed
 		// in a different order
 
-		alg.graph = new ImageSInt32(4,5);
+		alg.graph = new GrayS32(4,5);
 		alg.graph.data = new int[]{
 				0, 1, 2, 3,
 				4, 5, 6, 7,
@@ -154,7 +154,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		alg.regionSize.set(15, 9);
 
 		// regions: 2,5,15
-		alg.graph = new ImageSInt32(4,5);
+		alg.graph = new GrayS32(4,5);
 		alg.graph.data = new int[]{
 				2, 0, 2, 5,
 				3, 5, 4, 6,
@@ -177,7 +177,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 	public void find() {
 		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 
-		alg.graph = new ImageSInt32(4,5);
+		alg.graph = new GrayS32(4,5);
 		alg.graph.data = new int[]{
 				2, 0, 2, 5,
 				3, 5, 4, 6,
@@ -197,7 +197,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 
 		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(300,20,null);
 
-		alg.graph = new ImageSInt32(4,5);
+		alg.graph = new GrayS32(4,5);
 		alg.graph.data = new int[]{
 				2, 0, 2, 5,
 				3, 5, 4, 6,
@@ -222,7 +222,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		assertEquals(6,outputRegionSize.get(1));
 		assertEquals(16,outputRegionSize.get(2));
 
-		ImageSInt32 expected = new ImageSInt32(4,5);
+		GrayS32 expected = new GrayS32(4,5);
 		expected.data = new int[]{
 				2, 2, 2, 5,
 				5, 5, 5, 5,

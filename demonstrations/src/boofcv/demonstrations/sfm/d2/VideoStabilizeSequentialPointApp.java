@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -45,7 +45,7 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D extends ImageSingleBand,
+public class VideoStabilizeSequentialPointApp<I extends ImageGray, D extends ImageGray,
 		T extends InvertibleTransform<T>>
 		extends VideoStitchBaseApp<I,T>
 {
@@ -101,7 +101,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageSingleBand, D exten
 	}
 
 	public static void main( String args[] ) {
-		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(ImageFloat32.class, ImageFloat32.class);
+		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(GrayF32.class, GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));

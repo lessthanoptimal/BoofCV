@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.filter;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public class FilterSequence<Input extends ImageSingleBand, Output extends ImageSingleBand>
+public class FilterSequence<Input extends ImageGray, Output extends ImageGray>
 		implements FilterImageInterface<Input,Output> {
 
 	FilterImageInterface<Input,Output> firstFilter;

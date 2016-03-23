@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -41,25 +41,25 @@ public class TestSegmentMeanShiftSearchGray {
 
 	Random rand = new Random(234);
 
-	InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.EXTENDED);
+	InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
 	/**
 	 * Process a random image and do a basic sanity check on the output
 	 */
 	@Test
 	public void simpleTest() {
-		ImageFloat32 image = new ImageFloat32(20,25);
+		GrayF32 image = new GrayF32(20,25);
 
 		ImageMiscOps.fillUniform(image, rand, 0, 256);
 
-		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,100, false);
+		SegmentMeanShiftSearchGray<GrayF32> alg =
+				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,100, false);
 
 		alg.process(image);
 
 		FastQueue<Point2D_I32> locations = alg.getModeLocation();
 		GrowQueue_I32 counts = alg.getRegionMemberCount();
-		ImageSInt32 peaks = alg.getPixelToRegion();
+		GrayS32 peaks = alg.getPixelToRegion();
 		FastQueue<float[]> values = alg.getModeColor();
 
 		// there should be a fair number of local peaks due to the image being random
@@ -91,13 +91,13 @@ public class TestSegmentMeanShiftSearchGray {
 
 	@Test
 	public void findPeak_inside() {
-		ImageFloat32 image = new ImageFloat32(20,25);
+		GrayF32 image = new GrayF32(20,25);
 
 		ImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
 
 		// works better with this example when its uniform
-		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,3, false);
+		SegmentMeanShiftSearchGray<GrayF32> alg =
+				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,3, false);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -114,12 +114,12 @@ public class TestSegmentMeanShiftSearchGray {
 	}
 
 	private void findPeak_border(int cx, int cy, int startX, int startY) {
-		ImageFloat32 image = new ImageFloat32(20,25);
+		GrayF32 image = new GrayF32(20,25);
 
 		ImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
-		SegmentMeanShiftSearchGray<ImageFloat32> alg =
-				new SegmentMeanShiftSearchGray<ImageFloat32>(30,0.05f,interp,2,2,100, false);
+		SegmentMeanShiftSearchGray<GrayF32> alg =
+				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,100, false);
 
 		interp.setImage(image);
 		alg.image = image;

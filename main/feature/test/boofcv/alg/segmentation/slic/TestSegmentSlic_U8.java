@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,20 +19,20 @@
 package boofcv.alg.segmentation.slic;
 
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public class TestSegmentSlic_U8 extends GeneralSegmentSlicColorChecks<ImageUInt8> {
+public class TestSegmentSlic_U8 extends GeneralSegmentSlicColorChecks<GrayU8> {
 
 	public TestSegmentSlic_U8() {
-		super(ImageType.single(ImageUInt8.class));
+		super(ImageType.single(GrayU8.class));
 	}
 
 	@Override
-	public SegmentSlic<ImageUInt8> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
+	public SegmentSlic<GrayU8> createAlg(int numberOfRegions, float m, int totalIterations, ConnectRule rule) {
 		return new SegmentSlic_U8(numberOfRegions,m,totalIterations,rule);
 	}
 

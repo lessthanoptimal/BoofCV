@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TestUtilDenseOpticalFlow {
 
 	@Test
 	public void standardPyramid_sigma_05() {
-		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,1.5,25,100, ImageFloat32.class);
+		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,1.5,25,100, GrayF32.class);
 
 		assertEquals(3,pyr.getNumLayers());
 
@@ -49,7 +49,7 @@ public class TestUtilDenseOpticalFlow {
 
 	@Test
 	public void standardPyramid_sigma_1() {
-		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,1,1.5,25,100, ImageFloat32.class);
+		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,1,1.5,25,100, GrayF32.class);
 
 		assertEquals(1,pyr.getNumLayers());
 
@@ -59,7 +59,7 @@ public class TestUtilDenseOpticalFlow {
 
 	@Test
 	public void standardPyramid_sigma_0() {
-		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0,1.5,25,30, ImageFloat32.class);
+		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0,1.5,25,30, GrayF32.class);
 
 		assertEquals(30,pyr.getNumLayers());
 
@@ -69,7 +69,7 @@ public class TestUtilDenseOpticalFlow {
 
 	@Test
 	public void standardPyramid_justScale() {
-		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,0,25,100, ImageFloat32.class);
+		ImagePyramid pyr = UtilDenseOpticalFlow.standardPyramid(100,200,0.5,0,25,100, GrayF32.class);
 
 		assertEquals(3,pyr.getNumLayers());
 

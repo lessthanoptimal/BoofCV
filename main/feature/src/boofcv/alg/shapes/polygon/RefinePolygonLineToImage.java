@@ -20,7 +20,7 @@ package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.edge.SnapToEdge;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
@@ -54,7 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefinePolygonLineToImage<T extends ImageSingleBand> implements RefineBinaryPolygon<T> {
+public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBinaryPolygon<T> {
 
 	// How far away from a corner will it sample the line
 	private double cornerOffset = 2.0;

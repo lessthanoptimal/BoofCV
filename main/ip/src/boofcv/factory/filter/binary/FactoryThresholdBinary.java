@@ -19,7 +19,8 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.*;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -30,7 +31,7 @@ import boofcv.struct.image.ImageType;
 public class FactoryThresholdBinary {
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
 	 *
 	 * @param radius Radius of square region.
 	 * @param scale Threshold scale adjustment
@@ -38,13 +39,13 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> localGaussian(int radius, double scale, boolean down, Class<T> inputType) {
 		return new LocalGaussianBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, float, boolean)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, int, float, boolean)
 	 *
 	 * @param radius Radius of local region.  Try 15
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
@@ -52,13 +53,13 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType) {
 		return new LocalSauvolaBinaryFilter<T>(radius,k,down,ImageType.single(inputType));
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageUInt8, int, double, boolean, boofcv.struct.image.ImageSingleBand, boofcv.struct.image.ImageSingleBand)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSquare(ImageGray, GrayU8, int, double, boolean, ImageGray, ImageGray)
 	 *
 	 * @param radius Radius of square region.
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
@@ -66,12 +67,12 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> localSquare(int radius, double scale, boolean down, Class<T> inputType) {
 		return new LocalSquareBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
 											double minimumSpread, Class<T> inputType) {
 		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,scale,down,inputType);
@@ -86,7 +87,7 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> globalEntropy(int minValue, int maxValue, boolean down, Class<T> inputType) {
 		return new GlobalEntropyBinaryFilter<T>(minValue,maxValue,down,ImageType.single(inputType));
 	}
@@ -99,7 +100,7 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> globalFixed(double threshold, boolean down, Class<T> inputType) {
 		return new GlobalFixedBinaryFilter<T>(threshold,down,ImageType.single(inputType));
 	}
@@ -113,7 +114,7 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> globalOtsu(int minValue, int maxValue, boolean down, Class<T> inputType) {
 		return new GlobalOtsuBinaryFilter<T>(minValue,maxValue,down,ImageType.single(inputType));
 	}
@@ -125,7 +126,7 @@ public class FactoryThresholdBinary {
 	 * @param inputType Type of input image
 	 * @return The thresholder
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	InputToBinary<T> threshold( ConfigThreshold config, Class<T> inputType) {
 
 		switch( config.type ) {

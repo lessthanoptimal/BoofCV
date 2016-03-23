@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,19 +19,19 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectRectBasicWta_S32_U8 extends BasicDisparitySelectRectTests<int[],ImageUInt8> {
+public class TestImplSelectRectBasicWta_S32_U8 extends BasicDisparitySelectRectTests<int[],GrayU8> {
 
 	public TestImplSelectRectBasicWta_S32_U8() {
-		super(int[].class,ImageUInt8.class);
+		super(int[].class,GrayU8.class);
 	}
 
 	@Override
-	public DisparitySelect<int[],ImageUInt8> createAlg() {
+	public DisparitySelect<int[],GrayU8> createAlg() {
 		return new ImplSelectRectBasicWta_S32_U8();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -36,7 +36,7 @@ public abstract class TemplateDiffSquared<T extends ImageBase>
 		extends BaseTemplateIntensity<T> {
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
-	public static class F32 extends TemplateDiffSquared<ImageFloat32> {
+	public static class F32 extends TemplateDiffSquared<GrayF32> {
 		@Override
 		protected float evaluate(int tl_x, int tl_y) {
 
@@ -74,7 +74,7 @@ public abstract class TemplateDiffSquared<T extends ImageBase>
 		}
 	}
 
-	public static class U8 extends TemplateDiffSquared<ImageUInt8> {
+	public static class U8 extends TemplateDiffSquared<GrayU8> {
 		@Override
 		protected float evaluate(int tl_x, int tl_y) {
 

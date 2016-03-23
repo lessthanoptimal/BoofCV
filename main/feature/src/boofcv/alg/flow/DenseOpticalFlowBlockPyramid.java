@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.flow;
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 
 import java.util.Arrays;
@@ -53,7 +53,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
+public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray> {
 
 	// the maximum displacement it will search
 	protected int searchRadius;
@@ -268,16 +268,16 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Implementation for {@link ImageUInt8}
+	 * Implementation for {@link GrayU8}
 	 */
-	public static class U8 extends DenseOpticalFlowBlockPyramid<ImageUInt8>
+	public static class U8 extends DenseOpticalFlowBlockPyramid<GrayU8>
 	{
 		public U8(int searchRadius, int regionRadius, int maxPerPixelError) {
-			super(searchRadius, regionRadius, maxPerPixelError,ImageUInt8.class);
+			super(searchRadius, regionRadius, maxPerPixelError,GrayU8.class);
 		}
 
 		@Override
-		protected void extractTemplate( int cx , int cy , ImageUInt8 prev ) {
+		protected void extractTemplate( int cx , int cy , GrayU8 prev ) {
 			int index = 0;
 			for( int i = -regionRadius; i <= regionRadius; i++ ) {
 				int indexPrev = prev.startIndex + prev.stride*(i+cy) + cx-regionRadius;
@@ -288,7 +288,7 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 		}
 
 		@Override
-		protected float computeError( int cx , int cy , ImageUInt8 curr ) {
+		protected float computeError( int cx , int cy , GrayU8 curr ) {
 			int index = 0;
 			int error = 0;
 			for( int i = -regionRadius; i <= regionRadius; i++ ) {
@@ -304,16 +304,16 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Implementation for {@link ImageFloat32}
+	 * Implementation for {@link GrayF32}
 	 */
-	public static class F32 extends DenseOpticalFlowBlockPyramid<ImageFloat32>
+	public static class F32 extends DenseOpticalFlowBlockPyramid<GrayF32>
 	{
 		public F32(int searchRadius, int regionRadius, int maxPerPixelError) {
-			super(searchRadius, regionRadius, maxPerPixelError,ImageFloat32.class);
+			super(searchRadius, regionRadius, maxPerPixelError,GrayF32.class);
 		}
 
 		@Override
-		protected void extractTemplate( int cx , int cy , ImageFloat32 prev ) {
+		protected void extractTemplate( int cx , int cy , GrayF32 prev ) {
 			int index = 0;
 			for( int i = -regionRadius; i <= regionRadius; i++ ) {
 				int indexPrev = prev.startIndex + prev.stride*(i+cy) + cx-regionRadius;
@@ -324,7 +324,7 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageSingleBand> {
 		}
 
 		@Override
-		protected float computeError( int cx , int cy , ImageFloat32 curr ) {
+		protected float computeError( int cx , int cy , GrayF32 curr ) {
 			int index = 0;
 			float error = 0;
 			for( int i = -regionRadius; i <= regionRadius; i++ ) {

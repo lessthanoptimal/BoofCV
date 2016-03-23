@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -77,7 +77,7 @@ public class ExampleMultiviewSceneReconstruction {
 	double inlierTol = 1.5;
 
 	// Detects and describes image interest points
-	DetectDescribePoint<ImageFloat32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, ImageFloat32.class);
+	DetectDescribePoint<GrayF32, BrightFeature> detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 	// score ans association algorithm
 	ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class, true);
 	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
@@ -267,7 +267,7 @@ public class ExampleMultiviewSceneReconstruction {
 								FastQueue<BrightFeature> features, FastQueue<Point2D_F64> pixels,
 								GrowQueue_I32 colors ) {
 
-		ImageFloat32 image = ConvertBufferedImage.convertFrom(colorImage, (ImageFloat32) null);
+		GrayF32 image = ConvertBufferedImage.convertFrom(colorImage, (GrayF32) null);
 
 		features.reset();
 		pixels.reset();

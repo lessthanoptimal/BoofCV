@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,16 +20,16 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 /**
- * Implementation of {@link ImageDistort} for {@link MultiSpectral} images.
+ * Implementation of {@link ImageDistort} for {@link Planar} images.
  * 
  * @author Peter Abeles
  */
-public class ImplImageDistort_MS <Input extends ImageSingleBand,Output extends ImageSingleBand>
-		implements ImageDistort<MultiSpectral<Input>,MultiSpectral<Output>> {
+public class ImplImageDistort_MS <Input extends ImageGray,Output extends ImageGray>
+		implements ImageDistort<Planar<Input>,Planar<Output>> {
 
 	ImageDistort<Input,Output> layerDistort;
 
@@ -43,7 +43,7 @@ public class ImplImageDistort_MS <Input extends ImageSingleBand,Output extends I
 	}
 
 	@Override
-	public void apply(MultiSpectral<Input> srcImg, MultiSpectral<Output> dstImg) {
+	public void apply(Planar<Input> srcImg, Planar<Output> dstImg) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
 			throw new IllegalArgumentException("Number of bands must be the same");
 		int N = srcImg.getNumBands();
@@ -54,7 +54,7 @@ public class ImplImageDistort_MS <Input extends ImageSingleBand,Output extends I
 	}
 
 	@Override
-	public void apply(MultiSpectral<Input> srcImg, MultiSpectral<Output> dstImg,
+	public void apply(Planar<Input> srcImg, Planar<Output> dstImg,
 					  int dstX0, int dstY0, int dstX1, int dstY1) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
 			throw new IllegalArgumentException("Number of bands must be the same");

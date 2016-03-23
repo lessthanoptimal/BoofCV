@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestDiscreteFourierTransformOps {
 	Random rand = new Random(234);
 
 	Class imageTypes[] = new Class[]{InterleavedF32.class,InterleavedF64.class};
-	Class imageTypesS[] = new Class[]{ImageFloat32.class,ImageFloat64.class};
+	Class imageTypesS[] = new Class[]{GrayF32.class,GrayF64.class};
 
 	@Test
 	public void isPowerOf2() {
@@ -67,19 +67,19 @@ public class TestDiscreteFourierTransformOps {
 
 	@Test
 	public void checkImageArguments() {
-		DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,12,2));
+		DiscreteFourierTransformOps.checkImageArguments(new GrayF64(10,12),new InterleavedF32(10,12,2));
 
 		// test negative cases
 		try {
-			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,12,1));
+			DiscreteFourierTransformOps.checkImageArguments(new GrayF64(10,12),new InterleavedF32(10,12,1));
 			fail("Should have thrown an exception");
 		} catch( IllegalArgumentException ignore ){}
 		try {
-			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(20,12,2));
+			DiscreteFourierTransformOps.checkImageArguments(new GrayF64(10,12),new InterleavedF32(20,12,2));
 			fail("Should have thrown an exception");
 		} catch( IllegalArgumentException ignore ){}
 		try {
-			DiscreteFourierTransformOps.checkImageArguments(new ImageFloat64(10,12),new InterleavedF32(10,14,2));
+			DiscreteFourierTransformOps.checkImageArguments(new GrayF64(10,12),new InterleavedF32(10,14,2));
 			fail("Should have thrown an exception");
 		} catch( IllegalArgumentException ignore ){}
 	}
@@ -150,21 +150,21 @@ public class TestDiscreteFourierTransformOps {
 	public void magnitude() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
-			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
+			ImageGray output = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
 
 			magnitude(complex, output);
 			BoofTesting.checkSubImage(this, "magnitude", false, complex, output);
 		}
 	}
 
-	public void magnitude( ImageInterleaved transform , ImageSingleBand output ) {
+	public void magnitude( ImageInterleaved transform , ImageGray output ) {
 		GImageMiscOps.fillUniform(transform,rand,-5,5);
 		GImageMiscOps.fillUniform(output,rand,-5,5);
 
 		if( transform instanceof InterleavedF32 )
-			DiscreteFourierTransformOps.magnitude((InterleavedF32)transform, (ImageFloat32)output);
+			DiscreteFourierTransformOps.magnitude((InterleavedF32)transform, (GrayF32)output);
 		else
-			DiscreteFourierTransformOps.magnitude((InterleavedF64)transform, (ImageFloat64)output);
+			DiscreteFourierTransformOps.magnitude((InterleavedF64)transform, (GrayF64)output);
 
 		for( int y = 0; y < transform.height; y++ ) {
 			for( int x = 0; x < transform.width; x++ ) {
@@ -181,21 +181,21 @@ public class TestDiscreteFourierTransformOps {
 	public void phase() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
-			ImageSingleBand output = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
+			ImageGray output = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
 
 			phase(complex,output);
 			BoofTesting.checkSubImage(this, "phase", false, complex, output );
 		}
 	}
 
-	public void phase( ImageInterleaved transform , ImageSingleBand output ) {
+	public void phase( ImageInterleaved transform , ImageGray output ) {
 		GImageMiscOps.fillUniform(transform,rand,-5,5);
 		GImageMiscOps.fillUniform(output,rand,-5,5);
 
 		if( transform instanceof InterleavedF32 )
-			DiscreteFourierTransformOps.phase((InterleavedF32) transform, (ImageFloat32) output);
+			DiscreteFourierTransformOps.phase((InterleavedF32) transform, (GrayF32) output);
 		else
-			DiscreteFourierTransformOps.phase((InterleavedF64) transform, (ImageFloat64) output);
+			DiscreteFourierTransformOps.phase((InterleavedF64) transform, (GrayF64) output);
 
 
 		for( int y = 0; y < transform.height; y++ ) {
@@ -212,7 +212,7 @@ public class TestDiscreteFourierTransformOps {
 	@Test
 	public void realToComplex() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
-			ImageSingleBand real = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
+			ImageGray real = GeneralizedImageOps.createSingleBand(imageTypesS[i], 10, 20);
 			ImageInterleaved complex = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 
 			realToComplex(real,complex);
@@ -220,14 +220,14 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	public void realToComplex( ImageSingleBand real , ImageInterleaved complex ) {
+	public void realToComplex(ImageGray real , ImageInterleaved complex ) {
 		GImageMiscOps.fillUniform(real,rand,-5,5);
 		GImageMiscOps.fillUniform(complex,rand,-5,5);
 
 		if( complex instanceof InterleavedF32 )
-			DiscreteFourierTransformOps.realToComplex((ImageFloat32) real, (InterleavedF32) complex);
+			DiscreteFourierTransformOps.realToComplex((GrayF32) real, (InterleavedF32) complex);
 		else
-			DiscreteFourierTransformOps.realToComplex((ImageFloat64) real, (InterleavedF64) complex);
+			DiscreteFourierTransformOps.realToComplex((GrayF64) real, (InterleavedF64) complex);
 
 		for( int y = 0; y < real.height; y++ ) {
 			for( int x = 0; x < real.width; x++ ) {
@@ -240,7 +240,7 @@ public class TestDiscreteFourierTransformOps {
 	@Test
 	public void multiplyRealComplex() {
 		for( int i = 0; i < imageTypes.length; i++ ) {
-			ImageSingleBand realA = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
+			ImageGray realA = GeneralizedImageOps.createSingleBand(imageTypesS[i],10,20);
 			ImageInterleaved complexB = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 			ImageInterleaved complexC = GeneralizedImageOps.createInterleaved(imageTypes[i],10,20,2);
 
@@ -253,11 +253,11 @@ public class TestDiscreteFourierTransformOps {
 		}
 	}
 
-	public void multiplyRealComplex( ImageSingleBand realA , ImageInterleaved complexB , ImageInterleaved complexC ) {
+	public void multiplyRealComplex(ImageGray realA , ImageInterleaved complexB , ImageInterleaved complexC ) {
 		if( complexB instanceof InterleavedF32 )
-			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat32)realA, (InterleavedF32)complexB, (InterleavedF32)complexC);
+			DiscreteFourierTransformOps.multiplyRealComplex((GrayF32)realA, (InterleavedF32)complexB, (InterleavedF32)complexC);
 		else
-			DiscreteFourierTransformOps.multiplyRealComplex((ImageFloat64)realA, (InterleavedF64)complexB, (InterleavedF64)complexC);
+			DiscreteFourierTransformOps.multiplyRealComplex((GrayF64)realA, (InterleavedF64)complexB, (InterleavedF64)complexC);
 
 		Complex64F expected = new Complex64F();
 

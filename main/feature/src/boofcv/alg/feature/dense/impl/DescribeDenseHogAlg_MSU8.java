@@ -24,18 +24,18 @@ import boofcv.struct.image.*;
 import javax.annotation.Generated;
 
 /**
- * Implementation pf {@link DescribeDenseHogAlg} for {@link ImageFloat32}.
+ * Implementation pf {@link DescribeDenseHogAlg} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
 @Generated("")
 public class DescribeDenseHogAlg_MSU8 extends DescribeDenseHogAlg
-		<MultiSpectral<ImageUInt8>,MultiSpectral<ImageSInt16>>
+		<Planar<GrayU8>,Planar<GrayS16>>
 {
 	int numBands;
 
 	public DescribeDenseHogAlg_MSU8(int orientationBins, int widthCell, int widthBlock, int stepBlock, int numBands ) {
-		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.ms(numBands,ImageUInt8.class));
+		super(orientationBins, widthCell, widthBlock,stepBlock, ImageType.ms(numBands,GrayU8.class));
 		this.numBands = numBands;
 	}
 

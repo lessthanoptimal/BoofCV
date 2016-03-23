@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,9 @@ import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedF32;
 import georegression.struct.InvertibleTransform;
 
@@ -143,7 +143,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved, Motion exte
 	}
 
 	@Override
-	protected void _segment(Motion currentToWorld, T frame, ImageUInt8 segmented) {
+	protected void _segment(Motion currentToWorld, T frame, GrayU8 segmented) {
 		transform.setModel(currentToWorld);
 		inputWrapper.wrap(frame);
 

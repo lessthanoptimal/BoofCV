@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.alg.distort.DoNothingPixelTransform_F32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class CheckVisualOdometryDepthSim<I extends ImageSingleBand,Depth extends ImageSingleBand>
+public abstract class CheckVisualOdometryDepthSim<I extends ImageGray,Depth extends ImageGray>
 	extends VideoSequenceSimulator<I>
 {
 	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);

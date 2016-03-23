@@ -33,7 +33,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
 import javax.swing.*;
@@ -273,7 +273,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			if( buffered == null )
 				continue;
 
-			ImageFloat32 image = ConvertBufferedImage.convertFrom(buffered,(ImageFloat32)null);
+			GrayF32 image = ConvertBufferedImage.convertFrom(buffered,(GrayF32)null);
 
 			if( gui != null ) {
 				gui.addImage(f.getName(),buffered);
@@ -331,7 +331,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		AssistedCalibrationGui gui = new AssistedCalibrationGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
-		ImageFloat32 gray = new ImageFloat32(webcam.getViewSize().width,webcam.getViewSize().height);
+		GrayF32 gray = new GrayF32(webcam.getViewSize().width,webcam.getViewSize().height);
 
 		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui);
 		assisted.init(gray.width,gray.height);

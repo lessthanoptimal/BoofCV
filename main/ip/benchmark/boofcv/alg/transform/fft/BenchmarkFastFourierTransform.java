@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 
 import java.util.Random;
@@ -36,9 +36,9 @@ public class BenchmarkFastFourierTransform {
 	static int height = 480;
 	static long TEST_TIME = 1000;
 
-	static ImageFloat32 input = new ImageFloat32(width,height);
+	static GrayF32 input = new GrayF32(width,height);
 	static InterleavedF32 fourier = new InterleavedF32(width,height,2);
-	static ImageFloat32 output = new ImageFloat32(width,height);
+	static GrayF32 output = new GrayF32(width,height);
 
 
 	public static class ComputeFFT extends PerformerBase {

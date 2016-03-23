@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,19 +23,19 @@ import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
-public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensity<ImageFloat32> {
+public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensity<GrayF32> {
 	
 	int radius;
 	Kernel1D_F32 kernel;
-	ImageFloat32 imgXX = new ImageFloat32(1,1);
-	ImageFloat32 imgYY = new ImageFloat32(1,1);
-	ImageFloat32 imgXY = new ImageFloat32(1,1);
-	ImageFloat32 temp = new ImageFloat32(1,1);
+	GrayF32 imgXX = new GrayF32(1,1);
+	GrayF32 imgYY = new GrayF32(1,1);
+	GrayF32 imgXY = new GrayF32(1,1);
+	GrayF32 temp = new GrayF32(1,1);
 
 	// defines the A matrix, from which the eignevalues are computed
 	protected float totalXX, totalYY, totalXY;
@@ -46,7 +46,7 @@ public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensi
 	}
 
 	@Override
-	public void process(ImageFloat32 derivX, ImageFloat32 derivY, ImageFloat32 intensity ) {
+	public void process(GrayF32 derivX, GrayF32 derivY, GrayF32 intensity ) {
 		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
 
 		int w = derivX.width;
@@ -92,7 +92,7 @@ public abstract class ImplSsdCornerWeighted_F32 implements GradientCornerIntensi
 
 	protected abstract float computeResponse();
 
-	private void blur( ImageFloat32 image , ImageFloat32 temp ) {
+	private void blur(GrayF32 image , GrayF32 temp ) {
 		ConvolveNormalized.horizontal(kernel, image, temp);
 		ConvolveNormalized.vertical(kernel,temp,image);
 	}

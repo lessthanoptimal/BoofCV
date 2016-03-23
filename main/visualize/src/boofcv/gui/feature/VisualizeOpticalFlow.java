@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.gui.feature;
 import boofcv.alg.misc.PixelMath;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 
@@ -61,7 +61,7 @@ public class VisualizeOpticalFlow {
 
 	public static void magnitudeAbs(ImageFlow flowImage, BufferedImage out) {
 
-		ImageFloat32 magnitude = new ImageFloat32(flowImage.width,flowImage.height);
+		GrayF32 magnitude = new GrayF32(flowImage.width,flowImage.height);
 
 		float max = 0;
 
@@ -87,7 +87,7 @@ public class VisualizeOpticalFlow {
 
 	public static void magnitudeAbs(ImageFlow flowImage, float maxValue,  BufferedImage out) {
 
-		ImageFloat32 magnitude = new ImageFloat32(flowImage.width,flowImage.height);
+		GrayF32 magnitude = new GrayF32(flowImage.width,flowImage.height);
 
 
 		for( int y = 0; y < flowImage.height; y++ ) {

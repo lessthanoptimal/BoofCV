@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,21 +23,21 @@ import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.filter.convolve.ConvolveNormalized;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 
 /**
  * @author Peter Abeles
  */
-public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensity<ImageSInt16> {
+public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensity<GrayS16> {
 
 	int radius;
 	Kernel1D_I32 kernel;
-	ImageSInt32 imgXX = new ImageSInt32(1,1);
-	ImageSInt32 imgYY = new ImageSInt32(1,1);
-	ImageSInt32 imgXY = new ImageSInt32(1,1);
-	ImageSInt32 temp = new ImageSInt32(1,1);
+	GrayS32 imgXX = new GrayS32(1,1);
+	GrayS32 imgYY = new GrayS32(1,1);
+	GrayS32 imgXY = new GrayS32(1,1);
+	GrayS32 temp = new GrayS32(1,1);
 
 	// defines the A matrix, from which the eignevalues are computed
 	protected int totalXX, totalYY, totalXY;
@@ -48,7 +48,7 @@ public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensi
 	}
 
 	@Override
-	public void process(ImageSInt16 derivX, ImageSInt16 derivY, ImageFloat32 intensity ) {
+	public void process(GrayS16 derivX, GrayS16 derivY, GrayF32 intensity ) {
 		InputSanityCheck.checkSameShape(derivX, derivY, intensity);
 
 		int w = derivX.width;
@@ -94,7 +94,7 @@ public abstract class ImplSsdCornerWeighted_S16 implements GradientCornerIntensi
 
 	protected abstract float computeResponse();
 
-	private void blur( ImageSInt32 image , ImageSInt32 temp ) {
+	private void blur(GrayS32 image , GrayS32 temp ) {
 		ConvolveNormalized.horizontal(kernel, image, temp);
 		ConvolveNormalized.vertical(kernel,temp,image);
 	}

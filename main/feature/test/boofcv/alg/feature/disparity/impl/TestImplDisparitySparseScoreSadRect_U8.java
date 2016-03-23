@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,27 +20,27 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparitySparseScoreSadRect_U8 extends ChecksImplDisparitySparseScoreSadRect<ImageUInt8,int[]>{
+public class TestImplDisparitySparseScoreSadRect_U8 extends ChecksImplDisparitySparseScoreSadRect<GrayU8,int[]>{
 
 	public TestImplDisparitySparseScoreSadRect_U8() {
-		super(ImageUInt8.class);
+		super(GrayU8.class);
 	}
 
 	@Override
-	public DisparityScoreSadRect<ImageUInt8, ImageUInt8> createDense(int minDisparity, int maxDisparity,
-																	  int radiusX, int radiusY) {
-		return new ImplDisparityScoreSadRect_U8<ImageUInt8>(minDisparity,maxDisparity,radiusX,radiusY,
+	public DisparityScoreSadRect<GrayU8, GrayU8> createDense(int minDisparity, int maxDisparity,
+															 int radiusX, int radiusY) {
+		return new ImplDisparityScoreSadRect_U8<GrayU8>(minDisparity,maxDisparity,radiusX,radiusY,
 				new ImplSelectRectBasicWta_S32_U8());
 	}
 
 	@Override
-	public DisparitySparseScoreSadRect<int[], ImageUInt8> createSparse(int minDisparity, int maxDisparity,
-																		int radiusX, int radiusY) {
+	public DisparitySparseScoreSadRect<int[], GrayU8> createSparse(int minDisparity, int maxDisparity,
+																   int radiusX, int radiusY) {
 		return new ImplDisparitySparseScoreSadRect_U8(minDisparity,maxDisparity,radiusX,radiusY);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.feature.describe;
 
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
@@ -36,8 +36,8 @@ public class TestDescribeRegionPointConvert {
 		DummyConvert convert = new DummyConvert();
 		DummyDescribe original = new DummyDescribe();
 
-		DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8> alg =
-				new DescribeRegionPointConvert<ImageFloat32,TupleDesc_F64,TupleDesc_S8>(original,convert);
+		DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8> alg =
+				new DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8>(original,convert);
 
 		TupleDesc_S8 found = alg.createDescription();
 		assertTrue(found.value.length==5);
@@ -75,12 +75,12 @@ public class TestDescribeRegionPointConvert {
 		}
 	}
 
-	private static class DummyDescribe implements DescribeRegionPoint<ImageFloat32,TupleDesc_F64> {
+	private static class DummyDescribe implements DescribeRegionPoint<GrayF32,TupleDesc_F64> {
 
 		public boolean calledImageSet = false;
 
 		@Override
-		public void setImage(ImageFloat32 image) {
+		public void setImage(GrayF32 image) {
 			calledImageSet = true;
 		}
 

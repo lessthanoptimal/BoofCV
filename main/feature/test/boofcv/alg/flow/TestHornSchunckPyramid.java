@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.flow.ConfigHornSchunckPyramid;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.PyramidFloat;
 import org.junit.Test;
 
@@ -47,20 +47,20 @@ public class TestHornSchunckPyramid {
 		int width = 30;
 		int height = 40;
 
-		ImageFloat32 original1 = new ImageFloat32(width,height);
-		ImageFloat32 original2 = new ImageFloat32(width,height);
+		GrayF32 original1 = new GrayF32(width,height);
+		GrayF32 original2 = new GrayF32(width,height);
 
 		ImageMiscOps.fillRectangle(original1, 40, 10, 0, 10, height);
 		ImageMiscOps.fillRectangle(original2, 40, 15, 0, 10, height);
 
-		PyramidFloat<ImageFloat32> pyr1 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
-		PyramidFloat<ImageFloat32> pyr2 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,ImageFloat32.class);
+		PyramidFloat<GrayF32> pyr1 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,GrayF32.class);
+		PyramidFloat<GrayF32> pyr2 = UtilDenseOpticalFlow.standardPyramid(width,height,0.7,0,5,12,GrayF32.class);
 
 		pyr1.process(original1);
 		pyr2.process(original2);
 
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(
-				ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.bilinearPixelS(
+				GrayF32.class, BorderType.EXTENDED);
 		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(20f,100),interpolate);
 		alg.process(pyr1,pyr2);
 
@@ -75,10 +75,10 @@ public class TestHornSchunckPyramid {
 
 	@Test
 	public void processLayer() {
-		ImageFloat32 image1 = new ImageFloat32(width,height);
-		ImageFloat32 image2 = new ImageFloat32(width,height);
-		ImageFloat32 deriv2X = new ImageFloat32(width,height);
-		ImageFloat32 deriv2Y = new ImageFloat32(width,height);
+		GrayF32 image1 = new GrayF32(width,height);
+		GrayF32 image2 = new GrayF32(width,height);
+		GrayF32 deriv2X = new GrayF32(width,height);
+		GrayF32 deriv2Y = new GrayF32(width,height);
 
 		ImageMiscOps.fillRectangle(image1,40,4,0,3,height);
 		ImageMiscOps.fillRectangle(image2,40,5,0,3,height);
@@ -86,8 +86,8 @@ public class TestHornSchunckPyramid {
 		GImageDerivativeOps.gradient(DerivativeType.TWO_0,image2, deriv2X, deriv2Y, BorderType.EXTENDED);
 
 		// have the smoothness constraint be weak
-		InterpolatePixelS<ImageFloat32> interpolate = FactoryInterpolation.bilinearPixelS(
-				ImageFloat32.class, BorderType.EXTENDED);
+		InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.bilinearPixelS(
+				GrayF32.class, BorderType.EXTENDED);
 		HornSchunckPyramid alg = new HornSchunckPyramid(new ConfigHornSchunckPyramid(100,200),interpolate);
 
 		alg.initFlowX.reshape(width,height);
@@ -112,7 +112,7 @@ public class TestHornSchunckPyramid {
 
 	@Test
 	public void A() {
-		ImageFloat32 flow = new ImageFloat32(width,height);
+		GrayF32 flow = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(flow,rand,0,10);
 
@@ -126,7 +126,7 @@ public class TestHornSchunckPyramid {
 
 	@Test
 	public void safe() {
-		ImageFloat32 flow = new ImageFloat32(width,height);
+		GrayF32 flow = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(flow,rand,0,10);
 

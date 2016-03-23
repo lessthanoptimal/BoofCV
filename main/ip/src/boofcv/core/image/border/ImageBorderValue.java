@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,16 +29,16 @@ import java.util.Arrays;
  */
 public class ImageBorderValue {
 
-	public static ImageBorder wrap( ImageSingleBand image , double value ) {
+	public static ImageBorder wrap(ImageGray image , double value ) {
 		if( image.getDataType().isInteger() ) {
 			if( image.getDataType().getNumBits() <= 32 )
-				return wrap((ImageInteger)image,(int)value);
+				return wrap((GrayI)image,(int)value);
 			else
-				return wrap((ImageSInt64)image,(long)value);
+				return wrap((GrayS64)image,(long)value);
 		} else if( image.getDataType().getDataType() == float.class ) {
-			return wrap((ImageFloat32)image,(float)value);
+			return wrap((GrayF32)image,(float)value);
 		} else {
-			return wrap((ImageFloat64)image,value);
+			return wrap((GrayF64)image,value);
 		}
 	}
 
@@ -56,26 +56,26 @@ public class ImageBorderValue {
 		}
 	}
 
-	public static ImageBorder_S64 wrap( ImageSInt64 image , long value ) {
+	public static ImageBorder_S64 wrap(GrayS64 image , long value ) {
 		return new Value_I64(image,value);
 	}
 
-	public static ImageBorder_F64 wrap( ImageFloat64 image , double value ) {
+	public static ImageBorder_F64 wrap(GrayF64 image , double value ) {
 		return new Value_F64(image,value);
 	}
 
-	public static ImageBorder_F32 wrap( ImageFloat32 image , float value ) {
+	public static ImageBorder_F32 wrap(GrayF32 image , float value ) {
 		return new Value_F32(image,value);
 	}
 
-	public static ImageBorder_S32 wrap( ImageInteger image , int value ) {
+	public static ImageBorder_S32 wrap(GrayI image , int value ) {
 		return new Value_I(image,value);
 	}
 
 	public static class Value_I64 extends ImageBorder_S64 {
 		long value;
 
-		public Value_I64( ImageSInt64 image , long value ) {
+		public Value_I64(GrayS64 image , long value ) {
 			super(image);
 			this.value = value;
 		}
@@ -98,7 +98,7 @@ public class ImageBorderValue {
 	public static class Value_F64 extends ImageBorder_F64 {
 		double value;
 
-		public Value_F64( ImageFloat64 image , double value ) {
+		public Value_F64(GrayF64 image , double value ) {
 			super(image);
 			this.value = value;
 		}
@@ -121,7 +121,7 @@ public class ImageBorderValue {
 	public static class Value_F32 extends ImageBorder_F32 {
 		float value;
 
-		public Value_F32( ImageFloat32 image , float value ) {
+		public Value_F32(GrayF32 image , float value ) {
 			super(image);
 			this.value = value;
 		}
@@ -144,7 +144,7 @@ public class ImageBorderValue {
 	public static class Value_I extends ImageBorder_S32 {
 		int value;
 
-		public Value_I( ImageInteger image , int value ) {
+		public Value_I(GrayI image , int value ) {
 			super(image);
 			this.value = value;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public abstract class GenericNonMaxAlgorithmTests {
 
 	protected QueueCorner foundMinimum = new QueueCorner(100);
 	protected QueueCorner foundMaximum = new QueueCorner(100);
-	protected ImageFloat32 intensity = new ImageFloat32(width, height);
+	protected GrayF32 intensity = new GrayF32(width, height);
 
 
 	boolean canDetectMin;
@@ -61,13 +61,13 @@ public abstract class GenericNonMaxAlgorithmTests {
 	}
 
 
-	private void findLocalPeaks(ImageFloat32 intensity, float threshold, int radius, int border) {
+	private void findLocalPeaks(GrayF32 intensity, float threshold, int radius, int border) {
 		foundMinimum.reset();
 		foundMaximum.reset();
 		findMaximums(intensity, threshold, radius, border, foundMinimum, foundMaximum);
 	}
 
-	public abstract void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+	public abstract void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 									  QueueCorner foundMinimum, QueueCorner foundMaximum );
 
 
@@ -193,7 +193,7 @@ public abstract class GenericNonMaxAlgorithmTests {
 	 */
 	@Test
 	public void compareToNaive() {
-		ImageFloat32 inten = new ImageFloat32(30, 40);
+		GrayF32 inten = new GrayF32(30, 40);
 
 		QueueCorner naiveMin = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner naiveMax = new QueueCorner(inten.getWidth() * inten.getHeight());
@@ -201,7 +201,7 @@ public abstract class GenericNonMaxAlgorithmTests {
 		for (int useSubImage = 0; useSubImage <= 1; useSubImage++) {
 			// make sure it handles sub images correctly
 			if (useSubImage == 1) {
-				ImageFloat32 larger = new ImageFloat32(inten.width + 10, inten.height + 8);
+				GrayF32 larger = new GrayF32(inten.width + 10, inten.height + 8);
 				inten = larger.subimage(5, 5, inten.width + 5, inten.height + 5, null);
 			}
 

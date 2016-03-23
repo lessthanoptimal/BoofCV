@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,12 +35,12 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_S16 extends BilinearPixelS<ImageSInt16> {
+public class ImplBilinearPixel_S16 extends BilinearPixelS<GrayS16> {
 
 	public ImplBilinearPixel_S16() {
 	}
 
-	public ImplBilinearPixel_S16(ImageSInt16 orig) {
+	public ImplBilinearPixel_S16(GrayS16 orig) {
 
 		setImage(orig);
 	}
@@ -90,8 +90,8 @@ public class ImplBilinearPixel_S16 extends BilinearPixelS<ImageSInt16> {
 	}
 
 	@Override
-	public ImageType<ImageSInt16> getImageType() {
-		return ImageType.single(ImageSInt16.class);
+	public ImageType<GrayS16> getImageType() {
+		return ImageType.single(GrayS16.class);
 	}
 
 }

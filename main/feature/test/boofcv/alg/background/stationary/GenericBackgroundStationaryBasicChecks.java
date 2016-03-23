@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.background.stationary;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -60,8 +60,8 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 			alg.updateBackground(frame);
 		}
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		alg.segment(frame,segmented);
 		ImageMiscOps.fill(expected, 1);
@@ -85,8 +85,8 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 			alg.updateBackground(frame);
 		}
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		alg.segment(frame,segmented);
 		ImageMiscOps.fill(expected, 0);
@@ -112,7 +112,7 @@ public abstract class GenericBackgroundStationaryBasicChecks extends GenericBack
 			alg.updateBackground(frame);
 		}
 
-		ImageUInt8 segmented = new ImageUInt8(width,height);
+		GrayU8 segmented = new GrayU8(width,height);
 
 		GImageMiscOps.fill(frame, 103);
 		alg.setThreshold(2.5f);

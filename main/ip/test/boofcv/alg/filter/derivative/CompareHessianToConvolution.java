@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +46,7 @@ public class CompareHessianToConvolution {
 	Method m;
 	FilterImageInterface outputFilters[] = new FilterImageInterface[2];
 
-	Class<ImageSingleBand> inputType;
+	Class<ImageGray> inputType;
 
 	boolean processBorder;
 	int borderSize = 0;
@@ -55,7 +55,7 @@ public class CompareHessianToConvolution {
 		this.m = m;
 		Class<?> []param = m.getParameterTypes();
 
-		inputType = (Class<ImageSingleBand>)param[0];
+		inputType = (Class<ImageGray>)param[0];
 	}
 
 	public void setKernel( int which , Kernel1D horizontal , Kernel1D vertical ) {
@@ -83,16 +83,16 @@ public class CompareHessianToConvolution {
 		if( borderSize < kernel.getRadius() )
 			borderSize = kernel.getRadius();
 	}
-	public void compare( ImageSingleBand...images)  {
+	public void compare( ImageGray...images)  {
 		compare(false,images);
 		compare(true,images);
 	}
 
-	public void compare( boolean processBorder , ImageSingleBand...images)  {
+	public void compare( boolean processBorder , ImageGray...images)  {
 		this.processBorder = processBorder;
 		innerCompare(images);
 
-		ImageSingleBand subOut[] = new ImageSingleBand[ images.length ];
+		ImageGray subOut[] = new ImageGray[ images.length ];
 		for( int i = 0; i < images.length; i++ )
 			subOut[i] = BoofTesting.createSubImageOf(images[i]);
 		innerCompare(subOut);
@@ -100,7 +100,7 @@ public class CompareHessianToConvolution {
 
 
 
-	protected void innerCompare( ImageSingleBand...images)  {
+	protected void innerCompare( ImageGray...images)  {
 		Class<?> []param = m.getParameterTypes();
 
 		if( images.length != 5 )
@@ -110,9 +110,9 @@ public class CompareHessianToConvolution {
 		int height = images[0].height;
 
 		// now compute the second derivative using provided convolution filters
-		ImageSingleBand expectedOutput[] = new ImageSingleBand[3];
+		ImageGray expectedOutput[] = new ImageGray[3];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = (ImageSingleBand)images[0]._createNew(width,height);
+			expectedOutput[i] = (ImageGray)images[0]._createNew(width,height);
 		}
 		outputFilters[0].process(images[0],expectedOutput[0]);
 		outputFilters[1].process(images[1],expectedOutput[1]);

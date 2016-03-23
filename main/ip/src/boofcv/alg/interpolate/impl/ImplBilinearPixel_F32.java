@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,12 +35,12 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class ImplBilinearPixel_F32 extends BilinearPixelS<ImageFloat32> {
+public class ImplBilinearPixel_F32 extends BilinearPixelS<GrayF32> {
 
 	public ImplBilinearPixel_F32() {
 	}
 
-	public ImplBilinearPixel_F32(ImageFloat32 orig) {
+	public ImplBilinearPixel_F32(GrayF32 orig) {
 
 		setImage(orig);
 	}
@@ -90,8 +90,8 @@ public class ImplBilinearPixel_F32 extends BilinearPixelS<ImageFloat32> {
 	}
 
 	@Override
-	public ImageType<ImageFloat32> getImageType() {
-		return ImageType.single(ImageFloat32.class);
+	public ImageType<GrayF32> getImageType() {
+		return ImageType.single(GrayF32.class);
 	}
 
 }

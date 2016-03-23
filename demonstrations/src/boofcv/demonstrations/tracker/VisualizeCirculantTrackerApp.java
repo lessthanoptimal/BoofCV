@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.shapes.RectangleLength2D_F32;
 
 import java.awt.image.BufferedImage;
@@ -35,7 +35,7 @@ import java.awt.image.BufferedImage;
 /**
  * @author Peter Abeles
  */
-public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
+public class VisualizeCirculantTrackerApp<T extends ImageGray>
 	implements CirculantVisualizationPanel.Listener
 {
 
@@ -114,13 +114,13 @@ public class VisualizeCirculantTrackerApp<T extends ImageSingleBand>
 
 
 	public static void main( String args[] ) {
-		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<ImageUInt8>(ImageUInt8.class);
+		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<GrayU8>(GrayU8.class);
 
 //		String fileName = UtilIO.pathExample("tracking/track_peter.mjpeg");
 		String fileName = UtilIO.pathExample("tracking/snow_follow_car.mjpeg");
 
-		SimpleImageSequence<ImageUInt8> sequence = DefaultMediaManager.INSTANCE.
-				openVideo(fileName, ImageType.single(ImageUInt8.class));
+		SimpleImageSequence<GrayU8> sequence = DefaultMediaManager.INSTANCE.
+				openVideo(fileName, ImageType.single(GrayU8.class));
 
 		app.process(sequence);
 	}

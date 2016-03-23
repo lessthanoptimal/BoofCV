@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.detect.interest;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static boofcv.abst.feature.detect.interest.TestGeneralToInterestPoint.Helper;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestGeneralToInterestMulti {
 
-	ImageFloat32 input = new ImageFloat32(10,20);
+	GrayF32 input = new GrayF32(10,20);
 
 	/**
 	 * Several basic functionality tests
@@ -37,8 +37,8 @@ public class TestGeneralToInterestMulti {
 	public void various() {
 		Helper detector = new Helper();
 		detector.maximum = true;
-		GeneralToInterestMulti<ImageFloat32,ImageFloat32> alg =
-				new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		GeneralToInterestMulti<GrayF32,GrayF32> alg =
+				new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 
 		alg.detect(input);
 
@@ -61,17 +61,17 @@ public class TestGeneralToInterestMulti {
 	public void checkMinimumsMaximums() {
 		Helper detector = new Helper();
 		detector.minimum = true;
-		GeneralToInterestMulti<ImageFloat32,ImageFloat32> alg;
+		GeneralToInterestMulti<GrayF32,GrayF32> alg;
 
 		// just minimums
-		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 		assertEquals(1,alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
 
 		// both minimums and maximums
 		detector.maximum = true;
-		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 		assertEquals(2,alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
@@ -79,7 +79,7 @@ public class TestGeneralToInterestMulti {
 
 		// just maximums
 		detector.minimum = false;
-		alg = new GeneralToInterestMulti<ImageFloat32,ImageFloat32>(detector,2.5, ImageFloat32.class,ImageFloat32.class);
+		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
 		assertEquals(1, alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(6,alg.getFeatureSet(0).getNumberOfFeatures());

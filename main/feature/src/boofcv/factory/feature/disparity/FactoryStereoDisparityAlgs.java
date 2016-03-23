@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.*;
 import boofcv.alg.feature.disparity.impl.*;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -32,26 +32,26 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class FactoryStereoDisparityAlgs {
 
-	public static DisparitySelect<int[],ImageUInt8> selectDisparity_S32( int maxError , int tolR2L , double texture) {
+	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new ImplSelectRectBasicWta_S32_U8();
 		else
 			return new ImplSelectRectStandard_S32_U8(maxError,tolR2L,texture);
 	}
 
-	public static DisparitySelect<float[],ImageUInt8> selectDisparity_F32( int maxError , int tolR2L , double texture) {
+	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new ImplSelectRectBasicWta_F32_U8();
 		else
 			return new ImplSelectRectStandard_F32_U8(maxError,tolR2L,texture);
 	}
 
-	public static DisparitySelect<int[],ImageFloat32>
+	public static DisparitySelect<int[],GrayF32>
 	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
 		return new SelectRectSubpixel.S32_F32(maxError,tolR2L,texture);
 	}
 
-	public static DisparitySelect<float[],ImageFloat32>
+	public static DisparitySelect<float[],GrayF32>
 	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
 		return new SelectRectSubpixel.F32_F32(maxError,tolR2L,texture);
 	}
@@ -82,7 +82,7 @@ public class FactoryStereoDisparityAlgs {
 		return new SelectSparseStandardSubpixel.F32(maxError,texture);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageUInt8,T>
+	public static <T extends ImageGray> DisparityScoreSadRect<GrayU8,T>
 	scoreDisparitySadRect_U8( int minDisparity , int maxDisparity,
 						   int regionRadiusX, int regionRadiusY,
 						   DisparitySelect<int[],T> computeDisparity)
@@ -91,7 +91,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageSInt16,T>
+	public static <T extends ImageGray> DisparityScoreSadRect<GrayS16,T>
 	scoreDisparitySadRect_S16( int minDisparity , int maxDisparity,
 							  int regionRadiusX, int regionRadiusY,
 							  DisparitySelect<int[],T> computeDisparity)
@@ -100,7 +100,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreSadRect<ImageFloat32,T>
+	public static <T extends ImageGray> DisparityScoreSadRect<GrayF32,T>
 	scoreDisparitySadRect_F32( int minDisparity , int maxDisparity,
 							  int regionRadiusX, int regionRadiusY,
 							  DisparitySelect<float[],T> computeDisparity)
@@ -109,7 +109,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreWindowFive<ImageUInt8,T>
+	public static <T extends ImageGray> DisparityScoreWindowFive<GrayU8,T>
 	scoreDisparitySadRectFive_U8( int minDisparity , int maxDisparity,
 								  int regionRadiusX, int regionRadiusY,
 								  DisparitySelect<int[],T> computeDisparity)
@@ -118,7 +118,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreWindowFive<ImageSInt16,T>
+	public static <T extends ImageGray> DisparityScoreWindowFive<GrayS16,T>
 	scoreDisparitySadRectFive_S16( int minDisparity , int maxDisparity,
 								  int regionRadiusX, int regionRadiusY,
 								  DisparitySelect<int[],T> computeDisparity)
@@ -127,7 +127,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static <T extends ImageSingleBand> DisparityScoreWindowFive<ImageFloat32,T>
+	public static <T extends ImageGray> DisparityScoreWindowFive<GrayF32,T>
 	scoreDisparitySadRectFive_F32( int minDisparity , int maxDisparity,
 								   int regionRadiusX, int regionRadiusY,
 								   DisparitySelect<float[],T> computeDisparity)
@@ -136,7 +136,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
 	}
 
-	public static DisparitySparseScoreSadRect<int[],ImageUInt8>
+	public static DisparitySparseScoreSadRect<int[],GrayU8>
 	scoreDisparitySparseSadRect_U8( int minDisparity , int maxDisparity,
 									int regionRadiusX, int regionRadiusY )
 	{
@@ -144,7 +144,7 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity,regionRadiusX,regionRadiusY);
 	}
 
-	public static DisparitySparseScoreSadRect<float[],ImageFloat32>
+	public static DisparitySparseScoreSadRect<float[],GrayF32>
 	scoreDisparitySparseSadRect_F32( int minDisparity, int maxDisparity,
 									 int regionRadiusX, int regionRadiusY )
 	{

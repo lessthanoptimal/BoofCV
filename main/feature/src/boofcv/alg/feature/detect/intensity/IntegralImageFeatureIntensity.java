@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 
 
 /**
@@ -38,8 +38,8 @@ public class IntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static void hessian( ImageFloat32 integral, int skip , int size ,
-								ImageFloat32 intensity)
+	public static void hessian(GrayF32 integral, int skip , int size ,
+							   GrayF32 intensity)
 	{
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);
@@ -56,8 +56,8 @@ public class IntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static void hessian( ImageSInt32 integral, int skip , int size ,
-								ImageFloat32 intensity)
+	public static void hessian(GrayS32 integral, int skip , int size ,
+							   GrayF32 intensity)
 	{
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);

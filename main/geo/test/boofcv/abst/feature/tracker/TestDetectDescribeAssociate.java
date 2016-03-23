@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.tracker;
 
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -87,7 +87,7 @@ public class TestDetectDescribeAssociate {
 		assertTrue(dat.validCalled);
 	}
 
-	private static class Helper extends DetectDescribeAssociate<ImageFloat32,TupleDesc_F64> {
+	private static class Helper extends DetectDescribeAssociate<GrayF32,TupleDesc_F64> {
 		boolean validCalled = false;
 
 		private Helper() {
@@ -100,10 +100,10 @@ public class TestDetectDescribeAssociate {
 		}
 	}
 
-	private static class HelpManager implements DdaFeatureManager<ImageFloat32,TupleDesc_F64> {
+	private static class HelpManager implements DdaFeatureManager<GrayF32,TupleDesc_F64> {
 
 		@Override
-		public void detectFeatures(ImageFloat32 input,
+		public void detectFeatures(GrayF32 input,
 								   FastQueue<Point2D_F64> locDst,
 								   FastQueue<TupleDesc_F64> featDst) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -97,7 +97,7 @@ public class ExampleCalibrateMonocular {
 		for( String n : images ) {
 			BufferedImage input = UtilImageIO.loadImage(n);
 			if( n != null ) {
-				ImageFloat32 image = ConvertBufferedImage.convertFrom(input,(ImageFloat32)null);
+				GrayF32 image = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
 				if( !calibrationAlg.addImage(image) )
 					System.err.println("Failed to detect target in "+n);
 			}

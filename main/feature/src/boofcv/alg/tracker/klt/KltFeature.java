@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.klt;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * Contains feature information for {@link KltTracker}.
@@ -41,15 +41,15 @@ public class KltFeature {
 	/**
 	 * Pixel intensity around the feature
 	 */
-	public ImageFloat32 desc;
+	public GrayF32 desc;
 	/**
 	 * Image derivative around the feature in the x-direction
 	 */
-	public ImageFloat32 derivX;
+	public GrayF32 derivX;
 	/**
 	 * Image derivative around the feature in the y-direction
 	 */
-	public ImageFloat32 derivY;
+	public GrayF32 derivY;
 
 	/**
 	 * spatial gradient matrix used in updating the feature's position
@@ -60,9 +60,9 @@ public class KltFeature {
 		this.radius = radius;
 		int sideLength = radius * 2 + 1;
 
-		desc = new ImageFloat32(sideLength,sideLength);
-		derivX = new ImageFloat32(sideLength,sideLength);
-		derivY = new ImageFloat32(sideLength,sideLength);
+		desc = new GrayF32(sideLength,sideLength);
+		derivX = new GrayF32(sideLength,sideLength);
+		derivY = new GrayF32(sideLength,sideLength);
 	}
 
 	public void setPosition(float x, float y) {

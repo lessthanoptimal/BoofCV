@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -125,7 +125,7 @@ public class BatchDownSizeImage {
 
 		parseArguments(args);
 
-		ImageBase input = new ImageUInt8(1,1);
+		ImageBase input = new GrayU8(1,1);
 		ImageBase small = null;
 
 		int index = 0;
@@ -138,12 +138,12 @@ public class BatchDownSizeImage {
 			if( input.getWidth() != info.getWidth() || input.getHeight() != info.getHeight()) {
 				missMatch = true;
 			} if( info.getNumBands() == 1 ) {
-				if( !(input instanceof ImageSingleBand) )
+				if( !(input instanceof ImageGray) )
 					missMatch = true;
 			} else {
-				if( !(input instanceof MultiSpectral)) {
+				if( !(input instanceof Planar)) {
 					missMatch = true;
-				} else if( info.getNumBands() != ((MultiSpectral)input).getNumBands() )  {
+				} else if( info.getNumBands() != ((Planar)input).getNumBands() )  {
 					missMatch = true;
 				}
 			}
@@ -151,9 +151,9 @@ public class BatchDownSizeImage {
 			if( missMatch ) {
 				// declare the BoofCV image to conver the input into
 				if( info.getNumBands() == 1 ) {
-					input = new ImageUInt8(info.getWidth(),info.getHeight());
+					input = new GrayU8(info.getWidth(),info.getHeight());
 				} else {
-					input = new MultiSpectral<ImageUInt8>(ImageUInt8.class,info.getWidth(),info.getHeight(),info.getNumBands());
+					input = new Planar<GrayU8>(GrayU8.class,info.getWidth(),info.getHeight(),info.getNumBands());
 				}
 
 				// Now declare storage for the small image

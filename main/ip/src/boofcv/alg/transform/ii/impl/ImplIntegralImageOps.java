@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import boofcv.struct.image.*;
  */
 public class ImplIntegralImageOps {
 
-	public static void transform( final ImageFloat32 input , final ImageFloat32 transformed )
+	public static void transform(final GrayF32 input , final GrayF32 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -62,7 +62,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void transform( final ImageFloat64 input , final ImageFloat64 transformed )
+	public static void transform(final GrayF64 input , final GrayF64 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -88,7 +88,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void transform( final ImageUInt8 input , final ImageSInt32 transformed )
+	public static void transform(final GrayU8 input , final GrayS32 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -114,7 +114,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void transform( final ImageSInt32 input , final ImageSInt32 transformed )
+	public static void transform(final GrayS32 input , final GrayS32 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -140,7 +140,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void transform( final ImageSInt64 input , final ImageSInt64 transformed )
+	public static void transform(final GrayS64 input , final GrayS64 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -166,9 +166,9 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void convolve( ImageFloat32 integral ,
+	public static void convolve( GrayF32 integral ,
 								 IntegralKernel kernel,
-								 ImageFloat32 output )
+								 GrayF32 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
@@ -182,9 +182,9 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void convolveBorder( ImageFloat32 integral ,
-									   IntegralKernel kernel,
-									   ImageFloat32 output , int borderX , int borderY )
+	public static void convolveBorder(GrayF32 integral ,
+									  IntegralKernel kernel,
+									  GrayF32 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
@@ -226,7 +226,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static float convolveSparse( ImageFloat32 integral , IntegralKernel kernel , int x , int y )
+	public static float convolveSparse(GrayF32 integral , IntegralKernel kernel , int x , int y )
 	{
 		float ret = 0;
 		int N = kernel.getNumBlocks();
@@ -239,7 +239,7 @@ public class ImplIntegralImageOps {
 		return ret;
 	}
 
-	public static float block_unsafe( ImageFloat32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static float block_unsafe(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		float br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
 		float tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
@@ -249,7 +249,7 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static float block_zero( ImageFloat32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static float block_zero(GrayF32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		x0 = Math.min(x0,integral.width-1);
 		y0 = Math.min(y0,integral.height-1);
@@ -270,9 +270,9 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static void convolve( ImageSInt32 integral ,
+	public static void convolve( GrayS32 integral ,
 								 IntegralKernel kernel,
-								 ImageSInt32 output )
+								 GrayS32 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
@@ -286,9 +286,9 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void convolveBorder( ImageSInt32 integral ,
-									   IntegralKernel kernel,
-									   ImageSInt32 output , int borderX , int borderY )
+	public static void convolveBorder(GrayS32 integral ,
+									  IntegralKernel kernel,
+									  GrayS32 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
@@ -330,7 +330,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static int convolveSparse( ImageSInt32 integral , IntegralKernel kernel , int x , int y )
+	public static int convolveSparse(GrayS32 integral , IntegralKernel kernel , int x , int y )
 	{
 		int ret = 0;
 		int N = kernel.getNumBlocks();
@@ -343,7 +343,7 @@ public class ImplIntegralImageOps {
 		return ret;
 	}
 
-	public static int block_unsafe( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static int block_unsafe(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		int br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
 		int tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
@@ -353,7 +353,7 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static int block_zero( ImageSInt32 integral , int x0 , int y0 , int x1 , int y1 )
+	public static int block_zero(GrayS32 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		x0 = Math.min(x0,integral.width-1);
 		y0 = Math.min(y0,integral.height-1);
@@ -374,9 +374,9 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static void convolve( ImageFloat64 integral ,
+	public static void convolve( GrayF64 integral ,
 								 IntegralKernel kernel,
-								 ImageFloat64 output )
+								 GrayF64 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
@@ -390,9 +390,9 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void convolveBorder( ImageFloat64 integral ,
-									   IntegralKernel kernel,
-									   ImageFloat64 output , int borderX , int borderY )
+	public static void convolveBorder(GrayF64 integral ,
+									  IntegralKernel kernel,
+									  GrayF64 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
@@ -434,7 +434,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static double convolveSparse( ImageFloat64 integral , IntegralKernel kernel , int x , int y )
+	public static double convolveSparse(GrayF64 integral , IntegralKernel kernel , int x , int y )
 	{
 		double ret = 0;
 		int N = kernel.getNumBlocks();
@@ -447,7 +447,7 @@ public class ImplIntegralImageOps {
 		return ret;
 	}
 
-	public static double block_unsafe( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static double block_unsafe(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		double br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
 		double tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
@@ -457,7 +457,7 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static double block_zero( ImageFloat64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static double block_zero(GrayF64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		x0 = Math.min(x0,integral.width-1);
 		y0 = Math.min(y0,integral.height-1);
@@ -478,9 +478,9 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static void convolve( ImageSInt64 integral ,
+	public static void convolve( GrayS64 integral ,
 								 IntegralKernel kernel,
-								 ImageSInt64 output )
+								 GrayS64 output )
 	{
 		for( int y = 0; y < integral.height; y++ ) {
 			for( int x = 0; x < integral.width; x++ ) {
@@ -494,9 +494,9 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static void convolveBorder( ImageSInt64 integral ,
-									   IntegralKernel kernel,
-									   ImageSInt64 output , int borderX , int borderY )
+	public static void convolveBorder(GrayS64 integral ,
+									  IntegralKernel kernel,
+									  GrayS64 output , int borderX , int borderY )
 	{
 		for( int x = 0; x < integral.width; x++ ) {
 			for( int y = 0; y < borderY; y++ ) {
@@ -538,7 +538,7 @@ public class ImplIntegralImageOps {
 		}
 	}
 
-	public static long convolveSparse( ImageSInt64 integral , IntegralKernel kernel , int x , int y )
+	public static long convolveSparse(GrayS64 integral , IntegralKernel kernel , int x , int y )
 	{
 		long ret = 0;
 		int N = kernel.getNumBlocks();
@@ -551,7 +551,7 @@ public class ImplIntegralImageOps {
 		return ret;
 	}
 
-	public static long block_unsafe( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static long block_unsafe(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		long br = integral.data[ integral.startIndex + y1*integral.stride + x1 ];
 		long tr = integral.data[ integral.startIndex + y0*integral.stride + x1 ];
@@ -561,7 +561,7 @@ public class ImplIntegralImageOps {
 		return br-tr-bl+tl;
 	}
 
-	public static long block_zero( ImageSInt64 integral , int x0 , int y0 , int x1 , int y1 )
+	public static long block_zero(GrayS64 integral , int x0 , int y0 , int x1 , int y1 )
 	{
 		x0 = Math.min(x0,integral.width-1);
 		y0 = Math.min(y0,integral.height-1);

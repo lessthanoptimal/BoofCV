@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandardSparse;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Performs a convolution around a single pixel only.  The whole kernel must be contained inside the image, border
@@ -44,8 +44,8 @@ public class ConvolveImageNoBorderSparse {
 	 * @param storage Must be as long as the kernel's width.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve( Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
-								  ImageFloat32 input, int c_x , int c_y, float storage[] )
+	public static float convolve(Kernel1D_F32 horizontal, Kernel1D_F32 vertical,
+								 GrayF32 input, int c_x , int c_y, float storage[] )
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
@@ -61,8 +61,8 @@ public class ConvolveImageNoBorderSparse {
 	 * @param storage Must be as long as the kernel's width.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageUInt8 input, int c_x , int c_y, int storage[] )
+	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								 GrayU8 input, int c_x , int c_y, int storage[] )
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
@@ -78,8 +78,8 @@ public class ConvolveImageNoBorderSparse {
 	 * @param storage Must be as long as the kernel's width.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageSInt16 input, int c_x , int c_y, int storage[] )
+	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								 GrayS16 input, int c_x , int c_y, int storage[] )
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage);
 	}
@@ -98,9 +98,9 @@ public class ConvolveImageNoBorderSparse {
 	 * @param divisorVertical Divisor for vertical convolution.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageUInt8 input, int c_x , int c_y, int storage[] ,
-								  int divisorHorizontal, int divisorVertical)
+	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								 GrayU8 input, int c_x , int c_y, int storage[] ,
+								 int divisorHorizontal, int divisorVertical)
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage,divisorHorizontal,divisorVertical);
 	}
@@ -119,9 +119,9 @@ public class ConvolveImageNoBorderSparse {
 	 * @param divisorVertical Divisor for vertical convolution.
 	 * @return The pixel's value after the convolution
 	 */
-	public static float convolve( Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
-								  ImageSInt16 input, int c_x , int c_y, int storage[] ,
-								  int divisorHorizontal, int divisorVertical)
+	public static float convolve(Kernel1D_I32 horizontal, Kernel1D_I32 vertical,
+								 GrayS16 input, int c_x , int c_y, int storage[] ,
+								 int divisorHorizontal, int divisorVertical)
 	{
 		return ConvolveImageStandardSparse.convolve(horizontal,vertical,input,c_x,c_y,storage,divisorHorizontal,divisorVertical);
 	}

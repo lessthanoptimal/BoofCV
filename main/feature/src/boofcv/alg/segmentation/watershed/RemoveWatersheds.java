@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.segmentation.watershed;
 
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -47,7 +47,7 @@ public class RemoveWatersheds {
 	 *
 	 * @param segmented Entire segmented image (including border of -1 values) with watersheds
 	 */
-	public void remove( ImageSInt32 segmented ) {
+	public void remove( GrayS32 segmented ) {
 		// very quick sanity check
 		if( segmented.get(0,0) >= 0 )
 			throw new IllegalArgumentException("The segmented image must contain a border of -1 valued pixels.  See" +

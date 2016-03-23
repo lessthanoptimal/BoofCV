@@ -23,8 +23,8 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -65,7 +65,7 @@ public class TestStereoSparse3D {
 	@Test
 	public void checkGeometry() {
 		Dummy disparity = new Dummy();
-		StereoSparse3D alg = new StereoSparse3D(disparity, ImageFloat32.class);
+		StereoSparse3D alg = new StereoSparse3D(disparity, GrayF32.class);
 
 		alg.setCalibration(param);
 
@@ -104,7 +104,7 @@ public class TestStereoSparse3D {
 		double d;
 
 		@Override
-		public void setImages(ImageSingleBand imageLeft, ImageSingleBand imageRight) {}
+		public void setImages(ImageGray imageLeft, ImageGray imageRight) {}
 
 		@Override
 		public boolean process(int x, int y) {return true;}

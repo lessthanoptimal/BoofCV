@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.sfm.d2;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
 
@@ -33,8 +33,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MsToGrayMotion2D<T extends ImageSingleBand,IT extends InvertibleTransform>
-	implements ImageMotion2D<MultiSpectral<T>,IT>, AccessPointTracks
+public class MsToGrayMotion2D<T extends ImageGray,IT extends InvertibleTransform>
+	implements ImageMotion2D<Planar<T>,IT>, AccessPointTracks
 {
 	// motion estimation algorithm for a single band image
 	ImageMotion2D<T,IT> motion;
@@ -52,7 +52,7 @@ public class MsToGrayMotion2D<T extends ImageSingleBand,IT extends InvertibleTra
 	}
 
 	@Override
-	public boolean process(MultiSpectral<T> input) {
+	public boolean process(Planar<T> input) {
 		gray.reshape(input.width,input.height);
 		GConvertImage.average(input, gray);
 		return motion.process(gray);

@@ -21,7 +21,7 @@ package boofcv.alg.feature.dense;
 import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -114,7 +114,7 @@ public class TestDescribeDenseHogAlg {
 
 		Helper helper = new Helper(10,8,2);
 
-		ImageFloat32 input = new ImageFloat32(120,110);
+		GrayF32 input = new GrayF32(120,110);
 		helper.setInput(input);
 
 		helper.process();
@@ -227,12 +227,12 @@ public class TestDescribeDenseHogAlg {
 		assertEquals(3*8,helper.getRegionWidthPixel());
 	}
 
-	private class Helper extends DescribeDenseHogAlg<ImageFloat32,ImageFloat32> {
+	private class Helper extends DescribeDenseHogAlg<GrayF32,GrayF32> {
 
 		public float angle;
 
 		public Helper(int orientationBins, int widthCell, int widthBlock) {
-			super(orientationBins, widthCell, widthBlock, 1, ImageType.single(ImageFloat32.class));
+			super(orientationBins, widthCell, widthBlock, 1, ImageType.single(GrayF32.class));
 		}
 
 		@Override

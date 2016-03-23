@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,9 @@ import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
 import boofcv.alg.feature.detect.line.gridline.*;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.ImageGray;
 import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -56,7 +56,7 @@ public class FactoryDetectLineAlgs {
 	 * @param derivType Image derivative type.
 	 * @return Line segment detector
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	DetectLineSegmentsGridRansac<I,D> lineRansac(int regionSize ,
 												 double thresholdEdge ,
 												 double thresholdAngle ,
@@ -74,9 +74,9 @@ public class FactoryDetectLineAlgs {
 				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
 
 		GridRansacLineDetector<D> alg;
-		if( derivType == ImageFloat32.class )  {
+		if( derivType == GrayF32.class )  {
 			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(regionSize,10,matcher);
-		} else if( derivType == ImageSInt16.class ) {
+		} else if( derivType == GrayS16.class ) {
 			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(regionSize,10,matcher);
 		} else {
 			throw new IllegalArgumentException("Unsupported derivative type");
@@ -102,7 +102,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	DetectLineHoughFoot<I,D> houghFoot(ConfigHoughFoot config ,
 									   Class<I> imageType ,
 									   Class<D> derivType ) {
@@ -129,7 +129,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	DetectLineHoughFootSubimage<I,D> houghFootSub(ConfigHoughFootSubimage config ,
 												  Class<I> imageType ,
 												  Class<D> derivType ) {
@@ -156,7 +156,7 @@ public class FactoryDetectLineAlgs {
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	DetectLineHoughPolar<I,D> houghPolar(ConfigHoughPolar config ,
 										 Class<I> imageType ,
 										 Class<D> derivType ) {

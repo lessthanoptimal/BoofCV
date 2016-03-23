@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -43,13 +43,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 		public void kernelDerivX() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -68,13 +68,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelDerivY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -94,13 +94,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelHaarX() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -119,13 +119,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelHaarY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -146,13 +146,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelDerivXX() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -172,13 +172,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void derivXX() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -189,8 +189,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivXX(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
+			GrayF32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			GrayF32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}
@@ -198,13 +198,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelDerivYY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -225,13 +225,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void derivYY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -244,8 +244,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivYY(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
+			GrayF32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			GrayF32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}
@@ -253,13 +253,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void kernelDerivXY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -279,13 +279,13 @@ public class TestDerivativeIntegralImage {
 
 	@Test
 	public void derivXY() {
-		ImageFloat32 orig = new ImageFloat32(width,height);
-		ImageFloat32 integral = new ImageFloat32(width,height);
+		GrayF32 orig = new GrayF32(width,height);
+		GrayF32 integral = new GrayF32(width,height);
 
 		ImageMiscOps.fillUniform(orig,rand,0,20);
 
-		ImageFloat32 expected = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
 
 		IntegralImageOps.transform(orig,integral);
 
@@ -297,8 +297,8 @@ public class TestDerivativeIntegralImage {
 			DerivativeIntegralImage.derivXY(integral,found,size);
 
 			int r = size/2;
-			ImageFloat32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
-			ImageFloat32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
+			GrayF32 a = expected.subimage(r+1,r+1,expected.width-r,expected.height-r, null);
+			GrayF32 b = found.subimage(r+1,r+1,found.width-r,found.height-r, null);
 
 			BoofTesting.assertEquals(a,b,1e-2);
 		}

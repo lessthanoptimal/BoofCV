@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings({"PointlessBooleanExpression"})
-public abstract class StandardImageIntegerTests<T extends ImageInteger> extends StandardSingleBandTests<T> {
+public abstract class StandardImageIntegerTests<T extends GrayI> extends StandardSingleBandTests<T> {
 	boolean expectedSign;
 
 	protected StandardImageIntegerTests(boolean expectedSign) {
@@ -37,7 +37,7 @@ public abstract class StandardImageIntegerTests<T extends ImageInteger> extends 
 
 	@Test
 	public void checkSign() {
-		ImageInteger<?> img = (ImageInteger<?>)createImage(10,10);
+		GrayI<?> img = (GrayI<?>)createImage(10,10);
 
 		assertEquals(expectedSign,img.getDataType().isSigned());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -60,7 +60,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class VisualizeAssociationScoreApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements VisualizeScorePanel.Listener {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
@@ -282,8 +282,8 @@ public class VisualizeAssociationScoreApp<T extends ImageSingleBand, D extends I
 
 	public static void main(String args[]) {
 
-		Class imageType = ImageFloat32.class;
-		Class derivType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
+		Class derivType = GrayF32.class;
 
 		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(imageType, derivType);
 

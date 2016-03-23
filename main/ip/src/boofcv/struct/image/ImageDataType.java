@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,29 +60,29 @@ public enum ImageDataType {
 	private Class sumType;
 
 	public static ImageDataType classToType( Class imageClass ) {
-		if( imageClass == ImageUInt8.class )
+		if( imageClass == GrayU8.class )
 			return U8;
-		else if( imageClass == ImageSInt8.class )
+		else if( imageClass == GrayS8.class )
 			return S8;
-		else if( imageClass == ImageUInt16.class )
+		else if( imageClass == GrayU16.class )
 			return U16;
-		else if( imageClass == ImageSInt16.class )
+		else if( imageClass == GrayS16.class )
 			return S16;
-		else if( imageClass == ImageSInt32.class )
+		else if( imageClass == GrayS32.class )
 			return S32;
-		else if( imageClass == ImageSInt64.class )
+		else if( imageClass == GrayS64.class )
 			return S64;
-		else if( imageClass == ImageFloat32.class )
+		else if( imageClass == GrayF32.class )
 			return F32;
-		else if( imageClass == ImageFloat64.class )
+		else if( imageClass == GrayF64.class )
 			return F64;
-		else if( imageClass == ImageInt8.class )
+		else if( imageClass == GrayI8.class )
 			return I8;
-		else if( imageClass == ImageInt16.class )
+		else if( imageClass == GrayI16.class )
 			return I16;
-		else if( imageClass == ImageInteger.class )
+		else if( imageClass == GrayI.class )
 			return I;
-		else if( imageClass == ImageFloat.class )
+		else if( imageClass == GrayF.class )
 			return F;
 		else if( imageClass == InterleavedU8.class )
 			return U8;
@@ -111,29 +111,29 @@ public enum ImageDataType {
 	public static Class typeToSingleClass(ImageDataType type) {
 		switch (type) {
 			case U8:
-				return ImageUInt8.class;
+				return GrayU8.class;
 			case S8:
-				return ImageSInt8.class;
+				return GrayS8.class;
 			case U16:
-				return ImageUInt16.class;
+				return GrayU16.class;
 			case S16:
-				return ImageSInt16.class;
+				return GrayS16.class;
 			case S32:
-				return ImageSInt32.class;
+				return GrayS32.class;
 			case S64:
-				return ImageSInt64.class;
+				return GrayS64.class;
 			case F32:
-				return ImageFloat32.class;
+				return GrayF32.class;
 			case F64:
-				return ImageFloat64.class;
+				return GrayF64.class;
 			case I8:
-				return ImageInt8.class;
+				return GrayI8.class;
 			case I16:
-				return ImageInt16.class;
+				return GrayI16.class;
 			case I:
-				return ImageInteger.class;
+				return GrayI.class;
 			case F:
-				return ImageFloat.class;
+				return GrayF.class;
 		}
 
 		throw new RuntimeException("Add");

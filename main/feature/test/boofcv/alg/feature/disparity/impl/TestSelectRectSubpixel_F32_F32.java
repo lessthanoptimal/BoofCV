@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -26,15 +26,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSelectRectSubpixel_F32_F32 extends ChecksSelectRectStandardBase<float[],ImageFloat32> {
+public class TestSelectRectSubpixel_F32_F32 extends ChecksSelectRectStandardBase<float[],GrayF32> {
 
 
 	public TestSelectRectSubpixel_F32_F32() {
-		super(float[].class,ImageFloat32.class);
+		super(float[].class,GrayF32.class);
 	}
 
 	@Override
-	public ImplSelectRectStandardBase_F32<ImageFloat32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+	public ImplSelectRectStandardBase_F32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
 		return new SelectRectSubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
 	}
 
@@ -44,7 +44,7 @@ public class TestSelectRectSubpixel_F32_F32 extends ChecksSelectRectStandardBase
 	@Test
 	public void addSubpixelBias() {
 
-		ImageFloat32 img = new ImageFloat32(w,h);
+		GrayF32 img = new GrayF32(w,h);
 
 		SelectRectSubpixel.F32_F32 alg = new SelectRectSubpixel.F32_F32(-1,-1,-1);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii.impl;
 
 import boofcv.alg.transform.ii.SparseIntegralGradient_NoBorder;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 
 
@@ -29,7 +29,7 @@ import boofcv.struct.sparse.GradientValue_F32;
  * @author Peter Abeles
  */
 public class SparseIntegralGradient_NoBorder_F32 
-		extends SparseIntegralGradient_NoBorder<ImageFloat32, GradientValue_F32>
+		extends SparseIntegralGradient_NoBorder<GrayF32, GradientValue_F32>
 {
 
 	private GradientValue_F32 ret = new GradientValue_F32();

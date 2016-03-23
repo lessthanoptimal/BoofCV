@@ -1,11 +1,29 @@
+/*
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.abst.tracker;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -19,12 +37,12 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<ImageUInt8> {
+public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<GrayU8> {
 
 	public TextureGrayTrackerObjectRectangleTests() {
-		super(new ImageType<ImageUInt8>(ImageType.Family.SINGLE_BAND, ImageDataType.U8,1));
+		super(new ImageType<GrayU8>(ImageType.Family.SINGLE_BAND, ImageDataType.U8,1));
 
-		input = new ImageUInt8(width,height);
+		input = new GrayU8(width,height);
 	}
 
 	@Override
@@ -48,7 +66,7 @@ public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrac
 		}
 	}
 
-	public static void convexFill( Polygon2D_I32 poly , ImageUInt8 image , double value ) {
+	public static void convexFill(Polygon2D_I32 poly , GrayU8 image , double value ) {
 		int minX = Integer.MAX_VALUE; int maxX = Integer.MIN_VALUE;
 		int minY = Integer.MAX_VALUE; int maxY = Integer.MIN_VALUE;
 

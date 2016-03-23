@@ -33,9 +33,9 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
@@ -56,12 +56,12 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	StereoParameters param;
 
 	// distorted input images
-	MultiSpectral<ImageFloat32> distLeft;
-	MultiSpectral<ImageFloat32> distRight;
+	Planar<GrayF32> distLeft;
+	Planar<GrayF32> distRight;
 
 	// storage for undistorted and rectified images
-	MultiSpectral<ImageFloat32> rectLeft;
-	MultiSpectral<ImageFloat32> rectRight;
+	Planar<GrayF32> rectLeft;
+	Planar<GrayF32> rectRight;
 
 	boolean hasProcessed = false;
 
@@ -76,13 +76,13 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted images
-		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, true, ImageFloat32.class);
-		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, ImageFloat32.class);
+		distLeft = ConvertBufferedImage.convertFromMulti(origLeft, null, true, GrayF32.class);
+		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, GrayF32.class);
 
 		// storage for undistorted + rectified images
-		rectLeft = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		rectLeft = new Planar<GrayF32>(GrayF32.class,
 				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
-		rectRight = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		rectRight = new Planar<GrayF32>(GrayF32.class,
 				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
 
 		// Compute rectification
@@ -120,10 +120,10 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 	private void addRectified( final String name , final DenseMatrix64F rect1 , final DenseMatrix64F rect2 ) {
 		// Will rectify the image
-		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortLeft =
+		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
+		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
 				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.VALUE, imageType);
-		ImageDistort<ImageFloat32,ImageFloat32> imageDistortRight =
+		ImageDistort<GrayF32,GrayF32> imageDistortRight =
 				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.VALUE, imageType);
 
 		// Fill the image with all black

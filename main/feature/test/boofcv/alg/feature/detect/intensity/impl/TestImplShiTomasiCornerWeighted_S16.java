@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.ImageBorder1D_S32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
 
 			@Override
-			public void computeIntensity( ImageFloat32 intensity ) {
+			public void computeIntensity( GrayF32 intensity ) {
 				ImplShiTomasiCornerWeighted_S16 alg = new ImplShiTomasiCornerWeighted_S16(1);
 				alg.process(derivX_I16,derivY_I16,intensity);
 			}
@@ -61,20 +61,20 @@ public class TestImplShiTomasiCornerWeighted_S16 {
 	 */
 	@Test
 	public void compareToNaive() {
-		ImageUInt8 img = new ImageUInt8(width, height);
+		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, new Random(0xfeed), 0, 100);
 
-		ImageSInt16 derivX = new ImageSInt16(img.getWidth(), img.getHeight());
-		ImageSInt16 derivY = new ImageSInt16(img.getWidth(), img.getHeight());
+		GrayS16 derivX = new GrayS16(img.getWidth(), img.getHeight());
+		GrayS16 derivY = new GrayS16(img.getWidth(), img.getHeight());
 
 		GradientSobel.process(img, derivX, derivY, new ImageBorder1D_S32(BorderIndex1D_Extend.class));
 
 		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX, derivY);
 	}
 
-	public void compareToNaive(ImageSInt16 derivX, ImageSInt16 derivY) {
-		ImageFloat32 expected = new ImageFloat32(derivX.width,derivX.height);
-		ImageFloat32 found = new ImageFloat32(derivX.width,derivX.height);
+	public void compareToNaive(GrayS16 derivX, GrayS16 derivY) {
+		GrayF32 expected = new GrayF32(derivX.width,derivX.height);
+		GrayF32 found = new GrayF32(derivX.width,derivX.height);
 
 		ImplSsdCornerNaive naive = new ImplSsdCornerNaive(width, height, 3, true);
 		naive.process(derivX, derivY,expected);

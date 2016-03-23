@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.color;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 
 /**
  * <p>Color conversion between CIE XYZ and RGB color models.</p>
@@ -98,7 +98,7 @@ public class ColorXyz {
 	}
 
 	/**
-	 * Convert a 3-channel {@link boofcv.struct.image.MultiSpectral} image from RGB into XYZ.  RGB is assumed
+	 * Convert a 3-channel {@link Planar} image from RGB into XYZ.  RGB is assumed
 	 * to have a range from 0:255
 	 *
 	 * NOTE: Input and output image can be the same instance.
@@ -106,17 +106,17 @@ public class ColorXyz {
 	 * @param rgb (Input) RGB encoded image
 	 * @param xyz (Output) XYZ encoded image
 	 */
-	public static void rgbToXyz_F32( MultiSpectral<ImageFloat32> rgb , MultiSpectral<ImageFloat32> xyz ) {
+	public static void rgbToXyz_F32(Planar<GrayF32> rgb , Planar<GrayF32> xyz ) {
 
 		InputSanityCheck.checkSameShape(xyz, rgb);
 
-		ImageFloat32 R = rgb.getBand(0);
-		ImageFloat32 G = rgb.getBand(1);
-		ImageFloat32 B = rgb.getBand(2);
+		GrayF32 R = rgb.getBand(0);
+		GrayF32 G = rgb.getBand(1);
+		GrayF32 B = rgb.getBand(2);
 
-		ImageFloat32 X = xyz.getBand(0);
-		ImageFloat32 Y = xyz.getBand(1);
-		ImageFloat32 Z = xyz.getBand(2);
+		GrayF32 X = xyz.getBand(0);
+		GrayF32 Y = xyz.getBand(1);
+		GrayF32 Z = xyz.getBand(2);
 
 		for( int row = 0; row < xyz.height; row++ ) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;
@@ -135,7 +135,7 @@ public class ColorXyz {
 	}
 
 	/**
-	 * Convert a 3-channel {@link boofcv.struct.image.MultiSpectral} image from RGB into XYZ.  RGB is assumed
+	 * Convert a 3-channel {@link Planar} image from RGB into XYZ.  RGB is assumed
 	 * to have a range from 0:255
 	 *
 	 * NOTE: Input and output image can be the same instance.
@@ -143,17 +143,17 @@ public class ColorXyz {
 	 * @param rgb (Input) RGB encoded image
 	 * @param xyz (Output) XYZ encoded image
 	 */
-	public static void rgbToXyz_U8( MultiSpectral<ImageUInt8> rgb , MultiSpectral<ImageFloat32> xyz ) {
+	public static void rgbToXyz_U8(Planar<GrayU8> rgb , Planar<GrayF32> xyz ) {
 
 		InputSanityCheck.checkSameShape(xyz, rgb);
 
-		ImageUInt8 R = rgb.getBand(0);
-		ImageUInt8 G = rgb.getBand(1);
-		ImageUInt8 B = rgb.getBand(2);
+		GrayU8 R = rgb.getBand(0);
+		GrayU8 G = rgb.getBand(1);
+		GrayU8 B = rgb.getBand(2);
 
-		ImageFloat32 X = xyz.getBand(0);
-		ImageFloat32 Y = xyz.getBand(1);
-		ImageFloat32 Z = xyz.getBand(2);
+		GrayF32 X = xyz.getBand(0);
+		GrayF32 Y = xyz.getBand(1);
+		GrayF32 Z = xyz.getBand(2);
 
 		for( int row = 0; row < xyz.height; row++ ) {
 			int indexXyz = xyz.startIndex + row*xyz.stride;

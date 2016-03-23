@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
  */
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
-public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class DetectLineApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel implements ImageCorruptPanel.Listener
 {
 	Class<T> imageType;
@@ -165,8 +165,8 @@ public class DetectLineApp<T extends ImageSingleBand, D extends ImageSingleBand>
 	}
 
 	public static void main(String args[]) {
-		Class imageType = ImageFloat32.class;
-		Class derivType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
+		Class derivType = GrayF32.class;
 
 		DetectLineApp app = new DetectLineApp(imageType,derivType);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -39,27 +39,27 @@ import java.util.List;
  */
 public class CalibrationDetectorChessboard implements CalibrationDetector {
 
-	DetectChessboardFiducial<ImageFloat32> alg;
+	DetectChessboardFiducial<GrayF32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
 	public CalibrationDetectorChessboard(ConfigChessboard config) {
 
-		RefineBinaryPolygon<ImageFloat32> refineLine =
-				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class);
-		RefineBinaryPolygon<ImageFloat32> refineCorner = config.refineWithCorners ?
-				FactoryShapeDetector.refinePolygon(config.configRefineLines,ImageFloat32.class) : null;
+		RefineBinaryPolygon<GrayF32> refineLine =
+				FactoryShapeDetector.refinePolygon(config.configRefineLines,GrayF32.class);
+		RefineBinaryPolygon<GrayF32> refineCorner = config.refineWithCorners ?
+				FactoryShapeDetector.refinePolygon(config.configRefineLines,GrayF32.class) : null;
 
 		config.square.refine = null;
 
-		BinaryPolygonDetector<ImageFloat32> detectorSquare =
-				FactoryShapeDetector.polygon(config.square,ImageFloat32.class);
+		BinaryPolygonDetector<GrayF32> detectorSquare =
+				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
-		InputToBinary<ImageFloat32> inputToBinary =
-				FactoryThresholdBinary.threshold(config.thresholding,ImageFloat32.class);
+		InputToBinary<GrayF32> inputToBinary =
+				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
 
-		alg = new DetectChessboardFiducial<ImageFloat32>(
+		alg = new DetectChessboardFiducial<GrayF32>(
 				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,
 				refineLine,refineCorner,inputToBinary);
 
@@ -67,7 +67,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	}
 
 	@Override
-	public boolean process(ImageFloat32 input) {
+	public boolean process(GrayF32 input) {
 		if( alg.process(input) )  {
 			detected = new CalibrationObservation();
 			List<Point2D_F64> found = alg.getCalibrationPoints();
@@ -107,7 +107,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	}
 
 
-	public DetectChessboardFiducial<ImageFloat32> getAlgorithm() {
+	public DetectChessboardFiducial<GrayF32> getAlgorithm() {
 		return alg;
 	}
 

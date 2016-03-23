@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Random;
 
@@ -44,14 +44,14 @@ public class BenchmarkConvolveBox {
 
 	static Kernel1D_I32 kernelI32;
 	static Kernel1D_F32 kernelF32;
-	static ImageFloat32 input_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 out_F32 = new ImageFloat32(width,height);
-	static ImageFloat32 storageF32 = new ImageFloat32(width,height);
-	static ImageUInt8 input_I8 = new ImageUInt8(width,height);
-	static ImageSInt16 input_I16 = new ImageSInt16(width,height);
-	static ImageUInt8 out_I8 = new ImageUInt8(width,height);
-	static ImageSInt16 out_I16 = new ImageSInt16(width,height);
-	static ImageSInt32 out_I32 = new ImageSInt32(width,height);
+	static GrayF32 input_F32 = new GrayF32(width,height);
+	static GrayF32 out_F32 = new GrayF32(width,height);
+	static GrayF32 storageF32 = new GrayF32(width,height);
+	static GrayU8 input_I8 = new GrayU8(width,height);
+	static GrayS16 input_I16 = new GrayS16(width,height);
+	static GrayU8 out_I8 = new GrayU8(width,height);
+	static GrayS16 out_I16 = new GrayS16(width,height);
+	static GrayS32 out_I32 = new GrayS32(width,height);
 
 	// iterate through different sized kernel radius
 //	@Param({"1", "2", "3", "5","10"})

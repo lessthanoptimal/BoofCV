@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,9 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -58,8 +58,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			ImageUInt8 output = new ImageUInt8(width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+			GrayU8 output = new GrayU8(width,height);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -70,10 +70,10 @@ public class TestThresholdImageOps {
 		assertEquals(2, total);
 	}
 
-	public void performLocalSquare( Method m , ImageSingleBand input , ImageUInt8 output )
+	public void performLocalSquare(Method m , ImageGray input , GrayU8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
-		ImageUInt8 expected = new ImageUInt8(output.width,output.height);
+		GrayU8 expected = new GrayU8(output.width,output.height);
 
 		for( int radius = 1; radius <= 5; radius++ ) {
 			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
@@ -95,17 +95,17 @@ public class TestThresholdImageOps {
 		}
 	}
 
-	public void naiveLocalSquare(ImageSingleBand input, ImageUInt8 output,
-									int radius, double scale, boolean down) {
+	public void naiveLocalSquare(ImageGray input, GrayU8 output,
+								 int radius, double scale, boolean down) {
 
-		ImageSingleBand blur;
+		ImageGray blur;
 		boolean isInt;
-		if( input instanceof ImageUInt8 ) {
+		if( input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.mean((ImageUInt8)input,null,radius,null);
+			blur = BlurImageOps.mean((GrayU8)input,null,radius,null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.mean((ImageFloat32)input,null,radius,null);
+			blur = BlurImageOps.mean((GrayF32)input,null,radius,null);
 		}
 
 		float fscale = (float)scale;
@@ -151,8 +151,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			ImageUInt8 output = new ImageUInt8(width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+			GrayU8 output = new GrayU8(width,height);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -163,10 +163,10 @@ public class TestThresholdImageOps {
 		assertEquals(2, total);
 	}
 
-	public void performLocalGaussian( Method m , ImageSingleBand input , ImageUInt8 output )
+	public void performLocalGaussian(Method m , ImageGray input , GrayU8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
-		ImageUInt8 expected = new ImageUInt8(output.width,output.height);
+		GrayU8 expected = new GrayU8(output.width,output.height);
 
 		for( int radius = 1; radius <= 5; radius++ ) {
 			for( int indexScale = 0; indexScale < 4; indexScale++ ) {
@@ -189,17 +189,17 @@ public class TestThresholdImageOps {
 		}
 	}
 
-	public void naiveLocalGaussian( ImageSingleBand input , ImageUInt8 output ,
-									   int radius , double scale , boolean down ) {
+	public void naiveLocalGaussian(ImageGray input , GrayU8 output ,
+								   int radius , double scale , boolean down ) {
 
-		ImageSingleBand blur;
+		ImageGray blur;
 		boolean isInt;
-		if( input instanceof ImageUInt8 ) {
+		if( input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.gaussian((ImageUInt8) input, null, -1, radius, null);
+			blur = BlurImageOps.gaussian((GrayU8) input, null, -1, radius, null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.gaussian((ImageFloat32) input, null, -1, radius, null);
+			blur = BlurImageOps.gaussian((GrayF32) input, null, -1, radius, null);
 		}
 
 		float fscale = (float)scale;
@@ -246,8 +246,8 @@ public class TestThresholdImageOps {
 
 			Class param[] = m.getParameterTypes();
 
-			ImageSingleBand input = GeneralizedImageOps.createSingleBand(param[0], width, height);
-			ImageUInt8 output = new ImageUInt8(width,height);
+			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
+			GrayU8 output = new GrayU8(width,height);
 
 			GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
 			for( int y = 0; y < input.height; y++ ) {
@@ -263,7 +263,7 @@ public class TestThresholdImageOps {
 		assertEquals(6,total);
 	}
 
-	public void performThreshold( Method m , ImageSingleBand input , ImageUInt8 output )
+	public void performThreshold(Method m , ImageGray input , GrayU8 output )
 			throws InvocationTargetException, IllegalAccessException
 	{
 		int areaBelow = 8*input.height;

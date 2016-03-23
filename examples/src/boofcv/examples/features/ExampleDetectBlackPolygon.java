@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -59,14 +59,14 @@ public class ExampleDetectBlackPolygon {
 
 		// first configure the detector to only detect convex shapes with 3 to 7 sides
 		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
-		BinaryPolygonDetector<ImageUInt8> detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
+		BinaryPolygonDetector<GrayU8> detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConvex, detector, panel);
 
 		// now lets detect concave shapes with many sides
 		config.maximumSides = 12;
 		config.convex = false;
-		detector = FactoryShapeDetector.polygon(config, ImageUInt8.class);
+		detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConcave, detector, panel);
 
@@ -74,14 +74,14 @@ public class ExampleDetectBlackPolygon {
 	}
 
 	private static void processImages(String[] files,
-									  BinaryPolygonDetector<ImageUInt8> detector,
+									  BinaryPolygonDetector<GrayU8> detector,
 									  ListDisplayPanel panel)
 	{
 		for( String fileName : files ) {
 			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
 
-			ImageUInt8 input = ConvertBufferedImage.convertFromSingle(image, null, ImageUInt8.class);
-			ImageUInt8 binary = new ImageUInt8(input.width,input.height);
+			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
+			GrayU8 binary = new GrayU8(input.width,input.height);
 
 			// Binarization is done outside to allows creative tricks.  For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.

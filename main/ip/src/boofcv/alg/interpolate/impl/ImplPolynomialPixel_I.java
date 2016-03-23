@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.PolynomialPixel;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageType;
  * 
  * @author Peter Abeles
  */
-public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
+public class ImplPolynomialPixel_I extends PolynomialPixel<GrayI> {
 
 	public ImplPolynomialPixel_I(int maxDegree, float min, float max) {
 		super(maxDegree, min, max);
@@ -141,8 +141,8 @@ public class ImplPolynomialPixel_I extends PolynomialPixel<ImageInteger> {
 		return ret;
 	}
 	@Override
-	public ImageType<ImageInteger> getImageType() {
-		return ImageType.single(ImageInteger.class);
+	public ImageType<GrayI> getImageType() {
+		return ImageType.single(GrayI.class);
 	}
 
 }

@@ -29,7 +29,7 @@ import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
@@ -46,23 +46,23 @@ public class TestDescribePointBriefSO {
 	Random rand = new Random(234);
 	int width = 30;
 	int height = 40;
-	Class<ImageFloat32> imageType = ImageFloat32.class;
+	Class<GrayF32> imageType = GrayF32.class;
 
 	int briefRadius = 5;
 	BinaryCompareDefinition_I32 def = FactoryBriefDefinition.gaussian2(rand, briefRadius, 20);
-	BlurFilter<ImageFloat32> filterBlur;
+	BlurFilter<GrayF32> filterBlur;
 
 	public TestDescribePointBriefSO() {
 		filterBlur = FactoryBlurFilter.gaussian(imageType, -1, 1);
 	}
 
-	protected  ImageFloat32 createImage( int width , int height ) {
-		ImageFloat32 ret = new ImageFloat32(width,height);
+	protected GrayF32 createImage(int width , int height ) {
+		GrayF32 ret = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(ret, rand, 0, 50);
 		return ret;
 	}
 
-	protected DescribePointBriefSO<ImageFloat32> createAlg() {
+	protected DescribePointBriefSO<GrayF32> createAlg() {
 		return FactoryDescribePointAlgs.briefso(def,filterBlur);
 	}
 
@@ -71,9 +71,9 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void testOrientation() {
-		ImageFloat32 input = createImage(width,height);
+		GrayF32 input = createImage(width,height);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 		TupleDesc_B desc1 = alg.createFeature();
 		TupleDesc_B desc2 = alg.createFeature();
 
@@ -95,9 +95,9 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void testScale() {
-		ImageFloat32 input = createImage(width,height);
+		GrayF32 input = createImage(width,height);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 		TupleDesc_B desc1 = alg.createFeature();
 		TupleDesc_B desc2 = alg.createFeature();
 
@@ -119,9 +119,9 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void testSubImage() {
-		ImageFloat32 input = createImage(width,height);
+		GrayF32 input = createImage(width,height);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 		TupleDesc_B desc1 = alg.createFeature();
 		TupleDesc_B desc2 = alg.createFeature();
 
@@ -129,7 +129,7 @@ public class TestDescribePointBriefSO {
 		alg.setImage(input);
 		alg.process(input.width/2,input.height/2,0,briefRadius,desc1);
 
-		ImageFloat32 sub = BoofTesting.createSubImageOf(input);
+		GrayF32 sub = BoofTesting.createSubImageOf(input);
 
 		alg.setImage(sub);
 		alg.process(input.width/2,input.height/2,0,briefRadius,desc2);
@@ -144,10 +144,10 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void changeInInputSize() {
-		ImageFloat32 inputA = createImage(width,height);
-		ImageFloat32 inputB = createImage(width-5,height-5);
+		GrayF32 inputA = createImage(width,height);
+		GrayF32 inputB = createImage(width-5,height-5);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 		TupleDesc_B desc = alg.createFeature();
 
 		alg.setImage(inputA);
@@ -163,12 +163,12 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void testIntensityInvariance() {
-		ImageFloat32 input = createImage(width,height);
-		ImageFloat32 mod = input.clone();
+		GrayF32 input = createImage(width,height);
+		GrayF32 mod = input.clone();
 
 		GPixelMath.multiply(input, 2, mod);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 
 		TupleDesc_B desc1 = alg.createFeature();
 		TupleDesc_B desc2 = alg.createFeature();
@@ -194,13 +194,13 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void testManualCheck() {
-		ImageFloat32 input = createImage(width,height);
-		ImageFloat32 blurred = input._createNew(width, height);
+		GrayF32 input = createImage(width,height);
+		GrayF32 blurred = input._createNew(width, height);
 		filterBlur.process(input,blurred);
 
 		GImageSingleBand a = FactoryGImageSingleBand.wrap(blurred);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 
 		alg.setImage(input);
 
@@ -228,9 +228,9 @@ public class TestDescribePointBriefSO {
 	 */
 	@Test
 	public void checkBorder() {
-		ImageFloat32 input = createImage(width,height);
+		GrayF32 input = createImage(width,height);
 
-		DescribePointBriefSO<ImageFloat32> alg = createAlg();
+		DescribePointBriefSO<GrayF32> alg = createAlg();
 
 		alg.setImage(input);
 

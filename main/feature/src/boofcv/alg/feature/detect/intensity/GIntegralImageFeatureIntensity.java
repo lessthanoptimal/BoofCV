@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -35,14 +35,14 @@ public class GIntegralImageFeatureIntensity {
 	 * @param size Hessian kernel's size.
 	 * @param intensity Output intensity image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void hessian( T integral, int skip , int size ,
-				  ImageFloat32 intensity) {
+				  GrayF32 intensity) {
 
-		if( integral instanceof ImageFloat32 ) {
-			IntegralImageFeatureIntensity.hessian((ImageFloat32)integral,skip,size,intensity);
-		} else if( integral instanceof ImageSInt32) {
-			IntegralImageFeatureIntensity.hessian((ImageSInt32)integral,skip,size,intensity);
+		if( integral instanceof GrayF32) {
+			IntegralImageFeatureIntensity.hessian((GrayF32)integral,skip,size,intensity);
+		} else if( integral instanceof GrayS32) {
+			IntegralImageFeatureIntensity.hessian((GrayS32)integral,skip,size,intensity);
 		} else {
 			throw new IllegalArgumentException("Unsupported input type");
 		}

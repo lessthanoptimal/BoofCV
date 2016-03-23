@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.misc;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class TestImplAverageDownSampleN {
 		Class outputType = m.getParameterTypes()[2];
 
 
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(inputType,width,height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(inputType,width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
@@ -73,8 +73,8 @@ public class TestImplAverageDownSampleN {
 			int downWidth = width%region == 0 ? width/region : width/region+1;
 			int downHeight = height%region == 0 ? height/region : height/region+1;
 
-			ImageSingleBand found = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
-			ImageSingleBand expected = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
+			ImageGray found = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(outputType,downWidth,downHeight);
 
 			try {
 				m.invoke(null, input, region, found);
@@ -89,7 +89,7 @@ public class TestImplAverageDownSampleN {
 		}
 	}
 
-	public static void naive( ImageSingleBand input , int region , ImageSingleBand output ) {
+	public static void naive(ImageGray input , int region , ImageGray output ) {
 		for( int y = 0; y < input.height; y += region ) {
 			int endY = y+region > input.height ? input.height : y+region;
 

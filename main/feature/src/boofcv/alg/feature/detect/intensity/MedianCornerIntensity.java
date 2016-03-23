@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.impl.ImplMedianCornerIntensity;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
@@ -34,14 +34,14 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class MedianCornerIntensity {
 
-	public static void process(ImageFloat32 intensity , ImageFloat32 originalImage, ImageFloat32 medianImage)
+	public static void process(GrayF32 intensity , GrayF32 originalImage, GrayF32 medianImage)
 	{
 		InputSanityCheck.checkSameShape(intensity,originalImage,medianImage);
 
 		ImplMedianCornerIntensity.process(intensity,originalImage,medianImage);
 	}
 
-	public static void process(ImageFloat32 intensity , ImageUInt8 originalImage, ImageUInt8 medianImage)
+	public static void process(GrayF32 intensity , GrayU8 originalImage, GrayU8 medianImage)
 	{
 		InputSanityCheck.checkSameShape(intensity,originalImage,medianImage);
 

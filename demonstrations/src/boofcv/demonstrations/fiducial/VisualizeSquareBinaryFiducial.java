@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,9 +36,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
@@ -57,15 +57,15 @@ public class VisualizeSquareBinaryFiducial {
 	public void process( String nameImage , String nameIntrinsic ) {
 
 		IntrinsicParameters intrinsic = UtilIO.loadXML(nameIntrinsic);
-		ImageFloat32 input = UtilImageIO.loadImage(nameImage, ImageFloat32.class);
-		ImageFloat32 undistorted = new ImageFloat32(input.width,input.height);
+		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
+		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
 		IntrinsicParameters paramUndist = new IntrinsicParameters();
-		ImageDistort<ImageFloat32,ImageFloat32> undistorter = LensDistortionOps.imageRemoveDistortion(
+		ImageDistort<GrayF32,GrayF32> undistorter = LensDistortionOps.imageRemoveDistortion(
 				AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
-				ImageType.single(ImageFloat32.class));
+				ImageType.single(GrayF32.class));
 
-		InputToBinary<ImageFloat32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,ImageFloat32.class);
+		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,GrayF32.class);
 		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
 		detector.configure(paramUndist,false);
 		detector.setLengthSide(0.1);
@@ -96,18 +96,18 @@ public class VisualizeSquareBinaryFiducial {
 		ShowImages.showWindow(squares,"Candidates",true);
 	}
 
-	public static class Detector extends DetectFiducialSquareBinary<ImageFloat32> {
+	public static class Detector extends DetectFiducialSquareBinary<GrayF32> {
 
-		public List<ImageUInt8> squares = new ArrayList<ImageUInt8>();
-		public List<ImageFloat32> squaresGray = new ArrayList<ImageFloat32>();
+		public List<GrayU8> squares = new ArrayList<GrayU8>();
+		public List<GrayF32> squaresGray = new ArrayList<GrayF32>();
 
-		protected Detector( int gridWidth, double borderWidth , InputToBinary<ImageFloat32> inputToBinary ) {
-			super(gridWidth,borderWidth,0.65,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), ImageFloat32.class)
-					,ImageFloat32.class);
+		protected Detector( int gridWidth, double borderWidth , InputToBinary<GrayF32> inputToBinary ) {
+			super(gridWidth,borderWidth,0.65,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class)
+					,GrayF32.class);
 		}
 
 		@Override
-		protected boolean processSquare(ImageFloat32 square, Result result, double a ,double b) {
+		protected boolean processSquare(GrayF32 square, Result result, double a , double b) {
 			if( super.processSquare(square,result,a,b)) {
 				squares.add(super.getBinaryInner().clone());
 				squaresGray.add(super.getGrayNoBorder().clone());

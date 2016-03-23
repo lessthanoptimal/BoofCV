@@ -42,7 +42,7 @@ public class GeneralizedImageOps {
 	 * @param typeDst The type of output image.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageSingleBand> T convert( ImageSingleBand<?> src , T dst , Class<T> typeDst  )
+	public static <T extends ImageGray> T convert(ImageGray<?> src , T dst , Class<T> typeDst  )
 	{
 		if (dst == null) {
 			dst =(T) createSingleBand(typeDst, src.width, src.height);
@@ -55,38 +55,38 @@ public class GeneralizedImageOps {
 	}
 
 	public static boolean isFloatingPoint(Class<?> imgType) {
-		if( ImageFloat.class.isAssignableFrom(imgType) ) {
+		if( GrayF.class.isAssignableFrom(imgType) ) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public static double get(ImageSingleBand img, int x, int y) {
-		if (img instanceof ImageInt8) {
-			return ((ImageInt8) img).get(x, y);
-		} else if (img instanceof ImageInt16) {
-			return ((ImageInt16) img).get(x, y);
-		} else if (img instanceof ImageSInt32) {
-			return ((ImageSInt32) img).get(x, y);
-		} else if (img instanceof ImageFloat32) {
-			return ((ImageFloat32) img).get(x, y);
-		} else if (img instanceof ImageFloat64) {
-			return ((ImageFloat64) img).get(x, y);
-		} else if (img instanceof ImageSInt64) {
-			return ((ImageSInt64) img).get(x, y);
+	public static double get(ImageGray img, int x, int y) {
+		if (img instanceof GrayI8) {
+			return ((GrayI8) img).get(x, y);
+		} else if (img instanceof GrayI16) {
+			return ((GrayI16) img).get(x, y);
+		} else if (img instanceof GrayS32) {
+			return ((GrayS32) img).get(x, y);
+		} else if (img instanceof GrayF32) {
+			return ((GrayF32) img).get(x, y);
+		} else if (img instanceof GrayF64) {
+			return ((GrayF64) img).get(x, y);
+		} else if (img instanceof GrayS64) {
+			return ((GrayS64) img).get(x, y);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
 	}
 
 	public static double get(ImageBase img, int x, int y , int band ) {
-		if (img instanceof ImageSingleBand) {
-			return get((ImageSingleBand) img, x, y);
+		if (img instanceof ImageGray) {
+			return get((ImageGray) img, x, y);
 		} else if (img instanceof ImageInterleaved) {
 			return get((ImageInterleaved) img, x, y, band);
-		} else if (img instanceof MultiSpectral) {
-			return get(((MultiSpectral) img).getBand(band), x, y);
+		} else if (img instanceof Planar) {
+			return get(((Planar) img).getBand(band), x, y);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
@@ -114,44 +114,44 @@ public class GeneralizedImageOps {
 		}
 	}
 
-	public static <T extends ImageSingleBand> T createSingleBand(ImageDataType type, int width, int height) {
+	public static <T extends ImageGray> T createSingleBand(ImageDataType type, int width, int height) {
 		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.SINGLE_BAND, type);
 		return createSingleBand(typeClass, width, height);
 	}
 
 	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height, int numBands ) {
-		if( type == MultiSpectral.class )
+		if( type == Planar.class )
 			throw new IllegalArgumentException("Can't use this function with multi-spectral because the data type needs to be specified too");
 
-		if( ImageSingleBand.class.isAssignableFrom(type))
+		if( ImageGray.class.isAssignableFrom(type))
 			return (T)createSingleBand((Class)type,width,height);
 		else if( ImageInterleaved.class.isAssignableFrom(type))
 			return (T)createInterleaved((Class)type,width,height,numBands);
 		else
 			throw new RuntimeException("Unknown");
 	}
-	public static <T extends ImageSingleBand> T createSingleBand(Class<T> type, int width, int height) {
+	public static <T extends ImageGray> T createSingleBand(Class<T> type, int width, int height) {
 		type = BoofTesting.convertGenericToSpecificType(type);
 
-		if (type == ImageUInt8.class) {
-			return (T)new ImageUInt8(width, height);
-		} else if (type == ImageSInt8.class) {
-			return (T)new ImageSInt8(width, height);
-		} else if (type == ImageSInt16.class) {
-			return (T)new ImageSInt16(width, height);
-		} else if (type == ImageUInt16.class) {
-			return (T)new ImageUInt16(width, height);
-		} else if (type == ImageSInt32.class) {
-			return (T)new ImageSInt32(width, height);
-		} else if (type == ImageSInt64.class) {
-			return (T)new ImageSInt64(width, height);
-		} else if (type == ImageFloat32.class) {
-			return (T)new ImageFloat32(width, height);
-		} else if (type == ImageFloat64.class) {
-			return (T)new ImageFloat64(width, height);
-		} else if( type == ImageInteger.class ) {
+		if (type == GrayU8.class) {
+			return (T)new GrayU8(width, height);
+		} else if (type == GrayS8.class) {
+			return (T)new GrayS8(width, height);
+		} else if (type == GrayS16.class) {
+			return (T)new GrayS16(width, height);
+		} else if (type == GrayU16.class) {
+			return (T)new GrayU16(width, height);
+		} else if (type == GrayS32.class) {
+			return (T)new GrayS32(width, height);
+		} else if (type == GrayS64.class) {
+			return (T)new GrayS64(width, height);
+		} else if (type == GrayF32.class) {
+			return (T)new GrayF32(width, height);
+		} else if (type == GrayF64.class) {
+			return (T)new GrayF64(width, height);
+		} else if( type == GrayI.class ) {
 			// ImageInteger is a generic type, so just create something
-			return (T)new ImageSInt32(width,height);
+			return (T)new GrayS32(width,height);
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
@@ -187,23 +187,23 @@ public class GeneralizedImageOps {
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
 
-	public static void set(ImageSingleBand img, int x, int y, double value) {
-		if (ImageInteger.class.isAssignableFrom(img.getClass())) {
-			((ImageInteger)img).set(x,y,(int)value);
-		} else if (img instanceof ImageFloat32) {
-			((ImageFloat32) img).set(x, y,(float)value);
-		} else if (img instanceof ImageFloat64) {
-			((ImageFloat64) img).set(x, y, value);
-		} else if (img instanceof ImageSInt64) {
-			((ImageSInt64) img).set(x, y, (long)value);
+	public static void set(ImageGray img, int x, int y, double value) {
+		if (GrayI.class.isAssignableFrom(img.getClass())) {
+			((GrayI)img).set(x,y,(int)value);
+		} else if (img instanceof GrayF32) {
+			((GrayF32) img).set(x, y,(float)value);
+		} else if (img instanceof GrayF64) {
+			((GrayF64) img).set(x, y, value);
+		} else if (img instanceof GrayS64) {
+			((GrayS64) img).set(x, y, (long)value);
 		} else {
 			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
 	}
 
 	public static void setM(ImageBase img, int x, int y, double... value) {
-		if( img instanceof MultiSpectral ) {
-			MultiSpectral ms = (MultiSpectral) img;
+		if( img instanceof Planar) {
+			Planar ms = (Planar) img;
 
 			for (int i = 0; i < value.length; i++) {
 				set(ms.getBand(i), x, y, value[i]);
@@ -230,18 +230,18 @@ public class GeneralizedImageOps {
 					throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 				}
 			}
-		} else if( img instanceof ImageSingleBand ) {
+		} else if( img instanceof ImageGray) {
 			if( value.length != 1 )
 				throw new IllegalArgumentException("For a single band image the input pixel must have 1 band");
-			set((ImageSingleBand)img,x,y,value[0]);
+			set((ImageGray)img,x,y,value[0]);
 		} else {
 			throw new IllegalArgumentException("Add support for this image type!");
 		}
 	}
 
 	public static void setB(ImageBase img, int x, int y, int band , double value ) {
-		if( img instanceof MultiSpectral ) {
-			MultiSpectral ms = (MultiSpectral) img;
+		if( img instanceof Planar) {
+			Planar ms = (Planar) img;
 
 			GeneralizedImageOps.set(ms.getBand(band),x,y,value);
 		} else if( img instanceof ImageInterleaved ) {
@@ -264,31 +264,31 @@ public class GeneralizedImageOps {
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 			}
-		} else if( img instanceof ImageSingleBand ) {
+		} else if( img instanceof ImageGray) {
 			if( band != 0 )
 				throw new IllegalArgumentException("For a single band image the input pixel must have 1 band");
-			set((ImageSingleBand)img,x,y,value);
+			set((ImageGray)img,x,y,value);
 		} else {
 			throw new IllegalArgumentException("Add support for this image type!");
 		}
 	}
 
-	public static <T extends ImageSingleBand> int getNumBits(Class<T> type) {
-		if (type == ImageUInt8.class) {
+	public static <T extends ImageGray> int getNumBits(Class<T> type) {
+		if (type == GrayU8.class) {
 			return 8;
-		} else if (type == ImageSInt8.class) {
+		} else if (type == GrayS8.class) {
 			return 8;
-		} else if (type == ImageSInt16.class) {
+		} else if (type == GrayS16.class) {
 			return 16;
-		} else if (type == ImageUInt16.class) {
+		} else if (type == GrayU16.class) {
 			return 16;
-		} else if (type == ImageSInt32.class) {
+		} else if (type == GrayS32.class) {
 			return 32;
-		} else if (type == ImageSInt64.class) {
+		} else if (type == GrayS64.class) {
 			return 64;
-		} else if (type == ImageFloat32.class) {
+		} else if (type == GrayF32.class) {
 			return 32;
-		} else if (type == ImageFloat64.class) {
+		} else if (type == GrayF64.class) {
 			return 64;
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.RectangleRotate_F64;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import org.junit.Test;
 
@@ -63,8 +63,8 @@ public class TestSparseFlowObjectTracker {
 	}
 
 	protected void checkMotion( double tranX , double tranY , double rot ) {
-		ImageUInt8 frame0 = new ImageUInt8(320,240);
-		ImageUInt8 frame1 = new ImageUInt8(320,240);
+		GrayU8 frame0 = new GrayU8(320,240);
+		GrayU8 frame1 = new GrayU8(320,240);
 		ImageMiscOps.fillUniform(frame0,rand,0,256);
 
 		double c = Math.cos(rot);
@@ -74,10 +74,10 @@ public class TestSparseFlowObjectTracker {
 
 		SfotConfig config = new SfotConfig();
 
-		ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.sobel(ImageUInt8.class,ImageSInt16.class);
+		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
 
-		SparseFlowObjectTracker<ImageUInt8,ImageSInt16> alg = new SparseFlowObjectTracker<ImageUInt8, ImageSInt16>(
-				config,ImageUInt8.class,ImageSInt16.class,gradient);
+		SparseFlowObjectTracker<GrayU8,GrayS16> alg = new SparseFlowObjectTracker<GrayU8, GrayS16>(
+				config,GrayU8.class,GrayS16.class,gradient);
 
 		RectangleRotate_F64 region0 = new RectangleRotate_F64(120,140,30,40,0.1);
 		RectangleRotate_F64 region1 = new RectangleRotate_F64();

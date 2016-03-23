@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,14 @@
 package boofcv.abst.sfm;
 
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wrapper around {@link DepthSparse3D} for {@link ImagePixelTo3D}.
  *
  * @author Peter Abeles
  */
-public class DepthSparse3D_to_PixelTo3D<T extends ImageSingleBand>
+public class DepthSparse3D_to_PixelTo3D<T extends ImageGray>
 	implements ImagePixelTo3D
 {
 	DepthSparse3D<T> alg;

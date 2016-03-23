@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.alg.feature.describe.impl;
 
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.struct.feature.NccFeature;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Implementation of {@link boofcv.alg.feature.describe.DescribePointPixelRegionNCC}.
  *
  * @author Peter Abeles
  */
-public class ImplDescribePointPixelRegionNCC_U8 extends DescribePointPixelRegionNCC<ImageUInt8> {
+public class ImplDescribePointPixelRegionNCC_U8 extends DescribePointPixelRegionNCC<GrayU8> {
 
 	public ImplDescribePointPixelRegionNCC_U8(int regionWidth, int regionHeight) {
 		super(regionWidth, regionHeight);

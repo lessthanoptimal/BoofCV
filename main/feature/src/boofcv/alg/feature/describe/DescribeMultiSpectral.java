@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,20 +20,20 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 import java.lang.reflect.Array;
 
 /**
- * Computes a feature description from {@link MultiSpectral} images by computing a descriptor separately in each band.
+ * Computes a feature description from {@link Planar} images by computing a descriptor separately in each band.
  * The output descriptor is computed by concatenating the descriptors for each bands together. So [1,2,3] and [3,4,5]
  * from a two band image will become [1,2,3,3,4,5].
  *
  * @author Peter Abeles
  */
-public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc extends TupleDesc>
-		implements DescribeRegionPoint<MultiSpectral<T>,Desc>
+public abstract class DescribeMultiSpectral<T extends ImageGray, Desc extends TupleDesc>
+		implements DescribeRegionPoint<Planar<T>,Desc>
 {
 
 	// descriptor for each band in the image
@@ -66,7 +66,7 @@ public abstract class DescribeMultiSpectral<T extends ImageSingleBand, Desc exte
 	}
 
 	@Override
-	public void setImage(MultiSpectral<T> image) {
+	public void setImage(Planar<T> image) {
 		if( image.getNumBands() != describers.length ) {
 			throw new IllegalArgumentException("Unexpected number of bands in input image.  Found "+
 					image.getNumBands()+" expected "+describers.length);

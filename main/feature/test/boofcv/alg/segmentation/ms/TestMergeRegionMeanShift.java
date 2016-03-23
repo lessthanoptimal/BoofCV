@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.segmentation.ms;
 
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -34,7 +34,7 @@ public class TestMergeRegionMeanShift {
 	public void basicAll() {
 		MergeRegionMeanShift alg = new MergeRegionMeanShift(1,1);
 
-		ImageSInt32 pixelToRegion = new ImageSInt32(4,4);
+		GrayS32 pixelToRegion = new GrayS32(4,4);
 		pixelToRegion.data = new int[]
 				{0,0,0,1,
 				 2,0,0,1,
@@ -54,7 +54,7 @@ public class TestMergeRegionMeanShift {
 
 		alg.process(pixelToRegion, regionMemberCount, regionColor, modeLocation);
 
-		ImageSInt32 expectedP2R = new ImageSInt32(4,4);
+		GrayS32 expectedP2R = new GrayS32(4,4);
 		expectedP2R.data = new int[]
 				{0,0,0,1,
 				 0,0,0,1,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,23 +22,23 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplImageDistort_I16 extends GeneralImageDistortTests<ImageSInt16>{
+public class TestImplImageDistort_I16 extends GeneralImageDistortTests<GrayS16>{
 
 	public TestImplImageDistort_I16() {
-		super(ImageType.single(ImageSInt16.class));
+		super(ImageType.single(GrayS16.class));
 	}
 
 	@Override
-	public ImageDistort<ImageSInt16,ImageSInt16> createDistort(PixelTransform_F32 dstToSrc,
-															   InterpolatePixel<ImageSInt16> interp ) {
-		ImageDistort<ImageSInt16,ImageSInt16> ret = new ImplImageDistort_I16<ImageSInt16,ImageSInt16>((InterpolatePixelS)interp);
+	public ImageDistort<GrayS16,GrayS16> createDistort(PixelTransform_F32 dstToSrc,
+													   InterpolatePixel<GrayS16> interp ) {
+		ImageDistort<GrayS16,GrayS16> ret = new ImplImageDistort_I16<GrayS16,GrayS16>((InterpolatePixelS)interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

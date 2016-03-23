@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,10 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,21 +48,21 @@ import java.util.Random;
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
-public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryImageLabelOpsApp<T extends ImageGray> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener {
 
 	Random rand = new Random(234234);
 
 	Class<T> imageType;
 	T imageInput;
-	ImageUInt8 imageBinary;
-	ImageUInt8 imageOutput1;
-	ImageUInt8 imageOutput2;
-	ImageSInt32 imageLabeled;
-	ImageSingleBand selectedVisualize;
+	GrayU8 imageBinary;
+	GrayU8 imageOutput1;
+	GrayU8 imageOutput2;
+	GrayS32 imageLabeled;
+	ImageGray selectedVisualize;
 
-	FilterImageInterface<ImageUInt8, ImageUInt8> filter1;
-	FilterImageInterface<ImageUInt8, ImageUInt8> filter2;
+	FilterImageInterface<GrayU8, GrayU8> filter1;
+	FilterImageInterface<GrayU8, GrayU8> filter2;
 	ConnectRule connectRule;
 	BufferedImage work;
 	int colors[];
@@ -100,10 +100,10 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 		body.add(gui,BorderLayout.CENTER);
 
 		imageInput = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		imageBinary = new ImageUInt8(1,1);
-		imageOutput1 = new ImageUInt8(1,1);
-		imageOutput2 = new ImageUInt8(1,1);
-		imageLabeled = new ImageSInt32(1,1);
+		imageBinary = new GrayU8(1,1);
+		imageOutput1 = new GrayU8(1,1);
+		imageOutput2 = new GrayU8(1,1);
+		imageLabeled = new GrayS32(1,1);
 
 		selectedVisualize = imageLabeled;
 
@@ -163,8 +163,8 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 
 	@Override
 	public void refreshAll(Object[] cookies) {
-		filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[0];
-		filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookies[1];
+		filter1 = (FilterImageInterface<GrayU8, GrayU8>)cookies[0];
+		filter2 = (FilterImageInterface<GrayU8, GrayU8>)cookies[1];
 		connectRule = (Integer)cookies[2] == 4 ? ConnectRule.FOUR : ConnectRule.EIGHT;
 		performWork();
 	}
@@ -173,10 +173,10 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 		switch( indexFamily ) {
 			case 0:
-				filter1 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+				filter1 = (FilterImageInterface<GrayU8, GrayU8>)cookie;
 				break;
 			case 1:
-				filter2 = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+				filter2 = (FilterImageInterface<GrayU8, GrayU8>)cookie;
 				break;
 			case 2:
 				connectRule = (Integer)cookie == 4 ? ConnectRule.FOUR : ConnectRule.EIGHT;
@@ -211,10 +211,10 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	}
 
 	private synchronized void renderVisualizeImage() {
-		if( selectedVisualize instanceof ImageUInt8)
-			VisualizeBinaryData.renderBinary((ImageUInt8) selectedVisualize, false, work);
+		if( selectedVisualize instanceof GrayU8)
+			VisualizeBinaryData.renderBinary((GrayU8) selectedVisualize, false, work);
 		else {
-			VisualizeBinaryData.renderLabeled((ImageSInt32) selectedVisualize, colors, work);
+			VisualizeBinaryData.renderLabeled((GrayS32) selectedVisualize, colors, work);
 		}
 	}
 
@@ -256,7 +256,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageSingleBand> extends Selec
 	}
 
 	public static void main( String args[] ) {
-		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(ImageFloat32.class);
+		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));

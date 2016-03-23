@@ -32,8 +32,8 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -49,7 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationFiducialDetector<T extends ImageSingleBand>
+public class CalibrationFiducialDetector<T extends ImageGray>
 		implements FiducialDetector<T>
 {
 	// detects the calibration target
@@ -67,7 +67,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	Se3_F64 targetToCamera = new Se3_F64(); // refined
 
 	// storage for converted input image.  Detector only can process ImageFloat32
-	ImageFloat32 converted;
+	GrayF32 converted;
 
 	// Expected type of input image
 	ImageType<T> type;
@@ -128,7 +128,7 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	protected void init(CalibrationDetector detector, double width, Class<T> imageType) {
 		this.detector = detector;
 		this.type = ImageType.single(imageType);
-		this.converted = new ImageFloat32(1,1);
+		this.converted = new GrayF32(1,1);
 
 		this.width = width;
 
@@ -151,8 +151,8 @@ public class CalibrationFiducialDetector<T extends ImageSingleBand>
 	@Override
 	public void detect(T input) {
 
-		if( input instanceof ImageFloat32 ) {
-			converted = (ImageFloat32)input;
+		if( input instanceof GrayF32) {
+			converted = (GrayF32)input;
 		} else {
 			converted.reshape(input.width,input.height);
 			GConvertImage.convert(input, converted);

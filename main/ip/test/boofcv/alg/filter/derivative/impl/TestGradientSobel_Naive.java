@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -44,16 +44,16 @@ public class TestGradientSobel_Naive {
 	 */
 	@Test
 	public void compareToKnown_I8() {
-		ImageUInt8 img = new ImageUInt8(width, height);
+		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
-		ImageSInt16 derivX = new ImageSInt16(width, height);
-		ImageSInt16 derivY = new ImageSInt16(width, height);
+		GrayS16 derivX = new GrayS16(width, height);
+		GrayS16 derivY = new GrayS16(width, height);
 
 		BoofTesting.checkSubImage(this, "compareToKnown_I8", true, img, derivX, derivY);
 	}
 
-	public void compareToKnown_I8(ImageUInt8 img, ImageSInt16 derivX, ImageSInt16 derivY) {
+	public void compareToKnown_I8(GrayU8 img, GrayS16 derivX, GrayS16 derivY) {
 		GradientSobel_Naive.process(img, derivX, derivY);
 
 		int dX = -((img.get(0, 2) + img.get(0, 0)) + img.get(0, 1) * 2);
@@ -71,17 +71,17 @@ public class TestGradientSobel_Naive {
 	 */
 	@Test
 	public void compareToKnown_F32() {
-		ImageFloat32 img = new ImageFloat32(width, height);
+		GrayF32 img = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 255);
 
-		ImageFloat32 derivX = new ImageFloat32(width, height);
-		ImageFloat32 derivY = new ImageFloat32(width, height);
+		GrayF32 derivX = new GrayF32(width, height);
+		GrayF32 derivY = new GrayF32(width, height);
 
 		BoofTesting.checkSubImage(this, "compareToKnown_F32", true, img, derivX, derivY);
 
 	}
 
-	public void compareToKnown_F32(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
+	public void compareToKnown_F32(GrayF32 img, GrayF32 derivX, GrayF32 derivY) {
 		GradientSobel_Naive.process(img, derivX, derivY);
 
 		float dX = -((img.get(0, 2) + img.get(0, 0)) * 0.25f + img.get(0, 1) * 0.5f);

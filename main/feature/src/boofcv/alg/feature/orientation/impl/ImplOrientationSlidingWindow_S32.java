@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.OrientationSlidingWindow;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
 import georegression.metric.UtilAngle;
 
 /**
@@ -33,15 +33,15 @@ import georegression.metric.UtilAngle;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationSlidingWindow_S32 extends OrientationSlidingWindow<ImageSInt32> {
+public class ImplOrientationSlidingWindow_S32 extends OrientationSlidingWindow<GrayS32> {
 
 	public ImplOrientationSlidingWindow_S32(double objectRadiusToScale,int numAngles, double windowSize, boolean isWeighted) {
 		super(objectRadiusToScale,numAngles, windowSize, isWeighted);
 	}
 
 	@Override
-	public Class<ImageSInt32> getImageType() {
-		return ImageSInt32.class;
+	public Class<GrayS32> getImageType() {
+		return GrayS32.class;
 	}
 
 	private void computeAngles() {

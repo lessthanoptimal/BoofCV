@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
 /**
@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortCache_SB<Input extends ImageSingleBand,Output extends ImageSingleBand>
+public abstract class ImageDistortCache_SB<Input extends ImageGray,Output extends ImageGray>
 		implements ImageDistort<Input,Output> {
 
 	// size of output image

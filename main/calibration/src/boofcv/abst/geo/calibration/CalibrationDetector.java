@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.geo.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -37,10 +37,10 @@ public interface CalibrationDetector {
 	 * @param input Gray scale image containing calibration target
 	 * @return true if target was detected and false if not
 	 */
-	boolean process( ImageFloat32 input );
+	boolean process( GrayF32 input );
 
 	/**
-	 * Returns the set of detected points from the most recent call to {@link #process(ImageFloat32)}.  Each
+	 * Returns the set of detected points from the most recent call to {@link #process(GrayF32)}.  Each
 	 * time this function is invoked a new instance of the list and points is returned.  No data reuse here.
 	 *
 	 * @return List of detected points in row major grid order.

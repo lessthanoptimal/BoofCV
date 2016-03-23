@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for creating feature trackers algorithms.
@@ -51,7 +51,7 @@ public class FactoryTrackerAlg {
 	 * @param <D> Derivative image type.
 	 * @return Tracker
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	KltTracker<I, D> klt( KltConfig config, Class<I> imageType , Class<D> derivType )
 	{
 		if( config == null )
@@ -77,7 +77,7 @@ public class FactoryTrackerAlg {
 	 * @param <D> Derivative image type.
 	 * @return Tracker
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand>
+	public static <I extends ImageGray, D extends ImageGray>
 	PyramidKltTracker<I, D> kltPyramid( KltConfig config,
 										Class<I> imageType ,
 										Class<D> derivType )
@@ -104,7 +104,7 @@ public class FactoryTrackerAlg {
 	 * @param kltConfig Configuration for KLT
 	 * @param imageType Input image type.    @return Feature tracker
 	 */
-	public static <I extends ImageSingleBand, D extends ImageSingleBand, Desc extends TupleDesc>
+	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
 												 AssociateDescription<Desc> associate,
 												 PkltConfig kltConfig ,

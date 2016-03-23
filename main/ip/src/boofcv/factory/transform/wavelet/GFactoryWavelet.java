@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.factory.transform.wavelet;
 
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
 
@@ -34,44 +34,44 @@ import boofcv.struct.wavelet.WlCoef;
 @SuppressWarnings({"unchecked"})
 public class GFactoryWavelet {
 
-	public static <C extends WlCoef, T extends ImageSingleBand>
+	public static <C extends WlCoef, T extends ImageGray>
 	WaveletDescription<C> haar( Class<T> imageType )
 	{
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return FactoryWaveletHaar.generate(false,32);
-		else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+		else if( GrayI.class.isAssignableFrom(imageType) ) {
 			return FactoryWaveletHaar.generate(true,32);
 		} else {
 			return null;
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageSingleBand>
+	public static <C extends WlCoef, T extends ImageGray>
 	WaveletDescription<C> daubJ( Class<T> imageType , int J )
 	{
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (WaveletDescription<C>)FactoryWaveletDaub.daubJ_F32(J);
 		else {
 			return null;
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageSingleBand>
+	public static <C extends WlCoef, T extends ImageGray>
 	WaveletDescription<C> biorthogoal( Class<T> imageType , int J , BorderType borderType)
 	{
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (WaveletDescription<C>)FactoryWaveletDaub.biorthogonal_F32(J,borderType);
-		else if( ImageInteger.class.isAssignableFrom(imageType) ) {
+		else if( GrayI.class.isAssignableFrom(imageType) ) {
 			return (WaveletDescription<C>)FactoryWaveletDaub.biorthogonal_I32(J,borderType);
 		} else {
 			return null;
 		}
 	}
 
-	public static <C extends WlCoef, T extends ImageSingleBand>
+	public static <C extends WlCoef, T extends ImageGray>
 	WaveletDescription<C> coiflet( Class<T> imageType , int J )
 	{
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			return (WaveletDescription<C>)FactoryWaveletCoiflet.generate_F32(J);
 		else
 			return null;

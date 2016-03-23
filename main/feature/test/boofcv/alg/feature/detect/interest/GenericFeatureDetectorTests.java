@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.geometry.UtilPoint2D_I32;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public abstract class GenericFeatureDetectorTests {
 	 */
 	@Test
 	public void checkNegativeMaxFeatures() {
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 
 		// give it a bunch of features that any of the detectors should be able to see
 		GImageMiscOps.fillRectangle(input,100,10,10,15,15);
@@ -74,7 +74,7 @@ public abstract class GenericFeatureDetectorTests {
 	 */
 	@Test
 	public void checkFlushFeatures() {
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 
 		// provide a rectangle and circular feature
 		GImageMiscOps.fillRectangle(input,20,5,5,25,25);
@@ -95,7 +95,7 @@ public abstract class GenericFeatureDetectorTests {
 	 */
 	@Test
 	public void compareBlankImage() {
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 
 		Object alg = createDetector(-1);
 		int firstFound = detectFeature(input, alg);
@@ -112,7 +112,7 @@ public abstract class GenericFeatureDetectorTests {
 	 */
 	@Test
 	public void checkMultipleCalls() {
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		renderCheckered(input);
 
 		Object alg = createDetector(50);
@@ -134,9 +134,9 @@ public abstract class GenericFeatureDetectorTests {
 	/**
 	 * Returns the number of detected features in the image.
 	 */
-	protected abstract int detectFeature(ImageFloat32 input, Object detector);
+	protected abstract int detectFeature(GrayF32 input, Object detector);
 
-	private void drawCircle( ImageFloat32 img , int c_x , int c_y , double r ) {
+	private void drawCircle(GrayF32 img , int c_x , int c_y , double r ) {
 
 		for( int y = 0; y < img.height; y++ ) {
 			for( int x = 0; x < img.width; x++ ) {
@@ -148,7 +148,7 @@ public abstract class GenericFeatureDetectorTests {
 		}
 	}
 
-	protected void renderCheckered(ImageFloat32 input) {
+	protected void renderCheckered(GrayF32 input) {
 		boolean moo = true;
 		for( int y = 0; y < input.height; y += 10 ) {
 			int h = Math.min(10,input.height-y);

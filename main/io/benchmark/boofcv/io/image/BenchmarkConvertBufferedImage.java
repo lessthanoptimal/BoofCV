@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.io.image;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -40,8 +40,8 @@ public class BenchmarkConvertBufferedImage {
 	static int imgHeight = 480;
 
 	static BufferedImage imgBuff;
-	static ImageUInt8 imgInt8;
-	static MultiSpectral<ImageUInt8> multiInt8;
+	static GrayU8 imgInt8;
+	static Planar<GrayU8> multiInt8;
 	
 	static ImageBase boofImg;
 
@@ -107,8 +107,8 @@ public class BenchmarkConvertBufferedImage {
 	}
 	
 	public static void main( String args[] ) {
-		imgInt8 = new ImageUInt8(imgWidth,imgHeight);
-		multiInt8 = new MultiSpectral<ImageUInt8>(ImageUInt8.class,imgWidth,imgHeight,3);
+		imgInt8 = new GrayU8(imgWidth,imgHeight);
+		multiInt8 = new Planar<GrayU8>(GrayU8.class,imgWidth,imgHeight,3);
 		
 		GImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
 		for( int i = 0; i < multiInt8.getNumBands(); i++ )

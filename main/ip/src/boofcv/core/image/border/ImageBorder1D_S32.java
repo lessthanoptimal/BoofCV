@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,13 @@
 
 package boofcv.core.image.border;
 
-import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.GrayI;
 
 
 /**
  * @author Peter Abeles
  */
-public class ImageBorder1D_S32<T extends ImageInteger> extends ImageBorder_S32<T> {
+public class ImageBorder1D_S32<T extends GrayI> extends ImageBorder_S32<T> {
 	BorderIndex1D rowWrap;
 	BorderIndex1D colWrap;
 

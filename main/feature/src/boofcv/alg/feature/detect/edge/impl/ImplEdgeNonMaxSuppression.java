@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.feature.detect.edge.impl;
 
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS8;
 
 
 /**
@@ -38,7 +38,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Only processes the inner image.  Ignoring the border.
 	 */
-	static public void inner4( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void inner4(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{
 		final int w = intensity.width;
 		final int h = intensity.height-1;
@@ -78,7 +78,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Slow algorithm which processes the whole image.
 	 */
-	static public void naive4( ImageFloat32 _intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void naive4(GrayF32 _intensity , GrayS8 direction , GrayF32 output )
 	{
 		final int w = _intensity.width;
 		final int h = _intensity.height;
@@ -118,7 +118,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Just processes the image border.
 	 */
-	static public void border4( ImageFloat32 _intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void border4(GrayF32 _intensity , GrayS8 direction , GrayF32 output )
 	{
 		int w = _intensity.width;
 		int h = _intensity.height-1;
@@ -234,7 +234,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Only processes the inner image.  Ignoring the border.
 	 */
-	static public void inner8( ImageFloat32 intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void inner8(GrayF32 intensity , GrayS8 direction , GrayF32 output )
 	{
 		final int w = intensity.width;
 		final int h = intensity.height-1;
@@ -274,7 +274,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Slow algorithm which processes the whole image.
 	 */
-	static public void naive8( ImageFloat32 _intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void naive8(GrayF32 _intensity , GrayS8 direction , GrayF32 output )
 	{
 		final int w = _intensity.width;
 		final int h = _intensity.height;
@@ -314,7 +314,7 @@ public class ImplEdgeNonMaxSuppression {
 	/**
 	 * Just processes the image border.
 	 */
-	static public void border8( ImageFloat32 _intensity , ImageSInt8 direction , ImageFloat32 output )
+	static public void border8(GrayF32 _intensity , GrayS8 direction , GrayF32 output )
 	{
 		int w = _intensity.width;
 		int h = _intensity.height-1;

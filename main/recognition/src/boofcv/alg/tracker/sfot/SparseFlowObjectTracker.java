@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.geometry.UtilPoint2D_F32;
@@ -49,7 +49,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
-public class SparseFlowObjectTracker<Image extends ImageSingleBand, Derivative extends ImageSingleBand>
+public class SparseFlowObjectTracker<Image extends ImageGray, Derivative extends ImageGray>
 {
 	// for the current image
 	private ImagePyramid<Image> currentImage;

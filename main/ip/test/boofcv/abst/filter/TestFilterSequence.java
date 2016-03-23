@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.convolve.FactoryConvolve;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -54,22 +54,22 @@ public class TestFilterSequence {
 		Kernel1D_F32 ker2 = FactoryKernel.random1D_F32(kernelWidth+2,radius+1,0,5,rand);
 		Kernel1D_F32 ker3 = FactoryKernel.random1D_F32(kernelWidth+4,radius+2,0,5,rand);
 
-		ImageFloat32 input = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,10);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
-		FilterImageInterface f1 = FactoryConvolve.convolve(ker1,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterImageInterface f2 = FactoryConvolve.convolve(ker2,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
-		FilterImageInterface f3 = FactoryConvolve.convolve(ker3,ImageFloat32.class,ImageFloat32.class, BorderType.SKIP, true);
+		FilterImageInterface f1 = FactoryConvolve.convolve(ker1,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
+		FilterImageInterface f2 = FactoryConvolve.convolve(ker2,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
+		FilterImageInterface f3 = FactoryConvolve.convolve(ker3,GrayF32.class,GrayF32.class, BorderType.SKIP, true);
 
 		FilterSequence sequence = new FilterSequence(f1,f2,f3);
 		sequence.process(input,found);
 		assertEquals(radius+2,sequence.borderHorizontal);
 		assertEquals(radius+2,sequence.borderVertical);
 
-		ImageFloat32 tmp1 = new ImageFloat32(width,height);
-		ImageFloat32 tmp2 = new ImageFloat32(width,height);
+		GrayF32 tmp1 = new GrayF32(width,height);
+		GrayF32 tmp2 = new GrayF32(width,height);
 		ConvolveImageNoBorder.horizontal(ker1,input,tmp1);
 		ConvolveImageNoBorder.horizontal(ker2,tmp1,tmp2);
 		ConvolveImageNoBorder.horizontal(ker3,tmp2,expected);

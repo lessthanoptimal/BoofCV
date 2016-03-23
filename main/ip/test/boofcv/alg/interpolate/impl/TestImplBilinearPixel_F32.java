@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,17 +18,17 @@
 
 package boofcv.alg.interpolate.impl;
 
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImplBilinearPixel_F32 extends GeneralBilinearPixelSingleChecks<ImageFloat32>
+public class TestImplBilinearPixel_F32 extends GeneralBilinearPixelSingleChecks<GrayF32>
 {
 
 	@Override
-	protected ImageFloat32 createImage(int width, int height) {
-		return new ImageFloat32(width, height);
+	protected GrayF32 createImage(int width, int height) {
+		return new GrayF32(width, height);
 	}
 }

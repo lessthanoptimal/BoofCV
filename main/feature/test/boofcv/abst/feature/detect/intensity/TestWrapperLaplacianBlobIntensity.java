@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,20 +19,20 @@
 package boofcv.abst.feature.detect.intensity;
 
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapperLaplacianBlobIntensity<I extends ImageSingleBand, D extends ImageSingleBand>
+public class TestWrapperLaplacianBlobIntensity<I extends ImageGray, D extends ImageGray>
 		extends ChecksGeneralFeatureIntensity<I,D>
 {
 	public TestWrapperLaplacianBlobIntensity() {
-		addTypes(ImageFloat32.class,ImageFloat32.class);
-		addTypes(ImageUInt8.class, ImageSInt16.class);
+		addTypes(GrayF32.class,GrayF32.class);
+		addTypes(GrayU8.class, GrayS16.class);
 	}
 
 	@Override

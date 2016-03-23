@@ -62,7 +62,7 @@ import java.lang.reflect.Array;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBase<T> {
+public abstract class ImageGray<T extends ImageGray> extends ImageBase<T> {
 
 	{
 		this.imageType = (ImageType)ImageType.single(getClass());
@@ -75,7 +75,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 	 * @param width  Image's width.
 	 * @param height Image's height.
 	 */
-	protected ImageSingleBand(int width, int height) {
+	protected ImageGray(int width, int height) {
 		_setData(Array.newInstance(getDataType().getDataType(), width * height));
 		this.startIndex = 0;
 		this.stride = width;
@@ -83,7 +83,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 		this.height = height;
 	}
 
-	protected ImageSingleBand() {
+	protected ImageGray() {
 	}
 
 	/**
@@ -146,7 +146,7 @@ public abstract class ImageSingleBand<T extends ImageSingleBand> extends ImageBa
 
 		if( Array.getLength(data) < width*height ) {
 			// declare a new larger image to store the data
-			ImageSingleBand a = _createNew(width,height);
+			ImageGray a = _createNew(width,height);
 			_setData(a._getData());
 		}
 

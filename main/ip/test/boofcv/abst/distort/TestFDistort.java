@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
@@ -44,8 +44,8 @@ import static org.junit.Assert.assertTrue;
 public class TestFDistort {
 
 	int width = 30, height = 40;
-	ImageUInt8 input = new ImageUInt8(width,height);
-	ImageUInt8 output = new ImageUInt8(width,height);
+	GrayU8 input = new GrayU8(width,height);
+	GrayU8 output = new GrayU8(width,height);
 	Random rand = new Random(234);
 
 	@Test
@@ -54,7 +54,7 @@ public class TestFDistort {
 
 		new FDistort(input,output).scaleExt().apply();
 
-		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
+		InterpolatePixelS<GrayU8> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
 
 		float scaleX = (float)input.width/(float)output.width;
@@ -83,7 +83,7 @@ public class TestFDistort {
 	public void rotate() {
 
 		ImageMiscOps.fillUniform(input,rand,0,200);
-		ImageUInt8 output = new ImageUInt8(height,width);
+		GrayU8 output = new GrayU8(height,width);
 
 		new FDistort(input,output).rotate(Math.PI / 2).apply();
 
@@ -109,7 +109,7 @@ public class TestFDistort {
 		PixelTransform_F32 transform = new PixelTransformAffine_F32(affine.invert(null));
 		new FDistort(input,output).affine(2,0.1f,-0.2f,1.1f,3,4.5f).borderExt().apply();
 
-		InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(input,null);
+		InterpolatePixelS<GrayU8> interp = FactoryInterpolation.bilinearPixelS(input,null);
 		interp.setBorder(FactoryImageBorderAlgs.extend(input));
 		interp.setImage(input);
 
@@ -146,8 +146,8 @@ public class TestFDistort {
 		PixelTransform_F32 outputToInput = alg.outputToInput;
 
 		// a new image shouldn't cause new memory to be declared bad stuff to happen
-		ImageUInt8 found = new ImageUInt8(width/2,height/2);
-		ImageUInt8 expected = new ImageUInt8(width/2,height/2);
+		GrayU8 found = new GrayU8(width/2,height/2);
+		GrayU8 expected = new GrayU8(width/2,height/2);
 		alg.setRefs(input,found).scale().apply();
 
 		assertTrue(distorter==alg.distorter);
@@ -165,8 +165,8 @@ public class TestFDistort {
 	@Test
 	public void setBorderChange() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
-		ImageUInt8 found = new ImageUInt8(width/2,height/2);
-		ImageUInt8 expected = new ImageUInt8(width/2,height/2);
+		GrayU8 found = new GrayU8(width/2,height/2);
+		GrayU8 expected = new GrayU8(width/2,height/2);
 
 		FDistort alg = new FDistort();
 

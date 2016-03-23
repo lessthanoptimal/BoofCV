@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,9 +35,9 @@ public class ImageBinaryPanel extends JPanel {
 
 	// the image being displayed
 	protected BufferedImage img;
-	protected ImageUInt8 binaryImage;
+	protected GrayU8 binaryImage;
 
-	public ImageBinaryPanel( ImageUInt8 binaryImage ) {
+	public ImageBinaryPanel( GrayU8 binaryImage ) {
 		this.binaryImage = binaryImage;
 		img = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
 		VisualizeBinaryData.renderBinary(binaryImage,false,img);
@@ -57,7 +57,7 @@ public class ImageBinaryPanel extends JPanel {
 			g.drawImage(img, 0, 0, this);
 	}
 
-	public synchronized void setBinaryImage(ImageUInt8 binaryImage) {
+	public synchronized void setBinaryImage(GrayU8 binaryImage) {
 		this.binaryImage = binaryImage;
 		VisualizeBinaryData.renderBinary(binaryImage,false,img);
 	}

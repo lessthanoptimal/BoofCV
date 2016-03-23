@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest , int skip ) {
+	public static void horizontal(Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -68,7 +68,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_F32 kernel, ImageFloat32 image, ImageFloat32 dest , int skip ) {
+	public static void vertical(Kernel1D_F32 kernel, GrayF32 image, GrayF32 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -87,7 +87,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_F32 kernel, ImageFloat32 image, ImageFloat32 dest , int skip ) {
+	public static void convolve(Kernel2D_F32 kernel, GrayF32 image, GrayF32 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -106,7 +106,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest , int skip ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -125,7 +125,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageUInt8 image, ImageInt8 dest , int skip ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -144,7 +144,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageUInt8 image, ImageInt8 dest , int skip ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayU8 image, GrayI8 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -163,7 +163,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void horizontal(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest , int skip ) {
+	public static void horizontal(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -182,7 +182,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void vertical(Kernel1D_I32 kernel, ImageSInt16 image, ImageInt16 dest , int skip ) {
+	public static void vertical(Kernel1D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {
@@ -201,7 +201,7 @@ public class ConvolveDownNormalized {
 	 * @param dest	 Where the resulting image is written to. Modified.
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
-	public static void convolve(Kernel2D_I32 kernel, ImageSInt16 image, ImageInt16 dest , int skip ) {
+	public static void convolve(Kernel2D_I32 kernel, GrayS16 image, GrayI16 dest , int skip ) {
 		checkParameters(image, dest, skip);
 
 		if( kernel.width >= image.width ) {

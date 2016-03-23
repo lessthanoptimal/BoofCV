@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 
 /**
@@ -38,9 +38,9 @@ public class GradientSobel_UnrolledOuter {
 	/**
 	 * Can only process images which are NOT sub-images.
 	 */
-	public static void process_I8(ImageUInt8 orig,
-								  ImageSInt16 derivX,
-								  ImageSInt16 derivY) {
+	public static void process_I8(GrayU8 orig,
+								  GrayS16 derivX,
+								  GrayS16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -119,9 +119,9 @@ public class GradientSobel_UnrolledOuter {
 	/**
 	 * Can only process images which are NOT sub-images.
 	 */
-	public static void process_F32(ImageFloat32 orig,
-								   ImageFloat32 derivX,
-								   ImageFloat32 derivY) {
+	public static void process_F32(GrayF32 orig,
+								   GrayF32 derivX,
+								   GrayF32 derivY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;
@@ -201,9 +201,9 @@ public class GradientSobel_UnrolledOuter {
 	/**
 	 * Can process any but regular and sub-images.
 	 */
-	public static void process_F32_sub(ImageFloat32 orig,
-									   ImageFloat32 derivX,
-									   ImageFloat32 derivY) {
+	public static void process_F32_sub(GrayF32 orig,
+									   GrayF32 derivX,
+									   GrayF32 derivY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;

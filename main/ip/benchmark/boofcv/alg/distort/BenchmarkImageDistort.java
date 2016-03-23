@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.homography.Homography2D_F32;
 
 import java.util.Random;
@@ -35,7 +35,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkImageDistort<T extends ImageSingleBand> {
+public class BenchmarkImageDistort<T extends ImageGray> {
 	public static final int imgWidth = 640;
 	public static final int imgHeight = 480;
 
@@ -122,7 +122,7 @@ public class BenchmarkImageDistort<T extends ImageSingleBand> {
 
 
 	public static void main( String args[] ) {
-		BenchmarkImageDistort benchmark = new BenchmarkImageDistort(ImageFloat32.class);
+		BenchmarkImageDistort benchmark = new BenchmarkImageDistort(GrayF32.class);
 
 		benchmark.benchmark();
 	}

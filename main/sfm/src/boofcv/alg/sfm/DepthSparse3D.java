@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.sfm;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageInteger;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
@@ -39,7 +39,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class DepthSparse3D<T extends ImageSingleBand> {
+public abstract class DepthSparse3D<T extends ImageGray> {
 
 	// Storage for the depth image
 	protected T depthImage;
@@ -146,9 +146,9 @@ public abstract class DepthSparse3D<T extends ImageSingleBand> {
 	protected abstract double lookupDepth(int depthX, int depthY);
 
 	/**
-	 * Implementation for {@link ImageInteger}.
+	 * Implementation for {@link GrayI}.
 	 */
-	public static class I<T extends ImageInteger> extends DepthSparse3D<T> {
+	public static class I<T extends GrayI> extends DepthSparse3D<T> {
 
 		public I(double depthScale) {
 			super(depthScale);
@@ -161,9 +161,9 @@ public abstract class DepthSparse3D<T extends ImageSingleBand> {
 	}
 
 	/**
-	 * Implementation for {@link ImageFloat32}.
+	 * Implementation for {@link GrayF32}.
 	 */
-	public static class F32 extends DepthSparse3D<ImageFloat32> {
+	public static class F32 extends DepthSparse3D<GrayF32> {
 
 		public F32(double depthScale) {
 			super(depthScale);

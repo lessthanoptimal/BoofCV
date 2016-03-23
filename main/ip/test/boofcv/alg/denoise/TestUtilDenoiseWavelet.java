@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.denoise;
 
 import boofcv.alg.denoise.wavelet.UtilDenoiseWavelet;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import java.util.Random;
@@ -40,7 +40,7 @@ public class TestUtilDenoiseWavelet {
 
 	@Test
 	public void estimateNoiseStdDev() {
-		ImageFloat32 image = new ImageFloat32(width,height);
+		GrayF32 image = new GrayF32(width,height);
 
 		double sigma = 12;
 		ImageMiscOps.addGaussian(image,rand,sigma,-10000,10000);
@@ -53,7 +53,7 @@ public class TestUtilDenoiseWavelet {
 	@Test
 	public void universalThreshold() {
 
-		ImageFloat32 image = new ImageFloat32(width,height);
+		GrayF32 image = new GrayF32(width,height);
 
 		double sigma = 12;
 

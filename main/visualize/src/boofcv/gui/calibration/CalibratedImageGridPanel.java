@@ -29,9 +29,9 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -65,8 +65,8 @@ public class CalibratedImageGridPanel extends JPanel {
 	List<ImageResults> results = new ArrayList<ImageResults>();
 
 	// for displaying corrected image
-	MultiSpectral<ImageFloat32> origMS;
-	MultiSpectral<ImageFloat32> correctedMS;
+	Planar<GrayF32> origMS;
+	Planar<GrayF32> correctedMS;
 
 	// configures what is displayed or not
 	boolean showPoints = true;
@@ -75,7 +75,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean showAll = false;
 	boolean showNumbers = true;
 
-	ImageDistort<ImageFloat32,ImageFloat32> undoRadial;
+	ImageDistort<GrayF32,GrayF32> undoRadial;
 	PointTransform_F32 remove_p_to_p;
 
 	// how much errors are scaled up
@@ -105,8 +105,8 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			// the number of bands can be difficult to ascertain without digging deep into the data structure
 			// so just declare a new one using convert
-			origMS = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
-			correctedMS = ConvertBufferedImage.convertFromMulti(image,null,true,ImageFloat32.class);
+			origMS = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
+			correctedMS = ConvertBufferedImage.convertFromMulti(image,null,true,GrayF32.class);
 			undistorted = new BufferedImage(image.getWidth(),image.getHeight(),image.getType());
 		}
 	}
@@ -164,11 +164,11 @@ public class CalibratedImageGridPanel extends JPanel {
 	}
 
 	private void undoRadialDistortion(BufferedImage image) {
-		ConvertBufferedImage.convertFromMulti(image, origMS,true, ImageFloat32.class);
+		ConvertBufferedImage.convertFromMulti(image, origMS,true, GrayF32.class);
 
 		for( int i = 0; i < origMS.getNumBands(); i++ ) {
-			ImageFloat32 in = origMS.getBand(i);
-			ImageFloat32 out = correctedMS.getBand(i);
+			GrayF32 in = origMS.getBand(i);
+			GrayF32 out = correctedMS.getBand(i);
 
 			undoRadial.apply(in,out);
 		}
@@ -279,11 +279,11 @@ public class CalibratedImageGridPanel extends JPanel {
 	public void setDistorted ( IntrinsicParameters param , DenseMatrix64F rect ) {
 		if( rect == null ) {
 			this.undoRadial = LensDistortionOps.imageRemoveDistortion(
-					AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null, ImageType.single(ImageFloat32.class));
+					AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
 		} else {
 			this.undoRadial =
-					RectifyImageOps.rectifyImage(param, rect, BorderType.VALUE, ImageType.single(ImageFloat32.class));
+					RectifyImageOps.rectifyImage(param, rect, BorderType.VALUE, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = RectifyImageOps.transformPixelToRect_F32(param, rect);
 		}
 	}

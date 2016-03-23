@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,16 +43,16 @@ import java.util.ArrayList;
  * Demonstrates the affects of different binary operations on an image.
  */
 // todo clean up appearance
-public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgorithmAndInputPanel
+public class DemoBinaryImageOpsApp<T extends ImageGray> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener
 {
 	Class<T> imageType;
 	T imageInput;
-	ImageUInt8 imageBinary;
-	ImageUInt8 imageOutput;
-	ImageUInt8 selectedVisualize;
+	GrayU8 imageBinary;
+	GrayU8 imageOutput;
+	GrayU8 selectedVisualize;
 
-	FilterImageInterface<ImageUInt8, ImageUInt8> filter;
+	FilterImageInterface<GrayU8, GrayU8> filter;
 	BufferedImage work;
 
 	boolean processedImage = false;
@@ -81,8 +81,8 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 		body.add(gui,BorderLayout.CENTER);
 
 		imageInput = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		imageBinary = new ImageUInt8(1,1);
-		imageOutput = new ImageUInt8(1,1);
+		imageBinary = new GrayU8(1,1);
+		imageOutput = new GrayU8(1,1);
 
 		selectedVisualize = imageOutput;
 
@@ -143,7 +143,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		filter = (FilterImageInterface<ImageUInt8, ImageUInt8>)cookie;
+		filter = (FilterImageInterface<GrayU8, GrayU8>)cookie;
 
 		performWork();
 	}
@@ -200,7 +200,7 @@ public class DemoBinaryImageOpsApp<T extends ImageSingleBand> extends SelectAlgo
 	}
 
 	public static void main( String args[] ) {
-		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(ImageFloat32.class);
+		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(GrayF32.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));

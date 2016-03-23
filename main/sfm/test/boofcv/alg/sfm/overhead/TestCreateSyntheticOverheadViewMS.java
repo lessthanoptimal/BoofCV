@@ -21,8 +21,8 @@ package boofcv.alg.sfm.overhead;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -55,21 +55,21 @@ public class TestCreateSyntheticOverheadViewMS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		CreateSyntheticOverheadViewMS<ImageFloat32> alg =
-				new CreateSyntheticOverheadViewMS<ImageFloat32>(TypeInterpolate.BILINEAR,3,ImageFloat32.class);
+		CreateSyntheticOverheadViewMS<GrayF32> alg =
+				new CreateSyntheticOverheadViewMS<GrayF32>(TypeInterpolate.BILINEAR,3,GrayF32.class);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 
-		MultiSpectral<ImageFloat32> input = new MultiSpectral<ImageFloat32>(ImageFloat32.class,width,height,3);
+		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,width,height,3);
 		for( int i = 0; i < 3; i++ )
 			ImageMiscOps.fill(input.getBand(i), 10+i);
 
-		MultiSpectral<ImageFloat32> output = new MultiSpectral<ImageFloat32>(ImageFloat32.class,overheadW,overheadH,3);
+		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,overheadW,overheadH,3);
 
 		alg.process(input,output);
 
 		for( int i = 0; i < 3; i++ ) {
-			ImageFloat32 o = output.getBand(i);
+			GrayF32 o = output.getBand(i);
 
 			// check parts that shouldn't be in view
 			assertEquals(0,o.get(0,300),1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,8 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel {
 	ImagePanel panel;
 
@@ -186,8 +186,8 @@ public class ShowFeatureOrientationApp<T extends ImageSingleBand, D extends Imag
 	}
 
 	public static void main(String args[]) {
-		ShowFeatureOrientationApp<ImageFloat32, ImageFloat32> app =
-				new ShowFeatureOrientationApp<ImageFloat32, ImageFloat32>(ImageFloat32.class, ImageFloat32.class);
+		ShowFeatureOrientationApp<GrayF32, GrayF32> app =
+				new ShowFeatureOrientationApp<GrayF32, GrayF32>(GrayF32.class, GrayF32.class);
 
 //		ShowFeatureOrientationApp<ImageUInt8, ImageSInt16> app =
 //				new ShowFeatureOrientationApp<ImageUInt8,ImageSInt16>(input,ImageUInt8.class, ImageSInt16.class);

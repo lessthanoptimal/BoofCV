@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationImageTests<T extends ImageSingleBand> {
+public class GenericOrientationImageTests<T extends ImageGray> {
 
 	int width = 30;
 	int height = 40;

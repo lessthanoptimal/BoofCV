@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksGeneralFeatureIntensity<I extends ImageSingleBand , D extends ImageSingleBand>
+public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray, D extends ImageGray>
 {
 	public List<Class> listInputTypes = new ArrayList<Class>();
 	public List<Class> listDerivTypes = new ArrayList<Class>();
@@ -73,7 +73,7 @@ public abstract class ChecksGeneralFeatureIntensity<I extends ImageSingleBand , 
 		GeneralFeatureIntensity<I,D> alg = createAlg(imageType,derivType);
 		alg.process(input,derivX,derivY,derivXX,derivYY,derivXY);
 
-		ImageFloat32 intensity = alg.getIntensity();
+		GrayF32 intensity = alg.getIntensity();
 
 		int r = alg.getIgnoreBorder();
 		checkBorderZero(intensity, r);
@@ -101,7 +101,7 @@ public abstract class ChecksGeneralFeatureIntensity<I extends ImageSingleBand , 
 		GImageMiscOps.fillUniform(derivXY, rand, -100, 100);
 	}
 
-	private void checkBorderZero(ImageFloat32 intensity, int r) {
+	private void checkBorderZero(GrayF32 intensity, int r) {
 		for( int y = 0; y < intensity.height; y++ ) {
 			if( y >= r && y < intensity.height-r )
 				continue;

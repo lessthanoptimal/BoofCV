@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class CommonImageDistortCacheTests<T extends ImageSingleBand> {
+public abstract class CommonImageDistortCacheTests<T extends ImageGray> {
 
 	Class<T> imageType;
 	

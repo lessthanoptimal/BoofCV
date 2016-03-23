@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,9 +81,9 @@ public class TestLocalWeightedHistogramRotRect {
 
 	@Test
 	public void computeHistogram() {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,40,50,3);
 		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
-				ImageFloat32.class, BorderType.EXTENDED));
+				GrayF32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
 
@@ -117,9 +117,9 @@ public class TestLocalWeightedHistogramRotRect {
 	 */
 	@Test
 	public void computeHistogramBorder_compare() {
-		MultiSpectral<ImageFloat32> image = new MultiSpectral<ImageFloat32>(ImageFloat32.class,40,50,3);
+		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,40,50,3);
 		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
-				ImageFloat32.class, BorderType.EXTENDED));
+				GrayF32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.background.BackgroundModelMoving;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.background.stationary.BackgroundStationaryGaussian;
 import boofcv.alg.background.stationary.GenericBackgroundStationaryGaussianChecks;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F32;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public abstract class GenericBackgroundMovingGaussianChecks extends GenericBackg
 		}
 
 		@Override
-		public void segment(ImageBase frame, ImageUInt8 segmented) {
+		public void segment(ImageBase frame, GrayU8 segmented) {
 			moving.segment(stationary,frame,segmented);
 		}
 

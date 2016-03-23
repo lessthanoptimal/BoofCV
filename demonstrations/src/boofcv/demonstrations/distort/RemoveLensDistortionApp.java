@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -51,10 +51,10 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	IntrinsicParameters param;
 
 	// distorted input
-	MultiSpectral<ImageFloat32> dist;
+	Planar<GrayF32> dist;
 
 	// storage for undistorted image
-	MultiSpectral<ImageFloat32> undist;
+	Planar<GrayF32> undist;
 
 	boolean hasProcessed = false;
 
@@ -69,10 +69,10 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		this.param = param;
 
 		// distorted image
-		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, ImageFloat32.class);
+		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
 
 		// storage for undistorted image
-		undist = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		undist = new Planar<GrayF32>(GrayF32.class,
 				dist.getWidth(),dist.getHeight(),dist.getNumBands());
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier
@@ -96,9 +96,9 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 
 	private void addUndistorted(final String name, final PointTransform_F32 model) {
 		// Set up image distort
-		InterpolatePixelS<ImageFloat32> interp = FactoryInterpolation.bilinearPixelS(ImageFloat32.class, BorderType.VALUE);
-		ImageDistort<ImageFloat32,ImageFloat32> undistorter =
-				FactoryDistort.distortSB(false, interp, ImageFloat32.class);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.VALUE);
+		ImageDistort<GrayF32,GrayF32> undistorter =
+				FactoryDistort.distortSB(false, interp, GrayF32.class);
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
 		DistortImageOps.distortMS(dist, undist, undistorter);

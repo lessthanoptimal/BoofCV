@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -44,14 +44,14 @@ public class TestGradientSobel_UnrolledOuter {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
-				ImageUInt8 img = new ImageUInt8(w, h);
+				GrayU8 img = new GrayU8(w, h);
 				ImageMiscOps.fillUniform(img, new Random(0xfeed), 0, 100);
 
-				ImageSInt16 derivX = new ImageSInt16(w, h);
-				ImageSInt16 derivY = new ImageSInt16(w, h);
+				GrayS16 derivX = new GrayS16(w, h);
+				GrayS16 derivY = new GrayS16(w, h);
 
-				ImageSInt16 derivX2 = new ImageSInt16(w, h);
-				ImageSInt16 derivY2 = new ImageSInt16(w, h);
+				GrayS16 derivX2 = new GrayS16(w, h);
+				GrayS16 derivY2 = new GrayS16(w, h);
 
 				GradientSobel_Naive.process(img, derivX2, derivY2);
 				GradientSobel_UnrolledOuter.process_I8(img, derivX, derivY);
@@ -71,14 +71,14 @@ public class TestGradientSobel_UnrolledOuter {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
 
-				ImageFloat32 img = new ImageFloat32(w, h);
+				GrayF32 img = new GrayF32(w, h);
 				ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
-				ImageFloat32 derivX = new ImageFloat32(w, h);
-				ImageFloat32 derivY = new ImageFloat32(w, h);
+				GrayF32 derivX = new GrayF32(w, h);
+				GrayF32 derivY = new GrayF32(w, h);
 
-				ImageFloat32 derivX2 = new ImageFloat32(w, h);
-				ImageFloat32 derivY2 = new ImageFloat32(w, h);
+				GrayF32 derivX2 = new GrayF32(w, h);
+				GrayF32 derivY2 = new GrayF32(w, h);
 
 				GradientSobel_Naive.process(img, derivX2, derivY2);
 				GradientSobel_UnrolledOuter.process_F32(img, derivX, derivY);
@@ -94,20 +94,20 @@ public class TestGradientSobel_UnrolledOuter {
 		for( int offY = 0; offY < 3; offY++ ) {
 			for( int offX = 0; offX < 3; offX++ ) {
 				int w = width+offX; int h = height+offY;
-				ImageFloat32 img = new ImageFloat32(w, h);
+				GrayF32 img = new GrayF32(w, h);
 				ImageMiscOps.fillUniform(img, rand, 0f, 255f);
 
-				ImageFloat32 derivX = new ImageFloat32(w, h);
-				ImageFloat32 derivY = new ImageFloat32(w, h);
+				GrayF32 derivX = new GrayF32(w, h);
+				GrayF32 derivY = new GrayF32(w, h);
 
 				BoofTesting.checkSubImage(this, "process_F32_sub_naive", true, img, derivX, derivY);
 			}
 		}
 	}
 
-	public void process_F32_sub_naive(ImageFloat32 img, ImageFloat32 derivX, ImageFloat32 derivY) {
-		ImageFloat32 derivX2 = new ImageFloat32(derivX.width, derivX.height);
-		ImageFloat32 derivY2 = new ImageFloat32(derivX.width, derivX.height);
+	public void process_F32_sub_naive(GrayF32 img, GrayF32 derivX, GrayF32 derivY) {
+		GrayF32 derivX2 = new GrayF32(derivX.width, derivX.height);
+		GrayF32 derivY2 = new GrayF32(derivX.width, derivX.height);
 
 		GradientSobel_Naive.process(img, derivX2, derivY2);
 		GradientSobel_UnrolledOuter.process_F32_sub(img, derivX, derivY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,14 +42,14 @@ import boofcv.struct.image.*;
  */
 public class FactoryTrackerObjectAlgs {
 
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	public static <T extends ImageGray,D extends ImageGray>
 	TldTracker<T,D> createTLD( TldParameters config ,
 							   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
 							   Class<T> imageType , Class<D> derivType ) {
 		return new TldTracker<T,D>(config,interpolate,gradient,imageType,derivType);
 	}
 
-	public static <T extends ImageSingleBand,D extends ImageSingleBand>
+	public static <T extends ImageGray,D extends ImageGray>
 	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig config ,
 												   Class<T> imageType , Class<D> derivType ,
 												   ImageGradient<T, D> gradient) {
@@ -109,7 +109,7 @@ public class FactoryTrackerObjectAlgs {
 		}
 	}
 
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	CirculantTracker<T> circulant( ConfigCirculantTracker config , Class<T> imageType) {
 		if( config == null )
 			config = new ConfigCirculantTracker();

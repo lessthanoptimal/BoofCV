@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,15 +21,15 @@ package boofcv.alg.sfm.overhead;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
 /**
- * Implementation of {@link CreateSyntheticOverheadView} for {@link ImageSingleBand}.
+ * Implementation of {@link CreateSyntheticOverheadView} for {@link ImageGray}.
  *
  * @author Peter Abeles
  */
-public class CreateSyntheticOverheadViewS<T extends ImageSingleBand> extends CreateSyntheticOverheadView<T>
+public class CreateSyntheticOverheadViewS<T extends ImageGray> extends CreateSyntheticOverheadView<T>
 {
 	// computes interpolated pixel value
 	private InterpolatePixelS<T> interp;

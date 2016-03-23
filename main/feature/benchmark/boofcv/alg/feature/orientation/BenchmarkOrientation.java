@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.Random;
@@ -40,7 +40,7 @@ import static boofcv.factory.feature.orientation.FactoryOrientationAlgs.*;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSingleBand> {
+public class BenchmarkOrientation<I extends ImageGray, D extends ImageGray> {
 
 	static final long TEST_TIME = 1000;
 	static Random rand = new Random(234234);
@@ -54,7 +54,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	I image;
 	D derivX;
 	D derivY;
-	ImageSingleBand ii;
+	ImageGray ii;
 
 	Point2D_I32 pts[];
 	double radiuses[];
@@ -67,7 +67,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 		this.imageType = imageType;
 		this.derivType = derivType;
 
-		Class integralType = ImageFloat32.class == imageType ? ImageFloat32.class : ImageSInt32.class;
+		Class integralType = GrayF32.class == imageType ? GrayF32.class : GrayS32.class;
 
 		image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		ii = GeneralizedImageOps.createSingleBand(integralType, width, height);
@@ -197,7 +197,7 @@ public class BenchmarkOrientation<I extends ImageSingleBand, D extends ImageSing
 	}
 
 	public static void main( String argsp[ ] ) {
-		BenchmarkOrientation<ImageFloat32,ImageFloat32> alg = new BenchmarkOrientation<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+		BenchmarkOrientation<GrayF32,GrayF32> alg = new BenchmarkOrientation<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 //		BenchmarkOrientation<ImageUInt8,ImageSInt16> alg = new BenchmarkOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class, ImageSInt16.class);
 
 		alg.perform();

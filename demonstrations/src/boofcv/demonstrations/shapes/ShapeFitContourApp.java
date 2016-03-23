@@ -33,8 +33,8 @@ import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 
@@ -52,20 +52,20 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ShapeFitContourApp
-		extends DemonstrationBase<ImageUInt8>
+		extends DemonstrationBase<GrayU8>
 		implements ThresholdControlPanel.Listener
 {
 	// displays intensity image
 	VisualizePanel gui = new VisualizePanel();
 
 	// converted input image
-	ImageUInt8 inputPrev = new ImageUInt8(1,1);
-	ImageUInt8 binary = new ImageUInt8(1,1);
-	ImageUInt8 filtered = new ImageUInt8(1,1);
+	GrayU8 inputPrev = new GrayU8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
+	GrayU8 filtered = new GrayU8(1,1);
 	// if it has processed an image or not
 	boolean processImage = false;
 
-	InputToBinary<ImageUInt8> inputToBinary;
+	InputToBinary<GrayU8> inputToBinary;
 
 	// Found contours
 	List<Contour> contours;
@@ -76,7 +76,7 @@ public class ShapeFitContourApp
 	ShapeFitContourPanel controlPanel;
 
 	public ShapeFitContourApp(List<String> examples ) {
-		super(examples, ImageType.single(ImageUInt8.class));
+		super(examples, ImageType.single(GrayU8.class));
 
 		controlPanel = new ShapeFitContourPanel(this);
 
@@ -84,11 +84,11 @@ public class ShapeFitContourApp
 		add(BorderLayout.CENTER, gui);
 
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
-		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
+		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
 	}
 
 	@Override
-	public synchronized void processImage(final BufferedImage buffered, ImageUInt8 input ) {
+	public synchronized void processImage(final BufferedImage buffered, GrayU8 input ) {
 		if( buffered != null ) {
 			original = conditionalDeclare(buffered,original);
 			work = conditionalDeclare(buffered,work);
@@ -141,7 +141,7 @@ public class ShapeFitContourApp
 	}
 
 
-	public void process( final ImageUInt8 input ) {
+	public void process( final GrayU8 input ) {
 
 		// threshold the input image
 		inputToBinary.process(input,binary);
@@ -160,7 +160,7 @@ public class ShapeFitContourApp
 	@Override
 	public void imageThresholdUpdated() {
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
-		inputToBinary = FactoryThresholdBinary.threshold(config,ImageUInt8.class);
+		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
 		processImageThread(null,null);
 	}
 

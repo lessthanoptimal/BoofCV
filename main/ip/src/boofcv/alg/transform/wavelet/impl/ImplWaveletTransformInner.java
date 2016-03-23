@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.wavelet.WlCoef_F32;
 import boofcv.struct.wavelet.WlCoef_I32;
 
@@ -40,7 +40,7 @@ import boofcv.struct.wavelet.WlCoef_I32;
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class ImplWaveletTransformInner {
 
-	public static void horizontal( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void horizontal(WlCoef_F32 coefficients , GrayF32 input , GrayF32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -83,7 +83,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void vertical(WlCoef_F32 coefficients , GrayF32 input , GrayF32 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
@@ -127,7 +127,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void horizontalInverse(WlCoef_F32 coefficients , GrayF32 input , GrayF32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -188,7 +188,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WlCoef_F32 coefficients , ImageFloat32 input , ImageFloat32 output )
+	public static void verticalInverse(WlCoef_F32 coefficients , GrayF32 input , GrayF32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -249,7 +249,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontal( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
+	public static void horizontal(WlCoef_I32 coefficients , GrayS32 input , GrayS32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -295,7 +295,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void vertical( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
+	public static void vertical(WlCoef_I32 coefficients , GrayS32 input , GrayS32 output )
 	{
 		final int offsetA = coefficients.offsetScaling*input.stride;
 		final int offsetB = coefficients.offsetWavelet*input.stride;
@@ -342,7 +342,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void horizontalInverse( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
+	public static void horizontalInverse(WlCoef_I32 coefficients , GrayS32 input , GrayS32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;
@@ -408,7 +408,7 @@ public class ImplWaveletTransformInner {
 		}
 	}
 
-	public static void verticalInverse( WlCoef_I32 coefficients , ImageSInt32 input , ImageSInt32 output )
+	public static void verticalInverse(WlCoef_I32 coefficients , GrayS32 input , GrayS32 output )
 	{
 		final int offsetA = coefficients.offsetScaling;
 		final int offsetB = coefficients.offsetWavelet;

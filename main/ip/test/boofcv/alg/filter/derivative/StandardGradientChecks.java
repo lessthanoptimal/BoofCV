@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.border.BorderIndex1D_Wrap;
 import boofcv.core.image.border.ImageBorder1D_F32;
 import boofcv.core.image.border.ImageBorder1D_S32;
 import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -76,13 +76,13 @@ public class StandardGradientChecks {
 	 */
 	private void testSecondDerivative(Method m1 , Method m2) {
 		Class params[] = m1.getParameterTypes();
-		ImageSingleBand input = GeneralizedImageOps.createSingleBand(params[0], width, height);
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(params[1], width, height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(params[2], width, height);
-		ImageSingleBand derivXX = GeneralizedImageOps.createSingleBand(params[1], width, height);
-		ImageSingleBand derivYY = GeneralizedImageOps.createSingleBand(params[2], width, height);
-		ImageSingleBand derivXY = GeneralizedImageOps.createSingleBand(params[1], width, height);
-		ImageSingleBand derivYX = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageGray input = GeneralizedImageOps.createSingleBand(params[0], width, height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(params[2], width, height);
+		ImageGray derivXX = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageGray derivYY = GeneralizedImageOps.createSingleBand(params[2], width, height);
+		ImageGray derivXY = GeneralizedImageOps.createSingleBand(params[1], width, height);
+		ImageGray derivYX = GeneralizedImageOps.createSingleBand(params[1], width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 40);
 

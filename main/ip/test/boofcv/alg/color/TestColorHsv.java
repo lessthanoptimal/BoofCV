@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
 import org.junit.Test;
 
 import java.util.Random;
@@ -91,9 +91,9 @@ public class TestColorHsv {
 
 	@Test
 	public void multispectral_F32() {
-		MultiSpectral<ImageFloat32> rgb = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
-		MultiSpectral<ImageFloat32> hsv = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
-		MultiSpectral<ImageFloat32> found = new MultiSpectral<ImageFloat32>(ImageFloat32.class,10,15,3);
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,10,15,3);
+		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,10,15,3);
+		Planar<GrayF32> found = new Planar<GrayF32>(GrayF32.class,10,15,3);
 
 		GImageMiscOps.fillUniform(rgb, rand, 0, 255);
 

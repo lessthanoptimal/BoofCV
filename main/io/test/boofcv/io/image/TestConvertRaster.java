@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,11 +98,11 @@ public class TestConvertRaster {
 		assertTrue(r != 101);
 
 		// test several image types
-		ImageUInt8 out = new ImageUInt8(5, 5);
+		GrayU8 out = new GrayU8(5, 5);
 		ConvertRaster.bufferedToGray(img, out);
 		assertEquals(101, out.get(0, 0));
 
-		ImageFloat32 outF = new ImageFloat32(5, 5);
+		GrayF32 outF = new GrayF32(5, 5);
 		ConvertRaster.bufferedToGray(img, outF);
 		assertEquals(101, outF.get(0, 0), 1e-4);
 	}
@@ -117,7 +117,7 @@ public class TestConvertRaster {
 
 		img.getRaster().getDataBuffer().setElem(0, 2005);
 
-		ImageUInt16 out = new ImageUInt16(5, 5);
+		GrayU16 out = new GrayU16(5, 5);
 		ConvertRaster.bufferedToGray(img, out);
 		assertEquals(2005, out.get(0, 0));
 	}
@@ -166,7 +166,7 @@ public class TestConvertRaster {
 		int numBands = inputBuff.getRaster().getNumBands();
 
 		ImageBase output;
-		if (ImageSingleBand.class.isAssignableFrom(imageType)) {
+		if (ImageGray.class.isAssignableFrom(imageType)) {
 			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
 		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
 			if( m.getName().contains("Gray")) {
@@ -177,14 +177,14 @@ public class TestConvertRaster {
 		} else {
 			Class type;
 			if (m.getName().contains("U8")) {
-				type = ImageUInt8.class;
+				type = GrayU8.class;
 			} else if (m.getName().contains("F32")) {
-				type = ImageFloat32.class;
+				type = GrayF32.class;
 			} else {
 				throw new IllegalArgumentException("Unexpected: " + m.getName());
 			}
 
-			output = new MultiSpectral(type, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
+			output = new Planar(type, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
 		}
 		return output;
 	}
@@ -262,8 +262,8 @@ public class TestConvertRaster {
 				m.invoke(null, input, output.getRaster());
 
 				// read directly from raster if the raster is an input
-				if( MultiSpectral.class.isAssignableFrom(input.getClass()) )
-					BoofTesting.checkEquals(output.getRaster(),(MultiSpectral)input,1);
+				if( Planar.class.isAssignableFrom(input.getClass()) )
+					BoofTesting.checkEquals(output.getRaster(),(Planar)input,1);
 				else
 					BoofTesting.checkEquals(output, input,false,  1f);
 			} else {

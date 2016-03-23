@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,36 +25,36 @@ import boofcv.struct.image.*;
 
 /**
  * Compute the variance for a rectangular region using the integral image.  Supports both U8 and F32 input images.
- * For each new image in the sequence a call to {@link #setImage(boofcv.struct.image.ImageSingleBand)} must be done
+ * For each new image in the sequence a call to {@link #setImage(ImageGray)} must be done
  * so that it can compute the required integral images.  See paper for mathematical details on how the variance
  * is computed using integral images.
  *
  * @author Peter Abeles
  */
-public class TldVarianceFilter<T extends ImageSingleBand> {
+public class TldVarianceFilter<T extends ImageGray> {
 
 	// threshold for selecting candidate regions
 	private double thresholdLower;
 
 	// integral image used to compute mean
-	private ImageSingleBand integral;
+	private ImageGray integral;
 	// integral image of the pixel value squared
-	private ImageSingleBand integralSq;
+	private ImageGray integralSq;
 
 	/**
 	 * Constructor which specifies the input image type.
 	 *
-	 * @param imageType  Either {@link ImageUInt8} or {@link ImageFloat32}
+	 * @param imageType  Either {@link GrayU8} or {@link GrayF32}
 	 */
 	public TldVarianceFilter( Class<T> imageType ) {
 
 		// declare integral images.
 		if(GeneralizedImageOps.isFloatingPoint(imageType) ) {
-			integral = new ImageFloat32(1,1);
-			integralSq = new ImageFloat64(1,1);
+			integral = new GrayF32(1,1);
+			integralSq = new GrayF64(1,1);
 		} else {
-			integral = new ImageSInt32(1,1);
-			integralSq = new ImageSInt64(1,1);
+			integral = new GrayS32(1,1);
+			integralSq = new GrayS64(1,1);
 		}
 	}
 
@@ -72,9 +72,9 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 
 		GIntegralImageOps.transform(gray,integral);
 		if( gray.getDataType().isInteger())
-			transformSq((ImageUInt8)gray,(ImageSInt64)integralSq);
+			transformSq((GrayU8)gray,(GrayS64)integralSq);
 		else
-			transformSq((ImageFloat32)gray,(ImageFloat64)integralSq);
+			transformSq((GrayF32)gray,(GrayF64)integralSq);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	/**
 	 * Integral image of pixel value squared. integer
 	 */
-	public static void transformSq( final ImageUInt8 input , final ImageSInt64 transformed )
+	public static void transformSq(final GrayU8 input , final GrayS64 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;
@@ -161,7 +161,7 @@ public class TldVarianceFilter<T extends ImageSingleBand> {
 	/**
 	 * Integral image of pixel value squared.  floating point
 	 */
-	public static void transformSq( final ImageFloat32 input , final ImageFloat64 transformed )
+	public static void transformSq(final GrayF32 input , final GrayF64 transformed )
 	{
 		int indexSrc = input.startIndex;
 		int indexDst = transformed.startIndex;

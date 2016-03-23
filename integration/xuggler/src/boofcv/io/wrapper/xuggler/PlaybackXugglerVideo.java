@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.io.wrapper.xuggler;
 
 import boofcv.gui.image.PlaybackImageSequence;
 import boofcv.io.UtilIO;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Displays a video after reading it in using xuggler.
@@ -39,9 +39,9 @@ public class PlaybackXugglerVideo {
 			fileName = args[0];
 		}
 
-		XugglerSimplified<ImageUInt8> sequence = new XugglerSimplified<ImageUInt8>(fileName, ImageType.single(ImageUInt8.class));
+		XugglerSimplified<GrayU8> sequence = new XugglerSimplified<GrayU8>(fileName, ImageType.single(GrayU8.class));
 
-		PlaybackImageSequence<ImageUInt8> player = new PlaybackImageSequence<ImageUInt8>(sequence);
+		PlaybackImageSequence<GrayU8> player = new PlaybackImageSequence<GrayU8>(sequence);
 
 		player.process();
 

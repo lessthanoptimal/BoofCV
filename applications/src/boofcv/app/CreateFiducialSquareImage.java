@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 	protected void printPatternDefinitions() {
 		for( int i = 0; i < imagePaths.size(); i++ ) {
 			String imageName = new File(imagePaths.get(i)).getName();
-			ImageUInt8 image = UtilImageIO.loadImage(imagePaths.get(i), ImageUInt8.class);
+			GrayU8 image = UtilImageIO.loadImage(imagePaths.get(i), GrayU8.class);
 
 			if( image == null ) {
 				System.err.println("Can't read image.  Path = "+ imagePaths.get(i));
@@ -56,13 +56,13 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 			// make sure the image is square and divisible by 8
 			int s = image.width - (image.width%8);
 			if( image.width != s || image.height != s ) {
-				ImageUInt8 tmp = new ImageUInt8(s, s);
+				GrayU8 tmp = new GrayU8(s, s);
 				new FDistort(image, tmp).scaleExt().apply();
 				image = tmp;
 			}
 
 			double scale = image.width/innerWidth;
-			ImageUInt8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
+			GrayU8 binary = ThresholdImageOps.threshold(image, null, threshold, false);
 			if( showPreview )
 				ShowImages.showWindow(VisualizeBinaryData.renderBinary(binary, false, null), "Binary Image");
 

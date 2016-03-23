@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,8 +61,8 @@ public class TestImplAverageDownSample {
 			Class typeSrc = m.getParameterTypes()[0];
 			Class typeDst = m.getParameterTypes()[1];
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,6,3);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,6,3);
 
 			fillHorizontal(src);
 			m.invoke(null,src,dst);
@@ -89,8 +89,8 @@ public class TestImplAverageDownSample {
 			Class typeSrc = m.getParameterTypes()[0];
 			Class typeDst = m.getParameterTypes()[1];
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
 
 			fillHorizontal(src);
 			m.invoke(null,src,dst);
@@ -118,8 +118,8 @@ public class TestImplAverageDownSample {
 
 //			System.out.println(typeSrc+"   "+typeDst);
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,9,3);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,4,3);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,9,3);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,4,3);
 
 			fillHorizontal(src);
 			m.invoke(null,src,dst);
@@ -135,7 +135,7 @@ public class TestImplAverageDownSample {
 		assertEquals(4,methods.size());
 	}
 
-	private void fillHorizontal(ImageSingleBand src) {
+	private void fillHorizontal(ImageGray src) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				GeneralizedImageOps.set(src,x,y,x);
@@ -151,8 +151,8 @@ public class TestImplAverageDownSample {
 			Class typeSrc = m.getParameterTypes()[0];
 			Class typeDst = m.getParameterTypes()[1];
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,3,6);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,6);
 
 			fillVertical(src);
 			m.invoke(null,src,dst);
@@ -177,8 +177,8 @@ public class TestImplAverageDownSample {
 
 //			System.out.println(typeSrc+"   "+typeDst);
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
 
 			fillVertical(src);
 			m.invoke(null,src,dst);
@@ -210,8 +210,8 @@ public class TestImplAverageDownSample {
 
 //			System.out.println(typeSrc+"   "+typeDst);
 
-			ImageSingleBand src = GeneralizedImageOps.createSingleBand(typeSrc,3,9);
-			ImageSingleBand dst = GeneralizedImageOps.createSingleBand(typeDst,3,4);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,9);
+			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,4);
 
 			fillVertical(src);
 			m.invoke(null,src,dst);
@@ -233,7 +233,7 @@ public class TestImplAverageDownSample {
 		assertEquals(4,methods.size());
 	}
 
-	private void fillVertical(ImageSingleBand src) {
+	private void fillVertical(ImageGray src) {
 		for (int x = 0; x < src.width; x++) {
 			for (int y = 0; y < src.height; y++) {
 				GeneralizedImageOps.set(src,x,y,y);

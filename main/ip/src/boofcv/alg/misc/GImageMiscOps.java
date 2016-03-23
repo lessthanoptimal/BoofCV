@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,25 +45,25 @@ public class GImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 ImageBase input , ImageBase output ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageInt8) input, (ImageInt8) output);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageInt16) input, (ImageInt16) output);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageSInt32) input, (ImageSInt32) output);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageSInt64) input, (ImageSInt64) output);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageFloat32) input, (ImageFloat32) output);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (ImageFloat64) input, (ImageFloat64) output);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI8) input, (GrayI8) output);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI16) input, (GrayI16) output);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS32) input, (GrayS32) output);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS64) input, (GrayS64) output);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF32) input, (GrayF32) output);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF64) input, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral mi = (MultiSpectral)input;
-			MultiSpectral mo = (MultiSpectral)output;
+		} else if( input instanceof Planar) {
+			Planar mi = (Planar)input;
+			Planar mo = (Planar)output;
 			for( int i = 0; i < mi.getNumBands(); i++ )
 				copy(srcX,srcY,dstX,dstY,width,height,mi.getBand(i),mo.getBand(i));
 		} else {
@@ -78,19 +78,19 @@ public class GImageMiscOps {
 	 * @param value fill value
 	 */
 	public static void fill( ImageBase input , double value ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt8) input, (int) value);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt16) input, (int) value);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt32) input, (int) value);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt64) input, (long) value);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat32) input, (float) value);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat64) input, value);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((GrayI8) input, (int) value);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((GrayI16) input, (int) value);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayS32) input, (int) value);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayS64) input, (long) value);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayF32) input, (float) value);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayF64) input, value);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -110,8 +110,8 @@ public class GImageMiscOps {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				fill(m.getBand(i),value);
 		} else {
@@ -126,19 +126,19 @@ public class GImageMiscOps {
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
 	public static void fill( ImageBase input , double[] values ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt8) input, (int) values[0]);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fill((ImageInt16) input, (int) values[0]);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt32) input, (int) values[0]);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageSInt64) input, (long) values[0]);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat32) input, (float) values[0]);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fill((ImageFloat64) input, values[0]);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((GrayI8) input, (int) values[0]);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fill((GrayI16) input, (int) values[0]);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayS32) input, (int) values[0]);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayS64) input, (long) values[0]);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayF32) input, (float) values[0]);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fill((GrayF64) input, values[0]);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -158,8 +158,8 @@ public class GImageMiscOps {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				fill(m.getBand(i),values[i]);
 		} else {
@@ -191,8 +191,8 @@ public class GImageMiscOps {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
 			fill(m.getBand(band),value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
@@ -206,25 +206,25 @@ public class GImageMiscOps {
 	 * @param band Which band the image is to be inserted into
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
-	public static void insertBand( ImageSingleBand input , int band , ImageMultiBand output ) {
+	public static void insertBand(ImageGray input , int band , ImageMultiBand output ) {
 		if( output instanceof ImageInterleaved ) {
 			if( InterleavedI8.class.isAssignableFrom(output.getClass()) ) {
-				ImageMiscOps.insertBand((ImageInt8) input, band, (InterleavedI8) output);
+				ImageMiscOps.insertBand((GrayI8) input, band, (InterleavedI8) output);
 			} else if( InterleavedI16.class.isAssignableFrom(output.getClass()) ) {
-				ImageMiscOps.insertBand((ImageInt16) input, band, (InterleavedI16) output);
+				ImageMiscOps.insertBand((GrayI16) input, band, (InterleavedI16) output);
 			} else if( InterleavedS32.class == output.getClass() ) {
-				ImageMiscOps.insertBand((ImageSInt32) input, band, (InterleavedS32) output);
+				ImageMiscOps.insertBand((GrayS32) input, band, (InterleavedS32) output);
 			} else if( InterleavedS64.class == output.getClass() ) {
-				ImageMiscOps.insertBand((ImageSInt64) input, band, (InterleavedS64) output);
+				ImageMiscOps.insertBand((GrayS64) input, band, (InterleavedS64) output);
 			} else if( InterleavedF32.class == output.getClass() ) {
-				ImageMiscOps.insertBand((ImageFloat32) input, band, (InterleavedF32) output);
+				ImageMiscOps.insertBand((GrayF32) input, band, (InterleavedF32) output);
 			} else if( InterleavedF64.class == output.getClass() ) {
-				ImageMiscOps.insertBand((ImageFloat64) input, band, (InterleavedF64) output);
+				ImageMiscOps.insertBand((GrayF64) input, band, (InterleavedF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( output instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)output;
+		} else if( output instanceof Planar) {
+			Planar m = (Planar)output;
 			m.getBand(band).setTo(input);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
@@ -239,24 +239,24 @@ public class GImageMiscOps {
 	 * @param radius Border width.
 	 */
 	public static void fillBorder( ImageBase input , double value , int radius ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillBorder((ImageInt8) input, (int) value, radius);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillBorder((ImageInt16) input, (int) value, radius);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillBorder((ImageSInt32) input, (int) value, radius);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillBorder((ImageSInt64) input, (long) value, radius);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillBorder((ImageFloat32) input, (float) value, radius);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillBorder((ImageFloat64) input, value, radius);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((GrayI8) input, (int) value, radius);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((GrayI16) input, (int) value, radius);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayS32) input, (int) value, radius);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayS64) input, (long) value, radius);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayF32) input, (float) value, radius);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayF64) input, value, radius);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				fillBorder(m.getBand(i), value, radius);
 		} else {
@@ -275,24 +275,24 @@ public class GImageMiscOps {
 	 * @param height Rectangle height
 	 */
 	public static void fillRectangle( ImageBase input , double value, int x0, int y0, int width, int height ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillRectangle((ImageInt8) input, (int) value, x0, y0, width, height);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillRectangle((ImageInt16) input, (int) value, x0, y0, width, height);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageSInt32) input, (int) value, x0, y0, width, height);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageSInt64) input, (long) value, x0, y0, width, height);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageFloat32) input, (float) value, x0, y0, width, height);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillRectangle((ImageFloat64) input, value, x0, y0, width, height);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillRectangle((GrayI8) input, (int) value, x0, y0, width, height);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillRectangle((GrayI16) input, (int) value, x0, y0, width, height);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((GrayS32) input, (int) value, x0, y0, width, height);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((GrayS64) input, (long) value, x0, y0, width, height);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((GrayF32) input, (float) value, x0, y0, width, height);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fillRectangle((GrayF64) input, value, x0, y0, width, height);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral) input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar) input;
 			for (int i = 0; i < m.getNumBands(); i++)
 				fillRectangle(m.getBand(i), value, x0, y0, width, height);
 		} else if( input instanceof ImageInterleaved ) {
@@ -329,24 +329,24 @@ public class GImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian( ImageBase input , Random rand , double mean , double sigma , double lowerBound , double upperBound ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillGaussian((ImageInt8) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillGaussian((ImageInt16) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillGaussian((ImageSInt32) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillGaussian((ImageSInt64) input, rand, mean, sigma, (long) lowerBound, (long) upperBound);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillGaussian((ImageFloat32) input, rand, mean, sigma, (float) lowerBound, (float) upperBound);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillGaussian((ImageFloat64) input, rand, mean, sigma, lowerBound, upperBound);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillGaussian((GrayI8) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillGaussian((GrayI16) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((GrayS32) input, rand, mean, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((GrayS64) input, rand, mean, sigma, (long) lowerBound, (long) upperBound);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((GrayF32) input, rand, mean, sigma, (float) lowerBound, (float) upperBound);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fillGaussian((GrayF64) input, rand, mean, sigma, lowerBound, upperBound);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral) input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar) input;
 			for (int i = 0; i < m.getNumBands(); i++)
 				fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 		} else if( input instanceof ImageInterleaved ) {
@@ -379,19 +379,19 @@ public class GImageMiscOps {
 	 * @param max Maximum value of the distribution.  Inclusive.
 	 */
 	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt8) input, rand, (int) min, ((int) max) - 1);
-			} else if( ImageInt16.class.isAssignableFrom(input.getClass()) ) {
-				ImageMiscOps.fillUniform((ImageInt16) input, rand, (int) min, ((int) max) - 1);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt32) input, rand, (int) min, ((int) max) - 1);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageSInt64) input, rand, (long) min, ((long) max) - 1);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageFloat32) input, rand, (float) min, (float) max);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.fillUniform((ImageFloat64) input, rand, min, max);
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((GrayI8) input, rand, (int) min, ((int) max) - 1);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillUniform((GrayI16) input, rand, (int) min, ((int) max) - 1);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((GrayS32) input, rand, (int) min, ((int) max) - 1);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((GrayS64) input, rand, (long) min, ((long) max) - 1);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((GrayF32) input, rand, (float) min, (float) max);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fillUniform((GrayF64) input, rand, min, max);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
@@ -411,8 +411,8 @@ public class GImageMiscOps {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				fillUniform(m.getBand(i), rand , min, max);
 		} else {
@@ -433,28 +433,28 @@ public class GImageMiscOps {
 	public static void addGaussian( ImageBase input, Random rand , double sigma ,
 									double lowerBound , double upperBound  )
 	{
-		if( input instanceof ImageSingleBand ) {
-			if( ImageUInt8.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageUInt8) input, rand, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt8.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageSInt8) input, rand, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageUInt16.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageUInt16) input, rand, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt16.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageSInt16) input, rand, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageSInt32) input, rand, sigma, (int) lowerBound, (int) upperBound);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageSInt64) input, rand, sigma, (long) lowerBound, (long) upperBound);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageFloat32) input, rand, sigma, (float) lowerBound, (float) upperBound);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.addGaussian((ImageFloat64) input, rand, sigma, lowerBound, upperBound);
+		if( input instanceof ImageGray) {
+			if( GrayU8.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayU8) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS8.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayS8) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayU16.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayU16) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS16.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayS16) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayS32) input, rand, sigma, (int) lowerBound, (int) upperBound);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayS64) input, rand, sigma, (long) lowerBound, (long) upperBound);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayF32) input, rand, sigma, (float) lowerBound, (float) upperBound);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.addGaussian((GrayF64) input, rand, sigma, lowerBound, upperBound);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral) input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar) input;
 			for (int i = 0; i < m.getNumBands(); i++)
 				addGaussian(m.getBand(i), rand, sigma, lowerBound, upperBound);
 		} else if( input instanceof ImageInterleaved ) {
@@ -486,28 +486,28 @@ public class GImageMiscOps {
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X < max.
 	 */
 	public static void addUniform( ImageBase input, Random rand , double min , double max  ) {
-		if( input instanceof ImageSingleBand ) {
-			if( ImageUInt8.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageUInt8) input, rand, (int) min, (int) max);
-			} else if( ImageSInt8.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageSInt8) input, rand, (int) min, (int) max);
-			} else if( ImageUInt16.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageUInt16) input, rand, (int) min, (int) max);
-			} else if( ImageSInt16.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageSInt16) input, rand, (int) min, (int) max);
-			} else if( ImageSInt32.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageSInt32) input, rand, (int) min, (int) max);
-			} else if( ImageSInt64.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageSInt64) input, rand, (long) min, (long) max);
-			} else if( ImageFloat32.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageFloat32) input, rand, (float) min, (float) max);
-			} else if( ImageFloat64.class == input.getClass() ) {
-				ImageMiscOps.addUniform((ImageFloat64) input, rand, min, max);
+		if( input instanceof ImageGray) {
+			if( GrayU8.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayU8) input, rand, (int) min, (int) max);
+			} else if( GrayS8.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayS8) input, rand, (int) min, (int) max);
+			} else if( GrayU16.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayU16) input, rand, (int) min, (int) max);
+			} else if( GrayS16.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayS16) input, rand, (int) min, (int) max);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayS32) input, rand, (int) min, (int) max);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayS64) input, rand, (long) min, (long) max);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayF32) input, rand, (float) min, (float) max);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.addUniform((GrayF64) input, rand, min, max);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 			}
-		} else if( input instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral) input;
+		} else if( input instanceof Planar) {
+			Planar m = (Planar) input;
 			for (int i = 0; i < m.getNumBands(); i++)
 				addUniform(m.getBand(i), rand, min, max);
 		} else if( input instanceof ImageInterleaved ) {
@@ -539,26 +539,26 @@ public class GImageMiscOps {
 	 * Flips the image from top to bottom
 	 */
 	public static void flipVertical( ImageBase img ) {
-		if( img instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageInt8) img);
-			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageInt16) img);
-			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageSInt32) img);
-			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageSInt64) img);
-			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageFloat32) img);
-			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageFloat64) img);
-			} else if (ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipVertical((ImageSInt64) img);
+		if( img instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayI8) img);
+			} else if( GrayI16.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayI16) img);
+			} else if ( GrayS32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayS32) img);
+			} else if ( GrayS64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayS64) img);
+			} else if (GrayF32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayF32) img);
+			} else if (GrayF64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayF64) img);
+			} else if (GrayS64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipVertical((GrayS64) img);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 			}
-		} else if( img instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)img;
+		} else if( img instanceof Planar) {
+			Planar m = (Planar)img;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				flipVertical(m.getBand(i));
 		} else {
@@ -570,26 +570,26 @@ public class GImageMiscOps {
 	 * Flips the image from left to right
 	 */
 	public static void flipHorizontal( ImageBase img ) {
-		if( img instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageInt8) img);
-			} else if( ImageInt16.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageInt16) img);
-			} else if ( ImageSInt32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageSInt32) img);
-			} else if ( ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageSInt64) img);
-			} else if (ImageFloat32.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageFloat32) img);
-			} else if (ImageFloat64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageFloat64) img);
-			} else if (ImageSInt64.class.isAssignableFrom(img.getClass()) ) {
-				ImageMiscOps.flipHorizontal((ImageSInt64) img);
+		if( img instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayI8) img);
+			} else if( GrayI16.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayI16) img);
+			} else if ( GrayS32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayS32) img);
+			} else if ( GrayS64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayS64) img);
+			} else if (GrayF32.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayF32) img);
+			} else if (GrayF64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayF64) img);
+			} else if (GrayS64.class.isAssignableFrom(img.getClass()) ) {
+				ImageMiscOps.flipHorizontal((GrayS64) img);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 			}
-		} else if( img instanceof MultiSpectral ) {
-			MultiSpectral m = (MultiSpectral)img;
+		} else if( img instanceof Planar) {
+			Planar m = (Planar)img;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				flipHorizontal(m.getBand(i));
 		} else {
@@ -602,26 +602,26 @@ public class GImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( ImageBase image ) {
-		if( image instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageInt8) image);
-			} else if( ImageInt16.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageInt16) image);
-			} else if ( ImageSInt32.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt32) image);
-			} else if ( ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt64) image);
-			} else if (ImageFloat32.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageFloat32) image);
-			} else if (ImageFloat64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageFloat64) image);
-			} else if (ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt64) image);
+		if( image instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayI8) image);
+			} else if( GrayI16.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayI16) image);
+			} else if ( GrayS32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS32) image);
+			} else if ( GrayS64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS64) image);
+			} else if (GrayF32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayF32) image);
+			} else if (GrayF64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayF64) image);
+			} else if (GrayS64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS64) image);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + image.getClass().getSimpleName());
 			}
-		} else if( image instanceof MultiSpectral ) {
-			MultiSpectral a = (MultiSpectral)image;
+		} else if( image instanceof Planar) {
+			Planar a = (Planar)image;
 			for( int i = 0; i < a.getNumBands(); i++ )
 				rotateCW(a.getBand(i));
 		} else {
@@ -633,27 +633,27 @@ public class GImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( ImageBase imageA , ImageBase imageB ) {
-		if( imageA instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageInt8) imageA, (ImageInt8) imageB);
-			} else if( ImageInt16.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageInt16) imageA, (ImageInt16) imageB);
-			} else if ( ImageSInt32.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt32) imageA, (ImageSInt32) imageB);
-			} else if ( ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt64) imageA, (ImageSInt64) imageB);
-			} else if (ImageFloat32.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageFloat32) imageA, (ImageFloat32) imageB);
-			} else if (ImageFloat64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageFloat64) imageA, (ImageFloat64) imageB);
-			} else if (ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCW((ImageSInt64) imageA, (ImageSInt64) imageB);
+		if( imageA instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayI8) imageA, (GrayI8) imageB);
+			} else if( GrayI16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayI16) imageA, (GrayI16) imageB);
+			} else if ( GrayS32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS32) imageA, (GrayS32) imageB);
+			} else if ( GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS64) imageA, (GrayS64) imageB);
+			} else if (GrayF32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayF32) imageA, (GrayF32) imageB);
+			} else if (GrayF64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayF64) imageA, (GrayF64) imageB);
+			} else if (GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCW((GrayS64) imageA, (GrayS64) imageB);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
 			}
-		} else if( imageA instanceof MultiSpectral ) {
-			MultiSpectral a = (MultiSpectral)imageA;
-			MultiSpectral b = (MultiSpectral)imageB;
+		} else if( imageA instanceof Planar) {
+			Planar a = (Planar)imageA;
+			Planar b = (Planar)imageB;
 			for( int i = 0; i < a.getNumBands(); i++ )
 				rotateCW(a.getBand(i), b.getBand(i));
 		} else {
@@ -666,26 +666,26 @@ public class GImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( ImageBase image ) {
-		if( image instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageInt8) image);
-			} else if( ImageInt16.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageInt16) image);
-			} else if ( ImageSInt32.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt32) image);
-			} else if ( ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt64) image);
-			} else if (ImageFloat32.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageFloat32) image);
-			} else if (ImageFloat64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageFloat64) image);
-			} else if (ImageSInt64.class.isAssignableFrom(image.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt64) image);
+		if( image instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayI8) image);
+			} else if( GrayI16.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayI16) image);
+			} else if ( GrayS32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS32) image);
+			} else if ( GrayS64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS64) image);
+			} else if (GrayF32.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayF32) image);
+			} else if (GrayF64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayF64) image);
+			} else if (GrayS64.class.isAssignableFrom(image.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS64) image);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + image.getClass().getSimpleName());
 			}
-		} else if( image instanceof MultiSpectral ) {
-			MultiSpectral a = (MultiSpectral)image;
+		} else if( image instanceof Planar) {
+			Planar a = (Planar)image;
 			for( int i = 0; i < a.getNumBands(); i++ )
 				rotateCCW(a.getBand(i));
 		} else {
@@ -697,27 +697,27 @@ public class GImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( ImageBase imageA , ImageBase imageB ) {
-		if( imageA instanceof ImageSingleBand ) {
-			if( ImageInt8.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageInt8) imageA, (ImageInt8) imageB);
-			} else if( ImageInt16.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageInt16) imageA, (ImageInt16) imageB);
-			} else if ( ImageSInt32.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt32) imageA, (ImageSInt32) imageB);
-			} else if ( ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt64) imageA, (ImageSInt64) imageB);
-			} else if (ImageFloat32.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageFloat32) imageA, (ImageFloat32) imageB);
-			} else if (ImageFloat64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageFloat64) imageA, (ImageFloat64) imageB);
-			} else if (ImageSInt64.class.isAssignableFrom(imageA.getClass()) ) {
-				ImageMiscOps.rotateCCW((ImageSInt64) imageA,(ImageSInt64) imageB);
+		if( imageA instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayI8) imageA, (GrayI8) imageB);
+			} else if( GrayI16.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayI16) imageA, (GrayI16) imageB);
+			} else if ( GrayS32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS32) imageA, (GrayS32) imageB);
+			} else if ( GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS64) imageA, (GrayS64) imageB);
+			} else if (GrayF32.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayF32) imageA, (GrayF32) imageB);
+			} else if (GrayF64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayF64) imageA, (GrayF64) imageB);
+			} else if (GrayS64.class.isAssignableFrom(imageA.getClass()) ) {
+				ImageMiscOps.rotateCCW((GrayS64) imageA,(GrayS64) imageB);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
 			}
-		} else if( imageA instanceof MultiSpectral ) {
-			MultiSpectral a = (MultiSpectral)imageA;
-			MultiSpectral b = (MultiSpectral)imageB;
+		} else if( imageA instanceof Planar) {
+			Planar a = (Planar)imageA;
+			Planar b = (Planar)imageB;
 			for( int i = 0; i < a.getNumBands(); i++ )
 				rotateCCW(a.getBand(i), b.getBand(i));
 		} else {

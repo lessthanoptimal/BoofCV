@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,19 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectRectStandard_S32_U8 extends ChecksSelectRectStandardBase<int[],ImageUInt8> {
+public class TestImplSelectRectStandard_S32_U8 extends ChecksSelectRectStandardBase<int[],GrayU8> {
 
 	public TestImplSelectRectStandard_S32_U8() {
-		super(int[].class,ImageUInt8.class);
+		super(int[].class,GrayU8.class);
 	}
 
 	@Override
-	public ImplSelectRectStandardBase_S32<ImageUInt8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+	public ImplSelectRectStandardBase_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
 		return new ImplSelectRectStandard_S32_U8(maxError,rightToLeftTolerance,texture);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -50,19 +50,19 @@ public class TestImageDistortCache_SB {
 		offX=offY=0;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150,alg.getTotal());
 
 		offX=offY=0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150,alg.getTotal());
 
 		offX=offY=-0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150,alg.getTotal());
 	}
 
@@ -74,21 +74,21 @@ public class TestImageDistortCache_SB {
 		alg.reset();
 		alg.setRenderAll(true);
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150, alg.getTotal());
 
 		offX=offY=0.1f;
 		alg.reset();
 		alg.setRenderAll(false);
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(9 * 14, alg.getTotal());
 
 		offX=offY=-0.1f;
 		alg.reset();
 		alg.setRenderAll(false);
 		alg.setModel(tran);
-		alg.apply(new ImageFloat32(10, 15), new ImageFloat32(10, 15));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(9*14,alg.getTotal());
 	}
 

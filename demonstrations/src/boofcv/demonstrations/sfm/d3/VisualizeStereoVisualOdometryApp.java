@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,8 +59,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -78,7 +78,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
+public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 		extends StereoVideoAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener
 {
 
@@ -418,7 +418,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageSingleBand>
 
 	public static void main( String args[] ) throws FileNotFoundException {
 
-		Class type = ImageFloat32.class;
+		Class type = GrayF32.class;
 //		Class type = ImageUInt8.class;
 
 		VisualizeStereoVisualOdometryApp app = new VisualizeStereoVisualOdometryApp(type);

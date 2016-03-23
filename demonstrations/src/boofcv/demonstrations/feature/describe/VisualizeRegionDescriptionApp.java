@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
@@ -47,7 +47,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends ImageSingleBand>
+public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends ImageGray>
 	extends SelectAlgorithmAndInputPanel implements SelectRegionDescriptionPanel.Listener
 {
 	boolean processedImage = false;
@@ -107,7 +107,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {
-				MultiSpectral<T> input = ConvertBufferedImage.convertFromMulti(image, null, true, imageType);
+				Planar<T> input = ConvertBufferedImage.convertFromMulti(image, null, true, imageType);
 				describe.setImage(input);
 			}
 		}
@@ -173,7 +173,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageSingleBand, D extends
 
 
 	public static void main( String args[] ) {
-		Class imageType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);

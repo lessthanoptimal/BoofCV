@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,10 @@
 package boofcv.alg.feature.color;
 
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 
 /**
  * <p>
@@ -49,7 +49,7 @@ public class HistogramFeatureOps {
 	 * @param maxPixelValue Maximum possible value for a pixel for all bands.
 	 * @param histogram Output histogram.  Must have same number of bands as input image. Modified.
 	 */
-	public static void histogram( ImageUInt8 image , int maxPixelValue , TupleDesc_F64 histogram )
+	public static void histogram(GrayU8 image , int maxPixelValue , TupleDesc_F64 histogram )
 	{
 		int numBins = histogram.size();
 		int divisor = maxPixelValue+1;
@@ -75,7 +75,7 @@ public class HistogramFeatureOps {
 	 * @param maxPixelValue Maximum possible value for a pixel
 	 * @param histogram Output histogram.  Must have same number of bands as input image. Modified.
 	 */
-	public static void histogram( ImageUInt16 image , int maxPixelValue , TupleDesc_F64 histogram )
+	public static void histogram(GrayU16 image , int maxPixelValue , TupleDesc_F64 histogram )
 	{
 		int numBins = histogram.size();
 		int divisor = maxPixelValue+1;
@@ -102,7 +102,7 @@ public class HistogramFeatureOps {
 	 * @param maxPixelValue Maximum possible value for a pixel. Inclusive
 	 * @param histogram The output histogram.
 	 */
-	public static void histogram( ImageFloat32 image , float minPixelValue , float maxPixelValue , TupleDesc_F64 histogram )
+	public static void histogram(GrayF32 image , float minPixelValue , float maxPixelValue , TupleDesc_F64 histogram )
 	{
 		int numBins = histogram.size();
 		float divisor = maxPixelValue-minPixelValue;
@@ -123,12 +123,12 @@ public class HistogramFeatureOps {
 	}
 
 	/**
-	 * Constructs an N-D histogram from a {@link MultiSpectral} {@link ImageFloat32} image.
+	 * Constructs an N-D histogram from a {@link Planar} {@link GrayF32} image.
 	 *
 	 * @param image input image
 	 * @param histogram preconfigured histogram to store the output
 	 */
-	public static void histogram_F32( MultiSpectral<ImageFloat32> image , Histogram_F64 histogram )
+	public static void histogram_F32(Planar<GrayF32> image , Histogram_F64 histogram )
 	{
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
@@ -154,12 +154,12 @@ public class HistogramFeatureOps {
 	}
 
 	/**
-	 * Constructs an N-D histogram from a {@link MultiSpectral} {@link ImageUInt8} image.
+	 * Constructs an N-D histogram from a {@link Planar} {@link GrayU8} image.
 	 *
 	 * @param image input image
 	 * @param histogram preconfigured histogram to store the output
 	 */
-	public static void histogram_U8( MultiSpectral<ImageUInt8> image , Histogram_F64 histogram )
+	public static void histogram_U8(Planar<GrayU8> image , Histogram_F64 histogram )
 	{
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");

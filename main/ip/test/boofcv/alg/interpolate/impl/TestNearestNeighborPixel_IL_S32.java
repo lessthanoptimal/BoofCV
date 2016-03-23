@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedS32;
 
 /**
@@ -40,9 +40,9 @@ public class TestNearestNeighborPixel_IL_S32 extends GeneralChecksInterpolationP
 	}
 
 	@Override
-	protected <SB extends ImageSingleBand> InterpolatePixelS<SB>
+	protected <SB extends ImageGray> InterpolatePixelS<SB>
 	wrapSingle(SB image, int minValue, int maxValue) {
-		return (InterpolatePixelS)new NearestNeighborPixel_S32((ImageSInt32)image);
+		return (InterpolatePixelS)new NearestNeighborPixel_S32((GrayS32)image);
 	}
 
 	@Override

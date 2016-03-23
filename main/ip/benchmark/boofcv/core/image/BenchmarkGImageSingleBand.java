@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.core.image;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.Random;
 
@@ -37,13 +37,13 @@ public class BenchmarkGImageSingleBand {
 	static int width = 640;
 	static int height = 480;
 
-	static ImageFloat32 input = new ImageFloat32(width,height);
+	static GrayF32 input = new GrayF32(width,height);
 
 	public static class IndexDirect_U8 extends PerformerBase
 	{
-		ImageUInt8 output;
+		GrayU8 output;
 
-		public IndexDirect_U8(ImageUInt8 output) {
+		public IndexDirect_U8(GrayU8 output) {
 			this.output = output;
 		}
 
@@ -60,9 +60,9 @@ public class BenchmarkGImageSingleBand {
 
 	public static class IndexDirect_F32 extends PerformerBase
 	{
-		ImageFloat32 output;
+		GrayF32 output;
 
-		public IndexDirect_F32( ImageFloat32 output) {
+		public IndexDirect_F32( GrayF32 output) {
 			this.output = output;
 		}
 
@@ -81,7 +81,7 @@ public class BenchmarkGImageSingleBand {
 	{
 		GImageSingleBand output;
 
-		public IndexAccess( ImageSingleBand output) {
+		public IndexAccess( ImageGray output) {
 			this.output = FactoryGImageSingleBand.wrap(output);
 		}
 
@@ -100,7 +100,7 @@ public class BenchmarkGImageSingleBand {
 	{
 		GImageSingleBand output;
 
-		public PixelAccess( ImageSingleBand output) {
+		public PixelAccess( ImageGray output) {
 			this.output = FactoryGImageSingleBand.wrap(output);
 		}
 
@@ -117,8 +117,8 @@ public class BenchmarkGImageSingleBand {
 	}
 
 	public static void main( String args[] ) {
-		ImageFloat32 output_F32 = new ImageFloat32(width,height);
-		ImageUInt8 output_U8 = new ImageUInt8(width,height);
+		GrayF32 output_F32 = new GrayF32(width,height);
+		GrayU8 output_U8 = new GrayU8(width,height);
 
 		Random rand = new Random(234);
 

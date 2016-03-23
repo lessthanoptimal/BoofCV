@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.segmentation.watershed;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +33,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void basic() {
-		ImageUInt8 image = new ImageUInt8(300,320);
+		GrayU8 image = new GrayU8(300,320);
 		ImageMiscOps.fill(image, 255);
 		image.set(10, 15, 10);
 		image.set(100, 200, 50);
@@ -49,7 +49,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void example0() {
-		ImageUInt8 image = new ImageUInt8(3,4);
+		GrayU8 image = new GrayU8(3,4);
 		image.data = new byte[]
 				{1,5,1,
 						1,5,1,
@@ -61,7 +61,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 		alg.process(image);
 
 		assertEquals(3,alg.getTotalRegions());
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 		int a = found.get(0,0);
 		int b = found.get(2,0);
@@ -79,7 +79,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void example1() {
-		ImageUInt8 image = new ImageUInt8(4,4);
+		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[]
 				{1,5,5,1,
 						1,5,5,1,
@@ -91,7 +91,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 		alg.process(image);
 
 		assertEquals(3,alg.getTotalRegions());
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 		int a = found.get(0,0);
 		int b = found.get(3,0);
@@ -110,7 +110,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void example2() {
-		ImageUInt8 image = new ImageUInt8(5,4);
+		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[]
 				{5,5,5,5,5,
 						5,1,5,1,5,
@@ -121,7 +121,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 		alg.process(image);
 
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 		assertEquals(3,alg.getTotalRegions());
 		int a = found.get(0,0);
@@ -142,7 +142,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void example4() {
-		ImageUInt8 image = new ImageUInt8(5,4);
+		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[]
 				{5,5,5,5,5,
 				 5,1,4,2,5,
@@ -153,7 +153,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 		alg.process(image);
 
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 //		found.print();
 
@@ -174,7 +174,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void example5() {
-		ImageUInt8 image = new ImageUInt8(5,4);
+		GrayU8 image = new GrayU8(5,4);
 		image.data = new byte[] {
 				1,1,1,5,5,
 				1,1,1,5,5,
@@ -185,7 +185,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 		alg.process(image);
 
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 //		found.print();
 
@@ -200,14 +200,14 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void exampleSeeds0() {
-		ImageUInt8 image = new ImageUInt8(4,4);
+		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				1,5,5,1,
 				1,5,5,1,
 				1,5,5,1,
 				1,5,5,1};
 
-		ImageSInt32 seed = new ImageSInt32(4,4);
+		GrayS32 seed = new GrayS32(4,4);
 		seed.data = new int[]{
 				0,0,0,0,
 				1,0,0,0,
@@ -217,7 +217,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
 
 		alg.process(image,seed);
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 //		found.print();
 
@@ -231,7 +231,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void exampleSeeds1() {
-		ImageUInt8 image = new ImageUInt8(4,4);
+		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				1,5,5,1,
 				1,5,5,1,
@@ -239,7 +239,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 				1,5,5,1};
 
 		// seed from a value which isn't a local minimum
-		ImageSInt32 seed = new ImageSInt32(4,4);
+		GrayS32 seed = new GrayS32(4,4);
 		seed.data = new int[]{
 				0,0,0,0,
 				0,1,0,0,
@@ -249,7 +249,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
 
 		alg.process(image,seed);
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 //		found.print();
 
@@ -263,7 +263,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 
 	@Test
 	public void exampleSeeds2() {
-		ImageUInt8 image = new ImageUInt8(4,4);
+		GrayU8 image = new GrayU8(4,4);
 		image.data = new byte[] {
 				5,5,5,5,
 				5,5,5,5,
@@ -271,7 +271,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 				5,5,5,5};
 
 		// try multiple seeds
-		ImageSInt32 seed = new ImageSInt32(4,4);
+		GrayS32 seed = new GrayS32(4,4);
 		seed.data = new int[]{
 				1,0,0,0,
 				0,0,0,0,
@@ -287,7 +287,7 @@ public class TestWatershedVincentSoille1991_Connect8 {
 		WatershedVincentSoille1991 alg = new WatershedVincentSoille1991.Connect8();
 
 		alg.process(image,seed);
-		ImageSInt32 found = alg.getOutput();
+		GrayS32 found = alg.getOutput();
 
 //		found.print();
 

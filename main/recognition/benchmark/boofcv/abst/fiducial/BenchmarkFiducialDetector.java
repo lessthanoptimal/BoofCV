@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
+public class BenchmarkFiducialDetector<T extends ImageGray> {
 
 	FiducialDetector<T> detector;
 	List<T> images = new ArrayList<T>();
@@ -87,7 +87,7 @@ public class BenchmarkFiducialDetector<T extends ImageSingleBand> {
 		String directory = UtilIO.pathExample("fiducial/binary/");
 
 		FiducialDetector detector = FactoryFiducial.squareBinary(
-				new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , ImageUInt8.class);
+				new ConfigFiducialBinary(0.2), ConfigThreshold.fixed(100) , GrayU8.class);
 		perform(directory, detector);
 
 //		detector = FactoryFiducial.

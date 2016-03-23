@@ -20,9 +20,9 @@ package boofcv.alg.segmentation.ms;
 
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestMergeSmallRegions {
 	 */
 	@Test
 	public void process() {
-		ImageUInt8 image = new ImageUInt8(10,9);
+		GrayU8 image = new GrayU8(10,9);
 		image.data = new byte[]{
 				0,0,0,5,5,5,0,0,0,0,
 				0,0,0,5,5,5,7,8,0,0,
@@ -53,7 +53,7 @@ public class TestMergeSmallRegions {
 				0,0,0,0,0,0,9,9,9,9,
 				0,0,0,0,0,0,9,9,6,7};
 
-		ImageSInt32 pixelToRegion = new ImageSInt32(10,9);
+		GrayS32 pixelToRegion = new GrayS32(10,9);
 		pixelToRegion.data = new int[]{
 				0,0,0,1,1,1,0,0,0,0,
 				0,0,0,1,1,1,4,5,0,0,
@@ -77,10 +77,10 @@ public class TestMergeSmallRegions {
 		};
 		regionColor.resize(10);
 
-		ComputeRegionMeanColor<ImageUInt8> mean = new ComputeRegionMeanColor.U8();
+		ComputeRegionMeanColor<GrayU8> mean = new ComputeRegionMeanColor.U8();
 		mean.process(image,pixelToRegion,memberCount,regionColor);
 
-		MergeSmallRegions<ImageUInt8> alg = new MergeSmallRegions<ImageUInt8>(3, ConnectRule.FOUR,mean);
+		MergeSmallRegions<GrayU8> alg = new MergeSmallRegions<GrayU8>(3, ConnectRule.FOUR,mean);
 
 		alg.process(image, pixelToRegion, memberCount, regionColor);
 
@@ -107,7 +107,7 @@ public class TestMergeSmallRegions {
 		regionMemberCount.size = 6;
 		regionMemberCount.data = new int[]{10,11,20,20,10,20};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(11,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(11,ConnectRule.FOUR,null);
 
 		assertTrue(alg.setupPruneList(regionMemberCount));
 
@@ -127,14 +127,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void findAdjacentRegions_center() {
 		int N = 9;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{1,1,1,1,1,
 				 1,2,3,4,1,
 				 1,5,6,7,1,
 				 1,8,8,8,1};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -163,14 +163,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void findAdjacentRegions_right() {
 		int N = 9;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{1,1,1,1,2,
 				 1,1,1,1,3,
 				 1,1,1,7,4,
 				 1,1,1,1,5};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -204,14 +204,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void findAdjacentRegions_bottom() {
 		int N = 9;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{1,1,1,1,1,
 				 1,1,1,1,1,
 				 4,1,1,1,1,
 				 2,1,1,3,5};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -279,7 +279,7 @@ public class TestMergeSmallRegions {
 		}
 	}
 
-	private void checkNode(MergeSmallRegions<ImageFloat32> alg, int[] edges,int pruneId) {
+	private void checkNode(MergeSmallRegions<GrayF32> alg, int[] edges, int pruneId) {
 		assertEquals(edges.length,alg.pruneGraph.get(pruneId).edges.size);
 		for( int i = 0; i < edges.length; i++ ) {
 			assertTrue(alg.pruneGraph.get(pruneId).isConnected(edges[i]));
@@ -292,14 +292,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void adjacentInner4() {
 		int N = 9;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{1,2,3,0,0,
 				 8,9,4,0,0,
 				 7,6,5,0,0,
 				 0,0,0,0,0};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -328,14 +328,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void adjacentInner8() {
 		int N = 13;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{1,2,3,10,0,
 				 8,9,4,11,0,
 				 7,6,5,12,0,
 				 0,0,0,0,0};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.EIGHT,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.EIGHT,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -369,14 +369,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void adjacentBorder8() {
 		int N = 13;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{0,0,0, 0,0,
 				 8,2,0, 9,4,
 				 7,1,3, 5,11,
 				 0,0,6,10,12};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.EIGHT,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.EIGHT,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);
@@ -410,14 +410,14 @@ public class TestMergeSmallRegions {
 	@Test
 	public void adjacentBorder4() {
 		int N = 13;
-		ImageSInt32 pixelToRegion = new ImageSInt32(5,4);
+		GrayS32 pixelToRegion = new GrayS32(5,4);
 		pixelToRegion.data = new int[]
 				{0,0,0, 0,0,
 				 8,2,0, 9,4,
 				 7,1,3, 5,11,
 				 0,0,6,10,12};
 
-		MergeSmallRegions<ImageFloat32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
+		MergeSmallRegions<GrayF32> alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
 		alg.segmentPruneFlag.resize(N);

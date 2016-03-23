@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public abstract class GeneralBilinearPixelSingleChecks<T extends ImageSingleBand> extends GeneralChecksInterpolationPixelS<T> {
+public abstract class GeneralBilinearPixelSingleChecks<T extends ImageGray> extends GeneralChecksInterpolationPixelS<T> {
 
 	@Override
 	protected InterpolatePixelS<T> wrap(T image, int minValue, int maxValue) {

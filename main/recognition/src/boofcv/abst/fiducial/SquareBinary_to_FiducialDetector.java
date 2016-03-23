@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,14 @@ package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
-public class SquareBinary_to_FiducialDetector<T extends ImageSingleBand>
+public class SquareBinary_to_FiducialDetector<T extends ImageGray>
 	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareBinary<T>>
 {
 	double targetWidth;

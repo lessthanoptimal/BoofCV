@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageSingleBand;
  * @author Peter Abeles
  */
 public abstract class DisparityScoreRowFormat
-		<Input extends ImageSingleBand, Disparity extends ImageSingleBand>
+		<Input extends ImageGray, Disparity extends ImageGray>
 {
 	// the minimum disparity that it will check
 	protected int minDisparity;

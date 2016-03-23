@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,9 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShowLensDistortion<T extends ImageSingleBand>
+public class ShowLensDistortion<T extends ImageGray>
 		extends SelectInputPanel implements ChangeListener, ItemListener
 {
 	double radial1 = 0;
@@ -72,8 +72,8 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	ImagePanel gui = new ImagePanel();
 	boolean processedImage = false;
 
-	MultiSpectral<T> input;
-	MultiSpectral<T> output;
+	Planar<T> input;
+	Planar<T> output;
 	// rendered in main thread
 	BufferedImage renderedImage;
 	// rendered is copied to this in a GUI thread
@@ -85,8 +85,8 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 	public ShowLensDistortion(Class<T> imageType) {
 
 		this.imageType = imageType;
-		input = new MultiSpectral<T>(imageType, 1, 1 , 3);
-		output = new MultiSpectral<T>(imageType, 1, 1 , 3);
+		input = new Planar<T>(imageType, 1, 1 , 3);
+		output = new Planar<T>(imageType, 1, 1 , 3);
 		addToToolbar(createRadialSelect());
 
 		setMainGUI(gui);
@@ -267,8 +267,8 @@ public class ShowLensDistortion<T extends ImageSingleBand>
 
 //		ShowImageBlurApp<ImageFloat32> app
 //				= new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
-		ShowLensDistortion<ImageUInt8> app
-				= new ShowLensDistortion<ImageUInt8>(ImageUInt8.class);
+		ShowLensDistortion<GrayU8> app
+				= new ShowLensDistortion<GrayU8>(GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 

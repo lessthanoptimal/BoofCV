@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,8 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_I32;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -48,9 +48,9 @@ public class TestBlurImageOps {
 
 	@Test
 	public void mean_U8() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 found = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -73,9 +73,9 @@ public class TestBlurImageOps {
 
 	@Test
 	public void mean_F32() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -98,9 +98,9 @@ public class TestBlurImageOps {
 	@Test
 	public void median_U8() {
 
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 found = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -114,9 +114,9 @@ public class TestBlurImageOps {
 
 	@Test
 	public void median_F32() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
@@ -130,9 +130,9 @@ public class TestBlurImageOps {
 
 	@Test
 	public void gaussian_U8() {
-		ImageUInt8 input = new ImageUInt8(width,height);
-		ImageUInt8 found = new ImageUInt8(width,height);
-		ImageUInt8 expected = new ImageUInt8(width,height);
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 found = new GrayU8(width,height);
+		GrayU8 expected = new GrayU8(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
@@ -152,9 +152,9 @@ public class TestBlurImageOps {
 
 	@Test
 	public void gaussian_F32() {
-		ImageFloat32 input = new ImageFloat32(width,height);
-		ImageFloat32 found = new ImageFloat32(width,height);
-		ImageFloat32 expected = new ImageFloat32(width,height);
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 found = new GrayF32(width,height);
+		GrayF32 expected = new GrayF32(width,height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 

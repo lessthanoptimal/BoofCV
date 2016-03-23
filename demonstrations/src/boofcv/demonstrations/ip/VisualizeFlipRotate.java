@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -33,12 +33,12 @@ import java.awt.image.BufferedImage;
 public class  VisualizeFlipRotate {
 	public static void main(String[] args) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
-		ImageUInt8 gray = ConvertBufferedImage.convertFrom(input,(ImageUInt8)null);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(input,(GrayU8)null);
 
-		ImageUInt8 flipH = gray.clone();
-		ImageUInt8 flipV = gray.clone();
-		ImageUInt8 rotateCW = new ImageUInt8(gray.height,gray.width);
-		ImageUInt8 rotateCCW = new ImageUInt8(gray.height,gray.width);
+		GrayU8 flipH = gray.clone();
+		GrayU8 flipV = gray.clone();
+		GrayU8 rotateCW = new GrayU8(gray.height,gray.width);
+		GrayU8 rotateCCW = new GrayU8(gray.height,gray.width);
 
 		ImageMiscOps.flipHorizontal(flipH);
 		ImageMiscOps.flipVertical(flipV);

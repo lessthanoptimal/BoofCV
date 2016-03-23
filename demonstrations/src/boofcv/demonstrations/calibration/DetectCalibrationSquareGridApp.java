@@ -27,8 +27,8 @@ import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 {
-	DetectSquareGridFiducial<ImageFloat32> alg;
+	DetectSquareGridFiducial<GrayF32> alg;
 	ConfigSquareGrid config;
 
 	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
@@ -73,12 +73,12 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 	}
 
 	@Override
-	protected boolean process(ImageFloat32 image) {
+	protected boolean process(GrayF32 image) {
 		return alg.process(image);
 	}
 
 	@Override
-	protected ImageUInt8 getBinaryImage() {
+	protected GrayU8 getBinaryImage() {
 		return alg.getBinary();
 	}
 

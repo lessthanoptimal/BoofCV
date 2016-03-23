@@ -28,7 +28,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -59,7 +59,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  *
  * @author Peter Abeles
  */
-public class VisOdomQuadPnP<T extends ImageSingleBand,TD extends TupleDesc> {
+public class VisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc> {
 
 	// used to estimate each feature's 3D location using a stereo pair
 	private TriangulateTwoViewsCalibrated triangulate;

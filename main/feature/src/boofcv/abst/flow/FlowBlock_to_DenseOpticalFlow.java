@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.flow;
 import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
 import boofcv.alg.flow.UtilDenseOpticalFlow;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
 
@@ -30,7 +30,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
-public class FlowBlock_to_DenseOpticalFlow<T extends ImageSingleBand>
+public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray>
 	implements DenseOpticalFlow<T>
 {
 	DenseOpticalFlowBlockPyramid<T> flowAlg;

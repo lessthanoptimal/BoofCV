@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
@@ -31,7 +31,7 @@ public class TestNonMaxCandidateStrict extends GenericNonMaxCandidateTests {
 	}
 
 	@Override
-	public void findMaximums(ImageFloat32 intensity, float threshold, int radius, int border,
+	public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 							 QueueCorner candidatesMin, QueueCorner candidatesMax,
 							 QueueCorner foundMinimum, QueueCorner foundMaximum)
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,10 +47,10 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -68,7 +68,7 @@ import java.util.List;
  */
 // todo add waiting tool bar
 // todo show partial results
-public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends ImageSingleBand>
+public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends ImageGray>
 		extends SelectAlgorithmAndInputPanel {
 
 	InterestPointDetector<T> detector;
@@ -76,8 +76,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	AssociateDescription<TupleDesc> matcher;
 	OrientationImage<T> orientation;
 
-	MultiSpectral<T> imageLeft;
-	MultiSpectral<T> imageRight;
+	Planar<T> imageLeft;
+	Planar<T> imageRight;
 	T grayLeft;
 	T grayRight;
 
@@ -119,8 +119,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
 		orientation = FactoryOrientation.convertImage(orientationII,imageType);
 
-		imageLeft = new MultiSpectral<T>(imageType,1,1,3);
-		imageRight = new MultiSpectral<T>(imageType,1,1,3);
+		imageLeft = new Planar<T>(imageType,1,1,3);
+		imageRight = new Planar<T>(imageType,1,1,3);
 		grayLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
@@ -240,7 +240,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 		});
 	}
 
-	private void extractImageFeatures(MultiSpectral<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
+	private void extractImageFeatures(Planar<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
 		detector.detect(gray);
 		if( describe.getImageType().getFamily() == ImageType.Family.SINGLE_BAND )
 			describe.setImage(gray);
@@ -299,7 +299,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageSingleBand, D extends
 	}
 
 	public static void main(String args[]) {
-		Class imageType = ImageFloat32.class;
+		Class imageType = GrayF32.class;
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(imageType, derivType);

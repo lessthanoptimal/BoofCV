@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,8 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeScaleSpacePyramidApp<T extends ImageSingleBand>
+public class VisualizeScaleSpacePyramidApp<T extends ImageGray>
 	extends SelectInputPanel
 {
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
@@ -94,7 +94,7 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageSingleBand>
 	public static void main( String args[] ) {
 
 //		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
-		VisualizeScaleSpacePyramidApp<ImageUInt8> app = new VisualizeScaleSpacePyramidApp<ImageUInt8>(ImageUInt8.class);
+		VisualizeScaleSpacePyramidApp<GrayU8> app = new VisualizeScaleSpacePyramidApp<GrayU8>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));

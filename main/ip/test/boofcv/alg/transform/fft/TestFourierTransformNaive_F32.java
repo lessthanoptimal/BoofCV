@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.fft;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
@@ -69,10 +69,10 @@ public class TestFourierTransformNaive_F32 {
 
 	@Test
 	public void forward_reverse_image() {
-		ImageFloat32 input = new ImageFloat32(30,40);
-		ImageFloat32 tranR = new ImageFloat32(30,40);
-		ImageFloat32 tranI = new ImageFloat32(30,40);
-		ImageFloat32 output = new ImageFloat32(30,40);
+		GrayF32 input = new GrayF32(30,40);
+		GrayF32 tranR = new GrayF32(30,40);
+		GrayF32 tranI = new GrayF32(30,40);
+		GrayF32 output = new GrayF32(30,40);
 
 		ImageMiscOps.fillUniform(input,rand,0,100);
 		FourierTransformNaive_F32.forward(input, tranR, tranI);

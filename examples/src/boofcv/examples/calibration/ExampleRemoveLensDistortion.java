@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,9 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
@@ -58,8 +58,8 @@ public class ExampleRemoveLensDistortion {
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");
-		MultiSpectral<ImageFloat32> distortedImg =
-				ConvertBufferedImage.convertFromMulti(orig, null,true, ImageFloat32.class);
+		Planar<GrayF32> distortedImg =
+				ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
 
 		int numBands = distortedImg.getNumBands();
 
@@ -68,9 +68,9 @@ public class ExampleRemoveLensDistortion {
 		// fullView will include the entire original image
 		// The border is VALUE, which defaults to black, just so you can see it
 		ImageDistort allInside = LensDistortionOps.imageRemoveDistortion(AdjustmentType.EXPAND, BorderType.VALUE, param, null,
-				ImageType.ms(numBands, ImageFloat32.class));
+				ImageType.ms(numBands, GrayF32.class));
 		ImageDistort fullView = LensDistortionOps.imageRemoveDistortion(AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null,
-				ImageType.ms(numBands, ImageFloat32.class));
+				ImageType.ms(numBands, GrayF32.class));
 
 		// NOTE: After lens distortion has been removed the intrinsic parameters is changed.  If you pass
 		//       in  a set of IntrinsicParameters to the 4th variable it will save it there.
@@ -85,10 +85,10 @@ public class ExampleRemoveLensDistortion {
 	 * Displays results in a window for easy comparison..
 	 */
 	private static void displayResults(BufferedImage orig,
-									   MultiSpectral<ImageFloat32> distortedImg,
+									   Planar<GrayF32> distortedImg,
 									   ImageDistort allInside, ImageDistort fullView ) {
 		// render the results
-		MultiSpectral<ImageFloat32> undistortedImg = new MultiSpectral<ImageFloat32>(ImageFloat32.class,
+		Planar<GrayF32> undistortedImg = new Planar<GrayF32>(GrayF32.class,
 				distortedImg.getWidth(),distortedImg.getHeight(),distortedImg.getNumBands());
 
 		allInside.apply(distortedImg, undistortedImg);

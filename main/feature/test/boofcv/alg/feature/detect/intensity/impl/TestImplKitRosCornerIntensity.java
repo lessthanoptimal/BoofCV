@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
 /**
@@ -47,7 +47,7 @@ public class TestImplKitRosCornerIntensity
 		}
 
 		@Override
-		public void computeIntensity( ImageFloat32 intensity ) {
+		public void computeIntensity( GrayF32 intensity ) {
 			ImplKitRosCornerIntensity.process(intensity,derivX_F32,derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
 		}
 	}
@@ -59,7 +59,7 @@ public class TestImplKitRosCornerIntensity
 			performAllTests();
 		}
 
-		public void computeIntensity( ImageFloat32 intensity ) {
+		public void computeIntensity( GrayF32 intensity ) {
 			ImplKitRosCornerIntensity.process(intensity,derivX_I16,derivY_I16,derivXX_I16,derivYY_I16,derivXY_I16);
 		}
 	}

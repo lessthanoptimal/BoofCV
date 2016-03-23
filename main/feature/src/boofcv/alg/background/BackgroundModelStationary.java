@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.background;
 
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * <p>
@@ -46,5 +46,5 @@ public abstract class BackgroundModelStationary<T extends ImageBase> extends Bac
 	 * @param frame current image
 	 * @param segmented Segmented image. 0 = background, 1 = foreground/moving
 	 */
-	public abstract void segment( T frame , ImageUInt8 segmented );
+	public abstract void segment( T frame , GrayU8 segmented );
 }

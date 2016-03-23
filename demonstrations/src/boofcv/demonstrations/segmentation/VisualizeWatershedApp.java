@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.ImageSInt32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -38,14 +38,14 @@ public class VisualizeWatershedApp {
 
 	public static void main(String[] args) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
-		ImageUInt8 gray = new ImageUInt8(image.getWidth(),image.getHeight());
+		GrayU8 gray = new GrayU8(image.getWidth(),image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, gray);
 
 		WatershedVincentSoille1991 alg = FactorySegmentationAlg.watershed(ConnectRule.FOUR);
 		alg.process(gray);
 
-		ImageSInt32 pixelToRegion = alg.getOutput();
+		GrayS32 pixelToRegion = alg.getOutput();
 
 		VisualizeRegions.watersheds(pixelToRegion,image,0);
 

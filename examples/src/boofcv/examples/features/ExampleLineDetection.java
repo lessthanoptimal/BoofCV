@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,10 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 
@@ -60,7 +60,7 @@ public class ExampleLineDetection {
 	 * @param imageType Type of image processed by line detector.
 	 * @param derivType Type of image derivative.
 	 */
-	public static<T extends ImageSingleBand, D extends ImageSingleBand>
+	public static<T extends ImageGray, D extends ImageGray>
 			void detectLines( BufferedImage image , 
 							  Class<T> imageType ,
 							  Class<D> derivType )
@@ -94,7 +94,7 @@ public class ExampleLineDetection {
 	 * @param imageType Type of image processed by line detector.
 	 * @param derivType Type of image derivative.
 	 */
-	public static<T extends ImageSingleBand, D extends ImageSingleBand>
+	public static<T extends ImageGray, D extends ImageGray>
 	void detectLineSegments( BufferedImage image ,
 							 Class<T> imageType ,
 							 Class<D> derivType )
@@ -119,10 +119,10 @@ public class ExampleLineDetection {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		detectLines(input, ImageUInt8.class, ImageSInt16.class);
+		detectLines(input, GrayU8.class, GrayS16.class);
 
 		// line segment detection is still under development and only works for F32 images right now
-		detectLineSegments(input, ImageFloat32.class, ImageFloat32.class);
+		detectLineSegments(input, GrayF32.class, GrayF32.class);
 
 		ShowImages.showWindow(listPanel, "Detected Lines", true);
 	}

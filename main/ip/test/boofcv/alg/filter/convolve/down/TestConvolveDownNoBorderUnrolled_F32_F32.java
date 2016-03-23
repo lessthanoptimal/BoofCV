@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.filter.convolve.down;
 
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -31,7 +31,7 @@ public class TestConvolveDownNoBorderUnrolled_F32_F32 extends StandardConvolveUn
 	public TestConvolveDownNoBorderUnrolled_F32_F32() {
 		this.numUnrolled = GenerateConvolveDownNoBorderUnrolled.numUnrolled;
 		this.target = ConvolveDownNoBorderUnrolled_F32_F32.class;
-		this.param1D = new Class<?>[]{Kernel1D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
-		this.param2D = new Class<?>[]{Kernel2D_F32.class, ImageFloat32.class, ImageFloat32.class , int.class };
+		this.param1D = new Class<?>[]{Kernel1D_F32.class, GrayF32.class, GrayF32.class , int.class };
+		this.param2D = new Class<?>[]{Kernel2D_F32.class, GrayF32.class, GrayF32.class , int.class };
 	}
 }

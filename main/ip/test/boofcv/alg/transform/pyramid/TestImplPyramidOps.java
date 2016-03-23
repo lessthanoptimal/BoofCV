@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +57,7 @@ public class TestImplPyramidOps {
 		assertEquals(2,numFound);
 	}
 
-	private <T extends ImageSingleBand>
+	private <T extends ImageGray>
 	void scaleImageUp(Class<T> imageType , Method m ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType,15, 8);
 		T output = GeneralizedImageOps.createSingleBand(imageType,1, 1);
@@ -109,7 +109,7 @@ public class TestImplPyramidOps {
 		assertEquals(2,numFound);
 	}
 
-	private <T extends ImageSingleBand>
+	private <T extends ImageGray>
 	void scaleDown2(Class<T> imageType , Method m ) {
 
 		int sizes [] = new int[]{30,31};

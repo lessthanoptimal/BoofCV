@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,15 +20,15 @@ package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Wrapper around {@link DetectFiducialSquareImage} for {@link FiducialDetector}
  *
  * @author Peter Abeles
  */
-public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
+public class SquareImage_to_FiducialDetector<T extends ImageGray>
 	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareImage<T>>
 {
 	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
@@ -43,7 +43,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
 	public void addPatternImage(T pattern, double threshold, double lengthSide) {
-		ImageUInt8 binary = new ImageUInt8(pattern.width,pattern.height);
+		GrayU8 binary = new GrayU8(pattern.width,pattern.height);
 		GThresholdImageOps.threshold(pattern,binary,threshold,false);
 		alg.addPattern(binary, lengthSide);
 	}
@@ -54,7 +54,7 @@ public class SquareImage_to_FiducialDetector<T extends ImageSingleBand>
 	 * @param binary Binary image of the pattern.  0 = black, 1 = white.
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addPatternBinary(ImageUInt8 binary, double lengthSide) {
+	public void addPatternBinary(GrayU8 binary, double lengthSide) {
 		alg.addPattern(binary, lengthSide);
 	}
 

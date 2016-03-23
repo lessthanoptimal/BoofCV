@@ -19,7 +19,7 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 
 
 /**
@@ -65,7 +65,7 @@ public interface NonMaxSuppression {
 	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
 	 * @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	 */
-	public void process(ImageFloat32 intensity,
+	public void process(GrayF32 intensity,
 						QueueCorner candidateMin, QueueCorner candidateMax,
 						QueueCorner foundMin, QueueCorner foundMax );
 

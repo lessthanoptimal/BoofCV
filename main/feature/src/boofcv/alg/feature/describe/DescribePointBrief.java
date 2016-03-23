@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageSingleBand;
  *
  * @author Peter Abeles
  */
-public class DescribePointBrief<T extends ImageSingleBand> {
+public class DescribePointBrief<T extends ImageGray> {
 	// blurs the image prior to sampling
 	protected BlurFilter<T> filterBlur;
 	// blurred image

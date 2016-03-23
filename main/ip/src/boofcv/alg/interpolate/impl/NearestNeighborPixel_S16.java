@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.NearestNeighborPixelS;
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;
 
 
@@ -35,18 +35,18 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class NearestNeighborPixel_S16 extends NearestNeighborPixelS<ImageSInt16> {
+public class NearestNeighborPixel_S16 extends NearestNeighborPixelS<GrayS16> {
 
 	private short data[];
 	public NearestNeighborPixel_S16() {
 	}
 
-	public NearestNeighborPixel_S16(ImageSInt16 orig) {
+	public NearestNeighborPixel_S16(GrayS16 orig) {
 
 		setImage(orig);
 	}
 	@Override
-	public void setImage(ImageSInt16 image) {
+	public void setImage(GrayS16 image) {
 		super.setImage(image);
 		this.data = orig.data;
 	}
@@ -71,8 +71,8 @@ public class NearestNeighborPixel_S16 extends NearestNeighborPixelS<ImageSInt16>
 	}
 
 	@Override
-	public ImageType<ImageSInt16> getImageType() {
-		return ImageType.single(ImageSInt16.class);
+	public ImageType<GrayS16> getImageType() {
+		return ImageType.single(GrayS16.class);
 	}
 
 }

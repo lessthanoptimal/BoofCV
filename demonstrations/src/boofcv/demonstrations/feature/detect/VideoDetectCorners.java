@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.BoofVideoManager;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I16;
 
@@ -49,7 +49,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingleBand>
+public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
 		extends ProcessImageSequence<T> {
 
 	GeneralFeatureDetector<T, D> detector;
@@ -125,7 +125,7 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		}
 	}
 
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	void perform(String fileName, Class<T> imageType, Class<D> derivType) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
 
@@ -160,6 +160,6 @@ public class VideoDetectCorners<T extends ImageSingleBand, D extends ImageSingle
 		}
 
 //		perform(fileName,ImageUInt8.class,ImageSInt16.class);
-		perform(fileName, ImageFloat32.class, ImageFloat32.class);
+		perform(fileName, GrayF32.class, GrayF32.class);
 	}
 }

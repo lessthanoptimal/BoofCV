@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,26 +20,34 @@ package boofcv.struct.image;
 
 /**
  * <p>
- * Image with a pixel type of signed 16-bit integer.
+ * Gray scale image with a pixel type of signed 32-bit integer
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImageSInt16 extends ImageInt16<ImageSInt16> {
+public class GrayS32 extends GrayI<GrayS32> {
+
+	public int data[];
+
 	/**
 	 * Creates a new gray scale (single band/color) image.
 	 *
 	 * @param width  number of columns in the image.
 	 * @param height number of rows in the image.
 	 */
-	public ImageSInt16(int width, int height) {
+	public GrayS32(int width, int height) {
 		super(width, height);
 	}
 
 	/**
 	 * Creates an image with no data declared and the width/height set to zero.
 	 */
-	public ImageSInt16() {
+	public GrayS32() {
+	}
+
+	@Override
+	public void unsafe_set(int x, int y, int value) {
+		data[getIndex(x, y)] = value;
 	}
 
 	@Override
@@ -47,15 +55,48 @@ public class ImageSInt16 extends ImageInt16<ImageSInt16> {
 		return data[getIndex(x, y)];
 	}
 
+	/**
+	 * Sets the value of the specified pixel.
+	 *
+	 * @param x	 pixel coordinate.
+	 * @param y	 pixel coordinate.
+	 * @param value The pixel's new value.
+	 */
 	@Override
-	public ImageDataType getDataType() {
-		return ImageDataType.S16;
+	public void set(int x, int y, int value) {
+		if (!isInBounds(x, y))
+			throw new ImageAccessException("Requested pixel is out of bounds");
+
+		data[getIndex(x, y)] = value;
 	}
 
 	@Override
-	public ImageSInt16 _createNew(int imgWidth, int imgHeight) {
+	public ImageDataType getDataType() {
+		return ImageDataType.S32;
+	}
+
+	@Override
+	protected Object _getData() {
+		return data;
+	}
+
+	@Override
+	protected void _setData(Object data) {
+		this.data = (int[]) data;
+	}
+
+	@Override
+	public GrayS32 _createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
-			return new ImageSInt16();
-		return new ImageSInt16(imgWidth, imgHeight);
+			return new GrayS32();
+		return new GrayS32(imgWidth, imgHeight);
+	}
+
+	public int[] getData() {
+		return data;
+	}
+
+	public void setData(int[] data) {
+		this.data = data;
 	}
 }

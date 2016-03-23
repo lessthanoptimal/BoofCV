@@ -36,7 +36,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Factory for non-generic specific implementations of interest point detection algorithms.
@@ -55,7 +55,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	FeaturePyramid<T, D> hessianPyramid(int extractRadius,
 										float detectThreshold,
 										int maxFeatures,
@@ -82,7 +82,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	FeaturePyramid<T, D> harrisPyramid(int extractRadius,
 									   float detectThreshold,
 									   int maxFeatures,
@@ -110,7 +110,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	FeatureLaplacePyramid<T, D> hessianLaplace(int extractRadius,
 											   float detectThreshold,
 											   int maxFeatures,
@@ -139,7 +139,7 @@ public class FactoryInterestPointAlgs {
 	 * @param derivType       Image derivative type.
 	 * @return CornerLaplaceScaleSpace
 	 */
-	public static <T extends ImageSingleBand, D extends ImageSingleBand>
+	public static <T extends ImageGray, D extends ImageGray>
 	FeatureLaplacePyramid<T, D> harrisLaplace(int extractRadius,
 											  float detectThreshold,
 											  int maxFeatures,
@@ -165,7 +165,7 @@ public class FactoryInterestPointAlgs {
 	 * @param <II> Integral Image
 	 * @return The feature detector
 	 */
-	public static <II extends ImageSingleBand>
+	public static <II extends ImageGray>
 	FastHessianFeatureDetector<II> fastHessian( ConfigFastHessian config ) {
 
 		if( config == null )

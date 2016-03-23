@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,13 +37,13 @@ package boofcv.struct.image;
  *
  * @author Peter Abeles
  */
-public abstract class ImageInteger<T extends ImageInteger> extends ImageSingleBand<T> {
+public abstract class GrayI<T extends GrayI> extends ImageGray<T> {
 
-	protected ImageInteger(int width, int height ) {
+	protected GrayI(int width, int height ) {
 		super(width, height);
 	}
 
-	protected ImageInteger() {
+	protected GrayI() {
 	}
 
 	/**

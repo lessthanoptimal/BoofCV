@@ -25,20 +25,21 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
 /**
  * <p>
- * {@link MultiSpectral} images are one way in which color images can be stored and manipulated inside
- * of BoofCV.  Inside of a MultiSpectral image each color band is stored as an independent {@link boofcv.struct.image.ImageSingleBand}.
+ * {@link Planar} images are one way in which color images can be stored and manipulated inside
+ * of BoofCV.  Inside of a MultiSpectral image each color band is stored as an independent {@link ImageGray}.
  * This is unlike the more common interleaved format where color information is stored in the same image.
  * </p>
  *
  * <p>
- * The main advantage of {@link MultiSpectral} is the ease at which gray scale operations can be applied to each
+ * The main advantage of {@link Planar} is the ease at which gray scale operations can be applied to each
  * band independently with no additional code.  This is particularly useful in a library,
  * such as BoofCV, which is heavily focused on gray scale image processing and computer vision. The are also
  * situations for some scientific applications where processing each band independently makes more sense.
@@ -51,15 +52,15 @@ public class ExampleMultiSpectralImages {
 	public static ListDisplayPanel gui = new ListDisplayPanel();
 
 	/**
-	 * Many operations designed to only work on {@link boofcv.struct.image.ImageSingleBand} can be applied
+	 * Many operations designed to only work on {@link ImageGray} can be applied
 	 * to a MultiSpectral image by feeding in each band one at a time.
 	 */
 	public static void independent( BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
 
 		// declare the output blurred image
-		MultiSpectral<ImageUInt8> blurred = image.createSameShape();
+		Planar<GrayU8> blurred = image.createSameShape();
 		
 		// Apply Gaussian blur to each band in the image
 		for( int i = 0; i < image.getNumBands(); i++ ) {
@@ -78,11 +79,11 @@ public class ExampleMultiSpectralImages {
 	}
 
 	/**
-	 * Values of pixels can be read and modified by accessing the internal {@link boofcv.struct.image.ImageSingleBand}.
+	 * Values of pixels can be read and modified by accessing the internal {@link ImageGray}.
 	 */
 	public static void pixelAccess(  BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
 
 		int x = 10, y = 10;
 
@@ -106,9 +107,9 @@ public class ExampleMultiSpectralImages {
 	 */
 	public static void convertToGray( BufferedImage input ) {
 		// convert the BufferedImage into a MultiSpectral
-		MultiSpectral<ImageUInt8> image = ConvertBufferedImage.convertFromMulti(input,null,true,ImageUInt8.class);
+		Planar<GrayU8> image = ConvertBufferedImage.convertFromMulti(input,null,true,GrayU8.class);
 
-		ImageUInt8 gray = new ImageUInt8( image.width,image.height);
+		GrayU8 gray = new GrayU8( image.width,image.height);
 
 		// creates a gray scale image by averaging intensity value across pixels
 		GPixelMath.averageBand(image, gray);

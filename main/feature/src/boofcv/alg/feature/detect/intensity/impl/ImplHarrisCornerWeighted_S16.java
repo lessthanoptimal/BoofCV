@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageSInt16;
  * @author Peter Abeles
  */
 public class ImplHarrisCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
-		implements HarrisCornerIntensity<ImageSInt16>
+		implements HarrisCornerIntensity<GrayS16>
 {
 	float kappa;
 

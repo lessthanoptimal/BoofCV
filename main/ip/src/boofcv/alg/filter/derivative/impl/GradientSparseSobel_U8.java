@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.filter.derivative.impl;
 
 import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.sparse.GradientValue_I32;
 import boofcv.struct.sparse.SparseImageGradient;
 
@@ -28,12 +28,12 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class GradientSparseSobel_U8 implements SparseImageGradient<ImageUInt8,GradientValue_I32> {
+public class GradientSparseSobel_U8 implements SparseImageGradient<GrayU8,GradientValue_I32> {
 
 	// image being processed
-	ImageUInt8 input;
+	GrayU8 input;
 	// specifies how the image border is handled
-	ImageBorder_S32<ImageUInt8> border;
+	ImageBorder_S32<GrayU8> border;
 	// storage for computed gradient
 	GradientValue_I32 gradient = new GradientValue_I32();
 
@@ -41,7 +41,7 @@ public class GradientSparseSobel_U8 implements SparseImageGradient<ImageUInt8,Gr
 	 * Specifies how border pixels are handled.  If null then the border is not handled.
 	 * @param border how borders are handled
 	 */
-	public GradientSparseSobel_U8(ImageBorder_S32<ImageUInt8> border) {
+	public GradientSparseSobel_U8(ImageBorder_S32<GrayU8> border) {
 		this.border = border;
 	}
 
@@ -85,7 +85,7 @@ public class GradientSparseSobel_U8 implements SparseImageGradient<ImageUInt8,Gr
 	}
 
 	@Override
-	public void setImage(ImageUInt8 input) {
+	public void setImage(GrayU8 input) {
 		this.input = input;
 		if( border != null ) {
 			border.setImage(input);

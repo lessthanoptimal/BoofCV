@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.alg.filter.basic;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 
 /**
@@ -45,13 +45,13 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageSingleBand> T stretch(T input, double gamma, double beta, double max , T output) {
-		if( input instanceof ImageFloat32 ) {
-			return (T)GrayImageOps.stretch((ImageFloat32)input,gamma,(float)beta,(float)max,(ImageFloat32)output);
-		} else if( input instanceof ImageUInt8) {
-			return (T)GrayImageOps.stretch((ImageUInt8)input,gamma,(int)beta,(int)max,(ImageUInt8)output);
-		} else if( input instanceof ImageSInt16) {
-			return (T)GrayImageOps.stretch((ImageSInt16)input,gamma,(int)beta,(int)max,(ImageSInt16)output);
+	public static <T extends ImageGray> T stretch(T input, double gamma, double beta, double max , T output) {
+		if( input instanceof GrayF32) {
+			return (T)GrayImageOps.stretch((GrayF32)input,gamma,(float)beta,(float)max,(GrayF32)output);
+		} else if( input instanceof GrayU8) {
+			return (T)GrayImageOps.stretch((GrayU8)input,gamma,(int)beta,(int)max,(GrayU8)output);
+		} else if( input instanceof GrayS16) {
+			return (T)GrayImageOps.stretch((GrayS16)input,gamma,(int)beta,(int)max,(GrayS16)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -71,14 +71,14 @@ public class GGrayImageOps {
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
 	 * @return Output image.
 	 */
-	public static <T extends ImageSingleBand> T brighten( T input , double beta, double max , T output )
+	public static <T extends ImageGray> T brighten(T input , double beta, double max , T output )
 	{
-		if( input instanceof ImageFloat32 ) {
-			return (T)GrayImageOps.brighten((ImageFloat32) input, (float) beta, (float) max, (ImageFloat32) output);
-		} else if( input instanceof ImageUInt8 ) {
-			return (T)GrayImageOps.brighten((ImageUInt8)input,(int)beta,(int)max,(ImageUInt8)output);
-		} else if( input instanceof ImageSInt16) {
-			return (T)GrayImageOps.brighten((ImageSInt16) input, (int) beta, (int) max, (ImageSInt16) output);
+		if( input instanceof GrayF32) {
+			return (T)GrayImageOps.brighten((GrayF32) input, (float) beta, (float) max, (GrayF32) output);
+		} else if( input instanceof GrayU8) {
+			return (T)GrayImageOps.brighten((GrayU8)input,(int)beta,(int)max,(GrayU8)output);
+		} else if( input instanceof GrayS16) {
+			return (T)GrayImageOps.brighten((GrayS16) input, (int) beta, (int) max, (GrayS16) output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}

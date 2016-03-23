@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseImageGradient;
@@ -34,7 +34,7 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverageGradientIntegral<T extends ImageSingleBand,G extends GradientValue>
+public class ImplOrientationAverageGradientIntegral<T extends ImageGray,G extends GradientValue>
 		extends OrientationIntegralBase<T,G>
 {
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,10 @@ import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 
@@ -77,7 +77,7 @@ public class FactoryStereoDisparity {
 	 * @param imageType Type of input image.
 	 * @return Rectangular region based WTA disparity.algorithm.
 	 */
-	public static <T extends ImageSingleBand> StereoDisparity<T,ImageUInt8>
+	public static <T extends ImageGray> StereoDisparity<T,GrayU8>
 	regionWta( DisparityAlgorithms whichAlg ,
 			   int minDisparity , int maxDisparity,
 			   int regionRadiusX, int regionRadiusY ,
@@ -93,38 +93,38 @@ public class FactoryStereoDisparity {
 			maxError *= 3;
 
 		DisparitySelect select;
-		if( imageType == ImageUInt8.class || imageType == ImageSInt16.class ) {
+		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
 			select = selectDisparity_S32((int) maxError, validateRtoL, texture);
-		} else if( imageType == ImageFloat32.class ) {
+		} else if( imageType == GrayF32.class ) {
 			select = selectDisparity_F32((int) maxError, validateRtoL, texture);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		DisparityScoreRowFormat<T,ImageUInt8> alg = null;
+		DisparityScoreRowFormat<T,GrayU8> alg = null;
 
 		switch( whichAlg ) {
 			case RECT:
-				if( imageType == ImageUInt8.class ) {
+				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == ImageSInt16.class ) {
+				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == ImageFloat32.class ) {
+				} else if( imageType == GrayF32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
 				}
 				break;
 
 			case RECT_FIVE:
-				if( imageType == ImageUInt8.class ) {
+				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == ImageSInt16.class ) {
+				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == ImageFloat32.class ) {
+				} else if( imageType == GrayF32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
 				}
@@ -137,7 +137,7 @@ public class FactoryStereoDisparity {
 		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
-		return new WrapDisparitySadRect<T,ImageUInt8>(alg);
+		return new WrapDisparitySadRect<T,GrayU8>(alg);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class FactoryStereoDisparity {
 	 * @param imageType Type of input image.
 	 * @return Rectangular region based WTA disparity.algorithm.
 	 */
-	public static <T extends ImageSingleBand> StereoDisparity<T,ImageFloat32>
+	public static <T extends ImageGray> StereoDisparity<T,GrayF32>
 	regionSubpixelWta( DisparityAlgorithms whichAlg ,
 					   int minDisparity , int maxDisparity,
 					   int regionRadiusX, int regionRadiusY ,
@@ -176,38 +176,38 @@ public class FactoryStereoDisparity {
 			maxError *= 3;
 
 		DisparitySelect select;
-		if( imageType == ImageUInt8.class || imageType == ImageSInt16.class ) {
+		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
 			select = selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
-		} else if( imageType == ImageFloat32.class ) {
+		} else if( imageType == GrayF32.class ) {
 			select = selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		DisparityScoreRowFormat<T,ImageFloat32> alg = null;
+		DisparityScoreRowFormat<T,GrayF32> alg = null;
 
 		switch( whichAlg ) {
 			case RECT:
-				if( imageType == ImageUInt8.class ) {
+				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == ImageSInt16.class ) {
+				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == ImageFloat32.class ) {
+				} else if( imageType == GrayF32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
 				}
 				break;
 
 			case RECT_FIVE:
-				if( imageType == ImageUInt8.class ) {
+				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == ImageSInt16.class ) {
+				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == ImageFloat32.class ) {
+				} else if( imageType == GrayF32.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
 				}
@@ -220,7 +220,7 @@ public class FactoryStereoDisparity {
 		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
-		return new WrapDisparitySadRect<T,ImageFloat32>(alg);
+		return new WrapDisparitySadRect<T,GrayF32>(alg);
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class FactoryStereoDisparity {
 	 * @param <T> Image type
 	 * @return Sparse disparity algorithm
 	 */
-	public static <T extends ImageSingleBand> StereoDisparitySparse<T>
+	public static <T extends ImageGray> StereoDisparitySparse<T>
 	regionSparseWta( int minDisparity , int maxDisparity,
 					 int regionRadiusX, int regionRadiusY ,
 					 double maxPerPixelError ,
@@ -248,25 +248,25 @@ public class FactoryStereoDisparity {
 
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
-		if( imageType == ImageUInt8.class ) {
+		if( imageType == GrayU8.class ) {
 			DisparitySparseSelect<int[]> select;
 			if( subpixelInterpolation)
 				select = selectDisparitySparseSubpixel_S32((int) maxError, texture);
 			else
 				select = selectDisparitySparse_S32((int) maxError, texture);
 
-			DisparitySparseScoreSadRect<int[],ImageUInt8>
+			DisparitySparseScoreSadRect<int[],GrayU8>
 					score = scoreDisparitySparseSadRect_U8(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
 			return new WrapDisparitySparseSadRect(score,select);
-		} else if( imageType == ImageFloat32.class ) {
+		} else if( imageType == GrayF32.class ) {
 			DisparitySparseSelect<float[]> select;
 			if( subpixelInterpolation )
 				select = selectDisparitySparseSubpixel_F32((int) maxError, texture);
 			else
 				select = selectDisparitySparse_F32((int) maxError, texture);
 
-			DisparitySparseScoreSadRect<float[],ImageFloat32>
+			DisparitySparseScoreSadRect<float[],GrayF32>
 					score = scoreDisparitySparseSadRect_F32(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
 			return new WrapDisparitySparseSadRect(score,select);

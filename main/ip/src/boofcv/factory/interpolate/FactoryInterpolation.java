@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class FactoryInterpolation {
 	 * @param dataType Type of gray-scale image
 	 * @return Interpolation for single band image
 	 */
-	public static <T extends ImageSingleBand> InterpolatePixelS<T>
+	public static <T extends ImageGray> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, BorderType borderType , ImageDataType dataType )
 	{
 
@@ -77,7 +77,7 @@ public class FactoryInterpolation {
 	 * @param imageType Type of input image
 	 * @return Interpolation
 	 */
-	public static <T extends ImageSingleBand> InterpolatePixelS<T>
+	public static <T extends ImageGray> InterpolatePixelS<T>
 	createPixelS(double min, double max, TypeInterpolate type, BorderType borderType, Class<T> imageType)
 	{
 		InterpolatePixelS<T> alg;
@@ -146,7 +146,7 @@ public class FactoryInterpolation {
 	}
 
 	/**
-	 * Converts a single band interpolation algorithm into a mult-band interpolation for {@link MultiSpectral} images.
+	 * Converts a single band interpolation algorithm into a mult-band interpolation for {@link Planar} images.
 	 * NOTE: If a specialized interpolation exists you should use that instead of this the specialized code can
 	 * reduce the number of calculations.
 	 *
@@ -154,12 +154,12 @@ public class FactoryInterpolation {
 	 * @param <T> Single band image trype
 	 * @return Interpolation for MultiSpectral images
 	 */
-	public static <T extends ImageSingleBand> InterpolatePixelMB<MultiSpectral<T>>
+	public static <T extends ImageGray> InterpolatePixelMB<Planar<T>>
 	createPixelMS(InterpolatePixelS<T> singleBand) {
 		return new InterpolatePixel_MS_using_SB<T>(singleBand);
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {
+	public static <T extends ImageGray> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {
 
 		InterpolatePixelS<T> ret = bilinearPixelS((Class) image.getClass(), borderType);
 		ret.setImage(image);
@@ -167,18 +167,18 @@ public class FactoryInterpolation {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bilinearPixelS(Class<T> imageType, BorderType borderType ) {
+	public static <T extends ImageGray> InterpolatePixelS<T> bilinearPixelS(Class<T> imageType, BorderType borderType ) {
 		InterpolatePixelS<T> alg;
 
-		if( imageType == ImageFloat32.class )
+		if( imageType == GrayF32.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_F32();
-		else if( imageType == ImageFloat64.class )
+		else if( imageType == GrayF64.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_F64();
-		else if( imageType == ImageUInt8.class )
+		else if( imageType == GrayU8.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_U8();
-		else if( imageType == ImageSInt16.class )
+		else if( imageType == GrayS16.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_S16();
-		else if( imageType == ImageSInt32.class )
+		else if( imageType == GrayS32.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_S32();
 		else
 			throw new RuntimeException("Unknown image type: "+ typeName(imageType));
@@ -274,7 +274,7 @@ public class FactoryInterpolation {
 		return type == null ? "null" : type.getName();
 	}
 
-	public static <T extends ImageSingleBand> InterpolateRectangle<T> bilinearRectangle( T image ) {
+	public static <T extends ImageGray> InterpolateRectangle<T> bilinearRectangle(T image ) {
 
 		InterpolateRectangle<T> ret = bilinearRectangle((Class)image.getClass());
 		ret.setImage(image);
@@ -282,34 +282,34 @@ public class FactoryInterpolation {
 		return ret;
 	}
 
-	public static <T extends ImageSingleBand> InterpolateRectangle<T> bilinearRectangle( Class<T> type ) {
-		if( type == ImageFloat32.class )
+	public static <T extends ImageGray> InterpolateRectangle<T> bilinearRectangle(Class<T> type ) {
+		if( type == GrayF32.class )
 			return (InterpolateRectangle<T>)new BilinearRectangle_F32();
-		else if( type == ImageUInt8.class )
+		else if( type == GrayU8.class )
 			return (InterpolateRectangle<T>)new BilinearRectangle_U8();
-		else if( type == ImageSInt16.class )
+		else if( type == GrayS16.class )
 			return (InterpolateRectangle<T>)new BilinearRectangle_S16();
 		else
 			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> nearestNeighborPixelS(Class<T> type) {
-		if( type == ImageFloat32.class )
+	public static <T extends ImageGray> InterpolatePixelS<T> nearestNeighborPixelS(Class<T> type) {
+		if( type == GrayF32.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_F32();
-		else if( type == ImageUInt8.class )
+		else if( type == GrayU8.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_U8();
-		else if( type == ImageSInt16.class )
+		else if( type == GrayS16.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_S16();
-		else if( type == ImageUInt16.class )
+		else if( type == GrayU16.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_U16();
-		else if( type == ImageSInt32.class )
+		else if( type == GrayS32.class )
 			return (InterpolatePixelS<T>)new NearestNeighborPixel_S32();
 		else
 			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
-	public static <T extends ImageSingleBand> InterpolateRectangle<T> nearestNeighborRectangle( Class<?> type ) {
-		if( type == ImageFloat32.class )
+	public static <T extends ImageGray> InterpolateRectangle<T> nearestNeighborRectangle(Class<?> type ) {
+		if( type == GrayF32.class )
 			return (InterpolateRectangle<T>)new NearestNeighborRectangle_F32();
 //		else if( type == ImageUInt8.class )
 //			return (InterpolateRectangle<T>)new NearestNeighborRectangle_U8();
@@ -319,22 +319,22 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> bicubicS(float param, float min, float max, Class<T> type) {
+	public static <T extends ImageGray> InterpolatePixelS<T> bicubicS(float param, float min, float max, Class<T> type) {
 		BicubicKernel_F32 kernel = new BicubicKernel_F32(param);
-		if( type == ImageFloat32.class )
+		if( type == GrayF32.class )
 			return (InterpolatePixelS<T>)new ImplInterpolatePixelConvolution_F32(kernel,min,max);
-		else if( type == ImageUInt8.class )
+		else if( type == GrayU8.class )
 			return (InterpolatePixelS<T>)new ImplInterpolatePixelConvolution_U8(kernel,min,max);
-		else if( type == ImageSInt16.class )
+		else if( type == GrayS16.class )
 			return (InterpolatePixelS<T>)new ImplInterpolatePixelConvolution_S16(kernel,min,max);
 		else
 			throw new RuntimeException("Unknown image type: "+typeName(type));
 	}
 
-	public static <T extends ImageSingleBand> InterpolatePixelS<T> polynomialS(int maxDegree, double min, double max, Class<T> type) {
-		if( type == ImageFloat32.class )
+	public static <T extends ImageGray> InterpolatePixelS<T> polynomialS(int maxDegree, double min, double max, Class<T> type) {
+		if( type == GrayF32.class )
 			return (InterpolatePixelS<T>)new ImplPolynomialPixel_F32(maxDegree,(float)min,(float)max);
-		else if( ImageInteger.class.isAssignableFrom(type) ) {
+		else if( GrayI.class.isAssignableFrom(type) ) {
 			return (InterpolatePixelS<T>)new ImplPolynomialPixel_I(maxDegree,(float)min,(float)max);
 		} else
 			throw new RuntimeException("Unknown image type: "+typeName(type));
