@@ -18,8 +18,8 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -128,8 +128,8 @@ public class TestImageMiscOps {
 		int x1=3,y1=4;
 		m.invoke(null,1,2,3,4,w,h,src,dst);
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(src);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(dst);
+		GImageGray a = FactoryGImageGray.wrap(src);
+		GImageGray b = FactoryGImageGray.wrap(dst);
 		for( int i = 0; i < h; i++ ) {
 			for( int j = 0; j < w; j++ ) {
 				assertEquals(a.get(x0+j,y0+i).doubleValue(),b.get(x1+j,y1+i).doubleValue(),1e-4);
@@ -160,7 +160,7 @@ public class TestImageMiscOps {
 			m.invoke(null,orig,10.0f);
 		}
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				assertEquals(10.0,a.get(j,i).doubleValue(),1e-4);
@@ -284,7 +284,7 @@ public class TestImageMiscOps {
 			m.invoke(null,orig,5,r);
 		}
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j < r || i < r || j >= width-r || i >= height-r )
@@ -319,7 +319,7 @@ public class TestImageMiscOps {
 			m.invoke(null,orig,10.0f,x0,y0,width,height);
 		}
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				if( j < x0 || i < y0 || i >= (x0+width) || j >= (y0+height ))
@@ -391,7 +391,7 @@ public class TestImageMiscOps {
 
 		int numZero = 0;
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -455,7 +455,7 @@ public class TestImageMiscOps {
 
 		int numZero = 0;
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -526,7 +526,7 @@ public class TestImageMiscOps {
 			m.invoke(null,orig,rand,1,10);
 		}
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();
@@ -576,7 +576,7 @@ public class TestImageMiscOps {
 		m.invoke(null,orig,rand,2.0,0,255);
 
 		double stdev2 = 0;
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(orig);
+		GImageGray a = FactoryGImageGray.wrap(orig);
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double value = a.get(j,i).doubleValue();

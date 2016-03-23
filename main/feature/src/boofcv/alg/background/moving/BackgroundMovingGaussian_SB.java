@@ -22,8 +22,8 @@ import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransformModel_F32;
@@ -45,7 +45,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray, Motion extends In
 	protected InterpolatePixelMB<Planar<GrayF32>> interpolationBG;
 
 	// wrappers which provide abstraction across image types
-	protected GImageSingleBand inputWrapper;
+	protected GImageGray inputWrapper;
 	// storage for multi-band pixel values
 	protected float[] pixelBG = new float[2];
 
@@ -73,7 +73,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray, Motion extends In
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.pl(2, GrayF32.class));
 		this.interpolationBG.setImage(background);
-		inputWrapper = FactoryGImageSingleBand.create(imageType);
+		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
 	@Override

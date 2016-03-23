@@ -52,7 +52,7 @@ public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * Low level implementations of different methods for converting {@link Planar} into\n" +
-				" * {@link boofcv.struct.image.ImageSingleBand}.\n" +
+				" * {@link boofcv.struct.image.ImageGray}.\n" +
 				" * \n" +
 				" * <ul>\n" +
 				" * <li>Average computes the average value of each pixel across the bands.\n" +

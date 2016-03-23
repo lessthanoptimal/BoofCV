@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
@@ -90,8 +90,8 @@ public class TestImplMedianSortEdgeNaive extends CompareEquivalentFunctions {
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-		GImageSingleBand found = FactoryGImageSingleBand.wrap((ImageGray) targetParam[1]);
-		GImageSingleBand expected = FactoryGImageSingleBand.wrap((ImageGray) validationParam[1]);
+		GImageGray found = FactoryGImageGray.wrap((ImageGray) targetParam[1]);
+		GImageGray expected = FactoryGImageGray.wrap((ImageGray) validationParam[1]);
 
 
 		for( int y = 0; y < height; y++ ) {

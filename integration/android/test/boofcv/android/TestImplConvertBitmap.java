@@ -6,11 +6,11 @@ import java.nio.IntBuffer;
 
 import android.graphics.Bitmap;
 import android.test.AndroidTestCase;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
@@ -54,7 +54,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		Class[] params = m.getParameterTypes();
 		
 		try {
-			ImageSingleBand found = (ImageSingleBand)params[2].getConstructor(int.class,int.class).newInstance(w,h);
+			ImageGray found = (ImageGray)params[2].getConstructor(int.class,int.class).newInstance(w,h);
 
 			Object array;
 
@@ -72,7 +72,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 
 			m.invoke(null, array, config, found);
 			
-			GImageSingleBand g = FactoryGImageSingleBand.wrap(found);
+			GImageGray g = FactoryGImageGray.wrap(found);
 			
 			// should be 37 for both 8888 and 565
 			assertEquals(info,37,g.get(1,2).intValue());
@@ -169,11 +169,11 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		String info = config+" "+params[1].getSimpleName();
 		
 		try {
-			ImageSingleBand found = (ImageSingleBand)params[1].getConstructor(int.class,int.class).newInstance(w,h);
+			ImageGray found = (ImageGray)params[1].getConstructor(int.class,int.class).newInstance(w,h);
 
 			m.invoke(null, orig, found);
 			
-			GImageSingleBand g = FactoryGImageSingleBand.wrap(found);
+			GImageGray g = FactoryGImageGray.wrap(found);
 			
 			// should be 37 for both 8888 and 565
 			assertEquals(info,37,g.get(1,2).intValue());
@@ -250,7 +250,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		Class[] params = m.getParameterTypes();
 		
 		try {
-			ImageSingleBand src = (ImageSingleBand)params[0].getConstructor(int.class,int.class).newInstance(w,h);
+			ImageGray src = (ImageGray)params[0].getConstructor(int.class,int.class).newInstance(w,h);
 			GeneralizedImageOps.set(src, 1, 2, 16);
 			GeneralizedImageOps.set(src, 1, 3, 0xFF);
 			
@@ -273,7 +273,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 				dst.copyPixelsFromBuffer(ByteBuffer.wrap(buffer8));
 			}
 			
-			GImageSingleBand g = FactoryGImageSingleBand.wrap(src);
+			GImageGray g = FactoryGImageGray.wrap(src);
 			
 			if( config == Bitmap.Config.ARGB_8888 ) {
 				assertEquals(info,0xFF101010,(int)dst.getPixel(1,2));
@@ -312,7 +312,7 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		Class[] params = m.getParameterTypes();
 		
 		try {
-			ImageSingleBand src = (ImageSingleBand)params[0].getConstructor(int.class,int.class).newInstance(w,h);
+			ImageGray src = (ImageGray)params[0].getConstructor(int.class,int.class).newInstance(w,h);
 			GeneralizedImageOps.set(src, 1, 2, 16);
 			GeneralizedImageOps.set(src, 1, 3, 0xFF);
 

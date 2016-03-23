@@ -18,8 +18,8 @@
 
 package boofcv.struct.image;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import org.junit.Test;
 
@@ -193,8 +193,8 @@ public abstract class StandardSingleBandTests<T extends ImageGray> {
 		assertEquals(1, sub.getWidth());
 		assertEquals(2, sub.getHeight());
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(img);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(sub);
+		GImageGray a = FactoryGImageGray.wrap(img);
+		GImageGray b = FactoryGImageGray.wrap(sub);
 		
 		assertEquals(a.get(2, 3), b.get(0, 0));
 		assertEquals(a.get(2, 4), b.get(0, 1));
@@ -220,7 +220,7 @@ public abstract class StandardSingleBandTests<T extends ImageGray> {
 
 		// randomly fill the image
 		ImageGray imgA = createImage(10, 20);
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
+		GImageGray a = FactoryGImageGray.wrap(imgA);
 		for (int i = 0; i < imgA.getHeight(); i++) {
 			for (int j = 0; j < imgA.getWidth(); j++) {
 				a.set(j,i,rand.nextDouble()*200);

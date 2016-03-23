@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class DescriptorDistance {
 	}
 
 	/**
-	 * Computes the hamming distance.  A bit = 0 is a match and 1 is not match
+	 * <p>Computes the hamming distance.  A bit = 0 is a match and 1 is not match<p>
 	 *
 	 * Based on code snippet from <a href="http://graphics.stanford.edu/~seander/bithacks.html">Sean Eron Anderson Bit Twiddling Hacks</a>.
 	 *

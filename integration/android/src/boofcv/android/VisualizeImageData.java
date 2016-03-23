@@ -359,7 +359,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void disparity( ImageInteger disparity, int minValue, int maxValue,
+	public static void disparity( GrayI disparity, int minValue, int maxValue,
 								  int invalidColor, Bitmap output , byte[] storage ) {
 		shapeShape(disparity, output);
 

@@ -22,8 +22,8 @@ import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -249,7 +249,7 @@ public class TestThresholdImageOps {
 			ImageGray input = GeneralizedImageOps.createSingleBand(param[0], width, height);
 			GrayU8 output = new GrayU8(width,height);
 
-			GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+			GImageGray a = FactoryGImageGray.wrap(input);
 			for( int y = 0; y < input.height; y++ ) {
 				for( int x = 0; x < input.width; x++ ) {
 					a.set(x,y,x);

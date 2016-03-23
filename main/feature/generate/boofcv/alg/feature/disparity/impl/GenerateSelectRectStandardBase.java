@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print("import boofcv.alg.feature.disparity.SelectRectStandard;\n" +
-				"import boofcv.struct.image.ImageSingleBand;\n" +
+				"import boofcv.struct.image.ImageGray;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -76,7 +76,7 @@ public class GenerateSelectRectStandardBase extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public abstract class "+className+"<T extends ImageSingleBand>\n" +
+				"public abstract class "+className+"<T extends ImageGray>\n" +
 				"\t\textends SelectRectStandard<"+sumType+"[],T>\n" +
 				"{\n" +
 				"\t// scores organized for more efficient processing\n" +

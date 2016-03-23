@@ -449,8 +449,8 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
 
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
@@ -504,8 +504,8 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
 
 			for( int y = borderY; y < imgA.height-borderY; y++ ) {
 				for( int x = borderX; x < imgA.width-borderX; x++ ) {
@@ -544,8 +544,8 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
 
 			for( int y = borderY0; y < imgA.height-borderY1; y++ ) {
 				for( int x = borderX0; x < imgA.width-borderX1; x++ ) {
@@ -582,8 +582,8 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageSingleBand a = FactoryGImageSingleBand.wrap((ImageGray)imgA);
-			GImageSingleBand b = FactoryGImageSingleBand.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
 
 			for( int y = 0; y < imgA.height; y++ ) {
 				for( int x = 0; x < imgA.width; x++ ) {
@@ -623,8 +623,8 @@ public class BoofTesting {
 		if (imgA.getHeight() != imgB.getHeight())
 			throw new RuntimeException("Heights are not equals");
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
+		GImageGray a = FactoryGImageGray.wrap(imgA);
+		GImageGray b = FactoryGImageGray.wrap(imgB);
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < borderX; x++) {
@@ -645,7 +645,7 @@ public class BoofTesting {
 		}
 	}
 
-	private static void compareValues(double tol, GImageSingleBand a, GImageSingleBand b, int x, int y) {
+	private static void compareValues(double tol, GImageGray a, GImageGray b, int x, int y) {
 		double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
 		if (normalizer < 1.0) normalizer = 1.0;
 		if (Math.abs(a.get(x, y).doubleValue() - b.get(x, y).doubleValue()) / normalizer > tol)
@@ -1014,7 +1014,7 @@ public class BoofTesting {
 
 
 	public static void checkBorderZero(ImageGray outputImage, int border) {
-		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
+		GImageGray img = FactoryGImageGray.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
 			if (y >= border && y < img.getHeight() - border)
@@ -1030,7 +1030,7 @@ public class BoofTesting {
 	}
 
 	public static void checkBorderZero(ImageGray outputImage, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-		GImageSingleBand img = FactoryGImageSingleBand.wrap(outputImage);
+		GImageGray img = FactoryGImageGray.wrap(outputImage);
 
 		for (int y = 0; y < img.getHeight(); y++) {
 			if (y >= borderY0  && y < img.getHeight() - borderY1)
@@ -1047,8 +1047,8 @@ public class BoofTesting {
 
 	public static void printDiff(ImageGray imgA, ImageGray imgB) {
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(imgA);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(imgB);
+		GImageGray a = FactoryGImageGray.wrap(imgA);
+		GImageGray b = FactoryGImageGray.wrap(imgB);
 
 		System.out.println("------- Difference -----------");
 		for (int y = 0; y < imgA.getHeight(); y++) {

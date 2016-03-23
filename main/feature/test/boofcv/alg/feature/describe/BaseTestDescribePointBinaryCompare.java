@@ -23,8 +23,8 @@ import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageGray;
@@ -141,7 +141,7 @@ public abstract class BaseTestDescribePointBinaryCompare<T extends ImageGray> {
 	public void testManualCheck() {
 		T input = createImage(width,height);
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
+		GImageGray a = FactoryGImageGray.wrap(input);
 
 		DescribePointBinaryCompare<T> alg = createAlg(def);
 

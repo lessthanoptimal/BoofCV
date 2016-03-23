@@ -19,8 +19,8 @@
 package boofcv.alg.filter.basic.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
@@ -57,8 +57,8 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 255, output);
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(input);
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		GImageGray a = FactoryGImageGray.wrap(input);
+		GImageGray b = FactoryGImageGray.wrap(output);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -81,7 +81,7 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 10,255, output);
 
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		GImageGray b = FactoryGImageGray.wrap(output);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -112,7 +112,7 @@ public class TestImplGrayImageOps {
 
 		m.invoke(null,input, 2.5,10,255, output);
 
-		GImageSingleBand b = FactoryGImageSingleBand.wrap(output);
+		GImageGray b = FactoryGImageGray.wrap(output);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if( output.getDataType().isInteger() )

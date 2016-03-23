@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.ImageBorder;
 
 /**
@@ -45,7 +45,7 @@ import boofcv.core.image.border.ImageBorder;
 public class ImageLineIntegral {
 
 	// reference to image.
-	GImageSingleBand image;
+	GImageGray image;
 
 	// length of the line just computed
 	double length;
@@ -56,7 +56,7 @@ public class ImageLineIntegral {
 	 *
 	 * @param image image
 	 */
-	public void setImage( GImageSingleBand image ) {
+	public void setImage( GImageGray image ) {
 		this.image = image;
 	}
 

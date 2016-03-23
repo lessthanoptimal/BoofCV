@@ -20,8 +20,8 @@ package boofcv.alg.filter.convolve.border;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.struct.convolve.KernelBase;
@@ -143,8 +143,8 @@ public class TestConvolveJustBorder_General extends CompareImageBorder {
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());
 		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
-		GImageSingleBand t = FactoryGImageSingleBand.wrap(targetOut);
-		GImageSingleBand v = FactoryGImageSingleBand.wrap(validationOut);
+		GImageGray t = FactoryGImageGray.wrap(targetOut);
+		GImageGray v = FactoryGImageGray.wrap(validationOut);
 
 		for( int y = 0; y < targetOut.height; y++ ) {
 			if( y >= borderX0 &&  y < targetOut.height-borderX1 )

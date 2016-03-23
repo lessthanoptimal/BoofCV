@@ -20,9 +20,9 @@ package boofcv.alg.background.stationary;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.*;
 
 /**
@@ -37,13 +37,13 @@ public class BackgroundStationaryBasic_SB<T extends ImageGray>
 	protected GrayF32 background = new GrayF32(1,1);
 
 	// wrapper which provides abstraction across image types
-	protected GImageSingleBand inputWrapper;
+	protected GImageGray inputWrapper;
 
 	public BackgroundStationaryBasic_SB(float learnRate, float threshold,
 										Class<T> imageType) {
 		super(learnRate, threshold, ImageType.single(imageType));
 
-		inputWrapper = FactoryGImageSingleBand.create(imageType);
+		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
 	/**

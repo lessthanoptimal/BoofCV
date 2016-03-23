@@ -20,8 +20,8 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.ImageGray;
@@ -41,7 +41,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray>
 	private InterpolatePixelS<T> interp[];
 
 	// local variables
-	private GImageSingleBand output[];
+	private GImageGray output[];
 
 	/**
 	 * Constructor which allows the interpolator for each band to be specified
@@ -50,7 +50,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray>
 	 */
 	public CreateSyntheticOverheadViewPL(InterpolatePixelS<T> interp[]) {
 		this.interp = interp;
-		output = new GImageSingleBand[interp.length];
+		output = new GImageGray[interp.length];
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray>
 		for( int i = 0; i < numBands; i++ ) {
 			interp[i] = FactoryInterpolation.createPixelS(0, 255, type, BorderType.EXTENDED, imageType);
 		}
-		output = new GImageSingleBand[interp.length];
+		output = new GImageGray[interp.length];
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class CreateSyntheticOverheadViewPL<T extends ImageGray>
 
 		int N = input.getNumBands();
 		for( int i = 0; i < N; i++ ) {
-			this.output[i] = FactoryGImageSingleBand.wrap(output.getBand(i),this.output[i]);
+			this.output[i] = FactoryGImageGray.wrap(output.getBand(i),this.output[i]);
 			interp[i].setImage(input.getBand(i));
 		}
 

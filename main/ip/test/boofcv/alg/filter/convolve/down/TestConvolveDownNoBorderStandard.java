@@ -21,8 +21,8 @@ package boofcv.alg.filter.convolve.down;
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageGray;
@@ -176,8 +176,8 @@ public class TestConvolveDownNoBorderStandard {
 
 			ImageGray input = (ImageGray)targetParam[1];
 
-			GImageSingleBand t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
-			GImageSingleBand v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
+			GImageGray t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
+			GImageGray v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
 
 
 			int minY=0,minX=0,maxX=input.width,maxY=input.height;

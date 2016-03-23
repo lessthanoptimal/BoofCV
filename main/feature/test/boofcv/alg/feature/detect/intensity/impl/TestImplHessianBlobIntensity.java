@@ -19,8 +19,8 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -77,9 +77,9 @@ public class TestImplHessianBlobIntensity {
 	{
 		m.invoke(null,intensity,derivXX,derivYY,derivXY);
 
-		GImageSingleBand xx = FactoryGImageSingleBand.wrap(derivXX);
-		GImageSingleBand yy = FactoryGImageSingleBand.wrap(derivYY);
-		GImageSingleBand xy = FactoryGImageSingleBand.wrap(derivXY);
+		GImageGray xx = FactoryGImageGray.wrap(derivXX);
+		GImageGray yy = FactoryGImageGray.wrap(derivYY);
+		GImageGray xy = FactoryGImageGray.wrap(derivXY);
 
 		float expected =xx.get(5,6).floatValue()*yy.get(5,6).floatValue() - xy.get(5,6).floatValue()*xy.get(5,6).floatValue();
 		assertEquals(expected,intensity.get(5,6),1e-4);
@@ -117,8 +117,8 @@ public class TestImplHessianBlobIntensity {
 	{
 		m.invoke(null,intensity,derivXX,derivYY);
 
-		GImageSingleBand xx = FactoryGImageSingleBand.wrap(derivXX);
-		GImageSingleBand yy = FactoryGImageSingleBand.wrap(derivYY);
+		GImageGray xx = FactoryGImageGray.wrap(derivXX);
+		GImageGray yy = FactoryGImageGray.wrap(derivYY);
 
 
 		float expected = xx.get(5,6).floatValue() + yy.get(5,6).floatValue();

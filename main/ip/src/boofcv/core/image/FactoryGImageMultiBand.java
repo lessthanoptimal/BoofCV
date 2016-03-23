@@ -41,7 +41,7 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( ImageGray image ) {
-		return new GSingleToMB(FactoryGImageSingleBand.wrap(image));
+		return new GSingleToMB(FactoryGImageGray.wrap(image));
 	}
 
 	public static GImageMultiBand create( ImageType imageType ) {
@@ -92,7 +92,7 @@ public class FactoryGImageMultiBand {
 
 	public static class PL implements GImageMultiBand {
 		Planar image;
-		GImageSingleBand bandWrappers[];
+		GImageGray bandWrappers[];
 
 		public PL(Planar image) {
 			wrap(image);
@@ -106,9 +106,9 @@ public class FactoryGImageMultiBand {
 			if( this.image == null ) {
 				this.image = (Planar) image;
 
-				bandWrappers = new GImageSingleBand[this.image.getNumBands()];
+				bandWrappers = new GImageGray[this.image.getNumBands()];
 				for (int i = 0; i < bandWrappers.length; i++) {
-					bandWrappers[i] = FactoryGImageSingleBand.wrap(this.image.getBand(i));
+					bandWrappers[i] = FactoryGImageGray.wrap(this.image.getBand(i));
 				}
 			} else {
 				this.image = (Planar) image;
@@ -166,16 +166,16 @@ public class FactoryGImageMultiBand {
 
 	public static class GSingleToMB implements GImageMultiBand {
 
-		GImageSingleBand sb;
+		GImageGray sb;
 
-		public GSingleToMB(GImageSingleBand sb) {
+		public GSingleToMB(GImageGray sb) {
 			this.sb = sb;
 		}
 
 		@Override
 		public void wrap(ImageBase image) {
 			if( this.sb == null ) {
-				this.sb = FactoryGImageSingleBand.wrap((ImageGray)image);
+				this.sb = FactoryGImageGray.wrap((ImageGray)image);
 			} else {
 				this.sb.wrap((ImageGray)image);
 			}

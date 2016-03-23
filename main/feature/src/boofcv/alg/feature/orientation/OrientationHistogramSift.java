@@ -19,8 +19,8 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.CircularIndex;
 import boofcv.numerics.InterpolateArray;
@@ -82,7 +82,7 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 
 
 	// spacial image gradient of closest image in scale-space
-	private GImageSingleBand derivX,derivY;
+	private GImageGray derivX,derivY;
 
 	InterpolateArray approximateGauss;
 	double approximateStep = 0.1;
@@ -113,8 +113,8 @@ public class OrientationHistogramSift<Deriv extends ImageGray>
 		}
 		approximateGauss = new InterpolateArray(samples);
 
-		this.derivX = FactoryGImageSingleBand.create(derivType);
-		this.derivY = FactoryGImageSingleBand.create(derivType);
+		this.derivX = FactoryGImageGray.create(derivType);
+		this.derivY = FactoryGImageGray.create(derivType);
 	}
 
 	/**

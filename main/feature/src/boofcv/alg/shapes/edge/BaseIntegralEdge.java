@@ -20,9 +20,9 @@ package boofcv.alg.shapes.edge;
 
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
-import boofcv.core.image.GImageSingleBandDistorted;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
+import boofcv.core.image.GImageGrayDistorted;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform_F32;
@@ -38,12 +38,12 @@ public class BaseIntegralEdge<T extends ImageGray> {
 
 	// used when computing the fit for a line at specific points
 	protected ImageLineIntegral integral;
-	protected GImageSingleBand integralImage;
+	protected GImageGray integralImage;
 
 	public BaseIntegralEdge(Class<T> imageType) {
 		this.imageType = imageType;
 		this.integral = new ImageLineIntegral();
-		this.integralImage = FactoryGImageSingleBand.create(imageType);
+		this.integralImage = FactoryGImageGray.create(imageType);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class BaseIntegralEdge<T extends ImageGray> {
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
+		integralImage = new GImageGrayDistorted<T>(undistToDist,interpolate);
 	}
 
 	/**

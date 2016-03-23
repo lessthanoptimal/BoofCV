@@ -19,7 +19,7 @@
 package boofcv.alg.interpolate;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
 import boofcv.struct.image.GrayU8;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class TestImageLineIntegral {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		checkSolution(6,6,6,6, 0);
 		checkSolution(6.1,6.1,6.1,6.1, 0);
@@ -62,7 +62,7 @@ public class TestImageLineIntegral {
 		GrayU8 img = new GrayU8(10,15);
 		img.set(6,6,100);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		checkSolution(6.5, 6, 6.5, 7, 100);
 		checkSolution(6.5, 6, 6.5, 6.9, 0.9 * 100);
@@ -85,7 +85,7 @@ public class TestImageLineIntegral {
 		img.set(7,6,50);
 		img.set(8,6,10);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		checkSolution(6.5, 6, 6.5, 8, 150);
 		checkSolution(6.5, 6, 6.5, 7.5, 125);
@@ -110,7 +110,7 @@ public class TestImageLineIntegral {
 		img.set(0,0,100);
 		img.set(9,14,120);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		checkSolution(0.5, 0, 0.5, 0.5, 50);
 		checkSolution(9.5, 14.5, 9.5, 15, 0.5*120);
@@ -128,7 +128,7 @@ public class TestImageLineIntegral {
 		ImageMiscOps.fill(img,255);
 		img.set(6,6,100);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		// entirely inside
 		double r = Math.sqrt(0.1*0.1 + 0.2*0.2);
@@ -154,7 +154,7 @@ public class TestImageLineIntegral {
 		img.set(8,6,175);
 		img.set(7,7,50);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		// two entire diagonal at 45 degrees
 		checkSolution(6, 6, 8, 8, sqrt(2) * (100+50));
@@ -189,7 +189,7 @@ public class TestImageLineIntegral {
 		img.set(1,0,140);
 		img.set(1,1,150);
 
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 
 		checkSolution(0, 0, 2, 2, sqrt(2) * (100+150));
 		checkSolution(2, 0, 0, 2, sqrt(2) * (200+140));
@@ -203,7 +203,7 @@ public class TestImageLineIntegral {
 	@Test
 	public void isInside() {
 		GrayU8 img = new GrayU8(12,14);
-		alg.setImage(FactoryGImageSingleBand.wrap(img));
+		alg.setImage(FactoryGImageGray.wrap(img));
 		assertTrue(alg.isInside(0,0));
 		assertTrue(alg.isInside(12,14));
 		assertTrue(alg.isInside(12,0));

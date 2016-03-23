@@ -22,9 +22,9 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.background.moving.BackgroundMovingGaussian;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.*;
 
 /**
@@ -36,7 +36,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray>
 		extends BackgroundStationaryGaussian<T>
 {
 	// wrappers which provide abstraction across image types
-	protected GImageSingleBand inputWrapper;
+	protected GImageGray inputWrapper;
 
 	// background is composed of two channels.  0 = mean, 1 = variance
 	Planar<GrayF32> background = new Planar<GrayF32>(GrayF32.class,1,1,2);
@@ -52,7 +52,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray>
 	{
 		super(learnRate, threshold, ImageType.single(imageType));
 
-		inputWrapper = FactoryGImageSingleBand.create(imageType);
+		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
 	@Override

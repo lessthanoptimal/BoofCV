@@ -136,7 +136,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
-				"\t * Converts a {@link Planar} into a {@link ImageSingleBand} by computing the average value of each pixel\n" +
+				"\t * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel\n" +
 				"\t * across all the bands.\n" +
 				"\t * \n" +
 				"\t * @param input Input Planar image that is being converted. Not modified.\n" +

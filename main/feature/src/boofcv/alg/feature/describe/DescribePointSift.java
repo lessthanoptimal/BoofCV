@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.describe;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
@@ -55,7 +55,7 @@ import georegression.metric.UtilAngle;
 public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftCommon {
 
 	// spacial derivatives of input image
-	GImageSingleBand imageDerivX, imageDerivY;
+	GImageGray imageDerivX, imageDerivY;
 
 	// conversion from scale-space sigma to image pixels
 	double sigmaToPixels;
@@ -79,8 +79,8 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 		super(widthSubregion,widthGrid,numHistogramBins,weightingSigmaFraction,maxDescriptorElementValue);
 		this.sigmaToPixels = sigmaToPixels;
 
-		imageDerivX = FactoryGImageSingleBand.create(derivType);
-		imageDerivY = FactoryGImageSingleBand.create(derivType);
+		imageDerivX = FactoryGImageGray.create(derivType);
+		imageDerivY = FactoryGImageGray.create(derivType);
 	}
 
 	/**

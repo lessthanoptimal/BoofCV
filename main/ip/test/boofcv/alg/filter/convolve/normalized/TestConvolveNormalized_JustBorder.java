@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
 
@@ -69,30 +69,30 @@ public class TestConvolveNormalized_JustBorder {
 		@Override
 		protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-			GImageSingleBand t,v;
+			GImageGray t,v;
 
 			int borderX0=0,borderX1=0;
 			int borderY0=0,borderY1=0;
 
 			if( methodTest.getName().contentEquals("convolve")) {
-				t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
-				v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
+				t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
+				v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
 				borderX0=borderY0 = offset;
 				borderX1=borderY1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("horizontal") ) {
-				t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
-				v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
+				t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
+				v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
 				borderX0 = offset;
 				borderX1 = kernelRadius*2-offset;
 			} else if( methodTest.getName().contentEquals("vertical")) {
 				if( methodTest.getParameterTypes().length == 3 ) {
-					t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[2]);
-					v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[2]);
+					t = FactoryGImageGray.wrap((ImageGray) targetParam[2]);
+					v = FactoryGImageGray.wrap((ImageGray) validationParam[2]);
 					borderY0 = offset;
 					borderY1 = kernelRadius * 2 - offset;
 				} else {
-					t = FactoryGImageSingleBand.wrap((ImageGray) targetParam[3]);
-					v = FactoryGImageSingleBand.wrap((ImageGray) validationParam[3]);
+					t = FactoryGImageGray.wrap((ImageGray) targetParam[3]);
+					v = FactoryGImageGray.wrap((ImageGray) validationParam[3]);
 					borderX0=borderY0 = offset;
 					borderX1=borderY1 = kernelRadius*2-offset;
 				}

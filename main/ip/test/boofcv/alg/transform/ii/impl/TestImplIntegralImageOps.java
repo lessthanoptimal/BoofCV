@@ -22,9 +22,9 @@ import boofcv.alg.filter.convolve.ConvolveWithBorder;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_S32;
@@ -76,8 +76,8 @@ public class TestImplIntegralImageOps {
 
 		m.invoke(null,a,b);
 
-		GImageSingleBand aa = FactoryGImageSingleBand.wrap(a);
-		GImageSingleBand bb = FactoryGImageSingleBand.wrap(b);
+		GImageGray aa = FactoryGImageGray.wrap(a);
+		GImageGray bb = FactoryGImageGray.wrap(b);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {
@@ -194,7 +194,7 @@ public class TestImplIntegralImageOps {
 
 		GIntegralImageOps.convolve(integral,kernel,expected);
 
-		GImageSingleBand e = FactoryGImageSingleBand.wrap(expected);
+		GImageGray e = FactoryGImageGray.wrap(expected);
 
 		double found0 = ((Number)m.invoke(null,integral,kernel,0,0)).doubleValue();
 		double found1 = ((Number)m.invoke(null,integral,kernel,10,12)).doubleValue();

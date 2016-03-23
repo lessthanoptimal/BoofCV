@@ -29,9 +29,9 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class FactoryGImageSingleBand {
+public class FactoryGImageGray {
 
-	public static GImageSingleBand create( Class imageType ) {
+	public static GImageGray create( Class imageType ) {
 		if( imageType == GrayU8.class )
 			return new GSingle_U8(null);
 		else if( imageType == GrayS8.class )
@@ -52,7 +52,7 @@ public class FactoryGImageSingleBand {
 			throw new IllegalArgumentException("Unknown image type: "+imageType);
 	}
 
-	public static GImageSingleBand wrap( ImageGray image ) {
+	public static GImageGray wrap( ImageGray image ) {
 		if( image.getClass() == GrayU8.class )
 			return new GSingle_U8( (GrayU8)image );
 		else if( image.getClass() == GrayS8.class )
@@ -73,7 +73,7 @@ public class FactoryGImageSingleBand {
 			throw new IllegalArgumentException("Unknown image type: "+image.getClass());
 	}
 
-	public static GImageSingleBand wrap(ImageGray image , GImageSingleBand output ) {
+	public static GImageGray wrap(ImageGray image , GImageGray output ) {
 		if( output == null )
 			return wrap(image);
 
@@ -99,7 +99,7 @@ public class FactoryGImageSingleBand {
 		return output;
 	}
 
-	public static GImageSingleBand wrap( ImageBorder image ) {
+	public static GImageGray wrap( ImageBorder image ) {
 		if( GrayI.class.isAssignableFrom(image.getImage().getClass()) )
 			return new Border_I32( (ImageBorder_S32)image );
 		else if( image.getImage().getClass() == GrayF32.class )
@@ -610,7 +610,7 @@ public class FactoryGImageSingleBand {
 		}
 	}
 
-	public static abstract class GSingleBase<T extends ImageGray> implements GImageSingleBand {
+	public static abstract class GSingleBase<T extends ImageGray> implements GImageGray {
 
 		protected T image;
 
@@ -639,7 +639,7 @@ public class FactoryGImageSingleBand {
 		}
 	}
 
-	public static abstract class GSingleBorder<T extends ImageBorder> implements GImageSingleBand {
+	public static abstract class GSingleBorder<T extends ImageBorder> implements GImageGray {
 
 		protected T image;
 

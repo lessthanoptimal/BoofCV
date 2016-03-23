@@ -20,8 +20,8 @@ package boofcv.alg.denoise.impl;
 
 import boofcv.alg.denoise.ShrinkThresholdRule;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_I32;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class TestShrinkThresholdSoft_I32 {
 		final int height = image.height;
 		final int width = image.width;
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(image);
+		GImageGray a = FactoryGImageGray.wrap(image);
 
 		for( int y = 0; y < height; y++ ) {
 			for( int x = 0; x < width; x++ ) {

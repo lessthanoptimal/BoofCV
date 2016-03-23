@@ -23,8 +23,8 @@ import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.BoofDefaults;
@@ -198,7 +198,7 @@ public class TestDescribePointBriefSO {
 		GrayF32 blurred = input._createNew(width, height);
 		filterBlur.process(input,blurred);
 
-		GImageSingleBand a = FactoryGImageSingleBand.wrap(blurred);
+		GImageGray a = FactoryGImageGray.wrap(blurred);
 
 		DescribePointBriefSO<GrayF32> alg = createAlg();
 

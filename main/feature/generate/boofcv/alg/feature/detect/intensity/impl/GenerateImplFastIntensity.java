@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 		setOutputFile(className);
 
 		out.print("import boofcv.alg.feature.detect.intensity.FastCornerIntensity;\n" +
-				"import boofcv.struct.image.ImageSingleBand;\n" +
+				"import boofcv.struct.image.ImageGray;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -95,7 +95,7 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+"<T extends ImageSingleBand> extends FastCornerIntensity<T>\n" +
+				"public class "+className+"<T extends ImageGray> extends FastCornerIntensity<T>\n" +
 				"{\n" +
 				"\n" +
 				"\t/**\n" +

@@ -157,7 +157,7 @@ public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread 
 
 		synchronized ( lockConvert ) {
 			if( imageType.getFamily() == ImageType.Family.GRAY )
-				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageSingleBand) image,(Class) image.getClass());
+				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageGray) image,(Class) image.getClass());
 			else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
 				if (imageType.getDataType() == ImageDataType.U8)
 					ConvertNV21.nv21ToMsRgb_U8(bytes, image.width, image.height, (Planar) image);

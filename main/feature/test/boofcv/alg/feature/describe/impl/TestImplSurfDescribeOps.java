@@ -21,8 +21,8 @@ package boofcv.alg.feature.describe.impl;
 import boofcv.alg.feature.describe.SurfDescribeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.IntegralImageOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
@@ -159,7 +159,7 @@ public class TestImplSurfDescribeOps {
 	 */
 	public static <I extends ImageGray>
 	void createGradient( double theta , I image ) {
-		GImageSingleBand ret = FactoryGImageSingleBand.wrap(image);
+		GImageGray ret = FactoryGImageGray.wrap(image);
 
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);

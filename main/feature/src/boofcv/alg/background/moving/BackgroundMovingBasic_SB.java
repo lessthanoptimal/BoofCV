@@ -21,8 +21,8 @@ package boofcv.alg.background.moving;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -49,7 +49,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray, Motion extends Invert
 	protected InterpolatePixelS<GrayF32> interpolationBG;
 
 	// wrapper which provides abstraction across image types
-	protected GImageSingleBand inputWrapper;
+	protected GImageGray inputWrapper;
 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
 									PointTransformModel_F32<Motion> transform,
@@ -63,7 +63,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray, Motion extends Invert
 		this.interpolationBG.setBorder(FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED));
 		this.interpolationBG.setImage(background);
 
-		inputWrapper = FactoryGImageSingleBand.create(imageType);
+		inputWrapper = FactoryGImageGray.create(imageType);
 	}
 
 	/**

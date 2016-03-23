@@ -19,8 +19,8 @@
 package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
@@ -35,7 +35,7 @@ public class CreateSyntheticOverheadViewS<T extends ImageGray> extends CreateSyn
 	private InterpolatePixelS<T> interp;
 
 	// local variables
-	private GImageSingleBand output;
+	private GImageGray output;
 
 	/**
 	 * Constructor
@@ -53,7 +53,7 @@ public class CreateSyntheticOverheadViewS<T extends ImageGray> extends CreateSyn
 	 */
 	public void process(T input, T output) {
 
-		this.output = FactoryGImageSingleBand.wrap(output,this.output);
+		this.output = FactoryGImageGray.wrap(output,this.output);
 		interp.setImage(input);
 
 		int indexMap = 0;

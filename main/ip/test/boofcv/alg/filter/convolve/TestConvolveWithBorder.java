@@ -20,8 +20,8 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.border.CompareImageBorder;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.convolve.KernelBase;
@@ -71,8 +71,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 
 		stripBorder(larger,borderX0,borderY0,borderX1,borderY1).setTo(smaller);
 
-		GImageSingleBand s = FactoryGImageSingleBand.wrap(smaller);
-		GImageSingleBand l = FactoryGImageSingleBand.wrap(larger);
+		GImageGray s = FactoryGImageGray.wrap(smaller);
+		GImageGray l = FactoryGImageGray.wrap(larger);
 
 		for( int y = 0; y < larger.height; y++ ) {
 			for( int x = 0; x < larger.width; x++ ) {
@@ -168,8 +168,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		computeBorder((KernelBase)targetParam[0],methodTest.getName());
 		validationOut = stripBorder(validationOut,borderX0,borderY0,borderX1,borderY1);
 
-		GImageSingleBand t = FactoryGImageSingleBand.wrap(targetOut);
-		GImageSingleBand v = FactoryGImageSingleBand.wrap(validationOut);
+		GImageGray t = FactoryGImageGray.wrap(targetOut);
+		GImageGray v = FactoryGImageGray.wrap(validationOut);
 
 		for( int y = 0; y < targetOut.height; y++ ) {
 			for( int x = 0; x < targetOut.width; x++ ) {

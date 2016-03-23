@@ -27,7 +27,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface GImageSingleBand {
+public interface GImageGray {
 
 	void wrap( ImageGray image );
 

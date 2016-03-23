@@ -597,7 +597,7 @@ public class ConvertBufferedImage {
 			} else if( GrayF32.class == src.getClass() ) {
 				return convertTo((GrayF32)src,dst);
 			} else {
-				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
+				throw new IllegalArgumentException("ImageGray type is not yet supported: "+src.getClass().getSimpleName());
 			}
 		} else if( src instanceof Planar) {
 			Planar ms = (Planar)src;
@@ -615,7 +615,7 @@ public class ConvertBufferedImage {
 			} else if( InterleavedF32.class == src.getClass() ) {
 				return convertTo((InterleavedF32)src,dst,orderRgb);
 			} else {
-				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
+				throw new IllegalArgumentException("ImageGray type is not yet supported: "+src.getClass().getSimpleName());
 			}
 		}
 

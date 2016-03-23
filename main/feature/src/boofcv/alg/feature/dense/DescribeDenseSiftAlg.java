@@ -21,8 +21,8 @@ package boofcv.alg.feature.dense;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
-import boofcv.core.image.FactoryGImageSingleBand;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
@@ -51,7 +51,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray> extends DescribeSiftCommo
 	double periodColumns;
 
 	// wrapper around gradient images so that multiple types are supported
-	GImageSingleBand imageDerivX,imageDerivY;
+	GImageGray imageDerivX,imageDerivY;
 
 	// storage for descriptors
 	FastQueue<TupleDesc_F64> descriptors;
@@ -83,8 +83,8 @@ public class DescribeDenseSiftAlg<D extends ImageGray> extends DescribeSiftCommo
 
 		final int DOF = getDescriptorLength();
 
-		imageDerivX = FactoryGImageSingleBand.create(derivType);
-		imageDerivY = FactoryGImageSingleBand.create(derivType);
+		imageDerivX = FactoryGImageGray.create(derivType);
+		imageDerivY = FactoryGImageGray.create(derivType);
 
 		descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override

@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.edge;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.GImageSingleBandDistorted;
+import boofcv.core.image.GImageGrayDistorted;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
@@ -68,7 +68,7 @@ public class ScoreLineSegmentEdge<T extends ImageGray> extends BaseIntegralEdge<
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageSingleBandDistorted<T>(undistToDist,interpolate);
+		integralImage = new GImageGrayDistorted<T>(undistToDist,interpolate);
 	}
 
 	/**

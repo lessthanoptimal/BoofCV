@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.core.image.FactoryGImageSingleBand;
+import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GImageSingleBand;
+import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -78,7 +78,7 @@ public class TestImplMedianSortNaive {
 			throw new RuntimeException(e);
 		}
 
-		GImageSingleBand found = FactoryGImageSingleBand.wrap(_found);
+		GImageGray found = FactoryGImageGray.wrap(_found);
 
 		assertEquals(5,found.get(1,1).intValue());
 		assertEquals(6,found.get(2,1).intValue());

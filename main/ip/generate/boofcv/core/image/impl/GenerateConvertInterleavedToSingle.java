@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * Low level implementations of different methods for converting {@link boofcv.struct.image.ImageInterleaved} into\n" +
-				" * {@link boofcv.struct.image.ImageSingleBand}.\n" +
+				" * {@link boofcv.struct.image.ImageGray}.\n" +
 				" *\n" +
 				" * <ul>\n" +
 				" * <li>Average computes the average value of each pixel across the bands.\n" +

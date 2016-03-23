@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 		out.print("import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.feature.disparity.DisparityScoreSadRect;\n" +
 				"import boofcv.alg.feature.disparity.DisparitySelect;\n" +
-				"import boofcv.struct.image.ImageSingleBand;\n" +
+				"import boofcv.struct.image.ImageGray;\n" +
 				"import boofcv.struct.image."+typeInput+";\n" +
 				"\n" +
 				"/**\n" +
@@ -76,7 +76,7 @@ public class GenerateDisparityScoreSadRect extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+"<Disparity extends ImageSingleBand>\n" +
+				"public class "+className+"<Disparity extends ImageGray>\n" +
 				"\textends DisparityScoreSadRect<"+typeInput+",Disparity>\n" +
 				"{\n" +
 				"\n" +

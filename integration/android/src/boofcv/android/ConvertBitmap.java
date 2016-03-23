@@ -60,7 +60,7 @@ public class ConvertBitmap {
 	public static <T extends ImageBase>
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
 		switch( output.getImageType().getFamily() ) {
-			case SINGLE_BAND: {
+			case GRAY: {
 				if( output.getClass() == GrayF32.class )
 					bitmapToGray(input, (GrayF32) output, storage);
 				else if( output.getClass() == GrayU8.class )
@@ -90,7 +90,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally. 
 	 * @return The converted gray scale image.
 	 */
-	public static <T extends ImageSingleBand> 
+	public static <T extends ImageGray>
 	T bitmapToGray( Bitmap input , T output , Class<T> imageType , byte[] storage) {
 		if( imageType == GrayF32.class )
 			return (T)bitmapToGray(input,(GrayF32)output,storage);
@@ -162,7 +162,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted Planar image.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
 			output = new Planar<T>( type , input.getWidth() , input.getHeight() , 4 );
@@ -196,8 +196,8 @@ public class ConvertBitmap {
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
 		if( input instanceof Planar ) {
 			multiToBitmap((Planar)input,output,storage);
-		} else if( input instanceof ImageSingleBand ) {
-			grayToBitmap((ImageSingleBand)input,output,storage);
+		} else if( input instanceof ImageGray ) {
+			grayToBitmap((ImageGray)input,output,storage);
 		} else if( input instanceof ImageInterleaved ) {
 			interleavedToBitmap((ImageInterleaved) input, output, storage);
 		} else {
@@ -206,7 +206,7 @@ public class ConvertBitmap {
 	}
 
 	/**
-	 * Converts ImageSingleBand into Bitmap.
+	 * Converts ImageGray into Bitmap.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
@@ -214,7 +214,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( ImageSingleBand input , Bitmap output , byte[] storage) {
+	public static void grayToBitmap( ImageGray input , Bitmap output , byte[] storage) {
 		if( input instanceof GrayU8 )
 			grayToBitmap((GrayU8)input,output,storage);
 		else if( input instanceof GrayF32 )
@@ -224,7 +224,7 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts ImageSingleBand into Bitmap.
+	 * Converts ImageGray into Bitmap.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
@@ -245,7 +245,7 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts ImageSingleBand into Bitmap.
+	 * Converts ImageGray into Bitmap.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
@@ -274,7 +274,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static <T extends ImageSingleBand>
+	public static <T extends ImageGray>
 	void multiToBitmap(  Planar<T> input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");

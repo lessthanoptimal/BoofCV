@@ -25,15 +25,15 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class GImageSingleBandDistorted<T extends ImageGray> implements GImageSingleBand {
+public class GImageGrayDistorted<T extends ImageGray> implements GImageGray {
 
 	PixelTransform_F32 transform;
 	InterpolatePixelS<T> interpolate;
 
 	int inputWidth,inputHeight;
 
-	public GImageSingleBandDistorted(PixelTransform_F32 transform,
-									 InterpolatePixelS<T> interpolate) {
+	public GImageGrayDistorted(PixelTransform_F32 transform,
+							   InterpolatePixelS<T> interpolate) {
 		this.transform = transform;
 		this.interpolate = interpolate;
 	}

@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class BenchmarkGImageSingleBand {
+public class BenchmarkGImageGray {
 
 	static int period = 1000;
 
@@ -79,10 +79,10 @@ public class BenchmarkGImageSingleBand {
 
 	public static class IndexAccess extends PerformerBase
 	{
-		GImageSingleBand output;
+		GImageGray output;
 
 		public IndexAccess( ImageGray output) {
-			this.output = FactoryGImageSingleBand.wrap(output);
+			this.output = FactoryGImageGray.wrap(output);
 		}
 
 		@Override
@@ -98,10 +98,10 @@ public class BenchmarkGImageSingleBand {
 
 	public static class PixelAccess extends PerformerBase
 	{
-		GImageSingleBand output;
+		GImageGray output;
 
 		public PixelAccess( ImageGray output) {
-			this.output = FactoryGImageSingleBand.wrap(output);
+			this.output = FactoryGImageGray.wrap(output);
 		}
 
 		@Override

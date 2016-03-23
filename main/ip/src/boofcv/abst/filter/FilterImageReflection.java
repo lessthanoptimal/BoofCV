@@ -57,7 +57,7 @@ public class FilterImageReflection<Input extends ImageGray, Output extends Image
 		if (param.length != 2 && param.length != 3 )
 			throw new IllegalArgumentException("Input method must have two or three inputs");
 		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
+			throw new IllegalArgumentException("TWo input parameters must be of type ImageGray");
 	}
 
 
@@ -73,7 +73,7 @@ public class FilterImageReflection<Input extends ImageGray, Output extends Image
 		if (param.length != 2 && param.length != 3 )
 			throw new IllegalArgumentException("Input method must have two or three inputs");
 		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
-			throw new IllegalArgumentException("TWo input parameters must be of type ImageSingleBand");
+			throw new IllegalArgumentException("TWo input parameters must be of type ImageGray");
 	}
 
 	@Override

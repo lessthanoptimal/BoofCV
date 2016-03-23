@@ -107,7 +107,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	/**
 	 * Type of image each band is stored as.
 	 * 
-	 * @return The type of ImageSingleBand which each band is stored as.
+	 * @return The type of ImageGray which each band is stored as.
 	 */
 	public Class<T> getBandType() {
 		return type;
