@@ -91,7 +91,7 @@ public class DistortSupport {
 	}
 
 	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images of the specified image type, transformation
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the planar images of the specified image type, transformation
 	 * and interpolation instance.
 	 *
 	 * @param dstToSrc Transform from dst to src image.
@@ -99,11 +99,11 @@ public class DistortSupport {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	ImageDistort<Planar<Input>,Planar<Output>>
-	createDistortMS(Class<Output> outputType,PixelTransform_F32 dstToSrc,
+	createDistortPL(Class<Output> outputType, PixelTransform_F32 dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )
 	{
 		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
 		bandDistort.setModel(dstToSrc);
-		return new ImplImageDistort_MS<Input,Output>(bandDistort);
+		return new ImplImageDistort_PL<Input,Output>(bandDistort);
 	}
 }

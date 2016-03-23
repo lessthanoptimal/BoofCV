@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
 		super(numAlgFamilies);
 
-		this.imageType = new ImageType<I>(ImageType.Family.SINGLE_BAND, ImageDataType.classToType(imageClass),1);
+		this.imageType = new ImageType<I>(ImageType.Family.GRAY, ImageDataType.classToType(imageClass),1);
 		addToToolbar(createSelectDelay());
 	}
 

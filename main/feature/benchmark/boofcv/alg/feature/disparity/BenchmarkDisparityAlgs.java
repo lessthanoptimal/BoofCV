@@ -64,7 +64,7 @@ public class BenchmarkDisparityAlgs {
 
 	public static class EfficientSad_U8 extends PerformerBase {
 
-//		DisparitySelect<int[],ImageUInt8> compDisp =
+//		DisparitySelect<int[],GrayU8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
 		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);
@@ -79,7 +79,7 @@ public class BenchmarkDisparityAlgs {
 
 	public static class EfficientSad_F32 extends PerformerBase {
 
-		//		DisparitySelect<int[],ImageUInt8> compDisp =
+		//		DisparitySelect<int[],GrayU8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
 		DisparitySelect<float[],GrayU8> compDisp =
 				new ImplSelectRectStandard_F32_U8(250,2,0.1);
@@ -107,7 +107,7 @@ public class BenchmarkDisparityAlgs {
 
 	public static class EfficientSadFive_U8 extends PerformerBase {
 
-		//		DisparitySelect<int[],ImageUInt8> compDisp =
+		//		DisparitySelect<int[],GrayU8> compDisp =
 //				new ImplSelectRectBasicWta_S32_U8();
 		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);

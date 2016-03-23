@@ -199,8 +199,8 @@ public class IntensityFeaturePyramidApp<T extends ImageGray, D extends ImageGray
 		IntensityFeaturePyramidApp<GrayF32,GrayF32> app =
 				new IntensityFeaturePyramidApp<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
-//		IntensityFeaturePyramidApp<ImageUInt8, ImageSInt16> app =
-//				new IntensityFeaturePyramidApp<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+//		IntensityFeaturePyramidApp<GrayU8, GrayS16> app =
+//				new IntensityFeaturePyramidApp<GrayU8,GrayS16>(GrayU8.class,GrayS16.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 

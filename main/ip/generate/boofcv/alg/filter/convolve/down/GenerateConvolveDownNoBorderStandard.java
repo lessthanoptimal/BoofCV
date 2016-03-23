@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 
 	private void print_F32_F32() {
 		kernelType = "F32";
-		inputType = outputType = "ImageFloat32";
+		inputType = outputType = "GrayF32";
 		kernelData = inputData = outputData = "float";
 		bitWise = "";
 		hasDivisor = false;
@@ -69,7 +69,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 
 	private void print_U8_I16() {
 		kernelType = "I32";
-		inputType = "ImageUInt8";
+		inputType = "GrayU8";
 		outputType = "ImageInt16";
 		kernelData = "int";
 		inputData = "byte";
@@ -82,7 +82,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 	
 	private void print_S16_I16() {
 		kernelType = "I32";
-		inputType = "ImageSInt16";
+		inputType = "GrayS16";
 		outputType = "ImageInt16";
 		kernelData = "int";
 		inputData = "short";
@@ -95,7 +95,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 
 	private void print_U8_I8_Div() {
 		kernelType = "I32";
-		inputType = "ImageUInt8";
+		inputType = "GrayU8";
 		outputType = "ImageInt8";
 		kernelData = "int";
 		inputData = "byte";
@@ -108,7 +108,7 @@ public class GenerateConvolveDownNoBorderStandard extends CodeGeneratorBase {
 
 	private void print_S16_I16_Div() {
 		kernelType = "I32";
-		inputType = "ImageSInt16";
+		inputType = "GrayS16";
 		outputType = "ImageInt16";
 		kernelData = "int";
 		inputData = "short";

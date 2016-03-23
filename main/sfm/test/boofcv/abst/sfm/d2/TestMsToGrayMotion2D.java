@@ -36,7 +36,7 @@ public class TestMsToGrayMotion2D {
 	@Test
 	public void basicTests() {
 		Dummy child = new Dummy();
-		MsToGrayMotion2D alg = new MsToGrayMotion2D(child, GrayF32.class);
+		PlToGrayMotion2D alg = new PlToGrayMotion2D(child, GrayF32.class);
 
 		Planar<GrayF32> ms = new Planar<GrayF32>(GrayF32.class,20,30,3);
 

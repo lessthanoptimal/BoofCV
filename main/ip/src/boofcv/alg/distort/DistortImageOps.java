@@ -86,7 +86,7 @@ public class DistortImageOps {
 		if( input instanceof ImageGray) {
 			distortSingle((ImageGray)input, (ImageGray)output, model, interpType, borderType);
 		} else if( input instanceof Planar) {
-			distortMS((Planar) input, (Planar) output, model, borderType, interpType);
+			distortPL((Planar) input, (Planar) output, model, borderType, interpType);
 		}
 	}
 
@@ -156,7 +156,7 @@ public class DistortImageOps {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray,
 			M extends Planar<Input>,N extends Planar<Output>>
-	void distortMS(M input, N output,
+	void distortPL(M input, N output,
 				   PixelTransform_F32 transform,
 				   BorderType borderType, TypeInterpolate interpType)
 	{
@@ -167,7 +167,7 @@ public class DistortImageOps {
 		ImageDistort<Input,Output> distorter = FactoryDistort.distortSB(false, interp, outputBandType);
 		distorter.setModel(transform);
 
-		distortMS(input,output,distorter);
+		distortPL(input,output,distorter);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class DistortImageOps {
 		if( input instanceof ImageGray) {
 			distortSingle((ImageGray) input, (ImageGray) output, model, interpType, borderType);
 		} else if( input instanceof Planar) {
-			distortMS((Planar) input, (Planar) output, model,  borderType, interpType);
+			distortPL((Planar) input, (Planar) output, model,  borderType, interpType);
 		}
 	}
 
@@ -251,7 +251,7 @@ public class DistortImageOps {
 		if( input instanceof ImageGray) {
 			distortSingle((ImageGray) input, (ImageGray) output, model, interpType, borderType);
 		} else if( input instanceof Planar) {
-			distortMS((Planar) input, (Planar) output, model,borderType, interpType);
+			distortPL((Planar) input, (Planar) output, model,borderType, interpType);
 		}
 	}
 
@@ -266,7 +266,7 @@ public class DistortImageOps {
 	 * @param <Input> Band type.
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
-	void distortMS(Planar<Input> input , Planar<Output> output ,
+	void distortPL(Planar<Input> input , Planar<Output> output ,
 				   ImageDistort<Input,Output> distortion )
 	{
 		for( int band = 0; band < input.getNumBands(); band++ )

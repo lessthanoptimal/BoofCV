@@ -124,7 +124,7 @@ public class TestComputeRegionMeanColor {
 	}
 
 	@Test
-	public void specific_MS_U8() {
+	public void specific_PL_U8() {
 		createRegionColor(2);
 		GrayU8 band = new GrayU8(w,h);
 		byte a = 1,b=2,c=3,d=10;
@@ -139,7 +139,7 @@ public class TestComputeRegionMeanColor {
 		image.bands[0] = band;
 		image.bands[1] = band;
 
-		ComputeRegionMeanColor<Planar<GrayU8>> alg = new ComputeRegionMeanColor.MS_U8(2);
+		ComputeRegionMeanColor<Planar<GrayU8>> alg = new ComputeRegionMeanColor.PL_U8(2);
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 
@@ -151,7 +151,7 @@ public class TestComputeRegionMeanColor {
 	}
 
 	@Test
-	public void specific_MS_F32() {
+	public void specific_PL_F32() {
 		createRegionColor(2);
 		GrayF32 band = new GrayF32(w,h);
 		float a = 1.1f,b=2.2f,c=3.3f,d=10.7f;
@@ -166,7 +166,7 @@ public class TestComputeRegionMeanColor {
 		image.bands[0] = band;
 		image.bands[1] = band;
 
-		ComputeRegionMeanColor<Planar<GrayF32>> alg = new ComputeRegionMeanColor.MS_F32(2);
+		ComputeRegionMeanColor<Planar<GrayF32>> alg = new ComputeRegionMeanColor.PL_F32(2);
 
 		alg.process(image,segments,regionMemberCount,regionColor);
 

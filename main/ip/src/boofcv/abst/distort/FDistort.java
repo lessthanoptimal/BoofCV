@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -327,12 +327,12 @@ public class FDistort
 		if( distorter == null ) {
 			Class typeOut = output.getImageType().getImageClass();
 			switch( input.getImageType().getFamily() ) {
-				case SINGLE_BAND:
+				case GRAY:
 					distorter = FactoryDistort.distortSB(cached, (InterpolatePixelS)interp, typeOut);
 					break;
 
-				case MULTI_SPECTRAL:
-					distorter = FactoryDistort.distortMS(cached, (InterpolatePixelS)interp, typeOut);
+				case PLANAR:
+					distorter = FactoryDistort.distortPL(cached, (InterpolatePixelS)interp, typeOut);
 					break;
 
 				case INTERLEAVED:

@@ -18,9 +18,9 @@
 
 package boofcv.openkinect;
 
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.openkinect.freenect.*;
 
 import java.nio.ByteBuffer;
@@ -48,9 +48,9 @@ public class StreamOpenKinectRgbDepth {
 	private Listener listener;
 
 	// image with depth information
-	private ImageUInt16 depth = new ImageUInt16(1,1);
+	private GrayU16 depth = new GrayU16(1,1);
 	// image with color information
-	private MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
+	private Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
 
 	// thread which synchronized video streams
 	private CombineThread thread;
@@ -193,6 +193,6 @@ public class StreamOpenKinectRgbDepth {
 		 * @param timeRgb Time-stamp for rgb image
 		 * @param timeDepth Time-stamp for depth image
 		 */
-		public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth);
+		public void processKinect(Planar<GrayU8> rgb, GrayU16 depth, long timeRgb, long timeDepth);
 	}
 }

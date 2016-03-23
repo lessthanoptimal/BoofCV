@@ -20,7 +20,7 @@ package boofcv.examples.geometry;
 
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
-import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewPL;
 import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -50,7 +50,7 @@ public class ExampleOverheadView {
 		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));
 
 		CreateSyntheticOverheadView<Planar<GrayU8>> generateOverhead =
-				new CreateSyntheticOverheadViewMS<GrayU8>(TypeInterpolate.BILINEAR,3,GrayU8.class);
+				new CreateSyntheticOverheadViewPL<GrayU8>(TypeInterpolate.BILINEAR,3,GrayU8.class);
 
 		// size of cells in the overhead image in world units
 		double cellSize = 0.05;

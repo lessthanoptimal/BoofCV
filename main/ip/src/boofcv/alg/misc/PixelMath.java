@@ -4819,7 +4819,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayU8> input , GrayU8 output ) {
@@ -4902,7 +4902,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayS8> input , GrayS8 output ) {
@@ -4985,7 +4985,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayU16> input , GrayU16 output ) {
@@ -5068,7 +5068,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayS16> input , GrayS16 output ) {
@@ -5151,7 +5151,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayS32> input , GrayS32 output ) {
@@ -5234,7 +5234,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayS64> input , GrayS64 output ) {
@@ -5317,7 +5317,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayF32> input , GrayF32 output ) {
@@ -5400,7 +5400,7 @@ public class PixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 * 
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand(Planar<GrayF64> input , GrayF64 output ) {

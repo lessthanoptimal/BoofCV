@@ -149,7 +149,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples a multi-spectral image.  Type checking is done at runtime.
+	 * Down samples a planar image.  Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param sampleWidth Width of square region.
@@ -164,7 +164,7 @@ public class AverageDownSampleOps {
 	}
 
 	/**
-	 * Down samples a multi-spectral image.  Type checking is done at runtime.
+	 * Down samples a planar image.  Type checking is done at runtime.
 	 *
 	 * @param input Input image. Not modified.
 	 * @param output Output image. Modified.

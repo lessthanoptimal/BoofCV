@@ -20,8 +20,8 @@ package boofcv.factory.feature.dense;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
 import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_F32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_MSF32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_MSU8;
+import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLF32;
+import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLU8;
 import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_U8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -38,7 +38,7 @@ public class FactoryDescribeImageDenseAlg {
 		config.checkValidity();
 
 		DescribeDenseHogAlg hog;
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			switch( imageType.getDataType() ) {
 				case U8:
 					hog = new DescribeDenseHogAlg_U8(config.orientationBins,config.widthCell
@@ -53,15 +53,15 @@ public class FactoryDescribeImageDenseAlg {
 				default:
 					throw new IllegalArgumentException("Unsupported image type");
 			}
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			switch( imageType.getDataType() ) {
 				case U8:
-					hog = new DescribeDenseHogAlg_MSU8(config.orientationBins,config.widthCell
+					hog = new DescribeDenseHogAlg_PLU8(config.orientationBins,config.widthCell
 							,config.widthBlock,config.stepBlock,imageType.getNumBands());
 					break;
 
 				case F32:
-					hog = new DescribeDenseHogAlg_MSF32(config.orientationBins,config.widthCell
+					hog = new DescribeDenseHogAlg_PLF32(config.orientationBins,config.widthCell
 							,config.widthBlock,config.stepBlock,imageType.getNumBands());
 					break;
 

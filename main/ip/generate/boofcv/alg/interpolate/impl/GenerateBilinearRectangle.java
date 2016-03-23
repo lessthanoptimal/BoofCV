@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,8 +65,8 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 		out.println();
 		out.print("import boofcv.alg.interpolate.InterpolateRectangle;\n" +
 				"import boofcv.struct.image."+image.getSingleBandName()+";\n");
-		if( image.getSingleBandName().compareTo("ImageFloat32") != 0 )
-			out.println("import boofcv.struct.image.ImageFloat32;");
+		if( image.getSingleBandName().compareTo("GrayF32") != 0 )
+			out.println("import boofcv.struct.image.GrayF32;");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -113,7 +113,7 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic void region(float tl_x, float tl_y, ImageFloat32 output ) {\n" +
+				"\tpublic void region(float tl_x, float tl_y, GrayF32 output ) {\n" +
 				"\t\tif( tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height ) {\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Region is outside of the image\");\n" +
 				"\t\t}\n" +
@@ -177,7 +177,7 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				"\t\t\thandleBorder(output, xt, yt, ax, ay, bx, by, regWidth, regHeight, results, borderRight, borderBottom);\n" +
 				"\t}\n" +
 				"\n" +
-				"\tprivate void handleBorder( ImageFloat32 output,\n" +
+				"\tprivate void handleBorder( GrayF32 output,\n" +
 				"\t\t\t\t\t\t\t  int xt, int yt,\n" +
 				"\t\t\t\t\t\t\t  float ax, float ay, float bx, float by,\n" +
 				"\t\t\t\t\t\t\t  int regWidth, int regHeight, float[] results,\n" +

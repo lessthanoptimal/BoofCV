@@ -56,7 +56,7 @@ public class BoofDefaults {
 	}
 
 	/**
-	 * Creates a new instance of the default border for derivatives of ImageFloat32
+	 * Creates a new instance of the default border for derivatives of GrayF32
 	 */
 	public static ImageBorder_F32 borderDerivative_F32() {
 		return new ImageBorder1D_F32((Class)BorderIndex1D_Extend.class);

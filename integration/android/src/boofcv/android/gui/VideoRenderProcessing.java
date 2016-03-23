@@ -156,13 +156,13 @@ public abstract class VideoRenderProcessing<T extends ImageBase> extends Thread 
 			return;
 
 		synchronized ( lockConvert ) {
-			if( imageType.getFamily() == ImageType.Family.SINGLE_BAND )
+			if( imageType.getFamily() == ImageType.Family.GRAY )
 				ConvertNV21.nv21ToGray(bytes, image.width, image.height, (ImageSingleBand) image,(Class) image.getClass());
-			else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+			else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
 				if (imageType.getDataType() == ImageDataType.U8)
-					ConvertNV21.nv21ToMsRgb_U8(bytes, image.width, image.height, (MultiSpectral) image);
+					ConvertNV21.nv21ToMsRgb_U8(bytes, image.width, image.height, (Planar) image);
 				else if (imageType.getDataType() == ImageDataType.F32)
-					ConvertNV21.nv21ToMsRgb_F32(bytes, image.width, image.height, (MultiSpectral) image);
+					ConvertNV21.nv21ToMsRgb_F32(bytes, image.width, image.height, (Planar) image);
 				else
 					throw new RuntimeException("Oh Crap");
 			} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {

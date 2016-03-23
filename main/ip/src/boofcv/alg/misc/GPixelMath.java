@@ -970,7 +970,7 @@ public class GPixelMath {
 	/**
 	 * Computes the average for each pixel across all bands in the {@link Planar} image.
 	 *
-	 * @param input MultiSpectral image
+	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static <T extends ImageGray> void averageBand(Planar<T> input, T output) {

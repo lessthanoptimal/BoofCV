@@ -73,7 +73,7 @@ public class BenchmarkConvertBufferedImage {
 	{
 		@Override
 		public void process() {
-			ConvertBufferedImage.extractImageUInt8(imgBuff);
+			ConvertBufferedImage.extractGrayU8(imgBuff);
 		}
 	}
 
@@ -114,25 +114,25 @@ public class BenchmarkConvertBufferedImage {
 		for( int i = 0; i < multiInt8.getNumBands(); i++ )
 			GImageMiscOps.fillUniform(multiInt8.getBand(0), rand, 0, 100);
 
-		System.out.println("=========  Profiling for ImageUInt8 ==========");
+		System.out.println("=========  Profiling for GrayU8 ==========");
 		System.out.println();
 
 		createBufferedImage(BufferedImage.TYPE_3BYTE_BGR);
 		System.out.println("------- BufferedImage RGB interface ---------- ");
-		System.out.printf("BufferedImage to ImageUInt8   %10.2f ops/sec\n",
+		System.out.printf("BufferedImage to GrayU8   %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new FromInt8ToGenericBuff(),1000, false));
 		System.out.println("---- TYPE_3BYTE_BGR ----");
-		evaluateConvert(imgInt8,"ImageUInt8");
-		evaluateConvert(multiInt8,"MultiSpectral_U8");
+		evaluateConvert(imgInt8,"GrayU8");
+		evaluateConvert(multiInt8,"Planar_U8");
 
 		System.out.println("---- TYPE_INT_RGB ----");
 		createBufferedImage(BufferedImage.TYPE_INT_RGB);
-		evaluateConvert(imgInt8,"ImageUInt8");
-		evaluateConvert(multiInt8,"MultiSpectral_U8");
+		evaluateConvert(imgInt8,"GrayU8");
+		evaluateConvert(multiInt8,"Planar_U8");
 
 		System.out.println("---- TYPE_BYTE_GRAY ----");
 		createBufferedImage(BufferedImage.TYPE_BYTE_GRAY);
-		evaluateConvert(imgInt8,"ImageUInt8");
+		evaluateConvert(imgInt8,"GrayU8");
 
 		System.out.printf("extractImageInt8             %10.2f ops/sec\n",
 				ProfileOperation.profileOpsPerSec(new ExtractImageInt8(),1000, false));

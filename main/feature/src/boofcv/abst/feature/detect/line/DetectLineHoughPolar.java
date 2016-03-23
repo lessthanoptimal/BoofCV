@@ -76,7 +76,7 @@ public class DetectLineHoughPolar<I extends ImageGray, D extends ImageGray> impl
 	GrayU8 binary = new GrayU8(1,1);
 
 	GrayF32 suppressed = new GrayF32(1,1);
-//	ImageFloat32 angle = new ImageFloat32(1,1);
+//	GrayF32 angle = new GrayF32(1,1);
 //	ImageSInt8 direction = new ImageSInt8(1,1);
 
 	// angle tolerance for post processing pruning

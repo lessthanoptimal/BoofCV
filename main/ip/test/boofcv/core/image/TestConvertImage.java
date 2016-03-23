@@ -323,7 +323,7 @@ public class TestConvertImage {
 
 	private void checkMultiAverage(Method m, Class inputType, Class outputType) {
 		if( inputType != Planar.class )
-			fail("Expected MultiSpectral image");
+			fail("Expected Planar image");
 
 		ImageGray output = GeneralizedImageOps.createSingleBand(outputType, imgWidth, imgHeight);
 

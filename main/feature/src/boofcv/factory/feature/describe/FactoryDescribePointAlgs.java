@@ -63,9 +63,9 @@ public class FactoryDescribePointAlgs {
 	}
 
 	public static <T extends ImageGray>
-	DescribePointSurfMultiSpectral<T> surfColor(DescribePointSurf<T> describe , int numBands ) {
+	DescribePointSurfPlanar<T> surfColor(DescribePointSurf<T> describe , int numBands ) {
 
-		return new DescribePointSurfMultiSpectral<T>(describe,numBands);
+		return new DescribePointSurfPlanar<T>(describe,numBands);
 	}
 
 	public static <T extends ImageGray>

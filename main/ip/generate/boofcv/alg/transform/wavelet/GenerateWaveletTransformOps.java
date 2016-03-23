@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,8 +59,8 @@ public class GenerateWaveletTransformOps extends CodeGeneratorBase {
 				"import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformBorder;\n" +
 				"import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformInner;\n" +
 				"import boofcv.alg.transform.wavelet.impl.ImplWaveletTransformNaive;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
-				"import boofcv.struct.image.ImageSInt32;\n" +
+				"import boofcv.struct.image.GrayF32;\n" +
+				"import boofcv.struct.image.GrayS32;\n" +
 				"import boofcv.struct.wavelet.WaveletDescription;\n" +
 				"import boofcv.struct.wavelet.WlCoef_F32;\n" +
 				"import boofcv.struct.wavelet.WlCoef_I32;\n" +

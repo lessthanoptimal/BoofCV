@@ -133,8 +133,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray, D extends ImageG
 		Class type = GrayF32.class;
 		Class derivType = type;
 
-//		Class type = ImageUInt8.class;
-//		Class derivType = ImageSInt16.class;
+//		Class type = GrayU8.class;
+//		Class derivType = GrayS16.class;
 
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 

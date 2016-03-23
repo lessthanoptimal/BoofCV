@@ -45,7 +45,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 	Random rand = new Random(234);
 
-	ImageType<Planar<GrayF32>> imageType = ImageType.ms(2,GrayF32.class);
+	ImageType<Planar<GrayF32>> imageType = ImageType.pl(2,GrayF32.class);
 	InterpolatePixelMB<Planar<GrayF32>> interp =
 			FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
 
@@ -152,7 +152,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
-		ImageType<Planar<GrayF32>> imageType = ImageType.ms(1,GrayF32.class);
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(1,GrayF32.class);
 		InterpolatePixelMB<Planar<GrayF32>> interpMB =
 				FactoryInterpolation.createPixelMB(0,255,TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
 		InterpolatePixelS<GrayF32> interpSB = FactoryInterpolation.bilinearPixelS(

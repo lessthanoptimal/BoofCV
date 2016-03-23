@@ -40,7 +40,7 @@ import java.util.Random;
 public abstract class TextureGrayTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<GrayU8> {
 
 	public TextureGrayTrackerObjectRectangleTests() {
-		super(new ImageType<GrayU8>(ImageType.Family.SINGLE_BAND, ImageDataType.U8,1));
+		super(new ImageType<GrayU8>(ImageType.Family.GRAY, ImageDataType.U8,1));
 
 		input = new GrayU8(width,height);
 	}

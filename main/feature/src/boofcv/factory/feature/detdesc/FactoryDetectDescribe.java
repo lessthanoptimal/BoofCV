@@ -32,9 +32,9 @@ import boofcv.abst.feature.orientation.*;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.describe.DescribePointSurfMod;
-import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
+import boofcv.alg.feature.describe.DescribePointSurfPlanar;
 import boofcv.alg.feature.detdesc.CompleteSift;
-import boofcv.alg.feature.detdesc.DetectDescribeSurfMultiSpectral;
+import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
@@ -104,7 +104,7 @@ public class FactoryDetectDescribe {
 	 *
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 *
 	 * @param configDetector		Configuration for SURF detector
 	 * @param configDesc			Configuration for SURF descriptor
@@ -130,12 +130,12 @@ public class FactoryDetectDescribe {
 	 * <p>
 	 * Color version of SURF stable.  Features are detected in a gray scale image, but the descriptors are
 	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
-	 * {@link DetectDescribeSurfMultiSpectral} for details.
+	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
 	 * @see FastHessianFeatureDetector
 	 * @see DescribePointSurf
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 *
 	 * @param configDetector		Configuration for SURF detector
 	 * @param configDesc			Configuration for SURF descriptor
@@ -155,14 +155,14 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			DescribePointSurfMultiSpectral<II> describeMulti =
-					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+			DescribePointSurfPlanar<II> describeMulti =
+					new DescribePointSurfPlanar<II>(describe,imageType.getNumBands());
 
-			DetectDescribeSurfMultiSpectral<II> deteDesc =
-					new DetectDescribeSurfMultiSpectral<II>(detector,orientation,describeMulti);
+			DetectDescribeSurfPlanar<II> deteDesc =
+					new DetectDescribeSurfPlanar<II>(detector,orientation,describeMulti);
 
-			return new SurfMultiSpectral_to_DetectDescribePoint( deteDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -179,7 +179,7 @@ public class FactoryDetectDescribe {
 	 * [1] Add tech report when its finished.  See SURF performance web page for now.
 	 * </p>
 	 *
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 * @see FastHessianFeatureDetector
 	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 *
@@ -208,10 +208,10 @@ public class FactoryDetectDescribe {
 	 * <p>
 	 * Color version of SURF stable feature.  Features are detected in a gray scale image, but the descriptors are
 	 * computed using a color image.  Each band in the page adds to the descriptor length.  See
-	 * {@link DetectDescribeSurfMultiSpectral} for details.
+	 * {@link DetectDescribeSurfPlanar} for details.
 	 * </p>
 	 *
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 * @see FastHessianFeatureDetector
 	 * @see boofcv.alg.feature.describe.DescribePointSurfMod
 	 *
@@ -234,14 +234,14 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			DescribePointSurfMultiSpectral<II> describeMulti =
-					new DescribePointSurfMultiSpectral<II>(describe,imageType.getNumBands());
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+			DescribePointSurfPlanar<II> describeMulti =
+					new DescribePointSurfPlanar<II>(describe,imageType.getNumBands());
 
-			DetectDescribeSurfMultiSpectral<II> deteDesc =
-					new DetectDescribeSurfMultiSpectral<II>(detector,orientation,describeMulti);
+			DetectDescribeSurfPlanar<II> deteDesc =
+					new DetectDescribeSurfPlanar<II>(detector,orientation,describeMulti);
 
-			return new SurfMultiSpectral_to_DetectDescribePoint( deteDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}

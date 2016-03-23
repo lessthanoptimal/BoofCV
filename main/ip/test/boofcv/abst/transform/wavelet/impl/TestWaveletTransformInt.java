@@ -78,7 +78,7 @@ public class TestWaveletTransformInt {
 	}
 
 	/**
-	 * See how well it processes an image which is not an ImageSInt32
+	 * See how well it processes an image which is not an GrayS32
 	 */
 	@Test
 	public void checkOtherType() {

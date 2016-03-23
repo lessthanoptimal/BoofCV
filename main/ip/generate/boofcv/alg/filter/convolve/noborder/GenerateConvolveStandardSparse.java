@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,11 +32,11 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		setOutputFile(className);
 		printPreamble();
-		printAllOps("F32", "ImageFloat32","float","",false);
-		printAllOps("I32", "ImageUInt8","int"," & 0xFF",false);
-		printAllOps("I32", "ImageUInt8","int"," & 0xFF",true);
-		printAllOps("I32", "ImageSInt16","int","",false);
-		printAllOps("I32", "ImageSInt16","int","",true);
+		printAllOps("F32", "GrayF32","float","",false);
+		printAllOps("I32", "GrayU8","int"," & 0xFF",false);
+		printAllOps("I32", "GrayU8","int"," & 0xFF",true);
+		printAllOps("I32", "GrayS16","int","",false);
+		printAllOps("I32", "GrayS16","int","",true);
 		out.println("}");
 	}
 
@@ -44,9 +44,9 @@ public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 
 		out.print("import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
-				"import boofcv.struct.image.ImageSInt16;\n" +
-				"import boofcv.struct.image.ImageUInt8;\n" +
+				"import boofcv.struct.image.GrayF32;\n" +
+				"import boofcv.struct.image.GrayS16;\n" +
+				"import boofcv.struct.image.GrayU8;\n" +
 				"\n" +
 				"/**\n" +
 				" *\n" +

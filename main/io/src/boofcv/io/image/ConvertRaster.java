@@ -289,11 +289,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_3BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_1BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_4BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -312,11 +312,11 @@ public class ConvertRaster {
 		int srcStrideDiff = srcStride-src.getPixelStride()*dst.width;
 
 		if (numBands == 3) {
-			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_3BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_1BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_4BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -378,11 +378,11 @@ public class ConvertRaster {
 		int srcStrideDiff = 0;
 
 		if (numBands == 3) {
-			from_3BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_3BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_1BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			from_4BU8_to_MSU8(dst, srcData, srcOffset, srcStrideDiff);
+			from_4BU8_to_PLU8(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
@@ -405,17 +405,17 @@ public class ConvertRaster {
 		int srcStrideDiff = 0;
 
 		if (numBands == 3) {
-			from_3BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_3BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 1) {
-			from_1BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_1BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else if (numBands == 4) {
-			from_4BU8_to_MSF32(dst, srcData, srcOffset, srcStrideDiff);
+			from_4BU8_to_PLF32(dst, srcData, srcOffset, srcStrideDiff);
 		} else {
 			throw new RuntimeException("Write more code here.");
 		}
 	}
 
-	private static void from_4BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -436,7 +436,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] data = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -452,7 +452,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_MSF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -470,7 +470,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_4BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_4BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -490,7 +490,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_1BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_1BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte dstData[] = dst.getBand(0).data;
 
 		int indexSrc = srcOffset;
@@ -502,7 +502,7 @@ public class ConvertRaster {
 		}
 	}
 
-	private static void from_3BU8_to_MSU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
+	private static void from_3BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcOffset, int srcStrideDiff) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -998,7 +998,7 @@ public class ConvertRaster {
 
 	/**
 	 * <p>
-	 * Converts a buffered image into an multi-spectral image using the BufferedImage's RGB interface.
+	 * Converts a buffered image into an planar image using the BufferedImage's RGB interface.
 	 * </p>
 	 * <p>
 	 * This is much slower than working directly with the BufferedImage's internal raster and should be
@@ -1039,7 +1039,7 @@ public class ConvertRaster {
 
 	/**
 	 * <p>
-	 * Converts a buffered image into an multi-spectral image using the BufferedImage's RGB interface.
+	 * Converts a buffered image into an planar image using the BufferedImage's RGB interface.
 	 * </p>
 	 * <p>
 	 * This is much slower than working directly with the BufferedImage's internal raster and should be
@@ -1128,7 +1128,7 @@ public class ConvertRaster {
 
 	/**
 	 * <p>
-	 * Converts a buffered image into an multi-spectral image using the BufferedImage's RGB interface.
+	 * Converts a buffered image into an planar image using the BufferedImage's RGB interface.
 	 * </p>
 	 * <p>
 	 * This is much slower than working directly with the BufferedImage's internal raster and should be

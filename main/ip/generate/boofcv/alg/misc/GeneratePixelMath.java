@@ -40,7 +40,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
 
-	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.SINGLE_BAND,ImageType.Family.INTERLEAVED};
+	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
 
 	public void generate() throws FileNotFoundException {
 		printPreamble();
@@ -607,12 +607,12 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		String bitwise = input.getBitWise();
 		
 		out.print("\t/**\n" +
-				"\t * Computes the average for each pixel across all bands in the {@link MultiSpectral} image.\n" +
+				"\t * Computes the average for each pixel across all bands in the {@link Planar} image.\n" +
 				"\t * \n" +
-				"\t * @param input MultiSpectral image\n" +
+				"\t * @param input Planar image\n" +
 				"\t * @param output Gray scale image containing average pixel values\n" +
 				"\t */\n" +
-				"\tpublic static void averageBand( MultiSpectral<"+imageName+"> input , "+imageName+" output ) {\n" +
+				"\tpublic static void averageBand( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
 				"\t\tfinal int h = input.getHeight();\n" +
 				"\t\tfinal int w = input.getWidth();\n" +
 				"\n" +

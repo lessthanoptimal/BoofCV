@@ -131,7 +131,7 @@ public class VideoDetectInterestPoints<T extends ImageGray>
 			fileName = args[0];
 		}
 
-//		perform(fileName,ImageUInt8.class,ImageSInt16.class);
+//		perform(fileName,GrayU8.class,GrayS16.class);
 		perform(fileName, GrayF32.class,GrayF32.class);
 	}
 }

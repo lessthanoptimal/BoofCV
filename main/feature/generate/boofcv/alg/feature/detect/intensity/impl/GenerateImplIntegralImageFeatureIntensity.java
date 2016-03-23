@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 				"\t * Brute force approach which is easy to validate through visual inspection.\n" +
 				"\t */\n" +
 				"\tpublic static void hessianNaive( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
-				"\t\t\t\t\t\t\t\t\t ImageFloat32 intensity)\n" +
+				"\t\t\t\t\t\t\t\t\t GrayF32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height;\n" +
@@ -115,7 +115,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 				"\t * Only computes the fast hessian along the border using a brute force approach\n" +
 				"\t */\n" +
 				"\tpublic static void hessianBorder( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
-				"\t\t\t\t\t\t\t\t\t  ImageFloat32 intensity)\n" +
+				"\t\t\t\t\t\t\t\t\t  GrayF32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height;\n" +
@@ -159,7 +159,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 	}
 
 	private void computeIntensity( AutoTypeImage input ) {
-		out.print("\tprivate static void computeHessian("+input.getSingleBandName()+" integral, ImageFloat32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {\n" +
+		out.print("\tprivate static void computeHessian("+input.getSingleBandName()+" integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {\n" +
 				"\t\tfloat Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);\n" +
 				"\t\tfloat Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);\n" +
 				"\t\tfloat Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);\n" +
@@ -180,7 +180,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 				"\t * Optimizes intensity for the inner image.  \n" +
 				"\t */\n" +
 				"\tpublic static void hessianInner( "+input.getSingleBandName()+" integral, int skip , int size ,\n" +
-				"\t\t\t\t\t\t\t\t\t ImageFloat32 intensity)\n" +
+				"\t\t\t\t\t\t\t\t\t GrayF32 intensity)\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height;\n" +

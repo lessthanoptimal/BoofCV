@@ -70,12 +70,12 @@ public abstract class BenchmarkDerivativeBase {
 		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
 		System.out.println("               border = "+border);
 		System.out.println();
-		System.out.println("             ImageUInt8");
+		System.out.println("             GrayU8");
 		System.out.println();
 
 		profile_I8();
 
-		System.out.println("\n             ImageFloat32");
+		System.out.println("\n             GrayF32");
 		System.out.println();
 
 		profile_F32();

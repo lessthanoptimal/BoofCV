@@ -31,7 +31,7 @@ public class ImplConvertJCodecPicture {
 	/**
 	 * Converts a picture in JCodec RGB into RGB BoofCV
 	 */
-	public static void RGB_to_MSU8(Picture input, Planar<GrayU8> output) {
+	public static void RGB_to_PLU8(Picture input, Planar<GrayU8> output) {
 		if( input.getColor() != ColorSpace.RGB )
 			throw new RuntimeException("Unexpected input color space!");
 		if( output.getNumBands() != 3 )
@@ -61,7 +61,7 @@ public class ImplConvertJCodecPicture {
 	}
 
 
-	public static void yuv420_to_MsRgb_U8(Picture input, Planar<GrayU8> output) {
+	public static void yuv420_to_PlRgb_U8(Picture input, Planar<GrayU8> output) {
 
 		int[] Y = input.getPlaneData(0);
 		int[] U = input.getPlaneData(1);
@@ -103,7 +103,7 @@ public class ImplConvertJCodecPicture {
 		}
 	}
 
-	public static void yuv420_to_MsRgb_F32(Picture input, Planar<GrayF32> output) {
+	public static void yuv420_to_PlRgb_F32(Picture input, Planar<GrayF32> output) {
 
 		int[] Y = input.getPlaneData(0);
 		int[] U = input.getPlaneData(1);

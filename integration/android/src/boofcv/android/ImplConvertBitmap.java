@@ -47,7 +47,7 @@ public class ImplConvertBitmap {
 		}
 	}
 
-	public static void bitmapToGrayRGB(Bitmap input, ImageUInt8 output) {
+	public static void bitmapToGrayRGB(Bitmap input, GrayU8 output) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -62,7 +62,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void bitmapToGrayRGB(Bitmap input, ImageFloat32 output) {
+	public static void bitmapToGrayRGB(Bitmap input, GrayF32 output) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -77,14 +77,14 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void bitmapToMultiRGB_U8(Bitmap input, MultiSpectral<ImageUInt8> output) {
+	public static void bitmapToMultiRGB_U8(Bitmap input, Planar<GrayU8> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
-		ImageUInt8 A = output.getBand(3);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
+		GrayU8 A = output.getBand(3);
 
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
@@ -116,14 +116,14 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void bitmapToMultiRGB_F32(Bitmap input, MultiSpectral<ImageFloat32> output) {
+	public static void bitmapToMultiRGB_F32(Bitmap input, Planar<GrayF32> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
-		ImageFloat32 A = output.getBand(3);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
+		GrayF32 A = output.getBand(3);
 
 		for (int y = 0; y < h; y++) {
 			int index = output.startIndex + y * output.stride;
@@ -155,7 +155,7 @@ public class ImplConvertBitmap {
 		}
 	}
 
-	public static void grayToBitmapRGB(ImageUInt8 input, Bitmap output) {
+	public static void grayToBitmapRGB(GrayU8 input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -170,7 +170,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void grayToBitmapRGB(ImageFloat32 input, Bitmap output) {
+	public static void grayToBitmapRGB(GrayF32 input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -184,14 +184,14 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToBitmapRGB_U8(MultiSpectral<ImageUInt8> input, Bitmap output) {
+	public static void multiToBitmapRGB_U8(Planar<GrayU8> input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
-		ImageUInt8 R = input.getBand(0);
-		ImageUInt8 G = input.getBand(1);
-		ImageUInt8 B = input.getBand(2);
-		ImageUInt8 A = input.getBand(3);
+		GrayU8 R = input.getBand(0);
+		GrayU8 G = input.getBand(1);
+		GrayU8 B = input.getBand(2);
+		GrayU8 A = input.getBand(3);
 		
 		for (int y = 0; y < h; y++) {
 			int index = input.startIndex + y * input.stride;
@@ -202,14 +202,14 @@ public class ImplConvertBitmap {
 		}
 	}
 
-	public static void multiToBitmapRGB_F32(MultiSpectral<ImageFloat32> input, Bitmap output) {
+	public static void multiToBitmapRGB_F32(Planar<GrayF32> input, Bitmap output) {
 		final int h = input.height;
 		final int w = input.width;
 
-		ImageFloat32 R = input.getBand(0);
-		ImageFloat32 G = input.getBand(1);
-		ImageFloat32 B = input.getBand(2);
-		ImageFloat32 A = input.getBand(3);
+		GrayF32 R = input.getBand(0);
+		GrayF32 G = input.getBand(1);
+		GrayF32 B = input.getBand(2);
+		GrayF32 A = input.getBand(3);
 		
 		for (int y = 0; y < h; y++) {
 			int index = input.startIndex + y * input.stride;
@@ -225,7 +225,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToGray( int input[], Bitmap.Config config, ImageUInt8 output ) {
+	public static void arrayToGray( int input[], Bitmap.Config config, GrayU8 output ) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -251,7 +251,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToGray(int input[], Bitmap.Config config, ImageFloat32 output )
+	public static void arrayToGray(int input[], Bitmap.Config config, GrayF32 output )
 	{
 		final int h = output.height;
 		final int w = output.width;
@@ -278,14 +278,14 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_U8(int input[], Bitmap.Config config , MultiSpectral<ImageUInt8> output ) {
+	public static void arrayToMulti_U8(int input[], Bitmap.Config config , Planar<GrayU8> output ) {
 		final int h = output.height;
 		final int w = output.width;
 
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
-		ImageUInt8 A = output.getBand(3);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
+		GrayU8 A = output.getBand(3);
 		
 		int indexSrc = 0;
 		
@@ -340,14 +340,14 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_F32(int input[], Bitmap.Config config , MultiSpectral<ImageFloat32> output ) {
+	public static void arrayToMulti_F32(int input[], Bitmap.Config config , Planar<GrayF32> output ) {
 		final int h = output.height;
 		final int w = output.width;
 
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
-		ImageFloat32 A = output.getBand(3);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
+		GrayF32 A = output.getBand(3);
 		
 		int indexSrc = 0;
 		
@@ -402,7 +402,7 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToGray(byte array[], Bitmap.Config config , ImageUInt8 output) {
+	public static void arrayToGray(byte array[], Bitmap.Config config , GrayU8 output) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -450,7 +450,7 @@ public class ImplConvertBitmap {
 
 	}
 	
-	public static void arrayToGray(byte array[], Bitmap.Config config , ImageFloat32 output) {
+	public static void arrayToGray(byte array[], Bitmap.Config config , GrayF32 output) {
 		final int h = output.height;
 		final int w = output.width;
 
@@ -496,20 +496,20 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void arrayToMulti_U8(byte []input, Bitmap.Config config, MultiSpectral<ImageUInt8> output) {
+	public static void arrayToMulti_U8(byte []input, Bitmap.Config config, Planar<GrayU8> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
-		ImageUInt8 R = output.getBand(0);
-		ImageUInt8 G = output.getBand(1);
-		ImageUInt8 B = output.getBand(2);
+		GrayU8 R = output.getBand(0);
+		GrayU8 G = output.getBand(1);
+		GrayU8 B = output.getBand(2);
 
 		int indexSrc = 0;
 
 		switch (config) {
 		case ARGB_8888: {
 			if( output.getNumBands() == 4 ) {
-				ImageUInt8 A = output.getBand(3);
+				GrayU8 A = output.getBand(3);
 				for (int y = 0; y < h; y++) {
 					int indexDst = output.startIndex + y * output.stride;
 					int end = indexDst + w;
@@ -570,20 +570,20 @@ public class ImplConvertBitmap {
 
 	}
 	
-	public static void arrayToMulti_F32(byte []input, Bitmap.Config config, MultiSpectral<ImageFloat32> output) {
+	public static void arrayToMulti_F32(byte []input, Bitmap.Config config, Planar<GrayF32> output) {
 		final int h = output.height;
 		final int w = output.width;
 		
-		ImageFloat32 R = output.getBand(0);
-		ImageFloat32 G = output.getBand(1);
-		ImageFloat32 B = output.getBand(2);
+		GrayF32 R = output.getBand(0);
+		GrayF32 G = output.getBand(1);
+		GrayF32 B = output.getBand(2);
 
 		int indexSrc = 0;
 
 		switch (config) {
 		case ARGB_8888: {
 			if( output.getNumBands() == 4 ) {
-				ImageFloat32 A = output.getBand(3);
+				GrayF32 A = output.getBand(3);
 				for (int y = 0; y < h; y++) {
 					int indexDst = output.startIndex + y * output.stride;
 					int end = indexDst + w;
@@ -644,7 +644,7 @@ public class ImplConvertBitmap {
 
 	}
 
-	public static void grayToArray(ImageUInt8 input, byte []output , Bitmap.Config config ) {
+	public static void grayToArray(GrayU8 input, byte []output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -689,7 +689,7 @@ public class ImplConvertBitmap {
 
 	}
 	
-	public static void grayToArray(ImageFloat32 input, byte[] output , Bitmap.Config config ) {
+	public static void grayToArray(GrayF32 input, byte[] output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
@@ -733,20 +733,20 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToArray_U8(MultiSpectral<ImageUInt8> input, byte[] output , Bitmap.Config config ) {
+	public static void multiToArray_U8(Planar<GrayU8> input, byte[] output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
-		ImageUInt8 R = input.getBand(0);
-		ImageUInt8 G = input.getBand(1);
-		ImageUInt8 B = input.getBand(2);
+		GrayU8 R = input.getBand(0);
+		GrayU8 G = input.getBand(1);
+		GrayU8 B = input.getBand(2);
 
 		int indexDst = 0;
 
 		switch (config) {
 			case ARGB_8888:
 			if( input.getNumBands() == 4 ) {
-				ImageUInt8 A = input.getBand(3);
+				GrayU8 A = input.getBand(3);
 				for (int y = 0; y < h; y++) {
 					int indexSrc = input.startIndex + y * input.stride;
 					for (int x = 0; x < w; x++,indexSrc++) {
@@ -803,20 +803,20 @@ public class ImplConvertBitmap {
 		}
 	}
 	
-	public static void multiToArray_F32(MultiSpectral<ImageFloat32> input, byte[] output , Bitmap.Config config ) {
+	public static void multiToArray_F32(Planar<GrayF32> input, byte[] output , Bitmap.Config config ) {
 		final int h = input.height;
 		final int w = input.width;
 
-		ImageFloat32 R = input.getBand(0);
-		ImageFloat32 G = input.getBand(1);
-		ImageFloat32 B = input.getBand(2);
+		GrayF32 R = input.getBand(0);
+		GrayF32 G = input.getBand(1);
+		GrayF32 B = input.getBand(2);
 
 		int indexDst = 0;
 
 		switch (config) {
 		case ARGB_8888:
 			if( input.getNumBands() == 4 ) {
-				ImageFloat32 A = input.getBand(3);
+				GrayF32 A = input.getBand(3);
 				for (int y = 0; y < h; y++) {
 					int indexSrc = input.startIndex + y * input.stride;
 					for (int x = 0; x < w; x++,indexSrc++) {

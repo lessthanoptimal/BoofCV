@@ -334,7 +334,7 @@ public class TestLinearContourLabelChang2004 {
 	}
 
 //	private void print( List<Point2D_I32> l , int w, int h ) {
-//		ImageUInt8 img = new ImageUInt8(w,h);
+//		GrayU8 img = new GrayU8(w,h);
 //
 //		for( Point2D_I32 p : l ) {
 //			img.set(p.x,p.y,1);

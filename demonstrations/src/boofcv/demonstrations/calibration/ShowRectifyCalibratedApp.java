@@ -131,8 +131,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		GImageMiscOps.fill(rectRight,0);
 
 		// Render the rectified image
-		DistortImageOps.distortMS(distLeft, rectLeft, imageDistortLeft);
-		DistortImageOps.distortMS(distRight, rectRight, imageDistortRight);
+		DistortImageOps.distortPL(distLeft, rectLeft, imageDistortLeft);
+		DistortImageOps.distortPL(distRight, rectRight, imageDistortRight);
 
 		// convert for output
 		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null,true);

@@ -196,7 +196,7 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 
 	public static void main(String args[]) {
 		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayF32.class, GrayF32.class);
-//		DetectFeaturePointApp app = new DetectFeaturePointApp(ImageUInt8.class,ImageSInt16.class);
+//		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));

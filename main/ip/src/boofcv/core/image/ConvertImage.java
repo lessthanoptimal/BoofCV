@@ -21,7 +21,7 @@ package boofcv.core.image;
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.impl.ConvertInterleavedToSingle;
 import boofcv.core.image.impl.ImplConvertImage;
-import boofcv.core.image.impl.ImplConvertMsToSingle;
+import boofcv.core.image.impl.ImplConvertMsToGray;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
@@ -339,7 +339,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -350,7 +350,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -358,7 +358,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedU8}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -745,7 +745,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -756,7 +756,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -764,7 +764,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedS8}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1151,7 +1151,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1162,7 +1162,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -1170,7 +1170,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedU16}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1557,7 +1557,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1568,7 +1568,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -1576,7 +1576,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedS16}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1963,7 +1963,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -1974,7 +1974,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -1982,7 +1982,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedS32}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -2369,7 +2369,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -2380,7 +2380,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -2388,7 +2388,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedS64}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -2775,7 +2775,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -2786,7 +2786,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -2794,7 +2794,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedF32}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -3181,7 +3181,7 @@ public class ConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 * 
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -3192,7 +3192,7 @@ public class ConvertImage {
 			InputSanityCheck.checkSameShape(input, output);
 		}
 
-		ImplConvertMsToSingle.average(input, output);
+		ImplConvertMsToGray.average(input, output);
 
 		return output;
 	}
@@ -3200,7 +3200,7 @@ public class ConvertImage {
 	/**
 	 * Converts a {@link Planar} into the equivalent {@link InterleavedF64}
 	 *
-	 * @param input (Input) MultiSpectral image that is being converted. Not modified.
+	 * @param input (Input) Planar image that is being converted. Not modified.
 	 * @param output (Optional) The output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */

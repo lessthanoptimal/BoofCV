@@ -6,9 +6,9 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Processes the video data and displays it in a Bitmap image.  The bitmap is automatically scaled and translated
@@ -16,18 +16,18 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class ShowGradient extends VideoImageProcessing<ImageUInt8>
+public class ShowGradient extends VideoImageProcessing<GrayU8>
 {
    // Storage for the gradient
-   private ImageSInt16 derivX = new ImageSInt16(1,1);
-   private ImageSInt16 derivY = new ImageSInt16(1,1);
+   private GrayS16 derivX = new GrayS16(1,1);
+   private GrayS16 derivY = new GrayS16(1,1);
 
    // computes the image gradient
-   private ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class, ImageSInt16.class);
+   private ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
    protected ShowGradient()
    {
-      super(ImageType.single(ImageUInt8.class));
+      super(ImageType.single(GrayU8.class));
    }
 
    @Override
@@ -40,7 +40,7 @@ public class ShowGradient extends VideoImageProcessing<ImageUInt8>
    }
 
    @Override
-   protected void process(ImageUInt8 gray, Bitmap output, byte[] storage)
+   protected void process(GrayU8 gray, Bitmap output, byte[] storage)
    {
       gradient.process(gray,derivX,derivY);
       VisualizeImageData.colorizeGradient(derivX, derivY, -1, output, storage);

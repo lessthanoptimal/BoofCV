@@ -40,7 +40,7 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 	boolean multiColor;
 
 	public ColorTrackerObjectRectangleTests( boolean multiColor ) {
-		super(new ImageType<Planar<GrayU8>>(ImageType.Family.MULTI_SPECTRAL, ImageDataType.U8,3));
+		super(new ImageType<Planar<GrayU8>>(ImageType.Family.PLANAR, ImageDataType.U8,3));
 
 		this.multiColor = multiColor;
 

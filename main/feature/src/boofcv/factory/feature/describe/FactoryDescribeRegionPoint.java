@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.alg.feature.describe.DescribePointSurf;
-import boofcv.alg.feature.describe.DescribePointSurfMultiSpectral;
+import boofcv.alg.feature.describe.DescribePointSurfPlanar;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
@@ -68,7 +68,7 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * Color variant of the SURF descriptor which has been designed for speed and sacrifices some stability.
 	 *
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 *
 	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
@@ -82,10 +82,10 @@ public class FactoryDescribeRegionPoint {
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfSpeed( config, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+			DescribePointSurfPlanar<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
 
-			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);
+			return new SurfPlanar_to_DescribeRegionPoint(color,bandType,integralType);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
@@ -117,7 +117,7 @@ public class FactoryDescribeRegionPoint {
 	/**
 	 * Color variant of the SURF descriptor which has been designed for stability.
 	 *
-	 * @see DescribePointSurfMultiSpectral
+	 * @see DescribePointSurfPlanar
 	 *
 	 * @param config SURF configuration. Pass in null for default options.
 	 * @param imageType Type of input image.
@@ -131,10 +131,10 @@ public class FactoryDescribeRegionPoint {
 
 		DescribePointSurf<II> alg = FactoryDescribePointAlgs.surfStability( config, integralType);
 
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			DescribePointSurfMultiSpectral<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+			DescribePointSurfPlanar<II> color = FactoryDescribePointAlgs.surfColor( alg,imageType.getNumBands());
 
-			return new SurfMultiSpectral_to_DescribeRegionPoint(color,bandType,integralType);
+			return new SurfPlanar_to_DescribeRegionPoint(color,bandType,integralType);
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}

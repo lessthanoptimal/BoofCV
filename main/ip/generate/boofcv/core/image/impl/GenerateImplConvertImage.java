@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,7 +163,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 		String bandName = imageIn.getSingleBandName();
 
 		out.print(
-				"\tpublic static void convert( "+inputName+" input , MultiSpectral<"+bandName+"> output ) {\n" +
+				"\tpublic static void convert( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -184,7 +184,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 		String bandName = imageIn.getSingleBandName();
 
 		out.print(
-				"\tpublic static void convert( MultiSpectral<"+bandName+"> input , "+outputName+" output ) {\n" +
+				"\tpublic static void convert( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.getNumBands();\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +

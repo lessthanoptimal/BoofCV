@@ -25,9 +25,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import com.sun.jna.NativeLibrary;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.openkinect.freenect.Context;
@@ -103,7 +103,7 @@ public class LogKinectDataApp implements StreamOpenKinectRgbDepth.Listener {
 	}
 
 	@Override
-	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
+	public void processKinect(Planar<GrayU8> rgb, GrayU16 depth, long timeRgb, long timeDepth) {
 		System.out.println(frameNumber+"  "+timeRgb);
 		try {
 			logFile.write(String.format("%10d %d %d\n",frameNumber,timeRgb,timeDepth).getBytes());

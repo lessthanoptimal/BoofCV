@@ -1,7 +1,7 @@
 package boofcv.openkinect;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.image.GrayU16;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.junit.Test;
 
@@ -24,10 +24,10 @@ public class TestUtilOpenKinect {
 	@Test
 	public void saveDepth_parseDepth() throws IOException {
 
-		ImageUInt16 depth = new ImageUInt16(width,height);
+		GrayU16 depth = new GrayU16(width,height);
 		ImageMiscOps.fillUniform(depth,rand,0,10000);
 		GrowQueue_I8 data = new GrowQueue_I8();
-		ImageUInt16 found = new ImageUInt16(width,height);
+		GrayU16 found = new GrayU16(width,height);
 
 		UtilOpenKinect.saveDepth(depth, "temp.depth", data);
 

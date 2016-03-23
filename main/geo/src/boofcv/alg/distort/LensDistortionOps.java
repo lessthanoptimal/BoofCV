@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,12 +89,12 @@ public class LensDistortionOps {
 		ImageDistort<T,T> distort;
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				distort = FactoryDistort.distortSB(true, interp, bandType);
 				break;
 
-			case MULTI_SPECTRAL:
-				distort = FactoryDistort.distortMS(true,interp, bandType);
+			case PLANAR:
+				distort = FactoryDistort.distortPL(true,interp, bandType);
 				break;
 
 			default:

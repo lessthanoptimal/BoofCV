@@ -163,8 +163,8 @@ public class ShowImageDerivative<T extends ImageGray, D extends ImageGray>
 
 		ShowImageDerivative<GrayF32,GrayF32> app
 				= new ShowImageDerivative<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
-//		ShowImageDerivative<ImageUInt8, ImageSInt16> app
-//				= new ShowImageDerivative<ImageUInt8,ImageSInt16>(ImageUInt8.class,ImageSInt16.class);
+//		ShowImageDerivative<GrayU8, GrayS16> app
+//				= new ShowImageDerivative<GrayU8,GrayS16>(GrayU8.class,GrayS16.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));

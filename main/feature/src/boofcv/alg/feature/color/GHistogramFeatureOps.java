@@ -52,7 +52,7 @@ public class GHistogramFeatureOps {
 	}
 
 	/**
-	 * Computes a joint histogram for a multi-spectral image.  Since it's a joint distribution the histogram
+	 * Computes a joint histogram for a planar image.  Since it's a joint distribution the histogram
 	 * can become huge (and too sparse) if bin sizes are used that are too big.  Also consider computing the
 	 * histogram independently in each band.
 	 *

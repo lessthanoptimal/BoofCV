@@ -60,13 +60,13 @@ public class FactoryTrackerObjectAlgs {
 	PixelLikelihood<T> likelihoodHueSatHistIndependent(
 			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
-		if( imageType.getFamily() != ImageType.Family.MULTI_SPECTRAL )
-			throw new IllegalArgumentException("Only MultiSpectral images supported currently");
+		if( imageType.getFamily() != ImageType.Family.PLANAR)
+			throw new IllegalArgumentException("Only Planar images supported currently");
 		if( imageType.getNumBands() != 3 )
 			throw new IllegalArgumentException("Input image type must have 3 bands.");
 
 		if( imageType.getDataType() == ImageDataType.U8 ) {
-			return (PixelLikelihood)new LikelihoodHueSatHistInd_MS_U8((int)maxPixelValue,numHistogramBins);
+			return (PixelLikelihood)new LikelihoodHueSatHistInd_PL_U8((int)maxPixelValue,numHistogramBins);
 		} else {
 			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
@@ -76,13 +76,13 @@ public class FactoryTrackerObjectAlgs {
 	PixelLikelihood<T> likelihoodHueSatHistCoupled(
 			double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
-		if( imageType.getFamily() != ImageType.Family.MULTI_SPECTRAL )
-			throw new IllegalArgumentException("Only MultiSpectral images supported currently");
+		if( imageType.getFamily() != ImageType.Family.PLANAR)
+			throw new IllegalArgumentException("Only Planar images supported currently");
 		if( imageType.getNumBands() != 3 )
 			throw new IllegalArgumentException("Input image type must have 3 bands.");
 
 		if( imageType.getDataType() == ImageDataType.U8 ) {
-			return (PixelLikelihood)new LikelihoodHueSatHistCoupled_MS_U8((int)maxPixelValue,numHistogramBins);
+			return (PixelLikelihood)new LikelihoodHueSatHistCoupled_PL_U8((int)maxPixelValue,numHistogramBins);
 		} else {
 			throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 		}
@@ -92,20 +92,20 @@ public class FactoryTrackerObjectAlgs {
 	PixelLikelihood<T> likelihoodHistogramCoupled( double maxPixelValue , int numHistogramBins , ImageType<T> imageType )
 	{
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				if( imageType.getDataType() != ImageDataType.U8 )
 					throw new IllegalArgumentException("Only U8 currently supported");
 				return (PixelLikelihood)new LikelihoodHistCoupled_SB_U8((int)maxPixelValue,numHistogramBins);
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				if( imageType.getDataType() == ImageDataType.U8 ) {
-					return (PixelLikelihood)new LikelihoodHistCoupled_MS_U8((int)maxPixelValue,numHistogramBins);
+					return (PixelLikelihood)new LikelihoodHistCoupled_PL_U8((int)maxPixelValue,numHistogramBins);
 				} else {
 					throw new RuntimeException("Band type not yet supported "+imageType.getDataType());
 				}
 
 			default:
-				throw new IllegalArgumentException("Image family not yet supported.  Try MultiSpectral");
+				throw new IllegalArgumentException("Image family not yet supported.  Try Planar");
 		}
 	}
 

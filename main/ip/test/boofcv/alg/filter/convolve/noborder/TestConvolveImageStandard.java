@@ -66,7 +66,7 @@ public class TestConvolveImageStandard {
 			if( !isTestMethod(m))
 				continue;
 
-			System.out.println("Testing "+m.getName());
+//			System.out.println("Testing "+m.getName());
 			testMethod(m);
 			numFound++;
 		}

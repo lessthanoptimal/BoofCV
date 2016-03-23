@@ -236,9 +236,9 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		DescribeImageDense<GrayU8,TupleDesc_F64> desc = (DescribeImageDense)
 				FactoryDescribeImageDense.surfFast(surfFast, GrayU8.class);
-//				FactoryDescribeImageDense.surfStable(surfStable, ImageUInt8.class);
-//				FactoryDescribeImageDense.sift(sift, ImageUInt8.class);
-//				FactoryDescribeImageDense.hog(hog, ImageType.single(ImageUInt8.class));
+//				FactoryDescribeImageDense.surfStable(surfStable, GrayU8.class);
+//				FactoryDescribeImageDense.sift(sift, GrayU8.class);
+//				FactoryDescribeImageDense.hog(hog, ImageType.single(GrayU8.class));
 
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_F64(null, MAX_KNN_ITERATIONS, 20, 1e-6);
 		clusterer.setVerbose(true);

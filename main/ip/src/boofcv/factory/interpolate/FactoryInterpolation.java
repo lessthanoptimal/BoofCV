@@ -18,7 +18,7 @@
 
 package boofcv.factory.interpolate;
 
-import boofcv.abst.filter.interpolate.InterpolatePixel_MS_using_SB;
+import boofcv.abst.filter.interpolate.InterpolatePixel_PL_using_SB;
 import boofcv.alg.interpolate.*;
 import boofcv.alg.interpolate.impl.*;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
@@ -55,8 +55,8 @@ public class FactoryInterpolation {
 	public static <T extends ImageBase> InterpolatePixel<T>
 	createPixel(double min, double max, TypeInterpolate type, BorderType borderType, ImageType<T> imageType) {
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
-			case MULTI_SPECTRAL:
+			case GRAY:
+			case PLANAR:
 				return createPixelS(min, max, type, borderType, imageType.getImageClass());
 
 			case INTERLEAVED:
@@ -120,10 +120,10 @@ public class FactoryInterpolation {
 	{
 		switch (imageType.getFamily()) {
 
-			case MULTI_SPECTRAL:
-				return (InterpolatePixelMB) createPixelMS(createPixelS(min, max, type, borderType, imageType.getDataType()));
+			case PLANAR:
+				return (InterpolatePixelMB) createPixelPL(createPixelS(min, max, type, borderType, imageType.getDataType()));
 
-			case SINGLE_BAND:{
+			case GRAY:{
 				InterpolatePixelS interpS = createPixelS(min,max,type,borderType,imageType.getImageClass());
 				return new InterpolatePixel_S_to_MB(interpS);
 			}
@@ -152,11 +152,11 @@ public class FactoryInterpolation {
 	 *
 	 * @param singleBand Interpolation for a single band.
 	 * @param <T> Single band image trype
-	 * @return Interpolation for MultiSpectral images
+	 * @return Interpolation for Planar images
 	 */
 	public static <T extends ImageGray> InterpolatePixelMB<Planar<T>>
-	createPixelMS(InterpolatePixelS<T> singleBand) {
-		return new InterpolatePixel_MS_using_SB<T>(singleBand);
+	createPixelPL(InterpolatePixelS<T> singleBand) {
+		return new InterpolatePixel_PL_using_SB<T>(singleBand);
 	}
 
 	public static <T extends ImageGray> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {
@@ -311,9 +311,9 @@ public class FactoryInterpolation {
 	public static <T extends ImageGray> InterpolateRectangle<T> nearestNeighborRectangle(Class<?> type ) {
 		if( type == GrayF32.class )
 			return (InterpolateRectangle<T>)new NearestNeighborRectangle_F32();
-//		else if( type == ImageUInt8.class )
+//		else if( type == GrayU8.class )
 //			return (InterpolateRectangle<T>)new NearestNeighborRectangle_U8();
-//		else if( type == ImageSInt16.class )
+//		else if( type == GrayS16.class )
 //			return (InterpolateRectangle<T>)new NearestNeighborRectangle_S16();
 		else
 			throw new RuntimeException("Unknown image type: "+typeName(type));

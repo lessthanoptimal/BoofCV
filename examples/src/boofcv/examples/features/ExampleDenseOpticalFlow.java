@@ -56,10 +56,10 @@ public class ExampleDenseOpticalFlow {
 //		String fileName1 = UtilIO.pathExample("denseflow/Grove2_09.png");
 
 		DenseOpticalFlow<GrayF32> denseFlow =
-//				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);
-//				FactoryDenseOpticalFlow.region(null,ImageFloat32.class);
-//				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageFloat32.class);
-//				FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class);
+//				FactoryDenseOpticalFlow.flowKlt(null, 6, GrayF32.class, null);
+//				FactoryDenseOpticalFlow.region(null,GrayF32.class);
+//				FactoryDenseOpticalFlow.hornSchunck(20, 1000, GrayF32.class);
+//				FactoryDenseOpticalFlow.hornSchunckPyramid(null,GrayF32.class);
 				FactoryDenseOpticalFlow.broxWarping(null, GrayF32.class);
 
 		BufferedImage buff0 = media.openImage(fileName0);

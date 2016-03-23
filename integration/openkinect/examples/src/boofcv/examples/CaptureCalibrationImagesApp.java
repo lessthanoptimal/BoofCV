@@ -25,9 +25,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.StreamOpenKinectRgbDepth;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import com.sun.jna.NativeLibrary;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.openkinect.freenect.Context;
@@ -65,8 +65,8 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 
 	ImagePanel gui;
 
-	MultiSpectral<ImageUInt8> savedRgb;
-	ImageUInt16 savedDepth;
+	Planar<GrayU8> savedRgb;
+	GrayU16 savedDepth;
 
 	volatile boolean updateDisplay;
 	volatile boolean savedImages;
@@ -90,8 +90,8 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 
 		buffRgb = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
-		savedRgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,w,h,3);
-		savedDepth = new ImageUInt16(w,h);
+		savedRgb = new Planar<GrayU8>(GrayU8.class,w,h,3);
+		savedDepth = new GrayU16(w,h);
 
 		gui = ShowImages.showWindow(buffRgb, "Kinect RGB");
 		gui.addKeyListener(this);
@@ -138,7 +138,7 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 	}
 
 	@Override
-	public void processKinect(MultiSpectral<ImageUInt8> rgb, ImageUInt16 depth, long timeRgb, long timeDepth) {
+	public void processKinect(Planar<GrayU8> rgb, GrayU16 depth, long timeRgb, long timeDepth) {
 
 		if( updateDisplay ) {
 			ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);

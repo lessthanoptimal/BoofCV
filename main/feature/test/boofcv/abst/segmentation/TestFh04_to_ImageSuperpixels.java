@@ -33,8 +33,8 @@ public class TestFh04_to_ImageSuperpixels<T extends ImageBase> extends GeneralIm
 	public TestFh04_to_ImageSuperpixels() {
 		super(ImageType.single(GrayU8.class),
 				ImageType.single(GrayF32.class),
-				ImageType.ms(3, GrayU8.class),
-				ImageType.ms(3, GrayF32.class));
+				ImageType.pl(3, GrayU8.class),
+				ImageType.pl(3, GrayF32.class));
 	}
 
 	@Override

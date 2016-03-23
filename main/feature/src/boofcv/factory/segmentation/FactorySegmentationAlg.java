@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,20 +49,20 @@ public class FactorySegmentationAlg {
 	 */
 	public static <T extends ImageBase>
 	ComputeRegionMeanColor<T> regionMeanColor(ImageType<T> imageType) {
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			switch( imageType.getDataType() ) {
 				case U8:
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
 				case F32:
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
 			}
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 			switch( imageType.getDataType() ) {
 				case U8:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_U8(N);
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
 				case F32:
-					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.MS_F32(N);
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
 			}
 		}
 
@@ -91,7 +91,7 @@ public class FactorySegmentationAlg {
 
 		SegmentMeanShiftSearch<T> search;
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(imageType.getImageClass(), BorderType.EXTENDED);
 			search = new SegmentMeanShiftSearchGray(maxIterations,convergenceTol,interp,
 					spacialRadius,spacialRadius,colorRadius,config.fast);
@@ -113,7 +113,7 @@ public class FactorySegmentationAlg {
 
 	public static <T extends ImageBase>
 	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule , ImageType<T> imageType) {
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
 			if( rule == ConnectRule.FOUR ) {
 				switch( imageType.getDataType() ) {
 					case U8:
@@ -129,21 +129,21 @@ public class FactorySegmentationAlg {
 						return (FhEdgeWeights)new FhEdgeWeights8_F32();
 				}
 			}
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 			if( rule == ConnectRule.FOUR ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_MsU8(N);
+						return (FhEdgeWeights)new FhEdgeWeights4_PLU8(N);
 					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_MsF32(N);
+						return (FhEdgeWeights)new FhEdgeWeights4_PLF32(N);
 				}
 			} else if( rule == ConnectRule.EIGHT ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_MsU8(N);
+						return (FhEdgeWeights)new FhEdgeWeights8_PLU8(N);
 					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_MsF32(N);
+						return (FhEdgeWeights)new FhEdgeWeights8_PLF32(N);
 				}
 			}
 		}
@@ -176,7 +176,7 @@ public class FactorySegmentationAlg {
 		if( config == null )
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");
 
-		if( imageType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
 				switch( imageType.getDataType() ) {
 					case U8:
 						return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
@@ -185,14 +185,14 @@ public class FactorySegmentationAlg {
 						return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
 								config.spacialWeight,config.totalIterations,config.connectRule);
 				}
-		} else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (SegmentSlic)new SegmentSlic_MsU8(config.numberOfRegions,
+						return (SegmentSlic)new SegmentSlic_PlU8(config.numberOfRegions,
 								config.spacialWeight,config.totalIterations,config.connectRule,N);
 					case F32:
-						return (SegmentSlic)new SegmentSlic_MsF32(config.numberOfRegions,
+						return (SegmentSlic)new SegmentSlic_PlF32(config.numberOfRegions,
 								config.spacialWeight,config.totalIterations,config.connectRule,N);
 				}
 		}

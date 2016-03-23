@@ -44,7 +44,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 	@Test
 	public void track() {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
-		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMS(interpSB);
+		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelPL(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,0.0f,0.1f,calcHistogram);
 
@@ -78,7 +78,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 	@Test
 	public void updateLocation() {
 		InterpolatePixelS interpSB = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
-		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelMS(interpSB);
+		InterpolatePixelMB interpolate = FactoryInterpolation.createPixelPL(interpSB);
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,0.0f,0.1f,calcHistogram);
 

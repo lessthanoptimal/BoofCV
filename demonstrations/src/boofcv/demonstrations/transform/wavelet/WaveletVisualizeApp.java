@@ -141,7 +141,7 @@ public class WaveletVisualizeApp
 	public static void main( String args[] ) {
 		BufferedImage in = UtilImageIO.loadImage("data/standard/lena512.bmp");
 		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
-//		WaveletVisualizeApp app = new WaveletVisualizeApp(ImageUInt8.class);
+//		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));

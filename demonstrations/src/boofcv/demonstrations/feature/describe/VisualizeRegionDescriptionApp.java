@@ -72,7 +72,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends Image
 		this.imageType = imageType;
 
 		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
+		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)));
 		addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
 		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
@@ -103,7 +103,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends Image
 
 	private void setDescriptorInput() {
 		if( describe != null )  {
-			if( describe.getImageType().getFamily() == ImageType.Family.SINGLE_BAND ) {
+			if( describe.getImageType().getFamily() == ImageType.Family.GRAY) {
 				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 				describe.setImage(input);
 			} else {

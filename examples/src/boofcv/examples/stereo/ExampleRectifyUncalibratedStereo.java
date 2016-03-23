@@ -95,8 +95,8 @@ public class ExampleRectifyUncalibratedStereo {
 		ImageDistort<GrayF32,GrayF32> imageDistortRight =
 				RectifyImageOps.rectifyImage(rect2, BorderType.SKIP, GrayF32.class);
 
-		DistortImageOps.distortMS(unrectLeft, rectLeft, imageDistortLeft);
-		DistortImageOps.distortMS(unrectRight, rectRight, imageDistortRight);
+		DistortImageOps.distortPL(unrectLeft, rectLeft, imageDistortLeft);
+		DistortImageOps.distortPL(unrectRight, rectRight, imageDistortRight);
 
 		// convert for output
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft,null,true);

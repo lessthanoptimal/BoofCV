@@ -65,7 +65,7 @@ public class SegmentMeanShift<T extends ImageBase> {
 	MergeSmallRegions<T> prune;
 
 	// contains resegmented image after enforcing all points be connected
-//	ImageSInt32 pixelToRegion2 = new ImageSInt32(1,1);
+//	GrayS32 pixelToRegion2 = new GrayS32(1,1);
 
 	/**
 	 * Specifies internal classes used by mean-shift.

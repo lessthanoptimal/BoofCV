@@ -188,7 +188,7 @@ public class ExampleImageStitching {
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.VALUE);
 		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distort =
-				DistortSupport.createDistortMS(GrayF32.class, model, interp, false);
+				DistortSupport.createDistortPL(GrayF32.class, model, interp, false);
 		distort.setRenderAll(false);
 
 		// Render first image

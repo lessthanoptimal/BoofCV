@@ -64,7 +64,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	public void printAll() {
 		AutoTypeImage types[] = AutoTypeImage.getSpecificTypes();
 
-		ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.SINGLE_BAND,ImageType.Family.INTERLEAVED};
+		ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
 
 		List<CodeGenerator> functions = new ArrayList<CodeGenerator>();
 		functions.add( new GenerateMin());

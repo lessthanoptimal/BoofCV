@@ -87,7 +87,7 @@ public class BoofTesting {
 		if( input instanceof ImageGray) {
 			return (T)createSubImageOf_S((ImageGray)input);
 		} else if( input instanceof Planar) {
-			return (T)createSubImageOf_MS((Planar) input);
+			return (T)createSubImageOf_PL((Planar) input);
 		} else if( input instanceof ImageInterleaved ) {
 			return (T)createSubImageOf_I((ImageInterleaved) input);
 		} else {
@@ -117,7 +117,7 @@ public class BoofTesting {
 		return ret;
 	}
 
-	public static <T extends Planar> T createSubImageOf_MS(T input) {
+	public static <T extends Planar> T createSubImageOf_PL(T input) {
 		T ret = (T)new Planar(input.type,input.width,input.height,input.getNumBands());
 
 		for( int i = 0; i < input.getNumBands(); i++ ) {
@@ -669,10 +669,10 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
+	 * Checks to see if the BufferedImage has the same intensity values as the GrayU8
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB ImageUInt8
+	 * @param imgB GrayU8
 	 */
 	public static void checkEquals(BufferedImage imgA, GrayU8 imgB) {
 
@@ -717,10 +717,10 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
+	 * Checks to see if the BufferedImage has the same intensity values as the GrayU8
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB ImageUInt8
+	 * @param imgB GrayU8
 	 */
 	public static void checkEquals(BufferedImage imgA, GrayI16 imgB) {
 
@@ -785,10 +785,10 @@ public class BoofTesting {
 	}
 
 	/**
-	 * Checks to see if the BufferedImage has the same intensity values as the ImageUInt8
+	 * Checks to see if the BufferedImage has the same intensity values as the GrayU8
 	 *
 	 * @param imgA BufferedImage
-	 * @param imgB ImageUInt8
+	 * @param imgB GrayU8
 	 */
 	public static void checkEquals(BufferedImage imgA, GrayF32 imgB, float tol) {
 

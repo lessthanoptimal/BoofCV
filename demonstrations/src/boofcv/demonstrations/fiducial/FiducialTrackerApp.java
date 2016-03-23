@@ -96,7 +96,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 	FiducialStability stabilityMax = new FiducialStability();
 
 	public FiducialTrackerApp(Class<I> imageType) {
-		super(0, ImageType.ms(3, imageType));
+		super(0, ImageType.pl(3, imageType));
 		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -160,7 +160,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 	@Override
 	protected void updateAlg(Planar<I> frame, BufferedImage buffImage) {
 
-		if( detector.getInputType().getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( detector.getInputType().getFamily() == ImageType.Family.GRAY) {
 			gray.reshape(frame.width, frame.height);
 			GConvertImage.average(frame, gray);
 		}
@@ -309,7 +309,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 		stabilityMax.location = 0.05;
 		stabilityMax.orientation = 0.02;
 
-		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
+		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.pl(3, imageClass));
 
 		if( video == null ) {
 			System.err.println("Can't find video "+videoName);
@@ -339,7 +339,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 	}
 
 	public static void main(String[] args) {
-//		Class type = ImageFloat32.class;
+//		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
 		FiducialTrackerApp app = new FiducialTrackerApp(type);

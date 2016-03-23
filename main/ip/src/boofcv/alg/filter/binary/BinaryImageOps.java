@@ -46,7 +46,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 /*
- * DESIGN NOTE: 8-bit integer images ({@link ImageUInt8}) are used instead of images composed of boolean values because
+ * DESIGN NOTE: 8-bit integer images ({@link GrayU8}) are used instead of images composed of boolean values because
  * there is no performance advantage.  According to the virtual machines specification binary arrays are stored as
  * byte arrays with 1 representing true and 0 representing false.
 

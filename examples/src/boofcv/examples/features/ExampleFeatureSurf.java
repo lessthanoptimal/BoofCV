@@ -53,7 +53,7 @@ public class ExampleFeatureSurf {
 	 * Use generalized interfaces for working with SURF.  This removes much of the drudgery, but also reduces flexibility
 	 * and slightly increases memory and computational requirements.
 	 * 
-	 *  @param image Input image type. DOES NOT NEED TO BE ImageFloat32, ImageUInt8 works too
+	 *  @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too
 	 */
 	public static void easy( GrayF32 image ) {
 		// create the detector and descriptors
@@ -73,7 +73,7 @@ public class ExampleFeatureSurf {
 	 * this case.  They are almost the same as TupleDesc_F64, but contain the Laplacian's sign which can be used
 	 * to speed up association. That is an example of how using less generalized interfaces can improve performance.
 	 * 
-	 * @param image Input image type. DOES NOT NEED TO BE ImageFloat32, ImageUInt8 works too
+	 * @param image Input image type. DOES NOT NEED TO BE GrayF32, GrayU8 works too
 	 */
 	public static <II extends ImageGray> void harder(GrayF32 image ) {
 		// SURF works off of integral images

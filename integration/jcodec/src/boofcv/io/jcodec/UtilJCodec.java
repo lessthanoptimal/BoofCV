@@ -33,14 +33,14 @@ public class UtilJCodec {
 	 */
 	public static void convertToBoof(Picture input, ImageBase output) {
 		if( input.getColor() == ColorSpace.RGB ) {
-			ImplConvertJCodecPicture.RGB_to_MSU8(input, (Planar) output);
+			ImplConvertJCodecPicture.RGB_to_PLU8(input, (Planar) output);
 		} else if( input.getColor() == ColorSpace.YUV420 ) {
 			if( output instanceof Planar) {
 				Planar ms = (Planar)output;
 				if( ms.getImageType().getDataType() == ImageDataType.U8 ) {
-					ImplConvertJCodecPicture.yuv420_to_MsRgb_U8(input, ms);
+					ImplConvertJCodecPicture.yuv420_to_PlRgb_U8(input, ms);
 				} else if( ms.getImageType().getDataType() == ImageDataType.F32 ) {
-					ImplConvertJCodecPicture.yuv420_to_MsRgb_F32(input, ms);
+					ImplConvertJCodecPicture.yuv420_to_PlRgb_F32(input, ms);
 				}
 			} else if( output instanceof GrayU8) {
 				ImplConvertJCodecPicture.yuv420_to_U8(input, (GrayU8) output);

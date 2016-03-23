@@ -48,7 +48,7 @@ import java.lang.reflect.Array;
  * 
  * <p>
  * May image processing operations can be run independently on each color band. This is useful since many
- * operations have been written for {@link ImageGray}, but not MultiSpectral yet.
+ * operations have been written for {@link ImageGray}, but not Planar yet.
  * <pre>
  * for( int i = 0; i < image.numBands(); i++ ) {
  *     SomeGrayImageFilter.process( image.getBand(0) );
@@ -71,7 +71,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	public T bands[];
 
 	/**
-	 * Creates a MultiSpectral image with the specified properties.
+	 * Creates a Planar image with the specified properties.
 	 *
 	 * @param type The type of image which each band is stored as.
 	 * @param width Width of the image.
@@ -88,7 +88,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 		for (int i = 0; i < numBands; i++) {
 			bands[i] = GeneralizedImageOps.createSingleBand(type, width, height);
 		}
-		this.imageType = ImageType.ms(numBands,type);
+		this.imageType = ImageType.pl(numBands,type);
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	public Planar(Class<T> type, int numBands) {
 		this.type = type;
 		this.bands = (T[]) Array.newInstance(type, numBands);
-		this.imageType = ImageType.ms(numBands,type);
+		this.imageType = ImageType.pl(numBands,type);
 	}
 
 

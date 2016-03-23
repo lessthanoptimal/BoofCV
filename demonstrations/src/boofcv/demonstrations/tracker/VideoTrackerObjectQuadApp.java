@@ -71,7 +71,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	boolean firstFrame = true;
 
 	public VideoTrackerObjectQuadApp( Class<I> imageType ) {
-		super(1, ImageType.ms(3, imageType));
+		super(1, ImageType.pl(3, imageType));
 		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -155,7 +155,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 
 		boolean grayScale = false;
 
-		if( tracker.getImageType().getFamily() == ImageType.Family.SINGLE_BAND ) {
+		if( tracker.getImageType().getFamily() == ImageType.Family.GRAY) {
 			gray.reshape(frame.width,frame.height);
 			GConvertImage.average(frame, gray);
 			grayScale = true;
@@ -239,7 +239,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 
 		parseQuad(path+"_rect.txt");
 
-		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.ms(3, imageClass));
+		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.pl(3, imageClass));
 
 		process(video);
 	}
@@ -293,7 +293,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 
 
 	public static void main(String[] args) {
-//		Class type = ImageFloat32.class;
+//		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
 		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);

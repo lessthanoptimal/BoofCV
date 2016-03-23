@@ -101,7 +101,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 				FactoryDistort.distortSB(false, interp, GrayF32.class);
 		undistorter.setModel(new PointToPixelTransform_F32(model));
 
-		DistortImageOps.distortMS(dist, undist, undistorter);
+		DistortImageOps.distortPL(dist, undist, undistorter);
 
 		final BufferedImage out = ConvertBufferedImage.convertTo(undist,null,true);
 

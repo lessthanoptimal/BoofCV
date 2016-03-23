@@ -50,19 +50,19 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	}
 
 	public static <I extends ImageGray> ImageType<I> single(Class<I> imageType ) {
-		return new ImageType<I>(Family.SINGLE_BAND, ImageDataType.classToType(imageType),1);
+		return new ImageType<I>(Family.GRAY, ImageDataType.classToType(imageType),1);
 	}
 
 	public static <I extends ImageGray> ImageType<I> single(ImageDataType type ) {
-		return new ImageType<I>(Family.SINGLE_BAND, type,1);
+		return new ImageType<I>(Family.GRAY, type,1);
 	}
 
-	public static <I extends ImageGray> ImageType<Planar<I>> ms(int numBands , Class<I> imageType ) {
-		return new ImageType<Planar<I>>(Family.MULTI_SPECTRAL, ImageDataType.classToType(imageType),numBands);
+	public static <I extends ImageGray> ImageType<Planar<I>> pl(int numBands , Class<I> imageType ) {
+		return new ImageType<Planar<I>>(Family.PLANAR, ImageDataType.classToType(imageType),numBands);
 	}
 
-	public static <I extends ImageGray> ImageType<Planar<I>> ms(int numBands , ImageDataType type ) {
-		return new ImageType<Planar<I>>(Family.MULTI_SPECTRAL, type,numBands);
+	public static <I extends ImageGray> ImageType<Planar<I>> pl(int numBands , ImageDataType type ) {
+		return new ImageType<Planar<I>>(Family.PLANAR, type,numBands);
 	}
 
 	public static <I extends ImageInterleaved> ImageType<I> il(int numBands, Class<I> imageType) {
@@ -86,13 +86,13 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	 */
 	public T createImage( int width , int height ) {
 		switch( family ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return (T)GeneralizedImageOps.createSingleBand(getImageClass(),width,height);
 
 			case INTERLEAVED:
 				return (T)GeneralizedImageOps.createInterleaved(getImageClass(), width, height, numBands);
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				return (T)new Planar(getImageClass(),width,height,numBands);
 
 			default:
@@ -107,11 +107,11 @@ public class ImageType<T extends ImageBase> implements Serializable {
 	 */
 	public T[] createArray( int length ) {
 		switch( family ) {
-			case SINGLE_BAND:
+			case GRAY:
 			case INTERLEAVED:
 				return (T[])Array.newInstance(getImageClass(),length);
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				return (T[])new Planar[ length ];
 
 			default:
@@ -133,8 +133,8 @@ public class ImageType<T extends ImageBase> implements Serializable {
 
 	public static Class getImageClass( Family family , ImageDataType dataType ) {
 		switch( family ) {
-			case SINGLE_BAND:
-			case MULTI_SPECTRAL:
+			case GRAY:
+			case PLANAR:
 				switch( dataType ) {
 					case F32: return GrayF32.class;
 					case F64: return GrayF64.class;
@@ -174,8 +174,8 @@ public class ImageType<T extends ImageBase> implements Serializable {
 
 	public static enum Family
 	{
-		SINGLE_BAND,
-		MULTI_SPECTRAL,
+		GRAY,
+		PLANAR,
 		INTERLEAVED
 	}
 }

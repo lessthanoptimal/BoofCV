@@ -178,7 +178,7 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testMultiSpectral() {
+	public void testPlanar() {
 		Planar original = new Planar(GrayU8.class,40,50,3);
 		GImageMiscOps.addUniform(original, rand, 0, 100);
 		UtilIO.saveXML(original, "temp.txt");

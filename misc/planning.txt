@@ -26,8 +26,6 @@ Alpha 0.23
   * Ability to remove images and recompute
 
 Massive Refactorings
-- MultiSpectral to Planar
-- ImageUInt8 to ImageU8 ... etc
 - Delete type specific functions from FactoryDerivative
 
 Face Detectors
@@ -60,7 +58,7 @@ Future
 - Background Model
   * GMM model
   * Shadow removal
-  * remove support for MultiSpectral once Interleaved is supported enough
+  * remove support for Planar once Interleaved is supported enough
 
 - Unit test for getScaleAtRadius
   * Implement universally

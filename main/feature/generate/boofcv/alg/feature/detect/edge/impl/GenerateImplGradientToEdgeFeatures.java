@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void intensityE( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 intensity )\n" +
+		out.print("\tstatic public void intensityE( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , GrayF32 intensity )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -101,7 +101,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 
 		String bitWise = derivType.getBitWise();
 
-		out.print("\tstatic public void intensityAbs( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 intensity )\n" +
+		out.print("\tstatic public void intensityAbs( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , GrayF32 intensity )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -125,7 +125,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void direction( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 angle )\n" +
+		out.print("\tstatic public void direction( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , GrayF32 angle )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
@@ -157,7 +157,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 		String bitWise = derivType.getBitWise();
 		String sumType = derivType.getSumType();
 
-		out.print("\tstatic public void direction2( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 angle )\n" +
+		out.print("\tstatic public void direction2( "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , GrayF32 angle )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +

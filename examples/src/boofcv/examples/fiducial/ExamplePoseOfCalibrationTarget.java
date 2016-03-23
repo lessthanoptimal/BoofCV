@@ -69,7 +69,7 @@ public class ExamplePoseOfCalibrationTarget {
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");
 		SimpleImageSequence<GrayF32> video =
 				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(GrayF32.class));
-//				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(ImageFloat32.class));
+//				DefaultMediaManager.INSTANCE.openCamera(null, 640, 480, ImageType.single(GrayF32.class));
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.

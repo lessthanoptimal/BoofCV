@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
-				" * Low level implementations of different methods for converting {@link MultiSpectral} into\n" +
+				" * Low level implementations of different methods for converting {@link Planar} into\n" +
 				" * {@link boofcv.struct.image.ImageSingleBand}.\n" +
 				" * \n" +
 				" * <ul>\n" +
@@ -74,7 +74,7 @@ public class GenerateImplConvertMsToSingle extends CodeGeneratorBase {
 		String typecast = in.getTypeCastFromSum();
 		String bitwise = in.getBitWise();
 
-		out.print("\tpublic static void average( MultiSpectral<"+imageType+"> from , "+imageType+" to ) {\n" +
+		out.print("\tpublic static void average( Planar<"+imageType+"> from , "+imageType+" to ) {\n" +
 				"\t\tint numBands = from.getNumBands();\n" +
 				"\n" +
 				"\t\tif( numBands == 1 ) {\n" +

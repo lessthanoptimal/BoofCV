@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ public class GenerateConvolveDownNormalizedNaive extends CodeGeneratorBase {
 
 	public void generate() {
 		printPreamble();
-		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float");
-		printAllOps("I32", "ImageUInt8","ImageInt8","int","int");
-		printAllOps("I32", "ImageSInt16","ImageInt16","int","int");
+		printAllOps("F32", "GrayF32","GrayF32","float","float");
+		printAllOps("I32", "GrayU8","ImageInt8","int","int");
+		printAllOps("I32", "GrayS16","ImageInt16","int","int");
 		out.println("}");
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.factory.sfm;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
-import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewMS;
+import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewPL;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -40,14 +40,14 @@ public class FactorySfmMisc {
 		Class classType = imageType.getImageClass();
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 			{
 				InterpolatePixelS interp = FactoryInterpolation.bilinearPixelS(classType, BorderType.EXTENDED);
 				return new CreateSyntheticOverheadViewS(interp);
 			}
 
-			case MULTI_SPECTRAL:
-				return new CreateSyntheticOverheadViewMS(TypeInterpolate.BILINEAR,imageType.getNumBands(),classType);
+			case PLANAR:
+				return new CreateSyntheticOverheadViewPL(TypeInterpolate.BILINEAR,imageType.getNumBands(),classType);
 
 			default:
 				throw new IllegalArgumentException(imageType.getFamily()+" is not supported");

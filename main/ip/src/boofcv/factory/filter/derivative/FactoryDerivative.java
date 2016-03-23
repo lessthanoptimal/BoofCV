@@ -96,10 +96,10 @@ public class FactoryDerivative {
 	 */
 	public static <I extends ImageGray, D extends ImageGray>
 	ImageGradient<Planar<I>,Planar<D>>
-	gradientMS(DerivativeType type , int numBands , Class<I> inputType , Class<D> derivType )
+	gradientPL(DerivativeType type , int numBands , Class<I> inputType , Class<D> derivType )
 	{
 		ImageGradient<I,D> g = gradientSB(type,inputType,derivType);
-		return new ImageGradient_MS<I, D>(g,numBands);
+		return new ImageGradient_PL<I, D>(g,numBands);
 	}
 
 
@@ -113,15 +113,15 @@ public class FactoryDerivative {
 		}
 
 		switch( inputType.getFamily() ) {
-			case SINGLE_BAND: {
+			case GRAY: {
 				Class derivClass = derivType != null ? derivType.getImageClass() : null;
 				return gradientSB(type,inputType.getImageClass(),derivClass);
 			}
 
-			case MULTI_SPECTRAL: {
+			case PLANAR: {
 				int numBands = inputType.getNumBands();
 				Class derivClass = derivType != null ? derivType.getImageClass() : null;
-				return gradientMS(type,numBands,inputType.getImageClass(),derivClass);
+				return gradientPL(type,numBands,inputType.getImageClass(),derivClass);
 			}
 
 			case INTERLEAVED:

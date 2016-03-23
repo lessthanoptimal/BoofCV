@@ -198,7 +198,7 @@ public class BenchmarkOrientation<I extends ImageGray, D extends ImageGray> {
 
 	public static void main( String argsp[ ] ) {
 		BenchmarkOrientation<GrayF32,GrayF32> alg = new BenchmarkOrientation<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
-//		BenchmarkOrientation<ImageUInt8,ImageSInt16> alg = new BenchmarkOrientation<ImageUInt8,ImageSInt16>(ImageUInt8.class, ImageSInt16.class);
+//		BenchmarkOrientation<GrayU8,GrayS16> alg = new BenchmarkOrientation<GrayU8,GrayS16>(GrayU8.class, GrayS16.class);
 
 		alg.perform();
 	}

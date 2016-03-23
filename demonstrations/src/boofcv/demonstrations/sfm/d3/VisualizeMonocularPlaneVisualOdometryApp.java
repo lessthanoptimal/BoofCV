@@ -392,7 +392,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 	public static void main( String args[] ) throws FileNotFoundException {
 
 		Class type = GrayF32.class;
-//		Class type = ImageUInt8.class;
+//		Class type = GrayU8.class;
 
 		VisualizeMonocularPlaneVisualOdometryApp app = new VisualizeMonocularPlaneVisualOdometryApp(type);
 

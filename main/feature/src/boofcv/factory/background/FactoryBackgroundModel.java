@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,11 +47,11 @@ public class FactoryBackgroundModel {
 		config.checkValidity();
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return new BackgroundStationaryBasic_SB(config.learnRate,config.threshold,imageType.getImageClass());
 
-			case MULTI_SPECTRAL:
-				return new BackgroundStationaryBasic_MS(config.learnRate,config.threshold,imageType);
+			case PLANAR:
+				return new BackgroundStationaryBasic_PL(config.learnRate,config.threshold,imageType);
 
 			case INTERLEAVED:
 				return new BackgroundStationaryBasic_IL(config.learnRate,config.threshold,imageType);
@@ -74,12 +74,12 @@ public class FactoryBackgroundModel {
 		config.checkValidity();
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return new BackgroundMovingBasic_SB(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType.getImageClass());
 
-			case MULTI_SPECTRAL:
-				return new BackgroundMovingBasic_MS(config.learnRate,config.threshold,
+			case PLANAR:
+				return new BackgroundMovingBasic_PL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
 
 			case INTERLEAVED:
@@ -105,12 +105,12 @@ public class FactoryBackgroundModel {
 		BackgroundStationaryGaussian<T> ret;
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				ret = new BackgroundStationaryGaussian_SB(config.learnRate,config.threshold,imageType.getImageClass());
 				break;
 
-			case MULTI_SPECTRAL:
-				ret =  new BackgroundStationaryGaussian_MS(config.learnRate,config.threshold,imageType);
+			case PLANAR:
+				ret =  new BackgroundStationaryGaussian_PL(config.learnRate,config.threshold,imageType);
 				break;
 
 			case INTERLEAVED:
@@ -144,13 +144,13 @@ public class FactoryBackgroundModel {
 		BackgroundMovingGaussian<T,Motion> ret;
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				ret = new BackgroundMovingGaussian_SB(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType.getImageClass());
 				break;
 
-			case MULTI_SPECTRAL:
-				ret =  new BackgroundMovingGaussian_MS(config.learnRate,config.threshold,
+			case PLANAR:
+				ret =  new BackgroundMovingGaussian_PL(config.learnRate,config.threshold,
 						transform,config.interpolation,imageType);
 				break;
 

@@ -71,7 +71,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray, Motion extends In
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
-				0, 255, interpType, BorderType.EXTENDED, ImageType.ms(2, GrayF32.class));
+				0, 255, interpType, BorderType.EXTENDED, ImageType.pl(2, GrayF32.class));
 		this.interpolationBG.setImage(background);
 		inputWrapper = FactoryGImageSingleBand.create(imageType);
 	}

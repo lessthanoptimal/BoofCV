@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.sfm.d2;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.abst.sfm.d2.MsToGrayMotion2D;
+import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.gui.VideoProcessAppBase;
@@ -95,7 +95,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 							  Class imageType,
 							  boolean color ,
 							  Motion2DPanel gui) {
-		super(numAlgFamilies, color ? ImageType.ms(3, imageType) : ImageType.single(imageType));
+		super(numAlgFamilies, color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
 
 		this.gui = gui;
 		gui.addMouseListener(this);
@@ -114,13 +114,13 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			Class imageType = this.imageType.getImageClass();
 
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
 
-			ImageMotion2D motion2DColor = new MsToGrayMotion2D(motion,imageType);
+			ImageMotion2D motion2DColor = new PlToGrayMotion2D(motion,imageType);
 
 			return FactoryMotion2D.createVideoStitchMS(maxJumpFraction,motion2DColor,imageType);
 		} else {

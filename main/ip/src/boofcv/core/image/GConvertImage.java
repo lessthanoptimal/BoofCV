@@ -150,7 +150,7 @@ public class GConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 *
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
@@ -181,7 +181,7 @@ public class GConvertImage {
 	 * Converts a {@link Planar} into a {@link ImageGray} by computing the average value of each pixel
 	 * across all the bands.
 	 *
-	 * @param input Input MultiSpectral image that is being converted. Not modified.
+	 * @param input Input Planar image that is being converted. Not modified.
 	 * @param output (Optional) The single band output image.  If null a new image is created. Modified.
 	 * @return Converted image.
 	 */

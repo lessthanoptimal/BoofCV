@@ -18,9 +18,9 @@
 
 package boofcv.openkinect;
 
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.ddogleg.struct.GrowQueue_I8;
 import org.openkinect.freenect.Resolution;
 
@@ -62,7 +62,7 @@ public class UtilOpenKinect {
 	 * @param input Input buffer
 	 * @param output Output depth image
 	 */
-	public static void bufferDepthToU16( ByteBuffer input , ImageUInt16 output ) {
+	public static void bufferDepthToU16( ByteBuffer input , GrayU16 output ) {
 		int indexIn = 0;
 		for( int y = 0; y < output.height; y++ ) {
 			int indexOut = output.startIndex + y*output.stride;
@@ -77,7 +77,7 @@ public class UtilOpenKinect {
 	 * @param input Input data
 	 * @param output Output depth image
 	 */
-	public static void bufferDepthToU16( byte[] input , ImageUInt16 output ) {
+	public static void bufferDepthToU16( byte[] input , GrayU16 output ) {
 		int indexIn = 0;
 		for( int y = 0; y < output.height; y++ ) {
 			int indexOut = output.startIndex + y*output.stride;
@@ -88,14 +88,14 @@ public class UtilOpenKinect {
 	}
 
 	/**
-	 * Converts ByteBuffer that contains RGB data into a 3-channel MultiSpectral image
+	 * Converts ByteBuffer that contains RGB data into a 3-channel Planar image
 	 * @param input Input buffer
 	 * @param output Output depth image
 	 */
-	public static void bufferRgbToMsU8( ByteBuffer input , MultiSpectral<ImageUInt8> output ) {
-		ImageUInt8 band0 = output.getBand(0);
-		ImageUInt8 band1 = output.getBand(1);
-		ImageUInt8 band2 = output.getBand(2);
+	public static void bufferRgbToMsU8( ByteBuffer input , Planar<GrayU8> output ) {
+		GrayU8 band0 = output.getBand(0);
+		GrayU8 band1 = output.getBand(1);
+		GrayU8 band2 = output.getBand(2);
 
 		int indexIn = 0;
 		for( int y = 0; y < output.height; y++ ) {
@@ -109,14 +109,14 @@ public class UtilOpenKinect {
 	}
 
 	/**
-	 * Converts byte array that contains RGB data into a 3-channel MultiSpectral image
+	 * Converts byte array that contains RGB data into a 3-channel Planar image
 	 * @param input Input array
 	 * @param output Output depth image
 	 */
-	public static void bufferRgbToMsU8( byte []input , MultiSpectral<ImageUInt8> output ) {
-		ImageUInt8 band0 = output.getBand(0);
-		ImageUInt8 band1 = output.getBand(1);
-		ImageUInt8 band2 = output.getBand(2);
+	public static void bufferRgbToMsU8( byte []input , Planar<GrayU8> output ) {
+		GrayU8 band0 = output.getBand(0);
+		GrayU8 band1 = output.getBand(1);
+		GrayU8 band2 = output.getBand(2);
 
 		int indexIn = 0;
 		for( int y = 0; y < output.height; y++ ) {
@@ -129,7 +129,7 @@ public class UtilOpenKinect {
 		}
 	}
 
-	public static void saveDepth( ImageUInt16 depth , String fileName , GrowQueue_I8 data ) throws IOException {
+	public static void saveDepth( GrayU16 depth , String fileName , GrowQueue_I8 data ) throws IOException {
 		File out = new File(fileName);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(out));
 
@@ -152,7 +152,7 @@ public class UtilOpenKinect {
 		os.close();
 	}
 
-	public static void parseDepth( String fileName , ImageUInt16 depth , GrowQueue_I8 data ) throws IOException {
+	public static void parseDepth( String fileName , GrayU16 depth , GrowQueue_I8 data ) throws IOException {
 		DataInputStream in = new DataInputStream(new FileInputStream(fileName));
 
 		String s[] = readLine(in).split(" ");

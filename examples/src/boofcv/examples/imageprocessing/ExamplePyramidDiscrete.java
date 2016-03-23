@@ -98,7 +98,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray> {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
 		ExamplePyramidDiscrete<GrayF32> app = new ExamplePyramidDiscrete<GrayF32>(GrayF32.class);
-//		ExamplePyramidDiscrete<ImageUInt8> app = new ExamplePyramidDiscrete<ImageUInt8>(ImageUInt8.class);
+//		ExamplePyramidDiscrete<GrayU8> app = new ExamplePyramidDiscrete<GrayU8>(GrayU8.class);
 
 		app.standard();
 //		app.unusual();

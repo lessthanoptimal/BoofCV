@@ -30,7 +30,7 @@ import java.lang.reflect.Array;
  * <p/>
  * <p>
  * Most image operations work off of direct children of this class.  For operations which support images with
- * multiple bands or colors (e.g. RGB or multi-spectral cameras) there is the {@link ImageInterleaved} class and others.
+ * multiple bands or colors (e.g. RGB or planar cameras) there is the {@link ImageInterleaved} class and others.
  * </p>
  * <p/>
  * <p>

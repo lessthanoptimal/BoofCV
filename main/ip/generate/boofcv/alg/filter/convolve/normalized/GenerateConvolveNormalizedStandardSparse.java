@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ public class GenerateConvolveNormalizedStandardSparse {
 
 	public void generate() {
 		printPreamble();
-		printConvolve("F32", "ImageFloat32","float","");
-		printConvolve("I32", "ImageUInt8","int"," & 0xFF");
-		printConvolve("I32", "ImageSInt16","int","");
+		printConvolve("F32", "GrayF32","float","");
+		printConvolve("I32", "GrayU8","int"," & 0xFF");
+		printConvolve("I32", "GrayS16","int","");
 		out.println("}");
 	}
 
@@ -50,9 +50,9 @@ public class GenerateConvolveNormalizedStandardSparse {
 				"\n" +
 				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_I32;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
-				"import boofcv.struct.image.ImageSInt16;\n" +
-				"import boofcv.struct.image.ImageUInt8;\n" +
+				"import boofcv.struct.image.GrayF32;\n" +
+				"import boofcv.struct.image.GrayS16;\n" +
+				"import boofcv.struct.image.GrayU8;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

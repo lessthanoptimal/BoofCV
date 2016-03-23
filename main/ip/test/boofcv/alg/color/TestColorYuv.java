@@ -106,7 +106,7 @@ public class TestColorYuv {
 	}
 
 	@Test
-	public void yuvToRgb_F32_MultiSpectral() {
+	public void yuvToRgb_F32_Planar() {
 		Planar<GrayF32> yuv = new Planar<GrayF32>(GrayF32.class,10,15,3);
 		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,10,15,3);
 		Planar<GrayF32> found = new Planar<GrayF32>(GrayF32.class,10,15,3);
@@ -129,7 +129,7 @@ public class TestColorYuv {
 		}
 	}
 	@Test
-	public void ycbcrToRgb_U8_MultiSpectral() {
+	public void ycbcrToRgb_U8_Planar() {
 		Planar<GrayU8> yuv = new Planar<GrayU8>(GrayU8.class,10,15,3);
 		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,10,15,3);
 

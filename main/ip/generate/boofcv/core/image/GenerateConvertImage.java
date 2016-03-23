@@ -136,14 +136,14 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
-				"\t * Converts a {@link MultiSpectral} into a {@link ImageSingleBand} by computing the average value of each pixel\n" +
+				"\t * Converts a {@link Planar} into a {@link ImageSingleBand} by computing the average value of each pixel\n" +
 				"\t * across all the bands.\n" +
 				"\t * \n" +
-				"\t * @param input Input MultiSpectral image that is being converted. Not modified.\n" +
+				"\t * @param input Input Planar image that is being converted. Not modified.\n" +
 				"\t * @param output (Optional) The single band output image.  If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static "+imageName+" average( MultiSpectral<"+imageName+"> input , "+imageName+" output ) {\n" +
+				"\tpublic static "+imageName+" average( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageName+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
@@ -187,15 +187,15 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		String bandName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
-				"\t * Converts a {@link "+inputName+"} into the equivalent {@link MultiSpectral}\n" +
+				"\t * Converts a {@link "+inputName+"} into the equivalent {@link Planar}\n" +
 				"\t * \n" +
 				"\t * @param input (Input) ImageInterleaved that is being converted. Not modified.\n" +
 				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static MultiSpectral<"+bandName+"> convert( "+inputName+" input , MultiSpectral<"+bandName+"> output ) {\n" +
+				"\tpublic static Planar<"+bandName+"> convert( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
 				"\t\tif (output == null) {\n" +
-				"\t\t\toutput = new MultiSpectral<"+bandName+">("+bandName+".class,input.width, input.height,input.numBands);\n" +
+				"\t\t\toutput = new Planar<"+bandName+">("+bandName+".class,input.width, input.height,input.numBands);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\t\t}\n" +
@@ -211,13 +211,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 		String bandName = imageIn.getSingleBandName();
 
 		out.print("\t/**\n" +
-				"\t * Converts a {@link MultiSpectral} into the equivalent {@link "+outputName+"}\n" +
+				"\t * Converts a {@link Planar} into the equivalent {@link "+outputName+"}\n" +
 				"\t *\n" +
-				"\t * @param input (Input) MultiSpectral image that is being converted. Not modified.\n" +
+				"\t * @param input (Input) Planar image that is being converted. Not modified.\n" +
 				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static "+outputName+" convert( MultiSpectral<"+bandName+"> input , "+outputName+" output ) {\n" +
+				"\tpublic static "+outputName+" convert( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height,input.getNumBands());\n" +
 				"\t\t} else {\n" +
@@ -245,10 +245,10 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * @param output (Optional) Storage for the output image.  Can be null.\n" +
 				"\t * @return The converted output image.\n" +
 				"\t */\n" +
-				"\tpublic static ImageUInt8 convert("+imageIn.getSingleBandName()+" input , "+sumType+" min , "+sumType+" max , int numValues , ImageUInt8 output )\n" +
+				"\tpublic static GrayU8 convert("+imageIn.getSingleBandName()+" input , "+sumType+" min , "+sumType+" max , int numValues , GrayU8 output )\n" +
 				"\t{\n" +
 				"\t\tif (output == null) {\n" +
-				"\t\t\toutput = new ImageUInt8(input.width, input.height);\n" +
+				"\t\t\toutput = new GrayU8(input.width, input.height);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\t\t}\n" +

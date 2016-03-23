@@ -101,7 +101,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		String fileName = UtilIO.pathExample("tracking/balls_blue_red.mjpeg");
 		RectangleLength2D_I32 location = new RectangleLength2D_I32(394,247,475-394,325-247);
 
-		ImageType<Planar<GrayU8>> imageType = ImageType.ms(3,GrayU8.class);
+		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
 
 		SimpleImageSequence<Planar<GrayU8>> video = media.openVideo(fileName, imageType);
 

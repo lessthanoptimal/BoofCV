@@ -97,7 +97,7 @@ public class VisualizePyramidFloatApp <T extends ImageGray>
 
 	public static void main( String args[] ) {
 
-//		VisualizePyramidFloatApp<ImageFloat32> app = new VisualizePyramidFloatApp<ImageFloat32>(ImageFloat32.class);
+//		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<GrayF32>(GrayF32.class);
 		VisualizePyramidFloatApp<GrayU8> app = new VisualizePyramidFloatApp<GrayU8>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();

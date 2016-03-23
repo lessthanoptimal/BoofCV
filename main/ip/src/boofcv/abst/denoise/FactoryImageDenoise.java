@@ -116,7 +116,7 @@ public class FactoryImageDenoise {
 			WaveletDescription<WlCoef_I32> waveletDesc_I32 = FactoryWaveletDaub.biorthogonal_I32(5, BorderType.REFLECT);
 			descTran = FactoryWaveletTransform.create_I(waveletDesc_I32,numLevels,
 					(int)minPixelValue,(int)maxPixelValue,
-					ImageType.getImageClass(ImageType.Family.SINGLE_BAND, imageType));
+					ImageType.getImageClass(ImageType.Family.GRAY, imageType));
 		}
 		return descTran;
 	}

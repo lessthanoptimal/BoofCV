@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,12 +74,12 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 		String sumType = derivType.getSumType();
 		String bitWise = derivType.getBitWise();
 
-		out.print("\tpublic static void determinant( ImageFloat32 featureIntensity , "+derivName+" hessianXX, "+derivName+" hessianYY , "+derivName+" hessianXY ) {\n" +
+		out.print("\tpublic static void determinant( GrayF32 featureIntensity , "+derivName+" hessianXX, "+derivName+" hessianYY , "+derivName+" hessianXY ) {\n" +
 				"\t\tfinal int width = hessianXX.width;\n" +
 				"\t\tfinal int height = hessianXX.height;\n" +
 				"\n" +
 				"\t\tif( featureIntensity == null ) {\n" +
-				"\t\t\tfeatureIntensity = new ImageFloat32(width,height);\n" +
+				"\t\t\tfeatureIntensity = new GrayF32(width,height);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +
@@ -105,12 +105,12 @@ public class GenerateImplHessianBlobIntensity extends CodeGeneratorBase {
 		String sumType = derivType.getSumType();
 		String bitWise = derivType.getBitWise();
 
-		out.print("\tpublic static void trace( ImageFloat32 featureIntensity , "+derivName+" hessianXX, "+derivName+" hessianYY ) {\n" +
+		out.print("\tpublic static void trace( GrayF32 featureIntensity , "+derivName+" hessianXX, "+derivName+" hessianYY ) {\n" +
 				"\t\tfinal int width = hessianXX.width;\n" +
 				"\t\tfinal int height = hessianXX.height;\n" +
 				"\n" +
 				"\t\tif( featureIntensity == null ) {\n" +
-				"\t\t\tfeatureIntensity = new ImageFloat32(width,height);\n" +
+				"\t\t\tfeatureIntensity = new GrayF32(width,height);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < height; y++ ) {\n" +

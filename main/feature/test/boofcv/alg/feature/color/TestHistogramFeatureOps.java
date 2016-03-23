@@ -142,7 +142,7 @@ public class TestHistogramFeatureOps {
 	}
 
 	@Test
-	public void histogram_MS_U8() {
+	public void histogram_PL_U8() {
 		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
@@ -169,7 +169,7 @@ public class TestHistogramFeatureOps {
 	 * Compare to single band image.  Results should be identical
 	 */
 	@Test
-	public void histogram_MS_U8_compareToSingle() {
+	public void histogram_PL_U8_compareToSingle() {
 		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
@@ -189,7 +189,7 @@ public class TestHistogramFeatureOps {
 	}
 
 	@Test
-	public void histogram_MS_F32() {
+	public void histogram_PL_F32() {
 		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
@@ -216,7 +216,7 @@ public class TestHistogramFeatureOps {
 	 * Compare to single band image.  Results should be identical
 	 */
 	@Test
-	public void histogram_MS_F32_compareToSingle() {
+	public void histogram_PL_F32_compareToSingle() {
 		GrayF32 image = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(image,rand,-100,100);
 

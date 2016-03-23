@@ -66,7 +66,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	Se3_F64 initialEstimate = new Se3_F64();
 	Se3_F64 targetToCamera = new Se3_F64(); // refined
 
-	// storage for converted input image.  Detector only can process ImageFloat32
+	// storage for converted input image.  Detector only can process GrayF32
 	GrayF32 converted;
 
 	// Expected type of input image

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,10 +90,10 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @param down If true then the inequality <= is used, otherwise if false then &gt; is used.\n" +
 				"\t * @return Output image.\n" +
 				"\t */\n" +
-				"\tpublic static ImageUInt8 threshold( "+imageIn.getSingleBandName()+" input , ImageUInt8 output ,\n" +
+				"\tpublic static GrayU8 threshold( "+imageIn.getSingleBandName()+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t"+imageIn.getSumType()+" threshold , boolean down )\n" +
 				"\t{\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input,output,GrayU8.class);\n" +
 				"\n" +
 				"\t\tif( down ) {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
@@ -150,11 +150,11 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
-				"\tpublic static ImageUInt8 localSquare( "+imageName+" input , ImageUInt8 output ,\n" +
+				"\tpublic static GrayU8 localSquare( "+imageName+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t int radius , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input,output,GrayU8.class);\n" +
 				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
 				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
 				"\n" +
@@ -223,11 +223,11 @@ public class GenerateThresholdImageOps extends CodeGeneratorBase {
 				"\t * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.\n" +
 				"\t * @return Thresholded image.\n" +
 				"\t */\n" +
-				"\tpublic static ImageUInt8 localGaussian( "+imageName+" input , ImageUInt8 output ,\n" +
+				"\tpublic static GrayU8 localGaussian( "+imageName+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t   int radius , float scale , boolean down ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t   "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input,output,ImageUInt8.class);\n" +
+				"\t\toutput = InputSanityCheck.checkDeclare(input,output,GrayU8.class);\n" +
 				"\t\tstorage1 = InputSanityCheck.checkDeclare(input,storage1,"+imageName+".class);\n" +
 				"\t\tstorage2 = InputSanityCheck.checkDeclare(input,storage2,"+imageName+".class);\n" +
 				"\n" +

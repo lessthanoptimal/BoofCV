@@ -24,9 +24,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -49,8 +49,8 @@ public class CreateRgbPointCloudFileApp {
 
 		IntrinsicParameters param = UtilIO.loadXML(nameCalib);
 
-		ImageUInt16 depth = new ImageUInt16(1,1);
-		MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
+		GrayU16 depth = new GrayU16(1,1);
+		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
 
 		UtilImageIO.loadPPM_U8(nameRgb, rgb, null);
 		UtilOpenKinect.parseDepth(nameDepth,depth,null);

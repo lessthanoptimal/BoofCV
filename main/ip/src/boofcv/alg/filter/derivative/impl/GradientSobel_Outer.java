@@ -40,7 +40,7 @@ import boofcv.struct.image.GrayU8;
 public class GradientSobel_Outer {
 
 	/**
-	 * Computes derivative of ImageUInt8.  None of the images can be sub-images.
+	 * Computes derivative of GrayU8.  None of the images can be sub-images.
 	 */
 	public static void process_I8(GrayU8 orig,
 								  GrayS16 derivX,
@@ -67,7 +67,7 @@ public class GradientSobel_Outer {
 	}
 
 	/**
-	 * Computes derivative of ImageUInt8.  Inputs can be sub-images.
+	 * Computes derivative of GrayU8.  Inputs can be sub-images.
 	 */
 	public static void process_I8_sub(GrayU8 orig,
 									  GrayS16 derivX,
@@ -128,7 +128,7 @@ public class GradientSobel_Outer {
 	}
 
 	/**
-	 * Computes derivative of ImageFloat32.  None of the images can be sub-images.
+	 * Computes derivative of GrayF32.  None of the images can be sub-images.
 	 */
 	public static void process_F32(GrayF32 orig,
 								   GrayF32 derivX,

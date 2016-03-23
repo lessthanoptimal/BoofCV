@@ -108,7 +108,7 @@ public class DisplayGaussianKernelApp<T extends ImageGray> extends SelectAlgorit
 
 	public static void main( String args[] ) {
 		DisplayGaussianKernelApp<GrayF32> panel = new DisplayGaussianKernelApp<GrayF32>(GrayF32.class);
-//		DisplayGaussianKernelApp<ImageSInt32> panel = new DisplayGaussianKernelApp<ImageSInt32>(ImageSInt32.class);
+//		DisplayGaussianKernelApp<GrayS32> panel = new DisplayGaussianKernelApp<GrayS32>(GrayS32.class);
 
 		panel.setPreferredSize(new Dimension(640,480));
 

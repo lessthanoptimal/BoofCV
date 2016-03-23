@@ -82,7 +82,7 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogram() {
 		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelPL(FactoryInterpolation.bilinearPixelS(
 				GrayF32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);
@@ -118,7 +118,7 @@ public class TestLocalWeightedHistogramRotRect {
 	@Test
 	public void computeHistogramBorder_compare() {
 		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,40,50,3);
-		InterpolatePixelMB interp = FactoryInterpolation.createPixelMS(FactoryInterpolation.bilinearPixelS(
+		InterpolatePixelMB interp = FactoryInterpolation.createPixelPL(FactoryInterpolation.bilinearPixelS(
 				GrayF32.class, BorderType.EXTENDED));
 		GImageMiscOps.fillUniform(image,rand,0,100);
 		interp.setImage(image);

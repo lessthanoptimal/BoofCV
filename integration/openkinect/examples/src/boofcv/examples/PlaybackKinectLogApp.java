@@ -25,9 +25,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import java.awt.image.BufferedImage;
@@ -45,9 +45,9 @@ public class PlaybackKinectLogApp {
 	boolean depthIsPng = false;
 
 	// image with depth information
-	private ImageUInt16 depth = new ImageUInt16(1,1);
+	private GrayU16 depth = new GrayU16(1,1);
 	// image with color information
-	private MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
+	private Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
 
 	BufferedImage outRgb;
 	BufferedImage outDepth;

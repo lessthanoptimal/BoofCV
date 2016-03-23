@@ -55,14 +55,14 @@ public class ExampleTrackerObjectQuad {
 		// Create the tracker.  Comment/Uncomment to change the tracker.
 		TrackerObjectQuad tracker =
 				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
-//				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
-//				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
-//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), ImageType.ms(3, ImageUInt8.class));
-//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),ImageType.ms(3,ImageUInt8.class));
+//				FactoryTrackerObjectQuad.sparseFlow(null,GrayU8.class,null);
+//				FactoryTrackerObjectQuad.tld(null,GrayU8.class);
+//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), ImageType.pl(3, GrayU8.class));
+//				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),ImageType.pl(3,GrayU8.class));
 
 				// Mean-shift likelihood will fail in this video, but is excellent at tracking objects with
 				// a single unique color.  See ExampleTrackerMeanShiftLikelihood
-//				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,ImageType.ms(3,ImageUInt8.class));
+//				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,ImageType.pl(3,GrayU8.class));
 
 		SimpleImageSequence video = media.openVideo(fileName, tracker.getImageType());
 

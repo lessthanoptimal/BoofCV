@@ -61,8 +61,8 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 		out.print("import boofcv.struct.image." + typeInput + ";\n");
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");
-		if( typeInput.compareTo("ImageFloat32") != 0 && typeOutput.compareTo("ImageFloat32") != 0 ) {
-			out.print("import boofcv.struct.image.ImageFloat32;\n");
+		if( typeInput.compareTo("GrayF32") != 0 && typeOutput.compareTo("GrayF32") != 0 ) {
+			out.print("import boofcv.struct.image.GrayF32;\n");
 		}
 		out.print("import javax.annotation.Generated;\n\n");
 
@@ -183,7 +183,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t * calculations for each window and avoiding cache misses. Then compute the eigen values\n" +
 				"\t */\n" +
 				"\t@Override\n" +
-				"\tprotected void vertical( ImageFloat32 intensity ) {\n" +
+				"\tprotected void vertical( GrayF32 intensity ) {\n" +
 				"\t\t"+sumType+"[] hXX = horizXX.data;\n" +
 				"\t\t"+sumType+"[] hXY = horizXY.data;\n" +
 				"\t\t"+sumType+"[] hYY = horizYY.data;\n" +

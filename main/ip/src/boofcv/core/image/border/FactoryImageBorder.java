@@ -63,10 +63,10 @@ public class FactoryImageBorder {
 	public static <T extends ImageBase> ImageBorder<T>
 	generic( BorderType borderType, ImageType<T> imageType ) {
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return single(imageType.getImageClass(),borderType);
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				return single(imageType.getImageClass(),borderType);
 
 			case INTERLEAVED:
@@ -80,10 +80,10 @@ public class FactoryImageBorder {
 	public static <T extends ImageBase> ImageBorder<T>
 	genericValue( double value, ImageType<T> imageType ) {
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return singleValue(imageType.getImageClass(), value);
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				return singleValue(imageType.getImageClass(),value);
 
 			case INTERLEAVED:

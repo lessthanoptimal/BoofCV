@@ -148,8 +148,8 @@ public class IntensityPointFeatureApp<T extends ImageGray, D extends ImageGray>
 	}
 
 	public static void main( String args[] ) {
-//		IntensityPointFeatureApp<ImageFloat32,ImageFloat32> app =
-//				new IntensityPointFeatureApp<ImageFloat32,ImageFloat32>(ImageFloat32.class,ImageFloat32.class);
+//		IntensityPointFeatureApp<GrayF32,GrayF32> app =
+//				new IntensityPointFeatureApp<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 		IntensityPointFeatureApp<GrayU8, GrayS16> app =
 				new IntensityPointFeatureApp<GrayU8,GrayS16>(GrayU8.class,GrayS16.class);

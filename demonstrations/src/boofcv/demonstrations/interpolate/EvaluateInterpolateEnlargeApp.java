@@ -134,9 +134,9 @@ public class EvaluateInterpolateEnlargeApp<T extends ImageBase>
 
 	public static void main( String args[] ) {
 
-		ImageType type = ImageType.ms(3,GrayF32.class);
-//		ImageType type = ImageType.ms(3,ImageUInt8.class);
-//		ImageType type = ImageType.single(ImageUInt8.class);
+		ImageType type = ImageType.pl(3,GrayF32.class);
+//		ImageType type = ImageType.pl(3,GrayU8.class);
+//		ImageType type = ImageType.single(GrayU8.class);
 //		ImageType type = ImageType.il(3, InterleavedF32.class);
 
 		EvaluateInterpolateEnlargeApp app = new EvaluateInterpolateEnlargeApp(type);

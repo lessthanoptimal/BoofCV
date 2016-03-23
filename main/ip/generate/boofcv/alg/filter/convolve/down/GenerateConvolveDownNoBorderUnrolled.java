@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,8 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public void createF32() throws FileNotFoundException {
 		className = "ConvolveDownNoBorderUnrolled_F32_F32";
 		typeKernel = "F32";
-		typeInput = "ImageFloat32";
-		typeOutput = "ImageFloat32";
+		typeInput = "GrayF32";
+		typeOutput = "GrayF32";
 		dataKernel = "float";
 		dataInput = "float";
 		dataOutput = "float";
@@ -72,7 +72,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public void createU8_I8_Div() throws FileNotFoundException {
 		className = "ConvolveDownNoBorderUnrolled_U8_I8_Div";
 		typeKernel = "I32";
-		typeInput = "ImageUInt8";
+		typeInput = "GrayU8";
 		typeOutput = "ImageInt8";
 		dataKernel = "int";
 		dataInput = "byte";
@@ -87,7 +87,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public void createU8_I16() throws FileNotFoundException {
 		className = "ConvolveDownNoBorderUnrolled_U8_I16";
 		typeKernel = "I32";
-		typeInput = "ImageUInt8";
+		typeInput = "GrayU8";
 		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "byte";
@@ -102,7 +102,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public void createS16_I16() throws FileNotFoundException {
 		className = "ConvolveDownNoBorderUnrolled_S16_I16";
 		typeKernel = "I32";
-		typeInput = "ImageSInt16";
+		typeInput = "GrayS16";
 		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "short";
@@ -117,7 +117,7 @@ public class GenerateConvolveDownNoBorderUnrolled extends CodeGeneratorBase {
 	public void createS16_I16_Div() throws FileNotFoundException {
 		className = "ConvolveDownNoBorderUnrolled_S16_I16_Div";
 		typeKernel = "I32";
-		typeInput = "ImageSInt16";
+		typeInput = "GrayS16";
 		typeOutput = "ImageInt16";
 		dataKernel = "int";
 		dataInput = "short";

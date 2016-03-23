@@ -23,9 +23,9 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import com.sun.jna.NativeLibrary;
 import org.openkinect.freenect.*;
 
@@ -44,8 +44,8 @@ public class OpenKinectStreamingTest {
 		NativeLibrary.addSearchPath("freenect", OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY);
 	}
 
-	MultiSpectral<ImageUInt8> rgb = new MultiSpectral<ImageUInt8>(ImageUInt8.class,1,1,3);
-	ImageUInt16 depth = new ImageUInt16(1,1);
+	Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
+	GrayU16 depth = new GrayU16(1,1);
 
 	BufferedImage outRgb;
 	ImagePanel guiRgb;

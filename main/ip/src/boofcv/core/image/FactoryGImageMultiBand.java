@@ -45,8 +45,8 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand create( ImageType imageType ) {
-		if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
-			return new MS();
+		if( imageType.getFamily() == ImageType.Family.PLANAR) {
+			return new PL();
 		} else if( imageType.getFamily() == ImageType.Family.INTERLEAVED ) {
 			switch( imageType.getDataType() ) {
 				case U8:
@@ -64,7 +64,7 @@ public class FactoryGImageMultiBand {
 	}
 
 	public static GImageMultiBand wrap( Planar image ) {
-		return new MS(image);
+		return new PL(image);
 	}
 
 	public static GImageMultiBand wrap( ImageInterleaved image ) {
@@ -90,15 +90,15 @@ public class FactoryGImageMultiBand {
 		}
 	}
 
-	public static class MS implements GImageMultiBand {
+	public static class PL implements GImageMultiBand {
 		Planar image;
 		GImageSingleBand bandWrappers[];
 
-		public MS(Planar image) {
+		public PL(Planar image) {
 			wrap(image);
 		}
 
-		public MS() {
+		public PL() {
 		}
 
 		@Override
@@ -155,7 +155,7 @@ public class FactoryGImageMultiBand {
 
 		@Override
 		public float getF(int index) {
-			throw new RuntimeException("Not supported for MultiSpectral images.  Would be slow.");
+			throw new RuntimeException("Not supported for Planar images.  Would be slow.");
 		}
 
 		@Override

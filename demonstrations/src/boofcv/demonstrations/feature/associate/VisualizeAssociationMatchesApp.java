@@ -104,7 +104,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.ms(3, imageType)));
+		addAlgorithm(1, "SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)));
 		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null,imageType));
 		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
 		addAlgorithm(1, "BRIEFSO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
@@ -242,7 +242,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 
 	private void extractImageFeatures(Planar<T> color , T gray, FastQueue<TupleDesc> descs, List<Point2D_F64> locs) {
 		detector.detect(gray);
-		if( describe.getImageType().getFamily() == ImageType.Family.SINGLE_BAND )
+		if( describe.getImageType().getFamily() == ImageType.Family.GRAY)
 			describe.setImage(gray);
 		else
 			describe.setImage(color);

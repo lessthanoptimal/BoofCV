@@ -15,7 +15,7 @@
 
 - Derivative
  * Overflow in integer derivatives.
-   - Provide support for ImageSInt32?
+   - Provide support for GrayS32?
    - Do a better job normalizing?
    - See ShowImageDerivative
  * Check comments for Sobel and Prewitt.  Can you really compute it from those kernels?

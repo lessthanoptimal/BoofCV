@@ -264,14 +264,14 @@ public class VisualizeTldDetectionApp<T extends ImageGray,D extends ImageGray>
 
 //		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
 
-//		SimpleImageSequence<ImageUInt8> sequence =
-//				new XugglerSimplified<ImageUInt8>(fileName, ImageDataType.single(ImageUInt8.class));
+//		SimpleImageSequence<GrayU8> sequence =
+//				new XugglerSimplified<GrayU8>(fileName, ImageDataType.single(GrayU8.class));
 //
 //		sequence.hasNext();
 //		sequence.next();
 //		sequence.hasNext();
 //		sequence.next();
 //
-//		new VisualizeTldDetectionApp((BufferedImage)sequence.getGuiImage(),ImageUInt8.class);
+//		new VisualizeTldDetectionApp((BufferedImage)sequence.getGuiImage(),GrayU8.class);
 	}
 }

@@ -56,7 +56,7 @@ public class TestWrapDisparitySadRect {
 		}
 
 		@Override
-		public void _process(GrayF32 left, GrayF32 right, GrayF32 imageFloat32) {
+		public void _process(GrayF32 left, GrayF32 right, GrayF32 GrayF32) {
 		}
 
 		@Override

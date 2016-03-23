@@ -119,7 +119,7 @@ public class ExampleAssociatePoints<T extends ImageGray, TD extends TupleDesc> {
 	public static void main( String args[] ) {
 
 		Class imageType = GrayF32.class;
-//		Class imageType = ImageUInt8.class;
+//		Class imageType = GrayU8.class;
 
 		// select which algorithms to use
 		DetectDescribePoint detDesc = FactoryDetectDescribe.

@@ -61,17 +61,17 @@ public class ConvertBitmap {
 	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
 		switch( output.getImageType().getFamily() ) {
 			case SINGLE_BAND: {
-				if( output.getClass() == ImageFloat32.class )
-					bitmapToGray(input, (ImageFloat32) output, storage);
-				else if( output.getClass() == ImageUInt8.class )
-					bitmapToGray(input,(ImageUInt8)output,storage);
+				if( output.getClass() == GrayF32.class )
+					bitmapToGray(input, (GrayF32) output, storage);
+				else if( output.getClass() == GrayU8.class )
+					bitmapToGray(input,(GrayU8)output,storage);
 				else
 					throw new IllegalArgumentException("Unsupported BoofCV Image Type");
 			} break;
 
-			case MULTI_SPECTRAL:
-				MultiSpectral ms = (MultiSpectral)output;
-				bitmapToMS(input,ms,ms.getBandType(),storage);
+			case PLANAR:
+				Planar pl = (Planar)output;
+				bitmapToMS(input,pl,pl.getBandType(),storage);
 			break;
 
 			default:
@@ -92,26 +92,26 @@ public class ConvertBitmap {
 	 */
 	public static <T extends ImageSingleBand> 
 	T bitmapToGray( Bitmap input , T output , Class<T> imageType , byte[] storage) {
-		if( imageType == ImageFloat32.class )
-			return (T)bitmapToGray(input,(ImageFloat32)output,storage);
-		else if( imageType == ImageUInt8.class )
-			return (T)bitmapToGray(input,(ImageUInt8)output,storage);
+		if( imageType == GrayF32.class )
+			return (T)bitmapToGray(input,(GrayF32)output,storage);
+		else if( imageType == GrayU8.class )
+			return (T)bitmapToGray(input,(GrayU8)output,storage);
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Image Type");
 		
 	}
 	
 	/**
-	 * Converts Bitmap image into ImageUInt8.
+	 * Converts Bitmap image into GrayU8.
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally. 
 	 * @return The converted gray scale image.
 	 */
-	public static ImageUInt8 bitmapToGray( Bitmap input , ImageUInt8 output , byte[] storage ) {
+	public static GrayU8 bitmapToGray( Bitmap input , GrayU8 output , byte[] storage ) {
 		if( output == null ) {
-			output = new ImageUInt8( input.getWidth() , input.getHeight() );
+			output = new GrayU8( input.getWidth() , input.getHeight() );
 		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -126,7 +126,7 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts Bitmap image into ImageFloat32.
+	 * Converts Bitmap image into GrayF32.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
@@ -135,9 +135,9 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
-	public static ImageFloat32 bitmapToGray( Bitmap input , ImageFloat32 output , byte[] storage) {
+	public static GrayF32 bitmapToGray( Bitmap input , GrayF32 output , byte[] storage) {
 		if( output == null ) {
-			output = new ImageFloat32( input.getWidth() , input.getHeight() );
+			output = new GrayF32( input.getWidth() , input.getHeight() );
 		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -152,20 +152,20 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts Bitmap image into MultiSpectral image of the appropriate type.
+	 * Converts Bitmap image into Planar image of the appropriate type.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
-	 * @param type The type of internal single band image used in the MultiSpectral image.
+	 * @param type The type of internal single band image used in the Planar image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
-	 * @return The converted MultiSpectral image.
+	 * @return The converted Planar image.
 	 */
 	public static <T extends ImageSingleBand>
-	MultiSpectral<T> bitmapToMS( Bitmap input , MultiSpectral<T> output , Class<T> type , byte[] storage ) {
+	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
-			output = new MultiSpectral<T>( type , input.getWidth() , input.getHeight() , 4 );
+			output = new Planar<T>( type , input.getWidth() , input.getHeight() , 4 );
 		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -174,10 +174,10 @@ public class ConvertBitmap {
 			storage = declareStorage(input,null);
 		input.copyPixelsToBuffer(ByteBuffer.wrap(storage));
 		
-		if( type == ImageUInt8.class )
-			ImplConvertBitmap.arrayToMulti_U8(storage, input.getConfig(), (MultiSpectral)output);
-		else if( type == ImageFloat32.class )
-			ImplConvertBitmap.arrayToMulti_F32(storage, input.getConfig(), (MultiSpectral)output);
+		if( type == GrayU8.class )
+			ImplConvertBitmap.arrayToMulti_U8(storage, input.getConfig(), (Planar)output);
+		else if( type == GrayF32.class )
+			ImplConvertBitmap.arrayToMulti_F32(storage, input.getConfig(), (Planar)output);
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 
@@ -194,8 +194,8 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
-		if( input instanceof MultiSpectral ) {
-			multiToBitmap((MultiSpectral)input,output,storage);
+		if( input instanceof Planar ) {
+			multiToBitmap((Planar)input,output,storage);
 		} else if( input instanceof ImageSingleBand ) {
 			grayToBitmap((ImageSingleBand)input,output,storage);
 		} else if( input instanceof ImageInterleaved ) {
@@ -215,10 +215,10 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void grayToBitmap( ImageSingleBand input , Bitmap output , byte[] storage) {
-		if( input instanceof ImageUInt8 )
-			grayToBitmap((ImageUInt8)input,output,storage);
-		else if( input instanceof ImageFloat32 )
-			grayToBitmap((ImageFloat32)input,output,storage);
+		if( input instanceof GrayU8 )
+			grayToBitmap((GrayU8)input,output,storage);
+		else if( input instanceof GrayF32 )
+			grayToBitmap((GrayF32)input,output,storage);
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type: "+input);
 	}
@@ -232,7 +232,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( ImageUInt8 input , Bitmap output , byte[] storage) {
+	public static void grayToBitmap( GrayU8 input , Bitmap output , byte[] storage) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -253,7 +253,7 @@ public class ConvertBitmap {
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( ImageFloat32 input , Bitmap output , byte[] storage ) {
+	public static void grayToBitmap( GrayF32 input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -266,16 +266,16 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts MultiSpectral image into Bitmap.
+	 * Converts Planar image into Bitmap.
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 *
-	 * @param input Input MultiSpectral image.
+	 * @param input Input Planar image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageSingleBand>
-	void multiToBitmap(  MultiSpectral<T> input , Bitmap output , byte[] storage ) {
+	void multiToBitmap(  Planar<T> input , Bitmap output , byte[] storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
@@ -283,10 +283,10 @@ public class ConvertBitmap {
 		if( storage == null )
 			storage = declareStorage(output,null);
 		
-		if( input.getBandType() == ImageUInt8.class )
-			ImplConvertBitmap.multiToArray_U8((MultiSpectral)input, storage,output.getConfig());
-		else if( input.getBandType() == ImageFloat32.class )
-			ImplConvertBitmap.multiToArray_F32((MultiSpectral)input, storage,output.getConfig());
+		if( input.getBandType() == GrayU8.class )
+			ImplConvertBitmap.multiToArray_U8((Planar)input, storage,output.getConfig());
+		else if( input.getBandType() == GrayF32.class )
+			ImplConvertBitmap.multiToArray_F32((Planar)input, storage,output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
@@ -297,7 +297,7 @@ public class ConvertBitmap {
 	 *
 	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 *
-	 * @param input Input MultiSpectral image.
+	 * @param input Input Planar image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
@@ -320,12 +320,12 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts ImageUInt8 into a new Bitmap.
+	 * Converts GrayU8 into a new Bitmap.
 	 * 
 	 * @param input Input gray scale image.
 	 * @param config Type of Bitmap image to create.
 	 */
-	public static Bitmap grayToBitmap( ImageUInt8 input , Bitmap.Config config ) {
+	public static Bitmap grayToBitmap( GrayU8 input , Bitmap.Config config ) {
 		Bitmap output = Bitmap.createBitmap(input.width, input.height, config);
 		
 		grayToBitmap(input,output,null);
@@ -334,12 +334,12 @@ public class ConvertBitmap {
 	}
 	
 	/**
-	 * Converts ImageFloat32 into a new Bitmap.
+	 * Converts GrayF32 into a new Bitmap.
 	 * 
 	 * @param input Input gray scale image.
 	 * @param config Type of Bitmap image to create.
 	 */
-	public static Bitmap grayToBitmap( ImageFloat32 input , Bitmap.Config config ) {
+	public static Bitmap grayToBitmap( GrayF32 input , Bitmap.Config config ) {
 		Bitmap output = Bitmap.createBitmap(input.width, input.height, config);
 		
 		grayToBitmap(input,output,null);

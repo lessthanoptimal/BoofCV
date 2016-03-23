@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ public class GenerateImplPyramidOps extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		setOutputFile(className);
 		out.print("import boofcv.alg.interpolate.InterpolatePixelS;\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
-				"import boofcv.struct.image.ImageUInt8;\n" +
+				"import boofcv.struct.image.GrayF32;\n" +
+				"import boofcv.struct.image.GrayU8;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +

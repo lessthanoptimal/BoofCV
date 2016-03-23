@@ -228,7 +228,7 @@ public class ShowImageBlurApp<T extends ImageGray>
 
 	public static void main(String args[]) {
 
-//		ShowImageBlurApp<ImageFloat32> app = new ShowImageBlurApp<ImageFloat32>(ImageFloat32.class);
+//		ShowImageBlurApp<GrayF32> app = new ShowImageBlurApp<GrayF32>(GrayF32.class);
 		ShowImageBlurApp<GrayU8> app = new ShowImageBlurApp<GrayU8>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();

@@ -113,10 +113,10 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
-	public void extractImageUInt8() {
+	public void extractGrayU8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
-		GrayU8 found = ConvertBufferedImage.extractImageUInt8(origImg);
+		GrayU8 found = ConvertBufferedImage.extractGrayU8(origImg);
 
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
@@ -126,7 +126,7 @@ public class TestConvertBufferedImage {
 		// test a sub-image input
 		origImg = origImg.getSubimage(1,2,5,6);
 
-		found = ConvertBufferedImage.extractImageUInt8(origImg);
+		found = ConvertBufferedImage.extractGrayU8(origImg);
 
 		assertEquals(2*10+1, found.startIndex);
 		assertEquals(imgWidth, found.stride);
@@ -138,21 +138,21 @@ public class TestConvertBufferedImage {
 	public void extractImageInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
-		ConvertBufferedImage.extractImageUInt8(origImg);
+		ConvertBufferedImage.extractGrayU8(origImg);
 	}
 
 	@Test
 	public void extractImageInt8_fail() {
 		try {
 			BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
-			ConvertBufferedImage.extractImageUInt8(origImg);
+			ConvertBufferedImage.extractGrayU8(origImg);
 			fail("Should have had an unexpected number of bands");
 		} catch (IllegalArgumentException e) {
 		}
 
 		try {
 			BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
-			ConvertBufferedImage.extractImageUInt8(origImg);
+			ConvertBufferedImage.extractGrayU8(origImg);
 			fail("Should be the wrong type");
 		} catch (IllegalArgumentException e) {
 		}
@@ -191,24 +191,24 @@ public class TestConvertBufferedImage {
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
 	@Test
-	public void convertFrom_ms_orderRgb() {
+	public void convertFrom_PL_orderRgb() {
 		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
-			convertFrom_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
 	}
 
-	public void convertFrom_ms_orderRgb(int buffType, Class bandType, boolean reorder) {
+	public void convertFrom_PL_orderRgb(int buffType, Class bandType, boolean reorder) {
 		BufferedImage input = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
 
 		int numBands = input.getRaster().getNumBands();
@@ -404,7 +404,7 @@ public class TestConvertBufferedImage {
 	}
 
 	@Test
-	public void convertTo_MS() {
+	public void convertTo_PL() {
 		Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
 		for (Class t : types) {
@@ -447,24 +447,24 @@ public class TestConvertBufferedImage {
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
 	@Test
-	public void convertTo_ms_orderRgb() {
+	public void convertTo_PL_orderRgb() {
 		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
-			convertTo_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
-			convertTo_ms_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
-			convertTo_ms_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
+			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
 	}
 
-	public void convertTo_ms_orderRgb(int buffType, Class bandType, boolean reorder) {
+	public void convertTo_PL_orderRgb(int buffType, Class bandType, boolean reorder) {
 		BufferedImage output = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
 
 		int numBands = output.getRaster().getNumBands();

@@ -74,7 +74,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral image support needs to be added");
+			throw new IllegalArgumentException("Planar image support needs to be added");
 		}
 	}
 
@@ -126,7 +126,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown Image Type");
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral image support needs to be added");
+			throw new IllegalArgumentException("Planar image support needs to be added");
 		}
 	}
 
@@ -178,7 +178,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral image support needs to be added");
+			throw new IllegalArgumentException("Planar image support needs to be added");
 		}
 	}
 
@@ -233,7 +233,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral image support needs to be added");
+			throw new IllegalArgumentException("Planar image support needs to be added");
 		}
 	}
 
@@ -286,7 +286,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral image support needs to be added");
+			throw new IllegalArgumentException("Planar image support needs to be added");
 		}
 	}
 
@@ -370,7 +370,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral images needs to be added");
+			throw new IllegalArgumentException("Planar images needs to be added");
 		}
 	}
 
@@ -424,7 +424,7 @@ public class GImageStatistics {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
 		} else {
-			throw new IllegalArgumentException("MultiSpectral images needs to be added");
+			throw new IllegalArgumentException("Planar images needs to be added");
 		}
 	}
 

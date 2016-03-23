@@ -88,7 +88,7 @@ public class ExampleStereoDisparity3D {
 
 		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(scaledLeft,scaledRight,param,rectLeft,rectRight);
 
-//		ImageUInt8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, maxDisparity);
+//		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, maxDisparity);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(rectLeft, rectRight, 3, minDisparity, maxDisparity);
 
 		// ------------- Convert disparity image into a 3D point cloud

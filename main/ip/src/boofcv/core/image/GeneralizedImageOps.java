@@ -115,13 +115,13 @@ public class GeneralizedImageOps {
 	}
 
 	public static <T extends ImageGray> T createSingleBand(ImageDataType type, int width, int height) {
-		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.SINGLE_BAND, type);
+		Class<T> typeClass = ImageType.getImageClass(ImageType.Family.GRAY, type);
 		return createSingleBand(typeClass, width, height);
 	}
 
 	public static <T extends ImageBase> T createImage(Class<T> type, int width, int height, int numBands ) {
 		if( type == Planar.class )
-			throw new IllegalArgumentException("Can't use this function with multi-spectral because the data type needs to be specified too");
+			throw new IllegalArgumentException("Can't use this function with planar because the data type needs to be specified too");
 
 		if( ImageGray.class.isAssignableFrom(type))
 			return (T)createSingleBand((Class)type,width,height);

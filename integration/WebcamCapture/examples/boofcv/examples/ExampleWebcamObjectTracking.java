@@ -212,12 +212,12 @@ public class ExampleWebcamObjectTracking<T extends ImageBase> extends JPanel
 
 	public static void main(String[] args) {
 
-		ImageType<Planar<GrayU8>> colorType = ImageType.ms(3,GrayU8.class);
+		ImageType<Planar<GrayU8>> colorType = ImageType.pl(3,GrayU8.class);
 
 		TrackerObjectQuad tracker =
 				FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
-//				FactoryTrackerObjectQuad.sparseFlow(null,ImageUInt8.class,null);
-//				FactoryTrackerObjectQuad.tld(null,ImageUInt8.class);
+//				FactoryTrackerObjectQuad.sparseFlow(null,GrayU8.class,null);
+//				FactoryTrackerObjectQuad.tld(null,GrayU8.class);
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(), colorType);
 //				FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),colorType);
 //				FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,255, MeanShiftLikelihoodType.HISTOGRAM,colorType);

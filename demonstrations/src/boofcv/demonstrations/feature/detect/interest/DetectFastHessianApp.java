@@ -74,6 +74,6 @@ public class DetectFastHessianApp {
 		BufferedImage input = UtilImageIO.loadImage(fileName);
 
 		doStuff(GrayF32.class,input);
-//		doStuff(ImageUInt8.class,input);
+//		doStuff(GrayU8.class,input);
 	}
 }

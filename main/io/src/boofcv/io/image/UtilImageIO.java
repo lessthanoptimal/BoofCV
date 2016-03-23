@@ -338,7 +338,7 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * Reads a PPM image file directly into a MultiSpectral<ImageUInt8> image.   To improve performance when reading
+	 * Reads a PPM image file directly into a Planar<GrayU8> image.   To improve performance when reading
 	 * many images, the user can provide work space memory in the optional parameters
 	 *
 	 * @param fileName Location of PPM file
@@ -355,7 +355,7 @@ public class UtilImageIO {
 	}
 
 	/**
-	 * Reads a PPM image file directly into a MultiSpectral<ImageUInt8> image.   To improve performance when reading
+	 * Reads a PPM image file directly into a Planar<GrayU8> image.   To improve performance when reading
 	 * many images, the user can provide work space memory in the optional parameters
 	 *
 	 * @param inputStream InputStream for PPM image

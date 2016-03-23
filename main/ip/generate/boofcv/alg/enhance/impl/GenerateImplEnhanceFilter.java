@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -327,7 +327,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t/**\n" +
 				"\t * Handle outside image pixels by extending the image.\n" +
 				"\t */\n" +
-				"\tpublic static float safeGet( ImageFloat32 input , int x , int y ) {\n" +
+				"\tpublic static float safeGet( GrayF32 input , int x , int y ) {\n" +
 				"\t\tif( x < 0 )\n" +
 				"\t\t\tx = 0;\n" +
 				"\t\telse if( x >= input.width )\n" +

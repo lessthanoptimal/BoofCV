@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ public class GenerateConvolveDownNormalized_JustBorder extends CodeGeneratorBase
 
 	public void generate() {
 		printPreamble();
-		printAllOps("F32", "ImageFloat32","ImageFloat32","float","float","float","float","");
-		printAllOps("I32", "ImageUInt8","ImageInt8","int","byte","byte","int"," & 0xFF");
-		printAllOps("I32", "ImageSInt16","ImageInt16","int","short","short","int","");
+		printAllOps("F32", "GrayF32","GrayF32","float","float","float","float","");
+		printAllOps("I32", "GrayU8","ImageInt8","int","byte","byte","int"," & 0xFF");
+		printAllOps("I32", "GrayS16","ImageInt16","int","short","short","int","");
 		out.println("}");
 	}
 

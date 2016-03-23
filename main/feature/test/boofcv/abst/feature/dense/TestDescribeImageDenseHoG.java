@@ -43,7 +43,7 @@ public class TestDescribeImageDenseHoG {
 
 	ImageType imageTypes[] = new ImageType[]{
 			ImageType.single(GrayU8.class), ImageType.single(GrayF32.class),
-			ImageType.ms(2, ImageDataType.U8),ImageType.ms(2, ImageDataType.F32) };
+			ImageType.pl(2, ImageDataType.U8),ImageType.pl(2, ImageDataType.F32) };
 
 	/**
 	 * Checks to see if valid locations are returned.  Very simple test.  Can't test descriptor correctness since

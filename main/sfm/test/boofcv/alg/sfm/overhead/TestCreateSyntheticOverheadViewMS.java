@@ -55,8 +55,8 @@ public class TestCreateSyntheticOverheadViewMS {
 
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
-		CreateSyntheticOverheadViewMS<GrayF32> alg =
-				new CreateSyntheticOverheadViewMS<GrayF32>(TypeInterpolate.BILINEAR,3,GrayF32.class);
+		CreateSyntheticOverheadViewPL<GrayF32> alg =
+				new CreateSyntheticOverheadViewPL<GrayF32>(TypeInterpolate.BILINEAR,3,GrayF32.class);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Only processes the inner image.  Ignoring the border.\n" +
 				"\t */\n" +
-				"\tstatic public void inner4( ImageFloat32 intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY, ImageFloat32 output )\n" +
+				"\tstatic public void inner4( GrayF32 intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY, GrayF32 output )\n" +
 				"\t{\n" +
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height-1;\n" +
@@ -113,7 +113,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Just processes the image border.\n" +
 				"\t */\n" +
-				"\tstatic public void border4( ImageFloat32 _intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , ImageFloat32 output )\n" +
+				"\tstatic public void border4( GrayF32 _intensity , "+derivType.getSingleBandName()+" derivX , "+derivType.getSingleBandName()+" derivY , GrayF32 output )\n" +
 				"\t{\n" +
 				"\t\tint w = _intensity.width;\n" +
 				"\t\tint h = _intensity.height-1;\n" +

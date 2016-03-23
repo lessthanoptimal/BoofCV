@@ -118,10 +118,10 @@ public class ExampleSegmentSuperpixels {
 		image = ConvertBufferedImage.stripAlphaChannel(image);
 
 		// Select input image type.  Some algorithms behave different depending on image type
-		ImageType<Planar<GrayF32>> imageType = ImageType.ms(3, GrayF32.class);
-//		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
-//		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
-//		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
+//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
+//		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
+//		ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
 
 //		ImageSuperpixels alg = FactoryImageSegmentation.meanShift(null, imageType);
 //		ImageSuperpixels alg = FactoryImageSegmentation.slic(new ConfigSlic(400), imageType);

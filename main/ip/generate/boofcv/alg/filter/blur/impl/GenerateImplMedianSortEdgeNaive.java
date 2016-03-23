@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 		out.print(CodeGeneratorUtil.copyright);
 		out.print("package boofcv.alg.filter.blur.impl;\n" +
 				"\n" +
-				"import boofcv.struct.image.ImageFloat32;\n" +
+				"import boofcv.struct.image.GrayF32;\n" +
 				"import boofcv.struct.image.ImageInteger;\n" +
 				"import pja.sorting.QuickSelect;\n" +
 				"\n" +

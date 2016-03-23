@@ -70,7 +70,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	boolean busy = false;
 
 	public VisualizeImageSegmentationApp() {
-		this((ImageType)ImageType.ms(3,GrayF32.class));
+		this((ImageType)ImageType.pl(3,GrayF32.class));
 	}
 
 	public VisualizeImageSegmentationApp(ImageType<T> imageType ) {
@@ -236,10 +236,10 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 	}
 
 	public static void main(String[] args) {
-		ImageType<Planar<GrayF32>> imageType = ImageType.ms(3,GrayF32.class);
-//		ImageType<MultiSpectral<ImageUInt8>> imageType = ImageType.ms(3,ImageUInt8.class);
-//		ImageType<ImageFloat32> imageType = ImageType.single(ImageFloat32.class);
-//		ImageType<ImageUInt8> imageType = ImageType.single(ImageUInt8.class);
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
+//		ImageType<Planar<GrayU8>> imageType = ImageType.pl(3,GrayU8.class);
+//		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
+//		ImageType<GrayU8> imageType = ImageType.single(GrayU8.class);
 
 		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
 

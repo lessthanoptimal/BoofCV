@@ -21,7 +21,7 @@ package boofcv.examples.geometry;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.abst.sfm.d2.MsToGrayMotion2D;
+import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
@@ -71,7 +71,7 @@ public class ExampleVideoMosaic {
 
 		// wrap it so it output color images while estimating motion from gray
 		ImageMotion2D<Planar<GrayF32>,Homography2D_F64> motion2DColor =
-				new MsToGrayMotion2D<GrayF32,Homography2D_F64>(motion2D,GrayF32.class);
+				new PlToGrayMotion2D<GrayF32,Homography2D_F64>(motion2D,GrayF32.class);
 
 		// This fuses the images together
 		StitchingFromMotion2D<Planar<GrayF32>,Homography2D_F64>
@@ -81,7 +81,7 @@ public class ExampleVideoMosaic {
 		MediaManager media = DefaultMediaManager.INSTANCE;
 		String fileName = UtilIO.pathExample("mosaic/airplane01.mjpeg");
 		SimpleImageSequence<Planar<GrayF32>> video =
-				media.openVideo(fileName, ImageType.ms(3, GrayF32.class));
+				media.openVideo(fileName, ImageType.pl(3, GrayF32.class));
 
 		Planar<GrayF32> frame = video.next();
 

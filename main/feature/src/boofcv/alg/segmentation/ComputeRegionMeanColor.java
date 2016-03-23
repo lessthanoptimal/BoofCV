@@ -132,8 +132,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	/**
 	 * Implementation for {@link Planar}
 	 */
-	public static class MS_U8 extends ComputeRegionMeanColor<Planar<GrayU8>> {
-		public MS_U8( int numBands ) {super(numBands);}
+	public static class PL_U8 extends ComputeRegionMeanColor<Planar<GrayU8>> {
+		public PL_U8( int numBands ) {super(numBands);}
 
 		@Override
 		protected void addPixelValue(int index, float[] sum) {
@@ -146,8 +146,8 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase> {
 	/**
 	 * Implementation for {@link Planar}
 	 */
-	public static class MS_F32 extends ComputeRegionMeanColor<Planar<GrayF32>> {
-		public MS_F32( int numBands ) {super(numBands);}
+	public static class PL_F32 extends ComputeRegionMeanColor<Planar<GrayF32>> {
+		public PL_F32( int numBands ) {super(numBands);}
 
 		@Override
 		protected void addPixelValue(int index, float[] sum) {

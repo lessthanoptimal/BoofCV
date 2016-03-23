@@ -9,10 +9,10 @@ import android.test.AndroidTestCase;
 import boofcv.core.image.FactoryGImageSingleBand;
 import boofcv.core.image.GImageSingleBand;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 
 public class TestImplConvertBitmap extends AndroidTestCase {
 
@@ -111,9 +111,9 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		
 		try {
 			int numBands = Bitmap.Config.ARGB_8888 == config ? 4 : 3;
-			Class msType = m.getName().contains("U8") ? ImageUInt8.class : ImageFloat32.class;
+			Class msType = m.getName().contains("U8") ? GrayU8.class : GrayF32.class;
 			
-			MultiSpectral found = new MultiSpectral(msType,w,h,numBands);
+			Planar found = new Planar(msType,w,h,numBands);
 
 			Object array;
 
@@ -210,9 +210,9 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		
 		try {
 			int numBands = Bitmap.Config.ARGB_8888 == config ? 4 : 3;
-			Class msType = m.getName().contains("U8") ? ImageUInt8.class : ImageFloat32.class;
+			Class msType = m.getName().contains("U8") ? GrayU8.class : GrayF32.class;
 			
-			MultiSpectral found = new MultiSpectral(msType,w,h,numBands);
+			Planar found = new Planar(msType,w,h,numBands);
 
 			m.invoke(null, orig, found);
 			
@@ -353,9 +353,9 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		
 		try {
 			int numBands = Bitmap.Config.ARGB_8888 == config ? 4 : 3;
-			Class msType = m.getName().contains("U8") ? ImageUInt8.class : ImageFloat32.class;
+			Class msType = m.getName().contains("U8") ? GrayU8.class : GrayF32.class;
 			
-			MultiSpectral src = new MultiSpectral(msType,w,h,numBands);
+			Planar src = new Planar(msType,w,h,numBands);
 			
 			GeneralizedImageOps.set(src.getBand(0),1, 2, 0x38);
 			GeneralizedImageOps.set(src.getBand(1),1, 2, 0x64);
@@ -420,9 +420,9 @@ public class TestImplConvertBitmap extends AndroidTestCase {
 		
 		try {
 			int numBands = Bitmap.Config.ARGB_8888 == config ? 4 : 3;
-			Class msType = m.getName().contains("U8") ? ImageUInt8.class : ImageFloat32.class;
+			Class msType = m.getName().contains("U8") ? GrayU8.class : GrayF32.class;
 			
-			MultiSpectral src = new MultiSpectral(msType,w,h,numBands);
+			Planar src = new Planar(msType,w,h,numBands);
 			
 			GeneralizedImageOps.set(src.getBand(0),1, 2, 0x38);
 			GeneralizedImageOps.set(src.getBand(1),1, 2, 0x64);

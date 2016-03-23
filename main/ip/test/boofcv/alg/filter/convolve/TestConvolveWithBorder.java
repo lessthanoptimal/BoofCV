@@ -93,7 +93,7 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 			}
 		}
 
-//		ShowImages.showWindow((ImageFloat32)larger,"large",true);
+//		ShowImages.showWindow((GrayF32)larger,"large",true);
 	}
 
 	@Override

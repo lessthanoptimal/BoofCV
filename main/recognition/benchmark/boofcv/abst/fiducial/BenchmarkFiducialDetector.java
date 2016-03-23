@@ -91,7 +91,7 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 		perform(directory, detector);
 
 //		detector = FactoryFiducial.
-//				squareBinaryRobust(new ConfigFiducialBinary(0.2), 6, ImageUInt8.class);
+//				squareBinaryRobust(new ConfigFiducialBinary(0.2), 6, GrayU8.class);
 //		perform(directory, detector);
 	}
 }

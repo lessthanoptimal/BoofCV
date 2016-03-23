@@ -96,7 +96,7 @@ public class ConvertBufferedImage {
 	 * @param img Image whose internal data is extracted and wrapped.
 	 * @return An image whose internal data is the same as the input image.
 	 */
-	public static GrayU8 extractImageUInt8(BufferedImage img) {
+	public static GrayU8 extractGrayU8(BufferedImage img) {
 		if (img.getRaster() instanceof ByteInterleavedRaster &&
 				img.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
 
@@ -168,7 +168,7 @@ public class ConvertBufferedImage {
 	/**
 	 * <p>
 	 * Creates a new BufferedImage that internally uses the same data as the provided
-	 * ImageUInt8.  The returned BufferedImage will be of type TYPE_BYTE_GRAY.
+	 * GrayU8.  The returned BufferedImage will be of type TYPE_BYTE_GRAY.
 	 * </p>
 	 * <p/>
 	 * <p>
@@ -239,11 +239,11 @@ public class ConvertBufferedImage {
 		T out = imageType.createImage(src.getWidth(),src.getHeight());
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				convertFromSingle(src, (ImageGray)out, imageType.getImageClass());
 				break;
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				convertFromMulti(src, (Planar) out, orderRgb, imageType.getImageClass());
 				break;
 
@@ -263,11 +263,11 @@ public class ConvertBufferedImage {
 		ImageType<T> imageType = output.getImageType();
 
 		switch( imageType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				convertFromSingle(src, (ImageGray)output, imageType.getImageClass());
 				break;
 
-			case MULTI_SPECTRAL:
+			case PLANAR:
 				convertFromMulti(src, (Planar) output, orderRgb, imageType.getImageClass());
 				break;
 
@@ -415,7 +415,7 @@ public class ConvertBufferedImage {
 	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
 	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency.
 	 *                 Most of the time you want this to be true.
-	 * @param type Which type of data structure is each band. (ImageUInt8 or ImageFloat32)
+	 * @param type Which type of data structure is each band. (GrayU8 or GrayF32)
 	 * @return Converted image.
 	 */
 	public static <T extends ImageGray> Planar<T>
@@ -607,7 +607,7 @@ public class ConvertBufferedImage {
 			} else if( GrayF32.class == ms.getBandType() ) {
 				return convertTo_F32((Planar<GrayF32>) ms, dst, orderRgb);
 			} else {
-				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getBandType().getSimpleName());
+				throw new IllegalArgumentException("Planar type is not yet supported: "+ ms.getBandType().getSimpleName());
 			}
 		} else if( src instanceof ImageInterleaved ) {
 			if( InterleavedU8.class == src.getClass() ) {
@@ -978,7 +978,7 @@ public class ConvertBufferedImage {
 	}
 
 	/**
-	 * If a MultiSpectral was created from a BufferedImage its colors might not be in the expected order.
+	 * If a Planar was created from a BufferedImage its colors might not be in the expected order.
 	 * Invoking this function ensures that the image will have the expected ordering.  For images with
 	 * 3 bands it will be RGB and for 4 bands it will be ARGB.
 	 */

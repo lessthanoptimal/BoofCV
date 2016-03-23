@@ -177,8 +177,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGr
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 
-//		Class imageType = ImageUInt8.class;
-//		Class derivType = ImageSInt16.class;
+//		Class imageType = GrayU8.class;
+//		Class derivType = GrayS16.class;
 
 		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);
 

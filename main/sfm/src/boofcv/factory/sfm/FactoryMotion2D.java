@@ -151,7 +151,7 @@ public class FactoryMotion2D {
 	}
 
 	/**
-	 * Estimates the image motion from multi-spectral images and then combines images together.
+	 * Estimates the image motion from planar images and then combines images together.
 	 * Typically used for mosaics and stabilization.
 	 *
 	 * @param maxJumpFraction If the area changes by this much between two consecuative frames then the transform
@@ -175,7 +175,7 @@ public class FactoryMotion2D {
 
 		InterpolatePixelS<I> interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
 		ImageDistort<Planar<I>,Planar<I>> distorter =
-				FactoryDistort.distortMS(false,interp, imageType);
+				FactoryDistort.distortPL(false,interp, imageType);
 		distorter.setRenderAll(false);
 
 		return new StitchingFromMotion2D<Planar<I>, IT>(motion2D,distorter,transform,maxJumpFraction );

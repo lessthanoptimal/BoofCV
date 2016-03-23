@@ -138,7 +138,7 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 
 		@Override
 		public void process() {
-			if( alg.getImageType().getFamily() == ImageType.Family.SINGLE_BAND )
+			if( alg.getImageType().getFamily() == ImageType.Family.GRAY)
 				alg.setImage(gray);
 			else
 				alg.setImage(colorMS);
@@ -166,13 +166,13 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F",
 				FactoryDescribeRegionPoint.<I,II>surfFast(surfSpeed, imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F Color",
-				FactoryDescribeRegionPoint.surfColorFast(surfSpeed, ImageType.ms(3, imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfColorFast(surfSpeed, ImageType.pl(3, imageType))),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S",
 				FactoryDescribeRegionPoint.<I,II>surfStable(surfStable,  imageType)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Describe("SURF-S Color",
-				FactoryDescribeRegionPoint.surfColorStable(surfStable,  ImageType.ms(3, imageType))),TEST_TIME);
+				FactoryDescribeRegionPoint.surfColorStable(surfStable,  ImageType.pl(3, imageType))),TEST_TIME);
 
-//		if( imageType == ImageFloat32.class )
+//		if( imageType == GrayF32.class )
 //			ProfileOperation.printOpsPerSec(new Describe("SIFT", FactoryDescribeRegionPoint.sift(null,null)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Brief512(),TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BriefSO512(),TEST_TIME);
@@ -180,7 +180,7 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 
 	public static void main( String arg[ ] ) {
 		BenchmarkDescribe<GrayF32,?,?> alg = new BenchmarkDescribe(GrayF32.class);
-//		BenchmarkDescribe<ImageUInt8,?,?> alg = new BenchmarkDescribe(ImageUInt8.class);
+//		BenchmarkDescribe<GrayU8,?,?> alg = new BenchmarkDescribe(GrayU8.class);
 
 		alg.perform();
 	}

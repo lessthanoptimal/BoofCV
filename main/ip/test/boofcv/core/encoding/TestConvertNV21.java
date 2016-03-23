@@ -58,7 +58,7 @@ public class TestConvertNV21 {
 
 	@Test
 	public void testColor() {
-		ImageType types[] = new ImageType[]{ImageType.ms(3, ImageDataType.U8),ImageType.ms(3,ImageDataType.F32),
+		ImageType types[] = new ImageType[]{ImageType.pl(3, ImageDataType.U8),ImageType.pl(3,ImageDataType.F32),
 				ImageType.il(3, ImageDataType.U8),ImageType.il(3, ImageDataType.F32)};
 
 		byte[] data = random(width,height);

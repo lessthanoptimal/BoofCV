@@ -39,10 +39,10 @@ public class ExampleJCodecDisplayFrames {
 	public static void main(String[] args) {
 
 		String fileName = UtilIO.pathExample("background/highway_bridge_jitter.mp4");
-		ImageType type = ImageType.ms(3, GrayU8.class);
-//		ImageType type = ImageType.single(ImageUInt8.class);
-//		ImageType type = ImageType.ms(3, ImageFloat32.class);
-//		ImageType type = ImageType.single(ImageFloat32.class);
+		ImageType type = ImageType.pl(3, GrayU8.class);
+//		ImageType type = ImageType.single(GrayU8.class);
+//		ImageType type = ImageType.pl(3, GrayF32.class);
+//		ImageType type = ImageType.single(GrayF32.class);
 
 		JCodecSimplified sequence = new JCodecSimplified<Planar<GrayU8>>(fileName,type);
 

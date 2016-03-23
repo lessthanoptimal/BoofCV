@@ -42,7 +42,7 @@ public class TestLoadFileImageSequence {
 				UtilIO.getPathToBase()+"main/io/data/test/","png");
 
 
-		assertTrue(alg.getImageType().getFamily() == ImageType.Family.SINGLE_BAND);
+		assertTrue(alg.getImageType().getFamily() == ImageType.Family.GRAY);
 		assertTrue(ImageDataType.F32 == alg.getImageType().getDataType());
 		assertTrue(!alg.isLoop());
 

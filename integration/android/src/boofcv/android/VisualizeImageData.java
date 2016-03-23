@@ -50,7 +50,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void binaryToBitmap( ImageUInt8 binary , boolean invert , Bitmap output , byte[] storage ) {
+	public static void binaryToBitmap( GrayU8 binary , boolean invert , Bitmap output , byte[] storage ) {
 		shapeShape(binary, output);
 
 		if( storage == null )
@@ -95,7 +95,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( ImageSInt16 input , int maxAbsValue , Bitmap output , byte[] storage ) {
+	public static void colorizeSign( GrayS16 input , int maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(input, output);
 
 		if( storage == null )
@@ -134,7 +134,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeSign( ImageFloat32 input , float maxAbsValue , Bitmap output , byte[] storage ) {
+	public static void colorizeSign( GrayF32 input , float maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(input, output);
 
 		if( storage == null )
@@ -173,7 +173,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude(ImageSInt32 input , int maxAbsValue , Bitmap output , byte[] storage) {
+	public static void grayMagnitude(GrayS32 input , int maxAbsValue , Bitmap output , byte[] storage) {
 		shapeShape(input, output);
 
 		if( storage == null )
@@ -206,7 +206,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void grayMagnitude(ImageFloat32 input , float maxAbsValue , Bitmap output , byte[] storage) {
+	public static void grayMagnitude(GrayF32 input , float maxAbsValue , Bitmap output , byte[] storage) {
 		shapeShape(input, output);
 
 		if( storage == null )
@@ -240,7 +240,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeGradient( ImageSInt16 derivX , ImageSInt16 derivY ,
+	public static void colorizeGradient( GrayS16 derivX , GrayS16 derivY ,
 										 int maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(derivX, derivY, output);
 
@@ -299,7 +299,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image.
 	 */
-	public static void colorizeGradient( ImageFloat32 derivX , ImageFloat32 derivY ,
+	public static void colorizeGradient( GrayF32 derivX , GrayF32 derivY ,
 										 float maxAbsValue , Bitmap output , byte[] storage ) {
 		shapeShape(derivX, derivY, output);
 
@@ -409,7 +409,7 @@ public class VisualizeImageData {
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void disparity( ImageFloat32 disparity, int minValue, int maxValue,
+	public static void disparity( GrayF32 disparity, int minValue, int maxValue,
 								  int invalidColor, Bitmap output , byte[] storage ) {
 		shapeShape(disparity, output);
 
@@ -542,7 +542,7 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 **/
-	public static void renderLabeled(ImageSInt32 labelImage, int numRegions, Bitmap output , byte[] storage) {
+	public static void renderLabeled(GrayS32 labelImage, int numRegions, Bitmap output , byte[] storage) {
 
 		if( storage == null )
 			storage = declareStorage(output,null);
@@ -581,12 +581,12 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void regionBorders( ImageSInt32 pixelToRegion , int borderColor ,
+	public static void regionBorders( GrayS32 pixelToRegion , int borderColor ,
 									  Bitmap output , byte[] storage) {
 		if( storage == null )
 			storage = declareStorage(output,null);
 
-		ImageUInt8 binary = new ImageUInt8(pixelToRegion.width,pixelToRegion.height);
+		GrayU8 binary = new GrayU8(pixelToRegion.width,pixelToRegion.height);
 		ImageSegmentationOps.markRegionBorders(pixelToRegion, binary);
 		int indexOut = 0;
 		for( int y = 0; y < binary.height; y++ ) {
@@ -612,7 +612,7 @@ public class VisualizeImageData {
 	 * @param output Where the output is written to
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void regionsColor( ImageSInt32 pixelToRegion ,
+	public static void regionsColor( GrayS32 pixelToRegion ,
 									 FastQueue<float[]> segmentColor ,
 									 Bitmap output , byte[] storage ) {
 		if( storage == null )

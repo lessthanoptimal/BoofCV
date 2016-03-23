@@ -57,7 +57,7 @@ public class ExampleFiducialBinary {
 		// Detect the fiducial
 		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
 				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
-//				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),ImageFloat32.class);
+//				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
 
 		detector.setIntrinsic(param);
 

@@ -41,10 +41,10 @@ public class FactoryDistort {
 	public static <Input extends ImageBase, Output extends ImageBase>
 	ImageDistort<Input, Output> distort(boolean cached, InterpolatePixel<Input> interp, ImageType<Output> outputType) {
 		switch( outputType.getFamily() ) {
-			case SINGLE_BAND:
+			case GRAY:
 				return distortSB(cached,(InterpolatePixelS)interp,outputType.getImageClass());
-			case MULTI_SPECTRAL:
-				return distortMS(cached,(InterpolatePixelS)interp,outputType.getImageClass());
+			case PLANAR:
+				return distortPL(cached,(InterpolatePixelS)interp,outputType.getImageClass());
 			case INTERLEAVED:
 				return distortIL(cached,(InterpolatePixelMB) interp, (ImageType)outputType);
 			default:
@@ -91,7 +91,7 @@ public class FactoryDistort {
 	}
 
 	/**
-	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the multi-spectral images, transformation
+	 * Creates a {@link boofcv.alg.distort.ImageDistort} for the planar images, transformation
 	 * and interpolation instance.
 	 *
 	 * @param cached If true the distortion is only computed one.  False for recomputed each time, but less memory.
@@ -100,10 +100,10 @@ public class FactoryDistort {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	ImageDistort<Planar<Input>,Planar<Output>>
-	distortMS( boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
+	distortPL(boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		ImageDistort<Input, Output> distortSingle = distortSB(cached, interp, outputType);
-		return new ImplImageDistort_MS<Input, Output>(distortSingle);
+		return new ImplImageDistort_PL<Input, Output>(distortSingle);
 	}
 
 	public static <Input extends ImageInterleaved, Output extends ImageInterleaved>

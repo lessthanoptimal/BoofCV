@@ -67,7 +67,7 @@ public class TestGHistogramFeatureOps {
 	}
 
 	@Test
-	public void histogram_ms() {
+	public void histogram_pl() {
 		for( Class type : supported ) {
 			Planar image = new Planar(type,width,height,2);
 			GImageMiscOps.fillUniform(image,rand,0,200);
