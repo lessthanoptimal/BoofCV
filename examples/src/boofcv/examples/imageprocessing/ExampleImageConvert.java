@@ -25,6 +25,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -83,9 +84,12 @@ public class ExampleImageConvert {
 		// adjusting the pixel's value
 		BufferedImage outBad = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
 		BufferedImage outScaled = new BufferedImage(imageBad.width,imageBad.height,BufferedImage.TYPE_INT_RGB);
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad Conversion");
-		ShowImages.showWindow(ConvertBufferedImage.convertTo(scaledAbs,outScaled),"Scaled");
-		ShowImages.showWindow(colorX,"Visualized");
+
+		ListDisplayPanel panel = new ListDisplayPanel();
+		panel.addImage(ConvertBufferedImage.convertTo(scaledAbs,outScaled),"Scaled");
+		panel.addImage(colorX,"Visualized");
+		panel.addImage(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad Conversion");
+		ShowImages.showWindow(panel,"Image Convert",true);
 	}
 
 	/**

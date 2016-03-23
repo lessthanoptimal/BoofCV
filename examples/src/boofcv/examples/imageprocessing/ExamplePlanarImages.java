@@ -35,7 +35,8 @@ import java.awt.image.BufferedImage;
  * <p>
  * {@link Planar} images are one way in which color images can be stored and manipulated inside
  * of BoofCV.  Inside of a Planar image each color band is stored as an independent {@link ImageGray}.
- * This is unlike the more common interleaved format where color information is stored in the same image.
+ * This is unlike the more common interleaved format where color information is stored in adjacent bytes in
+ * the same image.
  * </p>
  *
  * <p>
