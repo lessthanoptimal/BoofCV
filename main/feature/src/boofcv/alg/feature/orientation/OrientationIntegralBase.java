@@ -68,7 +68,7 @@ public abstract class OrientationIntegralBase<II extends ImageGray,G extends Gra
 	 * @param period How often the image is sampled in pixels at canonical size. Internally, this value
 	 *               is scaled by scaledPeriod = period*objectRadius/sampleRadius.  Typically 1.
 	 * @param kernelWidth How wide of a kernel should be used to sample. Try 4
-	 * @param weightSigma Sigma for weighting.  &le; zero for unweighted.
+	 * @param weightSigma Sigma for weighting.  Set to zero for unweighted, negative to use sampleRadius.
 	 * @param assignDefaultRadius If true it will set the object's radius to a scale of 1
 	 */
 	public OrientationIntegralBase(double objectRadiusToScale, int sampleRadius, double period,
@@ -80,7 +80,7 @@ public abstract class OrientationIntegralBase<II extends ImageGray,G extends Gra
 		this.kernelWidth = kernelWidth;
 		this.sampleWidth = sampleRadius *2+1;
 		this.integralType = integralType;
-		if( weightSigma > 0 )
+		if( weightSigma != 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma, sampleRadius);
 
 		g = (SparseScaleGradient<II,G>)SurfDescribeOps.createGradient(false, integralType);
