@@ -34,7 +34,7 @@ BoofCV is divided up into many modules.  The easiest way to include all of them 
 
 For Gradle projects:
 ```groovy
-compile group: 'org.boofcv', name: 'all', version: '0.22'
+compile group: 'org.boofcv', name: 'all', version: '0.23'
 ```
 
 For Maven projects:
@@ -42,7 +42,7 @@ For Maven projects:
 <dependency>
   <groupId>org.boofcv</groupId>
   <artifactId>all</artifactId>
-  <version>0.22</version>
+  <version>0.23</version>
 </dependency>
 ```
 
