@@ -84,7 +84,7 @@ public class TestPyramidOps {
 
 	@Test
 	public void gradient() {
-		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel_F32();
+		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
 
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<GrayF32>(GrayF32.class,false,scales);
 		in.initialize(width, height);

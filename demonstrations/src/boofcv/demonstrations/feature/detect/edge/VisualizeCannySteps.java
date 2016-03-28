@@ -66,7 +66,7 @@ public class VisualizeCannySteps {
 		GrayU8 output = new GrayU8(inputF32.width,inputF32.height);
 
 		BlurStorageFilter<GrayF32> blur = FactoryBlurFilter.gaussian(GrayF32.class,-1,2);
-		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel_F32();
+		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
 
 		blur.process(inputF32,blurred);
 		gradient.process(blurred,derivX,derivY);

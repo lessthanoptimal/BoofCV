@@ -42,7 +42,7 @@ public class TestGradientSparseThree_U8 extends GeneralGradientSparse {
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.three_U8();
+		return FactoryDerivative.three(GrayU8.class,GrayS16.class);
 	}
 
 }

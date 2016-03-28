@@ -41,7 +41,7 @@ public class TestOrientationGradientToImage {
 		OrientationGradient<GrayF32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, GrayF32.class);
 
 		ImageGradient<GrayF32,GrayF32> gradient =
-				FactoryDerivative.sobel_F32();
+				FactoryDerivative.sobel(GrayF32.class,null);
 
 		OrientationGradientToImage<GrayF32,GrayF32>
 				alg = new OrientationGradientToImage<GrayF32, GrayF32>(orig,gradient,

@@ -59,7 +59,7 @@ public class TestAnyImageDerivative {
 
 	@Test
 	public void test() {
-		ImageGradient<GrayF32,GrayF32> g =  FactoryDerivative.three_F32();
+		ImageGradient<GrayF32,GrayF32> g =  FactoryDerivative.three(GrayF32.class,null);
 
 		GrayF32 derivX = new GrayF32(width,height);
 		GrayF32 derivY = new GrayF32(width,height);

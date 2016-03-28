@@ -41,7 +41,7 @@ public class TestGradientSparseSobel_F32 extends GeneralGradientSparse {
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.sobel_F32();
+		return FactoryDerivative.sobel(GrayF32.class,null);
 	}
 
 }

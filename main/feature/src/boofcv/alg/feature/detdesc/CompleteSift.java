@@ -54,7 +54,7 @@ public class CompleteSift extends SiftDetector
 	GrowQueue_F64 orientations = new GrowQueue_F64();
 
 	// used to compute the image gradient
-	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three_F32();
+	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,null);
 
 	// spacial derivative for the current scale in the octave
 	GrayF32 derivX = new GrayF32(1,1);

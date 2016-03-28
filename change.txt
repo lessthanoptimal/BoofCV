@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2016/
+Date    : 2016/03/27
 Version : 0.23
 
 - Refactored image data structure names for consistency and brevity
@@ -28,22 +28,8 @@ Version : 0.23
   * 68 times faster than equivalent older code
   * 8 times faster than a lookup table!
   * Thanks pcmoen for finding this gem and the pull request
-
-
-- TODO HOG
-  * Benchmark to see using a dot product of precomputed gradients is faster than using
-    atan() to compute the angle.
-  * Provide an easier to use API to access the cells
-  * Look at paper again and see if it uses soft binning of gradient into cells
-     * User configurable
-  * Consider renaming class and make low level api easier to use?
-     * access to cell image
-     * break block computation off into separate function
-  * Non square cells and blocks?
-
-- TODO Regression: Chessboard image border to fiducial regression
-- TODO Regression: Scene Classification
-- TODO Naive implementation of DLS
+- FactoryDerivative
+  * Deleted type-specific functions
 
 ---------------------------------------------
 Date    : 2016/03/04

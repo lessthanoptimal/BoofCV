@@ -42,7 +42,7 @@ public class TestGradientSparseSobel_U8 extends GeneralGradientSparse {
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.sobel_U8();
+		return FactoryDerivative.sobel(imageType,derivType);
 	}
 
 }

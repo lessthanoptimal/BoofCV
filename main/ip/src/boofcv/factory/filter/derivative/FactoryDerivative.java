@@ -210,46 +210,6 @@ public class FactoryDerivative {
 		return new ImageGradient_Gaussian<I,D>(sigma,radius,inputType,derivType);
 	}
 
-	public static ImageGradient<GrayF32,GrayF32> gaussian_F32(double sigma , int radius ) {
-		return gaussian(sigma,radius, GrayF32.class,GrayF32.class);
-	}
-
-	public static ImageGradient<GrayF32,GrayF32> sobel_F32() {
-		return sobel(GrayF32.class,GrayF32.class);
-	}
-
-	public static ImageGradient<GrayF32,GrayF32> three_F32() {
-		return three(GrayF32.class,GrayF32.class);
-	}
-
-	public static ImageHessianDirect<GrayF32,GrayF32> hessianDirectThree_F32() {
-		return hessianDirectThree(GrayF32.class,GrayF32.class);
-	}
-
-	public static ImageHessianDirect<GrayF32,GrayF32> hessianDirectSobel_F32() {
-		return hessianDirectSobel(GrayF32.class,GrayF32.class);
-	}
-
-	public static ImageGradient<GrayU8, GrayS16> gaussian_U8(double sigma, int radius) {
-		return gaussian(sigma,radius,GrayU8.class,GrayS16.class);
-	}
-
-	public static ImageGradient<GrayU8, GrayS16> sobel_U8() {
-		return sobel(GrayU8.class,GrayS16.class);
-	}
-
-	public static ImageGradient<GrayU8, GrayS16> three_U8() {
-		return three(GrayU8.class,GrayS16.class);
-	}
-
-	public static ImageHessianDirect<GrayU8, GrayS16> hessianDirectThree_U8() {
-		return hessianDirectThree(GrayU8.class,GrayS16.class);
-	}
-
-	public static ImageHessianDirect<GrayU8, GrayS16> hessianDirectSobel_U8() {
-		return hessianDirectSobel(GrayU8.class,GrayS16.class);
-	}
-
 	public static <D extends ImageGray> ImageHessian<D> hessianSobel(Class<D> derivType ) {
 		if( derivType == GrayF32.class )
 			return (ImageHessian<D>)hessian(GradientSobel.class,GrayF32.class);

@@ -41,7 +41,7 @@ public class TestGradientSparseThree_F32 extends GeneralGradientSparse {
 
 	@Override
 	public ImageGradient createGradient() {
-		return FactoryDerivative.three_F32();
+		return FactoryDerivative.three(GrayF32.class,null);
 	}
 
 }
