@@ -122,9 +122,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		// Will rectify the image
 		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
-				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.VALUE, imageType);
+				RectifyImageOps.rectifyImage(param.getLeft(), rect1, BorderType.ZERO, imageType);
 		ImageDistort<GrayF32,GrayF32> imageDistortRight =
-				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.VALUE, imageType);
+				RectifyImageOps.rectifyImage(param.getRight(), rect2, BorderType.ZERO, imageType);
 
 		// Fill the image with all black
 		GImageMiscOps.fill(rectLeft, 0);

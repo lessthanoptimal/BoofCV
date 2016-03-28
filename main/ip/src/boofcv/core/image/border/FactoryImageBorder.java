@@ -96,7 +96,7 @@ public class FactoryImageBorder {
 
 	/**
 	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageGray}.  If type
-	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
+	 * {@link BorderType#ZERO} is passed in then the value will be set to 0.  Alternatively you could
 	 * use {@link #singleValue(Class, double)} instead.
 	 *
 	 * @param imageType Type of image being processed.
@@ -130,7 +130,7 @@ public class FactoryImageBorder {
 				borderClass = BorderIndex1D_Wrap.class;
 				break;
 
-			case VALUE:
+			case ZERO:
 				return FactoryImageBorder.singleValue(imageType, 0);
 
 			default:
@@ -151,7 +151,7 @@ public class FactoryImageBorder {
 
 	/**
 	 * Creates an instance of the requested algorithms for handling borders pixels on {@link ImageInterleaved}.  If type
-	 * {@link BorderType#VALUE} is passed in then the value will be set to 0.  Alternatively you could
+	 * {@link BorderType#ZERO} is passed in then the value will be set to 0.  Alternatively you could
 	 * use {@link #singleValue(Class, double)} instead.
 	 *
 	 * @param imageType Type of image being processed.
@@ -185,7 +185,7 @@ public class FactoryImageBorder {
 				borderClass = BorderIndex1D_Wrap.class;
 				break;
 
-			case VALUE:
+			case ZERO:
 				return FactoryImageBorder.interleavedValue(imageType, 0);
 
 			default:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,8 @@ public enum BorderType {
 	WRAP,
 
 	/**
-	 * The image border is set to a fixed value.  Generates harsh edges that can cause artifacts in some applications.
-	 * If no mechanism is provided to let you specify the value then it will default to black.
+	 * The image border is set to a fixed value of zero.  Generates harsh edges that can cause artifacts
+	 * in some applications.
 	 */
-	VALUE
+	ZERO
 }

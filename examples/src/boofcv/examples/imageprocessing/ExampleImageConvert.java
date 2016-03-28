@@ -88,7 +88,7 @@ public class ExampleImageConvert {
 		ListDisplayPanel panel = new ListDisplayPanel();
 		panel.addImage(ConvertBufferedImage.convertTo(scaledAbs,outScaled),"Scaled");
 		panel.addImage(colorX,"Visualized");
-		panel.addImage(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad Conversion");
+		panel.addImage(ConvertBufferedImage.convertTo(imageBad,outBad),"Bad");
 		ShowImages.showWindow(panel,"Image Convert",true);
 	}
 

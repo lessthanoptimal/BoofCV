@@ -279,11 +279,11 @@ public class CalibratedImageGridPanel extends JPanel {
 	public void setDistorted ( IntrinsicParameters param , DenseMatrix64F rect ) {
 		if( rect == null ) {
 			this.undoRadial = LensDistortionOps.imageRemoveDistortion(
-					AdjustmentType.FULL_VIEW, BorderType.VALUE, param, null, ImageType.single(GrayF32.class));
+					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, null, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
 		} else {
 			this.undoRadial =
-					RectifyImageOps.rectifyImage(param, rect, BorderType.VALUE, ImageType.single(GrayF32.class));
+					RectifyImageOps.rectifyImage(param, rect, BorderType.ZERO, ImageType.single(GrayF32.class));
 			this.remove_p_to_p = RectifyImageOps.transformPixelToRect_F32(param, rect);
 		}
 	}

@@ -243,7 +243,7 @@ public class TestBaseDetectFiducialSquare {
 		PointTransform_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
 		PointTransform_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
-				TypeInterpolate.BILINEAR, BorderType.VALUE, GrayU8.class);
+				TypeInterpolate.BILINEAR, BorderType.ZERO, GrayU8.class);
 		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, interp, GrayU8.class);
 		distorter.setModel(new PointToPixelTransform_F32(distToUndistort));
 		GrayU8 distorted = new GrayU8(640,480);

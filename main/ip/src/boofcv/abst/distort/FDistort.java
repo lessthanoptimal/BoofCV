@@ -182,7 +182,7 @@ public class FDistort
 		// to recycle here the value also needs to be saved
 //		if( borderType == BorderType.VALUE )
 //			return this;
-		borderType = BorderType.VALUE;
+		borderType = BorderType.ZERO;
 		return border(FactoryImageBorder.genericValue(value, inputType));
 	}
 

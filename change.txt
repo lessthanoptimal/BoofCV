@@ -30,6 +30,7 @@ Version : 0.23
   * Thanks pcmoen for finding this gem and the pull request
 - FactoryDerivative
   * Deleted type-specific functions
+- BorderType.VALUE is now ZERO because it always defaulted to zero
 
 ---------------------------------------------
 Date    : 2016/03/04

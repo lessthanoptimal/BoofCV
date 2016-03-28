@@ -23,6 +23,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -42,6 +43,8 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleConvolution {
 
+	private static ListDisplayPanel panel = new ListDisplayPanel();
+
 	public static void main(String[] args) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
@@ -50,6 +53,8 @@ public class ExampleConvolution {
 		convolve1D(gray);
 		convolve2D(gray);
 		normalize2D(gray);
+
+		ShowImages.showWindow(panel,"Convolution Examples",true);
 	}
 
 	/**
@@ -65,10 +70,10 @@ public class ExampleConvolution {
 		GrayS16 output = new GrayS16(gray.width,gray.height);
 
 		GConvolveImageOps.horizontal(kernel, gray, output, border);
-		ShowImages.showWindow(VisualizeImageData.standard(output, null), "1D Horizontal");
+		panel.addImage(VisualizeImageData.standard(output, null), "1D Horizontal");
 
 		GConvolveImageOps.vertical(kernel, gray, output, border);
-		ShowImages.showWindow(VisualizeImageData.standard(output, null), "1D Vertical");
+		panel.addImage(VisualizeImageData.standard(output, null), "1D Vertical");
 	}
 
 	/**
@@ -87,7 +92,7 @@ public class ExampleConvolution {
 		ImageBorder<GrayU8> border = FactoryImageBorder.single(gray, BorderType.EXTENDED);
 
 		GConvolveImageOps.convolve(kernel, gray, output, border);
-		ShowImages.showWindow(VisualizeImageData.standard(output, null), "2D Kernel");
+		panel.addImage(VisualizeImageData.standard(output, null), "2D Kernel");
 	}
 
 	/**
@@ -103,6 +108,6 @@ public class ExampleConvolution {
 		GrayU8 output = new GrayU8(gray.width,gray.height);
 
 		GConvolveImageOps.convolveNormalized(kernel, gray, output);
-		ShowImages.showWindow(VisualizeImageData.standard(output, null), "2D Normalized Kernel");
+		panel.addImage(VisualizeImageData.standard(output, null), "2D Normalized Kernel");
 	}
 }

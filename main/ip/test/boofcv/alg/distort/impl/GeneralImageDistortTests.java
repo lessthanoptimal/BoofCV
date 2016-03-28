@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 
 	public GeneralImageDistortTests( ImageType<T> imageType ) {
 		this.imageType = imageType;
-		interp = FactoryInterpolation.createPixel(0,255, TypeInterpolate.NEAREST_NEIGHBOR,BorderType.VALUE,imageType);
+		interp = FactoryInterpolation.createPixel(0,255, TypeInterpolate.NEAREST_NEIGHBOR,BorderType.ZERO,imageType);
 
 	}
 

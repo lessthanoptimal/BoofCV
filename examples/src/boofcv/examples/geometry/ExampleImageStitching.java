@@ -186,7 +186,7 @@ public class ExampleImageStitching {
 
 		// Used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.VALUE);
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> distort =
 				DistortSupport.createDistortPL(GrayF32.class, model, interp, false);
 		distort.setRenderAll(false);

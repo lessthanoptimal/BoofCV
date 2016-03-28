@@ -31,6 +31,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
@@ -54,6 +55,8 @@ public class ExampleImageFilter {
 
 	private static int blurRadius = 10;
 
+	private static ListDisplayPanel panel = new ListDisplayPanel();
+
 	public static void procedural( GrayU8 input )
 	{
 		GrayU8 blurred = new GrayU8(input.width,input.height);
@@ -68,7 +71,7 @@ public class ExampleImageFilter {
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
-		ShowImages.showWindow(outputImage,"Procedural Fixed Type");
+		panel.addImage(outputImage,"Procedural Fixed Type");
 	}
 
 	public static <T extends ImageGray, D extends ImageGray>
@@ -89,7 +92,7 @@ public class ExampleImageFilter {
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
-		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
+		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
 	public static <T extends ImageGray, D extends ImageGray>
@@ -112,7 +115,7 @@ public class ExampleImageFilter {
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
-		ShowImages.showWindow(outputImage,"Filter "+inputType.getSimpleName());
+		panel.addImage(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
 	public static void nogenerics( ImageGray input )
@@ -132,7 +135,7 @@ public class ExampleImageFilter {
 
 		// display the results
 		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
-		ShowImages.showWindow(outputImage,"Generalized "+inputType.getSimpleName());
+		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
 	public static void main( String args[] ) {
@@ -147,5 +150,7 @@ public class ExampleImageFilter {
 
 		// try another image data type
 		generalized(ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class));
+
+		ShowImages.showWindow(panel,"Image Filter Examples", true);
 	}
 }

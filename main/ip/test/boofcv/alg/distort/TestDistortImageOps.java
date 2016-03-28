@@ -57,7 +57,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.scale(input,output, BorderType.VALUE, TypeInterpolate.BILINEAR);
+		DistortImageOps.scale(input,output, BorderType.ZERO, TypeInterpolate.BILINEAR);
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
@@ -92,7 +92,7 @@ public class TestDistortImageOps {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.rotate(input, output,BorderType.VALUE, TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
+		DistortImageOps.rotate(input, output,BorderType.ZERO, TypeInterpolate.BILINEAR, (float) Math.PI / 2f);
 
 		double error = 0;
 		// the outside pixels are ignored because numerical round off can cause those to be skipped
