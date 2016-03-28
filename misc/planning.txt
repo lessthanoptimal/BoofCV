@@ -1,19 +1,4 @@
-Alpha 0.24
-
-- TODO HOG
-  * Benchmark to see using a dot product of precomputed gradients is faster than using
-    atan() to compute the angle.
-  * Provide an easier to use API to access the cells
-  * Look at paper again and see if it uses soft binning of gradient into cells
-     * User configurable
-  * Consider renaming class and make low level api easier to use?
-     * access to cell image
-     * break block computation off into separate function
-  * Non square cells and blocks?
-
-- TODO Regression: Chessboard image border to fiducial regression
-- TODO Regression: Scene Classification
-- TODO Naive implementation of DLS
+Version 0.24
 
 - Regression
   * Chessboard image border to fiducial regression
