@@ -24,9 +24,17 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
 /**
- * Conversion between RGB and CIE LAB color space.  LAB color is designed to approximate human vision.
+ * <p>Conversion between RGB and CIE LAB color space.  LAB color is designed to approximate human vision.
  * L for lightness and a and b for the color-opponent dimensions,  The reference white used in
- * the conversions below is D65.
+ * the conversions below is D65.</p>
+ *
+ * <p>
+ * Note:
+ * <ul>
+ * <li>L has a range of 0 to 100</li>
+ * <li>L = 0 is black and L* = 100 is diffuse white</li>
+ * </ul>
+ * </p>
  *
  * @author Peter Abeles
  */
@@ -110,7 +118,7 @@ public class ColorLab {
 	 * NOTE: Input and output image can be the same instance.
 	 *
 	 * @param rgb (Input) RGB encoded image
-	 * @param lab (Output) LAB encoded image
+	 * @param lab (Output) LAB encoded image. L = channel 0, A = channel 1, B = channel 2
 	 */
 	public static void rgbToLab_U8(Planar<GrayU8> rgb , Planar<GrayF32> lab ) {
 
@@ -157,13 +165,13 @@ public class ColorLab {
 	}
 
 	/**
-	 * Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
-	 * to have a range from 0:255
+	 * <p>Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
+	 * to have a range from 0:255</p>
 	 *
 	 * NOTE: Input and output image can be the same instance.
 	 *
 	 * @param rgb (Input) RGB encoded image
-	 * @param lab (Output) LAB encoded image
+	 * @param lab (Output) LAB encoded image.  L = channel 0, A = channel 1, B = channel 2
 	 */
 	public static void rgbToLab_F32(Planar<GrayF32> rgb , Planar<GrayF32> lab ) {
 
