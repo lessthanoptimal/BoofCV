@@ -58,13 +58,8 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * @param gray Render gray scale or color image
 	 */
 	public ConfusionMatrixPanel( DenseMatrix64F M , List<String> labels, int widthPixels , boolean gray ) {
+		this(widthPixels);
 
-		int heightPixels = widthPixels;
-		if( labels != null ) {
-			heightPixels *= 1.0-labelViewFraction;
-		}
-
-		setPreferredSize(new Dimension(widthPixels,heightPixels));
 		setLabels(labels);
 		setMatrix(M);
 		this.gray = gray;
@@ -72,12 +67,15 @@ public class ConfusionMatrixPanel extends JPanel {
 
 	/**
 	 * Constructor in which the prefered width and height is specified in pixels
-	 * @param width preferred width
-	 * @param height preferred height
+	 * @param widthPixels preferred width and height
 	 */
-	public ConfusionMatrixPanel(int width, int height) {
-		setPreferredSize(new Dimension(width,height));
-		setMinimumSize(new Dimension(width, height));
+	public ConfusionMatrixPanel(int widthPixels) {
+		int heightPixels = widthPixels;
+		if( labels != null ) {
+			heightPixels *= 1.0-labelViewFraction;
+		}
+
+		setPreferredSize(new Dimension(widthPixels,heightPixels));
 	}
 
 	public void setMatrix( DenseMatrix64F A ) {
@@ -166,6 +164,12 @@ public class ConfusionMatrixPanel extends JPanel {
 			Font fontLabel = new Font("monospaced", Font.BOLD, (int)(0.055*longestLabel*fontSize + 0.5));
 			g2.setFont(fontLabel);
 			FontMetrics metrics = g2.getFontMetrics(fontLabel);
+
+			// clear the background
+			g2.setColor(Color.WHITE);
+			g2.fillRect(gridWidth,0,viewWidth-gridWidth,viewHeight);
+
+			// draw the text
 			g2.setColor(Color.BLACK);
 			for (int i = 0; i < numRows; i++) {
 				String label = labels.get(i);
