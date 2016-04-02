@@ -269,7 +269,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 		// Show confusion matrix
 		// Not the best coloration scheme...  perfect = red diagonal and blue elsewhere.
-		ShowImages.showWindow(new ConfusionMatrixPanel(confusion.getMatrix(), 400, true), "Confusion Matrix", true);
+		ShowImages.showWindow(new ConfusionMatrixPanel(
+				confusion.getMatrix(),example.getScenes(), 400, true), "Confusion Matrix", true);
 
 		// For SIFT descriptor the accuracy is          54.0%
 		// For  "fast"  SURF descriptor the accuracy is 52.2%

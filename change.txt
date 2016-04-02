@@ -7,6 +7,10 @@ Date Format: year/month/day
 Date    : 2016
 Version : 0.24
 
+- Confusion Matrix Visualization
+  * Fixed bug where a row/column was being lopped off
+  * Added labels
+
 - TODO HOG
   * Benchmark to see using a dot product of precomputed gradients is faster than using
     atan() to compute the angle.
