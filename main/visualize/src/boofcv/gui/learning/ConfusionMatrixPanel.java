@@ -304,7 +304,7 @@ public class ConfusionMatrixPanel extends JPanel {
 		int numCategories = confusion.getNumRows();
 
 		synchronized ( this ) {
-			if( pixelX < gridWidth ) {
+			if( pixelX >= gridWidth ) {
 				output.insideMatrix = false;
 				output.col = output.row = pixelY*numCategories/gridHeight;
 			} else {
