@@ -66,9 +66,8 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * @param gray Render gray scale or color image
 	 */
 	public ConfusionMatrixPanel( DenseMatrix64F M , List<String> labels, int widthPixels , boolean gray ) {
-		this(widthPixels);
+		this(widthPixels,labels);
 
-		setLabels(labels);
 		setMatrix(M);
 		this.gray = gray;
 	}
@@ -77,7 +76,9 @@ public class ConfusionMatrixPanel extends JPanel {
 	 * Constructor in which the prefered width and height is specified in pixels
 	 * @param widthPixels preferred width and height
 	 */
-	public ConfusionMatrixPanel(int widthPixels) {
+	public ConfusionMatrixPanel(int widthPixels, List<String> labels ) {
+		setLabels(labels);
+
 		int heightPixels = widthPixels;
 		if( labels != null ) {
 			heightPixels *= 1.0-labelViewFraction;
