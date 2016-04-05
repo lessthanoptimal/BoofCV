@@ -48,14 +48,14 @@ public class ColorXyz {
 
 
 	/**
-	 * Conversion from 8-bit RGB into XYZ.
+	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToXyz( int r , int g , int b , double xyz[] ) {
 		srgbToXyz(r/255.0,g/255.0,b/255.0,xyz);
 	}
 
 	/**
-	 * Conversion from 8-bit RGB into XYZ.
+	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToXyz( int r , int g , int b , float xyz[] ) {
 		srgbToXyz(r/255.0f,g/255.0f,b/255.0f,xyz);
