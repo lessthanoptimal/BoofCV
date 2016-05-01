@@ -70,7 +70,7 @@ public class ImageLocalNormalization<T extends GrayF> {
 		 * @param delta A small value used to avoid divide by zero errors.  Typical 1e-4f for 32 bit and 1e-8 for 64bit
 		 * @param output Storage for output
 		 */
-	public void zeroMeanStdOne(Kernel1D kernel, T input , float maxPixelValue , float delta , T output ) {
+	public void zeroMeanStdOne(Kernel1D kernel, T input , double maxPixelValue , double delta , T output ) {
 		// check preconditions and initialize data structures
 		initialize(input, output);
 
@@ -104,7 +104,7 @@ public class ImageLocalNormalization<T extends GrayF> {
 	 * @param delta A small value used to avoid divide by zero errors.  Typical 1e-4f for 32 bit and 1e-8 for 64bit
 	 * @param output Storage for output
 	 */
-	public void zeroMeanStdOne( int radius , T input , float maxPixelValue , double delta , T output ) {
+	public void zeroMeanStdOne( int radius , T input , double maxPixelValue , double delta , T output ) {
 		// check preconditions and initialize data structures
 		initialize(input, output);
 

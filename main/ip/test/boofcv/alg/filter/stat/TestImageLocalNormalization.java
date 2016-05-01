@@ -18,9 +18,17 @@
 
 package boofcv.alg.filter.stat;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GConvertImage;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.convolve.Kernel1D;
+import boofcv.struct.image.GrayF;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.junit.Assert.fail;
 
@@ -29,15 +37,48 @@ import static org.junit.Assert.fail;
  */
 public class TestImageLocalNormalization {
 
+	Random rand = new Random(345);
+
 	Class types[] = {GrayF32.class, GrayF64.class};
+
+	int width = 40;
+	int height = 30;
+
+	double delta = 1e-4;
+	int radius = 3;
 
 	@Test
 	public void zeroMeanStdOne_kernel() {
+		double maxPixelValue = 5;
+
+		for( Class type : types ) {
+			int bits = type == GrayF32.class ? 32 : 64;
+			Kernel1D kernel = FactoryKernelGaussian.gaussian(1,true,bits,-1,radius);
+
+			GrayF input = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
+			GrayF found = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
+			GrayF expected = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
+
+			GImageMiscOps.fillUniform(input,rand,0,maxPixelValue);
+
+			ImageLocalNormalization alg = new ImageLocalNormalization(type);
+
+			alg.zeroMeanStdOne(kernel,input,maxPixelValue,delta,found);
+
+		}
+
 		fail("Implement");
 	}
 
 	@Test
 	public void zeroMeanStdOne() {
 		fail("Implement");
+	}
+
+	private void computeExpected( GrayF origInput , Kernel1D origKernel ) {
+		GrayF64 input = new GrayF64(width,height);
+		GConvertImage.convert(origInput,input);
+
+
 	}
 }
