@@ -20,10 +20,7 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.*;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
 
@@ -61,6 +58,21 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (!ConvolveImageUnrolled_F32_F32.horizontal(kernel, input, output))
+			ConvolveImageStandard.horizontal(kernel, input, output);
+	}
+
+	/**
+	 * Performs a horizontal 1D convolution across the image.  The horizontal border is not processed.
+	 *
+	 * @param input	 The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void horizontal(Kernel1D_F64 kernel,
+								  GrayF64 input, GrayF64 output) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_F64_F64.horizontal(kernel, input, output))
 			ConvolveImageStandard.horizontal(kernel, input, output);
 	}
 
@@ -166,6 +178,21 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (!ConvolveImageUnrolled_F32_F32.vertical(kernel, input,  output))
+			ConvolveImageStandard.vertical(kernel, input,  output);
+	}
+
+	/**
+	 * Performs a vertical 1D convolution across the image in the vertical direction.
+	 * The vertical border is not processed.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void vertical(Kernel1D_F64 kernel, GrayF64 input, GrayF64 output) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_F64_F64.vertical(kernel, input,  output))
 			ConvolveImageStandard.vertical(kernel, input,  output);
 	}
 
@@ -304,6 +331,20 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if( !ConvolveImageUnrolled_F32_F32.convolve(kernel,input,output))
+			ConvolveImageStandard.convolve(kernel, input,  output);
+	}
+
+	/**
+	 * Performs a 2D convolution across the image.  The image's borders are not processed.
+	 *
+	 * @param kernel A square kernel that will be convolved across the source image
+	 * @param input  The source image that is to be convolved
+	 * @param output   The results of the convolution
+	 */
+	public static void convolve(Kernel2D_F64 kernel, GrayF64 input, GrayF64 output) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if( !ConvolveImageUnrolled_F64_F64.convolve(kernel,input,output))
 			ConvolveImageStandard.convolve(kernel, input,  output);
 	}
 

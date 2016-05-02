@@ -22,10 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
 import boofcv.alg.filter.kernel.KernelMath;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_I32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_I32;
+import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
 /**
@@ -60,6 +57,30 @@ public class ConvolveNormalized {
 	}
 
 	/**
+	 * Performs a horizontal 1D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void horizontal(Kernel1D_F64 kernel, GrayF64 image, GrayF64 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width ) {
+			ConvolveNormalizedNaive.horizontal(kernel,image,dest);
+		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
+				Kernel1D_F64 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
+			ConvolveImageNoBorder.horizontal(kernel,image,dest);
+			ConvolveNormalized_JustBorder.horizontal(kernel,image,dest);
+		}
+	}
+
+	/**
 	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
 	 * overlap with the image.
 	 *
@@ -84,6 +105,30 @@ public class ConvolveNormalized {
 	}
 
 	/**
+	 * Performs a vertical 1D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void vertical(Kernel1D_F64 kernel, GrayF64 image, GrayF64 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.height ) {
+			ConvolveNormalizedNaive.vertical(kernel,image,dest);
+		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
+				Kernel1D_F64 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
+			ConvolveImageNoBorder.vertical(kernel,image,dest);
+			ConvolveNormalized_JustBorder.vertical(kernel,image,dest);
+		}
+	}
+
+	/**
 	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
 	 * overlap with the image.
 	 *
@@ -99,6 +144,30 @@ public class ConvolveNormalized {
 		} else {
 			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
 				Kernel2D_F32 k = kernel.copy();
+				KernelMath.normalizeSumToOne(k);
+				kernel = k;
+			}
+			ConvolveImageNoBorder.convolve(kernel, image, dest);
+			ConvolveNormalized_JustBorder.convolve(kernel, image, dest);
+		}
+	}
+
+	/**
+	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param image	 The original image. Not modified.
+	 * @param dest	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static void convolve(Kernel2D_F64 kernel, GrayF64 image, GrayF64 dest ) {
+		InputSanityCheck.checkSameShape(image, dest);
+
+		if( kernel.width >= image.width || kernel.width >= image.height ) {
+			ConvolveNormalizedNaive.convolve(kernel, image, dest);
+		} else {
+			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-8f ) {
+				Kernel2D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}

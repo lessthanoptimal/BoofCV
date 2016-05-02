@@ -14,6 +14,8 @@ Version : 0.24
   * Added ability to querry what's at a specific location
 - Local Image Normalization for use in machine learning
 - Added weighted RGB to Gray conversion with example
+- Convolve
+  * Better support for 64-bit float images
 
 - TODO HOG
   * Benchmark to see using a dot product of precomputed gradients is faster than using

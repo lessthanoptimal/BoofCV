@@ -114,7 +114,7 @@ public class ImageLocalNormalization<T extends GrayF> {
 		// take advantage of 2D gaussian kernels being separable
 		GBlurImageOps.mean(adjusted,localMean,radius, output);
 		GPixelMath.pow2(adjusted, pow2);
-		GBlurImageOps.mean(pow2,localPow2,radius, output);
+		GBlurImageOps.mean(pow2,localPow2,radius, output);;
 
 		// Compute the final output
 		if( imageType == GrayF32.class )
@@ -147,6 +147,7 @@ public class ImageLocalNormalization<T extends GrayF> {
 				float std = (float)Math.sqrt(localPow2.data[indexIn] - ave*ave);
 
 				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/(std+delta);
+				indexIn++;
 			}
 		}
 	}
@@ -166,6 +167,7 @@ public class ImageLocalNormalization<T extends GrayF> {
 				double std = Math.sqrt(localPow2.data[indexIn] - ave*ave);
 
 				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/(std+delta);
+				indexIn++;
 			}
 		}
 	}

@@ -32,7 +32,7 @@ public class TestConvolveNormalized_JustBorder {
 	@Test
 	public void compareToNaive() {
 		CompareToNaive test = new CompareToNaive();
-		int numFunctions = 14;
+		int numFunctions = 17;
 
 		for( int i = 0; i < 2; i++ ) {
 			test.setImageDimension(15+i,20+i);          

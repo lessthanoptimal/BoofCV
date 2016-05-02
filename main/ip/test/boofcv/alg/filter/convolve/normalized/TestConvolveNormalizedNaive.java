@@ -145,11 +145,6 @@ public class TestConvolveNormalizedNaive {
 		GrayU8 alt = new GrayU8(15,16);
 		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum());
 
-		alt.print();
-		System.out.println("-----------");
-		output.print();
-
-
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				int expected = vertical2(x, y, kernelX, kernelY, input);

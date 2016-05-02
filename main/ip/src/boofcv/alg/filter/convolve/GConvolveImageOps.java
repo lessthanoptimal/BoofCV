@@ -184,7 +184,9 @@ public class GConvolveImageOps {
 	public static <In extends ImageGray, Out extends ImageGray, K extends Kernel1D>
 	void horizontalNormalized(K kernel, In input, Out output ) {
 		if( input instanceof GrayF32) {
-			ConvolveNormalized.horizontal((Kernel1D_F32)kernel,(GrayF32)input,(GrayF32)output);
+			ConvolveNormalized.horizontal((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
+		} else if( input instanceof GrayF64) {
+			ConvolveNormalized.horizontal((Kernel1D_F64)kernel,(GrayF64)input,(GrayF64)output);
 		} else if( input instanceof GrayU8) {
 			ConvolveNormalized.horizontal((Kernel1D_I32)kernel,(GrayU8)input,(GrayI8)output);
 		} else if( input instanceof GrayS16) {
@@ -206,6 +208,8 @@ public class GConvolveImageOps {
 	void verticalNormalized(K kernel, T input, T output ) {
 		if( input instanceof GrayF32) {
 			ConvolveNormalized.vertical((Kernel1D_F32) kernel, (GrayF32) input, (GrayF32) output);
+		} else if( input instanceof GrayF64) {
+			ConvolveNormalized.vertical((Kernel1D_F64) kernel, (GrayF64) input, (GrayF64) output);
 		} else if( input instanceof GrayU8) {
 			ConvolveNormalized.vertical((Kernel1D_I32) kernel, (GrayU8) input, (GrayI8) output);
 		} else if( input instanceof GrayS16) {
@@ -227,6 +231,8 @@ public class GConvolveImageOps {
 	void convolveNormalized(K kernel, T input, T output ) {
 		if( input instanceof GrayF32) {
 			ConvolveNormalized.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output);
+		} else if( input instanceof GrayF64) {
+			ConvolveNormalized.convolve((Kernel2D_F64) kernel, (GrayF64) input, (GrayF64) output);
 		} else if( input instanceof GrayU8) {
 			ConvolveNormalized.convolve((Kernel2D_I32) kernel, (GrayU8) input, (GrayI8) output);
 		} else if( input instanceof GrayS16) {

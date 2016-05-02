@@ -18,18 +18,19 @@
 
 package boofcv.alg.color;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.*;
 import org.junit.Test;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestColorRgb {
-	Random rand = new Random(0);
+	private Random rand = new Random(0);
 
 	@Test
 	public void scalar_U8() {
@@ -81,35 +82,144 @@ public class TestColorRgb {
 
 	@Test
 	public void planar_U8() {
-		fail("implement");
+		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,20,30,3);
+		GrayU8 gray = new GrayU8(20,30);
+
+		GImageMiscOps.fillUniform(rgb,rand,0,150);
+
+		ColorRgb.rgbToGray_Weighted(rgb,gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				int r = rgb.getBand(0).unsafe_get(x,y);
+				int g = rgb.getBand(1).unsafe_get(x,y);
+				int b = rgb.getBand(2).unsafe_get(x,y);
+
+				double expected = computeExpected(r,g,b);
+				int found = gray.unsafe_get(x,y);
+
+				assertEquals(expected,found,1);
+			}
+		}
 	}
 
 	@Test
 	public void planar_F32() {
-		fail("implement");
+		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class, 20, 30, 3);
+		GrayF32 gray = new GrayF32(20, 30);
+
+		GImageMiscOps.fillUniform(rgb, rand, 0, 150);
+
+		ColorRgb.rgbToGray_Weighted(rgb, gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				float r = rgb.getBand(0).unsafe_get(x, y);
+				float g = rgb.getBand(1).unsafe_get(x, y);
+				float b = rgb.getBand(2).unsafe_get(x, y);
+
+				double expected = computeExpected(r, g, b);
+				float found = gray.unsafe_get(x, y);
+
+				assertEquals(expected, found, 1e-4);
+			}
+		}
 	}
 
 	@Test
 	public void planar_F64() {
-		fail("implement");
+		Planar<GrayF64> rgb = new Planar<GrayF64>(GrayF64.class, 20, 30, 3);
+		GrayF64 gray = new GrayF64(20, 30);
+
+		GImageMiscOps.fillUniform(rgb, rand, 0, 150);
+
+		ColorRgb.rgbToGray_Weighted(rgb, gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				double r = rgb.getBand(0).unsafe_get(x, y);
+				double g = rgb.getBand(1).unsafe_get(x, y);
+				double b = rgb.getBand(2).unsafe_get(x, y);
+
+				double expected = computeExpected(r, g, b);
+				double found = gray.unsafe_get(x, y);
+
+				assertEquals(expected, found, 1e-8);
+
+			}
+		}
 	}
 
 	@Test
 	public void interleaved_U8() {
-		fail("implement");
+		InterleavedU8 rgb = new InterleavedU8(20,30,3);
+		GrayU8 gray = new GrayU8(20,30);
+
+		GImageMiscOps.fillUniform(rgb,rand,0,150);
+
+		ColorRgb.rgbToGray_Weighted(rgb,gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				int r = rgb.getBand(x,y,0);
+				int g = rgb.getBand(x,y,1);
+				int b = rgb.getBand(x,y,2);
+
+				double expected = computeExpected(r,g,b);
+				int found = gray.unsafe_get(x,y);
+
+				assertEquals(expected,found,1);
+			}
+		}
 	}
 
 	@Test
 	public void interleaved_F32() {
-		fail("implement");
+		InterleavedF32 rgb = new InterleavedF32(20,30,3);
+		GrayF32 gray = new GrayF32(20,30);
+
+		GImageMiscOps.fillUniform(rgb,rand,0,150);
+
+		ColorRgb.rgbToGray_Weighted(rgb,gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				float r = rgb.getBand(x,y,0);
+				float g = rgb.getBand(x,y,1);
+				float b = rgb.getBand(x,y,2);
+
+				double expected = computeExpected(r,g,b);
+				float found = gray.unsafe_get(x,y);
+
+				assertEquals(expected,found,1e-4);
+			}
+		}
 	}
 
 	@Test
 	public void interleaved_F64() {
-		fail("implement");
+		InterleavedF64 rgb = new InterleavedF64(20,30,3);
+		GrayF64 gray = new GrayF64(20,30);
+
+		GImageMiscOps.fillUniform(rgb,rand,0,150);
+
+		ColorRgb.rgbToGray_Weighted(rgb,gray);
+
+		for (int y = 0; y < gray.height; y++) {
+			for (int x = 0; x < gray.width; x++) {
+				double r = rgb.getBand(x,y,0);
+				double g = rgb.getBand(x,y,1);
+				double b = rgb.getBand(x,y,2);
+
+				double expected = computeExpected(r,g,b);
+				double found = gray.unsafe_get(x,y);
+
+				assertEquals(expected,found,1e-8);
+			}
+		}
 	}
 
-	public double computeExpected( double r , double g , double b ) {
+	double computeExpected( double r , double g , double b ) {
 		return 0.299*r + 0.587*g + 0.114*b;
 	}
 }

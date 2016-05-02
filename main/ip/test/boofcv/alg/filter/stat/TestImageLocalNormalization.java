@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -57,7 +58,6 @@ public class TestImageLocalNormalization {
 
 			GrayF input = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
 			GrayF found = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
-			GrayF expected = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
 
 			GImageMiscOps.fillUniform(input,rand,0,maxPixelValue);
 
@@ -65,9 +65,8 @@ public class TestImageLocalNormalization {
 
 			alg.zeroMeanStdOne(kernel,input,maxPixelValue,delta,found);
 
+			compareToExpected(input,kernel,found);
 		}
-
-		fail("Implement");
 	}
 
 	@Test
@@ -75,10 +74,56 @@ public class TestImageLocalNormalization {
 		fail("Implement");
 	}
 
-	private void computeExpected( GrayF origInput , Kernel1D origKernel ) {
+	private void compareToExpected( GrayF origInput , Kernel1D origKernel, GrayF found  ) {
 		GrayF64 input = new GrayF64(width,height);
 		GConvertImage.convert(origInput,input);
 
-
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				double f = GeneralizedImageOps.get(found,x,y);
+				double expected = compute(x,y,input,origKernel);
+				assertEquals(x+" "+y,expected,f,1e-4);
+			}
+		}
 	}
+
+	private double compute( int cx , int cy , GrayF64 input , Kernel1D kernel ) {
+		int width = radius*2+1;
+		double vals[] = new double[width*width];
+		double weights[] = new double[width*width];
+		int numVals = 0;
+		double totalW = 0;
+		for (int ry = -radius; ry <= radius ; ry++) {
+			for (int rx = -radius; rx <= radius ; rx++) {
+				int x = cx+rx;
+				int y = cy+ry;
+
+				if( !input.isInBounds(x,y) )
+					continue;
+
+				double w = kernel.getDouble(radius+rx)*kernel.getDouble(radius+ry);
+				double v = input.get(x,y);
+
+				weights[numVals] = w;
+				vals[numVals++] = v;
+				totalW += w;
+			}
+		}
+
+		double mean = 0;
+		for (int i = 0; i < numVals; i++) {
+			mean += weights[i]*vals[i];
+		}
+		mean /= totalW;
+
+		double variance = 0;
+		for (int i = 0; i < numVals; i++) {
+			double delta = vals[i]-mean;
+			variance += weights[i]*delta*delta;
+		}
+		variance /= totalW;
+
+		return mean/(Math.sqrt(variance)+delta);
+	}
+
 }

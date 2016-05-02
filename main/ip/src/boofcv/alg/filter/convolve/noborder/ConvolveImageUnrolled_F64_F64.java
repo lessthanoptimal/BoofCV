@@ -17,9 +17,9 @@
  */
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.convolve.Kernel1D_F64;
+import boofcv.struct.convolve.Kernel2D_F64;
+import boofcv.struct.image.GrayF64;
 
 import javax.annotation.Generated;
 
@@ -41,9 +41,9 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled"})
-public class ConvolveImageUnrolled_F32_F32 {
-	public static boolean horizontal( Kernel1D_F32 kernel ,
-								   GrayF32 image, GrayF32 dest) {
+public class ConvolveImageUnrolled_F64_F64 {
+	public static boolean horizontal( Kernel1D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -76,8 +76,8 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_F32 kernel ,
-								   GrayF32 image, GrayF32 dest) {
+	public static boolean vertical( Kernel1D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -110,8 +110,8 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_F32 kernel ,
-								   GrayF32 image, GrayF32 dest) {
+	public static boolean convolve( Kernel2D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -144,14 +144,14 @@ public class ConvolveImageUnrolled_F32_F32 {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void horizontal3( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
@@ -164,7 +164,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				float total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
@@ -173,16 +173,16 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal5( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void horizontal5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
@@ -195,7 +195,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				float total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -206,18 +206,18 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal7( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void horizontal7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
@@ -230,7 +230,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				float total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -243,20 +243,20 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal9( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void horizontal9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
@@ -269,7 +269,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				float total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -284,22 +284,22 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void horizontal11( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void horizontal11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
-		final float k10 = kernel.data[9];
-		final float k11 = kernel.data[10];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
+		final double k10 = kernel.data[9];
+		final double k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
@@ -312,7 +312,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				float total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -329,14 +329,14 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical3( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void vertical3( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
@@ -353,7 +353,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				float total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -364,16 +364,16 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical5( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void vertical5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
@@ -390,7 +390,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				float total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -405,18 +405,18 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical7( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void vertical7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
@@ -433,7 +433,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				float total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -452,20 +452,20 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical9( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void vertical9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
@@ -482,7 +482,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				float total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -505,22 +505,22 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void vertical11( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
+	public static void vertical11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final float[] dataSrc = image.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final float k1 = kernel.data[0];
-		final float k2 = kernel.data[1];
-		final float k3 = kernel.data[2];
-		final float k4 = kernel.data[3];
-		final float k5 = kernel.data[4];
-		final float k6 = kernel.data[5];
-		final float k7 = kernel.data[6];
-		final float k8 = kernel.data[7];
-		final float k9 = kernel.data[8];
-		final float k10 = kernel.data[9];
-		final float k11 = kernel.data[10];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
+		final double k10 = kernel.data[9];
+		final double k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
@@ -537,7 +537,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				float total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -564,10 +564,10 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve3( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
+	public static void convolve3( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -577,16 +577,16 @@ public class ConvolveImageUnrolled_F32_F32 {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
 
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc] )* k3;
@@ -606,7 +606,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc] )* k3;
@@ -617,10 +617,10 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve5( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
+	public static void convolve5( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -630,18 +630,18 @@ public class ConvolveImageUnrolled_F32_F32 {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
 
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -665,7 +665,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -678,10 +678,10 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve7( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
+	public static void convolve7( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -691,20 +691,20 @@ public class ConvolveImageUnrolled_F32_F32 {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
 
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -732,7 +732,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -747,10 +747,10 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve9( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
+	public static void convolve9( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -760,22 +760,22 @@ public class ConvolveImageUnrolled_F32_F32 {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
-			float k8 = kernel.data[7];
-			float k9 = kernel.data[8];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
+			double k8 = kernel.data[7];
+			double k9 = kernel.data[8];
 
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -807,7 +807,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -824,10 +824,10 @@ public class ConvolveImageUnrolled_F32_F32 {
 		}
 	}
 
-	public static void convolve11( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
+	public static void convolve11( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final float[] dataSrc = src.data;
-		final float[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -837,24 +837,24 @@ public class ConvolveImageUnrolled_F32_F32 {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
-			float k1 = kernel.data[0];
-			float k2 = kernel.data[1];
-			float k3 = kernel.data[2];
-			float k4 = kernel.data[3];
-			float k5 = kernel.data[4];
-			float k6 = kernel.data[5];
-			float k7 = kernel.data[6];
-			float k8 = kernel.data[7];
-			float k9 = kernel.data[8];
-			float k10 = kernel.data[9];
-			float k11 = kernel.data[10];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
+			double k8 = kernel.data[7];
+			double k9 = kernel.data[8];
+			double k10 = kernel.data[9];
+			double k11 = kernel.data[10];
 
 			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				float total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -890,7 +890,7 @@ public class ConvolveImageUnrolled_F32_F32 {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					float total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;

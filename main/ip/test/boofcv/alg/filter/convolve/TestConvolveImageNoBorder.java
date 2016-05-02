@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(2);
-		a.performTests(22);
+		a.performTests(25);
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(5);
 		a.setOffset(1);
-		a.performTests(22);
+		a.performTests(25);
 	}
 
 	@Test
@@ -46,6 +46,6 @@ public class TestConvolveImageNoBorder {
 		CompareToStandardConvolution a = new CompareToStandardConvolution(ConvolveImageNoBorder.class);
 		a.setKernelWidth(4);
 		a.setOffset(3);
-		a.performTests(22);
+		a.performTests(25);
 	}
 }
