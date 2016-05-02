@@ -49,15 +49,19 @@ public class FactoryKernelGaussian {
 	public static <T extends KernelBase> T gaussian(Class<T> kernelType, double sigma, int radius )
 	{
 		if (Kernel1D_F32.class == kernelType) {
-			return gaussian(1,true, 32, sigma,radius);
+			return gaussian(1, true, 32, sigma, radius);
+		} else if (Kernel1D_F64.class == kernelType) {
+			return gaussian(1,true, 64, sigma,radius);
 		} else if (Kernel1D_I32.class == kernelType) {
 			return gaussian(1,false, 32, sigma,radius);
 		} else if (Kernel2D_I32.class == kernelType) {
 			return gaussian(2,false, 32, sigma,radius);
 		} else if (Kernel2D_F32.class == kernelType) {
 			return gaussian(2,true, 32, sigma,radius);
+		} else if (Kernel2D_F64.class == kernelType) {
+			return gaussian(2,true, 64, sigma,radius);
 		} else {
-			throw new RuntimeException("Unknown kernel type");
+			throw new RuntimeException("Unknown kernel type. "+kernelType.getSimpleName());
 		}
 	}
 

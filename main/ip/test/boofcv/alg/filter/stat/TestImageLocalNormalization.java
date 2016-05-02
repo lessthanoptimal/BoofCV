@@ -19,8 +19,10 @@
 package boofcv.alg.filter.stat;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF;
@@ -31,7 +33,6 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -47,11 +48,10 @@ public class TestImageLocalNormalization {
 
 	double delta = 1e-4;
 	int radius = 3;
+	double maxPixelValue = 5;
 
 	@Test
 	public void zeroMeanStdOne_kernel() {
-		double maxPixelValue = 5;
-
 		for( Class type : types ) {
 			int bits = type == GrayF32.class ? 32 : 64;
 			Kernel1D kernel = FactoryKernelGaussian.gaussian(1,true,bits,-1,radius);
@@ -71,12 +71,27 @@ public class TestImageLocalNormalization {
 
 	@Test
 	public void zeroMeanStdOne() {
-		fail("Implement");
+		Kernel1D kernel = FactoryKernel.table1D_F64(radius,false);
+		for( Class type : types ) {
+
+			GrayF input = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
+			GrayF found = (GrayF)GeneralizedImageOps.createSingleBand(type,width,height);
+
+			GImageMiscOps.fillUniform(input,rand,0,maxPixelValue);
+
+			ImageLocalNormalization alg = new ImageLocalNormalization(type);
+
+			alg.zeroMeanStdOne(radius,input,maxPixelValue,delta,found);
+
+			compareToExpected(input,kernel,found);
+		}
 	}
 
 	private void compareToExpected( GrayF origInput , Kernel1D origKernel, GrayF found  ) {
 		GrayF64 input = new GrayF64(width,height);
 		GConvertImage.convert(origInput,input);
+
+		PixelMath.divide(input,maxPixelValue,input);
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -92,7 +107,7 @@ public class TestImageLocalNormalization {
 		double vals[] = new double[width*width];
 		double weights[] = new double[width*width];
 		int numVals = 0;
-		double totalW = 0;
+
 		for (int ry = -radius; ry <= radius ; ry++) {
 			for (int rx = -radius; rx <= radius ; rx++) {
 				int x = cx+rx;
@@ -101,18 +116,16 @@ public class TestImageLocalNormalization {
 				if( !input.isInBounds(x,y) )
 					continue;
 
-				double w = kernel.getDouble(radius+rx)*kernel.getDouble(radius+ry);
-				double v = input.get(x,y);
-
-				weights[numVals] = w;
-				vals[numVals++] = v;
-				totalW += w;
+				weights[numVals] = kernel.getDouble(radius+rx)*kernel.getDouble(radius+ry);
+				vals[numVals++] = input.get(x,y);
 			}
 		}
 
 		double mean = 0;
+		double totalW = 0;
 		for (int i = 0; i < numVals; i++) {
 			mean += weights[i]*vals[i];
+			totalW += weights[i];
 		}
 		mean /= totalW;
 
@@ -123,7 +136,7 @@ public class TestImageLocalNormalization {
 		}
 		variance /= totalW;
 
-		return mean/(Math.sqrt(variance)+delta);
+		return (input.get(cx,cy)-mean)/(Math.sqrt(variance)+delta);
 	}
 
 }

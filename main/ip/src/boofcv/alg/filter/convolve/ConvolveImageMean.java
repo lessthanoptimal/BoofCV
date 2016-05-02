@@ -23,6 +23,7 @@ import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
+import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.*;
 
@@ -67,6 +68,46 @@ public class ConvolveImageMean {
 	public static void vertical(GrayF32 input, GrayF32 output, int radius) {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,true);
+		if( kernel.width > input.height ) {
+			ConvolveNormalized.vertical(kernel, input, output);
+		} else {
+			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.vertical(kernel, input, output);
+			ImplConvolveMean.vertical(input, output, radius);
+		}
+	}
+
+		/**
+	 * Performs a horizontal 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void horizontal(GrayF64 input, GrayF64 output, int radius) {
+
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius,true);
+		if( kernel.width > input.width ) {
+			ConvolveNormalized.horizontal(kernel,input,output);
+		} else {
+			InputSanityCheck.checkSameShape(input , output);
+			ConvolveNormalized_JustBorder.horizontal(kernel, input ,output );
+			ImplConvolveMean.horizontal(input, output, radius);
+		}
+	}
+
+	/**
+	 * Performs a vertical 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void vertical(GrayF64 input, GrayF64 output, int radius) {
+
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius,true);
 		if( kernel.width > input.height ) {
 			ConvolveNormalized.vertical(kernel, input, output);
 		} else {

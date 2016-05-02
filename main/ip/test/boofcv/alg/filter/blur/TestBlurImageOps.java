@@ -27,8 +27,10 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.convolve.Kernel2D_I32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
@@ -92,6 +94,30 @@ public class TestBlurImageOps {
 			BlurImageOps.mean(input,found, radius, null);
 
 			BoofTesting.assertEquals(expected,found,1e-4);
+		}
+	}
+
+	@Test
+	public void mean_F64() {
+		GrayF64 input = new GrayF64(width,height);
+		GrayF64 found = new GrayF64(width,height);
+		GrayF64 expected = new GrayF64(width,height);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
+
+			int w = radius*2+1;
+
+			Kernel2D_F64 kernel = new Kernel2D_F64(w);
+			Arrays.fill(kernel.data,1.0/(w*w));
+
+			ConvolveNormalized.convolve(kernel,input,expected);
+			BlurImageOps.mean(input,found, radius, null);
+
+			BoofTesting.assertEquals(expected,found,1e-8);
 		}
 	}
 
@@ -170,6 +196,29 @@ public class TestBlurImageOps {
 			BlurImageOps.gaussian(input,found,sigma,radius,null);
 
 			BoofTesting.assertEquals(expected,found,1e-4);
+		}
+	}
+
+	@Test
+	public void gaussian_F64() {
+		GrayF64 input = new GrayF64(width,height);
+		GrayF64 found = new GrayF64(width,height);
+		GrayF64 expected = new GrayF64(width,height);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		for( int radius = 1; radius <= 4; radius++ ) {
+			ImageMiscOps.fill(expected,0);
+			ImageMiscOps.fill(found,0);
+
+			Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian(Kernel2D_F64.class,-1,radius);
+			ConvolveNormalized.convolve(kernel,input,expected);
+
+			double sigma = FactoryKernelGaussian.sigmaForRadius(radius,0);
+
+			BlurImageOps.gaussian(input,found,sigma,radius,null);
+
+			BoofTesting.assertEquals(expected,found,1e-8);
 		}
 	}
 }
