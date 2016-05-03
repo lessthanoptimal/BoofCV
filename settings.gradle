@@ -1,6 +1,6 @@
 include 'examples','demonstrations','applications',
         'main:ip','main:io','main:feature','main:geo','main:calibration','main:sfm','main:recognition',
-        'main:visualize','main:checks','main:learning','main:all',
+        'main:visualize','main:checks','main:learning','integration:all','main:core',
         'integration:xuggler','integration:applet',"integration:WebcamCapture",
         'integration:jcodec'
 

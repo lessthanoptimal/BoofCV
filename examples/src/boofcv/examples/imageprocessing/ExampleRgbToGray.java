@@ -41,23 +41,27 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleRgbToGray {
 	public static void main(String[] args) {
+		// load the image and convert it into a BoofCV data type
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
 		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered,true, ImageType.pl(3,GrayU8.class));
 
+		// Declare storage space for converted gray scale images
 		GrayU8 weighted = new GrayU8(color.width,color.height);
+		GrayU8 unweighted = new GrayU8(color.width,color.height);
 
+		// Now run a benchmark to demonstrate the speed differences between the two approaches.  Both are very fast...
+		System.out.println("Running benchmark.  Should take a few seconds on a modern computer.\n");
 		long startTime;
-		int N = 500;
+		int N = 2000;
 		startTime = System.nanoTime();
 		for (int i = 0; i < N; i++) {
-			ColorRgb.rgbToGray_Weighted(color,weighted);
+			ColorRgb.rgbToGray_Weighted(color,weighted); // weigh the bands based on how human vision sees each color
 		}
 		double weightedFPS = N/((System.nanoTime()-startTime)*1e-9);
 
-		GrayU8 unweighted = new GrayU8(color.width,color.height);
 		startTime = System.nanoTime();
 		for (int i = 0; i < N; i++) {
-			ConvertImage.average(color,unweighted);
+			ConvertImage.average(color,unweighted); // this equally averages all the bands together
 		}
 		double unweightedFPS = N/((System.nanoTime()-startTime)*1e-9);
 

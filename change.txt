@@ -16,6 +16,9 @@ Version : 0.24
 - Added weighted RGB to Gray conversion with example
 - Convolve
   * Better support for 64-bit float images
+- Module "core" (formally "all") can be used to import everything in boofcv/main
+- Module "all" can be used to import everything in boofcv/main AND boofcv/integration
+
 
 - TODO HOG
   * Benchmark to see using a dot product of precomputed gradients is faster than using
