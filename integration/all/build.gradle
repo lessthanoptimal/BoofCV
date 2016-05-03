@@ -10,7 +10,12 @@ dependencies {
     compile project(':main:sfm')
     compile project(':main:visualize')
 
-    compile project(':integration:android')
+    try {
+        compile project(':integration:android')
+    } catch( UnknownProjectException ignore){}
+    try {
+        compile project(':integration:openkinect')
+    } catch( UnknownProjectException ignore){}
     compile project(':integration:jcodec')
     compile project(':integration:WebcamCapture')
     compile project(':integration:xuggler')
