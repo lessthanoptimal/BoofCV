@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D;
@@ -61,7 +62,7 @@ public class TestImageLocalNormalization {
 
 			GImageMiscOps.fillUniform(input,rand,0,maxPixelValue);
 
-			ImageLocalNormalization alg = new ImageLocalNormalization(type);
+			ImageLocalNormalization alg = new ImageLocalNormalization(type, BorderType.NORMALIZED);
 
 			alg.zeroMeanStdOne(kernel,input,maxPixelValue,delta,found);
 
@@ -79,7 +80,7 @@ public class TestImageLocalNormalization {
 
 			GImageMiscOps.fillUniform(input,rand,0,maxPixelValue);
 
-			ImageLocalNormalization alg = new ImageLocalNormalization(type);
+			ImageLocalNormalization alg = new ImageLocalNormalization(type, BorderType.NORMALIZED);
 
 			alg.zeroMeanStdOne(radius,input,maxPixelValue,delta,found);
 

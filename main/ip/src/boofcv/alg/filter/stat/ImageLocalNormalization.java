@@ -24,10 +24,14 @@ import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.core.image.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.ImageType;
 
 /**
  * Provides different functions for normalizing the spatially local statics of an image.
@@ -47,8 +51,20 @@ public class ImageLocalNormalization<T extends GrayF> {
 
 	protected Class<T> imageType;
 
-	public ImageLocalNormalization( Class<T> imageType ) {
+	// handle the image border.  If null then normalization is used
+	ImageBorder<T> border;
+
+	/**
+	 * Configures normalization
+	 *
+	 * @param imageType Type of input image
+	 * @param borderType How image borders are handled.  {@link BorderType#NORMALIZED} is recommended
+	 */
+	public ImageLocalNormalization( Class<T> imageType , BorderType borderType ) {
 		this.imageType = imageType;
+
+		if( borderType != BorderType.NORMALIZED )
+			border = FactoryImageBorder.generic(borderType, ImageType.single(imageType));
 
 		adjusted = GeneralizedImageOps.createSingleBand(imageType,1,1);
 		localMean = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -78,11 +94,19 @@ public class ImageLocalNormalization<T extends GrayF> {
 		T adjusted = ensureMaxValueOfOne(input, maxPixelValue);
 
 		// take advantage of 2D gaussian kernels being separable
-		GConvolveImageOps.horizontalNormalized(kernel,adjusted,output);
-		GConvolveImageOps.verticalNormalized(kernel,output,localMean);
-		GPixelMath.pow2(adjusted, pow2);
-		GConvolveImageOps.horizontalNormalized(kernel,pow2,output);
-		GConvolveImageOps.verticalNormalized(kernel,output,localPow2);
+		if( border == null ) {
+			GConvolveImageOps.horizontalNormalized(kernel, adjusted, output);
+			GConvolveImageOps.verticalNormalized(kernel, output, localMean);
+			GPixelMath.pow2(adjusted, pow2);
+			GConvolveImageOps.horizontalNormalized(kernel, pow2, output);
+			GConvolveImageOps.verticalNormalized(kernel, output, localPow2);
+		} else {
+			GConvolveImageOps.horizontal(kernel, adjusted, output, border);
+			GConvolveImageOps.vertical(kernel, output, localMean, border);
+			GPixelMath.pow2(adjusted, pow2);
+			GConvolveImageOps.horizontal(kernel, pow2, output, border);
+			GConvolveImageOps.vertical(kernel, output, localPow2, border);
+		}
 
 		// Compute the final output
 		if( imageType == GrayF32.class )
@@ -112,9 +136,13 @@ public class ImageLocalNormalization<T extends GrayF> {
 		T adjusted = ensureMaxValueOfOne(input, maxPixelValue);
 
 		// take advantage of 2D gaussian kernels being separable
-		GBlurImageOps.mean(adjusted,localMean,radius, output);
-		GPixelMath.pow2(adjusted, pow2);
-		GBlurImageOps.mean(pow2,localPow2,radius, output);;
+		if( border == null ) {
+			GBlurImageOps.mean(adjusted, localMean, radius, output);
+			GPixelMath.pow2(adjusted, pow2);
+			GBlurImageOps.mean(pow2, localPow2, radius, output);
+		} else {
+			throw new IllegalArgumentException("Only renormalize border supported here so far.  This can be changed...");
+		}
 
 		// Compute the final output
 		if( imageType == GrayF32.class )
