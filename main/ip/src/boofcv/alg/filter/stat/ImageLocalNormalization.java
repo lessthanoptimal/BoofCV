@@ -144,9 +144,9 @@ public class ImageLocalNormalization<T extends GrayF> {
 			while( indexIn < indexEnd ) {
 
 				float ave = localMean.data[indexIn];
-				float std = (float)Math.sqrt(localPow2.data[indexIn] - ave*ave);
+				float std = (float)Math.sqrt(localPow2.data[indexIn] - ave*ave + delta);
 
-				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/(std+delta);
+				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/std;
 				indexIn++;
 			}
 		}
@@ -164,9 +164,9 @@ public class ImageLocalNormalization<T extends GrayF> {
 			while( indexIn < indexEnd ) {
 
 				double ave = localMean.data[indexIn];
-				double std = Math.sqrt(localPow2.data[indexIn] - ave*ave);
+				double std = Math.sqrt(localPow2.data[indexIn] - ave*ave + delta);
 
-				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/(std+delta);
+				output.data[indexOut++] = (adjusted.data[indexIn]-ave)/std;
 				indexIn++;
 			}
 		}

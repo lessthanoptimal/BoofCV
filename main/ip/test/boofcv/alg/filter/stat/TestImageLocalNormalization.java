@@ -136,7 +136,7 @@ public class TestImageLocalNormalization {
 		}
 		variance /= totalW;
 
-		return (input.get(cx,cy)-mean)/(Math.sqrt(variance)+delta);
+		return (input.get(cx,cy)-mean)/(Math.sqrt(variance+delta));
 	}
 
 }
