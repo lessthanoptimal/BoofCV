@@ -18,6 +18,7 @@ Version : 0.24
   * Better support for 64-bit float images
 - Module "core" (formally "all") can be used to import everything in boofcv/main
 - Module "all" can be used to import everything in boofcv/main AND boofcv/integration
+- Adjusted assisted calibration so that it's possible to provide a custom output directory
 
 
 - TODO HOG

@@ -74,7 +74,7 @@ import java.util.List;
 public class AssistedCalibration {
 
 	public static final String OUTPUT_DIRECTORY = "calibration_data";
-	public static final String IMAGE_DIRECTORY = OUTPUT_DIRECTORY+"/images";
+	public static final String IMAGE_DIRECTORY = "images";
 
 	// determines how straight the target needs to be when selecting the canonical size
 	double CENTER_SKEW = 0.93;
@@ -127,17 +127,29 @@ public class AssistedCalibration {
 	// if true then there was sufficient geometric diversity at least once
 	boolean geometryTrigger = false;
 
-	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
-		File outputDir = new File(OUTPUT_DIRECTORY);
+	/**
+	 * Constructor with configuration
+	 *
+	 * @param detector Target detector
+	 * @param quality Used to compute geometry score
+	 * @param gui Visualization
+	 * @param outputDirectory Root directory for where all output will be stored
+	 * @param imageDirectory  Where images will be stored.  Relative to outputDirectory
+	 */
+	public AssistedCalibration(CalibrationDetector detector,
+							   ComputeGeometryScore quality,
+							   AssistedCalibrationGui gui,
+							   String outputDirectory , String imageDirectory ) {
+		File outputDir = new File(outputDirectory);
 		if( outputDir.exists() ) {
-			System.out.println("Deleting output directory "+OUTPUT_DIRECTORY);
+			System.out.println("Deleting output directory "+outputDirectory);
 			UtilIO.deleteRecursive(outputDir);
 		}
 
 		this.detector = detector;
 		this.gui = gui;
 		this.quality = quality;
-		this.saver = new ImageSelectorAndSaver(IMAGE_DIRECTORY);
+		this.saver = new ImageSelectorAndSaver(new File(outputDir,imageDirectory).getPath());
 
 		if( detector instanceof CalibrationDetectorChessboard) {
 			view = new CalibrationView.Chessboard();
@@ -147,6 +159,10 @@ public class AssistedCalibration {
 			throw new RuntimeException("Unknown calibration detector type");
 		}
 		view.initialize(detector);
+	}
+
+	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
+		this(detector,quality,gui,OUTPUT_DIRECTORY,IMAGE_DIRECTORY);
 	}
 
 	public void init( int imageWidth , int imageHeight ) {

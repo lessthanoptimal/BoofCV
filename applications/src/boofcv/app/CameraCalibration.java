@@ -43,6 +43,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static boofcv.app.calib.AssistedCalibration.*;
+import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
+
 /**
  * Application for easily calibrating a webcam using a live stream
  *
@@ -333,7 +336,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		GrayF32 gray = new GrayF32(webcam.getViewSize().width,webcam.getViewSize().height);
 
-		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui);
+		AssistedCalibration assisted = new AssistedCalibration(detector,quality,gui,OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
 		assisted.init(gray.width,gray.height);
 
 		BufferedImage image;
@@ -352,9 +355,8 @@ public class CameraCalibration extends BaseStandardInputApp {
 		if( assisted.isFinished() ) {
 			frame.setVisible(false);
 
-			inputDirectory = AssistedCalibration.IMAGE_DIRECTORY;
-			outputFileName = new File(AssistedCalibration.OUTPUT_DIRECTORY, "intrinsic.xml").getPath();
-
+			inputDirectory = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
+			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.xml").getPath();
 			handleDirectory();
 		}
 	}
