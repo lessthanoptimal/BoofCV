@@ -18,8 +18,18 @@
 
 package boofcv.io.javacv;
 
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.video.VideoInterface;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
+
 /**
  * @author Peter Abeles
  */
-public class JavaCVMediaManager {
+public class JavaCVVideo implements VideoInterface {
+	@Override
+	public <T extends ImageBase> SimpleImageSequence<T>
+	load(String fileName, ImageType<T> imageType) {
+		return new JavaCVVideoImageSequence<T>(fileName,imageType);
+	}
 }

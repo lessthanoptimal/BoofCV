@@ -19,7 +19,9 @@ Version : 0.24
 - Module "core" (formally "all") can be used to import everything in boofcv/main
 - Module "all" can be used to import everything in boofcv/main AND boofcv/integration
 - Adjusted assisted calibration so that it's possible to provide a custom output directory
-
+- Video
+  * Xuggler's Maven repository has taken it down.  Effectively killing the zombie project
+  * JavaCV has been integrated in as a replacement, but isn't perfect.  Requires platform specific settings.
 
 - TODO HOG
   * Benchmark to see using a dot product of precomputed gradients is faster than using
