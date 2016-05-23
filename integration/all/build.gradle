@@ -18,7 +18,7 @@ dependencies {
     } catch( UnknownProjectException ignore){}
     compile project(':integration:jcodec')
     compile project(':integration:WebcamCapture')
-    compile project(':integration:xuggler')
+    compile project(':integration:javacv')
 }
 
 idea {

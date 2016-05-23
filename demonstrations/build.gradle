@@ -9,7 +9,7 @@ dependencies {
     compile project(':main:recognition')
     compile project(':main:visualize')
 
-    compile project(':integration:xuggler')
+    compile project(':integration:javacv')
     compile project(':integration:WebcamCapture')
 }
 
