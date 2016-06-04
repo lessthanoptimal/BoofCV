@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,10 @@ public class UtilIO {
 	 */
 	public static String path( String path ) {
 		return new File(getPathToBase(),path).getAbsolutePath();
+	}
+
+	public static File getFileToBase() {
+		return new File(getPathToBase());
 	}
 
 	/**
