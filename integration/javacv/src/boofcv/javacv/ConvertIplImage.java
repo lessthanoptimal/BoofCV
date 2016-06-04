@@ -41,7 +41,7 @@ public class ConvertIplImage {
 		}
 	}
 
-	public static <T extends ImageGray<T>>T convertFrom( IplImage input , T output ) {
+	public static <T extends ImageGray>T convertFrom( IplImage input , T output ) {
 		if( input.nChannels() != 1 )
 			throw new IllegalArgumentException("Expected 1 channel for gray scale images");
 
@@ -78,7 +78,7 @@ public class ConvertIplImage {
 		return output;
 	}
 
-	public static <T extends ImageInterleaved<T>>T convertFrom( IplImage input , T output ) {
+	public static <T extends ImageInterleaved>T convertFrom( IplImage input , T output ) {
 		ImageDataType dataType = depthToBoofType(input.depth());
 
 		int numBands = input.nChannels();
