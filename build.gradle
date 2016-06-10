@@ -184,8 +184,6 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
     ext.listExternal = ext.listExternal - ext.boofJars
     ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
-    System.out.println(ext.listExternal)
-
     file('libraries').deleteDir()
     file('libraries').mkdir()
 
