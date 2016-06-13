@@ -3,6 +3,12 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2016/06/13
+Version : 0.24.1
+
+- Previous stable release accidentally referenced a SNAPSHOT of georegression
+
+---------------------------------------------
 Date    : 2016/06/04
 Version : 0.24
 
