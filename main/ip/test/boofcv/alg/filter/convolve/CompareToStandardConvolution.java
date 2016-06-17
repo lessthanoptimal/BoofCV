@@ -103,8 +103,10 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 			kernel = FactoryKernel.random2D_I32(kernelWidth,offset, -1, 1, rand);
 		} else if (Kernel2D_F32.class == paramType) {
 			kernel = FactoryKernel.random2D_F32(kernelWidth,offset, 0, 5, rand);
+		} else if (Kernel2D_F64.class == paramType) {
+			kernel = FactoryKernel.random2D_F64(kernelWidth,offset, 0, 5, rand);
 		} else {
-			throw new RuntimeException("Unknown kernel type");
+			throw new RuntimeException("Unknown kernel type "+paramType.getSimpleName());
 		}
 		return kernel;
 	}

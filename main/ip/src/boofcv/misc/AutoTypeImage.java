@@ -27,11 +27,11 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 public enum AutoTypeImage {
-	I("ImageInteger","int",true,0),
-	I8("ImageInt8","byte",true,8),
+	I("GrayI","int",true,0),
+	I8("GrayI8","byte",true,8),
 	U8(GrayU8.class),
 	S8(GrayS8.class),
-	I16("ImageInt16","short",true,16),
+	I16("GrayI16","short",true,16),
 	U16(GrayU16.class),
 	S16(GrayS16.class),
 	S32(GrayS32.class),

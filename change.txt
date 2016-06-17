@@ -2,25 +2,31 @@ Change Log
 
 Date Format: year/month/day
 
+---------------------------------------------
+Date    : 2016/06/13
+Version : 0.24.1
+
+- Previous stable release accidentally referenced a SNAPSHOT of georegression
 
 ---------------------------------------------
-Date    : 2016
+Date    : 2016/06/04
 Version : 0.24
 
-- TODO HOG
-  * Benchmark to see using a dot product of precomputed gradients is faster than using
-    atan() to compute the angle.
-  * Provide an easier to use API to access the cells
-  * Look at paper again and see if it uses soft binning of gradient into cells
-     * User configurable
-  * Consider renaming class and make low level api easier to use?
-     * access to cell image
-     * break block computation off into separate function
-  * Non square cells and blocks?
-
-- TODO Regression: Chessboard image border to fiducial regression
-- TODO Regression: Scene Classification
-- TODO Naive implementation of DLS
+- Confusion Matrix Visualization
+  * Fixed bug where a row/column was being lopped off
+  * Added labels
+  * Added ability to highlight one category
+  * Added ability to query what's at a specific location
+- Local Image Normalization for use in machine learning
+- Added weighted RGB to Gray conversion with example
+- Convolve
+  * Better support for 64-bit float images
+- Module "core" (formally "all") can be used to import everything in boofcv/main
+- Module "all" can be used to import everything in boofcv/main AND boofcv/integration
+- Adjusted assisted calibration so that it's possible to provide a custom output directory
+- Video
+  * Xuggler's Maven repository has taken it down.  Effectively killing the zombie project
+  * JavaCV has been integrated in as a replacement.
 
 ---------------------------------------------
 Date    : 2016/03/27

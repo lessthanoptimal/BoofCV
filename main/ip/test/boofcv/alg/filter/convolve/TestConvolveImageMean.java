@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
+import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_I32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
@@ -49,7 +50,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(6);
+		performTests(8);
 	}
 
 	@Override
@@ -123,7 +124,9 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	public static Object createTableKernel(Class<?> kernelType, int kernelRadius) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(kernelRadius,true);
+			kernel = FactoryKernel.table1D_F32(kernelRadius, true);
+		} else if (Kernel1D_F64.class == kernelType) {
+			kernel = FactoryKernel.table1D_F64(kernelRadius,true);
 		} else if (Kernel1D_I32.class == kernelType) {
 			kernel = FactoryKernel.table1D_I32(kernelRadius);
 		} else {

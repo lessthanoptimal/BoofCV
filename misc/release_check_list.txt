@@ -1,6 +1,9 @@
 - Do all unit tests pass?
 - Run regression tests
-- Update BoofDefaults.version
+- Update Version
+   * README.md
+   * BoofDefaults.version
+   * Gradle
 - Set release data in change.txt
 - Make sure all examples work
 - Make sure all applications in evaluation work

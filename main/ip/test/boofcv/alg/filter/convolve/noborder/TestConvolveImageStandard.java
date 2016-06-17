@@ -63,10 +63,11 @@ public class TestConvolveImageStandard {
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
 		for (Method m : methods) {
-			if( !isTestMethod(m))
+			if( !isTestMethod(m)) {
+//				System.out.println(m.getName());
 				continue;
+			}
 
-//			System.out.println("Testing "+m.getName());
 			testMethod(m);
 			numFound++;
 		}

@@ -34,7 +34,7 @@ BoofCV is divided up into many modules.  The easiest way to include all of them 
 
 For Gradle projects:
 ```groovy
-compile group: 'org.boofcv', name: 'all', version: '0.23'
+compile group: 'org.boofcv', name: 'all', version: '0.24.1'
 ```
 
 For Maven projects:
@@ -42,7 +42,7 @@ For Maven projects:
 <dependency>
   <groupId>org.boofcv</groupId>
   <artifactId>all</artifactId>
-  <version>0.23</version>
+  <version>0.24.1</version>
 </dependency>
 ```
 
@@ -52,10 +52,10 @@ There are also several integration modules which help BoofCV interact with exter
 --------------------------|---------------------------------------------------------------------
 integration:android       | Useful functions for working inside of Android devices.
 integration:applet        | Code for using BoofCV inside a Java applet.
+integration:javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.
 integration:jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 integration:openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
 integration:WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
-integration:xuggler       | [Xuggler](http://www.xuggle.com/xuggler/) is a wrapper around FFMPEG for reading video files.
 
 
 ## New to Java?

@@ -58,7 +58,7 @@ public abstract class CompareEquivalentFunctions {
 			boolean foundMatch = false;
 			for( Method c : candidates ) {
 				if( isEquivalent(c, m)) {
-					System.out.println("Examining: "+m.getName());
+//					System.out.println("Examining: "+m.getName());
 					foundMatch = true;
 					compareMethods(m, c);
 				}

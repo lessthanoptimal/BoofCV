@@ -13,6 +13,6 @@ dependencies {
 
 idea {
     module {
-        name = "BoofCV All"
+        name = "BoofCV Core"
     }
 }

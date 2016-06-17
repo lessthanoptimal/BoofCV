@@ -35,17 +35,21 @@ import boofcv.struct.image.Planar;
  * Y component encodes luma (B&W gray scale) and U,V encodes color. The same is true for Y,Cb,Cr, respectively.
  * In the functions below, if the input is floating point then YUV is used, otherwise YCbCr is used.  How
  * these color formats are encoded varies widely. For YCbCr, Y is "defined to have a nominal 8-bit range of 16-235,
- * Cb and Cr are defined to have a nominal range of 16-240", see [3].
+ * Cb and Cr are defined to have a nominal range of 16-240", see [2].
  * </p>
  *
- * <p>
- * Sources for equations:
- * <ul>
- *     <li>http://en.wikipedia.org/wiki/YUV</li>
+ * <b>Equations:</b>
+ * <pre>
+ * Y =  0.299*R + 0.587*G + 0.114*B
+ * U = -0.147*R - 0.289*G + 0.436*B = 0.492*(B - Y)
+ * V =  0.615*R - 0.515*G - 0.100*B = 0.877*(R - Y)</pre>
+ * <p>Source: [1] and [2].</p>
+ *
+ * <b>Citations:</b>
+ * <ol>
  *     <li>http://software.intel.com/sites/products/documentation/hpc/ipp/ippi/ippi_ch6/ch6_color_models.html</li>
  *     <li>Keith Jack, "Video Demystified" 5th ed 2007</li>
- * </ul>
- * </p>
+ * </ol>
  *
  * @author Peter Abeles
  */

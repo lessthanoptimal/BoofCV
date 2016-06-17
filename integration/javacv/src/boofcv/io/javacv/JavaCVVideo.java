@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,12 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv;
+package boofcv.io.javacv;
+
+import boofcv.io.image.SimpleImageSequence;
+import boofcv.io.video.VideoInterface;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 /**
- * Dummy class which does nothing so that the all package can be uploaded to Maven central
- *
  * @author Peter Abeles
  */
-public class All {
+public class JavaCVVideo implements VideoInterface {
+	@Override
+	public <T extends ImageBase> SimpleImageSequence<T>
+	load(String fileName, ImageType<T> imageType) {
+		return new JavaCVVideoImageSequence<T>(fileName,imageType);
+	}
 }

@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +40,7 @@ public class TestLoadFileImageSequence {
 	@Test
 	public void basicLoadTest() {
 		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
-				UtilIO.getPathToBase()+"main/io/data/test/","png");
+				new File(UtilIO.getFileToBase(),"main/io/data/test/").getAbsolutePath(),"png");
 
 
 		assertTrue(alg.getImageType().getFamily() == ImageType.Family.GRAY);
@@ -67,7 +68,7 @@ public class TestLoadFileImageSequence {
 	@Test
 	public void checkLoop() {
 		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
-				UtilIO.getPathToBase()+"main/io/data/test/","png");
+				new File(UtilIO.getFileToBase(),"main/io/data/test/").getAbsolutePath(),"png");
 		alg.setLoop(true);
 
 		assertTrue(alg.isLoop());

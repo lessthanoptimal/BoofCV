@@ -27,6 +27,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class GBlurImageOps {
 
 	/**
@@ -45,6 +46,8 @@ public class GBlurImageOps {
 			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
 		} else if( input instanceof GrayF32) {
 			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radius,(GrayF32)storage);
+		} else if( input instanceof GrayF64) {
+			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radius,(GrayF64)storage);
 		} else if( input instanceof Planar) {
 			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage);
 		} else  {
@@ -91,6 +94,8 @@ public class GBlurImageOps {
 			return (T)BlurImageOps.gaussian((GrayU8)input,(GrayU8)output,sigma,radius,(GrayU8)storage);
 		} else if( input instanceof GrayF32) {
 			return (T)BlurImageOps.gaussian((GrayF32)input,(GrayF32)output,sigma,radius,(GrayF32)storage);
+		} else if( input instanceof GrayF64) {
+			return (T)BlurImageOps.gaussian((GrayF64)input,(GrayF64)output,sigma,radius,(GrayF64)storage);
 		} else if( input instanceof Planar) {
 			return (T)BlurImageOps.gaussian((Planar)input,(Planar)output,sigma,radius,(ImageGray)storage);
 		} else  {

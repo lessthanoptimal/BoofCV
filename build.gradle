@@ -7,7 +7,7 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.boofcv'
-    version = '0.24-SNAPSHOT'
+    version = '0.24.1'
 }
 
 subprojects {
@@ -24,9 +24,6 @@ subprojects {
 
         maven {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-        maven {
-            url = "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
         }
     }
 
@@ -60,7 +57,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.georegression', name: 'georegression', version: '0.10'
+        compile group: 'org.georegression', name: 'georegression', version: '0.11'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
@@ -162,7 +159,7 @@ def mainProjects = [
 def integrationProjects = [
         ':integration:jcodec',
         ':integration:WebcamCapture',
-        ':integration:xuggler',
+        ':integration:javacv',
 ]
 try {
     project(':integration:android')
@@ -178,14 +175,14 @@ def javadocProjects = mainProjects + integrationProjects
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
 task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) << {
 
-    // dependencies for main and their own jars
-    ext.listExternal = files(mainProjects.collect{ project(it).configurations.compile })
-    // just the compiled jars for integration
-    ext.listInternal = files(javadocProjects.collect{ project(it).tasks.jar.archivePath })
-    // Add source jars
-    ext.listSource = files(javadocProjects.collect{ project(it).tasks.sourcesJar.archivePath })
+    // Compiled jars (bin and src) for all BoofCV modules
+    ext.boofJars = files(javadocProjects.collect{ project(it).tasks.jar.archivePath })
+    ext.boofJars += files(javadocProjects.collect{ project(it).tasks.sourcesJar.archivePath })
 
-    ext.listExternal = ext.listExternal - ext.listInternal
+    // This will be a list of just external dependencies
+    ext.listExternal = files(javadocProjects.collect{ project(it).configurations.compile })
+    ext.listExternal = ext.listExternal - ext.boofJars
+    ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
     file('libraries').deleteDir()
     file('libraries').mkdir()
@@ -196,8 +193,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
     }
 
     copy {
-        from ext.listInternal
-        from ext.listSource
+        from ext.boofJars
         into 'libraries'
 
         // append on BoofCV so it's clear which jars are part of BoofCV and which are not

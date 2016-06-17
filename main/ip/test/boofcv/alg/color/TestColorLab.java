@@ -27,6 +27,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -57,6 +58,8 @@ public class TestColorLab {
 				float A = output.getBand(1).get(x,y);
 				float B_ = output.getBand(2).get(x,y);
 
+				assertTrue( L >= 0f && L <= 100.0f);
+
 				assertEquals(expected[0],L,1e-4f);
 				assertEquals(expected[1],A,1e-4f);
 				assertEquals(expected[2],B_,1e-4f);
@@ -85,6 +88,8 @@ public class TestColorLab {
 				float L = output.getBand(0).get(x,y);
 				float A = output.getBand(1).get(x,y);
 				float B_ = output.getBand(2).get(x,y);
+
+				assertTrue( L >= 0f && L <= 100.0f);
 
 				assertEquals(expected[0],L,1e-4f);
 				assertEquals(expected[1],A,1e-4f);

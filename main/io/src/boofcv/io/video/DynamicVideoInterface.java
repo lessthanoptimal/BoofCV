@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,11 +38,16 @@ public class DynamicVideoInterface implements VideoInterface {
 
 	VideoInterface xuggler;
 	VideoInterface jcodec;
+	VideoInterface javacv;
 	BoofMjpegVideo mjpeg = new BoofMjpegVideo();
 
 	public DynamicVideoInterface() {
 		try {
 			xuggler = loadManager("boofcv.io.wrapper.xuggler.XugglerVideoInterface");
+		} catch( RuntimeException e ) {}
+
+		try {
+			javacv = loadManager("boofcv.io.javacv.JavaCVVideo");
 		} catch( RuntimeException e ) {}
 
 		try {
@@ -74,6 +79,12 @@ public class DynamicVideoInterface implements VideoInterface {
 		try {
 			if( xuggler != null ) {
 				return xuggler.load(fileName, imageType);
+			}
+		} catch( RuntimeException ignore ){}
+
+		try {
+			if( javacv != null ) {
+				return javacv.load(fileName, imageType);
 			}
 		} catch( RuntimeException ignore ){}
 
