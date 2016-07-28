@@ -87,8 +87,7 @@ public class UtilIO {
 	public static String getPathToBase() {
 		String path = "./";
 
-
-		for( int i = 0; i < 3; i++ ) {
+		while( true )  {
 			File f = new File(path);
 			if( !f.exists() )
 				throw new RuntimeException("Failed");
@@ -110,12 +109,8 @@ public class UtilIO {
 			if( foundMain && foundExamples && foundIntegration)
 				return path;
 
-			if( i > 0 )
-				path = "../"+path;
-			else
-				path = "../";
+			path = "../"+path;
 		}
-		throw new RuntimeException("Base not found");
 	}
 
 	/**

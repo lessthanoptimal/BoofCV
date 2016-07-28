@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,8 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	private void findImages() {
 		File dir = new File(directoryName);
 
-		if (!dir.isDirectory()) throw new IllegalArgumentException("directory must specify a directory");
+		if (!dir.isDirectory())
+			throw new IllegalArgumentException("directory must specify a directory.  path = "+directoryName);
 
 		String[] files = dir.list(new Filter());
 

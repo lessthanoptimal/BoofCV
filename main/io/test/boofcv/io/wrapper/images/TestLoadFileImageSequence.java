@@ -18,14 +18,12 @@
 
 package boofcv.io.wrapper.images;
 
-import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,14 +32,17 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestLoadFileImageSequence {
+
+	private String imagePath = getClass().getResource("/boofcv/io/image/wrapper/images/").getFile();
+
 	/**
 	 * See if it loads the expected number of files.
 	 */
 	@Test
 	public void basicLoadTest() {
-		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
-				new File(UtilIO.getFileToBase(),"main/io/data/test/").getAbsolutePath(),"png");
 
+		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
+				imagePath,"png");
 
 		assertTrue(alg.getImageType().getFamily() == ImageType.Family.GRAY);
 		assertTrue(ImageDataType.F32 == alg.getImageType().getDataType());
@@ -68,7 +69,7 @@ public class TestLoadFileImageSequence {
 	@Test
 	public void checkLoop() {
 		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
-				new File(UtilIO.getFileToBase(),"main/io/data/test/").getAbsolutePath(),"png");
+				imagePath,"png");
 		alg.setLoop(true);
 
 		assertTrue(alg.isLoop());
