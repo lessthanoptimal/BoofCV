@@ -169,13 +169,23 @@ public class ShapeFittingOps {
 															  boolean computeError ,
 															  FitData<EllipseRotated_F64> outputStorage ) {
 
+		List<Point2D_F64> pointsF = convert_I32_F64(points);
+
+		return fitEllipse_F64(pointsF,iterations,computeError,outputStorage);
+	}
+
+	/**
+	 * Converts a list of I32 points into F64
+	 * @param points Original points
+	 * @return Converted points
+	 */
+	public static List<Point2D_F64> convert_I32_F64(List<Point2D_I32> points) {
 		List<Point2D_F64> pointsF = new ArrayList<Point2D_F64>();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 			pointsF.add( new Point2D_F64(p.x,p.y));
 		}
-
-		return fitEllipse_F64(pointsF,iterations,computeError,outputStorage);
+		return pointsF;
 	}
 
 	/**

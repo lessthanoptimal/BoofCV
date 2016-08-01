@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -252,20 +252,56 @@ public class TestShapeFittingOps {
 	/**
 	 * Creates a simple rectangle
 	 */
-	private List<Point2D_I32> createRectangle() {
-		List<Point2D_I32> sequence = new ArrayList<Point2D_I32>();
-		for( int i = 0; i < 10; i++ ) {
-			sequence.add( new Point2D_I32(0,i));
+	public static List<Point2D_I32> createRectangle() {
+		return createRectangle_I32(5,10,(5+10)*2 - 4);
+	}
+
+	public static List<Point2D_I32> createRectangle_I32( int width , int height , int numPoints ) {
+		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+
+		int length = width*2 + height*2 - 4;
+
+		for (int i = 0; i < numPoints; i++) {
+			int x = i*length/numPoints;
+
+			if( x < width ) {
+				points.add( new Point2D_I32(x,0));
+			} else if( x < width+height-2) {
+				int y = x - width+1;
+				points.add( new Point2D_I32(width-1,y));
+			} else if( x < width*2+height-2) {
+				int xx = x - width - height+3;
+				points.add( new Point2D_I32(width-xx,height-1));
+			} else {
+				int y = x - width*2 - height+4;
+				points.add( new Point2D_I32(0,height-y));
+			}
 		}
-		for( int i = 1; i < 5; i++ ) {
-			sequence.add( new Point2D_I32(i,9));
+
+//		for( Point2D_I32 p : points ) {
+//			System.out.println(p);
+//		}
+//		System.out.println("Length = "+points.size());
+
+		return points;
+	}
+
+	public static List<Point2D_F64> createRectangle_F64( int width , int height , int numPoints ) {
+		return ShapeFittingOps.convert_I32_F64(createRectangle_I32(width,height,numPoints));
+	}
+
+	public static List<Point2D_F64> createEllipse_F64( EllipseRotated_F64 ellipse , int numPoints ) {
+
+		List<Point2D_F64> sequence = new ArrayList<Point2D_F64>();
+
+		for (int i = 0; i < numPoints; i++) {
+			double theta = 2.0*Math.PI*i/numPoints;
+			Point2D_F64 p = new Point2D_F64();
+
+			UtilEllipse_F64.computePoint(theta,ellipse,p);
+			sequence.add( p );
 		}
-		for( int i = 0; i < 10; i++ ) {
-			sequence.add( new Point2D_I32(5,9-i));
-		}
-		for( int i = 1; i < 5; i++ ) {
-			sequence.add( new Point2D_I32(5-i,0));
-		}
+
 		return sequence;
 	}
 }

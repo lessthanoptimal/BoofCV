@@ -43,6 +43,8 @@ import java.util.List;
  * computational efficiency reasons a maximum of 20 points are sampled.  If there are more than 20 points in
  * the contour then they are evenly sampled across the contour.
  *
+ * Only external contours are considered.
+ *
  * Parameters:
  * <dl>
  *    <dt>maxDistanceFromEllipse</dt>
@@ -73,7 +75,7 @@ public class BinaryEllipseDetectorPixel {
 	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-8,100);
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform_F32 distToUndist, undistToDist;
+	protected PixelTransform_F32 distToUndist;
 
 	private boolean verbose = false;
 
@@ -94,12 +96,10 @@ public class BinaryEllipseDetectorPixel {
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
 	 * @param distToUndist Transform from distorted to undistorted image.
-	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist ) {
+								  PixelTransform_F32 distToUndist ) {
 		this.distToUndist = distToUndist;
-		this.undistToDist = undistToDist;
 	}
 
 
@@ -116,7 +116,9 @@ public class BinaryEllipseDetectorPixel {
 		for (int i = 0; i < blobs.size; i++) {
 			Contour c = blobs.get(i);
 
-			if (c.external.size() < minimumContour || (maximumContour != 0 && c.external.size() > maximumContour) ) {
+			if (c.external.size() < minimumContour || (maximumContour > 0 && c.external.size() > maximumContour) ) {
+				if( verbose )
+					System.out.println("Rejecting: too small (or large) "+c.external.size());
 				continue;
 			}
 
@@ -125,6 +127,8 @@ public class BinaryEllipseDetectorPixel {
 
 			// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
 			if( !algebraic.process(pointsF.toList())) {
+				if( verbose )
+					System.out.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
 				continue;
 			}
 
@@ -133,8 +137,13 @@ public class BinaryEllipseDetectorPixel {
 			UtilEllipse_F64.convert(quad,f.ellipse);
 
 			if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
+				if( verbose )
+					System.out.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
 				found.removeTail();
 			}
+
+			if( verbose )
+				System.out.println("Success!  size = "+pointsF.size());
 
 			f.contour = c.external;
 		}
@@ -146,7 +155,7 @@ public class BinaryEllipseDetectorPixel {
 	 * @param external The external contour
 	 * @param pointsF Output of converted points
 	 */
-	private void undistortContour(List<Point2D_I32> external, FastQueue<Point2D_F64> pointsF ) {
+	void undistortContour(List<Point2D_I32> external, FastQueue<Point2D_F64> pointsF ) {
 		for (int j = 0; j < external.size(); j++) {
 			Point2D_I32 p = external.get(j);
 
@@ -162,7 +171,7 @@ public class BinaryEllipseDetectorPixel {
 	/**
 	 * Look at the maximum distance contour points are from the ellipse and see if they exceed a maximum threshold
 	 */
-	private boolean isApproximatelyElliptical(EllipseRotated_F64 ellipse , List<Point2D_F64> points , int maxSamples ) {
+	boolean isApproximatelyElliptical(EllipseRotated_F64 ellipse , List<Point2D_F64> points , int maxSamples ) {
 
 		closestPoint.setEllipse(ellipse);
 
