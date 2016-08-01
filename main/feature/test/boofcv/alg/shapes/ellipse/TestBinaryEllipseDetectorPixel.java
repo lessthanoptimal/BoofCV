@@ -18,11 +18,22 @@
 
 package boofcv.alg.shapes.ellipse;
 
+import boofcv.alg.distort.PixelTransformAffine_F32;
+import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.TestShapeFittingOps;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayU8;
+import georegression.metric.UtilAngle;
+import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -36,8 +47,44 @@ public class TestBinaryEllipseDetectorPixel {
 	 * Test the whole pipeline with a rendered image
 	 */
 	@Test
-	public void all() {
-		fail("implement");
+	public void basicOnImage() {
+
+		// render a binary image with two ovals
+		BufferedImage buffered = new BufferedImage(200,300,BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = buffered.createGraphics();
+
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,200,300);
+		g2.setColor(Color.BLACK);
+		g2.fillOval(20,30,20,16);
+		g2.fillOval(100,60,30,40);
+
+		GrayU8 input = new GrayU8(200,300);
+		ConvertBufferedImage.convertFrom(buffered,input);
+
+		GrayU8 binary = input.createSameShape();
+		ThresholdImageOps.threshold(input,binary,100,true);
+
+		// detect ovals in binary image
+		BinaryEllipseDetectorPixel alg = new BinaryEllipseDetectorPixel();
+
+		alg.process(binary);
+
+		// compare against expected results
+		List<BinaryEllipseDetectorPixel.Found> found = alg.getFound();
+
+		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> foundEllipses = new ArrayList<EllipseRotated_F64>();
+
+		for( BinaryEllipseDetectorPixel.Found f : found ) {
+			assertTrue( f.contour.size() > 10);
+			foundEllipses.add(f.ellipse);
+		}
+
+		expected.add( new EllipseRotated_F64(30,38,10,8,0));
+		expected.add( new EllipseRotated_F64(115,80,20,15,Math.PI/2.0));
+
+		checkEquals(expected,foundEllipses,1.0,0.1);
 	}
 
 	/**
@@ -45,7 +92,23 @@ public class TestBinaryEllipseDetectorPixel {
 	 */
 	@Test
 	public void undistortContour() {
-		fail("implement");
+		List<Point2D_I32> input = new ArrayList<Point2D_I32>();
+		FastQueue<Point2D_F64> output = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
+		for (int i = 0; i < 10; i++) {
+			input.add( new Point2D_I32(i,i));
+		}
+
+		BinaryEllipseDetectorPixel alg = new BinaryEllipseDetectorPixel();
+
+		alg.undistortContour(input,output);
+
+		assertEquals(input.size(),output.size);
+		for (int i = 0; i < input.size(); i++) {
+			Point2D_I32 p = input.get(i);
+			assertEquals(p.x,output.get(i).x,1e-8);
+			assertEquals(p.y,output.get(i).y,1e-8);
+		}
 	}
 
 	/**
@@ -53,7 +116,27 @@ public class TestBinaryEllipseDetectorPixel {
 	 */
 	@Test
 	public void undistortContour_WithDistortion() {
-		fail("implement");
+
+
+		List<Point2D_I32> input = new ArrayList<Point2D_I32>();
+		FastQueue<Point2D_F64> output = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
+		for (int i = 0; i < 10; i++) {
+			input.add( new Point2D_I32(i,i));
+		}
+
+		BinaryEllipseDetectorPixel alg = new BinaryEllipseDetectorPixel();
+		alg.setLensDistortion(100,200,
+				new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,10.0f,0)));
+
+		alg.undistortContour(input,output);
+
+		assertEquals(input.size(),output.size);
+		for (int i = 0; i < input.size(); i++) {
+			Point2D_I32 p = input.get(i);
+			assertEquals(p.x+10,output.get(i).x,1e-8);
+			assertEquals(p.y,output.get(i).y,1e-8);
+		}
 	}
 
 	/**
@@ -92,5 +175,30 @@ public class TestBinaryEllipseDetectorPixel {
 		assertTrue(alg.isApproximatelyElliptical(ellipse,positive,20));
 	}
 
+	public static void checkEquals( List<EllipseRotated_F64> expected ,
+									List<EllipseRotated_F64> found , double tol , double tolPhi )
+	{
+		assertEquals(expected.size(),found.size());
+
+		boolean matched[] = new boolean[expected.size()];
+
+		for( EllipseRotated_F64 f : found ) {
+			boolean foundMatch = false;
+			for (int i = 0; i < expected.size(); i++) {
+				EllipseRotated_F64 e = expected.get(i);
+
+				if( Math.abs(f.a-e.a) <= tol && Math.abs(f.b-e.b) <= tol
+						&& UtilAngle.dist(f.phi,e.phi) <= tolPhi ) {
+					foundMatch = matched[i] = true;
+				}
+
+			}
+			assertTrue(foundMatch);
+		}
+
+		for (int i = 0; i < matched.length; i++) {
+			assertTrue(matched[i]);
+		}
+	}
 
 }
