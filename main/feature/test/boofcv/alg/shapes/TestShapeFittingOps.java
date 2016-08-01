@@ -47,7 +47,7 @@ public class TestShapeFittingOps {
 		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,true,0.05,0,100);
 
 		assertEquals(4, result.size());
-		checkPolygon(new int[]{0, 0, 0, 9, 5, 9, 5, 0}, new int[]{0, 9, 14, 23}, result);
+		checkPolygon(new int[]{5, 0, 5, 9, 0, 9, 0, 0}, new int[]{5, 14, 19, 0}, result);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class TestShapeFittingOps {
 		List<PointIndex_I32> result = ShapeFittingOps.fitPolygon(sequence,false,0.05,0,100);
 
 		assertEquals(5, result.size());
-		checkPolygon(new int[]{0, 0, 0, 9, 5, 9, 5, 0, 1, 0}, new int[]{0, 9, 14, 23, 27}, result);
+		checkPolygon(new int[]{0, 0, 5, 0, 5, 9, 0, 9, 0, 1}, new int[]{0, 5, 14, 19, 27}, result);
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class TestShapeFittingOps {
 	 * Creates a simple rectangle
 	 */
 	public static List<Point2D_I32> createRectangle() {
-		return createRectangle_I32(5,10,(5+10)*2 - 4);
+		return createRectangle_I32(6,10,(6+10)*2 - 4);
 	}
 
 	public static List<Point2D_I32> createRectangle_I32( int width , int height , int numPoints ) {
