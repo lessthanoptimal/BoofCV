@@ -103,6 +103,10 @@ public class BinaryEllipseDetectorPixel {
 	}
 
 
+	/**
+	 * Finds all valid ellipses in the binary image
+	 * @param binary binary image
+	 */
 	public void process( GrayU8 binary ) {
 		labeled.reshape(binary.width, binary.height);
 
