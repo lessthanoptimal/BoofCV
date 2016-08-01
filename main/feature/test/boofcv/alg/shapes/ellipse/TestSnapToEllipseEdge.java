@@ -26,8 +26,21 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestSnapToEllipseEdge {
+	/**
+	 * Simple test case involving a fully rendered image and known result
+	 */
 	@Test
-	public void foo() {
+	public void simpleFullImage() {
+		fail("implement");
+	}
+
+	@Test
+	public void change() {
+		fail("implement");
+	}
+
+	@Test
+	public void computePointsAndWeights() {
 		fail("implement");
 	}
 }
