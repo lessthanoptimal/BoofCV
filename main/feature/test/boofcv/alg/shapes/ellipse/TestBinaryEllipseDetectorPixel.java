@@ -32,6 +32,7 @@ import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,19 +50,11 @@ public class TestBinaryEllipseDetectorPixel {
 	@Test
 	public void basicOnImage() {
 
-		// render a binary image with two ovals
-		BufferedImage buffered = new BufferedImage(200,300,BufferedImage.TYPE_INT_RGB);
-		Graphics2D g2 = buffered.createGraphics();
+		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		expected.add( new EllipseRotated_F64(30,38,10,8,0));
+		expected.add( new EllipseRotated_F64(115,80,20,15,Math.PI/2.0));
 
-		g2.setColor(Color.WHITE);
-		g2.fillRect(0,0,200,300);
-		g2.setColor(Color.BLACK);
-		g2.fillOval(20,30,20,16);
-		g2.fillOval(100,60,30,40);
-
-		GrayU8 input = new GrayU8(200,300);
-		ConvertBufferedImage.convertFrom(buffered,input);
-
+		GrayU8 input = renderEllipses(200,300,expected);
 		GrayU8 binary = input.createSameShape();
 		ThresholdImageOps.threshold(input,binary,100,true);
 
@@ -73,16 +66,12 @@ public class TestBinaryEllipseDetectorPixel {
 		// compare against expected results
 		List<BinaryEllipseDetectorPixel.Found> found = alg.getFound();
 
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
 		List<EllipseRotated_F64> foundEllipses = new ArrayList<EllipseRotated_F64>();
 
 		for( BinaryEllipseDetectorPixel.Found f : found ) {
 			assertTrue( f.contour.size() > 10);
 			foundEllipses.add(f.ellipse);
 		}
-
-		expected.add( new EllipseRotated_F64(30,38,10,8,0));
-		expected.add( new EllipseRotated_F64(115,80,20,15,Math.PI/2.0));
 
 		checkEquals(expected,foundEllipses,1.0,0.1);
 	}
@@ -189,7 +178,9 @@ public class TestBinaryEllipseDetectorPixel {
 
 				if( Math.abs(f.a-e.a) <= tol && Math.abs(f.b-e.b) <= tol
 						&& UtilAngle.dist(f.phi,e.phi) <= tolPhi ) {
-					foundMatch = matched[i] = true;
+					if( e.center.distance(f.center) <= tol ) {
+						foundMatch = matched[i] = true;
+					}
 				}
 
 			}
@@ -201,4 +192,43 @@ public class TestBinaryEllipseDetectorPixel {
 		}
 	}
 
+	public static void checkEquals( EllipseRotated_F64 expected ,
+									EllipseRotated_F64 found , double tol , double tolPhi ) {
+
+		assertEquals(expected.a , found.a, tol);
+		assertEquals(expected.b , found.b, tol);
+		assertEquals(expected.center.x , found.center.x, tol);
+		assertEquals(expected.center.y , found.center.y, tol);
+		assertTrue(UtilAngle.dist(found.phi, expected.phi) <= tolPhi);
+	}
+
+	public static GrayU8 renderEllipses( int width , int height , List<EllipseRotated_F64> ellipses )
+	{
+		// render a binary image with two ovals
+		BufferedImage buffered = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2 = buffered.createGraphics();
+
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,width,height);
+
+		for( EllipseRotated_F64 ellipse : ellipses ) {
+			g2.setColor(Color.BLACK);
+			AffineTransform tx = new AffineTransform();
+			tx.concatenate( AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y));
+			tx.concatenate( AffineTransform.getRotateInstance(ellipse.phi));
+
+			int a = (int)Math.round(ellipse.a);
+			int b = (int)Math.round(ellipse.b);
+
+			g2.setTransform(tx);
+			g2.fillOval(-a,-b,a*2,b*2);
+		}
+
+//		ShowImages.showDialog(buffered);
+
+		GrayU8 input = new GrayU8(width,height);
+		ConvertBufferedImage.convertFrom(buffered,input);
+
+		return input;
+	}
 }
