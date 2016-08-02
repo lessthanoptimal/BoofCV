@@ -87,7 +87,14 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 			computePointsAndWeights(refined);
 
 			if( fitter.process(samplePts.toList(),weights.data) ) {
+				// Get the results in local coordinates
 				UtilEllipse_F64.convert(fitter.getEllipse(),refined);
+				// convert back into image coordinates
+				double scale = previous.a;
+				refined.center.x = refined.center.x*scale + previous.center.x;
+				refined.center.y = refined.center.y*scale + previous.center.y;
+				refined.a *= scale;
+				refined.b *= scale;
 			} else {
 				return false;
 			}
@@ -105,6 +112,8 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 	protected static double change( EllipseRotated_F64 a , EllipseRotated_F64 b ) {
 		double total = 0;
 
+		total += Math.abs(a.center.x - b.center.x);
+		total += Math.abs(a.center.y - b.center.y);
 		total += Math.abs(a.a - b.a);
 		total += Math.abs(a.b - b.b);
 		total += UtilAngle.distHalf(a.phi , b.phi);
@@ -161,8 +170,10 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 				if (w < 0) w = -w;
 
 				if (w > 0) {
-					weights.add(w);
+					// convert into a local coordinate so make the linear fitting more numerically stable and
+					// independent on position in the image
 					samplePts.grow().set((x - ellipse.center.x) / localScale, (y - ellipse.center.y) / localScale);
+					weights.add(w);
 				}
 
 				x += tanX;
