@@ -86,7 +86,9 @@ public class DynamicVideoInterface implements VideoInterface {
 			if( javacv != null ) {
 				return javacv.load(fileName, imageType);
 			}
-		} catch( RuntimeException ignore ){}
+		} catch( RuntimeException ignore ){
+			ignore.printStackTrace();
+		}
 
 		try {
 			if( jcodec != null ) {
@@ -95,7 +97,7 @@ public class DynamicVideoInterface implements VideoInterface {
 				}
 			}
 		} catch( RuntimeException ignore ){}
-
+		System.err.println("Codec finally not found for file: " + fileName);
 		return null;
 	}
 
