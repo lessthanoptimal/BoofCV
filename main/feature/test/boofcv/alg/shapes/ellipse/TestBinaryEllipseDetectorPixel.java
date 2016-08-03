@@ -115,8 +115,7 @@ public class TestBinaryEllipseDetectorPixel {
 		}
 
 		BinaryEllipseDetectorPixel alg = new BinaryEllipseDetectorPixel();
-		alg.setLensDistortion(100,200,
-				new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,10.0f,0)));
+		alg.setLensDistortion(new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,10.0f,0)));
 
 		alg.undistortContour(input,output);
 

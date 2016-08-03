@@ -36,14 +36,16 @@ import org.ddogleg.struct.FastQueue;
 import java.util.List;
 
 /**
- * Detects ellipses inside a binary image by finding their contour.  Optionally, lens distortion can be removed
- * from the contour points prior to processing.  After the contour has been found an ellipse is fit to them using
- * the {@link FitEllipseAlgebraic algebraic} formulation.  Points which are not approximately ellipsoidal are removed.
+ * <p>Detects ellipses inside a binary image by finding their contour and fitting an ellipse to the contour.  Fitting
+ * is done using pixel precise contour points.  See {@link SnapToEllipseEdge} for a way to use sub-pixel points
+ * and improve the fit's accuracy.  Optionally, lens distortion can be removed from the contour points prior
+ * to processing.</p>
+ *
+ * After the contour has been found an ellipse is fit to them using the {@link FitEllipseAlgebraic algebraic}
+ * formulation.  Points which are not approximately ellipsoidal are removed.
  * Approximately ellipsoidal is defined by the distance of the farthest contour point away from the ellipse. For
  * computational efficiency reasons a maximum of 20 points are sampled.  If there are more than 20 points in
- * the contour then they are evenly sampled across the contour.
- *
- * Only external contours are considered.
+ * the contour then they are evenly sampled across the contour. Only external contours are considered.
  *
  * Parameters:
  * <dl>
@@ -83,25 +85,20 @@ public class BinaryEllipseDetectorPixel {
 
 	private FastQueue<Found> found = new FastQueue<Found>(Found.class,true);
 
-
 	/**
-	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
-	 * coordinates.  The undistorted image is never explicitly created.</p>
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted.
+	 * The undistorted image is never explicitly created.</p>
 	 *
 	 * <p>
 	 * WARNING: The undistorted image must have the same bounds as the distorted input image.  This is because
 	 * several of the bounds checks use the image shape.  This are simplified greatly by this assumption.
 	 * </p>
 	 *
-	 * @param width Input image width.  Used in sanity check only.
-	 * @param height Input image height.  Used in sanity check only.
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 */
-	public void setLensDistortion(int width , int height ,
-								  PixelTransform_F32 distToUndist ) {
+	public void setLensDistortion( PixelTransform_F32 distToUndist ) {
 		this.distToUndist = distToUndist;
 	}
-
 
 	/**
 	 * Finds all valid ellipses in the binary image

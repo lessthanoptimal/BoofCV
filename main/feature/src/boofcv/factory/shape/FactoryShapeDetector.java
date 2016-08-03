@@ -18,6 +18,9 @@
 
 package boofcv.factory.shape;
 
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
 import boofcv.alg.shapes.polygon.RefinePolygonCornersToImage;
@@ -32,6 +35,34 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class FactoryShapeDetector {
+
+	/**
+	 * Creates an ellipse detector which will detect all ellipses in the image initially using a binary image and
+	 * then refine the estimate using a subpixel algorithm in the gray scale image.
+	 *
+	 * @param config Configuration for ellipse detector.  null == default
+	 * @param imageType Input image type
+	 * @return Detecto
+	 */
+	public static <T extends ImageGray>
+	BinaryEllipseDetector<T> ellipse(ConfigEllipseDetector config , Class<T> imageType )
+	{
+		if( config == null )
+			config = new ConfigEllipseDetector();
+
+		config.checkValidity();
+
+		BinaryEllipseDetectorPixel detector = new BinaryEllipseDetectorPixel();
+		detector.setMaxDistanceFromEllipse(config.maxDistanceFromEllipse);
+		detector.setMaximumContour(config.maximumContour);
+		detector.setMinimumContour(config.minimumContour);
+
+		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<T>(config.numSampleContour,config.radialSamples,imageType);
+		refine.setConvergenceTol(config.convergenceTol);
+		refine.setMaxIterations(config.maxIterations);
+
+		return new BinaryEllipseDetector<T>(detector,refine);
+	}
 
 	/**
 	 * Creates a polygon detector.  The polygon is assumed to be a black shape with a much lighter background.
