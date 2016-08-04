@@ -42,6 +42,11 @@ public class ConfigEllipseDetector implements Configuration {
 	public int maximumContour = 0;
 
 	/**
+	 * Detector: If true it will consider internal contours and not just external
+	 */
+	public boolean processInternal = false;
+
+	/**
 	 * Refinement: maximum number of iterations it will performance
  	 */
 	protected int maxIterations = 10;

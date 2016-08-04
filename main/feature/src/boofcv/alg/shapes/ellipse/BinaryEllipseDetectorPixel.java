@@ -55,6 +55,8 @@ import java.util.List;
  *    <dd>minimum number of pixels in the contour</dd>
  *    <dt>maximumContour</dt>
  *    <dd>maximum number of pixels in the contour</dd>
+ *    <dt>internalContour</dt>
+ *    <dd>If true it will process internal contours</dd>
  * </dl>
  *
  * @author Peter Abeles
@@ -68,6 +70,8 @@ public class BinaryEllipseDetectorPixel {
 	private int minimumContour = 20;
 	// maximum number of pixels in the contour. 0 == no limit
 	private int maximumContour = 0;
+
+	private boolean internalContour = false;
 
 	private LinearContourLabelChang2004 contourFinder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	private GrayS32 labeled = new GrayS32(1,1);
@@ -105,6 +109,7 @@ public class BinaryEllipseDetectorPixel {
 	 * @param binary binary image
 	 */
 	public void process( GrayU8 binary ) {
+		found.reset();
 		labeled.reshape(binary.width, binary.height);
 
 		contourFinder.process(binary, labeled);
@@ -113,37 +118,47 @@ public class BinaryEllipseDetectorPixel {
 		for (int i = 0; i < blobs.size; i++) {
 			Contour c = blobs.get(i);
 
-			if (c.external.size() < minimumContour || (maximumContour > 0 && c.external.size() > maximumContour) ) {
-				if( verbose )
-					System.out.println("Rejecting: too small (or large) "+c.external.size());
-				continue;
+			proccessContour(c.external);
+
+			if(internalContour) {
+				for( int j = 0; j < c.internal.size(); j++ ) {
+					proccessContour(c.internal.get(j));
+				}
 			}
-
-			pointsF.reset();
-			undistortContour(c.external,pointsF);
-
-			// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
-			if( !algebraic.process(pointsF.toList())) {
-				if( verbose )
-					System.out.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
-				continue;
-			}
-
-			EllipseQuadratic_F64 quad = algebraic.getEllipse();
-			Found f = found.grow();
-			UtilEllipse_F64.convert(quad,f.ellipse);
-
-			if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
-				if( verbose )
-					System.out.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
-				found.removeTail();
-			}
-
-			if( verbose )
-				System.out.println("Success!  size = "+pointsF.size());
-
-			f.contour = c.external;
 		}
+	}
+
+	private void proccessContour(List<Point2D_I32> contour) {
+		if (contour.size() < minimumContour || (maximumContour > 0 && contour.size() > maximumContour) ) {
+			if( verbose )
+				System.out.println("Rejecting: too small (or large) "+contour.size());
+			return;
+		}
+
+		pointsF.reset();
+		undistortContour(contour,pointsF);
+
+		// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
+		if( !algebraic.process(pointsF.toList())) {
+			if( verbose )
+				System.out.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
+			return;
+		}
+
+		EllipseQuadratic_F64 quad = algebraic.getEllipse();
+		Found f = found.grow();
+		UtilEllipse_F64.convert(quad,f.ellipse);
+
+		if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
+			if( verbose )
+				System.out.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
+			found.removeTail();
+		}
+
+		if( verbose )
+			System.out.println("Success!  size = "+pointsF.size());
+
+		f.contour = contour;
 	}
 
 	/**
@@ -200,6 +215,14 @@ public class BinaryEllipseDetectorPixel {
 
 	public boolean isVerbose() {
 		return verbose;
+	}
+
+	public boolean isInternalContour() {
+		return internalContour;
+	}
+
+	public void setInternalContour(boolean internalContour) {
+		this.internalContour = internalContour;
 	}
 
 	public void setVerbose(boolean verbose) {
