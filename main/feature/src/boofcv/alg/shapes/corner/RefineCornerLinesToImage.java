@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.corner;
 
-import boofcv.alg.shapes.edge.SnapToEdge;
+import boofcv.alg.shapes.edge.SnapToLineEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
@@ -31,7 +31,7 @@ import georegression.struct.point.Vector2D_F64;
  * <p>
  * Refines the estimate of a corner.  A corner is defined as the intersection of two straight edges.  The inside
  * edge is either all darker or lighter than the background.  The optimization function when refining the edge
- * seeks to maximize the difference between the inside and outside of the edge.  Internally {@link SnapToEdge} is
+ * seeks to maximize the difference between the inside and outside of the edge.  Internally {@link SnapToLineEdge} is
  * used to perform this optimization.
  * </p>
  *
@@ -42,7 +42,7 @@ import georegression.struct.point.Vector2D_F64;
  * </p>
  *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
- * and invoke {@link SnapToEdge#setTransform(PixelTransform_F32)}}.</p>
+ * and invoke {@link SnapToLineEdge#setTransform(PixelTransform_F32)}}.</p>
  *
  * @author Peter Abeles
  */
@@ -61,7 +61,7 @@ public class RefineCornerLinesToImage<T extends ImageGray> {
 	private double convergeTolPixels;
 
 	// fits the line to the edge
-	private SnapToEdge<T> snapToEdge;
+	private SnapToLineEdge<T> snapToEdge;
 
 	//---------- storage for local work space
 	// adjusted corner points which have been offset from the true corners
@@ -110,7 +110,7 @@ public class RefineCornerLinesToImage<T extends ImageGray> {
 		this.cornerOffset = cornerOffset;
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
-		this.snapToEdge = new SnapToEdge<T>(maxLineSamples,sampleRadius,imageType);
+		this.snapToEdge = new SnapToLineEdge<T>(maxLineSamples,sampleRadius,imageType);
 		this.maxLineSamples = maxLineSamples;
 		this.imageType = imageType;
 		this.maxCornerChange = maxCornerChange;
@@ -126,7 +126,7 @@ public class RefineCornerLinesToImage<T extends ImageGray> {
 
 	/**
 	 * Sets the image which is going to be processed.  If a transform is to be used
-	 * {@link SnapToEdge#setTransform} should be called before this.
+	 * {@link SnapToLineEdge#setTransform} should be called before this.
 	 */
 	public void setImage(T image) {
 		this.image = image;
@@ -270,7 +270,7 @@ public class RefineCornerLinesToImage<T extends ImageGray> {
 		return _endRight;
 	}
 
-	public SnapToEdge<T> getSnapToEdge() {
+	public SnapToLineEdge<T> getSnapToEdge() {
 		return snapToEdge;
 	}
 }

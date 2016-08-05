@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
-import boofcv.alg.shapes.edge.SnapToEdge;
+import boofcv.alg.shapes.edge.SnapToLineEdge;
 import boofcv.misc.CircularIndex;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageGray;
@@ -183,7 +183,7 @@ public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineB
 		this.pixelsAway = pixelsAway;
 	}
 
-	public SnapToEdge<T> getSnapToEdge() {
+	public SnapToLineEdge<T> getSnapToEdge() {
 		return refineCorner.getSnapToEdge();
 	}
 }

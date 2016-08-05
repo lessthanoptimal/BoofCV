@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestPolygonEdgeIntensity {
+public class TestEdgeIntensityPolygon {
 	@Test
 	public void computeEdge() {
 		GrayU8 image = new GrayU8(400,500);
@@ -38,7 +38,7 @@ public class TestPolygonEdgeIntensity {
 		int value = 200;
 		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
 
-		PolygonEdgeIntensity<GrayU8> alg = new PolygonEdgeIntensity<GrayU8>(2,2,10,GrayU8.class);
+		EdgeIntensityPolygon<GrayU8> alg = new EdgeIntensityPolygon<GrayU8>(2,2,10,GrayU8.class);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 
@@ -63,7 +63,7 @@ public class TestPolygonEdgeIntensity {
 		int value = 200;
 		ImageMiscOps.fillRectangle(image,value,20,30,40,40);
 
-		PolygonEdgeIntensity<GrayU8> alg = new PolygonEdgeIntensity<GrayU8>(2,2,10,GrayU8.class);
+		EdgeIntensityPolygon<GrayU8> alg = new EdgeIntensityPolygon<GrayU8>(2,2,10,GrayU8.class);
 
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 		UtilPolygons2D_F64.convert(new Rectangle2D_F64(20,30,60,70),polygon);

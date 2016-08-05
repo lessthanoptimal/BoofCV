@@ -20,6 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polygon.RefineBinaryPolygon;
@@ -58,11 +59,20 @@ public class FactoryShapeDetector {
 		detector.setMinimumContour(config.minimumContour);
 		detector.setInternalContour(config.processInternal);
 
-		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<T>(config.numSampleContour,config.radialSamples,imageType);
+		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<T>(config.numSampleContour,config.refineRadialSamples,imageType);
 		refine.setConvergenceTol(config.convergenceTol);
 		refine.setMaxIterations(config.maxIterations);
 
-		return new BinaryEllipseDetector<T>(detector,refine);
+		if( config.numSampleContour <= 0 ) {
+			refine = null;
+		}
+
+		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<T>(
+				config.checkRadialDistance,
+				config.numSampleContour,
+				config.checkIntensityThreshold,imageType);
+
+		return new BinaryEllipseDetector<T>(detector,refine, check);
 	}
 
 	/**

@@ -36,13 +36,18 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
 	SnapToEllipseEdge<T> ellipseRefiner;
+	EdgeIntensityEllipse intensityCheck;
 
 	FastQueue<EllipseRotated_F64> refined = new FastQueue<EllipseRotated_F64>(EllipseRotated_F64.class,true);
 
+	boolean verbose;
+
 	public BinaryEllipseDetector(BinaryEllipseDetectorPixel ellipseDetector,
-								 SnapToEllipseEdge<T> ellipseRefiner) {
+								 SnapToEllipseEdge<T> ellipseRefiner,
+								 EdgeIntensityEllipse intensityCheck ) {
 		this.ellipseDetector = ellipseDetector;
 		this.ellipseRefiner = ellipseRefiner;
+		this.intensityCheck = intensityCheck;
 	}
 
 	/**
@@ -59,6 +64,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	public void setLensDistortion( PixelTransform_F32 distToUndist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		this.ellipseRefiner.setTransform(distToUndist);
+		this.intensityCheck.setTransform(distToUndist);
 	}
 
 	/**
@@ -72,14 +78,27 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 		ellipseDetector.process(binary);
 		ellipseRefiner.setImage(gray);
+		intensityCheck.setImage(gray);
 
 		List<BinaryEllipseDetectorPixel.Found> found = ellipseDetector.getFound();
 
 		for( BinaryEllipseDetectorPixel.Found f : found ) {
+
+			if( !intensityCheck.process(f.ellipse) ) {
+				if( verbose )
+					System.out.println("Rejecting ellipse which isn't intense enough");
+
+				continue;
+			}
+
 			EllipseRotated_F64 r = refined.grow();
 
-			if( !ellipseRefiner.process(f.ellipse,r) ) {
-				refined.removeTail();
+			if( ellipseRefiner != null ) {
+				if (!ellipseRefiner.process(f.ellipse, r)) {
+					refined.removeTail();
+				}
+			} else {
+				r.set(f.ellipse);
 			}
 		}
 	}

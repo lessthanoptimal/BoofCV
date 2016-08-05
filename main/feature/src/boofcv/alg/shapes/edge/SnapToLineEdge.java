@@ -52,7 +52,7 @@ import org.ddogleg.struct.GrowQueue_F64;
  * @author Peter Abeles
  */
 // TODO specify weight function.  close to A, close to B, even
-public class SnapToEdge<T extends ImageGray>extends BaseIntegralEdge<T> {
+public class SnapToLineEdge<T extends ImageGray>extends BaseIntegralEdge<T> {
 
 	// maximum number of times it will sample along the line
 	protected int lineSamples;
@@ -81,7 +81,7 @@ public class SnapToEdge<T extends ImageGray>extends BaseIntegralEdge<T> {
 	 * @param tangentialSamples Radius along the tangent of what it will sample.  Must be &ge; 1.  Try 2.
 	 * @param imageType Type of image it's going to process
 	 */
-	public SnapToEdge(int lineSamples, int tangentialSamples,  Class<T> imageType) {
+	public SnapToLineEdge(int lineSamples, int tangentialSamples, Class<T> imageType) {
 		super(imageType);
 
 		if( tangentialSamples < 1 )

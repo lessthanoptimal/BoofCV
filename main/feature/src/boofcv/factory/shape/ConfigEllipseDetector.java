@@ -57,7 +57,7 @@ public class ConfigEllipseDetector implements Configuration {
 	protected double convergenceTol = 1e-6;
 
 	/**
-	 * Refinement: how many points along the contour it will sample
+	 * Refinement: how many points along the contour it will sample.  Set to &le; 0 to disable refinement
 	 */
 	protected int numSampleContour = 20;
 
@@ -67,7 +67,27 @@ public class ConfigEllipseDetector implements Configuration {
 	 * Total intensity values sampled at each point along the line is radius*2+2,
 	 * and points added to line fitting is radius*2+1.
 	 */
-	protected int radialSamples = 1;
+	protected int refineRadialSamples = 1;
+
+	/**
+	 * Check:<br>
+	 * Threshold for minimum edge intensity.  This should be a value which is 0 to (max-min pixel value)
+	 * Set to &le; 0 to disable check.
+	 */
+	public double checkIntensityThreshold = 20;
+
+	/**
+	 * Check:<br>
+	 * Tangential distance away from contour the image is sampled when performing edge
+	 * intensity check.
+	 */
+	public double checkRadialDistance = 1.5;
+
+	/**
+	 * Check:<br>
+	 * Number of points along the contour it samples when performing edge intensity check.
+	 */
+	public int checkSamplePoints = 20;
 
 	@Override
 	public void checkValidity() {

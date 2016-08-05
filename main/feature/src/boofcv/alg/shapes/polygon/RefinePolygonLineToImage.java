@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.alg.shapes.edge.SnapToEdge;
+import boofcv.alg.shapes.edge.SnapToLineEdge;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
@@ -50,7 +50,7 @@ import java.util.List;
  * </p>
  *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
- * and invoke {@link SnapToEdge#setTransform(PixelTransform_F32)}.</p>
+ * and invoke {@link SnapToLineEdge#setTransform(PixelTransform_F32)}.</p>
  *
  * @author Peter Abeles
  */
@@ -69,7 +69,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 	// designed to prevent divergence
 	private double maxCornerChangePixel=2;
 
-	private SnapToEdge<T> snapToEdge;
+	private SnapToLineEdge<T> snapToEdge;
 
 	//---------- storage for local work space
 	private LineGeneral2D_F64 general[] = new LineGeneral2D_F64[0]; // estimated line for each side
@@ -101,7 +101,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
 		this.maxCornerChangePixel = maxCornerChangePixel;
-		this.snapToEdge = new SnapToEdge<T>(lineSamples,sampleRadius,imageType);
+		this.snapToEdge = new SnapToLineEdge<T>(lineSamples,sampleRadius,imageType);
 		this.imageType = imageType;
 
 		previous = new Polygon2D_F64(1);
@@ -115,12 +115,12 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 	public RefinePolygonLineToImage(int numSides ,Class<T> imageType) {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
-		this.snapToEdge = new SnapToEdge<T>(20,1,imageType);
+		this.snapToEdge = new SnapToLineEdge<T>(20,1,imageType);
 	}
 
 	/**
 	 * Sets the image which is going to be processed.  If a transform is to be used
-	 * {@link SnapToEdge#setTransform} should be called before this.
+	 * {@link SnapToLineEdge#setTransform} should be called before this.
 	 */
 	@Override
 	public void setImage(T image) {
@@ -300,7 +300,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 		adjB.y = b.y - unitY*cornerOffset;
 	}
 
-	public SnapToEdge<T> getSnapToEdge() {
+	public SnapToLineEdge<T> getSnapToEdge() {
 		return snapToEdge;
 	}
 }

@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSnapToEdge {
+public class TestSnapToLineEdge {
 
 	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
 
@@ -76,7 +76,7 @@ public class TestSnapToEdge {
 	public void easy_aligned(Class imageType) {
 		setup(null, imageType);
 
-		SnapToEdge alg = new SnapToEdge(10,2, imageType);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, imageType);
 		alg.setImage(image);
 
 		int r = 2;
@@ -91,7 +91,7 @@ public class TestSnapToEdge {
 		differentInitial(alg,right);
 	}
 
-	private void differentInitial( SnapToEdge alg , LineSegment2D_F64 segment ) {
+	private void differentInitial(SnapToLineEdge alg , LineSegment2D_F64 segment ) {
 		Vector2D_F64 v = new Vector2D_F64();
 		v.x = -segment.slopeY();
 		v.y = segment.slopeX();
@@ -146,7 +146,7 @@ public class TestSnapToEdge {
 	public void subimage(Class imageType) {
 		setup(null, imageType);
 
-		SnapToEdge alg = new SnapToEdge(10,2, imageType);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, imageType);
 		alg.setImage(BoofTesting.createSubImageOf_S(image));
 
 		int r = 2;
@@ -184,7 +184,7 @@ public class TestSnapToEdge {
 
 		double tol = 0.5;
 
-		SnapToEdge alg = new SnapToEdge(10,2, imageType);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, imageType);
 
 		Polygon2D_F64 input = new Polygon2D_F64(4);
 		AffinePointOps_F64.transform(affine,new Point2D_F64(x0,y0), input.get(0));
@@ -261,7 +261,7 @@ public class TestSnapToEdge {
 	public void computePointsAndWeights( Class imageType ) {
 		setup(null,imageType);
 
-		SnapToEdge alg = new SnapToEdge(10,2, imageType);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, imageType);
 
 		float H = y1-y0-10;
 
@@ -301,7 +301,7 @@ public class TestSnapToEdge {
 	public void computePointsAndWeights_border( Class imageType ) {
 		setup(null,imageType);
 
-		SnapToEdge alg = new SnapToEdge(10,2, imageType);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, imageType);
 
 		alg.setImage(image);
 		alg.computePointsAndWeights(0, image.height-2, 0, 2, 1, 0);
@@ -319,7 +319,7 @@ public class TestSnapToEdge {
 
 		LineSegment2D_F64 segment = new LineSegment2D_F64(10,20,50,-10);
 
-		SnapToEdge alg = new SnapToEdge(10,2, GrayU8.class);
+		SnapToLineEdge alg = new SnapToLineEdge(10,2, GrayU8.class);
 		alg.center.set(20,23);
 		alg.localScale = 10;
 
@@ -342,7 +342,7 @@ public class TestSnapToEdge {
 		assertEquals(expected.C,found.C,1e-8);
 	}
 
-	private void toLocal( Point2D_F64 p , SnapToEdge alg ) {
+	private void toLocal( Point2D_F64 p , SnapToLineEdge alg ) {
 		p.x = (p.x-alg.center.x)/alg.localScale;
 		p.y = (p.y-alg.center.y)/alg.localScale;
 	}

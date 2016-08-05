@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
-import boofcv.alg.shapes.edge.PolygonEdgeIntensity;
+import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
@@ -123,7 +123,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	boolean verbose = false;
 
 	// used to remove false positives
-	PolygonEdgeIntensity<T> edgeIntensity;
+	EdgeIntensityPolygon<T> edgeIntensity;
 	double edgeThreshold;
 	// should it check the edge score before?  With a chessboard pattern the initial guess is known to be very poor
 	// so it should only check the edge after.  Otherwise its good to filter before optimization.
@@ -161,7 +161,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 
 		setNumberOfSides(minSides,maxSides);
 		this.refinePolygon = refinePolygon;
-		this.edgeIntensity = new PolygonEdgeIntensity<T>(1,1.5,15,inputType);
+		this.edgeIntensity = new EdgeIntensityPolygon<T>(1,1.5,15,inputType);
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;

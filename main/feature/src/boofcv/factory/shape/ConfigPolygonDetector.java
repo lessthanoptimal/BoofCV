@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.factory.shape;
 
-import boofcv.alg.shapes.edge.PolygonEdgeIntensity;
+import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.struct.Configuration;
@@ -76,7 +76,7 @@ public class ConfigPolygonDetector implements Configuration {
 	 *
 	 * <p>Set to zero to disable.</p>
 	 *
-	 * @see PolygonEdgeIntensity
+	 * @see EdgeIntensityPolygon
 	 */
 	public double minimumEdgeIntensity = 6.0;
 
