@@ -40,14 +40,18 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 	FastQueue<EllipseRotated_F64> refined = new FastQueue<EllipseRotated_F64>(EllipseRotated_F64.class,true);
 
+	Class<T> inputType;
+
 	boolean verbose;
 
 	public BinaryEllipseDetector(BinaryEllipseDetectorPixel ellipseDetector,
 								 SnapToEllipseEdge<T> ellipseRefiner,
-								 EdgeIntensityEllipse<T> intensityCheck ) {
+								 EdgeIntensityEllipse<T> intensityCheck ,
+								 Class<T> inputType ) {
 		this.ellipseDetector = ellipseDetector;
 		this.ellipseRefiner = ellipseRefiner;
 		this.intensityCheck = intensityCheck;
+		this.inputType = inputType;
 	}
 
 	/**
@@ -63,7 +67,8 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	 */
 	public void setLensDistortion( PixelTransform_F32 distToUndist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
-		this.ellipseRefiner.setTransform(distToUndist);
+		if( this.ellipseRefiner != null )
+			this.ellipseRefiner.setTransform(distToUndist);
 		this.intensityCheck.setTransform(distToUndist);
 	}
 
@@ -77,7 +82,8 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 		refined.reset();
 
 		ellipseDetector.process(binary);
-		ellipseRefiner.setImage(gray);
+		if( ellipseRefiner != null)
+			ellipseRefiner.setImage(gray);
 		intensityCheck.setImage(gray);
 
 		List<BinaryEllipseDetectorPixel.Found> found = ellipseDetector.getFound();
@@ -104,7 +110,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	}
 
 	public Class<T> getInputType() {
-		return ellipseRefiner.getInputType();
+		return inputType;
 	}
 
 	/**

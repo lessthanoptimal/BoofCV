@@ -80,6 +80,7 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 	 */
 	public boolean process(EllipseRotated_F64 input, EllipseRotated_F64 refined) {
 
+		refined.set(input);
 		previous.set(input);
 
 		for (int iteration = 0; iteration < maxIterations; iteration++) {

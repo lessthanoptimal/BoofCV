@@ -47,7 +47,7 @@ public class ConfigEllipseDetector implements Configuration {
 	public boolean processInternal = false;
 
 	/**
-	 * Refinement: maximum number of iterations it will performance
+	 * Refinement: maximum number of refinement iterations it will performance.  Set to zero to disable
  	 */
 	public int maxIterations = 10;
 

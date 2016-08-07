@@ -63,7 +63,7 @@ public class FactoryShapeDetector {
 		refine.setConvergenceTol(config.convergenceTol);
 		refine.setMaxIterations(config.maxIterations);
 
-		if( config.numSampleContour <= 0 ) {
+		if( config.maxIterations <= 0 || config.numSampleContour <= 0 ) {
 			refine = null;
 		}
 
@@ -72,7 +72,7 @@ public class FactoryShapeDetector {
 				config.numSampleContour,
 				config.checkIntensityThreshold,imageType);
 
-		return new BinaryEllipseDetector<T>(detector,refine, check);
+		return new BinaryEllipseDetector<T>(detector,refine, check, imageType);
 	}
 
 	/**
