@@ -66,4 +66,8 @@ public class BaseIntegralEdge<T extends ImageGray> {
 		integralImage.wrap(image);
 		integral.setImage(integralImage);
 	}
+
+	public Class<T> getInputType() {
+		return imageType;
+	}
 }

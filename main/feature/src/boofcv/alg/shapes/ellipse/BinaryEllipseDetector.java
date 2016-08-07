@@ -36,7 +36,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
 	SnapToEllipseEdge<T> ellipseRefiner;
-	EdgeIntensityEllipse intensityCheck;
+	EdgeIntensityEllipse<T> intensityCheck;
 
 	FastQueue<EllipseRotated_F64> refined = new FastQueue<EllipseRotated_F64>(EllipseRotated_F64.class,true);
 
@@ -44,7 +44,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 
 	public BinaryEllipseDetector(BinaryEllipseDetectorPixel ellipseDetector,
 								 SnapToEllipseEdge<T> ellipseRefiner,
-								 EdgeIntensityEllipse intensityCheck ) {
+								 EdgeIntensityEllipse<T> intensityCheck ) {
 		this.ellipseDetector = ellipseDetector;
 		this.ellipseRefiner = ellipseRefiner;
 		this.intensityCheck = intensityCheck;
@@ -101,6 +101,10 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 				r.set(f.ellipse);
 			}
 		}
+	}
+
+	public Class<T> getInputType() {
+		return ellipseRefiner.getInputType();
 	}
 
 	/**

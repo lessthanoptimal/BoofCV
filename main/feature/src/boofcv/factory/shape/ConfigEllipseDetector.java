@@ -49,17 +49,17 @@ public class ConfigEllipseDetector implements Configuration {
 	/**
 	 * Refinement: maximum number of iterations it will performance
  	 */
-	protected int maxIterations = 10;
+	public int maxIterations = 10;
 
 	/**
 	 * Refinement: when the difference between two ellipses is less than this amount stop iterating
 	 */
-	protected double convergenceTol = 1e-6;
+	public double convergenceTol = 1e-6;
 
 	/**
 	 * Refinement: how many points along the contour it will sample.  Set to &le; 0 to disable refinement
 	 */
-	protected int numSampleContour = 20;
+	public int numSampleContour = 20;
 
 	/**
 	 * Refinement:<br>
@@ -67,7 +67,7 @@ public class ConfigEllipseDetector implements Configuration {
 	 * Total intensity values sampled at each point along the line is radius*2+2,
 	 * and points added to line fitting is radius*2+1.
 	 */
-	protected int refineRadialSamples = 1;
+	public int refineRadialSamples = 1;
 
 	/**
 	 * Check:<br>
