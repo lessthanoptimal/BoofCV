@@ -43,7 +43,7 @@ public class DetectChessSquarePoints<T extends ImageGray> {
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoCrossClusters s2c;
-	CrossClustersIntoGrids c2g;
+	SquareCrossClustersIntoGrids c2g;
 
 	// size of square grids
 	private int numRows,numCols;
@@ -79,7 +79,7 @@ public class DetectChessSquarePoints<T extends ImageGray> {
 		this.detectorSquare = detectorSquare;
 
 		s2c = new SquaresIntoCrossClusters(maxCornerDistance,-1);
-		c2g = new CrossClustersIntoGrids();
+		c2g = new SquareCrossClustersIntoGrids();
 	}
 
 	/**
@@ -268,7 +268,7 @@ public class DetectChessSquarePoints<T extends ImageGray> {
 		return s2c;
 	}
 
-	public CrossClustersIntoGrids getGrids() {
+	public SquareCrossClustersIntoGrids getGrids() {
 		return c2g;
 	}
 

@@ -37,7 +37,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO If number of corners != 4 will considerConnect work correctly? Especially if more than 4
-// TODO also update RegularClustersIntoGrids for non-4-corner shapes
+// TODO also update SquareRegularClustersIntoGrids for non-4-corner shapes
 public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 
 	// maximum neighbors on nearest-neighbor search

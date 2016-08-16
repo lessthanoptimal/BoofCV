@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.alg.fiducial.calib.grid;
 
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareGridTools;
-import boofcv.alg.fiducial.calib.squares.TestRegularClustersIntoGrids;
 import boofcv.alg.fiducial.calib.squares.TestSquareGridTools;
+import boofcv.alg.fiducial.calib.squares.TestSquareRegularClustersIntoGrids;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class TestDetectSquareGridFiducial {
 
 		assertEquals(4 * 3 * 4, list.size());
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		double x0 = -w/2;
 		double y0 = -w/2;

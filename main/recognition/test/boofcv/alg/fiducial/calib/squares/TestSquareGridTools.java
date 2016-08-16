@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class TestSquareGridTools {
 
 		SquareGrid grid = createGrid(2,3);
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		double expected = (2*w*(3-1))*(2*w*(2-1)); // see how the grid is constructed
 
 		assertEquals(expected, alg.computeSize(grid), 1e-8);
@@ -174,7 +174,7 @@ public class TestSquareGridTools {
 	public void boundingPolygonCCW_rect() {
 		SquareGridTools alg = new SquareGridTools();
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		for (int rows = 2; rows <= 4; rows++) {
@@ -219,7 +219,7 @@ public class TestSquareGridTools {
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		alg.boundingPolygonCCW(grid, poly);
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		assertTrue(poly.get(0).distance(- w/2,  - w/2) <= 1e-8);
 		assertTrue(poly.get(1).distance(  w/2 , - w/2) <= 1e-8);
 		assertTrue(poly.get(2).distance(  w/2 , w*4 + w / 2) <= 1e-8);
@@ -235,7 +235,7 @@ public class TestSquareGridTools {
 		Polygon2D_F64 poly = new Polygon2D_F64(4);
 		alg.boundingPolygonCCW(grid, poly);
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		assertTrue(poly.get(0).distance( -w/2      , -w/2) <= 1e-8);
 		assertTrue(poly.get(1).distance( w*4 + w/2 , -w/2) <= 1e-8);
 		assertTrue(poly.get(2).distance( w*4 + w/2 ,  w/2) <= 1e-8);
@@ -259,7 +259,7 @@ public class TestSquareGridTools {
 
 		assertTrue(alg.orderSquareCorners(grid));
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		double x0 = -w/2;
 		double y0 = -w/2;
 
@@ -421,7 +421,7 @@ public class TestSquareGridTools {
 
 	public static SquareGrid createGrid( int numRows , int numCols ) {
 		SquareGrid grid = new SquareGrid();
-		grid.nodes =  TestRegularClustersIntoGrids.createGrid(numRows,numCols);
+		grid.nodes =  TestSquareRegularClustersIntoGrids.createGrid(numRows,numCols);
 		grid.columns = numCols;
 		grid.rows = numRows;
 		return grid;

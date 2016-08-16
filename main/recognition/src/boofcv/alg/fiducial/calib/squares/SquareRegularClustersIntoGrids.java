@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RegularClustersIntoGrids {
+public class SquareRegularClustersIntoGrids {
 
 	// Value of a node which has been searched already
 	static final int SEARCHED = 1;
@@ -48,7 +48,7 @@ public class RegularClustersIntoGrids {
 	 * Configures class
 	 * @param minimumElements The minimum number of elements which must be in a cluster for it to be accepted
 	 */
-	public RegularClustersIntoGrids(int minimumElements) {
+	public SquareRegularClustersIntoGrids(int minimumElements) {
 		this.minimumElements = minimumElements;
 	}
 

@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareGridTools;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
-import boofcv.alg.fiducial.calib.squares.TestRegularClustersIntoGrids;
+import boofcv.alg.fiducial.calib.squares.TestSquareRegularClustersIntoGrids;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
@@ -38,7 +38,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
-import static boofcv.alg.fiducial.calib.squares.TestCrossClustersIntoGrids.connect;
+import static boofcv.alg.fiducial.calib.squares.TestSquareCrossClustersIntoGrids.connect;
 import static org.junit.Assert.*;
 
 /**
@@ -313,7 +313,7 @@ public class TestDetectChessSquarePoints {
 
 		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<GrayU8>(2,2,0.01,null);
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
@@ -347,7 +347,7 @@ public class TestDetectChessSquarePoints {
 		grid.columns = cols;
 		grid.rows = rows;
 
-		double w = TestRegularClustersIntoGrids.DEFAULT_WIDTH;
+		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 				if( row%2 == 0 ) {

@@ -54,7 +54,7 @@ public class TestBinaryEllipseDetectorPixel {
 		expected.add( new EllipseRotated_F64(30,38,10,8,0));
 		expected.add( new EllipseRotated_F64(115,80,20,15,Math.PI/2.0));
 
-		GrayU8 input = renderEllipses(200,300,expected);
+		GrayU8 input = renderEllipses(200,300,expected, 0);
 		GrayU8 binary = input.createSameShape();
 		ThresholdImageOps.threshold(input,binary,100,true);
 
@@ -175,9 +175,13 @@ public class TestBinaryEllipseDetectorPixel {
 			for (int i = 0; i < expected.size(); i++) {
 				EllipseRotated_F64 e = expected.get(i);
 
-				if( Math.abs(f.a-e.a) <= tol && Math.abs(f.b-e.b) <= tol
-						&& UtilAngle.dist(f.phi,e.phi) <= tolPhi ) {
-					if( e.center.distance(f.center) <= tol ) {
+				if( Math.abs(f.a-e.a) <= tol && Math.abs(f.b-e.b) <= tol) {
+					boolean angleMatch = true;
+					// if it's a circle ignore the angle
+					if( Math.abs(e.a - e.b) > 1e-8 ) {
+						angleMatch = UtilAngle.dist(f.phi,e.phi) <= tolPhi;
+					}
+					if( angleMatch && e.center.distance(f.center) <= tol ) {
 						foundMatch = matched[i] = true;
 					}
 				}
@@ -201,17 +205,19 @@ public class TestBinaryEllipseDetectorPixel {
 		assertTrue(UtilAngle.dist(found.phi, expected.phi) <= tolPhi);
 	}
 
-	public static GrayU8 renderEllipses( int width , int height , List<EllipseRotated_F64> ellipses )
+	public static GrayU8 renderEllipses(int width, int height, List<EllipseRotated_F64> ellipses, int color)
 	{
 		// render a binary image with two ovals
 		BufferedImage buffered = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2 = buffered.createGraphics();
 
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0,0,width,height);
 
+		g2.setColor(new Color(color,color,color));
 		for( EllipseRotated_F64 ellipse : ellipses ) {
-			g2.setColor(Color.BLACK);
 			AffineTransform tx = new AffineTransform();
 			tx.concatenate( AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y));
 			tx.concatenate( AffineTransform.getRotateInstance(ellipse.phi));

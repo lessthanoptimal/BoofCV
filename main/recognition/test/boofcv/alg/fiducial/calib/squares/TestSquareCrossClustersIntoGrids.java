@@ -33,10 +33,10 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestCrossClustersIntoGrids {
+public class TestSquareCrossClustersIntoGrids {
 	@Test
 	public void processCluster_positive() {
-		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 
 		for (int rows = 2; rows <= 5; rows++) {
 			for (int cols = 2; cols <= 5; cols++) {
@@ -96,7 +96,7 @@ public class TestCrossClustersIntoGrids {
 	private void checkFirstRow1and2( boolean skip , int top , int bottom  )
 	{
 		List<SquareNode> cluster = createCluster(skip,top,bottom);
-		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 
 		// see if any of the nodes in the first row can be the seed
 		for (int i = 0; i < top; i++) {
@@ -175,7 +175,7 @@ public class TestCrossClustersIntoGrids {
 	private void checkAddNextRow( boolean skip , int top , int bottom  )
 	{
 		List<SquareNode> cluster = createCluster(skip,top,bottom);
-		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 		List<List<SquareNode>> ordered = new ArrayList<List<SquareNode>>();
 
 		// mark the first row as traversed, which it will be
@@ -220,7 +220,7 @@ public class TestCrossClustersIntoGrids {
 				connect(node, second, new SquareNode(), 0);
 				node.edges[second].b.graph = SquareNode.RESET_GRAPH;
 
-				assertEquals(first, CrossClustersIntoGrids.lowerEdgeIndex(node));
+				assertEquals(first, SquareCrossClustersIntoGrids.lowerEdgeIndex(node));
 			}
 		}
 	}
@@ -230,17 +230,17 @@ public class TestCrossClustersIntoGrids {
 		SquareNode node = new SquareNode();
 
 		for (int i = 0; i < 4; i++) {
-			assertFalse(CrossClustersIntoGrids.isOpenEdge(node,i));
+			assertFalse(SquareCrossClustersIntoGrids.isOpenEdge(node,i));
 		}
 		for (int i = 0; i < 4; i++) {
 			connect(node,i,new SquareNode(),i);
 		}
 		for (int i = 0; i < 4; i++) {
-			assertFalse(CrossClustersIntoGrids.isOpenEdge(node,i));
+			assertFalse(SquareCrossClustersIntoGrids.isOpenEdge(node,i));
 		}
 		for (int i = 0; i < 4; i++) {
 			node.edges[i].b.graph = SquareNode.RESET_GRAPH;
-			assertTrue(CrossClustersIntoGrids.isOpenEdge(node,i));
+			assertTrue(SquareCrossClustersIntoGrids.isOpenEdge(node,i));
 			node.edges[i].b.graph = 0;
 		}
 	}
@@ -296,7 +296,7 @@ public class TestCrossClustersIntoGrids {
 	{
 		List<SquareNode> row = new ArrayList<SquareNode>();
 
-		CrossClustersIntoGrids alg = new CrossClustersIntoGrids();
+		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 		alg.addToRow(cluster.get(seed),seedCorner,sign,skip,row);
 
 		assertEquals(expected.length,row.size());
@@ -313,11 +313,11 @@ public class TestCrossClustersIntoGrids {
 		SquareNode a = new SquareNode();
 		a.corners = new Polygon2D_F64(4);
 
-		assertEquals(0,CrossClustersIntoGrids.numberOfOpenEdges(a));
+		assertEquals(0, SquareCrossClustersIntoGrids.numberOfOpenEdges(a));
 		connect(a,1,new SquareNode(),0);
-		assertEquals(0,CrossClustersIntoGrids.numberOfOpenEdges(a));
+		assertEquals(0, SquareCrossClustersIntoGrids.numberOfOpenEdges(a));
 		a.edges[1].b.graph = SquareNode.RESET_GRAPH;
-		assertEquals(1,CrossClustersIntoGrids.numberOfOpenEdges(a));
+		assertEquals(1, SquareCrossClustersIntoGrids.numberOfOpenEdges(a));
 	}
 
 	/**
@@ -387,12 +387,12 @@ public class TestCrossClustersIntoGrids {
 		cluster.get(2).edges[0] = new SquareEdge();
 		cluster.get(2).edges[1] = new SquareEdge();
 
-		assertTrue(cluster.get(1)==CrossClustersIntoGrids.findSeedNode(cluster));
+		assertTrue(cluster.get(1)== SquareCrossClustersIntoGrids.findSeedNode(cluster));
 
 		cluster.get(1).edges[3] = new SquareEdge();
-		assertTrue(cluster.get(1)==CrossClustersIntoGrids.findSeedNode(cluster));
+		assertTrue(cluster.get(1)== SquareCrossClustersIntoGrids.findSeedNode(cluster));
 
 		cluster.get(1).edges[0] = new SquareEdge();
-		assertTrue(cluster.get(2)==CrossClustersIntoGrids.findSeedNode(cluster));
+		assertTrue(cluster.get(2)== SquareCrossClustersIntoGrids.findSeedNode(cluster));
 	}
 }

@@ -30,32 +30,32 @@ http://boofcv.org/index.php?title=Download:BoofCV
 
 ## Include in Gradle and Maven Projects
 
-BoofCV is divided up into many modules.  The easiest way to include all of them is to make your project dependent on 'main:all'
+BoofCV is divided up into many modules.  The easiest way to include the critical ones make your project dependent on 'core'.
 
 For Gradle projects:
 ```groovy
-compile group: 'org.boofcv', name: 'all', version: '0.24.1'
+compile group: 'org.boofcv', name: 'core', version: '0.25'
 ```
 
 For Maven projects:
 ```
 <dependency>
   <groupId>org.boofcv</groupId>
-  <artifactId>all</artifactId>
-  <version>0.24.1</version>
+  <artifactId>core</artifactId>
+  <version>0.25</version>
 </dependency>
 ```
 
 There are also several integration modules which help BoofCV interact with external projects.  A list of those is included below:
 
-          Name            |                 Description
---------------------------|---------------------------------------------------------------------
-integration:android       | Useful functions for working inside of Android devices.
-integration:applet        | Code for using BoofCV inside a Java applet.
-integration:javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.
-integration:jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
-integration:openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
-integration:WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
+    Name      |                 Description
+--------------|---------------------------------------------------------------------
+android       | Useful functions for working inside of Android devices.
+applet        | Code for using BoofCV inside a Java applet.
+javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV and FFMPEG for reading video files.
+jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
+openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
+WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
 
 
 ## New to Java?

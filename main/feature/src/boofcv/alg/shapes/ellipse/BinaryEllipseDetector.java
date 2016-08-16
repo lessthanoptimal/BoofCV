@@ -27,23 +27,37 @@ import org.ddogleg.struct.FastQueue;
 import java.util.List;
 
 /**
- * TODO write
+ * Detects ellipses inside gray scale images.  The first step is to detect them in a binary image and then
+ * refine the fit using the gray scale image.  Optionally the refinement step can be turned off or postponed
+ * until the user invokes it directly.  False positives are pruned using the edge intensity check.  This check removes
+ * ellipses with edges that are low intensity sicne they are most likely generated from noise.
  *
  * @author Peter Abeles
  */
-// TODO reject ellipses with weak edges
 public class BinaryEllipseDetector<T extends ImageGray> {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
 	SnapToEllipseEdge<T> ellipseRefiner;
 	EdgeIntensityEllipse<T> intensityCheck;
 
+	// storage for the output refined ellipses
 	FastQueue<EllipseRotated_F64> refined = new FastQueue<EllipseRotated_F64>(EllipseRotated_F64.class,true);
 
 	Class<T> inputType;
 
-	boolean verbose;
+	boolean verbose = false;
 
+	// toggled the refinement step.  If false an ellise can still be refined after the fact
+	boolean autoRefine = true;
+
+	/**
+	 * Configures the detector
+	 *
+	 * @param ellipseDetector Detector which uses pixel precise edges
+	 * @param ellipseRefiner Sub pixel edge refinement.  If null the refinement step is skipped
+	 * @param intensityCheck Computes the intensity of the edge to remove false positives
+	 * @param inputType Input image type
+	 */
 	public BinaryEllipseDetector(BinaryEllipseDetectorPixel ellipseDetector,
 								 SnapToEllipseEdge<T> ellipseRefiner,
 								 EdgeIntensityEllipse<T> intensityCheck ,
@@ -64,12 +78,13 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	 * </p>
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.
+	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion( PixelTransform_F32 distToUndist ) {
+	public void setLensDistortion( PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		if( this.ellipseRefiner != null )
-			this.ellipseRefiner.setTransform(distToUndist);
-		this.intensityCheck.setTransform(distToUndist);
+			this.ellipseRefiner.setTransform(undistToDist);
+		this.intensityCheck.setTransform(undistToDist);
 	}
 
 	/**
@@ -109,12 +124,46 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 		}
 	}
 
+	/**
+	 * If auto refine is turned off an ellipse can be refined after the fact using this function, provided
+	 * that the refinement algorithm was passed in to the constructor
+	 * @param ellipse The ellipse to be refined
+	 * @return true if refine was successful or false if not
+	 */
+	public boolean refine( EllipseRotated_F64 ellipse ) {
+		if( autoRefine )
+			throw new IllegalArgumentException("Autorefine is true, no need to refine again");
+		if( ellipseRefiner == null )
+			throw new IllegalArgumentException("Refiner has not been passed in");
+		if (!ellipseRefiner.process(ellipse,ellipse)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public boolean isAutoRefine() {
+		return autoRefine;
+	}
+
+	public void setAutoRefine(boolean autoRefine) {
+		this.autoRefine = autoRefine;
+	}
+
 	public Class<T> getInputType() {
 		return inputType;
 	}
 
 	/**
-	 * Returns all the found ellipses in the input image.
+	 * <p>Returns all the found ellipses in the input image.</p>
 	 *
 	 * WARNING: Returned data is recycled on the next call to process
 	 *

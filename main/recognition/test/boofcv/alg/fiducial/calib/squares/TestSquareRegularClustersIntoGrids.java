@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestRegularClustersIntoGrids {
+public class TestSquareRegularClustersIntoGrids {
 
 	public static double DEFAULT_WIDTH = 1.2;
 	Random rand = new Random(23423);
@@ -44,7 +44,7 @@ public class TestRegularClustersIntoGrids {
 			clusters.add(createGrid(length, length));
 		}
 
-		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		alg.process(clusters);
 		assertEquals(4,alg.getGrids().size());
@@ -56,7 +56,7 @@ public class TestRegularClustersIntoGrids {
 
 	@Test
 	public void checkNumberOfConnections_positive() {
-		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		for (int numRows = 1; numRows <= 4; numRows++) {
 			for (int numCols = 1; numCols <= 4; numCols++) {
@@ -76,7 +76,7 @@ public class TestRegularClustersIntoGrids {
 		List<SquareNode> nodes = createGrid(1, 2);
 		nodes.addAll( createGrid(2,3));
 
-		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 		assertEquals(0, alg.checkNumberOfConnections(nodes));
 	}
 
@@ -98,7 +98,7 @@ public class TestRegularClustersIntoGrids {
 
 				Collections.shuffle(nodes, rand);
 
-				RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+				SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 				alg.orderIntoLine(nodes);
 				SquareGrid found = alg.valid.getTail();
 
@@ -122,7 +122,7 @@ public class TestRegularClustersIntoGrids {
 
 				Collections.shuffle(nodes,rand);
 
-				RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+				SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 				alg.orderIntoGrid(nodes);
 				SquareGrid found = alg.valid.getTail();
 
@@ -149,7 +149,7 @@ public class TestRegularClustersIntoGrids {
 		}
 
 		List<SquareNode> found = new ArrayList<SquareNode>();
-		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		assertFalse(alg.addRowsToGrid(column, found));
 
@@ -165,7 +165,7 @@ public class TestRegularClustersIntoGrids {
 		int numCols = 4;
 		List<SquareNode> nodes = createGrid(numRows, numCols);
 
-		RegularClustersIntoGrids alg = new RegularClustersIntoGrids(1);
+		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		List<SquareNode> row = new ArrayList<SquareNode>();
 		List<SquareNode> col = new ArrayList<SquareNode>();
@@ -188,10 +188,10 @@ public class TestRegularClustersIntoGrids {
 
 	}
 
-	void checkAddLineToGrid(RegularClustersIntoGrids alg, SquareNode a, SquareNode b, List<SquareNode> list) {
+	void checkAddLineToGrid(SquareRegularClustersIntoGrids alg, SquareNode a, SquareNode b, List<SquareNode> list) {
 		list.clear();
-		a.graph = RegularClustersIntoGrids.SEARCHED;
-		b.graph = RegularClustersIntoGrids.SEARCHED;
+		a.graph = SquareRegularClustersIntoGrids.SEARCHED;
+		b.graph = SquareRegularClustersIntoGrids.SEARCHED;
 		alg.addLineToGrid(a,b,list);
 	}
 
@@ -204,8 +204,8 @@ public class TestRegularClustersIntoGrids {
 		connect(a, 0, b, 0);
 		connect(a, 1, c, 0);
 
-		assertTrue(c == RegularClustersIntoGrids.pickNot(a, b));
-		assertTrue(b == RegularClustersIntoGrids.pickNot(a, c));
+		assertTrue(c == SquareRegularClustersIntoGrids.pickNot(a, b));
+		assertTrue(b == SquareRegularClustersIntoGrids.pickNot(a, c));
 	}
 
 	@Test
@@ -219,9 +219,9 @@ public class TestRegularClustersIntoGrids {
 		connect(a,1,c,0);
 		connect(a,2,d,0);
 
-		assertTrue(d == RegularClustersIntoGrids.pickNot(a, b, c));
-		assertTrue(b == RegularClustersIntoGrids.pickNot(a, c, d));
-		assertTrue(c == RegularClustersIntoGrids.pickNot(a, d, b));
+		assertTrue(d == SquareRegularClustersIntoGrids.pickNot(a, b, c));
+		assertTrue(b == SquareRegularClustersIntoGrids.pickNot(a, c, d));
+		assertTrue(c == SquareRegularClustersIntoGrids.pickNot(a, d, b));
 	}
 
 	public static List<SquareNode> createGrid(int numRows, int numCols) {

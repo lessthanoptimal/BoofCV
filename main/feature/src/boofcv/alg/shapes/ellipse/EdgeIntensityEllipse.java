@@ -44,14 +44,13 @@ public class EdgeIntensityEllipse<T extends ImageGray> extends BaseIntegralEdge<
 	// computed edge score
 	double score;
 
-
 	/**
 	 * Configures edge intensity calculation
 	 *
 	 * @param tangentDistance Distance along tangent it will integrate
 	 * @param numContourPoints Number of points along the contour it will sample.  If &le; 0
 	 *                         the test will always pass
-	 * @param passThreshold Threshold for passing
+	 * @param passThreshold Threshold for passing. Value: 0 to (max - min) pixel value.
 	 * @param imageType Type of input image
 	 */
 	public EdgeIntensityEllipse(double tangentDistance,
@@ -69,7 +68,7 @@ public class EdgeIntensityEllipse<T extends ImageGray> extends BaseIntegralEdge<
 	/**
 	 * Processes the edge along the ellipse and determines if the edge intensity is strong enough
 	 * to pass or not
-	 * @param ellipse The ellipse
+	 * @param ellipse The ellipse in undistorted image coordinates.
 	 * @return true if it passes or false if not
 	 */
 	public boolean process(EllipseRotated_F64 ellipse ) {
@@ -94,17 +93,23 @@ public class EdgeIntensityEllipse<T extends ImageGray> extends BaseIntegralEdge<
 			double ct = Math.cos(theta);
 			double st = Math.sin(theta);
 
+			// location on ellipse in world frame
 			double px = ellipse.center.x + ellipse.a*ct*cphi - ellipse.b*st*sphi;
 			double py = ellipse.center.y + ellipse.a*ct*sphi + ellipse.b*st*cphi;
 
 			// find direction of the tangent line
-			double dx = px - ellipse.center.x;
-			double dy = py - ellipse.center.y;
-			double r = Math.sqrt(dx*dx + dy*dy);
+			// ellipse frame
+			double edx = ellipse.a*ct*ellipse.b*ellipse.b;
+			double edy = ellipse.b*st*ellipse.a*ellipse.a;
+			double r = Math.sqrt(edx*edx + edy*edy);
+			edx /= r;
+			edy /= r;
 
-			dx /= r;
-			dy /= r;
+			// rotate tangent into world frame
+			double dx = edx*cphi - edy*sphi;
+			double dy = edx*sphi + edy*cphi;
 
+			// define the line integral
 			double xin = px-dx*tangentDistance;
 			double yin = py-dy*tangentDistance;
 			double xout = px+dx*tangentDistance;

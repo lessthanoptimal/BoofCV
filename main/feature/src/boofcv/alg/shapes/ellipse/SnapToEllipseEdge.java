@@ -74,8 +74,8 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 	/**
 	 * Refines provided list by snapping it to edges found in the image
 	 *
-	 * @param input Close approximation of the ellipse in the image
-	 * @param refined Storage for refined estimate.
+	 * @param input (Output) Close approximation of the ellipse in the image
+	 * @param refined (Output) Storage for refined estimate.  Can be same instance as input
 	 * @return True if a refined estimate could be found, false if it failed
 	 */
 	public boolean process(EllipseRotated_F64 input, EllipseRotated_F64 refined) {

@@ -62,7 +62,7 @@ public class DetectSquareGridFiducial<T extends ImageGray> {
 
 	// Converts detected squares into a graph and into grids
 	SquaresIntoRegularClusters s2c;
-	RegularClustersIntoGrids c2g;
+	SquareRegularClustersIntoGrids c2g;
 
 	// output results.  Grid of calibration points in row-major order
 	List<Point2D_F64> calibrationPoints = new ArrayList<Point2D_F64>();
@@ -94,7 +94,7 @@ public class DetectSquareGridFiducial<T extends ImageGray> {
 		this.detectorSquare = detectorSquare;
 
 		s2c = new SquaresIntoRegularClusters(spaceToSquareRatio,Integer.MAX_VALUE, 1.35);
-		c2g = new RegularClustersIntoGrids(numCols*numRows);
+		c2g = new SquareRegularClustersIntoGrids(numCols*numRows);
 
 		calibRows = numRows*2;
 		calibCols = numCols*2;
@@ -202,7 +202,7 @@ public class DetectSquareGridFiducial<T extends ImageGray> {
 		return s2c;
 	}
 
-	public RegularClustersIntoGrids getGrids() {
+	public SquareRegularClustersIntoGrids getGrids() {
 		return c2g;
 	}
 

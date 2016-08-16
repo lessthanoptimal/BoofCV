@@ -33,7 +33,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * @author Peter Abeles
  */
-public class CrossClustersIntoGrids {
+public class SquareCrossClustersIntoGrids {
 
 	// verbose debug output
 	private boolean verbose = false;
