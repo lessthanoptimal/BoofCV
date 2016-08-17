@@ -18,19 +18,42 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
-import georegression.struct.shapes.EllipseRotated_F64;
+import org.junit.Test;
 
-import java.util.List;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class EllipsesIntoCrossClusters {
-	public void process(List<EllipseRotated_F64> ellipses ) {
-
+public class TestEllipsesIntoClusters {
+	@Test
+	public void emptyInput() {
+		fail("Implement");
 	}
 
-	public List<List<EllipseRotated_F64>> getClusters() {
-		return null;
+	@Test
+	public void noClusters() {
+		fail("Implement");
+	}
+
+
+	@Test
+	public void oneCluster() {
+		fail("Implement");
+	}
+
+	@Test
+	public void multipleClusters() {
+		fail("Implement");
+	}
+
+	@Test
+	public void multipleCalls() {
+		fail("Implement");
+	}
+
+	@Test
+	public void joinClusters() {
+		fail("Implement");
 	}
 }

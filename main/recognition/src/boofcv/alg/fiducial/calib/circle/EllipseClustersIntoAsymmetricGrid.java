@@ -21,6 +21,6 @@ package boofcv.alg.fiducial.calib.circle;
 /**
  * @author Peter Abeles
  */
-public class EllipseCrossClustersIntoGrid {
+public class EllipseClustersIntoAsymmetricGrid {
 
 }
