@@ -182,6 +182,9 @@ public class DescribeDenseHogOrigAlg<Input extends ImageBase> {
 		Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian2D_F64(0.5*blockWidthPixels,
 				blockWidthPixels/2,blockWidthPixels%2==1,false);
 		KernelMath.normalizeMaxOne(kernel);
+		for( double d : kernel.data )
+			if( d < 0 )
+				throw new RuntimeException("Egads");
 		weights = kernel.data;
 	}
 
@@ -236,7 +239,20 @@ public class DescribeDenseHogOrigAlg<Input extends ImageBase> {
 		for (int y = 0; y < maxY; y += stepBlockPixelsY ) {
 			for (int x = 0; x < maxX; x += stepBlockPixelsX ) {
 				TupleDesc_F64 d = descriptions.grow();
-				computeBlockHistogram(x,y, d.value);
+				Arrays.fill(d.value,0);
+				int histogramIndex = 0;
+				for (int cellRow = 0; cellRow < widthBlock; cellRow++) {
+					int blockPixelRow = cellRow*widthCell;
+					for (int cellCol = 0; cellCol < widthBlock; cellCol++) {
+						int blockPixelCol = cellCol*widthCell;
+
+						computeBlockHistogram(x+blockPixelCol,y+blockPixelRow,
+								blockPixelCol, blockPixelRow,
+								histogramIndex,d.value);
+						histogramIndex += orientationBins;
+					}
+				}
+
 				DescribeSiftCommon.normalizeDescriptor(d,0.2);
 				locations.grow().set(x,y);
 			}
@@ -245,22 +261,25 @@ public class DescribeDenseHogOrigAlg<Input extends ImageBase> {
 
 	/**
 	 * Computes the histogram for the block with the specified lower extent
-	 * @param pixelX0 block's lower extent x-axis
-	 * @param pixelY0 block's lower extent y-axis
+	 * @param imageX0 cell's lower extent x-axis in the image
+	 * @param pixelY0 cell's lower extent y-axis in the image
+	 * @param blockX0 Location of the cell in the block x-axis
+	 * @param blockY0 Location of the cell in the block y-axis
 	 * @param histogram Storage for the histogram
 	 */
-	void computeBlockHistogram( int pixelX0 , int pixelY0 , double histogram[] ) {
-
-		Arrays.fill(histogram,0);
-
-		int width = widthCell*widthBlock;
-		int height = widthCell*widthBlock;
+	void computeBlockHistogram( int imageX0 , int pixelY0 ,
+								int blockX0 , int blockY0 ,
+								int indexHist , double histogram[] ) {
+		// block's width in pixels
+		int blockWidth = widthCell*widthBlock;
 
 		float angleBinSize = GrlConstants.F_PI/orientationBins;
 
-		for (int i = 0; i < height; i++) {
-			int indexPixel = (pixelY0+i)*derivX.stride + pixelX0;
-			for (int j = 0; j < width; j++ ) {
+		for (int i = 0; i < widthCell; i++) {
+			int indexPixel = (pixelY0+i)*derivX.stride + imageX0;
+			int indexBlock = (blockY0+i)*blockWidth + blockX0;
+
+			for (int j = 0; j < widthCell; j++ ) {
 				// angle from 0 to pi radians
 				float angle = this.orientation.data[indexPixel];
 
@@ -268,7 +287,7 @@ public class DescribeDenseHogOrigAlg<Input extends ImageBase> {
 				double magnitude = this.magnitude.data[indexPixel];
 
 				// Gaussian weights which are centered at the block's center
-				double gridWeight = this.weights[ i*width + j];
+				double gridWeight = this.weights[ indexBlock++ ];
 
 				// Apply spatial weighting to magnitude
 				magnitude *= gridWeight;
@@ -280,8 +299,8 @@ public class DescribeDenseHogOrigAlg<Input extends ImageBase> {
 				index0 %= orientationBins;
 				int index1 = (index0+1)%orientationBins;
 
-				histogram[index0] += magnitude*(1.0-weight1);
-				histogram[index1] += magnitude*weight1;
+				histogram[indexHist+index0] += magnitude*(1.0-weight1);
+				histogram[indexHist+index1] += magnitude*weight1;
 			}
 		}
 	}
