@@ -38,7 +38,7 @@ import java.util.List;
 public class EllipsesIntoClusters {
 
 	// maximum number of neighbors it will consider
-	private int neighborsConsidered = 8;
+	private int neighborsConsidered = 10;
 	// Ratio between the diameter of a circle to the space between circles on the plane
 	// used to filter out ellipses
 	private double spaceToDiameterRatio;
@@ -118,7 +118,7 @@ public class EllipsesIntoClusters {
 			Node node1 = nodes.get(i);
 
 			// Only search the maximum of the major axis times two
-			double maxDistance = e1.a * spaceToDiameterRatio * 2.0;
+			double maxDistance = e1.a * spaceToDiameterRatio;
 
 			searchResults.reset();
 			// + 1 on max neighbors because this ellipse is returned
