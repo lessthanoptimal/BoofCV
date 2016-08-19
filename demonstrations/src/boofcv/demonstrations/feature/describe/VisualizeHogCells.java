@@ -18,13 +18,14 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
+import boofcv.abst.feature.dense.DescribeImageDense;
+import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.struct.feature.TupleDesc_F64;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
+import java.util.List;
 
 /**
  * Renders cells in HOG
@@ -33,20 +34,22 @@ import java.awt.geom.Line2D;
  */
 public class VisualizeHogCells {
 
-	DescribeDenseHogOrigAlg<?> hog;
+	DescribeImageDense<?,TupleDesc_F64> hog;
+	ConfigDenseHoG config;
 	Color colors[];
 	float cos[],sin[];
 
 	boolean localMax = false;
 	boolean showGrid = false;
 
-	public VisualizeHogCells( DescribeDenseHogOrigAlg<?> hog ) {
-		setHoG(hog);
+	public VisualizeHogCells(DescribeImageDense<?,TupleDesc_F64> hog, ConfigDenseHoG config ) {
+		setHoG(hog,config);
 	}
 
-	public synchronized void setHoG(DescribeDenseHogOrigAlg<?> hog) {
+	public synchronized void setHoG(DescribeImageDense<?,TupleDesc_F64> hog, ConfigDenseHoG config ) {
 		this.hog = hog;
-		int numAngles = hog.getOrientationBins();
+		this.config = config;
+		int numAngles = config.orientationBins;
 		cos = new float[numAngles];
 		sin = new float[numAngles];
 
@@ -64,11 +67,11 @@ public class VisualizeHogCells {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
 		if( showGrid ) {
-			int regionWidth = hog.getWidthCell()*hog.getWidthBlock();
-			int regionHeight = hog.getWidthCell()*hog.getWidthBlock();
+			int regionWidth = config.widthCell*config.widthBlock;
+			int regionHeight = config.widthCell*config.widthBlock;
 
-			int stepX = hog.getWidthCell()*hog.getStepBlock();
-			int stepY = hog.getWidthCell()*hog.getStepBlock();
+			int stepX = config.widthCell*config.stepBlock;
+			int stepY = config.widthCell*config.stepBlock;
 
 			g2.setColor(new Color(150, 150, 0));
 			g2.setStroke(new BasicStroke(1));
@@ -98,24 +101,24 @@ public class VisualizeHogCells {
 
 	private void local(Graphics2D g2) {
 
-		float r = hog.getWidthCell()/2.0f;
-		int numAngles = hog.getOrientationBins();
+		float r = config.widthCell/2.0f;
+		int numAngles = config.orientationBins;
 
-		FastQueue<TupleDesc_F64> descriptions = hog.getDescriptions();
-		FastQueue<Point2D_I32> locations = hog.getLocations();
+		List<TupleDesc_F64> descriptions = hog.getDescriptions();
+		List<Point2D_I32> locations = hog.getLocations();
 
 		Line2D.Float line = new Line2D.Float();
-		for (int i = 0; i < locations.size; i++) {
+		for (int i = 0; i < locations.size(); i++) {
 			TupleDesc_F64 desc = descriptions.get(i);
 			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < hog.getWidthBlock(); cellRow++) {
-				int c_y = p.y + (int)((cellRow + 0.5)*hog.getWidthCell());
-				for (int cellCol = 0; cellCol < hog.getWidthBlock(); cellCol++) {
-					int c_x = p.x + (int)((cellCol + 0.5)* hog.getWidthCell());
+			for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
+				int c_y = p.y;
+				for (int cellCol = 0; cellCol < config.widthBlock; cellCol++) {
+					int c_x = p.x;
 
 					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*hog.getWidthBlock() + cellCol)*numAngles;
+					int start = (cellRow*config.widthBlock + cellCol)*numAngles;
 
 					double maxValue = 0;
 					for (int j = 0; j < numAngles; j++) {
@@ -141,34 +144,32 @@ public class VisualizeHogCells {
 	}
 
 	private void global(Graphics2D g2) {
-		float r = hog.getWidthCell()/2.0f;
-		int numAngles = hog.getOrientationBins();
+		float r = config.widthCell/2.0f;
+		int numAngles = config.orientationBins;
 
-		FastQueue<TupleDesc_F64> descriptions = hog.getDescriptions();
-		FastQueue<Point2D_I32> locations = hog.getLocations();
+		List<TupleDesc_F64> descriptions = hog.getDescriptions();
+		List<Point2D_I32> locations = hog.getLocations();
 
 		double maxValue = 0;
-		for (int i = 0; i < descriptions.size; i++) {
+		for (int i = 0; i < descriptions.size(); i++) {
 			TupleDesc_F64 d = descriptions.get(i);
 			for (int j = 0; j < d.size(); j++) {
 				maxValue = Math.max(maxValue,d.value[j]);
 			}
 		}
 
-		System.out.println("max value "+maxValue);
-
 		Line2D.Float line = new Line2D.Float();
-		for (int i = 0; i < locations.size; i++) {
+		for (int i = 0; i < locations.size(); i++) {
 			TupleDesc_F64 desc = descriptions.get(i);
 			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < hog.getWidthBlock(); cellRow++) {
-				int c_y = p.y + (int)((cellRow + 0.5)*hog.getWidthCell());
-				for (int cellCol = 0; cellCol < hog.getWidthBlock(); cellCol++) {
-					int c_x = p.x + (int)((cellCol + 0.5)* hog.getWidthCell());
+			for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
+				int c_y = p.y;
+				for (int cellCol = 0; cellCol < config.widthBlock; cellCol++) {
+					int c_x = p.x;
 
 					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*hog.getWidthBlock() + cellCol)*numAngles;
+					int start = (cellRow*config.widthBlock + cellCol)*numAngles;
 
 					for (int j = 0; j < numAngles; j++) {
 						int a = (int) (255.0f * desc.value[j+start] / maxValue + 0.5f);

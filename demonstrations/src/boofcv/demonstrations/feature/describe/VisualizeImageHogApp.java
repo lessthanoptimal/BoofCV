@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
+import boofcv.abst.feature.dense.DescribeImageDense;
 import boofcv.factory.feature.dense.ConfigDenseHoG;
-import boofcv.factory.feature.dense.FactoryDescribeImageDenseAlg;
+import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
@@ -31,7 +31,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -49,7 +48,8 @@ import java.util.List;
 	// TODO render grid overlay
 public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBase<T> {
 
-	DescribeDenseHogOrigAlg<T> hog;
+	DescribeImageDense<T,TupleDesc_F64> hog;
+	ConfigDenseHoG config = new ConfigDenseHoG();
 	VisualizeHogCells visualizers;
 
 	ImagePanel imagePanel = new ImagePanel();
@@ -66,7 +66,7 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		super(exampleInputs, imageType);
 
 		createHoG(imageType);
-		visualizers = new VisualizeHogCells(hog);
+		visualizers = new VisualizeHogCells(hog,config);
 		visualizers.setShowLog(control.doShowLog);
 		visualizers.setLocalMax(control.doShowLocal);
 		visualizers.setShowGrid(control.doShowGrid);
@@ -80,20 +80,24 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				FastQueue<TupleDesc_F64> descriptions = hog.getDescriptions();
-				FastQueue<Point2D_I32> locations = hog.getLocations();
+				List<TupleDesc_F64> descriptions = hog.getDescriptions();
+				List<Point2D_I32> locations = hog.getLocations();
 
 				double bestDistance = Double.MAX_VALUE;
 				Point2D_I32 bestPt = null;
 				TupleDesc_F64 bestDesc = null;
 
-				int cellClickX = e.getX()/hog.getWidthCell();
-				int cellClickY = e.getY()/hog.getWidthCell();
+				int cellClickX = e.getX()/config.widthCell;
+				int cellClickY = e.getY()/config.widthCell;
 
-				for (int i = 0; i < locations.size; i++) {
+				for (int i = 0; i < locations.size(); i++) {
 					Point2D_I32 p = locations.get(i);
 
-					int d = UtilPoint2D_I32.distanceSq(p.x/hog.getWidthCell(),p.y/hog.getWidthCell(),
+					// go from center to lower extent
+					int x = p.x - (config.widthCell*config.widthBlock)/2;
+					int y = p.y - (config.widthCell*config.widthBlock)/2;
+
+					int d = UtilPoint2D_I32.distanceSq(x/config.widthCell,y/config.widthCell,
 							cellClickX, cellClickY);
 					if( d < bestDistance ) {
 						bestDistance = d;
@@ -104,10 +108,10 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 				if( bestDesc != null ) {
 					System.out.println("location = "+bestPt.x+"  "+bestPt.y);
-					int numAngles = hog.getOrientationBins();
+					int numAngles = config.orientationBins;
 					int cellIndex = 0;
-					for (int cellRow = 0; cellRow < hog.getWidthBlock(); cellRow++) {
-						for (int cellCol = 0; cellCol < hog.getWidthBlock(); cellCol++, cellIndex++ ) {
+					for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
+						for (int cellCol = 0; cellCol < config.widthBlock; cellCol++, cellIndex++ ) {
 							int start = cellIndex*numAngles;
 
 							System.out.printf("cell[%2d] = [ ",cellIndex);
@@ -119,18 +123,6 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 					}
 					System.out.println();
 				}
-
-//				int row = e.getY()/hog.getWidthCell();
-//				int col = e.getX()/hog.getWidthCell();
-
-//				if( row >= 0 && col >= 0 && row < hog.getCellRows() &&  col < hog.getCellCols() ) {
-//					DescribeDenseHogAlg.Cell c = hog.getCell(row,col);
-//					System.out.print("Cell["+row+" , "+col+"] histogram =");
-//					for (int i = 0; i < c.histogram.length; i++) {
-//						System.out.print("  "+c.histogram[i]);
-//					}
-//					System.out.println();
-//				}
 			}
 
 			@Override
@@ -145,20 +137,19 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 	}
 
 	private void createHoG(ImageType<T> imageType) {
-		ConfigDenseHoG config = new ConfigDenseHoG();
+		config.orientationBins = control.histogram;
 		config.widthCell = control.cellWidth;
+		config.fastVariant = control.doUseFast;
 		config.widthBlock = 1;
 		config.stepBlock = 1;
-		config.orientationBins = control.histogram;
 
-		hog = FactoryDescribeImageDenseAlg.hogOrig(config,imageType);
+		hog = FactoryDescribeImageDense.hog(config,imageType);
 	}
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
 		synchronized (lock) {
-			hog.setInput(input);
-			hog.process();
+			hog.process(input);
 
 			work = new BufferedImage(buffered.getWidth(),buffered.getHeight(), BufferedImage.TYPE_INT_RGB);
 
@@ -179,15 +170,18 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			hog.setWidthCell(width);
+			config.widthCell = width;
+			createHoG(imageType);
+			visualizers.setHoG(hog,config);
 			reprocessSingleImage();
 		}
 	}
 
-	public void setHistogram(int histogram) {
+	public void setOrientationBins(int numBins) {
 		synchronized (lock) {
+			config.orientationBins = numBins;
 			createHoG(imageType);
-			visualizers.setHoG(hog);
+			visualizers.setHoG(hog,config);
 			reprocessSingleImage();
 		}
 	}
@@ -210,6 +204,15 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 	public void setShowInput( boolean show ) {
 		this.showInput = show;
 		reprocessSingleImage();
+	}
+
+	public void setUseFast( boolean useFast ) {
+		synchronized (lock) {
+			config.fastVariant = useFast;
+			createHoG(imageType);
+			visualizers.setHoG(hog,config);
+			reprocessSingleImage();
+		}
 	}
 
 	public static void main(String[] args) {

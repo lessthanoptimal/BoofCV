@@ -20,6 +20,7 @@ package boofcv.alg.feature.describe;
 
 import boofcv.abst.feature.dense.DescribeImageDense;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -46,9 +47,15 @@ public class BenchmarkDenseDescribe {
 		GImageMiscOps.fillUniform( gray , rand , 0 , 200);
 	}
 
-	public class HoG extends PerformerBase {
-		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.hog(null, ImageType.single(GrayF32.class));
+	public class HoGFast extends PerformerBase {
+
+		DescribeImageDense<GrayF32, TupleDesc_F64> alg;
+
+		public HoGFast() {
+			ConfigDenseHoG config = new ConfigDenseHoG();
+			config.fastVariant = true;
+			alg = FactoryDescribeImageDense.hog(config, ImageType.single(GrayF32.class));
+		}
 
 		@Override
 		public void process() {
@@ -56,9 +63,9 @@ public class BenchmarkDenseDescribe {
 		}
 	}
 
-	public class HoGOrig extends PerformerBase {
+	public class HoG extends PerformerBase {
 		DescribeImageDense<GrayF32, TupleDesc_F64> alg =
-				FactoryDescribeImageDense.hogOrig(null, ImageType.single(GrayF32.class));
+				FactoryDescribeImageDense.hog(null, ImageType.single(GrayF32.class));
 
 		@Override
 		public void process() {
@@ -101,8 +108,8 @@ public class BenchmarkDenseDescribe {
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== ");
 		System.out.println();
 
-		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.HoG(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.HoGOrig(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HoGFast(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new HoG(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SURF_FAST(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SURF_STABLE(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new BenchmarkDenseDescribe.SIFT(), TEST_TIME);

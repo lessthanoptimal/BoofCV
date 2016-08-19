@@ -22,7 +22,7 @@ import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -121,30 +121,11 @@ public class FactoryDescribeImageDense {
 		return new DescribeImageDenseSift(alg,config.sampling.periodX,config.sampling.periodY,imageType);
 	}
 
-	/**
-	 * Creates a dense HOG descriptor.
-	 *
-	 * @see DescribeDenseHogOrigAlg
-	 *
-	 * @param config Configuration for HOG descriptor.  Can't be null.
-	 * @param imageType Type of input image.  Can be single band or planar
-	 * @return Dense HOG extractor
-	 */
-	public static <T extends ImageBase>
-	DescribeImageDense<T,TupleDesc_F64> hogOrig(ConfigDenseHoG config , ImageType<T> imageType ) {
-		if( config == null )
-			config = new ConfigDenseHoG();
-
-		config.checkValidity();
-
-		DescribeDenseHogOrigAlg hog = FactoryDescribeImageDenseAlg.hogOrig(config, imageType);
-
-		return new DescribeImageDenseHoGOrig<T>(hog);
-	}
 
 	/**
 	 * Creates a dense HOG descriptor.
 	 *
+	 * @see DescribeDenseHogFastAlg
 	 * @see DescribeDenseHogAlg
 	 *
 	 * @param config Configuration for HOG descriptor.  Can't be null.
@@ -158,8 +139,12 @@ public class FactoryDescribeImageDense {
 
 		config.checkValidity();
 
-		DescribeDenseHogAlg hog = FactoryDescribeImageDenseAlg.hog(config, imageType);
-
-		return new DescribeImageDenseHoG<T>(hog);
+		if( config.fastVariant ) {
+			DescribeDenseHogFastAlg hog = FactoryDescribeImageDenseAlg.hogFast(config, imageType);
+			return new DescribeImageDenseHoGFast<T>(hog);
+		} else {
+			DescribeDenseHogAlg hog = FactoryDescribeImageDenseAlg.hog(config, imageType);
+			return new DescribeImageDenseHoG<T>(hog);
+		}
 	}
 }

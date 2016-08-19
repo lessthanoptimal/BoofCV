@@ -18,8 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -29,16 +28,16 @@ import org.ddogleg.struct.FastQueue;
 import java.util.List;
 
 /**
- * Implementation of {@link DescribeImageDense} for {@link DescribeDenseHogAlg}.  This adds the capability to scale
+ * Implementation of {@link DescribeImageDense} for {@link DescribeDenseHogFastAlg}.  This adds the capability to scale
  * the
  *
  * @author Peter Abeles
  */
-public class DescribeImageDenseHoGOrig<T extends ImageBase> implements DescribeImageDense<T,TupleDesc_F64> {
+public class DescribeImageDenseHoGFast<T extends ImageBase> implements DescribeImageDense<T,TupleDesc_F64> {
 
-	DescribeDenseHogOrigAlg<T> hog;
+	DescribeDenseHogFastAlg<T> hog;
 
-	public DescribeImageDenseHoGOrig(DescribeDenseHogOrigAlg<T> hog) {
+	public DescribeImageDenseHoGFast(DescribeDenseHogFastAlg<T> hog) {
 		this.hog = hog;
 	}
 

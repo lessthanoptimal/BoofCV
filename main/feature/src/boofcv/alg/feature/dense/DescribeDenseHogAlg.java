@@ -20,21 +20,20 @@ package boofcv.alg.feature.dense;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
+import boofcv.alg.filter.derivative.DerivativeReduceType;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.kernel.KernelMath;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * <p>
@@ -84,13 +83,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative extends ImageBase> {
+public class DescribeDenseHogAlg<Input extends ImageBase> {
 
-	ImageGradient<Input, Derivative> gradient;
+	ImageGradient<Input, GrayF32> gradient;
 
 	// gradient of each pixel
-	protected Derivative derivX,derivY;
+	protected GrayF32 derivX = new GrayF32(1,1);
+	protected GrayF32 derivY = new GrayF32(1,1);
+	// orientation and magnitude of each pixel
+	protected GrayF32 orientation = new GrayF32(1,1);
+	protected GrayF64 magnitude = new GrayF64(1,1); // stored as F64 instead of F32 for speed
 
+	// Storage for descriptors
 	FastQueue<TupleDesc_F64> descriptions;
 
 	// Location of each descriptor in the image, top-left corner (lower extents)
@@ -101,15 +105,8 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	int widthBlock;  // number of cells wide a block is
 	int stepBlock; // how many cells are skipped between a block
 
-	// storage for histograms in each cell
-	Cell cells[] = new Cell[0];
-	// number of cell rows and columns in the image
-	int cellRows,cellCols;
-
-	// storage for pixel gradient
-	protected float pixelDX,pixelDY;
-
-	// weights applied to each
+	// spatial weights applied to each in a block
+	// stored in a row major order
 	double weights[];
 
 	// type of input image
@@ -131,11 +128,8 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 			throw new IllegalArgumentException("stepBlock must be >= 1");
 
 		this.imageType = imageType;
-		gradient = FactoryDerivative.gradient(DerivativeType.THREE,imageType,null);
-		ImageType<Derivative> derivType = gradient.getDerivativeType();
 
-		derivX = derivType.createImage(1,1);
-		derivY = derivType.createImage(1,1);
+		gradient = createGradient(imageType);
 
 		this.orientationBins = orientationBins;
 		this.widthCell = widthCell;
@@ -154,11 +148,44 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	}
 
 	/**
+	 * Given different types input images it creates the correct algorithm for computing the image gradient.  The
+	 * actualy calulcation is always done using {@link DerivativeType#THREE}
+	 */
+	static <Input extends ImageBase>
+	ImageGradient<Input,GrayF32> createGradient( ImageType<Input> imageType ) {
+		ImageGradient<Input,GrayF32> gradient;
+		ImageType<GrayF32> typeF32 = ImageType.single(GrayF32.class);
+
+		if( imageType.getDataType() != ImageDataType.F32 )
+			throw new IllegalArgumentException("Input image type must be F32");
+
+		if( imageType.getFamily() == ImageType.Family.GRAY) {
+			gradient = FactoryDerivative.gradient(DerivativeType.THREE,imageType, typeF32);
+		} else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
+			ImageType<Planar<GrayF32>> typePF32 = ImageType.pl(imageType.getNumBands(),GrayF32.class);
+			ImageGradient<Planar<GrayF32>,Planar<GrayF32>> gradientMB =
+					FactoryDerivative.gradient(DerivativeType.THREE,typePF32, typePF32);
+			gradient = (ImageGradient)FactoryDerivative.gradientReduce(gradientMB, DerivativeReduceType.MAX_F, GrayF32.class);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType);
+		}
+
+		return gradient;
+	}
+
+	/**
 	 * Computes the value of weights inside of a block
 	 */
 	protected void computeCellWeights() {
-		Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian2D_F64(0.5*widthBlock,widthBlock/2,widthBlock%2==1,false);
+
+		int blockWidthPixels = widthBlock*widthCell;
+
+		Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian2D_F64(0.5*blockWidthPixels,
+				blockWidthPixels/2,blockWidthPixels%2==1,false);
 		KernelMath.normalizeMaxOne(kernel);
+		for( double d : kernel.data )
+			if( d < 0 )
+				throw new RuntimeException("Egads");
 		weights = kernel.data;
 	}
 
@@ -169,9 +196,32 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 	public void setInput( Input input ) {
 		derivX.reshape(input.width,input.height);
 		derivY.reshape(input.width,input.height);
+		orientation.reshape(input.width,input.height);
+		magnitude.reshape(input.width,input.height);
 
 		// pixel gradient
 		gradient.process(input,derivX,derivY);
+
+		computePixelFeatures();
+	}
+
+	/**
+	 * Computes the orientation and magnitude of each pixel
+	 */
+	private void computePixelFeatures() {
+		for (int y = 0; y < derivX.height; y++) {
+			int pixelIndex = y*derivX.width;
+			int endIndex = pixelIndex+derivX.width;
+			for (; pixelIndex < endIndex; pixelIndex++ ) {
+				float dx = derivX.data[pixelIndex];
+				float dy = derivY.data[pixelIndex];
+
+				// angle from 0 to pi radians
+				orientation.data[pixelIndex] = UtilAngle.atanSafe(dy,dx) + GrlConstants.F_PId2;
+				// gradient magnitude
+				magnitude.data[pixelIndex] = Math.sqrt(dx*dx + dy*dy);
+			}
+		}
 	}
 
 	/**
@@ -181,145 +231,77 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		locations.reset();
 		descriptions.reset();
 
-		// see if the cell array needs to grow for this image.  Recycle data when growing
-		growCellArray(derivX.width, derivX.height);
+		int stepBlockPixelsX = widthCell*stepBlock;
+		int stepBlockPixelsY = widthCell*stepBlock;
 
-		computeCellHistograms();
+		int maxY = derivX.height - widthCell*widthBlock + 1;
+		int maxX = derivX.width - widthCell*widthBlock + 1;
 
-		int cellRowMax = (cellRows - (widthBlock-1));
-		int cellColMax = (cellCols - (widthBlock-1));
+		for (int y = 0; y < maxY; y += stepBlockPixelsY ) {
+			for (int x = 0; x < maxX; x += stepBlockPixelsX ) {
+				TupleDesc_F64 d = descriptions.grow();
+				Arrays.fill(d.value,0);
+				int histogramIndex = 0;
+				for (int cellRow = 0; cellRow < widthBlock; cellRow++) {
+					int blockPixelRow = cellRow*widthCell;
+					for (int cellCol = 0; cellCol < widthBlock; cellCol++) {
+						int blockPixelCol = cellCol*widthCell;
 
-		for (int i = 0; i < cellRowMax; i += stepBlock) {
-			for (int j = 0; j < cellColMax; j += stepBlock) {
-				computeDescriptor(i,j);
-			}
-		}
-
-	}
-
-	/**
-	 * Determines if the cell array needs to grow.  If it does a new array is declared.  Old data is recycled when
-	 * possible
-	 */
-	void growCellArray(int imageWidth, int imageHeight) {
-		cellCols = imageWidth/ widthCell;
-		cellRows = imageHeight/ widthCell;
-
-		if( cellRows*cellCols > cells.length ) {
-			Cell[] a = new Cell[cellCols*cellRows];
-
-			System.arraycopy(cells,0,a,0,cells.length);
-			for (int i = cells.length; i < a.length; i++) {
-				a[i] = new Cell();
-				a[i].histogram = new float[ orientationBins ];
-			}
-			cells = a;
-		}
-	}
-
-	/**
-	 * Convenience function which returns a list of all the descriptors computed inside the specified region in the image
-	 *
-	 * @param pixelX0 Pixel coordinate X-axis lower extent
-	 * @param pixelY0 Pixel coordinate Y-axis lower extent
-	 * @param pixelX1 Pixel coordinate X-axis upper extent
-	 * @param pixelY1 Pixel coordinate Y-axis upper extent
-	 * @param output List of descriptions
-	 */
-	public void getDescriptorsInRegion(int pixelX0 , int pixelY0 , int pixelX1 , int pixelY1 ,
-									   List<TupleDesc_F64> output ) {
-		int gridX0 = (int)Math.ceil(pixelX0/(double)widthCell);
-		int gridY0 = (int)Math.ceil(pixelY0/(double)widthCell);
-
-		int gridX1 = pixelX1/widthCell - widthBlock;
-		int gridY1 = pixelY1/widthCell - widthBlock;
-
-		for (int y = gridY0; y <= gridY1; y++) {
-			int index = y*cellCols + gridX0;
-			for (int x = gridX0; x <= gridX1; x++ ) {
-				output.add( descriptions.get(index++) );
-			}
-		}
-	}
-
-	/**
-	 * Compute the descriptor from the specified cells.  (row,col) to (row+w,col+w)
-	 * @param row Lower extent of cell rows
-	 * @param col Lower extent of cell columns
-	 */
-	void computeDescriptor(int row, int col) {
-		// set location to top-left pixel
-		locations.grow().set(col*widthCell,row*widthCell);
-
-		TupleDesc_F64 d = descriptions.grow();
-
-		int indexDesc = 0;
-		for (int i = 0; i < widthBlock; i++) {
-			for (int j = 0; j < widthBlock; j++) {
-				Cell c = cells[(row+i)*cellCols + (col+j)];
-
-				// copy the histogram into the descriptor while applying cell specific weighting
-				double w = weights[i*widthBlock+j];
-
-				for (int k = 0; k < c.histogram.length; k++) {
-					d.value[indexDesc++] = c.histogram[k]*w;
-				}
-			}
-		}
-
-		// Apply SIFT style L2-Hys normalization
-		DescribeSiftCommon.normalizeDescriptor(d,0.2);
-	}
-
-	/**
-	 * Compute histograms for all the cells inside the image using precomputed derivative.
-
-	 */
-	void computeCellHistograms() {
-
-		int width = cellCols*widthCell;
-		int height = cellRows*widthCell;
-
-		float angleBinSize = GrlConstants.F_PI/orientationBins;
-
-		int indexCell = 0;
-		for (int i = 0; i < height; i += widthCell) {
-			for (int j = 0; j < width; j += widthCell, indexCell++ ) {
-				Cell c = cells[indexCell];
-				c.reset();
-
-				for (int k = 0; k < widthCell; k++) {
-					int indexPixel = (i+k)*derivX.width+j;
-
-					for (int l = 0; l < widthCell; l++, indexPixel++ ) {
-						computeDerivative(indexPixel);
-
-						// angle from 0 to pi radians
-						float angle = UtilAngle.atanSafe(pixelDY,pixelDX) + GrlConstants.F_PId2;
-
-						// gradient magnitude
-						float magnitude = (float)Math.sqrt(pixelDX*pixelDX + pixelDY*pixelDY);
-
-						// Add the weighted gradient using bilinear interpolation
-						float findex0 = angle/angleBinSize;
-						int index0 = (int)findex0;
-						float weight1 = findex0-index0;
-						index0 %= orientationBins;
-						int index1 = (index0+1)%orientationBins;
-
-						c.histogram[index0] += magnitude*(1.0f-weight1);
-						c.histogram[index1] += magnitude*weight1;
+						computeBlockHistogram(x+blockPixelCol,y+blockPixelRow,
+								blockPixelCol, blockPixelRow,
+								histogramIndex,d.value);
+						histogramIndex += orientationBins;
 					}
 				}
 
+				DescribeSiftCommon.normalizeDescriptor(d,0.2);
+				locations.grow().set(x,y);
 			}
 		}
 	}
 
 	/**
-	 * Computes and stores the gradient at the specified pixel.  pixelIndex = y*columns + x
+	 * Computes the histogram for the block with the specified lower extent
+	 * @param imageX0 cell's lower extent x-axis in the image
+	 * @param pixelY0 cell's lower extent y-axis in the image
+	 * @param blockX0 Location of the cell in the block x-axis
+	 * @param blockY0 Location of the cell in the block y-axis
+	 * @param histogram Storage for the histogram
 	 */
-	public abstract void computeDerivative( int pixelIndex );
+	void computeBlockHistogram( int imageX0 , int pixelY0 ,
+								int blockX0 , int blockY0 ,
+								int indexHist , double histogram[] ) {
+		// block's width in pixels
+		int blockWidth = widthCell*widthBlock;
+
+		float angleBinSize = GrlConstants.F_PI/orientationBins;
+
+		for (int i = 0; i < widthCell; i++) {
+			int indexPixel = (pixelY0+i)*derivX.stride + imageX0;
+			int indexBlock = (blockY0+i)*blockWidth + blockX0;
+
+			for (int j = 0; j < widthCell; j++, indexPixel++, indexBlock++ ) {
+				// angle from 0 to pi radians
+				float angle = this.orientation.data[indexPixel];
+
+				// gradient magnitude
+				double magnitude = this.magnitude.data[indexPixel];
+
+				// Apply spatial weighting to magnitude
+				magnitude *= this.weights[ indexBlock ];
+
+				// Add the weighted gradient using bilinear interpolation
+				float findex0 = angle/angleBinSize;
+				int index0 = (int)findex0;
+				double weight1 = findex0-index0;
+				index0 %= orientationBins;
+				int index1 = (index0+1)%orientationBins;
+
+				histogram[indexHist+index0] += magnitude*(1.0-weight1);
+				histogram[indexHist+index1] += magnitude*weight1;
+			}
+		}
+	}
 
 	/**
 	 * List of locations for each descriptor.
@@ -335,20 +317,12 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return descriptions;
 	}
 
-	public Derivative _getDerivX() {
+	public GrayF32 _getDerivX() {
 		return derivX;
 	}
 
-	public Derivative _getDerivY() {
+	public GrayF32 _getDerivY() {
 		return derivY;
-	}
-
-	public float _getPixelDX() {
-		return pixelDX;
-	}
-
-	public float _getPixelDY() {
-		return pixelDY;
 	}
 
 	/**
@@ -379,18 +353,6 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 		return orientationBins;
 	}
 
-	public int getCellRows() {
-		return cellRows;
-	}
-
-	public int getCellCols() {
-		return cellCols;
-	}
-
-	public Cell getCell( int row , int col ) {
-		return cells[row*cellCols + col];
-	}
-
 	public void setStepBlock(int stepBlock) {
 		this.stepBlock = stepBlock;
 	}
@@ -401,14 +363,5 @@ public abstract class DescribeDenseHogAlg<Input extends ImageBase, Derivative ex
 
 	public TupleDesc_F64 createDescription() {
 		return new TupleDesc_F64(orientationBins*widthBlock*widthBlock);
-	}
-
-	public static class Cell
-	{
-		public float histogram[];
-
-		public void reset() {
-			Arrays.fill(histogram,0);
-		}
 	}
 }
