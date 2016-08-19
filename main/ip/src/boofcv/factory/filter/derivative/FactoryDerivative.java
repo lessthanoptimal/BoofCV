@@ -287,9 +287,7 @@ public class FactoryDerivative {
 	private static Method findReduce( String name , Class<?> inputType , Class<?> derivType  ) {
 		Method m;
 		try {
-
-			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(inputType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = GradientReduceToSingle.class.getDeclaredMethod(name, inputType,derivType,derivType,borderType);
+			m = GradientReduceToSingle.class.getDeclaredMethod(name, inputType,inputType,derivType,derivType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible",e);
 		}

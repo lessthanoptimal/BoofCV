@@ -18,20 +18,15 @@
 
 package boofcv.alg.feature.dense;
 
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
-import boofcv.alg.filter.derivative.DerivativeReduceType;
-import boofcv.alg.filter.derivative.DerivativeType;
-import boofcv.alg.filter.kernel.KernelMath;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.factory.filter.kernel.FactoryKernelGaussian;
-import boofcv.struct.convolve.Kernel2D_F64;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.stats.UtilGaussian;
 
 import java.util.Arrays;
 
@@ -88,27 +83,11 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogAlg<Input extends ImageBase> {
+public class DescribeDenseHogAlg<Input extends ImageBase> extends BaseDenseHog<Input> {
 
-	ImageGradient<Input, GrayF32> gradient;
-
-	// gradient of each pixel
-	protected GrayF32 derivX = new GrayF32(1,1);
-	protected GrayF32 derivY = new GrayF32(1,1);
 	// orientation and magnitude of each pixel
 	protected GrayF32 orientation = new GrayF32(1,1);
 	protected GrayF64 magnitude = new GrayF64(1,1); // stored as F64 instead of F32 for speed
-
-	// Storage for descriptors
-	FastQueue<TupleDesc_F64> descriptions;
-
-	// Location of each descriptor in the image, top-left corner (lower extents)
-	FastQueue<Point2D_I32> locations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-
-	int orientationBins; // number of orientation bins computed in a block
-	int pixelsPerCell; // number of pixels wide a cell is
-	int cellsPerBlock;  // number of cells wide a block is
-	int stepBlock; // how many cells are skipped between a block
 
 	// the active histogram being worked on
 	double histogram[];
@@ -117,68 +96,23 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 	// stored in a row major order
 	double weights[];
 
-	// type of input image
-	ImageType<Input> imageType;
-
 	/**
 	 * Configures HOG descriptor computation
 	 *
 	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
 	 * @param pixelsPerCell Number of pixel's wide a cell is.  8 recommended
-	 * @param cellsPerBlock Number of cells's wide a block is. 3 recommended
+	 * @param cellsPerBlockX Number of cells's wide a block is. x-axis 3 recommended
+	 * @param cellsPerBlockY Number of cells's wide a block is. x-axis 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
-	public DescribeDenseHogAlg(int orientationBins , int pixelsPerCell , int cellsPerBlock ,
+	public DescribeDenseHogAlg(int orientationBins , int pixelsPerCell ,
+							   int cellsPerBlockX , int cellsPerBlockY,
 							   int stepBlock ,
 							   ImageType<Input> imageType )
 	{
-		if( stepBlock <= 0 )
-			throw new IllegalArgumentException("stepBlock must be >= 1");
-
-		this.imageType = imageType;
-
-		gradient = createGradient(imageType);
-
-		this.orientationBins = orientationBins;
-		this.pixelsPerCell = pixelsPerCell;
-		this.cellsPerBlock = cellsPerBlock;
-		this.stepBlock = stepBlock;
-
-		descriptions = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(DescribeDenseHogAlg.this.orientationBins*
-						DescribeDenseHogAlg.this.cellsPerBlock *DescribeDenseHogAlg.this.cellsPerBlock);
-			}
-		};
+		super(orientationBins, pixelsPerCell, cellsPerBlockX, cellsPerBlockY, stepBlock, imageType);
 
 		computeWeightBlockPixels();
-	}
-
-	/**
-	 * Given different types input images it creates the correct algorithm for computing the image gradient.  The
-	 * actualy calulcation is always done using {@link DerivativeType#THREE}
-	 */
-	static <Input extends ImageBase>
-	ImageGradient<Input,GrayF32> createGradient( ImageType<Input> imageType ) {
-		ImageGradient<Input,GrayF32> gradient;
-		ImageType<GrayF32> typeF32 = ImageType.single(GrayF32.class);
-
-		if( imageType.getDataType() != ImageDataType.F32 )
-			throw new IllegalArgumentException("Input image type must be F32");
-
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			gradient = FactoryDerivative.gradient(DerivativeType.THREE,imageType, typeF32);
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR ) {
-			ImageType<Planar<GrayF32>> typePF32 = ImageType.pl(imageType.getNumBands(),GrayF32.class);
-			ImageGradient<Planar<GrayF32>,Planar<GrayF32>> gradientMB =
-					FactoryDerivative.gradient(DerivativeType.THREE,typePF32, typePF32);
-			gradient = (ImageGradient)FactoryDerivative.gradientReduce(gradientMB, DerivativeReduceType.MAX_F, GrayF32.class);
-		} else {
-			throw new IllegalArgumentException("Unsupported image type "+imageType);
-		}
-
-		return gradient;
 	}
 
 	/**
@@ -186,26 +120,55 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 	 */
 	protected void computeWeightBlockPixels() {
 
-		int pixelsPerBlock = cellsPerBlock * pixelsPerCell;
+		int rows = cellsPerBlockY*pixelsPerCell;
+		int cols = cellsPerBlockX*pixelsPerCell;
 
-		Kernel2D_F64 kernel = FactoryKernelGaussian.gaussian2D_F64(0.5*pixelsPerBlock,
-				pixelsPerBlock/2,pixelsPerBlock%2==1,false);
-		KernelMath.normalizeMaxOne(kernel);
-		weights = kernel.data;
+		weights = new double[ rows*cols ];
+
+		double offsetRow=0,offsetCol=0;
+		int radiusRow=rows/2,radiusCol=cols/2;
+		if( rows%2 == 0 ) {
+			offsetRow = 0.5;
+		}
+		if( cols%2 == 0 ) {
+			offsetCol = 0.5;
+		}
+
+		// use linear seperability of a Gaussian to make computation easier
+		// sigma is 1/2 the width along each axis
+		int index = 0;
+		for (int row = 0; row < rows; row++) {
+			double drow = row-radiusRow+offsetRow;
+			double pdfRow = UtilGaussian.computePDF(0, radiusRow, drow);
+
+			for (int col = 0; col < cols; col++) {
+				double dcol = col-radiusCol+offsetCol;
+				double pdfCol = UtilGaussian.computePDF(0, radiusCol, dcol);
+
+				weights[index++] = pdfCol*pdfRow;
+			}
+		}
+		// normalize so that the largest value is 1.0
+		double max = 0;
+		for (int i = 0; i < weights.length; i++) {
+			if( weights[i] > max ) {
+				max = weights[i];
+			}
+		}
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] /= max;
+		}
 	}
 
 	/**
 	 * Specifies input image.  Gradient is computed immediately
 	 * @param input input image
 	 */
+	@Override
 	public void setInput( Input input ) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
+		super.setInput(input);
 		orientation.reshape(input.width,input.height);
 		magnitude.reshape(input.width,input.height);
-
-		// pixel gradient
-		gradient.process(input,derivX,derivY);
 
 		computePixelFeatures();
 	}
@@ -232,6 +195,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 	/**
 	 * Computes the descriptor across the input image
 	 */
+	@Override
 	public void process() {
 		locations.reset();
 		descriptions.reset();
@@ -239,8 +203,8 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 		int stepBlockPixelsX = pixelsPerCell *stepBlock;
 		int stepBlockPixelsY = pixelsPerCell *stepBlock;
 
-		int maxY = derivX.height - pixelsPerCell * cellsPerBlock + 1;
-		int maxX = derivX.width - pixelsPerCell * cellsPerBlock + 1;
+		int maxY = derivX.height - pixelsPerCell * cellsPerBlockY + 1;
+		int maxX = derivX.width - pixelsPerCell * cellsPerBlockX + 1;
 
 		for (int y = 0; y < maxY; y += stepBlockPixelsY ) {
 			for (int x = 0; x < maxX; x += stepBlockPixelsX ) {
@@ -248,9 +212,9 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 				Arrays.fill(d.value,0);
 				histogram = d.value;
 
-				for (int cellRow = 0; cellRow < cellsPerBlock; cellRow++) {
+				for (int cellRow = 0; cellRow < cellsPerBlockY; cellRow++) {
 					int blockPixelRow = cellRow* pixelsPerCell;
-					for (int cellCol = 0; cellCol < cellsPerBlock; cellCol++) {
+					for (int cellCol = 0; cellCol < cellsPerBlockX; cellCol++) {
 						int blockPixelCol = cellCol* pixelsPerCell;
 
 						computeCellHistogram(x+blockPixelCol, y+blockPixelRow, cellCol, cellRow);
@@ -277,7 +241,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 
 		for (int i = 0; i < pixelsPerCell; i++) {
 			int indexPixel = (pixelY0+i)*derivX.stride + pixelX0;
-			int indexBlock = (cellY*pixelsPerCell+i)*pixelsPerCell*cellsPerBlock + cellX*pixelsPerCell;
+			int indexBlock = (cellY*pixelsPerCell+i)*pixelsPerCell*cellsPerBlockX + cellX*pixelsPerCell;
 
 			// Use center point of this cell to compute interpolation weights - bilinear interpolation
 			double spatialWeightY0,spatialWeightY1,spatialWeightY2;
@@ -364,74 +328,12 @@ public class DescribeDenseHogAlg<Input extends ImageBase> {
 	 */
 	private void addToHistogram(int cellX, int cellY, int orientationIndex, double magnitude) {
 		// see if it's being applied to a valid cell in the histogram
-		if( cellX < 0 || cellX >= cellsPerBlock)
+		if( cellX < 0 || cellX >= cellsPerBlockX)
 			return;
-		if( cellY < 0 || cellY >= cellsPerBlock)
+		if( cellY < 0 || cellY >= cellsPerBlockY)
 			return;
 
-		int index = (cellY*cellsPerBlock + cellX)*orientationBins + orientationIndex;
+		int index = (cellY*cellsPerBlockX + cellX)*orientationBins + orientationIndex;
 		histogram[index] += magnitude;
-	}
-
-	/**
-	 * List of locations for each descriptor.
-	 */
-	public FastQueue<Point2D_I32> getLocations() {
-		return locations;
-	}
-
-	/**
-	 * List of descriptors
-	 */
-	public FastQueue<TupleDesc_F64> getDescriptions() {
-		return descriptions;
-	}
-
-	public GrayF32 _getDerivX() {
-		return derivX;
-	}
-
-	public GrayF32 _getDerivY() {
-		return derivY;
-	}
-
-	/**
-	 * Returns the number of pixel's wide the square region is that a descriptor was computed from
-	 * @return number of pixels wide
-	 */
-	public int getRegionWidthPixel() {
-		return pixelsPerCell * cellsPerBlock;
-	}
-
-	public void setPixelsPerCell(int pixelsPerCell) {
-		this.pixelsPerCell = pixelsPerCell;
-	}
-
-	public int getPixelsPerCell() {
-		return pixelsPerCell;
-	}
-
-	public int getCellsPerBlock() {
-		return cellsPerBlock;
-	}
-
-	public int getStepBlock() {
-		return stepBlock;
-	}
-
-	public int getOrientationBins() {
-		return orientationBins;
-	}
-
-	public void setStepBlock(int stepBlock) {
-		this.stepBlock = stepBlock;
-	}
-
-	public ImageType<Input> getImageType() {
-		return imageType;
-	}
-
-	public TupleDesc_F64 createDescription() {
-		return new TupleDesc_F64(orientationBins* cellsPerBlock * cellsPerBlock);
 	}
 }

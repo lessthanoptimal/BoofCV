@@ -18,14 +18,11 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.abst.feature.dense.DescribeImageDense;
-import boofcv.factory.feature.dense.ConfigDenseHoG;
-import boofcv.struct.feature.TupleDesc_F64;
-import georegression.struct.point.Point2D_I32;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.util.List;
+import java.awt.image.BufferedImage;
 
 /**
  * Renders cells in HOG
@@ -34,22 +31,20 @@ import java.util.List;
  */
 public class VisualizeHogCells {
 
-	DescribeImageDense<?,TupleDesc_F64> hog;
-	ConfigDenseHoG config;
+	DescribeDenseHogFastAlg<?> hog;
 	Color colors[];
 	float cos[],sin[];
 
 	boolean localMax = false;
 	boolean showGrid = false;
 
-	public VisualizeHogCells(DescribeImageDense<?,TupleDesc_F64> hog, ConfigDenseHoG config ) {
-		setHoG(hog,config);
+	public VisualizeHogCells(DescribeDenseHogFastAlg<?> hog ) {
+		setHoG(hog);
 	}
 
-	public synchronized void setHoG(DescribeImageDense<?,TupleDesc_F64> hog, ConfigDenseHoG config ) {
+	public synchronized void setHoG(DescribeDenseHogFastAlg<?> hog) {
 		this.hog = hog;
-		this.config = config;
-		int numAngles = config.orientationBins;
+		int numAngles = hog.getOrientationBins();
 		cos = new float[numAngles];
 		sin = new float[numAngles];
 
@@ -61,31 +56,39 @@ public class VisualizeHogCells {
 		}
 	}
 
-	public synchronized void render( Graphics2D g2 , int imageWidth , int imageHeight ) {
+	public BufferedImage createOutputBuffered( BufferedImage input ) {
+		int cell = hog.getPixelsPerCell();
+		int rows = hog.getCellRows();
+		int cols = hog.getCellCols();
+		int width = cell*cols;
+		int height = cell*rows;
+
+		if( input == null || input.getWidth() != width || input.getHeight() != height )
+			return new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		else
+			return input;
+	}
+
+	public synchronized void render( Graphics2D g2 ) {
 
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
 		if( showGrid ) {
-			int regionWidth = config.pixelsPerCell *config.cellsPerBlock;
-			int regionHeight = config.pixelsPerCell *config.cellsPerBlock;
-
-			int stepX = config.pixelsPerCell *config.stepBlock;
-			int stepY = config.pixelsPerCell *config.stepBlock;
+			int cell = hog.getPixelsPerCell();
+			int rows = hog.getCellRows();
+			int cols = hog.getCellCols();
+			int width = cell*cols;
+			int height = cell*rows;
 
 			g2.setColor(new Color(150, 150, 0));
 			g2.setStroke(new BasicStroke(1));
 
-			for (int x = 0; x < imageWidth; x += stepX ) {
-				g2.drawLine(x,0,x,imageHeight);
-				int xx = x + regionWidth;
-				g2.drawLine(xx,0,xx,imageHeight);
+			for (int i = 0; i < rows; i++) {
+				g2.drawLine(0,i*cell,width,i*cell);
 			}
-
-			for (int y = 0; y < imageHeight; y += stepY ) {
-				g2.drawLine(0,y,imageWidth,y);
-				int yy = y + regionHeight;
-				g2.drawLine(0,yy,imageWidth,yy);
+			for (int i = 0; i < cols; i++) {
+				g2.drawLine(i*cell,0,i*cell,height);
 			}
 
 		}
@@ -100,90 +103,92 @@ public class VisualizeHogCells {
 	}
 
 	private void local(Graphics2D g2) {
+		int cell = hog.getPixelsPerCell();
+		int rows = hog.getCellRows();
+		int cols = hog.getCellCols();
+		int width = cell*cols;
+		int height = cell*rows;
 
-		float r = config.pixelsPerCell /2.0f;
-		int numAngles = config.orientationBins;
+		int numAngles = hog.getOrientationBins();
 
-		List<TupleDesc_F64> descriptions = hog.getDescriptions();
-		List<Point2D_I32> locations = hog.getLocations();
+		float r = cell/2-1;
 
 		Line2D.Float line = new Line2D.Float();
-		for (int i = 0; i < locations.size(); i++) {
-			TupleDesc_F64 desc = descriptions.get(i);
-			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
-				int c_y = p.y;
-				for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++) {
-					int c_x = p.x;
+		for (int y = 0; y < height; y += cell) {
+			float c_y = y + r;
 
-					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*config.cellsPerBlock + cellCol)*numAngles;
+			for (int x = 0; x < width; x += cell) {
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y / cell, x / cell);
 
-					double maxValue = 0;
-					for (int j = 0; j < numAngles; j++) {
-						maxValue = Math.max(maxValue,desc.value[j+start]);
-					}
+				float c_x = x + r;
 
-					for (int j = 0; j < numAngles; j++) {
-						int a = (int) (255.0f * desc.value[j+start] / maxValue + 0.5f);
+				float maxValue = 0;
+				for (int i = 0; i < c.histogram.length; i++) {
+					maxValue = Math.max(maxValue,c.histogram[i]);
+				}
 
-						g2.setColor(colors[a]);
+				for (int i = 0; i < numAngles; i++) {
+					int a = (int) (255.0f * c.histogram[i] / maxValue + 0.5f);
 
-						float x0 = c_x - r * cos[j];
-						float x1 = c_x + r * cos[j];
-						float y0 = c_y - r * sin[j];
-						float y1 = c_y + r * sin[j];
+					g2.setColor(colors[a]);
 
-						line.setLine(x0, y0, x1, y1);
-						g2.draw(line);
-					}
+					float x0 = c_x - r * cos[i];
+					float x1 = c_x + r * cos[i];
+					float y0 = c_y - r * sin[i];
+					float y1 = c_y + r * sin[i];
+
+					line.setLine(x0, y0, x1, y1);
+					g2.draw(line);
 				}
 			}
 		}
 	}
 
 	private void global(Graphics2D g2) {
-		float r = config.pixelsPerCell /2.0f;
-		int numAngles = config.orientationBins;
+		int cell = hog.getPixelsPerCell();
+		int rows = hog.getCellRows();
+		int cols = hog.getCellCols();
+		int width = cell*cols;
+		int height = cell*rows;
 
-		List<TupleDesc_F64> descriptions = hog.getDescriptions();
-		List<Point2D_I32> locations = hog.getLocations();
+		int numAngles = hog.getOrientationBins();
 
-		double maxValue = 0;
-		for (int i = 0; i < descriptions.size(); i++) {
-			TupleDesc_F64 d = descriptions.get(i);
-			for (int j = 0; j < d.size(); j++) {
-				maxValue = Math.max(maxValue,d.value[j]);
+		float r = cell/2;
+		float foo = cell/2-2;
+
+		float maxValue = 0;
+		for (int y = 0; y < rows; y++) {
+			for (int x = 0; x < cols; x++) {
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y, x);
+				for (int i = 0; i < numAngles; i++) {
+					maxValue = Math.max(maxValue, c.histogram[i]);
+				}
 			}
 		}
 
 		Line2D.Float line = new Line2D.Float();
-		for (int i = 0; i < locations.size(); i++) {
-			TupleDesc_F64 desc = descriptions.get(i);
-			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
-				int c_y = p.y;
-				for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++) {
-					int c_x = p.x;
+		for (int y = 0; y < height; y += cell) {
+			float c_y = y + r;
 
-					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*config.cellsPerBlock + cellCol)*numAngles;
+			for (int x = 0; x < width; x += cell) {
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y / cell, x / cell);
 
-					for (int j = 0; j < numAngles; j++) {
-						int a = (int) (255.0f * desc.value[j+start] / maxValue + 0.5f);
+				float c_x = x + r;
 
-						g2.setColor(colors[a]);
+				for (int i = 0; i < numAngles; i++) {
+					int a = (int) (255.0f * c.histogram[i] / maxValue + 0.5f);
 
-						float x0 = c_x - r * cos[j];
-						float x1 = c_x + r * cos[j];
-						float y0 = c_y - r * sin[j];
-						float y1 = c_y + r * sin[j];
+					g2.setColor(colors[a]);
 
-						line.setLine(x0, y0, x1, y1);
-						g2.draw(line);
-					}
+					float x0 = c_x - foo * cos[i];
+					float x1 = c_x + foo * cos[i];
+					float y0 = c_y - foo * sin[i];
+					float y1 = c_y + foo * sin[i];
+
+					line.setLine(x0, y0, x1, y1);
+					g2.draw(line);
 				}
 			}
 		}

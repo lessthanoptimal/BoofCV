@@ -19,16 +19,12 @@
 package boofcv.alg.feature.dense;
 
 import boofcv.abst.feature.dense.DescribeImageDenseHoG;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.describe.DescribeSiftCommon;
 import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,79 +47,34 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogFastAlg<Input extends ImageBase> {
+public class DescribeDenseHogFastAlg<Input extends ImageBase> extends BaseDenseHog<Input> {
 
-	ImageGradient<Input, GrayF32> gradient;
-
-	// gradient of each pixel
-	protected GrayF32 derivX = new GrayF32(1,1);
-	protected GrayF32 derivY = new GrayF32(1,1);
-
-	FastQueue<TupleDesc_F64> descriptions;
-
-	// Location of each descriptor in the image, top-left corner (lower extents)
-	FastQueue<Point2D_I32> locations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-
-	int orientationBins; // number of orientation bins computed in a block
-	int pixelsPerCell; // number of pixels wide a cell is
-	int cellsPerBlock;  // number of cells wide a block is
-	int stepBlock; // how many cells are skipped between a block
 
 	// storage for histograms in each cell
 	Cell cells[] = new Cell[0];
 	// number of cell rows and columns in the image
 	int cellRows,cellCols;
 
-	// type of input image
-	ImageType<Input> imageType;
-
 	/**
 	 * Configures HOG descriptor computation
 	 *
 	 * @param orientationBins Number of bins in a cell's histogram.  9 recommended
 	 * @param pixelsPerCell Number of pixel's wide a cell is.  8 recommended
-	 * @param cellsPerBlock Number of cells's wide a block is. 3 recommended
+	 * @param cellsPerBlockX Number of cells's wide a block is. 3 recommended
+	 * @param cellsPerBlockY Number of cells's wide a block is. 3 recommended
 	 * @param stepBlock Number of cells which are skipped between each block
 	 */
-	public DescribeDenseHogFastAlg(int orientationBins , int pixelsPerCell , int cellsPerBlock ,
+	public DescribeDenseHogFastAlg(int orientationBins , int pixelsPerCell , int cellsPerBlockX , int cellsPerBlockY,
 								   int stepBlock ,
 								   ImageType<Input> imageType )
 	{
-		if( stepBlock <= 0 )
-			throw new IllegalArgumentException("stepBlock must be >= 1");
-
-		this.imageType = imageType;
-		gradient = DescribeDenseHogAlg.createGradient(imageType);
-
-		this.orientationBins = orientationBins;
-		this.pixelsPerCell = pixelsPerCell;
-		this.cellsPerBlock = cellsPerBlock;
-		this.stepBlock = stepBlock;
-
-		descriptions = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(DescribeDenseHogFastAlg.this.orientationBins*
-						DescribeDenseHogFastAlg.this.cellsPerBlock *DescribeDenseHogFastAlg.this.cellsPerBlock);
-			}
-		};
-	}
-
-	/**
-	 * Specifies input image.  Gradient is computed immediately
-	 * @param input input image
-	 */
-	public void setInput( Input input ) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-
-		// pixel gradient
-		gradient.process(input,derivX,derivY);
+		super(orientationBins, pixelsPerCell, cellsPerBlockX, cellsPerBlockY, stepBlock, imageType);
 	}
 
 	/**
 	 * Computes the descriptor across the input image
 	 */
+	@Override
 	public void process() {
 		locations.reset();
 		descriptions.reset();
@@ -133,8 +84,8 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase> {
 
 		computeCellHistograms();
 
-		int cellRowMax = (cellRows - (cellsPerBlock -1));
-		int cellColMax = (cellCols - (cellsPerBlock -1));
+		int cellRowMax = (cellRows - (cellsPerBlockY -1));
+		int cellColMax = (cellCols - (cellsPerBlockX -1));
 
 		for (int i = 0; i < cellRowMax; i += stepBlock) {
 			for (int j = 0; j < cellColMax; j += stepBlock) {
@@ -178,8 +129,8 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase> {
 		int gridX0 = (int)Math.ceil(pixelX0/(double) pixelsPerCell);
 		int gridY0 = (int)Math.ceil(pixelY0/(double) pixelsPerCell);
 
-		int gridX1 = pixelX1/ pixelsPerCell - cellsPerBlock;
-		int gridY1 = pixelY1/ pixelsPerCell - cellsPerBlock;
+		int gridX1 = pixelX1/ pixelsPerCell - cellsPerBlockX;
+		int gridY1 = pixelY1/ pixelsPerCell - cellsPerBlockY;
 
 		for (int y = gridY0; y <= gridY1; y++) {
 			int index = y*cellCols + gridX0;
@@ -201,8 +152,8 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase> {
 		TupleDesc_F64 d = descriptions.grow();
 
 		int indexDesc = 0;
-		for (int i = 0; i < cellsPerBlock; i++) {
-			for (int j = 0; j < cellsPerBlock; j++) {
+		for (int i = 0; i < cellsPerBlockY; i++) {
+			for (int j = 0; j < cellsPerBlockX; j++) {
 				Cell c = cells[(row+i)*cellCols + (col+j)];
 
 				for (int k = 0; k < c.histogram.length; k++) {
@@ -261,56 +212,6 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase> {
 		}
 	}
 
-	/**
-	 * List of locations for each descriptor.
-	 */
-	public FastQueue<Point2D_I32> getLocations() {
-		return locations;
-	}
-
-	/**
-	 * List of descriptors
-	 */
-	public FastQueue<TupleDesc_F64> getDescriptions() {
-		return descriptions;
-	}
-
-	public GrayF32 _getDerivX() {
-		return derivX;
-	}
-
-	public GrayF32 _getDerivY() {
-		return derivY;
-	}
-
-	/**
-	 * Returns the number of pixel's wide the square region is that a descriptor was computed from
-	 * @return number of pixels wide
-	 */
-	public int getRegionWidthPixel() {
-		return pixelsPerCell * cellsPerBlock;
-	}
-
-	public void setPixelsPerCell(int pixelsPerCell) {
-		this.pixelsPerCell = pixelsPerCell;
-	}
-
-	public int getPixelsPerCell() {
-		return pixelsPerCell;
-	}
-
-	public int getCellsPerBlock() {
-		return cellsPerBlock;
-	}
-
-	public int getStepBlock() {
-		return stepBlock;
-	}
-
-	public int getOrientationBins() {
-		return orientationBins;
-	}
-
 	public int getCellRows() {
 		return cellRows;
 	}
@@ -321,18 +222,6 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase> {
 
 	public Cell getCell( int row , int col ) {
 		return cells[row*cellCols + col];
-	}
-
-	public void setStepBlock(int stepBlock) {
-		this.stepBlock = stepBlock;
-	}
-
-	public ImageType<Input> getImageType() {
-		return imageType;
-	}
-
-	public TupleDesc_F64 createDescription() {
-		return new TupleDesc_F64(orientationBins* cellsPerBlock * cellsPerBlock);
 	}
 
 	public static class Cell

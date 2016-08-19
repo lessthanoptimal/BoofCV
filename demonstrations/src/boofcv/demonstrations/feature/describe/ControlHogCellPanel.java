@@ -31,14 +31,13 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
-public class ControlHogPanel extends StandardAlgConfigPanel
+public class ControlHogCellPanel extends StandardAlgConfigPanel
 	implements ChangeListener, ItemListener
 {
 	JCheckBox showInput;
 	JCheckBox showGrid;
 	JCheckBox showLog;
 	JCheckBox showLocal;
-	JCheckBox useFast;
 
 
 	JSpinner selectWidth;
@@ -47,14 +46,13 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 	boolean doShowGrid = false;
 	boolean doShowLog = true;
 	boolean doShowLocal = false;
-	boolean doUseFast = false;
 
 	int cellWidth = 20;
 	int histogram = 9;
 
-	VisualizeImageHogApp owner;
+	VisualizeImageHogCellApp owner;
 
-	public ControlHogPanel(VisualizeImageHogApp owner) {
+	public ControlHogCellPanel(VisualizeImageHogCellApp owner) {
 
 		this.owner = owner;
 
@@ -78,11 +76,6 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 		showLocal.addItemListener(this);
 		showLocal.setMaximumSize(showLocal.getPreferredSize());
 
-		useFast = new JCheckBox("Fast Variant");
-		useFast.setSelected(doUseFast);
-		useFast.addItemListener(this);
-		useFast.setMaximumSize(useFast.getPreferredSize());
-
 		selectWidth = new JSpinner(new SpinnerNumberModel(cellWidth, 5, 50, 1));
 		selectWidth.addChangeListener(this);
 		selectWidth.setMaximumSize(selectWidth.getPreferredSize());
@@ -95,7 +88,6 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 		addAlignLeft(showGrid, this);
 		addAlignLeft(showLog,this);
 		addAlignLeft(showLocal,this);
-		addAlignLeft(useFast,this);
 
 		addLabeled(selectWidth, "Size:", this);
 		addLabeled(selectHistogram, "Histogram:", this);
@@ -125,9 +117,6 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 			owner.setShowLocal(doShowLocal);
 		} else if( showInput == e.getSource() ) {
 			owner.setShowInput(showInput.isSelected());
-		} else if( useFast == e.getSource() ) {
-			doUseFast = useFast.isSelected();
-			owner.setUseFast(useFast.isSelected());
 		}
 	}
 }

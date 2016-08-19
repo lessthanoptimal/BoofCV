@@ -18,11 +18,10 @@
 
 package boofcv.factory.feature.dense;
 
-import boofcv.abst.feature.dense.DescribeImageDenseHoGFast;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link DescribeImageDenseHoGFast}
+ * Configuration for {@link FactoryDescribeImageDense}
  *
  * @author Peter Abeles
  */
@@ -37,9 +36,14 @@ public class ConfigDenseHoG implements Configuration {
 	 */
 	public int pixelsPerCell = 8;
 	/**
-	 * Number of cells wide a block is
+	 * Number of cells wide a block is along x-axis
 	 */
-	public int cellsPerBlock = 3;
+	public int cellsPerBlockX = 3;
+	/**
+	 * Number of cells wide a block is along x-axis
+	 */
+	public int cellsPerBlockY = 3;
+
 	/**
 	 * Number of cells that are skipped between two blocks.
 	 */
@@ -49,7 +53,7 @@ public class ConfigDenseHoG implements Configuration {
 	 * If set to true a faster variant of HOG will be used which doesn't apply spatial normalization.
 	 * Set to false to replicate the version of HOG proposed in the original paper.
 	 */
-	public boolean fastVariant = false;
+	public boolean fastVariant = true;
 
 	@Override
 	public void checkValidity() {

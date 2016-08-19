@@ -52,9 +52,15 @@ public class TestDescribeImageDenseHoG {
 	@Test
 	public void checkSampleLocations() {
 		ConfigDenseHoG config = new ConfigDenseHoG();
+		config.fastVariant = true;
+		check(config);
+		config.fastVariant = false;
+		check(config);
+	}
 
-		int offX = config.pixelsPerCell *config.cellsPerBlock /2;
-		int offY = config.pixelsPerCell *config.cellsPerBlock /2;
+	private void check(ConfigDenseHoG config) {
+		int offX = config.pixelsPerCell *config.cellsPerBlockX /2;
+		int offY = config.pixelsPerCell *config.cellsPerBlockY /2;
 		int stride = config.pixelsPerCell *config.stepBlock;
 
 		for( ImageType type : imageTypes ) {

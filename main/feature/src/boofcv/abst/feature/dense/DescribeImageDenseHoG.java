@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.dense;
 
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.BaseDenseHog;
 import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
@@ -36,9 +36,9 @@ import java.util.List;
  */
 public class DescribeImageDenseHoG<T extends ImageBase> implements DescribeImageDense<T,TupleDesc_F64> {
 
-	DescribeDenseHogAlg<T> hog;
+	BaseDenseHog<T> hog;
 
-	public DescribeImageDenseHoG(DescribeDenseHogAlg<T> hog) {
+	public DescribeImageDenseHoG(BaseDenseHog<T> hog) {
 		this.hog = hog;
 	}
 
@@ -49,11 +49,13 @@ public class DescribeImageDenseHoG<T extends ImageBase> implements DescribeImage
 
 		// center region locations to make it compliant with this interface
 		FastQueue<Point2D_I32> locations = hog.getLocations();
-		int r = hog.getRegionWidthPixel()/2;
+		int rx = hog.getRegionWidthPixelX()/2;
+		int ry = hog.getRegionWidthPixelY()/2;
+
 		for (int i = 0; i < locations.size(); i++) {
 			Point2D_I32 p = locations.get(i);
-			p.x += r;
-			p.y += r;
+			p.x += rx;
+			p.y += ry;
 		}
 	}
 

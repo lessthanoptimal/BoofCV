@@ -21,6 +21,7 @@ package boofcv.factory.feature.dense;
 import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.alg.feature.dense.BaseDenseHog;
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
 import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
@@ -30,6 +31,7 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -139,12 +141,27 @@ public class FactoryDescribeImageDense {
 
 		config.checkValidity();
 
-		if( config.fastVariant ) {
-			DescribeDenseHogFastAlg hog = FactoryDescribeImageDenseAlg.hogFast(config, imageType);
-			return new DescribeImageDenseHoGFast<T>(hog);
+		ImageType actualType;
+		if( imageType.getDataType() != ImageDataType.F32 ) {
+			actualType = new ImageType(imageType.getFamily(),ImageDataType.F32,imageType.getNumBands());
 		} else {
-			DescribeDenseHogAlg hog = FactoryDescribeImageDenseAlg.hog(config, imageType);
-			return new DescribeImageDenseHoG<T>(hog);
+			actualType = imageType;
+		}
+
+		BaseDenseHog hog;
+		if( config.fastVariant ) {
+			hog = FactoryDescribeImageDenseAlg.hogFast(config, actualType);
+		} else {
+			hog = FactoryDescribeImageDenseAlg.hog(config, actualType);
+		}
+
+		DescribeImageDenseHoG output = new DescribeImageDenseHoG(hog);
+
+		// If the data type isn't F32 convert it into that data type first
+		if( actualType != imageType ) {
+			return new DescribeImageDense_Convert<T, TupleDesc_F64>(output,imageType);
+		} else {
+			return output;
 		}
 	}
 }

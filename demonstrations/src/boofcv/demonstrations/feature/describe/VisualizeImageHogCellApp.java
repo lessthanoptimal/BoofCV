@@ -18,19 +18,16 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.abst.feature.dense.DescribeImageDense;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.factory.feature.dense.ConfigDenseHoG;
-import boofcv.factory.feature.dense.FactoryDescribeImageDense;
+import boofcv.factory.feature.dense.FactoryDescribeImageDenseAlg;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.UtilPoint2D_I32;
-import georegression.struct.point.Point2D_I32;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -41,15 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * App which shows histogram for each cell in HOG descriptor.
+ *
  * @author Peter Abeles
  */
-// TODO add ability to control visualization options
-	// TODO change HOG cell size
-	// TODO render grid overlay
-public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBase<T> {
+public class VisualizeImageHogCellApp<T extends ImageBase> extends DemonstrationBase<T> {
 
-	DescribeImageDense<T,TupleDesc_F64> hog;
-	ConfigDenseHoG config = new ConfigDenseHoG();
+	// use the fast variant since it confidently computes each cell individually and doesn't normalize it
+	DescribeDenseHogFastAlg<T> hog;
 	VisualizeHogCells visualizers;
 
 	ImagePanel imagePanel = new ImagePanel();
@@ -58,15 +54,15 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	Object lock = new Object();
 
-	ControlHogPanel control = new ControlHogPanel(this);
+	ControlHogCellPanel control = new ControlHogCellPanel(this);
 
 	boolean showInput = false;
 
-	public VisualizeImageHogApp(List<String> exampleInputs, ImageType<T> imageType) {
+	public VisualizeImageHogCellApp(List<String> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
 		createHoG(imageType);
-		visualizers = new VisualizeHogCells(hog,config);
+		visualizers = new VisualizeHogCells(hog);
 		visualizers.setShowLog(control.doShowLog);
 		visualizers.setLocalMax(control.doShowLocal);
 		visualizers.setShowGrid(control.doShowGrid);
@@ -80,46 +76,14 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				List<TupleDesc_F64> descriptions = hog.getDescriptions();
-				List<Point2D_I32> locations = hog.getLocations();
+				int row = e.getY()/hog.getPixelsPerCell();
+				int col = e.getX()/hog.getPixelsPerCell();
 
-				double bestDistance = Double.MAX_VALUE;
-				Point2D_I32 bestPt = null;
-				TupleDesc_F64 bestDesc = null;
-
-				int cellClickX = e.getX()/config.pixelsPerCell;
-				int cellClickY = e.getY()/config.pixelsPerCell;
-
-				for (int i = 0; i < locations.size(); i++) {
-					Point2D_I32 p = locations.get(i);
-
-					// go from center to lower extent
-					int x = p.x - (config.pixelsPerCell *config.cellsPerBlock)/2;
-					int y = p.y - (config.pixelsPerCell *config.cellsPerBlock)/2;
-
-					int d = UtilPoint2D_I32.distanceSq(x/config.pixelsPerCell,y/config.pixelsPerCell,
-							cellClickX, cellClickY);
-					if( d < bestDistance ) {
-						bestDistance = d;
-						bestPt = p;
-						bestDesc = descriptions.get(i);
-					}
-				}
-
-				if( bestDesc != null ) {
-					System.out.println("location = "+bestPt.x+"  "+bestPt.y);
-					int numAngles = config.orientationBins;
-					int cellIndex = 0;
-					for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
-						for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++, cellIndex++ ) {
-							int start = cellIndex*numAngles;
-
-							System.out.printf("cell[%2d] = [ ",cellIndex);
-							for (int i = 0; i < numAngles; i++) {
-								System.out.printf("%f ",bestDesc.value[start+i]);
-							}
-							System.out.println(" ]");
-						}
+				if( row >= 0 && col >= 0 && row < hog.getCellRows() &&  col < hog.getCellCols() ) {
+					DescribeDenseHogFastAlg.Cell c = hog.getCell(row,col);
+					System.out.print("Cell["+row+" , "+col+"] histogram =");
+					for (int i = 0; i < c.histogram.length; i++) {
+						System.out.print("  "+c.histogram[i]);
 					}
 					System.out.println();
 				}
@@ -137,27 +101,26 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 	}
 
 	private void createHoG(ImageType<T> imageType) {
-		config.orientationBins = control.histogram;
+		ConfigDenseHoG config = new ConfigDenseHoG();
 		config.pixelsPerCell = control.cellWidth;
-		config.fastVariant = control.doUseFast;
-		config.cellsPerBlock = 1;
-		config.stepBlock = 1;
+		config.orientationBins = control.histogram;
 
-		hog = FactoryDescribeImageDense.hog(config,imageType);
+		hog = FactoryDescribeImageDenseAlg.hogFast(config,imageType);
 	}
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
 		synchronized (lock) {
-			hog.process(input);
+			hog.setInput(input);
+			hog.process();
 
-			work = new BufferedImage(buffered.getWidth(),buffered.getHeight(), BufferedImage.TYPE_INT_RGB);
+			work = visualizers.createOutputBuffered(work);
 
 			Graphics2D g2 = work.createGraphics();
 			g2.setColor(Color.BLACK);
 			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 
-			visualizers.render(g2, buffered.getWidth(),buffered.getHeight());
+			visualizers.render(g2);
 
 			if( showInput )
 				g2.drawImage(buffered,0,0,buffered.getWidth()/5,buffered.getHeight()/5,null);
@@ -170,18 +133,16 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			config.pixelsPerCell = width;
 			createHoG(imageType);
-			visualizers.setHoG(hog,config);
+			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}
 	}
 
-	public void setOrientationBins(int numBins) {
+	public void setOrientationBins(int histogram) {
 		synchronized (lock) {
-			config.orientationBins = numBins;
 			createHoG(imageType);
-			visualizers.setHoG(hog,config);
+			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}
 	}
@@ -206,15 +167,6 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		reprocessSingleImage();
 	}
 
-	public void setUseFast( boolean useFast ) {
-		synchronized (lock) {
-			config.fastVariant = useFast;
-			createHoG(imageType);
-			visualizers.setHoG(hog,config);
-			reprocessSingleImage();
-		}
-	}
-
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<String>();
 
@@ -224,11 +176,11 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 		examples.add(UtilIO.pathExample("segment/berkeley_man.jpg"));
 		ImageType imageType = ImageType.single(GrayF32.class);
 
-		VisualizeImageHogApp app = new VisualizeImageHogApp(examples, imageType);
+		VisualizeImageHogCellApp app = new VisualizeImageHogCellApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app, "Hog Descriptor Cell Visualization",true);
+		ShowImages.showWindow(app, "Hog Descriptor Unnormalized Cell Visualization",true);
 	}
 }
