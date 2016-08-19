@@ -19,6 +19,7 @@
 package boofcv.factory.feature.dense;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
 import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_F32;
 import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLF32;
 import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLU8;
@@ -33,6 +34,16 @@ import boofcv.struct.image.ImageType;
  */
 @SuppressWarnings("unchecked")
 public class FactoryDescribeImageDenseAlg {
+
+	public static <T extends ImageBase>
+	DescribeDenseHogOrigAlg<T> hogOrig( ConfigDenseHoG config , ImageType<T> imageType ) {
+		config.checkValidity();
+
+		return new DescribeDenseHogOrigAlg<T>(config.orientationBins, config.widthCell, config.widthBlock,
+				config.stepBlock, imageType);
+
+	}
+
 	public static <T extends ImageBase, D extends ImageBase>
 	DescribeDenseHogAlg<T,D> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();

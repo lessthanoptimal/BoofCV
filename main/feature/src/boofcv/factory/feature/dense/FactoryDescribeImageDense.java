@@ -18,18 +18,12 @@
 
 package boofcv.factory.feature.dense;
 
-import boofcv.abst.feature.dense.DescribeImageDense;
-import boofcv.abst.feature.dense.DescribeImageDenseHoG;
-import boofcv.abst.feature.dense.DescribeImageDenseSift;
-import boofcv.abst.feature.dense.GenericDenseDescribeImageDense;
+import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogOrigAlg;
 import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_F32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLF32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLU8;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_U8;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -130,6 +124,27 @@ public class FactoryDescribeImageDense {
 	/**
 	 * Creates a dense HOG descriptor.
 	 *
+	 * @see DescribeDenseHogOrigAlg
+	 *
+	 * @param config Configuration for HOG descriptor.  Can't be null.
+	 * @param imageType Type of input image.  Can be single band or planar
+	 * @return Dense HOG extractor
+	 */
+	public static <T extends ImageBase>
+	DescribeImageDense<T,TupleDesc_F64> hogOrig(ConfigDenseHoG config , ImageType<T> imageType ) {
+		if( config == null )
+			config = new ConfigDenseHoG();
+
+		config.checkValidity();
+
+		DescribeDenseHogOrigAlg hog = FactoryDescribeImageDenseAlg.hogOrig(config, imageType);
+
+		return new DescribeImageDenseHoGOrig<T>(hog);
+	}
+
+	/**
+	 * Creates a dense HOG descriptor.
+	 *
 	 * @see DescribeDenseHogAlg
 	 *
 	 * @param config Configuration for HOG descriptor.  Can't be null.
@@ -138,42 +153,12 @@ public class FactoryDescribeImageDense {
 	 */
 	public static <T extends ImageBase>
 	DescribeImageDense<T,TupleDesc_F64> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
+		if( config == null )
+			config = new ConfigDenseHoG();
+
 		config.checkValidity();
 
-		DescribeDenseHogAlg hog;
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_U8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
-
-				case F32:
-					hog = new DescribeDenseHogAlg_F32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_PLU8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
-
-				case F32:
-					hog = new DescribeDenseHogAlg_PLF32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
-		} else {
-			throw new IllegalArgumentException("Unsupported image type");
-		}
+		DescribeDenseHogAlg hog = FactoryDescribeImageDenseAlg.hog(config, imageType);
 
 		return new DescribeImageDenseHoG<T>(hog);
 	}
