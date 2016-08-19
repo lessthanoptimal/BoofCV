@@ -35,11 +35,11 @@ public class ConfigDenseHoG implements Configuration {
 	/**
 	 * Number of pixels in a cell.
 	 */
-	public int widthCell = 8;
+	public int pixelsPerCell = 8;
 	/**
 	 * Number of cells wide a block is
 	 */
-	public int widthBlock = 3;
+	public int cellsPerBlock = 3;
 	/**
 	 * Number of cells that are skipped between two blocks.
 	 */

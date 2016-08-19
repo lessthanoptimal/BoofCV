@@ -87,17 +87,17 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 				Point2D_I32 bestPt = null;
 				TupleDesc_F64 bestDesc = null;
 
-				int cellClickX = e.getX()/config.widthCell;
-				int cellClickY = e.getY()/config.widthCell;
+				int cellClickX = e.getX()/config.pixelsPerCell;
+				int cellClickY = e.getY()/config.pixelsPerCell;
 
 				for (int i = 0; i < locations.size(); i++) {
 					Point2D_I32 p = locations.get(i);
 
 					// go from center to lower extent
-					int x = p.x - (config.widthCell*config.widthBlock)/2;
-					int y = p.y - (config.widthCell*config.widthBlock)/2;
+					int x = p.x - (config.pixelsPerCell *config.cellsPerBlock)/2;
+					int y = p.y - (config.pixelsPerCell *config.cellsPerBlock)/2;
 
-					int d = UtilPoint2D_I32.distanceSq(x/config.widthCell,y/config.widthCell,
+					int d = UtilPoint2D_I32.distanceSq(x/config.pixelsPerCell,y/config.pixelsPerCell,
 							cellClickX, cellClickY);
 					if( d < bestDistance ) {
 						bestDistance = d;
@@ -110,8 +110,8 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 					System.out.println("location = "+bestPt.x+"  "+bestPt.y);
 					int numAngles = config.orientationBins;
 					int cellIndex = 0;
-					for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
-						for (int cellCol = 0; cellCol < config.widthBlock; cellCol++, cellIndex++ ) {
+					for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
+						for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++, cellIndex++ ) {
 							int start = cellIndex*numAngles;
 
 							System.out.printf("cell[%2d] = [ ",cellIndex);
@@ -138,9 +138,9 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	private void createHoG(ImageType<T> imageType) {
 		config.orientationBins = control.histogram;
-		config.widthCell = control.cellWidth;
+		config.pixelsPerCell = control.cellWidth;
 		config.fastVariant = control.doUseFast;
-		config.widthBlock = 1;
+		config.cellsPerBlock = 1;
 		config.stepBlock = 1;
 
 		hog = FactoryDescribeImageDense.hog(config,imageType);
@@ -170,7 +170,7 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			config.widthCell = width;
+			config.pixelsPerCell = width;
 			createHoG(imageType);
 			visualizers.setHoG(hog,config);
 			reprocessSingleImage();

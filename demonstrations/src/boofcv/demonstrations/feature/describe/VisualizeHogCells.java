@@ -67,11 +67,11 @@ public class VisualizeHogCells {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
 		if( showGrid ) {
-			int regionWidth = config.widthCell*config.widthBlock;
-			int regionHeight = config.widthCell*config.widthBlock;
+			int regionWidth = config.pixelsPerCell *config.cellsPerBlock;
+			int regionHeight = config.pixelsPerCell *config.cellsPerBlock;
 
-			int stepX = config.widthCell*config.stepBlock;
-			int stepY = config.widthCell*config.stepBlock;
+			int stepX = config.pixelsPerCell *config.stepBlock;
+			int stepY = config.pixelsPerCell *config.stepBlock;
 
 			g2.setColor(new Color(150, 150, 0));
 			g2.setStroke(new BasicStroke(1));
@@ -101,7 +101,7 @@ public class VisualizeHogCells {
 
 	private void local(Graphics2D g2) {
 
-		float r = config.widthCell/2.0f;
+		float r = config.pixelsPerCell /2.0f;
 		int numAngles = config.orientationBins;
 
 		List<TupleDesc_F64> descriptions = hog.getDescriptions();
@@ -112,13 +112,13 @@ public class VisualizeHogCells {
 			TupleDesc_F64 desc = descriptions.get(i);
 			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
+			for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
 				int c_y = p.y;
-				for (int cellCol = 0; cellCol < config.widthBlock; cellCol++) {
+				for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++) {
 					int c_x = p.x;
 
 					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*config.widthBlock + cellCol)*numAngles;
+					int start = (cellRow*config.cellsPerBlock + cellCol)*numAngles;
 
 					double maxValue = 0;
 					for (int j = 0; j < numAngles; j++) {
@@ -144,7 +144,7 @@ public class VisualizeHogCells {
 	}
 
 	private void global(Graphics2D g2) {
-		float r = config.widthCell/2.0f;
+		float r = config.pixelsPerCell /2.0f;
 		int numAngles = config.orientationBins;
 
 		List<TupleDesc_F64> descriptions = hog.getDescriptions();
@@ -163,13 +163,13 @@ public class VisualizeHogCells {
 			TupleDesc_F64 desc = descriptions.get(i);
 			Point2D_I32 p = locations.get(i);
 
-			for (int cellRow = 0; cellRow < config.widthBlock; cellRow++) {
+			for (int cellRow = 0; cellRow < config.cellsPerBlock; cellRow++) {
 				int c_y = p.y;
-				for (int cellCol = 0; cellCol < config.widthBlock; cellCol++) {
+				for (int cellCol = 0; cellCol < config.cellsPerBlock; cellCol++) {
 					int c_x = p.x;
 
 					// the descriptor is encoded in a row major format cell by cell
-					int start = (cellRow*config.widthBlock + cellCol)*numAngles;
+					int start = (cellRow*config.cellsPerBlock + cellCol)*numAngles;
 
 					for (int j = 0; j < numAngles; j++) {
 						int a = (int) (255.0f * desc.value[j+start] / maxValue + 0.5f);

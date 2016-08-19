@@ -53,9 +53,9 @@ public class TestDescribeImageDenseHoG {
 	public void checkSampleLocations() {
 		ConfigDenseHoG config = new ConfigDenseHoG();
 
-		int offX = config.widthCell*config.widthBlock/2;
-		int offY = config.widthCell*config.widthBlock/2;
-		int stride = config.widthCell*config.stepBlock;
+		int offX = config.pixelsPerCell *config.cellsPerBlock /2;
+		int offY = config.pixelsPerCell *config.cellsPerBlock /2;
+		int stride = config.pixelsPerCell *config.stepBlock;
 
 		for( ImageType type : imageTypes ) {
 			ImageBase image = type.createImage(width,height);
