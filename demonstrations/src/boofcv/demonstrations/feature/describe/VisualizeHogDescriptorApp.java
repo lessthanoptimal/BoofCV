@@ -29,9 +29,12 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -44,22 +47,25 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO render rectangle over selected descriptor
-// TODO select region with mouse
-// TODO draw descriptor in a new window which can be resized
-// TODO adjust HOG settings in GUI
 public class VisualizeHogDescriptorApp<T extends ImageBase> extends DemonstrationBase<T>
 {
-	ImagePanel imagePanel = new ImagePanel();
+	ControlHogDescriptorPanel controlPanel = new ControlHogDescriptorPanel(this);
+	VisualizePanel imagePanel = new VisualizePanel();
 
 	ConfigDenseHoG config = new ConfigDenseHoG();
 	DescribeImageDenseHoG<T> hog;
 
-	Object imageLock = new Object();
-
 	Color colors[];
 	float cos[],sin[];
 
+
+	final Object targetLock = new Object();
+	Point2D_I32 selectedPixel;
+	TupleDesc_F64 targetDesc;
+	Point2D_I32 targetLocation;
+
+	final Object inputLock = new Object();
+	T input;
 
 	public VisualizeHogDescriptorApp(List<String> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -69,12 +75,43 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 			colors[i] = new Color(i, i, i);
 		}
 
+		add(controlPanel,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
 
 		config.pixelsPerCell = 20;
 		config.cellsPerBlockY = 5;
 
 		updateDescriptor();
+
+		imagePanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				selectRegion(e.getX(),e.getY());
+			}
+		});
+	}
+
+	private void selectRegion( int x , int y ) {
+		int bestIndex = -1;
+		double bestDistance = Double.MAX_VALUE;
+		List<Point2D_I32> locations = hog.getLocations();
+		for( int i = 0; i < locations.size(); i++ ) {
+			Point2D_I32 p = locations.get(i);
+			double d = UtilPoint2D_I32.distance(p.x,p.y,x,y);
+			if( d < bestDistance ) {
+				bestDistance = d;
+				bestIndex = i;
+			}
+		}
+
+		synchronized (targetLock) {
+			if( bestIndex >= 0 ) {
+				selectedPixel = new Point2D_I32(x,y);
+				targetDesc = hog.getDescriptions().get(bestIndex);
+				targetLocation = hog.getLocations().get(bestIndex);
+				imagePanel.repaint();
+			}
+		}
 	}
 
 	private void updateDescriptor() {
@@ -94,24 +131,20 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
-		hog.process(input);
+		synchronized (inputLock) {
+			this.input = input;
+			hog.process(input);
+		}
 
-		Graphics2D g2 = buffered.createGraphics();
-
-		List<TupleDesc_F64> descriptions = hog.getDescriptions();
-		List<Point2D_I32> locations = hog.getLocations();
-
-		int N = descriptions.size()/2;
-
-		TupleDesc_F64 desc = descriptions.get(N);
-		Point2D_I32 location = locations.get(N);
-
-		renderHog(location.x,location.y,desc,g2);
+		synchronized (targetLock) {
+			selectedPixel = null;
+			targetDesc = null;
+			targetLocation = null;
+		}
 
 		imagePanel.setBufferedImage(buffered);
 		imagePanel.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-
 	}
 
 	private void renderHog(int bcx , int bcy ,
@@ -129,6 +162,11 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 		g2.setColor(Color.BLACK);
 		g2.fillRect(tl_x,tl_y,gridWidth,gridHeight);
 
+		double maxValue = 0;
+		for (int i = 0; i < desc.value.length; i++) {
+			maxValue = Math.max(maxValue,desc.value[i]);
+		}
+
 		float foo = config.pixelsPerCell/2.0f;
 
 		int index = 0;
@@ -138,7 +176,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 				int c_y = tl_y + (int)((cellY+0.5)*config.pixelsPerCell);
 
 				for (int i = 0; i < config.orientationBins; i++) {
-					int a = (int) (255.0f * desc.value[index++]);
+					int a = (int) (255.0f * desc.value[index++]/maxValue);
 					g2.setColor(colors[a]);
 
 					float x0 = c_x - foo * cos[i];
@@ -149,6 +187,54 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 					line.setLine(x0, y0, x1, y1);
 					g2.draw(line);
 				}
+			}
+		}
+
+		if( controlPanel.doShowGrid ) {
+			g2.setColor(Color.RED);
+			for (int cellY = 0; cellY <= config.cellsPerBlockY; cellY++) {
+				int y = tl_y+cellY*config.pixelsPerCell;
+				g2.drawLine(tl_x,y,tl_x+gridWidth,y);
+			}
+			for (int cellX = 0; cellX <= config.cellsPerBlockX; cellX++) {
+				int x = tl_x+cellX*config.pixelsPerCell;
+				g2.drawLine(x,tl_y,x,tl_y+gridHeight);
+			}
+		}
+	}
+
+	private class VisualizePanel extends ImagePanel {
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+
+			synchronized (targetLock) {
+				if( targetLocation != null ) {
+					renderHog(targetLocation.x, targetLocation.y,targetDesc,(Graphics2D)g);
+				}
+			}
+		}
+	}
+
+	public void visualsChanged() {
+		imagePanel.repaint();
+	}
+
+	public void configChanged() {
+		config.pixelsPerCell = controlPanel.cellWidth;
+		config.cellsPerBlockX = controlPanel.gridX;
+		config.cellsPerBlockY = controlPanel.gridY;
+		config.fastVariant = controlPanel.fast;
+		config.orientationBins = controlPanel.histogram;
+
+		synchronized (inputLock) {
+			updateDescriptor();
+			hog.process(input);
+		}
+
+		synchronized (targetLock ) {
+			if( selectedPixel != null ) {
+				selectRegion(selectedPixel.x,selectedPixel.y);
 			}
 		}
 	}
