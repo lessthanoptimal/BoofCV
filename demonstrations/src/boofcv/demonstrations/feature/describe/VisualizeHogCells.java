@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -31,18 +31,18 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeHogCells {
 
-	DescribeDenseHogAlg<?,?> hog;
+	DescribeDenseHogFastAlg<?> hog;
 	Color colors[];
 	float cos[],sin[];
 
 	boolean localMax = false;
 	boolean showGrid = false;
 
-	public VisualizeHogCells(DescribeDenseHogAlg<?,?> hog ) {
+	public VisualizeHogCells(DescribeDenseHogFastAlg<?> hog ) {
 		setHoG(hog);
 	}
 
-	public synchronized void setHoG(DescribeDenseHogAlg<?, ?> hog) {
+	public synchronized void setHoG(DescribeDenseHogFastAlg<?> hog) {
 		this.hog = hog;
 		int numAngles = hog.getOrientationBins();
 		cos = new float[numAngles];
@@ -57,7 +57,7 @@ public class VisualizeHogCells {
 	}
 
 	public BufferedImage createOutputBuffered( BufferedImage input ) {
-		int cell = hog.getWidthCell();
+		int cell = hog.getPixelsPerCell();
 		int rows = hog.getCellRows();
 		int cols = hog.getCellCols();
 		int width = cell*cols;
@@ -75,7 +75,7 @@ public class VisualizeHogCells {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
 		if( showGrid ) {
-			int cell = hog.getWidthCell();
+			int cell = hog.getPixelsPerCell();
 			int rows = hog.getCellRows();
 			int cols = hog.getCellCols();
 			int width = cell*cols;
@@ -103,7 +103,7 @@ public class VisualizeHogCells {
 	}
 
 	private void local(Graphics2D g2) {
-		int cell = hog.getWidthCell();
+		int cell = hog.getPixelsPerCell();
 		int rows = hog.getCellRows();
 		int cols = hog.getCellCols();
 		int width = cell*cols;
@@ -119,7 +119,7 @@ public class VisualizeHogCells {
 			float c_y = y + r;
 
 			for (int x = 0; x < width; x += cell) {
-				DescribeDenseHogAlg.Cell c = hog.getCell(y / cell, x / cell);
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y / cell, x / cell);
 
 				float c_x = x + r;
 
@@ -146,7 +146,7 @@ public class VisualizeHogCells {
 	}
 
 	private void global(Graphics2D g2) {
-		int cell = hog.getWidthCell();
+		int cell = hog.getPixelsPerCell();
 		int rows = hog.getCellRows();
 		int cols = hog.getCellCols();
 		int width = cell*cols;
@@ -160,7 +160,7 @@ public class VisualizeHogCells {
 		float maxValue = 0;
 		for (int y = 0; y < rows; y++) {
 			for (int x = 0; x < cols; x++) {
-				DescribeDenseHogAlg.Cell c = hog.getCell(y, x);
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y, x);
 				for (int i = 0; i < numAngles; i++) {
 					maxValue = Math.max(maxValue, c.histogram[i]);
 				}
@@ -173,7 +173,7 @@ public class VisualizeHogCells {
 			float c_y = y + r;
 
 			for (int x = 0; x < width; x += cell) {
-				DescribeDenseHogAlg.Cell c = hog.getCell(y / cell, x / cell);
+				DescribeDenseHogFastAlg.Cell c = hog.getCell(y / cell, x / cell);
 
 				float c_x = x + r;
 

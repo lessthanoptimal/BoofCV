@@ -18,24 +18,20 @@
 
 package boofcv.factory.feature.dense;
 
-import boofcv.abst.feature.dense.DescribeImageDense;
-import boofcv.abst.feature.dense.DescribeImageDenseHoG;
-import boofcv.abst.feature.dense.DescribeImageDenseSift;
-import boofcv.abst.feature.dense.GenericDenseDescribeImageDense;
+import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.alg.feature.dense.BaseDenseHog;
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_F32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLF32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLU8;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_U8;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -127,9 +123,11 @@ public class FactoryDescribeImageDense {
 		return new DescribeImageDenseSift(alg,config.sampling.periodX,config.sampling.periodY,imageType);
 	}
 
+
 	/**
 	 * Creates a dense HOG descriptor.
 	 *
+	 * @see DescribeDenseHogFastAlg
 	 * @see DescribeDenseHogAlg
 	 *
 	 * @param config Configuration for HOG descriptor.  Can't be null.
@@ -138,43 +136,32 @@ public class FactoryDescribeImageDense {
 	 */
 	public static <T extends ImageBase>
 	DescribeImageDense<T,TupleDesc_F64> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
+		if( config == null )
+			config = new ConfigDenseHoG();
+
 		config.checkValidity();
 
-		DescribeDenseHogAlg hog;
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_U8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
-
-				case F32:
-					hog = new DescribeDenseHogAlg_F32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_PLU8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
-
-				case F32:
-					hog = new DescribeDenseHogAlg_PLF32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
+		ImageType actualType;
+		if( imageType.getDataType() != ImageDataType.F32 ) {
+			actualType = new ImageType(imageType.getFamily(),ImageDataType.F32,imageType.getNumBands());
 		} else {
-			throw new IllegalArgumentException("Unsupported image type");
+			actualType = imageType;
 		}
 
-		return new DescribeImageDenseHoG<T>(hog);
+		BaseDenseHog hog;
+		if( config.fastVariant ) {
+			hog = FactoryDescribeImageDenseAlg.hogFast(config, actualType);
+		} else {
+			hog = FactoryDescribeImageDenseAlg.hog(config, actualType);
+		}
+
+		DescribeImageDenseHoG output = new DescribeImageDenseHoG(hog);
+
+		// If the data type isn't F32 convert it into that data type first
+		if( actualType != imageType ) {
+			return new DescribeImageDense_Convert<T, TupleDesc_F64>(output,imageType);
+		} else {
+			return output;
+		}
 	}
 }

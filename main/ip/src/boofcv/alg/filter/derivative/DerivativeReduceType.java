@@ -16,24 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.dense.impl;
-
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
+package boofcv.alg.filter.derivative;
 
 /**
+ * Different ways to reduce a gradient
+ *
  * @author Peter Abeles
  */
-public class TestDescribeDenseHogAlg_PLU8 extends GenericDescribeDenseHogAlgChecks<Planar<GrayU8>> {
-	public TestDescribeDenseHogAlg_PLU8() {
-		super(ImageType.pl(3, GrayU8.class));
-	}
-
-	@Override
-	public DescribeDenseHogAlg<Planar<GrayU8>,?>
-	createAlg(int orientationBins, int widthCell, int widthBlock , int stepBlock) {
-		return new DescribeDenseHogAlg_PLU8(orientationBins,widthCell,widthBlock,stepBlock,3);
-	}
+public enum DerivativeReduceType {
+	/**
+	 * Reduce by selecting the band with the maximum Frobenius norm.
+	 */
+	MAX_F
 }

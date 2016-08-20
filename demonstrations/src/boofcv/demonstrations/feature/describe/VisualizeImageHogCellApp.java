@@ -18,14 +18,14 @@
 
 package boofcv.demonstrations.feature.describe;
 
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDenseAlg;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -38,14 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * App which shows histogram for each cell in HOG descriptor.
+ *
  * @author Peter Abeles
  */
-// TODO add ability to control visualization options
-	// TODO change HOG cell size
-	// TODO render grid overlay
-public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBase<T> {
+public class VisualizeImageHogCellApp<T extends ImageBase> extends DemonstrationBase<T> {
 
-	DescribeDenseHogAlg<T,?> hog;
+	// use the fast variant since it confidently computes each cell individually and doesn't normalize it
+	DescribeDenseHogFastAlg<T> hog;
 	VisualizeHogCells visualizers;
 
 	ImagePanel imagePanel = new ImagePanel();
@@ -54,11 +54,11 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	Object lock = new Object();
 
-	ControlHogPanel control = new ControlHogPanel(this);
+	ControlHogCellPanel control = new ControlHogCellPanel(this);
 
 	boolean showInput = false;
 
-	public VisualizeImageHogApp(List<String> exampleInputs, ImageType<T> imageType) {
+	public VisualizeImageHogCellApp(List<String> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
 		createHoG(imageType);
@@ -76,11 +76,11 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				int row = e.getY()/hog.getWidthCell();
-				int col = e.getX()/hog.getWidthCell();
+				int row = e.getY()/hog.getPixelsPerCell();
+				int col = e.getX()/hog.getPixelsPerCell();
 
 				if( row >= 0 && col >= 0 && row < hog.getCellRows() &&  col < hog.getCellCols() ) {
-					DescribeDenseHogAlg.Cell c = hog.getCell(row,col);
+					DescribeDenseHogFastAlg.Cell c = hog.getCell(row,col);
 					System.out.print("Cell["+row+" , "+col+"] histogram =");
 					for (int i = 0; i < c.histogram.length; i++) {
 						System.out.print("  "+c.histogram[i]);
@@ -102,10 +102,10 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	private void createHoG(ImageType<T> imageType) {
 		ConfigDenseHoG config = new ConfigDenseHoG();
-		config.widthCell = control.cellWidth;
+		config.pixelsPerCell = control.cellWidth;
 		config.orientationBins = control.histogram;
 
-		hog = FactoryDescribeImageDenseAlg.hog(config,imageType);
+		hog = FactoryDescribeImageDenseAlg.hogFast(config,imageType);
 	}
 
 	@Override
@@ -133,12 +133,13 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 	public void setCellWidth( int width ) {
 		synchronized (lock) {
-			hog.setWidthCell(width);
+			createHoG(imageType);
+			visualizers.setHoG(hog);
 			reprocessSingleImage();
 		}
 	}
 
-	public void setHistogram(int histogram) {
+	public void setOrientationBins(int histogram) {
 		synchronized (lock) {
 			createHoG(imageType);
 			visualizers.setHoG(hog);
@@ -171,15 +172,15 @@ public class VisualizeImageHogApp <T extends ImageBase> extends DemonstrationBas
 
 		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
 		examples.add(UtilIO.pathExample("shapes/shapes02.png"));
-		examples.add(UtilIO.pathExample("shapes/concave01.jpg"));
-		examples.add(UtilIO.pathExample("particles01.jpg"));
-		ImageType imageType = ImageType.single(GrayU8.class);
+		examples.add(UtilIO.pathExample("segment/berkeley_horses.jpg"));
+		examples.add(UtilIO.pathExample("segment/berkeley_man.jpg"));
+		ImageType imageType = ImageType.single(GrayF32.class);
 
-		VisualizeImageHogApp app = new VisualizeImageHogApp(examples, imageType);
+		VisualizeImageHogCellApp app = new VisualizeImageHogCellApp(examples, imageType);
 
 		app.openFile(new File(examples.get(0)));
 		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app, "Hog Descriptor Cell Visualization",true);
+		ShowImages.showWindow(app, "Hog Descriptor Unnormalized Cell Visualization",true);
 	}
 }

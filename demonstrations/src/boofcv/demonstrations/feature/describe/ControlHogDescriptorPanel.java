@@ -31,49 +31,41 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
-public class ControlHogPanel extends StandardAlgConfigPanel
+public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 	implements ChangeListener, ItemListener
 {
-	JCheckBox showInput;
 	JCheckBox showGrid;
-	JCheckBox showLog;
-	JCheckBox showLocal;
+	JCheckBox useFast;
+
 
 	JSpinner selectWidth;
 	JSpinner selectHistogram;
+	JSpinner selectGridX;
+	JSpinner selectGridY;
 
-	boolean doShowGrid = false;
-	boolean doShowLog = true;
-	boolean doShowLocal = false;
+	boolean doShowGrid = true;
 
 	int cellWidth = 20;
 	int histogram = 9;
+	int gridX = 3;
+	int gridY = 5;
+	boolean fast = true;
 
-	VisualizeImageHogApp owner;
+	VisualizeHogDescriptorApp owner;
 
-	public ControlHogPanel(VisualizeImageHogApp owner) {
+	public ControlHogDescriptorPanel(VisualizeHogDescriptorApp owner) {
 
 		this.owner = owner;
-
-		showInput = new JCheckBox("Show Input");
-		showInput.setSelected(false);
-		showInput.addItemListener(this);
-		showInput.setMaximumSize(showInput.getPreferredSize());
 
 		showGrid = new JCheckBox("Show Grid");
 		showGrid.setSelected(doShowGrid);
 		showGrid.addItemListener(this);
 		showGrid.setMaximumSize(showGrid.getPreferredSize());
 
-		showLog = new JCheckBox("Log Intensity");
-		showLog.setSelected(doShowLog);
-		showLog.addItemListener(this);
-		showLog.setMaximumSize(showLog.getPreferredSize());
-
-		showLocal = new JCheckBox("Local Scaling");
-		showLocal.setSelected(doShowLocal);
-		showLocal.addItemListener(this);
-		showLocal.setMaximumSize(showLocal.getPreferredSize());
+		useFast = new JCheckBox("Fast HOG");
+		useFast.setSelected(fast);
+		useFast.addItemListener(this);
+		useFast.setMaximumSize(useFast.getPreferredSize());
 
 		selectWidth = new JSpinner(new SpinnerNumberModel(cellWidth, 5, 50, 1));
 		selectWidth.addChangeListener(this);
@@ -83,12 +75,21 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 		selectHistogram.addChangeListener(this);
 		selectHistogram.setMaximumSize(selectHistogram.getPreferredSize());
 
-		addAlignLeft(showInput, this);
-		addAlignLeft(showGrid, this);
-		addAlignLeft(showLog,this);
-		addAlignLeft(showLocal,this);
+		selectGridX = new JSpinner(new SpinnerNumberModel(gridX, 1, 20, 1));
+		selectGridX.addChangeListener(this);
+		selectGridX.setMaximumSize(selectGridX.getPreferredSize());
 
-		addLabeled(selectWidth, "Size:", this);
+		selectGridY = new JSpinner(new SpinnerNumberModel(gridY, 1, 20, 1));
+		selectGridY.addChangeListener(this);
+		selectGridY.setMaximumSize(selectGridY.getPreferredSize());
+
+
+		addAlignLeft(showGrid, this);
+		addAlignLeft(useFast,this);
+
+		addLabeled(selectWidth, "Cell Size:", this);
+		addLabeled(selectGridX, "Grid X:", this);
+		addLabeled(selectGridY, "Grid Y:", this);
 		addLabeled(selectHistogram, "Histogram:", this);
 	}
 
@@ -96,10 +97,16 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 	public void stateChanged(ChangeEvent e) {
 		if( selectWidth == e.getSource() ) {
 			cellWidth = ((Number) selectWidth.getValue()).intValue();
-			owner.setCellWidth(cellWidth);
+			owner.configChanged();
 		} else if( selectHistogram == e.getSource() ) {
 			histogram = ((Number) selectHistogram.getValue()).intValue();
-			owner.setHistogram(histogram);
+			owner.configChanged();
+		} else if( selectGridX == e.getSource() ) {
+			gridX = ((Number) selectGridX.getValue()).intValue();
+			owner.configChanged();
+		} else if( selectGridY == e.getSource() ) {
+			gridY = ((Number) selectGridY.getValue()).intValue();
+			owner.configChanged();
 		}
 	}
 
@@ -107,15 +114,10 @@ public class ControlHogPanel extends StandardAlgConfigPanel
 	public void itemStateChanged(ItemEvent e) {
 		if( showGrid == e.getSource() ) {
 			doShowGrid = showGrid.isSelected();
-			owner.setShowGrid(doShowGrid);
-		} else if( showLog == e.getSource() ) {
-			doShowLog = showLog.isSelected();
-			owner.setShowLog(doShowLog);
-		} else if( showLocal == e.getSource() ) {
-			doShowLocal = showLocal.isSelected();
-			owner.setShowLocal(doShowLocal);
-		} else if( showInput == e.getSource() ) {
-			owner.setShowInput(showInput.isSelected());
+			owner.visualsChanged();
+		} else if( useFast == e.getSource() ) {
+			fast = useFast.isSelected();
+			owner.configChanged();
 		}
 	}
 }

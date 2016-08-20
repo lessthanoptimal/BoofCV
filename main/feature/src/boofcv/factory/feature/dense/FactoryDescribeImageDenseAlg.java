@@ -19,10 +19,7 @@
 package boofcv.factory.feature.dense;
 
 import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_F32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLF32;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_PLU8;
-import boofcv.alg.feature.dense.impl.DescribeDenseHogAlg_U8;
+import boofcv.alg.feature.dense.DescribeDenseHogFastAlg;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -33,45 +30,22 @@ import boofcv.struct.image.ImageType;
  */
 @SuppressWarnings("unchecked")
 public class FactoryDescribeImageDenseAlg {
-	public static <T extends ImageBase, D extends ImageBase>
-	DescribeDenseHogAlg<T,D> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
+
+	public static <T extends ImageBase>
+	DescribeDenseHogAlg<T> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 
-		DescribeDenseHogAlg hog;
-		if( imageType.getFamily() == ImageType.Family.GRAY) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_U8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
+		return new DescribeDenseHogAlg<T>(config.orientationBins, config.pixelsPerCell,
+				config.cellsPerBlockX,config.cellsPerBlockY,
+				config.stepBlock, imageType);
 
-				case F32:
-					hog = new DescribeDenseHogAlg_F32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock);
-					break;
+	}
 
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
-		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			switch( imageType.getDataType() ) {
-				case U8:
-					hog = new DescribeDenseHogAlg_PLU8(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
+	public static <T extends ImageBase>
+	DescribeDenseHogFastAlg<T> hogFast(ConfigDenseHoG config , ImageType<T> imageType ) {
+		config.checkValidity();
 
-				case F32:
-					hog = new DescribeDenseHogAlg_PLF32(config.orientationBins,config.widthCell
-							,config.widthBlock,config.stepBlock,imageType.getNumBands());
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unsupported image type");
-			}
-		} else {
-			throw new IllegalArgumentException("Unsupported image type");
-		}
-
-		return hog;
+		return new DescribeDenseHogFastAlg(config.orientationBins,config.pixelsPerCell
+							,config.cellsPerBlockX,config.cellsPerBlockY,config.stepBlock, imageType);
 	}
 }

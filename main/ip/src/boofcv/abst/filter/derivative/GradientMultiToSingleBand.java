@@ -16,25 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.dense.impl;
+package boofcv.abst.filter.derivative;
 
-import boofcv.alg.feature.dense.DescribeDenseHogAlg;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 
 /**
- * Implementation pf {@link DescribeDenseHogAlg} for {@link GrayF32}.
+ * Interface for converting a multi-band gradient into a single band gradient.
  *
  * @author Peter Abeles
  */
-public class DescribeDenseHogAlg_F32 extends DescribeDenseHogAlg<GrayF32,GrayF32> {
-	public DescribeDenseHogAlg_F32(int orientationBins, int widthCell, int widthBlock, int stepBlock) {
-		super(orientationBins, widthCell, widthBlock, stepBlock, ImageType.single(GrayF32.class));
-	}
+public interface GradientMultiToSingleBand<Input extends ImageMultiBand, Output extends ImageGray>
+{
+	void process( Input inDerivX , Input inDerivY , Output  outDerivX , Output outDerivY );
 
-	@Override
-	public void computeDerivative(int pixelIndex) {
-		pixelDX = derivX.data[pixelIndex];
-		pixelDY = derivY.data[pixelIndex];
-	}
+	ImageType<Input> getInputType();
+
+	Class<Output> getOutputType();
 }

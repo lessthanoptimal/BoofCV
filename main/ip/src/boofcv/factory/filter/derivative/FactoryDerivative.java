@@ -38,6 +38,53 @@ import java.lang.reflect.Method;
 public class FactoryDerivative {
 
 	/**
+	 * Computes the image gradient inside a multi-band image then reduces the output to a single
+	 * band before returning the results
+	 *
+	 * @param gradient Computes the multi-band image gradient
+	 * @param type Specifies which method is to be used to reduce the output into single band image
+	 * @param outputType Type of output image
+	 * @param <I> Input type
+	 * @param <M> Intermediate type
+	 * @param <D> Output type
+	 * @return Gradient
+	 */
+	public static <I extends ImageMultiBand, M extends ImageMultiBand, D extends ImageGray>
+	ImageGradient<I,D> gradientReduce( ImageGradient<I,M> gradient ,
+									   DerivativeReduceType type,
+									   Class<D> outputType )
+	{
+
+		String name;
+
+		switch( type ) {
+			case MAX_F: name = "maxf"; break;
+			default:
+				throw new RuntimeException("Unknown reduce type "+type);
+		}
+
+		Class middleType;
+		switch( gradient.getDerivativeType().getFamily()) {
+			case PLANAR:
+				middleType = Planar.class;
+				break;
+
+			case GRAY:
+				throw new IllegalArgumentException("Can't have gradient output be single band");
+
+			default:
+				middleType = gradient.getDerivativeType().getImageClass();
+		}
+
+
+		Method m = findReduce(name,middleType, outputType);
+		GradientMultiToSingleBand_Reflection<M,D> reducer =
+				new GradientMultiToSingleBand_Reflection<M, D>(m,gradient.getDerivativeType(),outputType);
+
+		return new ImageGradientThenReduce<I,M,D>(gradient, reducer);
+	}
+
+	/**
 	 * Returns the gradient for single band images of the specified type
 	 * @param type Type of gradient
 	 * @param inputType Type of input image
@@ -235,6 +282,16 @@ public class FactoryDerivative {
 			return (ImageHessian<D>)hessian(GradientThree.class,GrayS16.class);
 		else
 			throw new IllegalArgumentException("Not supported yet");
+	}
+
+	private static Method findReduce( String name , Class<?> inputType , Class<?> derivType  ) {
+		Method m;
+		try {
+			m = GradientReduceToSingle.class.getDeclaredMethod(name, inputType,inputType,derivType,derivType);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("Input and derivative types are probably not compatible",e);
+		}
+		return m;
 	}
 
 	private static Method findDerivative(Class<?> derivativeClass,

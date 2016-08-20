@@ -6,21 +6,21 @@ Date Format: year/month/day
 Date    : 2016
 Version : 0.25
 
-- TODO black circle detector
-  * pixel
-  * sub-pixel
+- Black Circle Detector
+  * Binary image
+  * Subpixel edge for gray scale images
+- Circular Asymmetric Grid Calibration Pattern
+  * General Fiducial  # TODO
+- Histogram of Oriented Gradient
+  * Provided another implementation which is more faithful to original paper, but much slower
+  * Can now independently configure block size along each axis
 
-- TODO HOG
-  * Benchmark to see using a dot product of precomputed gradients is faster than using
-    atan() to compute the angle.
-  * Provide an easier to use API to access the cells
-  * Look at paper again and see if it uses soft binning of gradient into cells
-     * User configurable
-  * Consider renaming class and make low level api easier to use?
-     * access to cell image
-     * break block computation off into separate function
-  * Non square cells and blocks?
 
+- TODO Regression: circular grid fiducial and calibration
+- TODO Regression: Chessboard image border to fiducial regression
+- TODO Unit test for getScaleAtRadius
+  * Implement universally
+  * Create unit test for it
 
 ---------------------------------------------
 Date    : 2016/06/13

@@ -18,75 +18,57 @@
 
 package boofcv.alg.feature.dense;
 
-import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.alg.feature.describe.DescribeSiftCommon;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestDescribeDenseHogAlg {
+	ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
 
-	int width = 60;
-	int height = 80;
+	int imgWidth = 60;
+	int imgHeight = 80;
+
+	int pixelsPerCell = 4;
+	int widthCellsX = 3;
+	int widthCellsY = 4;
 
 	@Test
 	public void process() {
 		// intentionally left blank.  This is handled by image type specific checks
 	}
 
-	@Test
-	public void growCellArray() {
-		Helper helper = new Helper(10,8,2);
-
-		helper.growCellArray(64,32);
-		assertEquals(8*4,helper.cells.length);
-		assertEquals(8,helper.cellCols);
-		assertEquals(4,helper.cellRows);
-
-		helper.growCellArray(32,16);
-		assertEquals(8*4,helper.cells.length);
-		assertEquals(4,helper.cellCols);
-		assertEquals(2,helper.cellRows);
-
-		helper.growCellArray(64,40);
-		assertEquals(8*5,helper.cells.length);
-		assertEquals(8,helper.cellCols);
-		assertEquals(5,helper.cellRows);
-	}
-
 	/**
 	 * Tests to see if the weight has the expected shape or at least some of the expected characteristics.
 	 */
 	@Test
-	public void computeCellWeights() {
-		int cases[] = new int[]{4,5};
+	public void computeWeightBlockPixels() {
+		int pixelsPerCell = 3;
+		int cases[] = new int[]{3,4};
 
-		for( int width : cases ) {
-			Helper helper = new Helper(10, 8, width);
+		for( int widthCells : cases ) {
+			DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(10,pixelsPerCell,widthCells,widthCells+1,1,imageType);
 
-			int r = width/2 + width%2;
+			int widthPixelsX = widthCells*pixelsPerCell;
+			int widthPixelsY = (widthCells+1)*pixelsPerCell;
+
+			int rx = widthPixelsX/2 + widthPixelsX%2;
+			int ry = widthPixelsY/2 + widthPixelsY%2;
 
 			int totalOne = 0;
 			double max = 0;
-			for (int i = 0; i < r; i++) {
-				for (int j = 0; j < r; j++) {
+			for (int i = 0; i < ry; i++) {
+				for (int j = 0; j < rx; j++) {
 					// should be mirrored in all 4 quadrants
-					double v0 = helper.weights[i * width + j];
-					double v1 = helper.weights[i * width + (width - j - 1)];
-					double v2 = helper.weights[(width - i - 1) * width + (width - j - 1)];
-					double v3 = helper.weights[(width - i - 1) * width + j];
+					double v0 = helper.weights[i * widthPixelsX + j];
+					double v1 = helper.weights[i * widthPixelsX + (widthPixelsX - j - 1)];
+					double v2 = helper.weights[(widthPixelsY - i - 1) * widthPixelsX + (widthPixelsX - j - 1)];
+					double v3 = helper.weights[(widthPixelsY - i - 1) * widthPixelsX + j];
 
 					assertEquals(v0, v1, 1e-8);
 					assertEquals(v1, v2, 1e-8);
@@ -99,147 +81,79 @@ public class TestDescribeDenseHogAlg {
 				}
 			}
 			assertTrue(helper.weights[0] < helper.weights[1]);
-			assertTrue(helper.weights[0] < helper.weights[width]);
+			assertTrue(helper.weights[0] < helper.weights[widthCells]);
 			assertEquals(1.0, max, 1e-8);
-			if( width%2 == 1 )
+			if( widthPixelsX%2 == 1 )
 				assertEquals(1,totalOne);
 		}
 	}
 
+	/**
+	 * Checks to see if the expected cells are modified in the descriptor
+	 */
 	@Test
-	public void getDescriptorsInRegion() {
+	public void computeCellHistogram() {
 
-		int x0 = 5, x1 = 67;
-		int y0 = 9, y1 = 89;
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+				10,pixelsPerCell, widthCellsX, widthCellsY,1,imageType);
 
-		Helper helper = new Helper(10,8,2);
+		helper.setInput(new GrayF32(imgWidth,imgHeight));
+		ImageMiscOps.fill(helper.orientation,0);
+		ImageMiscOps.fill(helper.magnitude,1);
 
-		GrayF32 input = new GrayF32(120,110);
-		helper.setInput(input);
+		int cellX = 1;
+		int cellY = 2;
 
-		helper.process();
+		helper.histogram = new double[10* widthCellsX*widthCellsY];
+		helper.computeCellHistogram(20,25,cellX,cellY);
 
-		List<TupleDesc_F64> expected = new ArrayList<TupleDesc_F64>();
-
-		// use a different more brute force technique to find all the descriptors contained inside the region
-		// take advantage of the descriptors being computed in a row major order
-		int c = 8;
-		int w = 2*c;
-		for (int y = 0; y < input.height-w; y += c) {
-			int i = (y/c)*helper.cellCols;
-			for (int x = 0; x < input.width-w; x += c, i++) {
-				if( x >= x0 && x+w < x1 && y >= y0 && y+w < y1) {
-					expected.add( helper.getDescriptions().get(i));
-				}
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				checkCellModified(helper.histogram,cellX+j,cellY+i, true);
 			}
 		}
-
-		List<TupleDesc_F64> found = new ArrayList<TupleDesc_F64>();
-		helper.getDescriptorsInRegion(x0,y0,x1,y1,found);
-
-		assertEquals(expected.size(),found.size());
-
-		for (int j = 0; j < expected.size(); j++) {
-			assertTrue(found.contains(expected.get(j)));
-		}
+		// sanity check.  Shouldn't be modified
+		checkCellModified(helper.histogram,0,0, false);
 	}
 
-	@Test
-	public void computeDescriptor() {
-		Helper helper = new Helper(10,8,2);
+	private void checkCellModified( double histogram[] , int cellX , int cellY , boolean modified ) {
+		int index = (cellY*widthCellsX + cellX)*10;
 
-		helper.growCellArray(width,height);
-		int stride = helper.cellCols;
-
-		// manually build a simple histogram for input and manually construct the expected resulting descriptor
-		TupleDesc_F64 expected = new TupleDesc_F64(40);
-
-		setHistogram(helper.cells[2].histogram,2,3 , expected.value,0);
-		setHistogram(helper.cells[3].histogram,2,3 , expected.value,10);
-		setHistogram(helper.cells[stride + 2].histogram,5,0 , expected.value,20);
-		setHistogram(helper.cells[stride + 3].histogram,7,8 , expected.value,30);
-
-		DescribeSiftCommon.normalizeDescriptor(expected,0.2);
-
-		helper.computeDescriptor(0,2);
-
-		Point2D_I32 where = helper.locations.get(0);
-		TupleDesc_F64 found = helper.descriptions.get(0);
-
-		assertEquals(8*2,where.x);
-		assertEquals(0,where.y);
-
-		assertEquals(40,found.size());
-		assertTrue(DescriptorDistance.euclidean(expected,found) < 1e-8 );
-	}
-
-	private void setHistogram( float histogram[] , int a , int b , double expected[], int index0 ) {
-		Arrays.fill(histogram,0);
-		histogram[a] = 2.4f;
-		histogram[b] = 1.2f;
-
-		// construct the expected descriptor
-		expected[index0+a] = 2.4f;
-		expected[index0+b] = 1.2f;
-	}
-
-	@Test
-	public void computeCells() {
-
-		int cellWidth = 8;
-
-		Helper helper = new Helper(10,cellWidth,3);
-
-		helper.growCellArray(width,height);
-
-		int N = cellWidth*cellWidth;
-
-		for (int angle = 0; angle < 360; angle++) {
-			helper.angle = (float)(angle*Math.PI/180.0);
-
-			double floatBin = ((angle+90.0)*10.0/180);
-			int targetBin = (int)floatBin;
-			float expected = (float)(1.0-(floatBin-targetBin));
-
-			helper.computeCellHistograms();
-
-			targetBin %= 10;
-
-			for (int i = 0; i < helper.cells.length; i++) {
-				DescribeDenseHogAlg.Cell c = helper.cells[i];
-
-				for (int j = 0; j < c.histogram.length; j++) {
-					if( j == targetBin ) {
-						assertEquals(N*expected,c.histogram[j],1e-3f);
-					} else if( j == (targetBin+1)%10 ) {
-						assertEquals(N*(1.0f-expected),c.histogram[j],1e-3f);
-					} else {
-						assertEquals(0.0f,c.histogram[j],1e-3f);
-					}
-				}
+		for (int i = 0; i < 10; i++) {
+			if( (histogram[i+index] != 0) == modified ) {
+				return;
 			}
 		}
+		fail("Not modified = "+modified);
 	}
 
 	@Test
-	public void getRegionWidthPixel() {
-		Helper helper = new Helper(10,8,3);
-		assertEquals(3*8,helper.getRegionWidthPixel());
+	public void addToHistogram() {
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+				10,pixelsPerCell, widthCellsX, widthCellsX +1,1,imageType);
+
+		helper.histogram = new double[10*widthCellsX*widthCellsY];
+
+		// first try to add outside
+		helper.addToHistogram(-1,2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(10,2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(1,-2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(1,20,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+
+		// set it inside
+		helper.addToHistogram(1,2,3,1.0);
+		assertEquals((2* widthCellsX +1)*10+3,notZeroIndex(helper.histogram));
 	}
 
-	private class Helper extends DescribeDenseHogAlg<GrayF32,GrayF32> {
-
-		public float angle;
-
-		public Helper(int orientationBins, int widthCell, int widthBlock) {
-			super(orientationBins, widthCell, widthBlock, 1, ImageType.single(GrayF32.class));
+	private int notZeroIndex( double a[] ) {
+		for (int i = 0; i < a.length; i++) {
+			if( a[i] != 0 )
+				return i;
 		}
-
-		@Override
-		public void computeDerivative(int pixelIndex) {
-			pixelDX = (float)Math.cos(angle);
-			pixelDY = (float)Math.sin(angle);
-		}
+		return -1;
 	}
-
 }

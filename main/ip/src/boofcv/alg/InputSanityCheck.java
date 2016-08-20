@@ -130,4 +130,13 @@ public class InputSanityCheck {
 		if( image.isSubimage() )
 			throw new IllegalArgumentException("Input image cannot be a subimage");
 	}
+
+	public static void checkIndexing( ImageBase imgA , ImageBase imgB )
+	{
+		if( imgA.stride != imgB.stride )
+			throw new IllegalArgumentException("Strides of images are not the same");
+		if( imgA.startIndex != imgB.startIndex )
+			throw new IllegalArgumentException("Start index of the images is not the same");
+
+	}
 }
