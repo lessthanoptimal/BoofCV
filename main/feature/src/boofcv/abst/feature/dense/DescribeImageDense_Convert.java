@@ -50,6 +50,7 @@ public class DescribeImageDense_Convert<T extends ImageBase, Desc extends TupleD
 
 		workspace = describerType.createImage(1,1);
 		this.describer = describer;
+		this.inputType = inputType;
 	}
 
 
