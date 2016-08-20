@@ -23,6 +23,7 @@ import boofcv.factory.feature.dense.ConfigDenseHoG;
 import boofcv.factory.feature.dense.FactoryDescribeImageDense;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -53,18 +54,18 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 	VisualizePanel imagePanel = new VisualizePanel();
 
 	ConfigDenseHoG config = new ConfigDenseHoG();
+	final Object hogLock = new Object();
 	DescribeImageDenseHoG<T> hog;
 
 	Color colors[];
 	float cos[],sin[];
 
 
-	final Object targetLock = new Object();
 	Point2D_I32 selectedPixel;
+	int selectedIndex;
 	TupleDesc_F64 targetDesc;
 	Point2D_I32 targetLocation;
 
-	final Object inputLock = new Object();
 	T input;
 
 	public VisualizeHogDescriptorApp(List<String> exampleInputs, ImageType<T> imageType) {
@@ -83,6 +84,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 
 		updateDescriptor();
 
+		imagePanel.setScaling(ScaleOptions.NONE);
 		imagePanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -93,20 +95,21 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 
 	private void selectRegion( int x , int y ) {
 		int bestIndex = -1;
-		double bestDistance = Double.MAX_VALUE;
-		List<Point2D_I32> locations = hog.getLocations();
-		for( int i = 0; i < locations.size(); i++ ) {
-			Point2D_I32 p = locations.get(i);
-			double d = UtilPoint2D_I32.distance(p.x,p.y,x,y);
-			if( d < bestDistance ) {
-				bestDistance = d;
-				bestIndex = i;
+		synchronized (hogLock) {
+			double bestDistance = Double.MAX_VALUE;
+			List<Point2D_I32> locations = hog.getLocations();
+			for (int i = 0; i < locations.size(); i++) {
+				Point2D_I32 p = locations.get(i);
+				double d = UtilPoint2D_I32.distance(p.x, p.y, x, y);
+				if (d < bestDistance) {
+					bestDistance = d;
+					bestIndex = i;
+				}
 			}
-		}
 
-		synchronized (targetLock) {
 			if( bestIndex >= 0 ) {
 				selectedPixel = new Point2D_I32(x,y);
+				selectedIndex = bestIndex;
 				targetDesc = hog.getDescriptions().get(bestIndex);
 				targetLocation = hog.getLocations().get(bestIndex);
 				imagePanel.repaint();
@@ -115,7 +118,9 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 	}
 
 	private void updateDescriptor() {
-		hog = (DescribeImageDenseHoG<T>)FactoryDescribeImageDense.hog(config,imageType);
+		synchronized (hogLock) {
+			hog = (DescribeImageDenseHoG<T>) FactoryDescribeImageDense.hog(config, imageType);
+		}
 
 		int numAngles = config.orientationBins;
 		cos = new float[numAngles];
@@ -131,20 +136,32 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
-		synchronized (inputLock) {
+		boolean inputSizeChanged = false;
+		synchronized (hogLock) {
+			inputSizeChanged =
+					this.input == null || this.input.width != input.width || this.input.height != input.height;
 			this.input = input;
 			hog.process(input);
-		}
 
-		synchronized (targetLock) {
-			selectedPixel = null;
-			targetDesc = null;
-			targetLocation = null;
+			if( inputSizeChanged ) {
+				targetDesc = null;
+				targetLocation = null;
+				selectedPixel = null;
+			} else {
+				if (isRegionSelected()) {
+					targetDesc = hog.getDescriptions().get(selectedIndex);
+					targetLocation = hog.getLocations().get(selectedIndex);
+				}
+			}
 		}
 
 		imagePanel.setBufferedImage(buffered);
 		imagePanel.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 		imagePanel.setMinimumSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
+	}
+
+	private boolean isRegionSelected() {
+		return targetDesc != null;
 	}
 
 	private void renderHog(int bcx , int bcy ,
@@ -208,8 +225,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
-			synchronized (targetLock) {
-				if( targetLocation != null ) {
+			synchronized (hogLock) {
+				if( isRegionSelected() ) {
 					renderHog(targetLocation.x, targetLocation.y,targetDesc,(Graphics2D)g);
 				}
 			}
@@ -227,12 +244,12 @@ public class VisualizeHogDescriptorApp<T extends ImageBase> extends Demonstratio
 		config.fastVariant = controlPanel.fast;
 		config.orientationBins = controlPanel.histogram;
 
-		synchronized (inputLock) {
+		synchronized (hogLock) {
 			updateDescriptor();
 			hog.process(input);
 		}
 
-		synchronized (targetLock ) {
+		synchronized (hogLock ) {
 			if( selectedPixel != null ) {
 				selectRegion(selectedPixel.x,selectedPixel.y);
 			}

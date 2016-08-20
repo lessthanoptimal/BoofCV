@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.dense;
 
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
@@ -32,6 +33,15 @@ public class TestDescribeDenseHogAlg {
 
 	int imgWidth = 60;
 	int imgHeight = 80;
+
+	int pixelsPerCell = 4;
+	int widthCellsX = 3;
+	int widthCellsY = 4;
+
+	@Test
+	public void process() {
+		// intentionally left blank.  This is handled by image type specific checks
+	}
 
 	/**
 	 * Tests to see if the weight has the expected shape or at least some of the expected characteristics.
@@ -78,13 +88,72 @@ public class TestDescribeDenseHogAlg {
 		}
 	}
 
+	/**
+	 * Checks to see if the expected cells are modified in the descriptor
+	 */
 	@Test
-	public void computePixelFeatures() {
-		fail("Implement");
+	public void computeCellHistogram() {
+
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+				10,pixelsPerCell, widthCellsX, widthCellsY,1,imageType);
+
+		helper.setInput(new GrayF32(imgWidth,imgHeight));
+		ImageMiscOps.fill(helper.orientation,0);
+		ImageMiscOps.fill(helper.magnitude,1);
+
+		int cellX = 1;
+		int cellY = 2;
+
+		helper.histogram = new double[10* widthCellsX*widthCellsY];
+		helper.computeCellHistogram(20,25,cellX,cellY);
+
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				checkCellModified(helper.histogram,cellX+j,cellY+i, true);
+			}
+		}
+		// sanity check.  Shouldn't be modified
+		checkCellModified(helper.histogram,0,0, false);
+	}
+
+	private void checkCellModified( double histogram[] , int cellX , int cellY , boolean modified ) {
+		int index = (cellY*widthCellsX + cellX)*10;
+
+		for (int i = 0; i < 10; i++) {
+			if( (histogram[i+index] != 0) == modified ) {
+				return;
+			}
+		}
+		fail("Not modified = "+modified);
 	}
 
 	@Test
-	public void computeCellHistogram() {
-		fail("Implement");
+	public void addToHistogram() {
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+				10,pixelsPerCell, widthCellsX, widthCellsX +1,1,imageType);
+
+		helper.histogram = new double[10*widthCellsX*widthCellsY];
+
+		// first try to add outside
+		helper.addToHistogram(-1,2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(10,2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(1,-2,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+		helper.addToHistogram(1,20,3,1.0);
+		assertEquals(-1,notZeroIndex(helper.histogram));
+
+		// set it inside
+		helper.addToHistogram(1,2,3,1.0);
+		assertEquals((2* widthCellsX +1)*10+3,notZeroIndex(helper.histogram));
+	}
+
+	private int notZeroIndex( double a[] ) {
+		for (int i = 0; i < a.length; i++) {
+			if( a[i] != 0 )
+				return i;
+		}
+		return -1;
 	}
 }

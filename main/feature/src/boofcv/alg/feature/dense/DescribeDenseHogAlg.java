@@ -286,6 +286,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase> extends BaseDenseHog<I
 				index0 %= orientationBins;
 				int index1 = (index0+1)%orientationBins;
 
+
 				// spatial bilinear interpolation + orientation linear interpolation
 				// + gaussian weighting (previously applied)
 				addToHistogram( cellX-1, cellY-1 , index0, (1.0-oriWeight1)*magnitude*spatialWeightX0*spatialWeightY0);
@@ -326,7 +327,7 @@ public class DescribeDenseHogAlg<Input extends ImageBase> extends BaseDenseHog<I
 	 * @param orientationIndex orientation coordinate
 	 * @param magnitude edge magnitude
 	 */
-	private void addToHistogram(int cellX, int cellY, int orientationIndex, double magnitude) {
+	void addToHistogram(int cellX, int cellY, int orientationIndex, double magnitude) {
 		// see if it's being applied to a valid cell in the histogram
 		if( cellX < 0 || cellX >= cellsPerBlockX)
 			return;
