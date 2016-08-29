@@ -9,8 +9,9 @@ Version : 0.25
 - Black Circle Detector
   * Binary image
   * Subpixel edge for gray scale images
-- Circular Asymmetric Grid Calibration Pattern
-  * General Fiducial  # TODO
+- Circular Asymmetric Grid Pattern
+  * For calibration        # TODO
+  * As a general fiducial  # TODO
 - Histogram of Oriented Gradient
   * Provided another implementation which is more faithful to original paper, but much slower
   * Can now independently configure block size along each axis
