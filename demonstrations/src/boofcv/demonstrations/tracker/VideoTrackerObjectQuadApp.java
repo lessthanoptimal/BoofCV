@@ -22,12 +22,11 @@ import boofcv.abst.tracker.*;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
-import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.tracker.TrackerObjectQuadPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -36,18 +35,21 @@ import georegression.struct.shapes.Quadrilateral_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Let's the user select a region in the image and tracks it using different algorithms.
  *
  * @author Peter Abeles
  */
+// TODO Add controller for MAX FPS
+	// TODO fix pause button state
+	// TODO add back ability to select tracker
+	// TODO fix no image on webpage problem
 public class VideoTrackerObjectQuadApp<I extends ImageGray>
-		extends VideoProcessAppBase<Planar<I>>
+		extends DemonstrationBase<Planar<I>>
 		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener
 {
 	Class<I> imageClass;
@@ -67,48 +69,71 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	boolean selectionChanged = false;
 
 	boolean success;
-	boolean processedInputImage = false;
 	boolean firstFrame = true;
 
-	public VideoTrackerObjectQuadApp( Class<I> imageType ) {
-		super(1, ImageType.pl(3, imageType));
+	public VideoTrackerObjectQuadApp(List<PathLabel> examples,
+									 Class<I> imageType ) {
+		super(examples, ImageType.pl(3, imageType));
 		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		addAlgorithm(0, "Circulant", 0);
-		addAlgorithm(0, "TLD", 1);
-		addAlgorithm(0, "Mean-Shift Region Fixed", 2);
-		addAlgorithm(0, "Mean-Shift Region Scale", 3);
-		addAlgorithm(0, "Mean-Shift Pixel", 4);
-		addAlgorithm(0, "Sparse Flow Tracker", 5);
+//		addAlgorithm(0, "Circulant", 0);
+//		addAlgorithm(0, "TLD", 1);
+//		addAlgorithm(0, "Mean-Shift Region Fixed", 2);
+//		addAlgorithm(0, "Mean-Shift Region Scale", 3);
+//		addAlgorithm(0, "Mean-Shift Pixel", 4);
+//		addAlgorithm(0, "Sparse Flow Tracker", 5);
 
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
 
 		add(infoBar, BorderLayout.WEST);
 		add(videoPanel, BorderLayout.CENTER);
-		setMainGUI(videoPanel);
 	}
 
 	@Override
-	public void process( final SimpleImageSequence<Planar<I>> sequence ) {
+	protected void handleInputChange(InputMethod method, int width, int height) {
+		if( !(method == InputMethod.VIDEO || method == InputMethod.WEBCAM) )
+			throw new IllegalArgumentException("Must be a video or webcam!");
 
-		// stop the image processing code
-		stopWorker();
+		firstFrame = true;
+		streamPaused = true; // paused the video or webcam so that user can select
+		createNewTracker();
+		infoBar.setPlay(false);
 
-		this.sequence = sequence;
-		sequence.setLoop(false);
-		setPause(false);
-		if( !sequence.hasNext() )
-			throw new IllegalArgumentException("Empty sequence");
-
-		// start everything up and resume processing
-		doRefreshAll();
+		videoPanel.setPreferredSize(new Dimension(width, height));
+		videoPanel.setMaximumSize(new Dimension(width, height));
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
+	public void processImage(BufferedImage buffered, Planar<I> frame) {
+		boolean grayScale = false;
+
+		if( tracker.getImageType().getFamily() == ImageType.Family.GRAY) {
+			gray.reshape(frame.width,frame.height);
+			GConvertImage.average(frame, gray);
+			grayScale = true;
+		}
+
+		if( targetSelected ) {
+			if( selectionChanged ) {
+				selectionChanged = false;
+				if( grayScale)
+					success = tracker.initialize(gray, target);
+				else
+					success = tracker.initialize(frame, target);
+			} else
+			if( grayScale)
+				success = tracker.process(gray, target);
+			else
+				success = tracker.process(frame, target);
+		}
+
+		updateGUI(frame,buffered,1000.0);
+	}
+
+	private void createNewTracker() {
 		if( whichAlg == 0 )
 			tracker = FactoryTrackerObjectQuad.circulant(new ConfigCirculantTracker(), imageClass);
 		else if( whichAlg == 1 )
@@ -134,60 +159,18 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		targetSelected = true;
 		selectionChanged = true;
 		target.set(targetDefault);
-		setPause(false);
-
-		startWorkerThread();
 	}
 
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		stopWorker();
 
-		whichAlg = (Integer)cookie;
 
-		sequence.reset();
-
-		refreshAll(null);
-	}
-
-	@Override
-	protected void updateAlg(Planar<I> frame, BufferedImage buffImage) {
-
-		boolean grayScale = false;
-
-		if( tracker.getImageType().getFamily() == ImageType.Family.GRAY) {
-			gray.reshape(frame.width,frame.height);
-			GConvertImage.average(frame, gray);
-			grayScale = true;
-		}
-
-		if( targetSelected ) {
-			if( selectionChanged ) {
-				selectionChanged = false;
-				if( grayScale)
-					success = tracker.initialize(gray, target);
-				else
-					success = tracker.initialize(frame, target);
-			} else
-			if( grayScale)
-				success = tracker.process(gray, target);
-			else
-				success = tracker.process(frame, target);
-		}
-		processedInputImage = true;
-	}
-
-	@Override
-	protected void updateAlgGUI(Planar<I> frame, BufferedImage imageGUI, double fps) {
+	protected void updateGUI(Planar<I> frame, BufferedImage imageGUI, double fps) {
 		if( firstFrame ) {
-			videoPanel.setPreferredSize(new Dimension(imageGUI.getWidth(),imageGUI.getHeight()));
-			videoPanel.setBackGround((BufferedImage) sequence.getGuiImage());
+			videoPanel.setBackGround(imageGUI);
 			infoBar.setFPS(0);
 			infoBar.setTracking("");
 			firstFrame = false;
-			setPause(true);
 		} else {
-			videoPanel.setBackGround((BufferedImage) sequence.getGuiImage());
+			videoPanel.setBackGround(imageGUI);
 			videoPanel.setTarget(target, success);
 			infoBar.setFPS(fps);
 			if( success ) {
@@ -195,8 +178,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 			} else {
 				infoBar.setTracking("?");
 			}
-			videoPanel.repaint();
 		}
+		videoPanel.repaint();
 	}
 
 	@Override
@@ -205,17 +188,17 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		this.target.set(target);
 		targetSelected = true;
 		selectionChanged = true;
-		setPause(false);
+		streamPaused = false;
 	}
 
 	@Override
 	public void togglePause() {
-		setPause(!isPaused);
+		streamPaused = !streamPaused;
 	}
 
 	@Override
 	public void selectTarget() {
-		setPause(true);
+		streamPaused = true;
 		infoBar.setTracking("");
 		targetSelected = false;
 		videoPanel.enterSelectMode();
@@ -223,29 +206,25 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 
 	@Override
 	public void resetVideo() {
-		stopWorker();
-
-		sequence.reset();
-
-		refreshAll(null);
+		System.out.println("Reset video called");
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
-		processedInputImage = false;
-
-		String videoName = inputRefs.get(index).getPath();
+	public void openFile(File file) {
+		String videoName = file.getPath();
 		String path = videoName.substring(0,videoName.lastIndexOf('.'));
+				try {
+			parseQuad(path+"_rect.txt");
+		} catch (FileNotFoundException e) {
+			System.out.println("Can't find predefined region for "+file.getName());
+		}
 
-		parseQuad(path+"_rect.txt");
-
-		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.pl(3, imageClass));
-
-		process(video);
+		super.openFile(file);
 	}
 
-	private void parseQuad( String fileName ) {
-		Reader r = media.openFile(fileName);
+
+	private void parseQuad( String fileName ) throws FileNotFoundException {
+		Reader r = new FileReader(fileName);
 		BufferedReader in = new BufferedReader(r);
 
 		try {
@@ -274,49 +253,37 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	 * 1 = paused
 	 * 2 = finished
 	 */
-	@Override
-	protected void handleRunningStatus(int status) {
-		if( status == 0 ) {
-			infoBar.setPlay(false);
-		} else if( status == 1 ) {
-			infoBar.setPlay(true);
-		}
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedInputImage;
-	}
-
+//	@Override
+//	protected void handleRunningStatus(int status) {
+//		if( status == 0 ) {
+//			infoBar.setPlay(false);
+//		} else if( status == 1 ) {
+//			infoBar.setPlay(true);
+//		}
+//	}
 
 	public static void main(String[] args) {
 //		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 
-		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(type);
-
 //		app.setBaseDirectory(UtilIO.pathExample("");
 //		app.loadInputData(UtilIO.pathExample("tracking/file_list.txt");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("WildCat", UtilIO.pathExample("tracking/wildcat_robot.mjpeg")));
-		inputs.add(new PathLabel("Tree", UtilIO.pathExample("tracking/tree.mjpeg")));
-		inputs.add(new PathLabel("Book", UtilIO.pathExample("tracking/track_book.mjpeg")));
-		inputs.add(new PathLabel("Face", UtilIO.pathExample("tracking/track_peter.mjpeg")));
-		inputs.add(new PathLabel("Chipmunk", UtilIO.pathExample("tracking/chipmunk.mjpeg")));
-		inputs.add(new PathLabel("Balls", UtilIO.pathExample("tracking/balls_blue_red.mjpeg")));
-		inputs.add(new PathLabel("Driving Snow", UtilIO.pathExample("tracking/snow_follow_car.mjpeg")));
-		inputs.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
+		List<PathLabel> examples = new ArrayList<PathLabel>();
+		examples.add(new PathLabel("WildCat", UtilIO.pathExample("tracking/wildcat_robot.mjpeg")));
+		examples.add(new PathLabel("Tree", UtilIO.pathExample("tracking/tree.mjpeg")));
+		examples.add(new PathLabel("Book", UtilIO.pathExample("tracking/track_book.mjpeg")));
+		examples.add(new PathLabel("Face", UtilIO.pathExample("tracking/track_peter.mjpeg")));
+		examples.add(new PathLabel("Chipmunk", UtilIO.pathExample("tracking/chipmunk.mjpeg")));
+		examples.add(new PathLabel("Balls", UtilIO.pathExample("tracking/balls_blue_red.mjpeg")));
+		examples.add(new PathLabel("Driving Snow", UtilIO.pathExample("tracking/snow_follow_car.mjpeg")));
+		examples.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
 
-		app.setInputList(inputs);
+		VideoTrackerObjectQuadApp app = new VideoTrackerObjectQuadApp(examples,type);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
+		app.openFile(new File(examples.get(0).getPath()));
+
+		app.waitUntilDoneProcessing();
 
 		ShowImages.showWindow(app, "Tracking Rectangle",true);
 	}

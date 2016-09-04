@@ -55,7 +55,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 		implements ThresholdControlPanel.Listener
 {
 
-	Class<T> imageType;
+	Class<T> imageClass;
 
 	DetectPolygonControlPanel controls = new DetectPolygonControlPanel(this);
 
@@ -72,8 +72,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples, ImageType.single(imageType));
-
-		this.imageType = imageType;
+		this.imageClass = imageType;
 
 		guiImage = new VisualizePanel();
 
@@ -96,7 +95,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 		}
 		controls.getConfigPolygon().refine = configRefine;
 
-		detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(),imageType);
+		detector = FactoryShapeDetector.polygon(controls.getConfigPolygon(), imageClass);
 		imageThresholdUpdated();
 	}
 
@@ -168,7 +167,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 
 		ConfigThreshold config = controls.getThreshold().createConfig();
 
-		inputToBinary = FactoryThresholdBinary.threshold(config,imageType);
+		inputToBinary = FactoryThresholdBinary.threshold(config, imageClass);
 		processImageThread(null,null);
 	}
 

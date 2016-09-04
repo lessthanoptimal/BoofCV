@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.io.MediaManager;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
@@ -66,7 +67,17 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	BufferedImage inputBuffered;
 	MediaManager media = new DefaultMediaManager();
 
-	public DemonstrationBase(List<String> exampleInputs, ImageType<T> imageType) {
+	// If true then any stream will be paused.  If a webcam is running it will skip new images
+	// if a video it will stop processing the input
+	protected volatile boolean streamPaused = false;
+
+	/**
+	 * Constructor that specifies examples and input image type
+	 *
+	 * @param exampleInputs List of paths to examples.  Either a String file path or {@link PathLabel}.
+	 * @param imageType Type of image it's processing
+	 */
+	public DemonstrationBase(List<?> exampleInputs, ImageType<T> imageType) {
 		super(new BorderLayout());
 		createMenuBar(exampleInputs);
 
@@ -75,7 +86,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		this.boofCopy1 = imageType.createImage(1,1);
 	}
 
-	private void createMenuBar(List<String> exampleInputs) {
+	private void createMenuBar(List<?> exampleInputs) {
 		menuBar = new JMenuBar();
 
 		JMenu menu = new JMenu("File");
@@ -104,8 +115,19 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		menu = new JMenu("Examples");
 		menuBar.add(menu);
 
-		for (final String path : exampleInputs) {
-			JMenuItem menuItem = new JMenuItem(new File(path).getName());
+		for (final Object o : exampleInputs ) {
+			final String path,name;
+
+			if( o instanceof PathLabel )  {
+				path = ((PathLabel)o).getPath();
+				name = ((PathLabel)o).getLabel();
+			} else if( o instanceof String ){
+				path = (String)o;
+				name = new File((String)o).getName();
+			} else {
+				throw new IllegalArgumentException("Example must be a PathLabel or a String path");
+			}
+			JMenuItem menuItem = new JMenuItem( name );
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -116,6 +138,16 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		}
 
 		add(BorderLayout.NORTH, menuBar);
+	}
+
+	/**
+	 * Override to be notified when the input has changed
+	 * @param method Type of input source
+	 * @param width Width of input image
+	 * @param height Height of input image
+	 */
+	protected void handleInputChange( InputMethod method , int width , int height ) {
+
 	}
 
 	/**
@@ -279,6 +311,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 			input.reshape(buffered.getWidth(),buffered.getHeight());
 			inputBuffered = buffered;
 			ConvertBufferedImage.convertFrom(buffered,input,true);
+			handleInputChange(inputMethod,buffered.getWidth(),buffered.getHeight());
 			processImageThread(buffered, input);
 		}
 	}
@@ -375,12 +408,19 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 		@Override
 		public void run() {
+			handleInputChange(inputMethod,sequence.getNextWidth(),sequence.getNextHeight());
+
 			long before = System.currentTimeMillis();
 			while( !requestStop && sequence.hasNext() ) {
 				T input = sequence.next();
 
+				boolean skipFrame = streamPaused && inputMethod == InputMethod.WEBCAM;
+
 				if( input == null ) {
 					break;
+				} else if( skipFrame ) {
+					// do nothing just don't process it
+					before = System.currentTimeMillis();
 				} else {
 					BufferedImage buffered = sequence.getGuiImage();
 					processImageThread(buffered,input);
@@ -395,6 +435,13 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
 					}
 					before = System.currentTimeMillis();
+				}
+
+				// If paused and is a video, do thing until unpaused or a stop is requested
+				if( streamPaused && inputMethod == InputMethod.VIDEO ) {
+					while( streamPaused && !requestStop ) {
+						try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+					}
 				}
 			}
 			sequence.close();
