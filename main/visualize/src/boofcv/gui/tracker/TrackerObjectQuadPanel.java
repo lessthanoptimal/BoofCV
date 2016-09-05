@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,6 @@ import java.awt.image.BufferedImage;
  */
 public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 
-	boolean selectMode = true;
-
 	int numSelected = 0;
 
 	Quadrilateral_F64 quad = new Quadrilateral_F64();
@@ -48,6 +46,8 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	Listener listener;
 
 	BufferedImage bg;
+
+	Mode mode = Mode.SELECT_RECT;
 
 	public TrackerObjectQuadPanel(Listener listener) {
 		super(new BorderLayout());
@@ -65,8 +65,13 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 		bg.createGraphics().drawImage(image,0,0,null);
 	}
 
+	public synchronized void enterIdleMode() {
+		mode = Mode.IDLE;
+		repaint();
+	}
+
 	public synchronized void enterSelectMode() {
-		selectMode = true;
+		mode = Mode.SELECT_RECT;
 		numSelected = 0;
 		repaint();
 	}
@@ -74,7 +79,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	public synchronized void setTarget( Quadrilateral_F64 quad , boolean visible ) {
 		if( quad != null )
 			this.quad.set(quad);
-		selectMode = false;
+		mode = Mode.TRACKING;
 		targetVisible = visible;
 		repaint();
 	}
@@ -82,7 +87,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	public synchronized void setTarget( RectangleLength2D_I32 rect , boolean visible ) {
 		if( quad != null )
 			UtilPolygons2D_F64.convert(rect, quad);
-		selectMode = false;
+		mode = Mode.TRACKING;
 		targetVisible = visible;
 		repaint();
 	}
@@ -90,39 +95,41 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	@Override
 	protected synchronized void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = (Graphics2D) g;
 
-		g2.drawImage(bg,0,0,null);
+		g2.drawImage(bg, 0, 0, null);
 
 		g2.setStroke(new BasicStroke(5));
 		g2.setColor(Color.gray);
 
-		if( selectMode ) {
-			if( numSelected == 1 ) {
+		if (mode == Mode.SELECT_RECT) {
+			if (numSelected == 1) {
 				drawCorner(g2, quad.a, Color.RED);
-			} else if( numSelected == 2 ) {
+			} else if (numSelected == 2) {
 				drawLine(g2, quad.a, quad.b);
-				drawCorner(g2,quad.a,Color.RED);
-				drawCorner(g2,quad.b,Color.ORANGE);
-			} else if( numSelected == 3 ) {
-				drawLine(g2,quad.a,quad.b);
+				drawCorner(g2, quad.a, Color.RED);
+				drawCorner(g2, quad.b, Color.ORANGE);
+			} else if (numSelected == 3) {
+				drawLine(g2, quad.a, quad.b);
 				drawLine(g2, quad.b, quad.c);
-				drawCorner(g2,quad.a,Color.RED);
-				drawCorner(g2,quad.b,Color.ORANGE);
-				drawCorner(g2,quad.c,Color.CYAN);
-			} else if( numSelected == 4 ) {
-				VisualizeShapes.drawQuad(quad, g2, true, Color.gray , Color.CYAN);
-				drawCorner(g2,quad.a,Color.RED);
-				drawCorner(g2,quad.b,Color.ORANGE);
-				drawCorner(g2,quad.c,Color.CYAN);
-				drawCorner(g2,quad.d,Color.BLUE);
+				drawCorner(g2, quad.a, Color.RED);
+				drawCorner(g2, quad.b, Color.ORANGE);
+				drawCorner(g2, quad.c, Color.CYAN);
+			} else if (numSelected == 4) {
+				VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.CYAN);
+				drawCorner(g2, quad.a, Color.RED);
+				drawCorner(g2, quad.b, Color.ORANGE);
+				drawCorner(g2, quad.c, Color.CYAN);
+				drawCorner(g2, quad.d, Color.BLUE);
 			}
-		} else if( targetVisible ) {
-			VisualizeShapes.drawQuad(quad, g2,true, Color.gray , Color.CYAN);
-			drawCorner(g2,quad.a,Color.RED);
-			drawCorner(g2,quad.b,Color.RED);
-			drawCorner(g2,quad.c,Color.RED);
-			drawCorner(g2,quad.d,Color.RED);
+		} else if (mode == Mode.TRACKING) {
+			if (targetVisible) {
+				VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.CYAN);
+				drawCorner(g2, quad.a, Color.RED);
+				drawCorner(g2, quad.b, Color.RED);
+				drawCorner(g2, quad.c, Color.RED);
+				drawCorner(g2, quad.d, Color.RED);
+			}
 		}
 	}
 
@@ -136,7 +143,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 
 	@Override
 	public synchronized void mouseClicked(MouseEvent e) {
-		if( !selectMode || numSelected >= 4 )
+		if( mode != Mode.SELECT_RECT || numSelected >= 4 )
 			return;
 
 		if( numSelected == 0 ) {
@@ -153,13 +160,13 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 
 		if( numSelected == 4 ) {
 			listener.selectedTarget(quad);
-			selectMode = false;
+			mode = Mode.TRACKING;
 		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if( !selectMode ) {
+		if( mode != Mode.SELECT_RECT ) {
 			if( e.getButton() == 2 ) {
 				System.out.println("Entering select mode");
 				enterSelectMode();
@@ -178,16 +185,26 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	@Override
 	public void mouseExited(MouseEvent e) {}
 
-	public boolean isSelectMode() {
-		return selectMode;
-	}
-
 	public synchronized void setDefaultTarget(Quadrilateral_F64 target) {
 		this.quad.set(target);
 		numSelected = 4;
-		selectMode = false;
+		mode = Mode.TRACKING;
 		targetVisible = true;
 		repaint();
+	}
+
+	public Mode getMode() {
+		return mode;
+	}
+
+	public void setMode(Mode mode) {
+		this.mode = mode;
+	}
+
+	public enum Mode {
+		IDLE,
+		SELECT_RECT,
+		TRACKING
 	}
 
 	public static interface Listener

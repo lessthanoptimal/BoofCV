@@ -65,11 +65,17 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	protected ImageType<T> imageType;
 	T input;
 	BufferedImage inputBuffered;
-	MediaManager media = new DefaultMediaManager();
+	protected MediaManager media = new DefaultMediaManager();
 
 	// If true then any stream will be paused.  If a webcam is running it will skip new images
 	// if a video it will stop processing the input
 	protected volatile boolean streamPaused = false;
+
+	// minimum elapsed time between the each stream frame being processed, in milliseconds
+	protected volatile long streamPeriod = 30;
+
+	// File path to previously opened image or video.  null if webcam
+	protected String inputFilePath;
 
 	/**
 	 * Constructor that specifies examples and input image type
@@ -141,7 +147,9 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	}
 
 	/**
-	 * Override to be notified when the input has changed
+	 * Override to be notified when the input has changed.  This is also a good location to change the default
+	 * max FPS for streaming data.  It will be 0 for webcam and 30 FPS for videos
+	 *
 	 * @param method Type of input source
 	 * @param width Width of input image
 	 * @param height Height of input image
@@ -287,24 +295,11 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		stopPreviousInput();
 
 		String filePath = UtilIO.pathExample(file.getPath());
+		inputFilePath = filePath;
 		// mjpegs can be opened up as images.  so override the default behavior
 		BufferedImage buffered = filePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(filePath);
 		if( buffered == null ) {
-			SimpleImageSequence<T> sequence = media.openVideo(filePath, imageType);
-			if( sequence != null ) {
-				inputMethod = InputMethod.VIDEO;
-				sequenceThread = new ImageSequenceThread(sequence,30);
-				sequenceThread.start();
-			} else {
-				inputMethod = InputMethod.NONE;
-				waitingToOpenImage = false;
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						JOptionPane.showMessageDialog(DemonstrationBase.this, "Can't open file");
-					}
-				});
-			}
+			openVideo(filePath);
 		} else {
 
 			inputMethod = InputMethod.IMAGE;
@@ -313,6 +308,28 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 			ConvertBufferedImage.convertFrom(buffered,input,true);
 			handleInputChange(inputMethod,buffered.getWidth(),buffered.getHeight());
 			processImageThread(buffered, input);
+		}
+	}
+
+	/**
+	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has beens topped
+	 */
+	private void openVideo(String filePath) {
+		SimpleImageSequence<T> sequence = media.openVideo(filePath, imageType);
+		if( sequence != null ) {
+			inputMethod = InputMethod.VIDEO;
+			streamPeriod = 33; // default to 33 FPS for a video
+			sequenceThread = new ImageSequenceThread(sequence);
+			sequenceThread.start();
+		} else {
+			inputMethod = InputMethod.NONE;
+			waitingToOpenImage = false;
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					JOptionPane.showMessageDialog(DemonstrationBase.this, "Can't open file");
+				}
+			});
 		}
 	}
 
@@ -331,15 +348,17 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 
 		stopPreviousInput();
 
+		inputFilePath = null;
 		waitingToOpenImage = true;
 		inputMethod = InputMethod.WEBCAM;
+		streamPeriod = 0; // default to no delay in processing for a real time stream
 
 		new WaitingThread("Opening Webcam").start();
 		new Thread() {
 			public void run() {
 				SimpleImageSequence<T> sequence = media.openCamera(null,640,480,imageType);
 				if(sequence != null) {
-					sequenceThread = new ImageSequenceThread(sequence,0);
+					sequenceThread = new ImageSequenceThread(sequence);
 					sequenceThread.start();
 				} else {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -399,11 +418,10 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		boolean running = true;
 
 		SimpleImageSequence<T> sequence;
-		long pause;
 
-		public ImageSequenceThread(SimpleImageSequence<T> sequence, long pause ) {
+
+		public ImageSequenceThread(SimpleImageSequence<T> sequence) {
 			this.sequence = sequence;
-			this.pause = pause;
 		}
 
 		@Override
@@ -414,6 +432,7 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 			while( !requestStop && sequence.hasNext() ) {
 				T input = sequence.next();
 
+				// if it's a webcam and paused, just don't process the video frame
 				boolean skipFrame = streamPaused && inputMethod == InputMethod.WEBCAM;
 
 				if( input == null ) {
@@ -424,8 +443,8 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 				} else {
 					BufferedImage buffered = sequence.getGuiImage();
 					processImageThread(buffered,input);
-					if( pause > 0 ) {
-						long time = Math.max(0,pause-(System.currentTimeMillis()-before));
+					if( streamPeriod > 0 ) {
+						long time = Math.max(0, streamPeriod -(System.currentTimeMillis()-before));
 						if( time > 0 ) {
 							try {Thread.sleep(time);} catch (InterruptedException ignore) {}
 						} else {
@@ -457,6 +476,24 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		if( sequenceThread == null ) {
 			// hmm if it's reprocessing the last image in a sequence this might not work
 			processImageThread(inputBuffered, input);
+		}
+	}
+
+	/**
+	 * If the current input source is a video it will reload it from the start
+	 */
+	public void replayVideo() {
+		if( inputMethod == InputMethod.VIDEO ) {
+			synchronized (waitingLock) {
+				if (waitingToOpenImage) {
+					System.out.println("Waiting to open an image");
+					return;
+				}
+				waitingToOpenImage = true;
+			}
+
+			stopPreviousInput();
+			openVideo(inputFilePath);
 		}
 	}
 

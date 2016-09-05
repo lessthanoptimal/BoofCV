@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,20 +33,23 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements ActionListener {
+public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
 	JTextArea displayFPS;
 	JTextArea displayTracking;
+
+	JSpinner selectMaxVideoFPS;
 
 	JButton buttonPlay;
 
 	JButton buttonSelect;
 
-	JButton buttonReset;
+	JButton buttonReplay;
 
 	Listener listener;
+	private double maxFPS = 30;
 
-	public TrackerQuadInfoPanel( Listener listener ) {
+	public TrackerQuadInfoPanel( Listener listener  ) {
 		this.listener = listener;
 
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -59,17 +64,24 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		buttonSelect = new JButton("Select");
 		buttonSelect.addActionListener(this);
 
-		buttonReset = new JButton("Reset");
-		buttonReset.addActionListener(this);
+		buttonReplay = new JButton("Replay");
+		buttonReplay.addActionListener(this);
+
+		selectMaxVideoFPS = new JSpinner(new SpinnerNumberModel(maxFPS,0,100,5));
+		selectMaxVideoFPS.addChangeListener(this);
+		selectMaxVideoFPS.setMaximumSize(selectMaxVideoFPS.getPreferredSize());
 
 		addLabeledV(displayFPS,"Algorithm FPS:",this);
+		addLabeledV(selectMaxVideoFPS,"Max Video FPS:",this);
 		addLabeledV(displayTracking, "Tracking:", this);
 		addSeparator(200);
 		add(buttonPlay);
 		addAlignCenter(buttonPlay, this);
-		addAlignCenter(buttonReset, this);
+		addAlignCenter(buttonReplay, this);
 		addSeparator(200);
 		addAlignCenter(buttonSelect, this);
+
+		listener.setMaxFPS(maxFPS);
 	}
 
 	private JTextArea createTextInfo() {
@@ -79,20 +91,35 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		return comp;
 	}
 
-	public void setFPS( double fps ) {
-		displayFPS.setText(String.format("%5.1f", fps));
+	public void setFPS( final double fps ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				displayFPS.setText(String.format("%5.1f", fps));
+			}
+		});
 	}
 
-	public void setTracking( String text ) {
-		displayTracking.setText(text);
+	public void setTracking( final String text ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				displayTracking.setText(text);
+			}
+		});
 	}
 
-	public void setPlay( boolean playing ) {
-		if( playing ) {
-			buttonPlay.setText("Play");
-		} else {
-			buttonPlay.setText("Pause");
-		}
+	public void setPlay( final boolean playing ) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if( playing ) {
+					buttonPlay.setText("Playing");
+				} else {
+					buttonPlay.setText("Paused");
+				}
+			}
+		});
 	}
 
 	@Override
@@ -100,17 +127,31 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		if( e.getSource() == buttonPlay ) {
 			listener.togglePause();
 		} else if( e.getSource() == buttonSelect ) {
-			listener.selectTarget();
-		} else if( e.getSource() == buttonReset ) {
-			listener.resetVideo();
+			listener.enterSelectTargetMode();
+		} else if( e.getSource() == buttonReplay) {
+			listener.replayVideo();
 		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( e.getSource() == selectMaxVideoFPS ) {
+			maxFPS = ((Number) selectMaxVideoFPS.getValue()).doubleValue();
+			listener.setMaxFPS(maxFPS);
+		}
+	}
+
+	public double getMaxFPS() {
+		return maxFPS;
 	}
 
 	public static interface Listener {
 		public void togglePause();
 
-		public void selectTarget();
+		public void enterSelectTargetMode();
 
-		public void resetVideo();
+		public void replayVideo();
+
+		void setMaxFPS( double fps );
 	}
 }

@@ -33,7 +33,10 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.shapes.Quadrilateral_F64;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -44,13 +47,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO Add controller for MAX FPS
-	// TODO fix pause button state
-	// TODO add back ability to select tracker
-	// TODO fix no image on webpage problem
+	// TODO click and drag to define rectangle
+	// TODO clicking automatically pauses and goes into select mode
 public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		extends DemonstrationBase<Planar<I>>
-		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener
+		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener, ActionListener
 {
 	Class<I> imageClass;
 	TrackerObjectQuad tracker;
@@ -58,18 +59,33 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	TrackerObjectQuadPanel videoPanel;
 	TrackerQuadInfoPanel infoBar;
 
+	// which tracking algorithm has the user selected
 	int whichAlg;
 
 	I gray;
 
+	// current location of target in the image
 	Quadrilateral_F64 target = new Quadrilateral_F64();
+	// default location of target (if available) at the first frame
 	Quadrilateral_F64 targetDefault = new Quadrilateral_F64();
 
+	// has a region been selected by the user or a default was found
 	boolean targetSelected = false;
-	boolean selectionChanged = false;
+	// Does the tracker need to be initialized?
+	boolean initializeTracker = false;
 
+	// was tracking successful?
 	boolean success;
+	// Is this the very first frame processed by the tracker
 	boolean firstFrame = true;
+
+	// has which tracker being used been changed by the user?
+	boolean trackerChanged;
+	double FPS = 0;
+
+	// GUI component which lets the user select which algorithm to run
+	JComboBox selectAlgorithm;
+	boolean hasDefaultRect = false;
 
 	public VideoTrackerObjectQuadApp(List<PathLabel> examples,
 									 Class<I> imageType ) {
@@ -78,36 +94,66 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-//		addAlgorithm(0, "Circulant", 0);
-//		addAlgorithm(0, "TLD", 1);
-//		addAlgorithm(0, "Mean-Shift Region Fixed", 2);
-//		addAlgorithm(0, "Mean-Shift Region Scale", 3);
-//		addAlgorithm(0, "Mean-Shift Pixel", 4);
-//		addAlgorithm(0, "Sparse Flow Tracker", 5);
-
 		videoPanel = new TrackerObjectQuadPanel(this);
 		infoBar = new TrackerQuadInfoPanel(this);
 
 		add(infoBar, BorderLayout.WEST);
 		add(videoPanel, BorderLayout.CENTER);
+
+		selectAlgorithm = new JComboBox();
+		selectAlgorithm.addItem( "Circulant" );
+		selectAlgorithm.addItem( "TLD" );
+		selectAlgorithm.addItem( "Mean-Shift Region Fixed" );
+		selectAlgorithm.addItem( "Mean-Shift Region Scale" );
+		selectAlgorithm.addItem( "Mean-Shift Pixel" );
+		selectAlgorithm.addItem( "Sparse Flow Tracker" );
+		selectAlgorithm.addActionListener(this);
+		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
+		menuBar.add(selectAlgorithm);
 	}
 
 	@Override
-	protected void handleInputChange(InputMethod method, int width, int height) {
+	protected void handleInputChange(InputMethod method, final int width, final int height) {
 		if( !(method == InputMethod.VIDEO || method == InputMethod.WEBCAM) )
 			throw new IllegalArgumentException("Must be a video or webcam!");
 
+		if( method == InputMethod.VIDEO)
+			setPaused(true); // paused the video or webcam so that user can select
+		else
+			setPaused(false);
+
+		if( !hasDefaultRect ) {
+			videoPanel.setMode(TrackerObjectQuadPanel.Mode.IDLE);
+			targetSelected = false;
+		} else {
+			videoPanel.setDefaultTarget(targetDefault);
+			targetSelected = true;
+			initializeTracker = true;
+			target.set(targetDefault);
+		}
+
+		trackerChanged = true;
 		firstFrame = true;
-		streamPaused = true; // paused the video or webcam so that user can select
-		createNewTracker();
+		FPS = 0;
+
 		infoBar.setPlay(false);
+
+		// override default speed
+		setMaxFPS( infoBar.getMaxFPS());
 
 		videoPanel.setPreferredSize(new Dimension(width, height));
 		videoPanel.setMaximumSize(new Dimension(width, height));
 	}
 
 	@Override
-	public void processImage(BufferedImage buffered, Planar<I> frame) {
+	public void processImage(final BufferedImage buffered, Planar<I> frame) {
+
+		if( trackerChanged ) {
+			trackerChanged = false;
+			createNewTracker();
+			initializeTracker = true;
+		}
+
 		boolean grayScale = false;
 
 		if( tracker.getImageType().getFamily() == ImageType.Family.GRAY) {
@@ -117,20 +163,37 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		}
 
 		if( targetSelected ) {
-			if( selectionChanged ) {
-				selectionChanged = false;
+			if(initializeTracker) {
+				initializeTracker = false;
 				if( grayScale)
 					success = tracker.initialize(gray, target);
 				else
 					success = tracker.initialize(frame, target);
-			} else
-			if( grayScale)
-				success = tracker.process(gray, target);
-			else
-				success = tracker.process(frame, target);
+			} else {
+				long before = System.nanoTime();
+				if (grayScale)
+					success = tracker.process(gray, target);
+				else
+					success = tracker.process(frame, target);
+				long after = System.nanoTime();
+
+				// update the algorithm FPS estimate using a rolling average
+				double elapsed = (after-before)*1e-9;
+				double decay = 0.98;
+				if( FPS == 0 )
+					FPS = 1.0/elapsed;
+				else
+					FPS = decay*FPS + (1.0-decay)*(1.0/elapsed);
+			}
 		}
 
-		updateGUI(frame,buffered,1000.0);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updateGUI(buffered);
+			}
+		});
+
 	}
 
 	private void createNewTracker() {
@@ -152,18 +215,11 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 			tracker = FactoryTrackerObjectQuad.sparseFlow(null,imageClass,null);
 		} else
 			throw new RuntimeException("Unknown algorithm");
-
-		// use default rectangle
-		videoPanel.setDefaultTarget(targetDefault);
-		firstFrame = true;
-		targetSelected = true;
-		selectionChanged = true;
-		target.set(targetDefault);
 	}
 
 
 
-	protected void updateGUI(Planar<I> frame, BufferedImage imageGUI, double fps) {
+	protected void updateGUI(BufferedImage imageGUI) {
 		if( firstFrame ) {
 			videoPanel.setBackGround(imageGUI);
 			infoBar.setFPS(0);
@@ -171,8 +227,9 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 			firstFrame = false;
 		} else {
 			videoPanel.setBackGround(imageGUI);
-			videoPanel.setTarget(target, success);
-			infoBar.setFPS(fps);
+			if( targetSelected )
+				videoPanel.setTarget(target, success);
+			infoBar.setFPS(FPS);
 			if( success ) {
 				infoBar.setTracking("FOUND");
 			} else {
@@ -187,39 +244,70 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		System.out.println(target.a.x+" "+target.a.y+" "+target.b.x+" "+target.b.y+" "+target.c.x+" "+target.c.y+" "+target.d.x+" "+target.d.y);
 		this.target.set(target);
 		targetSelected = true;
-		selectionChanged = true;
+		initializeTracker = true;
 		streamPaused = false;
 	}
 
 	@Override
 	public void togglePause() {
-		streamPaused = !streamPaused;
+		setPaused(!streamPaused);
 	}
 
 	@Override
-	public void selectTarget() {
-		streamPaused = true;
+	public void enterSelectTargetMode() {
+		setPaused(true);
 		infoBar.setTracking("");
 		targetSelected = false;
 		videoPanel.enterSelectMode();
 	}
 
 	@Override
-	public void resetVideo() {
-		System.out.println("Reset video called");
+	public void replayVideo() {
+		if( inputMethod == InputMethod.VIDEO ) {
+			super.replayVideo();
+		}
+	}
+
+	@Override
+	public void setMaxFPS(double fps) {
+		if( fps == 0 )
+			streamPeriod = 0;
+		else
+			streamPeriod = (long)(1000/fps);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == selectAlgorithm ) {
+			whichAlg = selectAlgorithm.getSelectedIndex();
+			trackerChanged = true;
+		}
+	}
+
+	@Override
+	public void openWebcam() {
+		hasDefaultRect = false;
+		super.openWebcam();
 	}
 
 	@Override
 	public void openFile(File file) {
+		hasDefaultRect = false;
 		String videoName = file.getPath();
 		String path = videoName.substring(0,videoName.lastIndexOf('.'));
-				try {
+		try {
 			parseQuad(path+"_rect.txt");
+			hasDefaultRect = true;
 		} catch (FileNotFoundException e) {
 			System.out.println("Can't find predefined region for "+file.getName());
 		}
 
 		super.openFile(file);
+	}
+
+	private void setPaused( boolean paused ) {
+		streamPaused = paused;
+		infoBar.setPlay(!streamPaused);
 	}
 
 
