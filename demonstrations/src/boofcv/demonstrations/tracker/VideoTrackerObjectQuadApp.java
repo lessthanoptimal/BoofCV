@@ -47,8 +47,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-	// TODO click and drag to define rectangle
-	// TODO clicking automatically pauses and goes into select mode
 public class VideoTrackerObjectQuadApp<I extends ImageGray>
 		extends DemonstrationBase<Planar<I>>
 		implements TrackerObjectQuadPanel.Listener  , TrackerQuadInfoPanel.Listener, ActionListener
@@ -90,6 +88,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	public VideoTrackerObjectQuadApp(List<PathLabel> examples,
 									 Class<I> imageType ) {
 		super(examples, ImageType.pl(3, imageType));
+		this.allowImages = false;
 		this.imageClass = imageType;
 
 		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -249,16 +248,13 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 	}
 
 	@Override
-	public void togglePause() {
-		setPaused(!streamPaused);
+	public void pauseTracker() {
+		setPaused(true);
 	}
 
 	@Override
-	public void enterSelectTargetMode() {
-		setPaused(true);
-		infoBar.setTracking("");
-		targetSelected = false;
-		videoPanel.enterSelectMode();
+	public void togglePause() {
+		setPaused(!streamPaused);
 	}
 
 	@Override

@@ -42,7 +42,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 
 	JButton buttonPlay;
 
-	JButton buttonSelect;
 
 	JButton buttonReplay;
 
@@ -61,8 +60,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		buttonPlay = new JButton("Start");
 		buttonPlay.addActionListener(this);
 
-		buttonSelect = new JButton("Select");
-		buttonSelect.addActionListener(this);
 
 		buttonReplay = new JButton("Replay");
 		buttonReplay.addActionListener(this);
@@ -78,8 +75,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		add(buttonPlay);
 		addAlignCenter(buttonPlay, this);
 		addAlignCenter(buttonReplay, this);
-		addSeparator(200);
-		addAlignCenter(buttonSelect, this);
 
 		listener.setMaxFPS(maxFPS);
 	}
@@ -126,8 +121,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == buttonPlay ) {
 			listener.togglePause();
-		} else if( e.getSource() == buttonSelect ) {
-			listener.enterSelectTargetMode();
 		} else if( e.getSource() == buttonReplay) {
 			listener.replayVideo();
 		}
@@ -147,8 +140,6 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 
 	public static interface Listener {
 		public void togglePause();
-
-		public void enterSelectTargetMode();
 
 		public void replayVideo();
 

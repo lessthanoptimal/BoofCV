@@ -77,6 +77,10 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	// File path to previously opened image or video.  null if webcam
 	protected String inputFilePath;
 
+	protected boolean allowImages = true;
+	protected boolean allowVideos = true;
+	protected boolean allowWebcameras = true;
+
 	/**
 	 * Constructor that specifies examples and input image type
 	 *
@@ -299,8 +303,16 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 		// mjpegs can be opened up as images.  so override the default behavior
 		BufferedImage buffered = filePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(filePath);
 		if( buffered == null ) {
+			if( !allowVideos ) {
+				showRejectDiaglog("Can't process video files");
+				return;
+			}
 			openVideo(filePath);
 		} else {
+			if( !allowImages ) {
+				showRejectDiaglog("Can't process images");
+				return;
+			}
 
 			inputMethod = InputMethod.IMAGE;
 			input.reshape(buffered.getWidth(),buffered.getHeight());
@@ -343,13 +355,20 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	}
 
 	public void openWebcam() {
-		if(waitingToOpenImage)
+		if( !allowWebcameras ) {
+			showRejectDiaglog("Can't process webcams");
 			return;
+		}
+
+		synchronized (waitingLock) {
+			if (waitingToOpenImage)
+				return;
+			waitingToOpenImage = true;
+		}
 
 		stopPreviousInput();
 
 		inputFilePath = null;
-		waitingToOpenImage = true;
 		inputMethod = InputMethod.WEBCAM;
 		streamPeriod = 0; // default to no delay in processing for a real time stream
 
@@ -370,6 +389,13 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 				}
 			}
 		}.start();
+	}
+
+	/**
+	 * Displays a dialog box letting the user know it can't perform the requested action
+	 */
+	private void showRejectDiaglog( String message ) {
+		JOptionPane.showMessageDialog(null, message);
 	}
 
 	private ActionListener createActionListener() {
