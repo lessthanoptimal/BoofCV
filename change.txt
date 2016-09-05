@@ -15,6 +15,9 @@ Version : 0.25
 - Histogram of Oriented Gradient
   * Provided another implementation which is more faithful to original paper, but much slower
   * Can now independently configure block size along each axis
+- VideoTrackerObjectQuadApp
+  * Can now open webcams and videos
+  * Improved UI
 
 
 - TODO Regression: circular grid fiducial and calibration

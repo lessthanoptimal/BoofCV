@@ -21,6 +21,7 @@ package boofcv.gui.tracker;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
@@ -29,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 /**
@@ -36,7 +38,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
+public class TrackerObjectQuadPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	int numSelected = 0;
 
@@ -47,13 +49,14 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 
 	BufferedImage bg;
 
-	Mode mode = Mode.SELECT_RECT;
+	Mode mode = Mode.IDLE;
 
 	public TrackerObjectQuadPanel(Listener listener) {
 		super(new BorderLayout());
 		this.listener = listener;
 		if( listener != null ){
 			addMouseListener(this);
+			addMouseMotionListener(this);
 			grabFocus();
 		}
 	}
@@ -71,7 +74,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	}
 
 	public synchronized void enterSelectMode() {
-		mode = Mode.SELECT_RECT;
+		mode = Mode.PLACING_POINTS;
 		numSelected = 0;
 		repaint();
 	}
@@ -102,7 +105,7 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 		g2.setStroke(new BasicStroke(5));
 		g2.setColor(Color.gray);
 
-		if (mode == Mode.SELECT_RECT) {
+		if (mode == Mode.PLACING_POINTS) {
 			if (numSelected == 1) {
 				drawCorner(g2, quad.a, Color.RED);
 			} else if (numSelected == 2) {
@@ -122,6 +125,12 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 				drawCorner(g2, quad.c, Color.CYAN);
 				drawCorner(g2, quad.d, Color.BLUE);
 			}
+		} else if (mode == Mode.DRAGGING_RECT) {
+			VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.gray);
+			drawCorner(g2, quad.a, Color.RED);
+			drawCorner(g2, quad.b, Color.RED);
+			drawCorner(g2, quad.c, Color.RED);
+			drawCorner(g2, quad.d, Color.RED);
 		} else if (mode == Mode.TRACKING) {
 			if (targetVisible) {
 				VisualizeShapes.drawQuad(quad, g2, true, Color.gray, Color.CYAN);
@@ -143,8 +152,13 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 
 	@Override
 	public synchronized void mouseClicked(MouseEvent e) {
-		if( mode != Mode.SELECT_RECT || numSelected >= 4 )
+		if( mode == Mode.IDLE ) {
+			mode = Mode.PLACING_POINTS;
+			numSelected = 0;
+			listener.pauseTracker();
+		} else if( mode != Mode.PLACING_POINTS ) {
 			return;
+		}
 
 		if( numSelected == 0 ) {
 			quad.a.set(e.getX(),e.getY());
@@ -159,25 +173,45 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 		repaint();
 
 		if( numSelected == 4 ) {
-			listener.selectedTarget(quad);
 			mode = Mode.TRACKING;
+			listener.selectedTarget(quad);
 		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if( mode != Mode.SELECT_RECT ) {
-			if( e.getButton() == 2 ) {
-				System.out.println("Entering select mode");
-				enterSelectMode();
-			} else {
-				listener.togglePause();
-			}
-		}
+		if( mode == Mode.PLACING_POINTS )
+			return;
+		mode = Mode.DRAGGING_RECT;
+		quad.a.set(e.getX(),e.getY());
+		setCornerC(e.getX(),e.getY());
+
+		listener.pauseTracker();
+		repaint();
+	}
+
+	private void setCornerC( double x , double y ) {
+		quad.b.set(quad.a.x,y);
+		quad.c.set(x,y);
+		quad.d.set(x,quad.a.y);
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+		if( mode != Mode.DRAGGING_RECT )
+			return;
+		setCornerC(e.getX(),e.getY());
+
+		double area = Area2D_F64.quadrilateral(quad);
+		if( area < 10*10 ) {
+			mode = Mode.IDLE;
+			repaint();
+		} else {
+			mode = Mode.TRACKING;
+			listener.selectedTarget(quad);
+			repaint();
+		}
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {}
@@ -201,9 +235,22 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 		this.mode = mode;
 	}
 
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if( mode != Mode.DRAGGING_RECT )
+			return;
+		setCornerC(e.getX(),e.getY());
+		repaint();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+	}
+
 	public enum Mode {
 		IDLE,
-		SELECT_RECT,
+		DRAGGING_RECT,
+		PLACING_POINTS,
 		TRACKING
 	}
 
@@ -211,6 +258,6 @@ public class TrackerObjectQuadPanel extends JPanel implements MouseListener {
 	{
 		public void selectedTarget( Quadrilateral_F64 target );
 
-		public void togglePause();
+		public void pauseTracker();
 	}
 }
