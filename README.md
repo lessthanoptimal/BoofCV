@@ -5,6 +5,7 @@ Table of Contents
 ======================================
 
 * [Introduction]                       (#introduction)
+  * [Cloning Repository]               (#cloning-git-repository)
   * [Downloading]                      (#where-to-download)
   * [Gradle and Maven]                 (#include-in-gradle-and-maven-projects)
 * [Building from Source]               (#building-from-source)
@@ -21,6 +22,20 @@ BoofCV is an open source computer vision library written entirely in Java by Pet
 - [ Message Board   ] ( https://groups.google.com/group/boofcv             )
 - [ Bug Reports     ] ( https://github.com/lessthanoptimal/BoofCV/issues   )
 - [ Repository      ] ( https://github.com/lessthanoptimal/BoofCV          )
+
+## Cloning GIT Repository
+
+The bleeding edge source code can be obtained by cloning the git repository.
+
+```
+git clone --recursive https://github.com/lessthanoptimal/BoofCV.git boofcv
+```
+
+Is the data directory empty?  That's because you didn't follow instructions and skipped --recursive!  Fix that by doing the following.
+```
+cd boofcv
+git submodule update --init --recursive
+```
 
 ## Where to Download
 
@@ -96,16 +111,6 @@ Below are a few useful custom Gradle scripts that can be invoked:
 * _alljavadoc_ : Combines JavaDoc from all the sub-projects into one set.
 
 _createLibraryDirectory_ unless all dependencies are meet, not all projects in 'boofcv/integration' will produce jars.  See the "Integration Modules" section below for the details.
-
-## Data Directory
-
-If you checked out the source code directly from GIT you will need to also checkout the data directory if you want to run most of the examples.
-
-```
-cd boofcv
-git submodule init
-git submodule update
-```
 
 ## Compilation Error
 
