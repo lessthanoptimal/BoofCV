@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,11 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	@Override
 	public void associate() {
+		if( listSrc == null )
+			throw new IllegalArgumentException("source features not specified");
+		if( listDst == null )
+			throw new IllegalArgumentException("destination features not specified");
+
 		unassocSrc.reset();
 		alg.associate(listSrc,listDst);
 

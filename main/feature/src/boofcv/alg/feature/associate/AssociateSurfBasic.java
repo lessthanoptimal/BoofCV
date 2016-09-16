@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,6 +82,11 @@ public class AssociateSurfBasic {
 	 */
 	public void associate()
 	{
+		if( srcPositive.size == 0 && srcNegative.size == 0 )
+			throw new IllegalArgumentException("No source features!");
+		if( dstPositive.size == 0 && dstNegative.size == 0 )
+			throw new IllegalArgumentException("No destination features!");
+
 		// initialize data structures
 		matches.reset();
 		unassociatedSrc.reset();

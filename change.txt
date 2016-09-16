@@ -18,6 +18,8 @@ Version : 0.25
 - VideoTrackerObjectQuadApp
   * Can now open webcams and videos
   * Improved UI
+- Association
+  * Added helpful error messages when src and dst are not set
 
 
 - TODO Regression: circular grid fiducial and calibration
