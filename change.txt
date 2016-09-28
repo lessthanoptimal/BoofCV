@@ -20,6 +20,9 @@ Version : 0.25
   * Improved UI
 - Association
   * Added helpful error messages when src and dst are not set
+- Added support for F64 to F32 autocoding from regular F64 classes
+- Spherical cameras
+  * Equirectangular image support.  coordinates and redistortion
 
 
 - TODO Regression: circular grid fiducial and calibration

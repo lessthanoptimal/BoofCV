@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':main:autocode')
+}
+
+idea {
+    module {
+        name = "BoofCV Autocode"
+    }
+}
