@@ -24,7 +24,8 @@ Version : 0.25
 - Spherical cameras
   * Equirectangular image support.  coordinates and redistortion
 
-
+- TODO dual fisheye to equirectangular image
+- TODO fisheye
 - TODO Regression: circular grid fiducial and calibration
 - TODO Regression: Chessboard image border to fiducial regression
 - TODO Unit test for getScaleAtRadius
