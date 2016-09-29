@@ -18,16 +18,38 @@
 
 package boofcv.alg.distort.spherical;
 
+import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestEquirectangularRefocus_F32 {
+
+	/**
+	 * Sees if recentering moves it to approximately the expected location
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void simpleTests() {
+		Point2D_F32 found = new Point2D_F32();
+
+		EquirectangularRefocus_F32 alg = new EquirectangularRefocus_F32();
+
+		// this is the standard configuration and there should be no change
+		alg.configure(300,250,0,0);
+		alg.compute(299.0f*0.5f, 249*0.5f, found);
+		assertEquals( 0 , found.distance(299.0f*0.5f, 249*0.5f), GrlConstants.FLOAT_TEST_TOL);
+
+		alg.configure(300,250, (float)Math.PI/2.0f,0);
+		alg.compute(299.0f*0.5f, 249*0.5f, found);
+		assertEquals( 0 , found.distance(299.0f*0.75f, 249*0.5f), GrlConstants.FLOAT_TEST_TOL);
+
+		alg.configure(300,250, 0, (float)Math.PI/4.0f);
+		alg.compute(299.0f*0.5f, 249*0.5f, found);
+		assertEquals( 0 , found.distance(299.0f*0.5f, 249*0.75f), GrlConstants.FLOAT_TEST_TOL);
+
 	}
 }

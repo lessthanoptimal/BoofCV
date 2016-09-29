@@ -19,21 +19,22 @@
 package boofcv.alg.distort.spherical;
 
 import georegression.geometry.ConvertCoordinates3D_F64;
-import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
 
 /**
- * Contations common operations for handling coordinates in an equirectangular image.  An equirectangular image is
+ * Contains common operations for handling coordinates in an equirectangular image.  An equirectangular image is
  * a spherical coordinate system which has been projected onto a 2D image.
  *
- * longtitude is along the x-axis and goes from -pi to pi
+ * <p>
+ * longtitude is along the x-axis and goes from -pi to pi<br>
  * latitude is along the y-axis and goes from -pi/2 to pi/2
+ * </p>
  *
  * @author Peter Abeles
  */
-public class EquirectangularCoordinates_F64 {
+public class EquirectangularTools_F64 {
 	// input image width and height
 	int width;
 	int height;
@@ -45,12 +46,19 @@ public class EquirectangularCoordinates_F64 {
 	// internal storage to avoid declaring new memory
 	Point2D_F64 temp = new Point2D_F64();
 
-	public void configure( int width , int height , double latitudeCenter , double longitudeCenter  ) {
+	/**
+	 * Specifies the image and which latitude/longtiude will comprise the center axises
+	 * @param width Image width
+	 * @param height Image height
+	 * @param longitudeCenter center longitude line. -pi to pi
+	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
+	 */
+	public void configure( int width , int height , double longitudeCenter, double latitudeCenter  ) {
 		this.width = width;
 		this.height = height;
 
-		latCenterFrac = (latitudeCenter + GrlConstants.PId2)/GrlConstants.PI;
 		lonCenterFrac = (longitudeCenter + Math.PI)/(GrlConstants.PI2);
+		latCenterFrac = (latitudeCenter + GrlConstants.PId2)/GrlConstants.PI;
 	}
 
 	/**
@@ -69,25 +77,25 @@ public class EquirectangularCoordinates_F64 {
 	 * Converts the equirectangular coordinate into a latitude and longitude
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param latlon  (output) x = latitude, y = longitude
+	 * @param latlon  (output) x = longitude, y = latitude
 	 */
 	public void equiToLatlon( double x , double y , Point2D_F64 latlon ) {
-		double lat = (x/(width-1) - latCenterFrac)*GrlConstants.PI2;
-		latlon.x = UtilAngle.bound(lat);
+		double lon = (x/(width-1) - lonCenterFrac)*GrlConstants.PI;
+		double lat = (y/(height-1) - latCenterFrac)*GrlConstants.PI2;
 
-		double lon = (y/(height-1) - lonCenterFrac)*GrlConstants.PI;
-		latlon.y = UtilAngle.boundHalf(lon);
+		latlon.x = lon;//UtilAngle.boundHalf(lon);
+		latlon.y = lat;//UtilAngle.bound(lat);
 	}
 
 	/**
 	 * Convert from latitude-longitude coordinates into equirectangular coordinates
-	 * @param lat Latitude
 	 * @param lon Longitude
+	 * @param lat Latitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void latlonToRect(double lat , double lon , Point2D_F64 rect ) {
-		rect.x = UtilAngle.wrapZeroToOne(lat / GrlConstants.PI + latCenterFrac)*(width-1);
-		rect.y = UtilAngle.reflectZeroToOne(lon / GrlConstants.PId2 + lonCenterFrac)*(height-1);
+	public void latlonToRect(double lon , double lat , Point2D_F64 rect ) {
+		rect.x = (lon / GrlConstants.PI + lonCenterFrac)*(width-1);
+		rect.y = (lat / GrlConstants.PI2 + latCenterFrac)*(height-1);
 	}
 
 }

@@ -29,14 +29,21 @@ import georegression.struct.point.Point2D_F64;
  */
 public class EquirectangularRefocus_F64 implements PointTransform_F64 {
 
-	EquirectangularCoordinates_F64 inputOps = new EquirectangularCoordinates_F64();
-	EquirectangularCoordinates_F64 outputOps = new EquirectangularCoordinates_F64();
+	EquirectangularTools_F64 inputOps = new EquirectangularTools_F64();
+	EquirectangularTools_F64 outputOps = new EquirectangularTools_F64();
 
 	Point2D_F64 latlon = new Point2D_F64();
 
-	public void configure( int width , int height , double centerLatitude , double centerLongitude ) {
+	/**
+	 * Specifies the image and which latitude/longtiude will comprise the center axises
+	 * @param width Image width
+	 * @param height Image height
+	 * @param longitudeCenter center longitude line. -pi to pi
+	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
+	 */
+	public void configure( int width , int height , double longitudeCenter , double latitudeCenter ) {
 		inputOps.configure(width, height, 0,0);
-		outputOps.configure(width, height, centerLatitude, centerLongitude);
+		outputOps.configure(width, height, longitudeCenter, latitudeCenter);
 	}
 
 	@Override
