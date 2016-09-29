@@ -23,6 +23,7 @@ Version : 0.25
 - Added support for F64 to F32 autocoding from regular F64 classes
 - Spherical cameras
   * Equirectangular image support.  coordinates and redistortion
+- Dirty flag was not being set to false for cached image distort single band
 
 - TODO dual fisheye to equirectangular image
 - TODO fisheye

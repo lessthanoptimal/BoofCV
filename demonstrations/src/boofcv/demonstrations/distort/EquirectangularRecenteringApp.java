@@ -55,6 +55,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 
 
 	EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
+	PointToPixelTransform_F32 transform;
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
@@ -78,8 +79,9 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		InterpolatePixel<T> interp =
 				FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR,borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
-		distortImage.setModel( new PointToPixelTransform_F32(distorter));
 		distortImage.setRenderAll(true);
+
+		transform = new PointToPixelTransform_F32(distorter);
 
 		distorted = imageType.createImage(1,1);
 		inputCopy = imageType.createImage(1,1);
@@ -95,10 +97,8 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 				distorter.compute(e.getX(),e.getY(),r);
 				tools.equiToLonlat(r.x,r.y,latlon);
 
-				System.out.println();
-				System.out.println("Old center  lon "+distorter.getLongitudeCenter());
-				System.out.println("Recentering lon "+latlon.getX()+"  lat "+latlon.getY());
 				distorter.setCenter(latlon.x,latlon.y);
+				distortImage.setModel(transform); // let it know the transform has changed
 
 				if( inputMethod == InputMethod.IMAGE ) {
 					renderOutput(inputCopy);
@@ -115,6 +115,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 			panelImage.setPreferredSize(new Dimension(width,height));
 			distorter.setImageShape(width, height);
+			distortImage.setModel(transform); // let it know the transform has changed
 		}
 
 		centerLon = centerLat = 0;
