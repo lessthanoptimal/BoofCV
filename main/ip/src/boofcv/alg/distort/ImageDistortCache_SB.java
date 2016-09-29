@@ -107,6 +107,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray,Output extend
 					map[index++].set(dstToSrc.distX,dstToSrc.distY);
 				}
 			}
+			dirty = false;
 		} else if( dstImg.width != width || dstImg.height != height )
 			throw new IllegalArgumentException("Unexpected dstImg dimension");
 
