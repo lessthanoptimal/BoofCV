@@ -78,7 +78,7 @@ public class TestEquirectangularTools_F32 {
 		tools.configure(300,250,0,0);
 
 		Vector3D_F32 found = new Vector3D_F32();
-		tools.equiToNorm(299.0f/2.0f, 249/2.0f, found);
+		tools.equiToNorm(300.0f/2.0f, 250.0f/2.0f, found);
 
 		assertEquals(1.0f,found.x, GrlConstants.FLOAT_TEST_TOL);
 		assertEquals(0.0f,found.y, GrlConstants.FLOAT_TEST_TOL);

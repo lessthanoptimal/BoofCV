@@ -18,15 +18,28 @@
 
 package boofcv.demonstrations.distort;
 
+import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.PointToPixelTransform_F32;
+import boofcv.alg.distort.spherical.EquirectangularRefocus_F32;
+import boofcv.alg.interpolate.InterpolatePixel;
+import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.core.image.border.BorderType;
+import boofcv.factory.distort.FactoryDistort;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -39,29 +52,99 @@ import java.util.List;
  */
 public class EquirectangularRecenteringApp<T extends ImageBase> extends DemonstrationBase<T> {
 
+
+	EquirectangularRefocus_F32 distorter = new EquirectangularRefocus_F32();
+	ImageDistort<T,T> distortImage;
+
+	int imgWidth,imgHeight;
+
+	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
+
+	float centerLat;
+	float centerLon;
+
 	// todo add controls which allow lat and lon to be adjusted
 	ImagePanel panelImage;
+
+	T distorted;
+	T inputCopy;
 
 	public EquirectangularRecenteringApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-//		panelImage
+		panelImage = new ImagePanel();
+		add(panelImage, BorderLayout.CENTER);
+
+		BorderType borderType = BorderType.ZERO;
+		InterpolatePixel<T> interp =
+				FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR,borderType, imageType);
+		distortImage = FactoryDistort.distort(true, interp, imageType);
+		distortImage.setModel( new PointToPixelTransform_F32(distorter));
+		distortImage.setRenderAll(true);
+
+		distorted = imageType.createImage(1,1);
+		inputCopy = imageType.createImage(1,1);
+
+		panelImage.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Point2D_F32 latlon = new Point2D_F32();
+				distorter.getOutputOps().equiToLatlon(e.getX(),e.getY(),latlon);
+
+				System.out.println("Recentering lon "+latlon.getX()+"  lat "+latlon.getY());
+				distorter.configure(imgWidth,imgHeight,latlon.x,latlon.y);
+
+				if( inputMethod == InputMethod.IMAGE ) {
+					renderOutput(inputCopy);
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void handleInputChange(InputMethod method, int width, int height) {
+		super.handleInputChange(method, width, height);
+
+		if( rendered.getWidth() != width || rendered.getHeight() != height ) {
+			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
+			panelImage.setPreferredSize(new Dimension(width,height));
+			imgWidth = width;
+			imgHeight = height;
+
+		}
+
+		centerLon = centerLat = 0;
+		distorted.reshape(width,height);
+		distorter.configure(width,height,centerLon,centerLat);
 	}
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
 
+		T in;
+		if( inputMethod == InputMethod.IMAGE ) {
+			inputCopy.setTo(input);
+			in = inputCopy;
+		} else {
+			in = input;
+		}
+
+		renderOutput(in);
+	}
+
+	private void renderOutput(T in) {
+		distortImage.apply(in,distorted);
+		ConvertBufferedImage.convertTo(distorted,rendered,true);
+		panelImage.setBufferedImageSafe(rendered);
+		panelImage.repaint();
 	}
 
 	public static void main(String[] args) {
 
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
-		// todo add actual real images
 		List<PathLabel> examples = new ArrayList<PathLabel>();
-		examples.add(new PathLabel("WildCat", UtilIO.pathExample("tracking/wildcat_robot.mjpeg")));
-		examples.add(new PathLabel("Tree", UtilIO.pathExample("tracking/tree.mjpeg")));
-		examples.add(new PathLabel("Book", UtilIO.pathExample("tracking/track_book.mjpeg")));
+		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_halfdome.jpg")));
 
 		EquirectangularRecenteringApp app = new EquirectangularRecenteringApp(examples,type);
 

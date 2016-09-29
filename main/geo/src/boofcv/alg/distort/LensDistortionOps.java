@@ -86,20 +86,7 @@ public class LensDistortionOps {
 				break;
 		}
 
-		ImageDistort<T,T> distort;
-
-		switch( imageType.getFamily() ) {
-			case GRAY:
-				distort = FactoryDistort.distortSB(true, interp, bandType);
-				break;
-
-			case PLANAR:
-				distort = FactoryDistort.distortPL(true,interp, bandType);
-				break;
-
-			default:
-				throw new RuntimeException("Unsupported image family: "+imageType.getFamily());
-		}
+		ImageDistort<T,T> distort = FactoryDistort.distort(true, interp, imageType);
 
 		distort.setModel(new PointToPixelTransform_F32(undistToDist));
 		distort.setRenderAll(!skip );

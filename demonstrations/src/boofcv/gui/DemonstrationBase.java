@@ -288,6 +288,11 @@ public abstract class DemonstrationBase<T extends ImageBase> extends JPanel {
 	 * be stopped.
 	 */
 	public void openFile(File file) {
+		if( !file.exists() ) {
+			System.err.println("Can't find file "+file.getPath());
+			return;
+		}
+
 		synchronized (waitingLock) {
 			if (waitingToOpenImage) {
 				System.out.println("Waiting to open an image");

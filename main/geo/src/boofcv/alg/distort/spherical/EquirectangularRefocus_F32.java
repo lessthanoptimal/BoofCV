@@ -52,4 +52,12 @@ public class EquirectangularRefocus_F32 implements PointTransform_F32 {
 		inputOps.equiToLatlon(x,y,latlon);
 		outputOps.latlonToRect(latlon.x,latlon.y,out);
 	}
+
+	public EquirectangularTools_F32 getInputOps() {
+		return inputOps;
+	}
+
+	public EquirectangularTools_F32 getOutputOps() {
+		return outputOps;
+	}
 }

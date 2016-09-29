@@ -40,16 +40,16 @@ public class TestEquirectangularRefocus_F64 {
 
 		// this is the standard configuration and there should be no change
 		alg.configure(300,250,0,0);
-		alg.compute(299.0*0.5, 249*0.5, found);
-		assertEquals( 0 , found.distance(299.0*0.5, 249*0.5), GrlConstants.DOUBLE_TEST_TOL);
+		alg.compute(300.0*0.5, 250*0.5, found);
+		assertEquals( 0 , found.distance(300.0*0.5, 250*0.5), GrlConstants.DOUBLE_TEST_TOL);
 
 		alg.configure(300,250, Math.PI/2.0,0);
-		alg.compute(299.0*0.5, 249*0.5, found);
-		assertEquals( 0 , found.distance(299.0*0.75, 249*0.5), GrlConstants.DOUBLE_TEST_TOL);
+		alg.compute(300.0*0.5, 250*0.5, found);
+		assertEquals( 0 , found.distance(300.0*0.75, 250*0.5), GrlConstants.DOUBLE_TEST_TOL);
 
 		alg.configure(300,250, 0, Math.PI/4.0);
-		alg.compute(299.0*0.5, 249*0.5, found);
-		assertEquals( 0 , found.distance(299.0*0.5, 249*0.75), GrlConstants.DOUBLE_TEST_TOL);
+		alg.compute(300.0*0.5, 250*0.5, found);
+		assertEquals( 0 , found.distance(300.0*0.5, 250*0.75), GrlConstants.DOUBLE_TEST_TOL);
 
 	}
 }

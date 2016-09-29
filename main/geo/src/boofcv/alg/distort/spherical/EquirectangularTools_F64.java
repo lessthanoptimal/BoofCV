@@ -19,6 +19,7 @@
 package boofcv.alg.distort.spherical;
 
 import georegression.geometry.ConvertCoordinates3D_F64;
+import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -80,11 +81,11 @@ public class EquirectangularTools_F64 {
 	 * @param latlon  (output) x = longitude, y = latitude
 	 */
 	public void equiToLatlon( double x , double y , Point2D_F64 latlon ) {
-		double lon = (x/(width-1) - lonCenterFrac)*GrlConstants.PI;
-		double lat = (y/(height-1) - latCenterFrac)*GrlConstants.PI2;
+		double lon = (x/width - lonCenterFrac)*GrlConstants.PI;
+		double lat = (y/height - latCenterFrac)*GrlConstants.PI2;
 
-		latlon.x = lon;//UtilAngle.boundHalf(lon);
-		latlon.y = lat;//UtilAngle.bound(lat);
+		latlon.x = UtilAngle.boundHalf(lon);
+		latlon.y = UtilAngle.bound(lat);
 	}
 
 	/**
@@ -94,8 +95,16 @@ public class EquirectangularTools_F64 {
 	 * @param rect (Output) equirectangular coordinate
 	 */
 	public void latlonToRect(double lon , double lat , Point2D_F64 rect ) {
-		rect.x = (lon / GrlConstants.PI + lonCenterFrac)*(width-1);
-		rect.y = (lat / GrlConstants.PI2 + latCenterFrac)*(height-1);
+		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.PI + lonCenterFrac)*width;
+		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.PI2 + latCenterFrac)*height;
+	}
+
+	public double getCenterLatitude() {
+		return latCenterFrac*GrlConstants.PI - GrlConstants.PId2;
+	}
+
+	public double getCenterLongitude() {
+		return lonCenterFrac*GrlConstants.PI2 - GrlConstants.PI;
 	}
 
 }

@@ -46,6 +46,9 @@ public class FactoryDistort {
 			case PLANAR:
 				return distortPL(cached,(InterpolatePixelS)interp,outputType.getImageClass());
 			case INTERLEAVED:
+				if( interp instanceof InterpolatePixelS )
+					throw new IllegalArgumentException("Interpolation function for single band images was" +
+							" passed in for an interleaved image");
 				return distortIL(cached,(InterpolatePixelMB) interp, (ImageType)outputType);
 			default:
 				throw new IllegalArgumentException("Unknown image family "+outputType.getFamily());
