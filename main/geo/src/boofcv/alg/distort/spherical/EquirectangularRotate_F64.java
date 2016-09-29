@@ -18,30 +18,30 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PointTransform_F32;
-import georegression.geometry.ConvertRotation3D_F32;
-import georegression.geometry.GeometryMath_F32;
+import boofcv.struct.distort.PointTransform_F64;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Vector3D_F32;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
- * Applies a point transform that can be used to re-render an equirectangular image with a new center.  This lets you
- * close which parts of the image should be highly distorted and which should not.
+ * Transforms the equirectangular image as if the input image was taken by the camera at the same location but with
+ * a rotation.    Includes a built in function to center the camera at a particular location to minimize the distortion.
  *
  * @author Peter Abeles
  */
-public class EquirectangularRefocus_F32 implements PointTransform_F32 {
+public class EquirectangularRotate_F64 implements PointTransform_F64 {
 
-	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+	EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 
 	DenseMatrix64F R = CommonOps.identity(3,3);
-	Vector3D_F32 n = new Vector3D_F32();
+	Vector3D_F64 n = new Vector3D_F64();
 
-	float longitudeCenter;
-	float latitudeCenter;
+	double longitudeCenter;
+	double latitudeCenter;
 
 	/**
 	 * Specifies the image's width and height
@@ -54,34 +54,42 @@ public class EquirectangularRefocus_F32 implements PointTransform_F32 {
 	}
 
 	/**
-	 * Specifies which longitude/latitude will be along the displayed image center
+	 * Applies a rotation matrix which will center the view at the specified longitude/latitude
 	 *
 	 * @param longitudeCenter center longitude line. -pi to pi
 	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
 	 */
-	public void setCenter( float longitudeCenter , float latitudeCenter ) {
+	public void setCenter( double longitudeCenter , double latitudeCenter ) {
 		this.longitudeCenter = longitudeCenter;
 		this.latitudeCenter = latitudeCenter;
-		ConvertRotation3D_F32.eulerToMatrix(EulerType.ZXY,longitudeCenter,0,latitudeCenter,R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,latitudeCenter,0,longitudeCenter,R);
+	}
+
+	/**
+	 * Allows an arbitrary rotation matrix to be applied
+	 * @param R rotation matrix. 3x3
+	 */
+	public void setRotation( DenseMatrix64F R ) {
+		this.R.set(R);
 	}
 
 	@Override
-	public void compute(float x, float y, Point2D_F32 out) {
+	public void compute(double x, double y, Point2D_F64 out) {
 
 		tools.equiToNorm(x,y,n);
-		GeometryMath_F32.mult(R,n,n);
+		GeometryMath_F64.mult(R,n,n);
 		tools.normToEqui(n.x,n.y,n.z,out);
 	}
 
-	public EquirectangularTools_F32 getTools() {
+	public EquirectangularTools_F64 getTools() {
 		return tools;
 	}
 
-	public float getLongitudeCenter() {
+	public double getLongitudeCenter() {
 		return longitudeCenter;
 	}
 
-	public float getLatitudeCenter() {
+	public double getLatitudeCenter() {
 		return latitudeCenter;
 	}
 }

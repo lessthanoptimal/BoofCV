@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEquirectangularRefocus_F32 {
+public class TestEquirectangularRotate_F32 {
 
 	/**
 	 * Sees if recentering moves it to approximately the expected location
@@ -36,7 +36,7 @@ public class TestEquirectangularRefocus_F32 {
 	public void simpleTests() {
 		Point2D_F32 found = new Point2D_F32();
 
-		EquirectangularRefocus_F32 alg = new EquirectangularRefocus_F32();
+		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
 		alg.setImageShape(300,250);
 
 		// this is the standard configuration and there should be no change

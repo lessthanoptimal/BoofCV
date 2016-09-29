@@ -20,7 +20,7 @@ package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.distort.spherical.EquirectangularRefocus_F32;
+import boofcv.alg.distort.spherical.EquirectangularRotate_F32;
 import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -54,7 +54,7 @@ import java.util.List;
 public class EquirectangularRecenteringApp<T extends ImageBase> extends DemonstrationBase<T> {
 
 
-	EquirectangularRefocus_F32 distorter = new EquirectangularRefocus_F32();
+	EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
