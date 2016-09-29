@@ -37,17 +37,18 @@ public class TestEquirectangularRefocus_F32 {
 		Point2D_F32 found = new Point2D_F32();
 
 		EquirectangularRefocus_F32 alg = new EquirectangularRefocus_F32();
+		alg.setImageShape(300,250);
 
 		// this is the standard configuration and there should be no change
-		alg.configure(300,250,0,0);
+		alg.setCenter(0,0);
 		alg.compute(300.0f*0.5f, 250*0.5f, found);
 		assertEquals( 0 , found.distance(300.0f*0.5f, 250*0.5f), GrlConstants.FLOAT_TEST_TOL);
 
-		alg.configure(300,250, (float)Math.PI/2.0f,0);
+		alg.setCenter( (float)Math.PI/2.0f,0);
 		alg.compute(300.0f*0.5f, 250*0.5f, found);
 		assertEquals( 0 , found.distance(300.0f*0.75f, 250*0.5f), GrlConstants.FLOAT_TEST_TOL);
 
-		alg.configure(300,250, 0, (float)Math.PI/4.0f);
+		alg.setCenter(0, (float)Math.PI/4.0f);
 		alg.compute(300.0f*0.5f, 250*0.5f, found);
 		assertEquals( 0 , found.distance(300.0f*0.5f, 250*0.75f), GrlConstants.FLOAT_TEST_TOL);
 

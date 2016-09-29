@@ -19,7 +19,13 @@
 package boofcv.alg.distort.spherical;
 
 import boofcv.struct.distort.PointTransform_F64;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector3D_F64;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 /**
  * Applies a point transform that can be used to re-render an equirectangular image with a new center.  This lets you
@@ -29,35 +35,53 @@ import georegression.struct.point.Point2D_F64;
  */
 public class EquirectangularRefocus_F64 implements PointTransform_F64 {
 
-	EquirectangularTools_F64 inputOps = new EquirectangularTools_F64();
-	EquirectangularTools_F64 outputOps = new EquirectangularTools_F64();
+	EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 
-	Point2D_F64 latlon = new Point2D_F64();
+	DenseMatrix64F R = CommonOps.identity(3,3);
+	Vector3D_F64 n = new Vector3D_F64();
+
+	double longitudeCenter;
+	double latitudeCenter;
 
 	/**
-	 * Specifies the image and which latitude/longtiude will comprise the center axises
+	 * Specifies the image's width and height
+	 *
 	 * @param width Image width
 	 * @param height Image height
+	 */
+	public void setImageShape( int width , int height ) {
+		tools.configure(width, height);
+	}
+
+	/**
+	 * Specifies which longitude/latitude will be along the displayed image center
+	 *
 	 * @param longitudeCenter center longitude line. -pi to pi
 	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
 	 */
-	public void configure( int width , int height , double longitudeCenter , double latitudeCenter ) {
-		inputOps.configure(width, height, 0,0);
-		outputOps.configure(width, height, longitudeCenter, latitudeCenter);
+	public void setCenter( double longitudeCenter , double latitudeCenter ) {
+		this.longitudeCenter = longitudeCenter;
+		this.latitudeCenter = latitudeCenter;
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.ZXY,longitudeCenter,0,latitudeCenter,R);
 	}
 
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {
 
-		inputOps.equiToLatlon(x,y,latlon);
-		outputOps.latlonToRect(latlon.x,latlon.y,out);
+		tools.equiToNorm(x,y,n);
+		GeometryMath_F64.mult(R,n,n);
+		tools.normToEqui(n.x,n.y,n.z,out);
 	}
 
-	public EquirectangularTools_F64 getInputOps() {
-		return inputOps;
+	public EquirectangularTools_F64 getTools() {
+		return tools;
 	}
 
-	public EquirectangularTools_F64 getOutputOps() {
-		return outputOps;
+	public double getLongitudeCenter() {
+		return longitudeCenter;
+	}
+
+	public double getLatitudeCenter() {
+		return latitudeCenter;
 	}
 }

@@ -23,6 +23,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -30,30 +32,25 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestEquirectangularTools_F32 {
 
+	Random rand = new Random(234);
+	int width = 300;
+	int height = 250;
+
 	/**
 	 * Test converting back and forth between equirectangular coordinates and lat-lon using different
 	 * centers
 	 */
 	@Test
-	public void equiToLatlon_reverse() {
+	public void equiToLonlat_reverse() {
 
 		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+		tools.configure(width,height);
 
-		// change the focus to several different locations
-		for (int i = 0; i < 20; i++) {
-			float lat = (float)Math.PI*i/19.0f - GrlConstants.F_PId2;
-			for (int j = 0; j < 20; j++) {
-				float lon = 2.0f * (float)Math.PI * i/19.0f - GrlConstants.F_PI;
-
-				tools.configure(300,250,lon,lat);
-
-				// test back and forth conversations at different points
-				testCoordinate(tools, 150, 125);
-				testCoordinate(tools, 0, 125);
-				testCoordinate(tools, 150, 0);
-				testCoordinate(tools, 150, 249);
-			}
-		}
+		testCoordinate(tools, width/2, height/2);
+		testCoordinate(tools, 0, height/2);
+		testCoordinate(tools, width-1, height/2);
+		testCoordinate(tools, width/2, 0);
+		testCoordinate(tools, width/2, height-1);
 
 	}
 
@@ -61,8 +58,8 @@ public class TestEquirectangularTools_F32 {
 		Point2D_F32 ll = new Point2D_F32();
 		Point2D_F32 r = new Point2D_F32();
 
-		tools.equiToLatlon(x,y,ll);
-		tools.latlonToRect(ll.x,ll.y,r);
+		tools.equiToLonlat(x,y,ll);
+		tools.lonlatToEqui(ll.x,ll.y,r);
 
 		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
 		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
@@ -75,7 +72,7 @@ public class TestEquirectangularTools_F32 {
 	public void equiToNorm() {
 		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
-		tools.configure(300,250,0,0);
+		tools.configure(300,250);
 
 		Vector3D_F32 found = new Vector3D_F32();
 		tools.equiToNorm(300.0f/2.0f, 250.0f/2.0f, found);
@@ -83,6 +80,37 @@ public class TestEquirectangularTools_F32 {
 		assertEquals(1.0f,found.x, GrlConstants.FLOAT_TEST_TOL);
 		assertEquals(0.0f,found.y, GrlConstants.FLOAT_TEST_TOL);
 		assertEquals(0.0f,found.z, GrlConstants.FLOAT_TEST_TOL);
+	}
 
+	@Test
+	public void equiToNorm_reverse() {
+
+		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+		tools.configure(width,height);
+
+		equiToNorm_reverse(tools, width/2, height/2);
+		equiToNorm_reverse(tools, 0, height/2);
+		equiToNorm_reverse(tools, width-1, height/2);
+		equiToNorm_reverse(tools, width/2, 0);
+		equiToNorm_reverse(tools, width/2, height-1);
+
+		for (int i = 0; i < 100; i++) {
+			int x = rand.nextInt(width);
+			int y = rand.nextInt(height);
+
+			equiToNorm_reverse(tools,x,y);
+		}
+
+	}
+
+	private void equiToNorm_reverse(EquirectangularTools_F32 tools, float x , float y) {
+		Vector3D_F32 n = new Vector3D_F32();
+		Point2D_F32 r = new Point2D_F32();
+
+		tools.equiToNorm(x,y,n);
+		tools.normToEqui(n.x,n.y,n.z,r);
+
+		assertEquals(x,r.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals(y,r.y, GrlConstants.FLOAT_TEST_TOL);
 	}
 }

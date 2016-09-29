@@ -21,6 +21,7 @@ package boofcv.demonstrations.distort;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.spherical.EquirectangularRefocus_F32;
+import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
@@ -56,8 +57,6 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 	EquirectangularRefocus_F32 distorter = new EquirectangularRefocus_F32();
 	ImageDistort<T,T> distortImage;
 
-	int imgWidth,imgHeight;
-
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
 
 	float centerLat;
@@ -75,7 +74,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		panelImage = new ImagePanel();
 		add(panelImage, BorderLayout.CENTER);
 
-		BorderType borderType = BorderType.ZERO;
+		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
 				FactoryInterpolation.createPixel(0, 255, TypeInterpolate.BILINEAR,borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
@@ -89,10 +88,17 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Point2D_F32 latlon = new Point2D_F32();
-				distorter.getOutputOps().equiToLatlon(e.getX(),e.getY(),latlon);
+				Point2D_F32 r = new Point2D_F32();
 
+				EquirectangularTools_F32 tools = distorter.getTools();
+
+				distorter.compute(e.getX(),e.getY(),r);
+				tools.equiToLonlat(r.x,r.y,latlon);
+
+				System.out.println();
+				System.out.println("Old center  lon "+distorter.getLongitudeCenter());
 				System.out.println("Recentering lon "+latlon.getX()+"  lat "+latlon.getY());
-				distorter.configure(imgWidth,imgHeight,latlon.x,latlon.y);
+				distorter.setCenter(latlon.x,latlon.y);
 
 				if( inputMethod == InputMethod.IMAGE ) {
 					renderOutput(inputCopy);
@@ -108,14 +114,12 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		if( rendered.getWidth() != width || rendered.getHeight() != height ) {
 			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 			panelImage.setPreferredSize(new Dimension(width,height));
-			imgWidth = width;
-			imgHeight = height;
-
+			distorter.setImageShape(width, height);
 		}
 
 		centerLon = centerLat = 0;
 		distorted.reshape(width,height);
-		distorter.configure(width,height,centerLon,centerLat);
+		distorter.setImageShape(width,height);
 	}
 
 	@Override
@@ -144,7 +148,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> examples = new ArrayList<PathLabel>();
-		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_halfdome.jpg")));
+		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_half_dome.jpg")));
 
 		EquirectangularRecenteringApp app = new EquirectangularRecenteringApp(examples,type);
 

@@ -25,8 +25,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
 
 /**
- * Contains common operations for handling coordinates in an equirectangular image.  An equirectangular image is
- * a spherical coordinate system which has been projected onto a 2D image.
+ * Contains common operations for handling coordinates in an equirectangular image.
  *
  * <p>
  * longtitude is along the x-axis and goes from -pi to pi<br>
@@ -40,10 +39,6 @@ public class EquirectangularTools_F32 {
 	int width;
 	int height;
 
-	// location focus as a fractional coordinate
-	float latCenterFrac;
-	float lonCenterFrac;
-
 	// internal storage to avoid declaring new memory
 	Point2D_F32 temp = new Point2D_F32();
 
@@ -51,15 +46,10 @@ public class EquirectangularTools_F32 {
 	 * Specifies the image and which latitude/longtiude will comprise the center axises
 	 * @param width Image width
 	 * @param height Image height
-	 * @param longitudeCenter center longitude line. -pi to pi
-	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
 	 */
-	public void configure( int width , int height , float longitudeCenter, float latitudeCenter  ) {
+	public void configure( int width , int height ) {
 		this.width = width;
 		this.height = height;
-
-		lonCenterFrac = (longitudeCenter + (float)Math.PI)/(GrlConstants.F_PI2);
-		latCenterFrac = (latitudeCenter + GrlConstants.F_PId2)/GrlConstants.F_PI;
 	}
 
 	/**
@@ -70,8 +60,17 @@ public class EquirectangularTools_F32 {
 	 * @param norm Normalized pointing vector
 	 */
 	public void equiToNorm(float x , float y , Vector3D_F32 norm ) {
-		equiToLatlon(x,y, temp);
-		ConvertCoordinates3D_F32.latlonToUnitVector(temp.x,temp.y, norm);
+		equiToLonlat(x,y, temp);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.y,temp.x, norm);
+	}
+
+	public void normToEqui( float nx , float ny , float nz , Point2D_F32 rect ) {
+		float r = (float)Math.sqrt(nx*nx + ny*ny);
+
+		float lon = (float)Math.atan2(ny,nx);
+		float lat = UtilAngle.atanSafe(-nz,r);
+
+		lonlatToEqui(lon,lat,rect);
 	}
 
 	/**
@@ -80,12 +79,9 @@ public class EquirectangularTools_F32 {
 	 * @param y pixel coordinate in equirectangular image
 	 * @param latlon  (output) x = longitude, y = latitude
 	 */
-	public void equiToLatlon( float x , float y , Point2D_F32 latlon ) {
-		float lon = (x/width - lonCenterFrac)*GrlConstants.F_PI;
-		float lat = (y/height - latCenterFrac)*GrlConstants.F_PI2;
-
-		latlon.x = UtilAngle.boundHalf(lon);
-		latlon.y = UtilAngle.bound(lat);
+	public void equiToLonlat(float x , float y , Point2D_F32 latlon ) {
+		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
+		latlon.y = (y/height - 0.5f)*GrlConstants.F_PI; // latitude
 	}
 
 	/**
@@ -94,17 +90,8 @@ public class EquirectangularTools_F32 {
 	 * @param lat Latitude
 	 * @param rect (Output) equirectangular coordinate
 	 */
-	public void latlonToRect(float lon , float lat , Point2D_F32 rect ) {
-		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI + lonCenterFrac)*width;
-		rect.y = UtilAngle.reflectZeroToOne(lat / GrlConstants.F_PI2 + latCenterFrac)*height;
+	public void lonlatToEqui(float lon , float lat , Point2D_F32 rect ) {
+		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI + 0.5f)*height;
 	}
-
-	public float getCenterLatitude() {
-		return latCenterFrac*GrlConstants.F_PI - GrlConstants.F_PId2;
-	}
-
-	public float getCenterLongitude() {
-		return lonCenterFrac*GrlConstants.F_PI2 - GrlConstants.F_PI;
-	}
-
 }

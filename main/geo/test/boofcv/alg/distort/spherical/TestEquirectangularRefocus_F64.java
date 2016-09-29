@@ -37,17 +37,18 @@ public class TestEquirectangularRefocus_F64 {
 		Point2D_F64 found = new Point2D_F64();
 
 		EquirectangularRefocus_F64 alg = new EquirectangularRefocus_F64();
+		alg.setImageShape(300,250);
 
 		// this is the standard configuration and there should be no change
-		alg.configure(300,250,0,0);
+		alg.setCenter(0,0);
 		alg.compute(300.0*0.5, 250*0.5, found);
 		assertEquals( 0 , found.distance(300.0*0.5, 250*0.5), GrlConstants.DOUBLE_TEST_TOL);
 
-		alg.configure(300,250, Math.PI/2.0,0);
+		alg.setCenter( Math.PI/2.0,0);
 		alg.compute(300.0*0.5, 250*0.5, found);
 		assertEquals( 0 , found.distance(300.0*0.75, 250*0.5), GrlConstants.DOUBLE_TEST_TOL);
 
-		alg.configure(300,250, 0, Math.PI/4.0);
+		alg.setCenter(0, Math.PI/4.0);
 		alg.compute(300.0*0.5, 250*0.5, found);
 		assertEquals( 0 , found.distance(300.0*0.5, 250*0.75), GrlConstants.DOUBLE_TEST_TOL);
 
