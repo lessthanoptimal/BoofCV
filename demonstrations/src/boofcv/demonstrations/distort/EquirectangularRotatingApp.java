@@ -89,11 +89,11 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Point2D_F32 latlon = new Point2D_F32();
-				Point2D_F32 r = new Point2D_F32();
 
 				EquirectangularTools_F32 tools = distorter.getTools();
 
-				distorter.compute(e.getX(),e.getY());
+				double scale = panelImage.scale;
+				distorter.compute((int)(e.getX()/scale), (int)(e.getY()/scale));
 				tools.equiToLonlat(distorter.distX,distorter.distY,latlon);
 
 				distorter.setCenter(latlon.x,latlon.y);

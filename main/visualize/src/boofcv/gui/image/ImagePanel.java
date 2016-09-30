@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,8 @@ public class ImagePanel extends JPanel {
 	// should it re-size the image based on the panel's size
 	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
+	public double scale = 1;
+
 	public ImagePanel(BufferedImage img) {
 		this(img,ScaleOptions.NONE);
 	}
@@ -64,20 +66,21 @@ public class ImagePanel extends JPanel {
 				double ratioW = (double)getWidth()/(double)img.getWidth();
 				double ratioH = (double)getHeight()/(double)img.getHeight();
 
-				double ratio = Math.min(ratioW,ratioH);
-				if( scaling == ScaleOptions.DOWN && ratio >= 1 )
-					ratio = 1;
+				scale = Math.min(ratioW,ratioH);
+				if( scaling == ScaleOptions.DOWN && scale >= 1 )
+					scale = 1;
 
-				if( ratio == 1 ) {
+				if( scale == 1 ) {
 					g.drawImage(img, 0, 0, this);
 				} else {
-					AffineTransform tran = AffineTransform.getScaleInstance(ratio, ratio);
+					AffineTransform tran = AffineTransform.getScaleInstance(scale, scale);
 //					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 //							RenderingHints.VALUE_ANTIALIAS_ON);
 					g2.drawImage(img,tran,null);
 				}
 
 			} else {
+				scale = 1;
 				g2.drawImage(img, 0, 0, this);
 			}
 		}
