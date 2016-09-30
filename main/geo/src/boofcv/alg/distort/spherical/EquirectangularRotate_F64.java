@@ -41,9 +41,6 @@ public class EquirectangularRotate_F64 extends PixelTransform_F64 {
 	Vector3D_F64 n = new Vector3D_F64();
 	Point2D_F64 out = new Point2D_F64();
 
-	double longitudeCenter;
-	double latitudeCenter;
-
 	int imgWidth;
 	Vector3D_F64[] vectors = new Vector3D_F64[0];
 
@@ -95,8 +92,6 @@ public class EquirectangularRotate_F64 extends PixelTransform_F64 {
 	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
 	 */
 	public void setCenter( double longitudeCenter , double latitudeCenter ) {
-		this.longitudeCenter = longitudeCenter;
-		this.latitudeCenter = latitudeCenter;
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,latitudeCenter,0,longitudeCenter,R);
 	}
 
@@ -112,14 +107,4 @@ public class EquirectangularRotate_F64 extends PixelTransform_F64 {
 	public EquirectangularTools_F64 getTools() {
 		return tools;
 	}
-
-	public double getLongitudeCenter() {
-		return longitudeCenter;
-	}
-
-	public double getLatitudeCenter() {
-		return latitudeCenter;
-	}
-
-
 }

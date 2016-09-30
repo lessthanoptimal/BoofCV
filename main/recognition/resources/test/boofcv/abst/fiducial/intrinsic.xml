@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+  ~ Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
   ~
   ~ This file is part of BoofCV (http://boofcv.org).
   ~
@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<boofcv.struct.calib.IntrinsicParameters>
+<boofcv.struct.calib.PinholeRadial>
   <cx>308.4551818095542</cx>
   <cy>246.84300560315452</cy>
   <fx>701.0116882676376</fx>
@@ -28,4 +28,4 @@
   </radial>
   <skew>0.0</skew>
   <width>640</width>
-</boofcv.struct.calib.IntrinsicParameters>
+</boofcv.struct.calib.PinholeRadial>

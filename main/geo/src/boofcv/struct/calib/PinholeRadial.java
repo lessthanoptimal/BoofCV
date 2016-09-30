@@ -36,7 +36,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class PinholeRadial extends PinholeIntrinsic<PinholeRadial> implements Serializable {
+public class PinholeRadial extends PinholeIntrinsic implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
@@ -58,6 +58,13 @@ public class PinholeRadial extends PinholeIntrinsic<PinholeRadial> implements Se
 						 double cx, double cy,
 						 int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
+	}
+
+	public PinholeRadial fsetK(double fx, double fy,
+								  double skew,
+								  double cx, double cy,
+								  int width, int height) {
+		return (PinholeRadial)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
 	public PinholeRadial fsetRadial(double ...radial ) {

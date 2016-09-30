@@ -31,9 +31,9 @@ import boofcv.struct.distort.PointTransform_F64;
  */
 public class LensDistortionUndistorted implements LensDistortionPinhole{
 
-	PinholeIntrinsic<?> p;
+	PinholeIntrinsic p;
 
-	public LensDistortionUndistorted(PinholeIntrinsic<?> p) {
+	public LensDistortionUndistorted(PinholeIntrinsic p) {
 		this.p = p;
 	}
 

@@ -34,7 +34,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class PinholeIntrinsic<T extends PinholeIntrinsic<T>> implements Serializable {
+public class PinholeIntrinsic implements Serializable {
 
 	// serialization version
 	public static final long serialVersionUID = 1L;
@@ -66,10 +66,10 @@ public class PinholeIntrinsic<T extends PinholeIntrinsic<T>> implements Serializ
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public T fsetK(double fx, double fy,
-				   double skew,
-				   double cx, double cy,
-				   int width, int height) {
+	public PinholeIntrinsic fsetK(double fx, double fy,
+								  double skew,
+								  double cx, double cy,
+								  int width, int height) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -78,7 +78,7 @@ public class PinholeIntrinsic<T extends PinholeIntrinsic<T>> implements Serializ
 		this.width = width;
 		this.height = height;
 
-		return (T)this;
+		return this;
 	}
 
 	public void set( PinholeIntrinsic param ) {
