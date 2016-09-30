@@ -37,7 +37,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -360,7 +360,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		detector = FactoryFiducial.calibSquareGrid(config, GrayU8.class);
 	}
 
-	private static IntrinsicParameters handleIntrinsic(IntrinsicParameters intrinsic, int width, int height) {
+	private static PinholeRadial handleIntrinsic(PinholeRadial intrinsic, int width, int height) {
 		if( intrinsic == null ) {
 			System.out.println();
 			System.out.println("SERIOUSLY YOU NEED TO CALIBRATE THE CAMERA YOURSELF!");
@@ -392,7 +392,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 	/**
 	 * Displays a continuous stream of images
 	 */
-	private void processStream(IntrinsicParameters intrinsic , SimpleImageSequence<GrayU8> sequence , ImagePanel gui , long pauseMilli) {
+	private void processStream(PinholeRadial intrinsic , SimpleImageSequence<GrayU8> sequence , ImagePanel gui , long pauseMilli) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
@@ -441,7 +441,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 	/**
 	 * Displays a simple image
 	 */
-	private void processImage( IntrinsicParameters intrinsic , BufferedImage buffered , ImagePanel gui ) {
+	private void processImage(PinholeRadial intrinsic , BufferedImage buffered , ImagePanel gui ) {
 
 		Font font = new Font("Serif", Font.BOLD, 24);
 
@@ -525,7 +525,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
-		IntrinsicParameters intrinsic = intrinsicPath == null ? null : (IntrinsicParameters)UtilIO.loadXML(intrinsicPath);
+		PinholeRadial intrinsic = intrinsicPath == null ? null : (PinholeRadial)UtilIO.loadXML(intrinsicPath);
 
 		SimpleImageSequence<GrayU8> sequence = null;
 		long pause = 0;

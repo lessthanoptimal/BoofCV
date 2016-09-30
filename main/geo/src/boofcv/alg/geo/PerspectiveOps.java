@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.*;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -53,8 +53,8 @@ public class PerspectiveOps {
 	 * @param vfov Vertical FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static IntrinsicParameters createIntrinsic(int width, int height, double hfov, double vfov) {
-		IntrinsicParameters intrinsic = new IntrinsicParameters();
+	public static PinholeRadial createIntrinsic(int width, int height, double hfov, double vfov) {
+		PinholeRadial intrinsic = new PinholeRadial();
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width / 2;
@@ -74,8 +74,8 @@ public class PerspectiveOps {
 	 * @param hfov Horizontal FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static IntrinsicParameters createIntrinsic(int width, int height, double hfov) {
-		IntrinsicParameters intrinsic = new IntrinsicParameters();
+	public static PinholeRadial createIntrinsic(int width, int height, double hfov) {
+		PinholeRadial intrinsic = new PinholeRadial();
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width / 2;
@@ -93,7 +93,7 @@ public class PerspectiveOps {
 	 * @param param Intrinsic parameters
 	 * @param scale Scale factor that input image is being scaled by.
 	 */
-	public static void scaleIntrinsic( IntrinsicParameters param , double scale ) {
+	public static void scaleIntrinsic(PinholeRadial param , double scale ) {
 		param.width = (int)(param.width*scale);
 		param.height = (int)(param.height*scale);
 		param.cx *= scale;
@@ -105,13 +105,13 @@ public class PerspectiveOps {
 
 	/**
 	 *
-	 * <p>Recomputes the {@link IntrinsicParameters} given an adjustment matrix.</p>
+	 * <p>Recomputes the {@link PinholeRadial} given an adjustment matrix.</p>
 	 * K<sub>A</sub> = A*K<br>
 	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
 	 * original intrinsic calibration matrix.
 	 *
 	 * <p>
-	 * NOTE: Distortion parameters are ignored in the provided {@link IntrinsicParameters} class.
+	 * NOTE: Distortion parameters are ignored in the provided {@link PinholeRadial} class.
 	 * </p>
 	 *
 	 * @param parameters (Input) Original intrinsic parameters. Not modified.
@@ -119,12 +119,12 @@ public class PerspectiveOps {
 	 * @param adjustedParam (Output) Optional storage for adjusted intrinsic parameters. Can be null.
 	 * @return Adjusted intrinsic parameters.
 	 */
-	public static IntrinsicParameters adjustIntrinsic(IntrinsicParameters parameters,
-													  DenseMatrix64F adjustMatrix,
-													  IntrinsicParameters adjustedParam)
+	public static PinholeRadial adjustIntrinsic(PinholeRadial parameters,
+												DenseMatrix64F adjustMatrix,
+												PinholeRadial adjustedParam)
 	{
 		if( adjustedParam == null )
-			adjustedParam = new IntrinsicParameters();
+			adjustedParam = new PinholeRadial();
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(parameters, null);
 		DenseMatrix64F K_adj = new DenseMatrix64F(3,3);
@@ -157,7 +157,7 @@ public class PerspectiveOps {
 	 * @param K Storage for calibration matrix, must be 3x3.  If null then a new matrix is declared
 	 * @return Calibration matrix 3x3
 	 */
-	public static DenseMatrix64F calibrationMatrix( IntrinsicParameters param , DenseMatrix64F K ) {
+	public static DenseMatrix64F calibrationMatrix(PinholeRadial param , DenseMatrix64F K ) {
 
 		if( K == null ) {
 			K = new DenseMatrix64F(3,3);
@@ -183,11 +183,11 @@ public class PerspectiveOps {
 	 * @param param Where the intrinsic parameter are written to.  If null then a new instance is declared.
 	 * @return IntrinsicParameters structure.
 	 */
-	public static IntrinsicParameters matrixToParam( DenseMatrix64F K , int width , int height ,
-													 IntrinsicParameters param ) {
+	public static PinholeRadial matrixToParam(DenseMatrix64F K , int width , int height ,
+											  PinholeRadial param ) {
 
 		if( param == null )
-			param = new IntrinsicParameters();
+			param = new PinholeRadial();
 
 		param.fx = K.get(0,0);
 		param.fy = K.get(1,1);
@@ -213,7 +213,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , double x , double y , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(PinholeRadial param , double x , double y , Point2D_F64 pixel ) {
 
 		if( pixel == null )
 			pixel = new Point2D_F64();
@@ -237,7 +237,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F32 convertNormToPixel( IntrinsicParameters param , float x , float y , Point2D_F32 pixel ) {
+	public static Point2D_F32 convertNormToPixel(PinholeRadial param , float x , float y , Point2D_F32 pixel ) {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
@@ -261,7 +261,7 @@ public class PerspectiveOps {
 	 * @param pixel Optional storage for output.  If null a new instance will be declared.
 	 * @return pixel image coordinate
 	 */
-	public static Point2D_F64 convertNormToPixel( IntrinsicParameters param , Point2D_F64 norm , Point2D_F64 pixel ) {
+	public static Point2D_F64 convertNormToPixel(PinholeRadial param , Point2D_F64 norm , Point2D_F64 pixel ) {
 		return convertNormToPixel(param,norm.x,norm.y,pixel);
 	}
 
@@ -303,7 +303,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F64 convertPixelToNorm( IntrinsicParameters param , Point2D_F64 pixel , Point2D_F64 norm ) {
+	public static Point2D_F64 convertPixelToNorm(PinholeRadial param , Point2D_F64 pixel , Point2D_F64 norm ) {
 		if( norm == null )
 			norm = new Point2D_F64();
 
@@ -327,7 +327,7 @@ public class PerspectiveOps {
 	 * @param norm Optional storage for output.  If null a new instance will be declared.
 	 * @return normalized image coordinate
 	 */
-	public static Point2D_F32 convertPixelToNorm( IntrinsicParameters param , Point2D_F32 pixel , Point2D_F32 norm ) {
+	public static Point2D_F32 convertPixelToNorm(PinholeRadial param , Point2D_F32 pixel , Point2D_F32 norm ) {
 		if( norm == null )
 			norm = new Point2D_F32();
 
@@ -397,7 +397,7 @@ public class PerspectiveOps {
 	 * @param X 3D Point in world reference frame..
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel( IntrinsicParameters intrinsic , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel(PinholeRadial intrinsic , Point3D_F64 X ) {
 		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
 		return PerspectiveOps.convertNormToPixel(intrinsic, norm, norm);
 	}
@@ -490,7 +490,7 @@ public class PerspectiveOps {
 	/**
 	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
 	 */
-	public static WorldToCameraToPixel createWorldToPixel( IntrinsicParameters intrinsic , Se3_F64 worldToCamera )
+	public static WorldToCameraToPixel createWorldToPixel(PinholeRadial intrinsic , Se3_F64 worldToCamera )
 	{
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
 		alg.configure(intrinsic,worldToCamera);

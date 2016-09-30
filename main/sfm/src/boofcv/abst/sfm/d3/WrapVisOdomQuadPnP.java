@@ -24,7 +24,7 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomQuadPnP;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.Point2D3D;
@@ -117,7 +117,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc>
 		associateStereo.setCalibration(parameters);
 		distance.setStereoParameters(parameters);
 
-		IntrinsicParameters left = parameters.left;
+		PinholeRadial left = parameters.left;
 		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
 
 		if( refine != null )

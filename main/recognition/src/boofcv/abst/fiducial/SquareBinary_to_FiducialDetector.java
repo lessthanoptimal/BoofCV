@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -38,7 +38,7 @@ public class SquareBinary_to_FiducialDetector<T extends ImageGray>
 	}
 
 	@Override
-	public void setIntrinsic(IntrinsicParameters intrinsic) {
+	public void setIntrinsic(PinholeRadial intrinsic) {
 		alg.setLengthSide(targetWidth);
 		super.setIntrinsic(intrinsic);
 	}

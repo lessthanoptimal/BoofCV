@@ -27,7 +27,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -276,7 +276,7 @@ public class CalibratedImageGridPanel extends JPanel {
 		}
 	}
 
-	public void setDistorted ( IntrinsicParameters param , DenseMatrix64F rect ) {
+	public void setDistorted (PinholeRadial param , DenseMatrix64F rect ) {
 		if( rect == null ) {
 			this.undoRadial = LensDistortionOps.imageRemoveDistortion(
 					AdjustmentType.FULL_VIEW, BorderType.ZERO, param, null, ImageType.single(GrayF32.class));

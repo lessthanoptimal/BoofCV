@@ -22,7 +22,7 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.geo.*;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -49,7 +49,7 @@ import java.util.Random;
 public class ExamplePnP {
 
 	// describes the intrinsic camera parameters.
-	IntrinsicParameters intrinsic = new IntrinsicParameters(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
+	PinholeRadial intrinsic = new PinholeRadial(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
 
 	// Used to generate random observations
 	Random rand = new Random(234);

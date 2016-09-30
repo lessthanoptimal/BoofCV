@@ -28,7 +28,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -59,7 +59,7 @@ public class TestDetectFiducialSquareImage {
 	 */
 	@Test
 	public void checkFoundRotationMatrix() {
-		IntrinsicParameters intrinsic =new IntrinsicParameters(500,500,0,320,240,640,480);
+		PinholeRadial intrinsic =new PinholeRadial(500,500,0,320,240,640,480);
 
 		int w = DetectFiducialSquareBinary.w;
 		GrayF32 rendered_F32 = TestDetectFiducialSquareBinary.create(w, 314);

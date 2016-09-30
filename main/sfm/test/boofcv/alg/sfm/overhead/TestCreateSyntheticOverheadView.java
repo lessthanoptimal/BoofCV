@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageBase;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -38,7 +38,7 @@ public class TestCreateSyntheticOverheadView {
 
 	int width = 800;
 	int height = 850;
-	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial( 0.002,0);
+	PinholeRadial param = new PinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial( 0.002,0);
 
 	@Test
 	public void checkPrecomputedTransform() {

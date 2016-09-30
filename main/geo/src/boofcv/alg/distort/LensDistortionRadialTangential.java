@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.distort.radtan.*;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 
@@ -30,9 +30,9 @@ import boofcv.struct.distort.PointTransform_F64;
  */
 public class LensDistortionRadialTangential implements LensDistortionPinhole{
 
-	IntrinsicParameters p;
+	PinholeRadial p;
 
-	public LensDistortionRadialTangential(IntrinsicParameters p) {
+	public LensDistortionRadialTangential(PinholeRadial p) {
 		this.p = p;
 	}
 

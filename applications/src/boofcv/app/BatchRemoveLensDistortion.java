@@ -26,7 +26,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -101,8 +101,8 @@ public class BatchRemoveLensDistortion {
 			}
 		}
 
-		IntrinsicParameters param = UtilIO.loadXML(pathIntrinsic);
-		IntrinsicParameters paramAdj = new IntrinsicParameters();
+		PinholeRadial param = UtilIO.loadXML(pathIntrinsic);
+		PinholeRadial paramAdj = new PinholeRadial();
 
 		List<File> files = Arrays.asList(BoofMiscOps.findMatches(regex));
 		Collections.sort(files);

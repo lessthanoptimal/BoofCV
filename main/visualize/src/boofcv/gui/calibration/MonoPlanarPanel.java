@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -196,7 +196,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramC.setText(textC);
 	}
 
-	public void setCorrection( IntrinsicParameters param )
+	public void setCorrection( PinholeRadial param )
 	{
 		checkUndistorted.setEnabled(true);
 		mainView.setDistorted(param,null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,18 +21,7 @@ package boofcv.struct.calib;
 import java.io.Serializable;
 
 /**
- * <p>
- * Intrinsic camera parameters for a calibrated camera.  Specifies the calibration
- * matrix K and distortion parameters.
- * </p>
- *
- * <p>
- * <pre>
- *     [ fx skew  cx ]
- * K = [  0   fy  cy ]
- *     [  0    0   1 ]
- * </pre>
- * </p>
+ * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link PinholeIntrinsic pinhole camera}.</p?
  *
  * <p>
  * Radial and Tangental Distortion:<br>
@@ -47,21 +36,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-// todo move distortion parameters into its own class?
-public class IntrinsicParameters implements Serializable {
-
-	// serialization version
-	public static final long serialVersionUID = 1L;
-
-	/** image shape (units: pixels) */
-	public int width,height;
-
-	/** focal length along x and y axis (units: pixels) */
-	public double fx,fy;
-	/** skew parameter, typically 0 (units: pixels)*/
-	public double skew;
-	/** image center (units: pixels) */
-	public double cx,cy;
+public class PinholeRadial extends PinholeIntrinsic<PinholeRadial> implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
@@ -71,55 +46,33 @@ public class IntrinsicParameters implements Serializable {
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
 	 */
-	public IntrinsicParameters() {
+	public PinholeRadial() {
 	}
 
-	public IntrinsicParameters( IntrinsicParameters param ) {
+	public PinholeRadial(PinholeRadial param ) {
 		set(param);
 	}
 
-	public IntrinsicParameters( double fx, double fy,
-								double skew,
-								double cx, double cy,
-								int width, int height ) {
+	public PinholeRadial(double fx, double fy,
+						 double skew,
+						 double cx, double cy,
+						 int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public IntrinsicParameters fsetK(double fx, double fy,
-									 double skew,
-									 double cx, double cy,
-									 int width, int height) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
-		this.width = width;
-		this.height = height;
-
-		return this;
-	}
-
-	public IntrinsicParameters fsetRadial( double ...radial ) {
+	public PinholeRadial fsetRadial(double ...radial ) {
 		this.radial = radial.clone();
 		return this;
 	}
 
-	public IntrinsicParameters fsetTangental( double t1 , double t2) {
+	public PinholeRadial fsetTangental(double t1 , double t2) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;
 	}
 
-	public void set( IntrinsicParameters param ) {
-		this.fx = param.fx;
-		this.fy = param.fy;
-		this.skew = param.skew;
-		this.cx = param.cx;
-		this.cy = param.cy;
-		this.width = param.width;
-		this.height = param.height;
-		this.radial = param.radial;
+	public void set( PinholeRadial param ) {
+		super.set(param);
 
 		if( param.radial != null )
 			radial = param.radial.clone();
@@ -141,68 +94,12 @@ public class IntrinsicParameters implements Serializable {
 		return t1 != 0 || t2 != 0;
 	}
 
-	public double getCx() {
-		return cx;
-	}
-
-	public void setCx(double cx) {
-		this.cx = cx;
-	}
-
-	public double getCy() {
-		return cy;
-	}
-
-	public void setCy(double cy) {
-		this.cy = cy;
-	}
-
-	public double getFx() {
-		return fx;
-	}
-
-	public void setFx(double fx) {
-		this.fx = fx;
-	}
-
-	public double getFy() {
-		return fy;
-	}
-
-	public void setFy(double fy) {
-		this.fy = fy;
-	}
-
 	public double[] getRadial() {
 		return radial;
 	}
 
 	public void setRadial(double[] radial) {
 		this.radial = radial;
-	}
-
-	public double getSkew() {
-		return skew;
-	}
-
-	public void setSkew(double skew) {
-		this.skew = skew;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
 	}
 
 	public double getT1() {
@@ -222,11 +119,7 @@ public class IntrinsicParameters implements Serializable {
 	}
 
 	public void print() {
-		System.out.println("Shape "+width+" "+height);
-		System.out.printf("center %7.2f %7.2f\n", cx, cy);
-		System.out.println("fx = " + fx);
-		System.out.println("fy = "+fy);
-		System.out.println("skew = "+skew);
+		super.print();
 		if( radial != null ) {
 			for( int i = 0; i < radial.length; i++ ) {
 				System.out.printf("radial[%d] = %6.2e\n",i,radial[i]);

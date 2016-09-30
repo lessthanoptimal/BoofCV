@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.abst.geo.RefinePnP;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -95,7 +95,7 @@ public class QuadPoseEstimator {
 	protected Se3_F64 bestPose = new Se3_F64();
 
 	// predeclared internal work space.  Minimizing new memory
-	IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
+	PinholeRadial intrinsicUndist = new PinholeRadial();
 	Quadrilateral_F64 undistortedCorners = new Quadrilateral_F64();
 	Quadrilateral_F64 enlargedCorners = new Quadrilateral_F64();
 	Se3_F64 foundEnlarged = new Se3_F64();
@@ -129,7 +129,7 @@ public class QuadPoseEstimator {
 	 * Specifies the intrinsic parameters.
 	 * @param intrinsic Intrinsic camera parameters
 	 */
-	public void setIntrinsic( IntrinsicParameters intrinsic ) {
+	public void setIntrinsic( PinholeRadial intrinsic ) {
 		distortedToUndistorted =  LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,true);
 
 		intrinsicUndist.fsetK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy,

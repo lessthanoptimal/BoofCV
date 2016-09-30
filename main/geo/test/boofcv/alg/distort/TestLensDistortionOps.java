@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import georegression.struct.affine.Affine2D_F32;
@@ -49,7 +49,7 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void transform_F32_fullView() {
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
@@ -57,7 +57,7 @@ public class TestLensDistortionOps {
 
 		checkBorderOutside(adjToDist,distToAdj);
 
-		param = new IntrinsicParameters().
+		param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
 		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
 		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
@@ -66,7 +66,7 @@ public class TestLensDistortionOps {
 
 	@Test
 	public void transform_F64_fullView() {
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
@@ -74,7 +74,7 @@ public class TestLensDistortionOps {
 
 		checkBorderOutside(adjToDist,distToAdj);
 
-		param = new IntrinsicParameters().
+		param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-0.05);
 		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
 		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, false);
@@ -148,7 +148,7 @@ public class TestLensDistortionOps {
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
 
-		IntrinsicParameters orig = new IntrinsicParameters().
+		PinholeRadial orig = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
@@ -156,7 +156,7 @@ public class TestLensDistortionOps {
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		IntrinsicParameters adjusted = new IntrinsicParameters();
+		PinholeRadial adjusted = new PinholeRadial();
 		PointTransform_F32 distToAdj = LensDistortionOps.
 				transform_F32(AdjustmentType.FULL_VIEW, orig, adjusted, false);
 
@@ -177,7 +177,7 @@ public class TestLensDistortionOps {
 		// distorted pixel in original image
 		double pixelX = 12.5,pixelY = height-3;
 
-		IntrinsicParameters orig = new IntrinsicParameters().
+		PinholeRadial orig = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
@@ -185,7 +185,7 @@ public class TestLensDistortionOps {
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		IntrinsicParameters adjusted = new IntrinsicParameters();
+		PinholeRadial adjusted = new PinholeRadial();
 		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, orig, adjusted, false);
 
 		Point2D_F64 adjPixel = new Point2D_F64();
@@ -205,15 +205,15 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void transform_F32_shrink() {
-		IntrinsicParameters param =
-				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
+		PinholeRadial param =
+				new PinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
 		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
 		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
-		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
+		param = new PinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
 
 		adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
 		distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
@@ -223,15 +223,15 @@ public class TestLensDistortionOps {
 
 	@Test
 	public void transform_F64_shrink() {
-		IntrinsicParameters param =
-				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
+		PinholeRadial param =
+				new PinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
 		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
 		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
-		param = new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
+		param = new PinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1,-1e-4);
 
 		adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
 		distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
@@ -367,7 +367,7 @@ public class TestLensDistortionOps {
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
 
-		IntrinsicParameters orig = new IntrinsicParameters().
+		PinholeRadial orig = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
@@ -375,7 +375,7 @@ public class TestLensDistortionOps {
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		IntrinsicParameters adjusted = new IntrinsicParameters();
+		PinholeRadial adjusted = new PinholeRadial();
 		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
@@ -399,7 +399,7 @@ public class TestLensDistortionOps {
 		// distorted pixel in original image
 		double pixelX = 12.5,pixelY = height-3;
 
-		IntrinsicParameters orig = new IntrinsicParameters().
+		PinholeRadial orig = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
 		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
@@ -407,7 +407,7 @@ public class TestLensDistortionOps {
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		IntrinsicParameters adjusted = new IntrinsicParameters();
+		PinholeRadial adjusted = new PinholeRadial();
 		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F64 adjPixel = new Point2D_F64();

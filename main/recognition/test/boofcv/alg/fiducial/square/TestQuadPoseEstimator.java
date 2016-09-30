@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.square;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -42,7 +42,7 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void basicTest() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
+		PinholeRadial intrinsic = new PinholeRadial(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
 
 		Se3_F64 expectedW2C = new Se3_F64();
 		expectedW2C.T.set(0.1,-0.05,4);
@@ -75,7 +75,7 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void estimateP3P() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600);
+		PinholeRadial intrinsic = new PinholeRadial(500,550,0,400,300,800,600);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
@@ -112,7 +112,7 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void computeErrors() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(500,550,0,400,300,800,600);
+		PinholeRadial intrinsic = new PinholeRadial(500,550,0,400,300,800,600);
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);

@@ -21,7 +21,7 @@ package boofcv.abst.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.GrayF32;
@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestCalibrateStereoPlanar {
-	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).
+	PinholeRadial intrinsic = new PinholeRadial(200,210,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
@@ -94,7 +94,7 @@ public class TestCalibrateStereoPlanar {
 		assertTrue(MatrixFeatures.isIdentity(rightToLeft.getR(), 1e-3));
 	}
 
-	private void checkIntrinsic(IntrinsicParameters found) {
+	private void checkIntrinsic(PinholeRadial found) {
 		assertEquals(intrinsic.fx,found.fx,1e-3);
 		assertEquals(intrinsic.fy,found.fy,1e-3);
 		assertEquals(intrinsic.cx,found.cx,1e-3);

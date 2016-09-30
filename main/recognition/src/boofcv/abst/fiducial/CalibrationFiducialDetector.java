@@ -29,7 +29,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.GrayF32;
@@ -262,7 +262,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	}
 
 	@Override
-	public void setIntrinsic(IntrinsicParameters intrinsic) {
+	public void setIntrinsic(PinholeRadial intrinsic) {
 		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 	}
 

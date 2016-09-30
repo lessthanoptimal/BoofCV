@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -62,7 +62,7 @@ public class CameraPlaneProjection {
 	 * @param intrinsic Pixel to normalized image coordinates
 	 */
 	public void setConfiguration( Se3_F64 planeToCamera ,
-								  IntrinsicParameters intrinsic )
+								  PinholeRadial intrinsic )
 	{
 		this.planeToCamera = planeToCamera;
 		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
@@ -75,7 +75,7 @@ public class CameraPlaneProjection {
 	 * Configures the camera's intrinsic parameters
 	 * @param intrinsic Intrinsic camera parameters
 	 */
-	public void setIntrinsic(IntrinsicParameters intrinsic )
+	public void setIntrinsic(PinholeRadial intrinsic )
 	{
 		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);

@@ -30,7 +30,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayF32;
 
 import javax.swing.*;
@@ -128,7 +128,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 				monitor.setMessage(1,"Estimating Parameters");
 			}});
 
-		final IntrinsicParameters param = calibrator.process();
+		final PinholeRadial param = calibrator.process();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setResults(calibrator.getErrors());

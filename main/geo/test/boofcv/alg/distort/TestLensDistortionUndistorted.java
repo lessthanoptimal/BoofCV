@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 
 /**
  * @author Peter Abeles
@@ -27,7 +27,7 @@ public class TestLensDistortionUndistorted extends GeneralLensDistortionPinholeC
 {
 	@Override
 	public LensDistortionPinhole create() {
-		IntrinsicParameters param = new IntrinsicParameters(500,550,0.001,400,450,1000,800);
+		PinholeRadial param = new PinholeRadial(500,550,0.001,400,450,1000,800);
 
 		return new LensDistortionUndistorted(param);
 	}

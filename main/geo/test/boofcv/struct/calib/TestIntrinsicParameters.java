@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ public class TestIntrinsicParameters {
 
 	@Test
 	public void constructor_K() {
-		IntrinsicParameters p = new IntrinsicParameters(200,210,1,320,240,640,380);
+		PinholeRadial p = new PinholeRadial(200,210,1,320,240,640,380);
 
 		assertEquals(200,p.fx,1e-8);
 		assertEquals(210,p.fy,1e-8);
@@ -45,7 +45,7 @@ public class TestIntrinsicParameters {
 
 	@Test
 	public void fsetK() {
-		IntrinsicParameters p = new IntrinsicParameters(200,210,1,320,240,640,380);
+		PinholeRadial p = new PinholeRadial(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetK(201, 211, 2, 321, 241, 641, 381));
 
@@ -63,7 +63,7 @@ public class TestIntrinsicParameters {
 
 	@Test
 	public void fsetRadial() {
-		IntrinsicParameters p = new IntrinsicParameters(200,210,1,320,240,640,380);
+		PinholeRadial p = new PinholeRadial(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetRadial(1.1,2.2,3.3));
 
@@ -85,7 +85,7 @@ public class TestIntrinsicParameters {
 
 	@Test
 	public void fsetTangental() {
-		IntrinsicParameters p = new IntrinsicParameters(200,210,1,320,240,640,380);
+		PinholeRadial p = new PinholeRadial(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetTangental(1.1, 2.2));
 
@@ -104,7 +104,7 @@ public class TestIntrinsicParameters {
 
 	@Test
 	public void isDistorted() {
-		IntrinsicParameters p = new IntrinsicParameters(200,210,0,320,240,640,380);
+		PinholeRadial p = new PinholeRadial(200,210,0,320,240,640,380);
 
 		assertFalse(p.isDistorted());
 		assertFalse(p.fsetRadial(0,0).isDistorted());

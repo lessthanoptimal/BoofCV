@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -47,7 +47,7 @@ public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdom
 	 *
 	 * @param param Intrinsic parameters for camera
 	 */
-	public void setIntrinsic( IntrinsicParameters param );
+	public void setIntrinsic( PinholeRadial param );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked

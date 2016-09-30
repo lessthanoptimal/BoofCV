@@ -57,7 +57,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -266,7 +266,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 
 		handleRunningStatus(2);
 
-		IntrinsicParameters right = config.right;
+		PinholeRadial right = config.right;
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(config.left,null);
 		guiCam3D.init();
 		guiCam3D.setK(K);

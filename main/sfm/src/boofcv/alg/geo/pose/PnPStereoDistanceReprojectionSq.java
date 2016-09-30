@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.NormalizedToPixelError;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
@@ -60,8 +60,8 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F6
 	{
 		this.leftToRight = param.getRightToLeft().invert(null);
 
-		IntrinsicParameters left = param.left;
-		IntrinsicParameters right = param.right;
+		PinholeRadial left = param.left;
+		PinholeRadial right = param.right;
 
 		leftPixelError = new NormalizedToPixelError(left.fx,left.fy,left.skew);
 		rightPixelError = new NormalizedToPixelError(right.fx,right.fy,right.skew);

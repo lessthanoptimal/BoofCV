@@ -38,7 +38,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -63,14 +63,14 @@ public class VisualizeSquareFiducial {
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		IntrinsicParameters intrinsic = nameIntrinsic == null ? null : (IntrinsicParameters)UtilIO.loadXML(nameIntrinsic);
+		PinholeRadial intrinsic = nameIntrinsic == null ? null : (PinholeRadial)UtilIO.loadXML(nameIntrinsic);
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
 		Detector detector = new Detector();
 
 		if( intrinsic != null ) {
-			IntrinsicParameters paramUndist = new IntrinsicParameters();
+			PinholeRadial paramUndist = new PinholeRadial();
 			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.imageRemoveDistortion(
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
 					ImageType.single(GrayF32.class));

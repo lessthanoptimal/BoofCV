@@ -19,7 +19,7 @@
 package boofcv.alg.sfm.robust;
 
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -44,7 +44,7 @@ public class TestGenerateSe2_PlanePtPixel {
 
 	Random rand = new Random(93948);
 
-	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).fsetRadial(0,0);
+	PinholeRadial intrinsic = new PinholeRadial(200,210,0,320,240,640,480).fsetRadial(0,0);
 
 	GenerateSe2_PlanePtPixel alg = new GenerateSe2_PlanePtPixel();
 	Se3_F64 planeToCamera;

@@ -28,7 +28,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -48,7 +48,7 @@ public class ExampleFiducialBinary {
 		String directory = UtilIO.pathExample("fiducial/binary");
 
 		// load the lens distortion parameters and the input image
-		IntrinsicParameters param = UtilIO.loadXML(directory , "intrinsic.xml");
+		PinholeRadial param = UtilIO.loadXML(directory , "intrinsic.xml");
 		BufferedImage input = UtilImageIO.loadImage(directory , "image0000.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0001.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0002.jpg");

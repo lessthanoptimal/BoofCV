@@ -21,7 +21,7 @@ package boofcv.alg.depth;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -42,7 +42,7 @@ public class TestVisualDepthOps {
 	int width = 640;
 	int height = 480;
 
-	IntrinsicParameters param = new IntrinsicParameters(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
+	PinholeRadial param = new PinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
 
 	@Test
 	public void depthTo3D() {

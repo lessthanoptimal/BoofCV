@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class MonoPlaneParameters {
 	/**
 	 * Intrinsic parameters for the camera
 	 */
-	public IntrinsicParameters intrinsic;
+	public PinholeRadial intrinsic;
 	/**
 	 * Extrinsic parameters for the camera.  Transform from plane to camera coordinate system.  This is technically
 	 * over specified since only orientation (3-DOF) and distance from plane (1-DOF) is needed.  The extra
@@ -40,7 +40,7 @@ public class MonoPlaneParameters {
 	 */
 	public Se3_F64 planeToCamera;
 
-	public MonoPlaneParameters(IntrinsicParameters intrinsic, Se3_F64 planeToCamera) {
+	public MonoPlaneParameters(PinholeRadial intrinsic, Se3_F64 planeToCamera) {
 		this.intrinsic = intrinsic;
 		this.planeToCamera = planeToCamera;
 	}
@@ -48,11 +48,11 @@ public class MonoPlaneParameters {
 	public MonoPlaneParameters() {
 	}
 
-	public IntrinsicParameters getIntrinsic() {
+	public PinholeRadial getIntrinsic() {
 		return intrinsic;
 	}
 
-	public void setIntrinsic(IntrinsicParameters intrinsic) {
+	public void setIntrinsic(PinholeRadial intrinsic) {
 		this.intrinsic = intrinsic;
 	}
 

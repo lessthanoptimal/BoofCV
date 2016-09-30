@@ -21,7 +21,7 @@ package boofcv.abst.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestCalibrateMonoPlanar {
 
-	IntrinsicParameters intrinsic = new IntrinsicParameters(200,210,0,320,240,640,480).
+	PinholeRadial intrinsic = new PinholeRadial(200,210,0,320,240,640,480).
 	fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
@@ -77,7 +77,7 @@ public class TestCalibrateMonoPlanar {
 			alg.addImage(blank);
 		}
 
-		IntrinsicParameters found = alg.process();
+		PinholeRadial found = alg.process();
 
 		assertEquals(intrinsic.fx,found.fx,1e-3);
 		assertEquals(intrinsic.fy,found.fy,1e-3);

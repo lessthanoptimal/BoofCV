@@ -23,7 +23,7 @@ import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
@@ -37,13 +37,13 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 
 	FiducialDetector<T> detector;
 	List<T> images = new ArrayList<T>();
-	IntrinsicParameters param;
+	PinholeRadial param;
 
 	public BenchmarkFiducialDetector(FiducialDetector<T> detector) {
 		this.detector = detector;
 	}
 
-	public void setParam(IntrinsicParameters param) {
+	public void setParam(PinholeRadial param) {
 		this.param = param;
 	}
 
@@ -69,7 +69,7 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 	}
 
 	private static void perform(String directory, FiducialDetector detector) {
-		IntrinsicParameters intrinsic = UtilIO.loadXML(directory + "intrinsic.xml");
+		PinholeRadial intrinsic = UtilIO.loadXML(directory + "intrinsic.xml");
 
 //		intrinsic.radial = null;
 //		intrinsic.t1 = intrinsic.t2 = 0;

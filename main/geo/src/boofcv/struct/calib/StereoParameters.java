@@ -44,9 +44,9 @@ public class StereoParameters implements Serializable {
 	public static final long serialVersionUID = 1L;
 
 	/** intrinsic camera parameters of left camera */
-	public IntrinsicParameters left;
+	public PinholeRadial left;
 	/** intrinsic camera parameters of right camera */
-	public IntrinsicParameters right;
+	public PinholeRadial right;
 	/** transform from left camera to right camera */
 	public Se3_F64 rightToLeft;
 
@@ -54,22 +54,22 @@ public class StereoParameters implements Serializable {
 		this(param.left,param.right,param.getRightToLeft());
 	}
 
-	public StereoParameters(IntrinsicParameters left,
-							IntrinsicParameters right,
+	public StereoParameters(PinholeRadial left,
+							PinholeRadial right,
 							Se3_F64 rightToLeft ) {
-		this.left = new IntrinsicParameters(left);
+		this.left = new PinholeRadial(left);
 		this.rightToLeft = rightToLeft.copy();
-		this.right = new IntrinsicParameters(right);
+		this.right = new PinholeRadial(right);
 	}
 
 	public StereoParameters() {
 	}
 
-	public IntrinsicParameters getLeft() {
+	public PinholeRadial getLeft() {
 		return left;
 	}
 
-	public void setLeft(IntrinsicParameters left) {
+	public void setLeft(PinholeRadial left) {
 		this.left = left;
 	}
 
@@ -81,11 +81,11 @@ public class StereoParameters implements Serializable {
 		this.rightToLeft = rightToLeft;
 	}
 
-	public IntrinsicParameters getRight() {
+	public PinholeRadial getRight() {
 		return right;
 	}
 
-	public void setRight(IntrinsicParameters right) {
+	public void setRight(PinholeRadial right) {
 		this.right = right;
 	}
 

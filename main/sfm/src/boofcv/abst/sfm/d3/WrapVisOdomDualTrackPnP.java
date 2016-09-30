@@ -26,7 +26,7 @@ import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
@@ -117,7 +117,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray>
 			refine.setLeftToRight(leftToRight);
 		alg.setCalibration(parameters);
 
-		IntrinsicParameters left = parameters.left;
+		PinholeRadial left = parameters.left;
 		distanceMono.setIntrinsic(left.fx,left.fy,left.skew);
 		distanceStereo.setStereoParameters(parameters);
 		assoc.setCalibration(parameters);

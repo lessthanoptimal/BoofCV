@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -34,7 +34,7 @@ public class TestNormalizedToPixel_F64 {
 
 	@Test
 	public void basicTest() {
-		IntrinsicParameters p = new IntrinsicParameters().fsetK(1, 2, 3, 4, 5, 200, 300);
+		PinholeRadial p = new PinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
 

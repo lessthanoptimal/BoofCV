@@ -39,7 +39,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -83,7 +83,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 
 	FiducialDetector detector;
 
-	IntrinsicParameters intrinsic;
+	PinholeRadial intrinsic;
 
 	boolean processedInputImage = false;
 	boolean firstFrame = true;

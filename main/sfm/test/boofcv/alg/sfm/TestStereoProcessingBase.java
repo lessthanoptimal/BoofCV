@@ -21,7 +21,7 @@ package boofcv.alg.sfm;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.GrayU8;
@@ -158,8 +158,8 @@ public class TestStereoProcessingBase {
 		ret.getRightToLeft().getT().set(-0.2, 0.001, -0.012);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new IntrinsicParameters().fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
-		ret.right = new IntrinsicParameters().fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);
+		ret.left = new PinholeRadial().fsetK(300, 320, 0, width / 2, height / 2, width, height).fsetRadial(0.1,1e-4);
+		ret.right = new PinholeRadial().fsetK(290, 310, 0, width / 2 + 2, height / 2 - 6, width, height).fsetRadial(0.05, -2e-4);
 
 		return ret;
 	}

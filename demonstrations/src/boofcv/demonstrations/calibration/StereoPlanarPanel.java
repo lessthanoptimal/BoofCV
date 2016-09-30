@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
@@ -159,8 +159,8 @@ public class StereoPlanarPanel extends JPanel
 		return toolBar;
 	}
 
-	public void setRectification( IntrinsicParameters leftParam , DenseMatrix64F leftRect ,
-								  IntrinsicParameters rightParam , DenseMatrix64F rightRect ) {
+	public void setRectification(PinholeRadial leftParam , DenseMatrix64F leftRect ,
+								 PinholeRadial rightParam , DenseMatrix64F rightRect ) {
 		leftView.setDistorted(leftParam,leftRect);
 		rightView.setDistorted(rightParam,rightRect);
 		checkUndistorted.setEnabled(true);

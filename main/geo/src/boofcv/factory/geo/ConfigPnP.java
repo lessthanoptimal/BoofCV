@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 
 /**
  * Configuration parameters for solving the PnP problem
@@ -41,9 +41,9 @@ public class ConfigPnP implements Configuration {
 	/**
 	 * Intrinsic camera parameters.  Used to compute error in pixels.
 	 */
-	public IntrinsicParameters intrinsic;
+	public PinholeRadial intrinsic;
 
-	public ConfigPnP(IntrinsicParameters intrinsic) {
+	public ConfigPnP(PinholeRadial intrinsic) {
 		this.intrinsic = intrinsic;
 	}
 

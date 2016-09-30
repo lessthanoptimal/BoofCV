@@ -16,20 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.spherical;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.PinholeIntrinsic;
 
 /**
+ * Renders a pinhole camera view from an equirectangular image.
+ *
  * @author Peter Abeles
  */
-public class TestLensDistortionRadialTangential extends GeneralLensDistortionPinholeChecks
-{
-	@Override
-	public LensDistortionPinhole create() {
-		PinholeRadial param = new PinholeRadial(500,550,0.001,400,450,1000,800).
-				fsetRadial(0.02, 0.005);
+public class EquirectangularToPinhole_F64 {
 
-		return new LensDistortionRadialTangential(param);
-	}
+	PinholeIntrinsic pinhole;
 }

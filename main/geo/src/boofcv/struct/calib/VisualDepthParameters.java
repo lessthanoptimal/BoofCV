@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class VisualDepthParameters {
 	/**
 	 * Intrinsic camera parameters for the visual sensor.
 	 */
-	public IntrinsicParameters visualParam;
+	public PinholeRadial visualParam;
 
 	public VisualDepthParameters() {
 	}
@@ -56,11 +56,11 @@ public class VisualDepthParameters {
 		visualParam.set( param.visualParam );
 	}
 
-	public IntrinsicParameters getVisualParam() {
+	public PinholeRadial getVisualParam() {
 		return visualParam;
 	}
 
-	public void setVisualParam(IntrinsicParameters visualParam) {
+	public void setVisualParam(PinholeRadial visualParam) {
 		this.visualParam = visualParam;
 	}
 

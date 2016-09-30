@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import georegression.geometry.GeometryMath_F64;
@@ -48,8 +48,8 @@ public class TestRectifyImageOps {
 	@Test
 	public void fullViewLeft_calibrated() {
 
-		IntrinsicParameters param =
-				new IntrinsicParameters().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		PinholeRadial param =
+				new PinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		DenseMatrix64F rect1 = CommonOps.identity(3);
@@ -89,7 +89,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void allInsideLeft_calibrated() {
 
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
@@ -141,7 +141,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F32() {
 
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
@@ -167,7 +167,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F64() {
 
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
@@ -195,7 +195,7 @@ public class TestRectifyImageOps {
 	 */
 	@Test
 	public void transformPixelToRectNorm_F64() {
-		IntrinsicParameters param = new IntrinsicParameters().
+		PinholeRadial param = new PinholeRadial().
 						fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);

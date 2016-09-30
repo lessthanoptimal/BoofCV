@@ -30,7 +30,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
@@ -179,12 +179,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%.  Ignored
 	 *              if no lens distortion
 	 */
-	public void configure( IntrinsicParameters intrinsic , boolean cache ) {
+	public void configure(PinholeRadial intrinsic , boolean cache ) {
 		wasIntrinsicSet = true;
 		PointTransform_F32 pointSquareToInput;
 		if( intrinsic.isDistorted() ) {
 
-			IntrinsicParameters intrinsicUndist = new IntrinsicParameters();
+			PinholeRadial intrinsicUndist = new PinholeRadial();
 
 			// full view so that none of the pixels are discarded and to ensure that all pixels in the undistorted
 			// image are bounded by the the input image's shape

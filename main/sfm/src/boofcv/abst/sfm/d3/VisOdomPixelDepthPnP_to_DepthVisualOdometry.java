@@ -23,7 +23,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -104,7 +104,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	}
 
 	@Override
-	public void setCalibration(IntrinsicParameters paramVisual, PixelTransform_F32 visToDepth) {
+	public void setCalibration(PinholeRadial paramVisual, PixelTransform_F32 visToDepth) {
 		sparse3D.configure(paramVisual,visToDepth);
 
 		PointTransform_F64 leftPixelToNorm = transformPoint(paramVisual).undistort_F64(true,false);

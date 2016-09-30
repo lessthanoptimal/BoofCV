@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -59,7 +59,7 @@ public class TestPerspectiveOps {
 		double hfov = 30;
 		double vfov = 35;
 
-		IntrinsicParameters found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
+		PinholeRadial found = PerspectiveOps.createIntrinsic(640, 480, hfov, vfov);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
 		assertEquals(UtilAngle.degreeToRadian(vfov),2.0*Math.atan(found.cy/found.fy),1e-6);
@@ -70,7 +70,7 @@ public class TestPerspectiveOps {
 
 		double hfov = 30;
 
-		IntrinsicParameters found = PerspectiveOps.createIntrinsic(640, 480, hfov);
+		PinholeRadial found = PerspectiveOps.createIntrinsic(640, 480, hfov);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
 		assertEquals(found.fx,found.fy,1e-6);
@@ -80,7 +80,7 @@ public class TestPerspectiveOps {
 	public void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300);
+		PinholeRadial param = new PinholeRadial(200,300,2,250,260,200,300);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param,null);
 
 		// find the pixel location in the unscaled image
@@ -101,8 +101,8 @@ public class TestPerspectiveOps {
 
 		DenseMatrix64F B = new DenseMatrix64F(3,3,true,2,0,1,0,3,2,0,0,1);
 
-		IntrinsicParameters param = new IntrinsicParameters(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
-		IntrinsicParameters found = PerspectiveOps.adjustIntrinsic(param, B, null);
+		PinholeRadial param = new PinholeRadial(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
+		PinholeRadial found = PerspectiveOps.adjustIntrinsic(param, B, null);
 
 		DenseMatrix64F A = PerspectiveOps.calibrationMatrix(param, null);
 
@@ -136,7 +136,7 @@ public class TestPerspectiveOps {
 		double cy = 5;
 
 		DenseMatrix64F K = new DenseMatrix64F(3,3,true,fx,skew,cx,0,fy,cy,0,0,1);
-		IntrinsicParameters ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
+		PinholeRadial ret = PerspectiveOps.matrixToParam(K, 100, 200, null);
 
 		assertTrue(ret.fx == fx);
 		assertTrue(ret.fy == fy);
@@ -149,7 +149,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertNormToPixel_intrinsic_F64() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+		PinholeRadial intrinsic = new PinholeRadial(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
@@ -166,7 +166,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertNormToPixel_intrinsic_F32() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+		PinholeRadial intrinsic = new PinholeRadial(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 
@@ -198,7 +198,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertPixelToNorm_intrinsic_F64() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+		PinholeRadial intrinsic = new PinholeRadial(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -217,7 +217,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void convertPixelToNorm_intrinsic_F32() {
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+		PinholeRadial intrinsic = new PinholeRadial(100,150,0.1,120,209,500,600);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
 		DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -284,7 +284,7 @@ public class TestPerspectiveOps {
 	public void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		IntrinsicParameters intrinsic = new IntrinsicParameters(100,150,0.1,120,209,500,600);
+		PinholeRadial intrinsic = new PinholeRadial(100,150,0.1,120,209,500,600);
 
 		double normX = X.x/X.z;
 		double normY = X.y/X.z;

@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 public class TestSelectOverheadParameters {
 
 	protected int width=320,height=240;
-	IntrinsicParameters param = new IntrinsicParameters(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
+	PinholeRadial param = new PinholeRadial(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
 	Se3_F64 cameraToPlane = new Se3_F64();
 	Se3_F64 planeToCamera;
 

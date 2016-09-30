@@ -19,8 +19,8 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.calib.MonoPlaneParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray>
 	extends VideoSequenceSimulator<I>
 {
-	IntrinsicParameters param = new IntrinsicParameters(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
+	PinholeRadial param = new PinholeRadial(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
 	MonocularPlaneVisualOdometry<I> algorithm;
 
 	I left;

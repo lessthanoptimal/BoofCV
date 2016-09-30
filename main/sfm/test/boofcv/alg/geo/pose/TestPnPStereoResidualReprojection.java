@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.StereoPose;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -91,8 +91,8 @@ public class TestPnPStereoResidualReprojection extends CommonStereoMotionNPoint 
 		StereoParameters param = new StereoParameters();
 		param.rightToLeft = this.param.rightToLeft;
 		// intrinsic parameters are configured to be identical to normalized image coordinates
-		param.left = new IntrinsicParameters(1,1,0,0,0,0,0).fsetRadial(0,0);
-		param.right = new IntrinsicParameters(1,1,0,0,0,0,0).fsetRadial(0,0);
+		param.left = new PinholeRadial(1,1,0,0,0,0,0).fsetRadial(0,0);
+		param.right = new PinholeRadial(1,1,0,0,0,0,0).fsetRadial(0,0);
 		validation.setStereoParameters(param);
 		validation.setModel(worldToLeft);
 		double expected = validation.computeDistance(pointPose.get(0));

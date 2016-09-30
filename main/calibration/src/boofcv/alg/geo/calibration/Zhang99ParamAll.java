@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 
@@ -138,8 +138,8 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 	 *
 	 * @return Intrinsic parameters
 	 */
-	public IntrinsicParameters convertToIntrinsic() {
-		IntrinsicParameters ret = new IntrinsicParameters();
+	public PinholeRadial convertToIntrinsic() {
+		PinholeRadial ret = new PinholeRadial();
 
 		ret.fx = a;
 		ret.fy = b;

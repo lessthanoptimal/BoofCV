@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
 /**
  * Interface for detecting fiducials and estimating their 6-DOF pose.  The camera must be calibrated by
- * specifying {@link boofcv.struct.calib.IntrinsicParameters}.  When one or more fiducials are detected their IDs and pose
+ * specifying {@link PinholeRadial}.  When one or more fiducials are detected their IDs and pose
  * are returned.
  *
  * @author Peter Abeles
@@ -34,7 +34,7 @@ public interface FiducialDetector<T extends ImageBase>
 {
 	/**
 	 * Call to detect the fiducial inside the image.  Must call
-	 * {@link #setIntrinsic(boofcv.struct.calib.IntrinsicParameters)} first.
+	 * {@link #setIntrinsic(PinholeRadial)} first.
 	 * @param input Input image.  Not modified.
 	 */
 	void detect( T input );
@@ -63,7 +63,7 @@ public interface FiducialDetector<T extends ImageBase>
 	 *
 	 * @param intrinsic The camera's intrinsic parmeters
 	 */
-	void setIntrinsic( IntrinsicParameters intrinsic );
+	void setIntrinsic( PinholeRadial intrinsic );
 
 	/**
 	 * The total number of targets found
