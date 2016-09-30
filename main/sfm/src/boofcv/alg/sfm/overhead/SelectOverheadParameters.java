@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -78,7 +78,7 @@ public class SelectOverheadParameters {
 	 * @param planeToCamera Extrinsic camera parameters which specify the plane
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process(PinholeRadial intrinsic , Se3_F64 planeToCamera )
+	public boolean process(CameraPinholeRadial intrinsic , Se3_F64 planeToCamera )
 	{
 		proj.setPlaneToCamera(planeToCamera,true);
 		proj.setIntrinsic(intrinsic);

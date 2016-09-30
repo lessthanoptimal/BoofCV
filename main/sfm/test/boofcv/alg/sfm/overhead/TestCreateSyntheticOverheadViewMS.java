@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -38,7 +38,7 @@ public class TestCreateSyntheticOverheadViewMS {
 
 	int width = 800;
 	int height = 850;
-	PinholeRadial param = new PinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
+	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
 
 	int overheadW = 500;
 	int overheadH = 600;

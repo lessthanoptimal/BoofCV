@@ -28,7 +28,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
@@ -67,7 +67,7 @@ public class ExampleCalibrateMonocularPoints {
 		Zhang99ParamAll found = zhang99.getOptimized();
 
 		// Convenient function for converting from specialized Zhang99 format to generalized
-		PinholeRadial param = found.convertToIntrinsic();
+		CameraPinholeRadial param = found.convertToIntrinsic();
 
 		// print the results to standard out
 		param.print();

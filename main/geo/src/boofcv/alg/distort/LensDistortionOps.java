@@ -24,7 +24,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.*;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -62,7 +62,7 @@ public class LensDistortionOps {
 	 */
 	public static <T extends ImageBase>
 	ImageDistort<T,T> imageRemoveDistortion(AdjustmentType type, BorderType borderType,
-											PinholeRadial param, PinholeRadial paramAdj,
+											CameraPinholeRadial param, CameraPinholeRadial paramAdj,
 											ImageType<T> imageType)
 	{
 		Class bandType = imageType.getImageClass();
@@ -106,8 +106,8 @@ public class LensDistortionOps {
 	 * @return The requested transform
 	 */
 	public static PointTransform_F32 transform_F32(AdjustmentType type,
-												   PinholeRadial param,
-												   PinholeRadial paramAdj,
+												   CameraPinholeRadial param,
+												   CameraPinholeRadial paramAdj,
 												   boolean undistortedToDistorted)
 	{
 		PointTransform_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
@@ -150,8 +150,8 @@ public class LensDistortionOps {
 	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
 	 * and {@link PointTransform_F32}
 	 */
-	private static PointTransform_F32 adjustmentTransform_F32(PinholeRadial param,
-															  PinholeRadial paramAdj,
+	private static PointTransform_F32 adjustmentTransform_F32(CameraPinholeRadial param,
+															  CameraPinholeRadial paramAdj,
 															  boolean undistToDist,
 															  PointTransform_F32 remove_p_to_p,
 															  DenseMatrix64F A) {
@@ -192,8 +192,8 @@ public class LensDistortionOps {
 	 * @return The requested transform
 	 */
 	public static PointTransform_F64 transform_F64(AdjustmentType type,
-												   PinholeRadial param,
-												   PinholeRadial paramAdj,
+												   CameraPinholeRadial param,
+												   CameraPinholeRadial paramAdj,
 												   boolean undistortedToDistorted)
 	{
 		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
@@ -236,8 +236,8 @@ public class LensDistortionOps {
 	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
 	 * and {@link PointTransform_F32}
 	 */
-	private static PointTransform_F64 adjustmentTransform_F64(PinholeRadial param,
-															  PinholeRadial paramAdj,
+	private static PointTransform_F64 adjustmentTransform_F64(CameraPinholeRadial param,
+															  CameraPinholeRadial paramAdj,
 															  boolean adjToDistorted,
 															  PointTransform_F64 remove_p_to_p,
 															  DenseMatrix64F A) {
@@ -280,7 +280,7 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 */
-	public static LensDistortionPinhole transformPoint(PinholeRadial param) {
+	public static LensDistortionPinhole transformPoint(CameraPinholeRadial param) {
 		if( param.isDistorted())
 			return new LensDistortionRadialTangential(param);
 		else

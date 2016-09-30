@@ -21,7 +21,7 @@ package boofcv.struct.feature;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.UtilIO;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
@@ -195,12 +195,12 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testIntrinsicParamters() {
-		PinholeRadial original = new PinholeRadial().
+		CameraPinholeRadial original = new CameraPinholeRadial().
 				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
 		UtilIO.saveXML(original, "temp.txt");
 
-		PinholeRadial found = UtilIO.loadXML("temp.txt");
+		CameraPinholeRadial found = UtilIO.loadXML("temp.txt");
 
 		assertEquals(original.fx,found.fx,1e-8);
 		assertEquals(original.fy, found.fy, 1e-8);

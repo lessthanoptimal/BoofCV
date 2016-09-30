@@ -18,14 +18,14 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.alg.distort.PixelToNormalized_F64;
+import boofcv.alg.distort.PixelToNormalized_F32;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.PixelTransform_F64;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
+import boofcv.struct.distort.PixelTransform_F32;
+import georegression.geometry.ConvertRotation3D_F32;
+import georegression.geometry.GeometryMath_F32;
 import georegression.struct.EulerType;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Vector3D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -41,10 +41,10 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class EquirectangularToPinhole_F64 extends PixelTransform_F64 {
+public class EquirectangularToPinhole_F32 extends PixelTransform_F32 {
 
 	// function for doing match on equirectangular images
-	EquirectangularTools_F64 tools = new EquirectangularTools_F64();
+	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
 	// camera model without distortion
 	CameraPinhole pinhole;
@@ -53,11 +53,11 @@ public class EquirectangularToPinhole_F64 extends PixelTransform_F64 {
 	DenseMatrix64F direction = CommonOps.identity(3,3);
 
 	// storage for intermediate variables
-	Vector3D_F64 n = new Vector3D_F64();
-	Point2D_F64 out = new Point2D_F64();
+	Vector3D_F32 n = new Vector3D_F32();
+	Point2D_F32 out = new Point2D_F32();
 
 	// storage for precomputed pointing vectors for each pixel in pinhole camera
-	Vector3D_F64[] vectors = new Vector3D_F64[0];
+	Vector3D_F32[] vectors = new Vector3D_F32[0];
 
 	/**
 	 * Specifies the pinhole camera
@@ -67,22 +67,22 @@ public class EquirectangularToPinhole_F64 extends PixelTransform_F64 {
 		this.pinhole = pinhole;
 
 		if( vectors.length < pinhole.width*pinhole.height ) {
-			vectors = new Vector3D_F64[pinhole.width * pinhole.height];
+			vectors = new Vector3D_F32[pinhole.width * pinhole.height];
 			for (int i = 0; i < vectors.length; i++) {
-				vectors[i] = new Vector3D_F64();
+				vectors[i] = new Vector3D_F32();
 			}
 		}
 
 		// computing the 3D ray through each pixel in the pinhole camera at it's canonical
 		// location
-		PixelToNormalized_F64 pixelToNormalized = new PixelToNormalized_F64();
+		PixelToNormalized_F32 pixelToNormalized = new PixelToNormalized_F32();
 		pixelToNormalized.set(pinhole.fx,pinhole.fy,pinhole.skew,pinhole.cx,pinhole.cy);
 
-		Point2D_F64 norm = new Point2D_F64();
+		Point2D_F32 norm = new Point2D_F32();
 		for (int pixelY = 0; pixelY < pinhole.height; pixelY++) {
 			for (int pixelX = 0; pixelX < pinhole.width; pixelX++) {
 				pixelToNormalized.compute(pixelX, pixelY, norm);
-				Vector3D_F64 v = vectors[pixelY*pinhole.width+pixelX];
+				Vector3D_F32 v = vectors[pixelY*pinhole.width+pixelX];
 
 				v.set(norm.x,norm.y,1);
 			}
@@ -104,8 +104,8 @@ public class EquirectangularToPinhole_F64 extends PixelTransform_F64 {
 	 * @param yaw Radian from -pi to pi
 	 * @param pitch Radian from -pi/2 to pi/2
 	 */
-	public void setDirection(double yaw, double pitch ) {
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.YXZ,pitch,0,yaw,direction);
+	public void setDirection(float yaw, float pitch ) {
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,pitch,0,yaw,direction);
 	}
 
 	/**
@@ -125,9 +125,9 @@ public class EquirectangularToPinhole_F64 extends PixelTransform_F64 {
 	@Override
 	public void compute(int x, int y) {
 		// grab precomputed normalized image coordinate at canonical location
-		Vector3D_F64 v = vectors[y*pinhole.width+x];
+		Vector3D_F32 v = vectors[y*pinhole.width+x];
 		// move to requested orientation
-		GeometryMath_F64.mult(direction,v,n); // TODO make faster by not using an array based matrix
+		GeometryMath_F32.mult(direction,v,n); // TODO make faster by not using an array based matrix
 		// compute pixel coordinate
 		tools.normToEqui(n.x,n.y,n.z,out);
 

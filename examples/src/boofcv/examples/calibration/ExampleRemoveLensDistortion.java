@@ -28,7 +28,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -54,7 +54,7 @@ public class ExampleRemoveLensDistortion {
 		String imageDir = UtilIO.pathExample("structure/");
 
 		// load calibration parameters from the previously calibrated camera
-		PinholeRadial param = UtilIO.loadXML(calibDir , "intrinsic.xml");
+		CameraPinholeRadial param = UtilIO.loadXML(calibDir , "intrinsic.xml");
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");

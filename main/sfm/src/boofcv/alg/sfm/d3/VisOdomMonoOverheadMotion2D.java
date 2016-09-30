@@ -24,7 +24,7 @@ import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.OverheadView;
 import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.factory.sfm.FactorySfmMisc;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se2_F64;
@@ -102,7 +102,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param planeToCamera Transform from the plane to camera.
 	 */
-	public void configureCamera(PinholeRadial intrinsic ,
+	public void configureCamera(CameraPinholeRadial intrinsic ,
 								Se3_F64 planeToCamera ) {
 		this.planeToCamera = planeToCamera;
 

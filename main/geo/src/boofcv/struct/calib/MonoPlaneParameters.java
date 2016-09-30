@@ -31,7 +31,7 @@ public class MonoPlaneParameters {
 	/**
 	 * Intrinsic parameters for the camera
 	 */
-	public PinholeRadial intrinsic;
+	public CameraPinholeRadial intrinsic;
 	/**
 	 * Extrinsic parameters for the camera.  Transform from plane to camera coordinate system.  This is technically
 	 * over specified since only orientation (3-DOF) and distance from plane (1-DOF) is needed.  The extra
@@ -40,7 +40,7 @@ public class MonoPlaneParameters {
 	 */
 	public Se3_F64 planeToCamera;
 
-	public MonoPlaneParameters(PinholeRadial intrinsic, Se3_F64 planeToCamera) {
+	public MonoPlaneParameters(CameraPinholeRadial intrinsic, Se3_F64 planeToCamera) {
 		this.intrinsic = intrinsic;
 		this.planeToCamera = planeToCamera;
 	}
@@ -48,11 +48,11 @@ public class MonoPlaneParameters {
 	public MonoPlaneParameters() {
 	}
 
-	public PinholeRadial getIntrinsic() {
+	public CameraPinholeRadial getIntrinsic() {
 		return intrinsic;
 	}
 
-	public void setIntrinsic(PinholeRadial intrinsic) {
+	public void setIntrinsic(CameraPinholeRadial intrinsic) {
 		this.intrinsic = intrinsic;
 	}
 

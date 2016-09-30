@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
@@ -34,7 +34,7 @@ public class TestNormalizedToPixel_F32 {
 
 	@Test
 	public void basicTest() {
-		PinholeRadial p = new PinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
+		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(p, null);
 

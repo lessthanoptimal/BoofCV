@@ -34,7 +34,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
@@ -74,7 +74,7 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(200+120,300));
 		expected.add( new Point2D_F64(200+120,300+120));
 
-		PinholeRadial intrinsic =new PinholeRadial(500,500,0,320,240,640,480);
+		CameraPinholeRadial intrinsic =new CameraPinholeRadial(500,500,0,320,240,640,480);
 
 		// corners of the fiducial in world coordinates
 		double r = 2;
@@ -133,10 +133,10 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void findPatternEasy() {
-		checkFindKnown(new PinholeRadial(500,500,0,320,240,640,480),1.1);
+		checkFindKnown(new CameraPinholeRadial(500,500,0,320,240,640,480),1.1);
 	}
 
-	private void checkFindKnown(PinholeRadial intrinsic, double tol ) {
+	private void checkFindKnown(CameraPinholeRadial intrinsic, double tol ) {
 		GrayU8 pattern = createPattern(6*20, false);
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
 //		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  100,50,  100,150,  50,150);
@@ -180,7 +180,7 @@ public class TestBaseDetectFiducialSquare {
 	public void computeTargetToWorld() {
 
 		double lengthSide = 1.5;
-		PinholeRadial intrinsic = new PinholeRadial(400,400,0,320,240,640,380);
+		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,320,240,640,380);
 		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
 
 		Dummy alg = new Dummy();
@@ -224,14 +224,14 @@ public class TestBaseDetectFiducialSquare {
 
 		DetectCorner detector = new DetectCorner();
 
-		PinholeRadial intrinsic = new PinholeRadial(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
+		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
 		detectWithLensDistortion(expected, detector, intrinsic);
 
-		intrinsic = new PinholeRadial(500,500,0,320,240,640,480).fsetRadial(0.1,0.05);
+		intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(0.1,0.05);
 		detectWithLensDistortion(expected, detector, intrinsic);
 	}
 
-	private void detectWithLensDistortion(List<Point2D_F64> expected, DetectCorner detector, PinholeRadial intrinsic) {
+	private void detectWithLensDistortion(List<Point2D_F64> expected, DetectCorner detector, CameraPinholeRadial intrinsic) {
 		// create a pattern with a corner for orientation and put it into the image
 		GrayU8 pattern = createPattern(6*20, true);
 		GrayU8 image = new GrayU8(640,480);

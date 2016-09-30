@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * @author Peter Abeles
@@ -27,7 +27,7 @@ public class TestLensDistortionRadialTangential extends GeneralLensDistortionPin
 {
 	@Override
 	public LensDistortionPinhole create() {
-		PinholeRadial param = new PinholeRadial(500,550,0.001,400,450,1000,800).
+		CameraPinholeRadial param = new CameraPinholeRadial(500,550,0.001,400,450,1000,800).
 				fsetRadial(0.02, 0.005);
 
 		return new LensDistortionRadialTangential(param);

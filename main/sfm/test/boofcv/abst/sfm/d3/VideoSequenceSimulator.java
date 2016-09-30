@@ -23,7 +23,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -47,7 +47,7 @@ public class VideoSequenceSimulator<I extends ImageGray> {
 
 	Random rand = new Random(1234);
 
-	PinholeRadial intrinsic;
+	CameraPinholeRadial intrinsic;
 	DenseMatrix64F K;
 
 	BufferedImage workImage;
@@ -65,7 +65,7 @@ public class VideoSequenceSimulator<I extends ImageGray> {
 		outputImage = GeneralizedImageOps.createSingleBand(inputType,workImage.getWidth(),workImage.getHeight());
 	}
 
-	public void setIntrinsic( PinholeRadial param ) {
+	public void setIntrinsic( CameraPinholeRadial param ) {
 		this.intrinsic = param;
 		K = PerspectiveOps.calibrationMatrix(param,null);
 	}

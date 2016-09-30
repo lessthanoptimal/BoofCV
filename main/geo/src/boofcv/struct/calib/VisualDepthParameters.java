@@ -42,7 +42,7 @@ public class VisualDepthParameters {
 	/**
 	 * Intrinsic camera parameters for the visual sensor.
 	 */
-	public PinholeRadial visualParam;
+	public CameraPinholeRadial visualParam;
 
 	public VisualDepthParameters() {
 	}
@@ -56,11 +56,11 @@ public class VisualDepthParameters {
 		visualParam.set( param.visualParam );
 	}
 
-	public PinholeRadial getVisualParam() {
+	public CameraPinholeRadial getVisualParam() {
 		return visualParam;
 	}
 
-	public void setVisualParam(PinholeRadial visualParam) {
+	public void setVisualParam(CameraPinholeRadial visualParam) {
 		this.visualParam = visualParam;
 	}
 

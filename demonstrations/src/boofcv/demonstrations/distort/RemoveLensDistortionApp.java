@@ -30,7 +30,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
@@ -48,7 +48,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	PinholeRadial param;
+	CameraPinholeRadial param;
 
 	// distorted input
 	Planar<GrayF32> dist;
@@ -64,7 +64,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		setMainGUI(gui);
 	}
 
-	public void configure( final BufferedImage orig , PinholeRadial param )
+	public void configure( final BufferedImage orig , CameraPinholeRadial param )
 	{
 		this.param = param;
 
@@ -122,7 +122,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput(String name, int index) {
 		PathLabel refs = inputRefs.get(index);
 
-		PinholeRadial param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
+		CameraPinholeRadial param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
 		BufferedImage orig = media.openImage(refs.getPath(1));
 
 		configure(orig,param);

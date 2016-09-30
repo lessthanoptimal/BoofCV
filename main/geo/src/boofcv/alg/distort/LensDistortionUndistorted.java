@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.calib.PinholeIntrinsic;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.DoNothingTransform_F32;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F32;
@@ -31,9 +31,9 @@ import boofcv.struct.distort.PointTransform_F64;
  */
 public class LensDistortionUndistorted implements LensDistortionPinhole{
 
-	PinholeIntrinsic p;
+	CameraPinhole p;
 
-	public LensDistortionUndistorted(PinholeIntrinsic p) {
+	public LensDistortionUndistorted(CameraPinhole p) {
 		this.p = p;
 	}
 

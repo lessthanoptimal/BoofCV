@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.CalibratedImageGridPanel;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import org.ejml.data.DenseMatrix64F;
 
 import javax.swing.*;
@@ -159,8 +159,8 @@ public class StereoPlanarPanel extends JPanel
 		return toolBar;
 	}
 
-	public void setRectification(PinholeRadial leftParam , DenseMatrix64F leftRect ,
-								 PinholeRadial rightParam , DenseMatrix64F rightRect ) {
+	public void setRectification(CameraPinholeRadial leftParam , DenseMatrix64F leftRect ,
+								 CameraPinholeRadial rightParam , DenseMatrix64F rightRect ) {
 		leftView.setDistorted(leftParam,leftRect);
 		rightView.setDistorted(rightParam,rightRect);
 		checkUndistorted.setEnabled(true);

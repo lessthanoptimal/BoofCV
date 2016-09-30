@@ -29,7 +29,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -62,7 +62,7 @@ public class ExamplePoseOfCalibrationTarget {
 	public static void main( String args[] ) {
 
 		// Load camera calibration
-		PinholeRadial intrinsic =
+		CameraPinholeRadial intrinsic =
 				UtilIO.loadXML(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml"));
 
 		// load the video file

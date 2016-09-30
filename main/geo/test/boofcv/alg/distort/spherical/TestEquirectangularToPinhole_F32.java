@@ -20,7 +20,7 @@ package boofcv.alg.distort.spherical;
 
 import boofcv.struct.calib.CameraPinhole;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.point.Vector3D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEquirectangularToPinhole_F64 {
+public class TestEquirectangularToPinhole_F32 {
 
 	private int equiWidth = 600;
 	private int equiHeight = 400;
@@ -44,7 +44,7 @@ public class TestEquirectangularToPinhole_F64 {
 	public void canonicalIsPointedPositiveZ() {
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 
-		EquirectangularToPinhole_F64 alg = new EquirectangularToPinhole_F64();
+		EquirectangularToPinhole_F32 alg = new EquirectangularToPinhole_F32();
 
 		alg.setPinhole(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
@@ -59,28 +59,28 @@ public class TestEquirectangularToPinhole_F64 {
 	public void setDirection() {
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 
-		EquirectangularToPinhole_F64 alg = new EquirectangularToPinhole_F64();
+		EquirectangularToPinhole_F32 alg = new EquirectangularToPinhole_F32();
 
 		alg.setPinhole(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
-		alg.setDirection(0, Math.PI/2);
+		alg.setDirection(0, (float)Math.PI/2);
 
 		assertPointing(alg,imgWidth/2,imgHeight/2,1,0,0);
 	}
 
-	private void assertPointing( EquirectangularToPinhole_F64 alg , int x , int y , double nx , double ny , double nz )
+	private void assertPointing( EquirectangularToPinhole_F32 alg , int x , int y , float nx , float ny , float nz )
 	{
-		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
+		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
 		tools.configure(equiWidth,equiHeight);
 
-		Vector3D_F64 n = new Vector3D_F64();
+		Vector3D_F32 n = new Vector3D_F32();
 
 		alg.compute(x,y);
 		tools.equiToNorm(alg.distX,alg.distY,n);
 
-		assertEquals( nx, n.x, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals( ny, n.y, GrlConstants.DOUBLE_TEST_TOL);
-		assertEquals( nz, n.z, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals( nx, n.x, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals( ny, n.y, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals( nz, n.z, GrlConstants.FLOAT_TEST_TOL);
 	}
 }

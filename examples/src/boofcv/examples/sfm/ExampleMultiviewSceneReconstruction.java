@@ -31,7 +31,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
@@ -114,7 +114,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Process the images and reconstructor the scene as a point cloud using matching interest points between
 	 * images.
 	 */
-	public void process(PinholeRadial intrinsic , List<BufferedImage> colorImages ) {
+	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
 
 		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 
@@ -614,7 +614,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		String directory = UtilIO.pathExample("sfm/chair");
 
-		PinholeRadial intrinsic = UtilIO.loadXML(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
+		CameraPinholeRadial intrinsic = UtilIO.loadXML(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.xml");
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");
 

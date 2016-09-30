@@ -18,7 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -47,7 +47,7 @@ public interface MonocularVisualOdometry<T extends ImageBase> extends VisualOdom
 	 *
 	 * @param param Intrinsic parameters for camera
 	 */
-	public void setIntrinsic( PinholeRadial param );
+	public void setIntrinsic( CameraPinholeRadial param );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked

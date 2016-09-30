@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 
@@ -138,8 +138,8 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 	 *
 	 * @return Intrinsic parameters
 	 */
-	public PinholeRadial convertToIntrinsic() {
-		PinholeRadial ret = new PinholeRadial();
+	public CameraPinholeRadial convertToIntrinsic() {
+		CameraPinholeRadial ret = new CameraPinholeRadial();
 
 		ret.fx = a;
 		ret.fy = b;

@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F32;
@@ -78,7 +78,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 	 * @param overheadWidth Number of columns in overhead image
 	 * @param overheadHeight Number of rows in overhead image
 	 */
-	public void configure( PinholeRadial intrinsic ,
+	public void configure( CameraPinholeRadial intrinsic ,
 						   Se3_F64 planeToCamera ,
 						   double centerX, double centerY, double cellSize ,
 						   int overheadWidth , int overheadHeight )

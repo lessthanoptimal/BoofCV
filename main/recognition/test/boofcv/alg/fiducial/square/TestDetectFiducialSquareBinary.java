@@ -26,7 +26,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
@@ -60,7 +60,7 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void checkFoundRotationMatrix() {
 
-		PinholeRadial intrinsic = new PinholeRadial(500,500,0,320,240,640,480);
+		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480);
 
 		GrayF32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
 		GrayU8 rendered = new GrayU8(rendered_F32.width,rendered_F32.height);

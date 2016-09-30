@@ -22,7 +22,7 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.PlanePtPixel;
@@ -171,7 +171,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 */
-	public void setIntrinsic(PinholeRadial intrinsic) {
+	public void setIntrinsic(CameraPinholeRadial intrinsic) {
 		planeProjection.setIntrinsic(intrinsic);
 		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 		pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);

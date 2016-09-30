@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
@@ -41,7 +41,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 	public abstract ImageBase loadImage(ImageType imageType);
 
-	public abstract PinholeRadial loadIntrinsic();
+	public abstract CameraPinholeRadial loadIntrinsic();
 
 	public abstract FiducialDetector createDetector( ImageType imageType );
 
@@ -50,7 +50,7 @@ public abstract class GenericFiducialDetectorChecks {
 	 */
 	@Test
 	public void checkNoDistortion() {
-		PinholeRadial param = loadIntrinsic();
+		CameraPinholeRadial param = loadIntrinsic();
 
 		if( !param.isDistorted() )
 			fail("intrinsic must be distorted");
@@ -87,7 +87,7 @@ public abstract class GenericFiducialDetectorChecks {
 			ImageBase image = loadImage(type);
 			FiducialDetector detector = createDetector(type);
 
-			PinholeRadial intrinsic = loadIntrinsic();
+			CameraPinholeRadial intrinsic = loadIntrinsic();
 			assertTrue(intrinsic.isDistorted());
 
 			detector.setIntrinsic(intrinsic);

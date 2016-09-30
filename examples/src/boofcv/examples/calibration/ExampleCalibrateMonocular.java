@@ -27,7 +27,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
@@ -103,7 +103,7 @@ public class ExampleCalibrateMonocular {
 			}
 		}
 		// process and compute intrinsic parameters
-		PinholeRadial intrinsic = calibrationAlg.process();
+		CameraPinholeRadial intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
 		UtilIO.saveXML(intrinsic, "intrinsic.xml");

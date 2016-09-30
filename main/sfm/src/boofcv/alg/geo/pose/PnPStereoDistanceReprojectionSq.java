@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.NormalizedToPixelError;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.struct.point.Point2D_F64;
@@ -60,8 +60,8 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModel<Se3_F6
 	{
 		this.leftToRight = param.getRightToLeft().invert(null);
 
-		PinholeRadial left = param.left;
-		PinholeRadial right = param.right;
+		CameraPinholeRadial left = param.left;
+		CameraPinholeRadial right = param.right;
 
 		leftPixelError = new NormalizedToPixelError(left.fx,left.fy,left.skew);
 		rightPixelError = new NormalizedToPixelError(right.fx,right.fy,right.skew);

@@ -20,7 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.alg.sfm.SfmTestHelper;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -64,8 +64,8 @@ public class TestAssociateStereo2D {
 		param = new StereoParameters();
 		param.rightToLeft = leftToRight.invert(null);
 
-		param.left = new PinholeRadial(400,500,0.1,160,120,320,240).fsetRadial(0,0);
-		param.right = new PinholeRadial(380,505,0.05,165,115,320,240).fsetRadial(0,0);
+		param.left = new CameraPinholeRadial(400,500,0.1,160,120,320,240).fsetRadial(0,0);
+		param.right = new CameraPinholeRadial(380,505,0.05,165,115,320,240).fsetRadial(0,0);
 
 		descLeft = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
 			@Override

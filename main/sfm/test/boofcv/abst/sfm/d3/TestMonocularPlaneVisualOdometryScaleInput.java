@@ -18,8 +18,8 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -47,7 +47,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	public void setCalibration() {
 		param = null;
 
-		PinholeRadial intrinsic = createIntrinsic();
+		CameraPinholeRadial intrinsic = createIntrinsic();
 		Se3_F64 extrinsic = new Se3_F64();
 		extrinsic.T.x=8;
 		Dummy dummy = new Dummy();
@@ -65,7 +65,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	public void process() {
 		image = null;
 
-		PinholeRadial intrinsic = createIntrinsic();
+		CameraPinholeRadial intrinsic = createIntrinsic();
 		Dummy dummy = new Dummy();
 
 		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
@@ -91,8 +91,8 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		assertTrue(type == alg.getImageType());
 	}
 
-	public PinholeRadial createIntrinsic() {
-		return new PinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
+	public CameraPinholeRadial createIntrinsic() {
+		return new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
 	}
 
 	protected class Dummy implements MonocularPlaneVisualOdometry<GrayF32> {

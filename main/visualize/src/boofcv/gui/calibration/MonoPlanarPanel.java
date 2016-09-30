@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -196,7 +196,7 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 		paramC.setText(textC);
 	}
 
-	public void setCorrection( PinholeRadial param )
+	public void setCorrection( CameraPinholeRadial param )
 	{
 		checkUndistorted.setEnabled(true);
 		mainView.setDistorted(param,null);

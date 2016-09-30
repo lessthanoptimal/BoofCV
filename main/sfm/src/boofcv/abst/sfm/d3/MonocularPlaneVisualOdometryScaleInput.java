@@ -20,8 +20,8 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.calib.PinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -50,7 +50,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase> implem
 
 	@Override
 	public void setCalibration( MonoPlaneParameters param ) {
-		scaleParameter.intrinsic = new PinholeRadial(param.intrinsic);
+		scaleParameter.intrinsic = new CameraPinholeRadial(param.intrinsic);
 		scaleParameter.planeToCamera = param.planeToCamera.copy();
 
 		PerspectiveOps.scaleIntrinsic(scaleParameter.intrinsic, scaleFactor);

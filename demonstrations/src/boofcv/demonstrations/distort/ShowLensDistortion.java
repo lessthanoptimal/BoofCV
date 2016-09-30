@@ -29,7 +29,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -195,7 +195,7 @@ public class ShowLensDistortion<T extends ImageGray>
 		ProgressMonitorThread thread = new MyMonitorThread(this);
 		thread.start();
 
-		PinholeRadial param = new PinholeRadial().fsetK(input.width * 0.8, input.width * 0.8, 0,
+		CameraPinholeRadial param = new CameraPinholeRadial().fsetK(input.width * 0.8, input.width * 0.8, 0,
 				input.width / 2, input.height / 2, input.width, input.height).fsetRadial(radial1, radial2).
 				fsetTangental(tangential1, tangential2);
 

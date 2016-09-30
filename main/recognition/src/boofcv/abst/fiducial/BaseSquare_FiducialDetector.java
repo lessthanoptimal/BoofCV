@@ -20,7 +20,7 @@ package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.StabilitySquareFiducialEstimate;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -51,7 +51,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 	}
 
 	@Override
-	public void setIntrinsic(PinholeRadial intrinsic) {
+	public void setIntrinsic(CameraPinholeRadial intrinsic) {
 		alg.configure(intrinsic,true);
 		stability = new StabilitySquareFiducialEstimate(alg.getPoseEstimator());
 	}

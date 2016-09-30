@@ -21,7 +21,7 @@ package boofcv.struct.calib;
 import java.io.Serializable;
 
 /**
- * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link PinholeIntrinsic pinhole camera}.</p?
+ * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link CameraPinhole pinhole camera}.</p?
  *
  * <p>
  * Radial and Tangental Distortion:<br>
@@ -36,7 +36,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class PinholeRadial extends PinholeIntrinsic implements Serializable {
+public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
@@ -46,39 +46,39 @@ public class PinholeRadial extends PinholeIntrinsic implements Serializable {
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
 	 */
-	public PinholeRadial() {
+	public CameraPinholeRadial() {
 	}
 
-	public PinholeRadial(PinholeRadial param ) {
+	public CameraPinholeRadial(CameraPinholeRadial param ) {
 		set(param);
 	}
 
-	public PinholeRadial(double fx, double fy,
-						 double skew,
-						 double cx, double cy,
-						 int width, int height ) {
+	public CameraPinholeRadial(double fx, double fy,
+							   double skew,
+							   double cx, double cy,
+							   int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public PinholeRadial fsetK(double fx, double fy,
-								  double skew,
-								  double cx, double cy,
-								  int width, int height) {
-		return (PinholeRadial)super.fsetK(fx, fy, skew, cx, cy, width, height);
+	public CameraPinholeRadial fsetK(double fx, double fy,
+									 double skew,
+									 double cx, double cy,
+									 int width, int height) {
+		return (CameraPinholeRadial)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public PinholeRadial fsetRadial(double ...radial ) {
+	public CameraPinholeRadial fsetRadial(double ...radial ) {
 		this.radial = radial.clone();
 		return this;
 	}
 
-	public PinholeRadial fsetTangental(double t1 , double t2) {
+	public CameraPinholeRadial fsetTangental(double t1 , double t2) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;
 	}
 
-	public void set( PinholeRadial param ) {
+	public void set( CameraPinholeRadial param ) {
 		super.set(param);
 
 		if( param.radial != null )

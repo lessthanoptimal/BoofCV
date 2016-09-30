@@ -24,7 +24,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -91,8 +91,8 @@ public class StereoProcessingBase<T extends ImageGray> {
 	 * @param stereoParam stereo parameters
 	 */
 	public void setCalibration(StereoParameters stereoParam) {
-		PinholeRadial left = stereoParam.getLeft();
-		PinholeRadial right = stereoParam.getRight();
+		CameraPinholeRadial left = stereoParam.getLeft();
+		CameraPinholeRadial right = stereoParam.getRight();
 
 		// adjust image size
 		imageLeftRect.reshape(left.getWidth(), left.getHeight());

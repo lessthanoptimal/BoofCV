@@ -32,7 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 
@@ -291,7 +291,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		// process and compute intrinsic parameters
-		final PinholeRadial intrinsic = calibrationAlg.process();
+		final CameraPinholeRadial intrinsic = calibrationAlg.process();
 
 		if( gui != null ) {
 			SwingUtilities.invokeLater(new Runnable() {

@@ -28,7 +28,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
@@ -55,7 +55,7 @@ public class ExampleFiducialImage {
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		PinholeRadial param = UtilIO.loadXML(imagePath, "intrinsic.xml");
+		CameraPinholeRadial param = UtilIO.loadXML(imagePath, "intrinsic.xml");
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 

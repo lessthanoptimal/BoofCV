@@ -19,7 +19,7 @@
 package boofcv.abst.geo.calibration;
 
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
@@ -126,8 +126,8 @@ public class CalibrateStereoPlanar {
 	public StereoParameters process() {
 
 		// calibrate left and right cameras
-		PinholeRadial leftParam = calibrateMono(calibLeft,viewLeft);
-		PinholeRadial rightParam = calibrateMono(calibRight,viewRight);
+		CameraPinholeRadial leftParam = calibrateMono(calibLeft,viewLeft);
+		CameraPinholeRadial rightParam = calibrateMono(calibRight,viewRight);
 
 		// fit motion from right to left
 		Se3_F64 rightToLeft = computeRightToLeft();
@@ -138,9 +138,9 @@ public class CalibrateStereoPlanar {
 	/**
 	 * Compute intrinsic calibration for one of the cameras
 	 */
-	private PinholeRadial calibrateMono(CalibrateMonoPlanar calib , List<Se3_F64> location )
+	private CameraPinholeRadial calibrateMono(CalibrateMonoPlanar calib , List<Se3_F64> location )
 	{
-		PinholeRadial intrinsic = calib.process();
+		CameraPinholeRadial intrinsic = calib.process();
 
 		Zhang99ParamAll zhangParam = calib.getZhangParam();
 

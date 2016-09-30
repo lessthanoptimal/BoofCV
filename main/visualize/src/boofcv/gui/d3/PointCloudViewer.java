@@ -19,7 +19,7 @@
 package boofcv.gui.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -93,7 +93,7 @@ public class PointCloudViewer extends JPanel
 		configure(K);
 	}
 
-	public PointCloudViewer(PinholeRadial intrinsic, double keyStepSize) {
+	public PointCloudViewer(CameraPinholeRadial intrinsic, double keyStepSize) {
 		this(keyStepSize);
 		configure(PerspectiveOps.calibrationMatrix(intrinsic,null));
 		setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));

@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * Intrinsic camera parameters for a calibrated pinhole camera.  Specifies the calibration
+ * Intrinsic camera parameters for a pinhole camera.  Specifies the calibration
  * matrix K and distortion parameters.
  * </p>
  *
@@ -34,7 +34,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class PinholeIntrinsic implements Serializable {
+public class CameraPinhole implements Serializable {
 
 	// serialization version
 	public static final long serialVersionUID = 1L;
@@ -52,24 +52,24 @@ public class PinholeIntrinsic implements Serializable {
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
 	 */
-	public PinholeIntrinsic() {
+	public CameraPinhole() {
 	}
 
-	public PinholeIntrinsic(PinholeIntrinsic param ) {
+	public CameraPinhole(CameraPinhole param ) {
 		set(param);
 	}
 
-	public PinholeIntrinsic(double fx, double fy,
-							double skew,
-							double cx, double cy,
-							int width, int height ) {
+	public CameraPinhole(double fx, double fy,
+						 double skew,
+						 double cx, double cy,
+						 int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public PinholeIntrinsic fsetK(double fx, double fy,
-								  double skew,
-								  double cx, double cy,
-								  int width, int height) {
+	public CameraPinhole fsetK(double fx, double fy,
+							   double skew,
+							   double cx, double cy,
+							   int width, int height) {
 		this.fx = fx;
 		this.fy = fy;
 		this.skew = skew;
@@ -81,7 +81,7 @@ public class PinholeIntrinsic implements Serializable {
 		return this;
 	}
 
-	public void set( PinholeIntrinsic param ) {
+	public void set( CameraPinhole param ) {
 		this.fx = param.fx;
 		this.fy = param.fy;
 		this.skew = param.skew;

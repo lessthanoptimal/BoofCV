@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.alg.sfm.SfmTestHelper;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -44,8 +44,8 @@ public class TestStereoConsistencyCheck {
 		StereoParameters param = new StereoParameters();
 		param.rightToLeft = leftToRight.invert(null);
 
-		param.left = new PinholeRadial(400,500,0.1,160,120,320,240).fsetRadial(0,0);
-		param.right = new PinholeRadial(380,505,0.05,165,115,320,240).fsetRadial(0,0);
+		param.left = new CameraPinholeRadial(400,500,0.1,160,120,320,240).fsetRadial(0,0);
+		param.right = new CameraPinholeRadial(380,505,0.05,165,115,320,240).fsetRadial(0,0);
 
 		Point3D_F64 X = new Point3D_F64(0.02,-0.5,3);
 

@@ -27,7 +27,7 @@ import boofcv.alg.geo.robust.DistanceHomographySq;
 import boofcv.alg.geo.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.geo.robust.Se3FromEssentialGenerator;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.Point2D3D;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
@@ -128,7 +128,7 @@ public class FactoryMultiViewRobust {
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
-		PinholeRadial intrinsic = essential.intrinsic;
+		CameraPinholeRadial intrinsic = essential.intrinsic;
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,
@@ -163,7 +163,7 @@ public class FactoryMultiViewRobust {
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
-		PinholeRadial intrinsic = essential.intrinsic;
+		CameraPinholeRadial intrinsic = essential.intrinsic;
 
 		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
 				new DistanceSe3SymmetricSq(triangulate,

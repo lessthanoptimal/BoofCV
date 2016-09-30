@@ -39,7 +39,7 @@ import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.DoNothingTransform_F64;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -76,7 +76,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		String imageDir = UtilIO.pathExample("stereo/");
 
 		// Camera parameters
-		PinholeRadial intrinsic = UtilIO.loadXML(calibDir , "intrinsic.xml");
+		CameraPinholeRadial intrinsic = UtilIO.loadXML(calibDir , "intrinsic.xml");
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");
@@ -143,7 +143,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param inliers     OUTPUT: Set of inlier features from RANSAC
 	 * @return Found camera motion.  Note translation has an arbitrary scale
 	 */
-	public static Se3_F64 estimateCameraMotion(PinholeRadial intrinsic,
+	public static Se3_F64 estimateCameraMotion(CameraPinholeRadial intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
@@ -161,7 +161,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	/**
 	 * Convert a set of associated point features from pixel coordinates into normalized image coordinates.
 	 */
-	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, PinholeRadial intrinsic) {
+	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
 		PointTransform_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
@@ -193,7 +193,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	public static void rectifyImages(GrayU8 distortedLeft,
 									 GrayU8 distortedRight,
 									 Se3_F64 leftToRight,
-									 PinholeRadial intrinsic,
+									 CameraPinholeRadial intrinsic,
 									 GrayU8 rectifiedLeft,
 									 GrayU8 rectifiedRight,
 									 DenseMatrix64F rectifiedK) {
@@ -227,7 +227,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	/**
 	 * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
 	 */
-	public static void drawInliers(BufferedImage left, BufferedImage right, PinholeRadial intrinsic,
+	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
 								   List<AssociatedPair> normalized) {
 		PointTransform_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 

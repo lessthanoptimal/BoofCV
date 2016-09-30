@@ -27,7 +27,7 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.distort.SequencePointTransform_F32;
@@ -116,12 +116,12 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
-	public static void fullViewLeft(PinholeRadial paramLeft,
+	public static void fullViewLeft(CameraPinholeRadial paramLeft,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									DenseMatrix64F rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
-		paramLeft = new PinholeRadial(paramLeft);
+		paramLeft = new CameraPinholeRadial(paramLeft);
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
@@ -181,12 +181,12 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
-	public static void allInsideLeft(PinholeRadial paramLeft,
+	public static void allInsideLeft(CameraPinholeRadial paramLeft,
 									 DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight,
 									 DenseMatrix64F rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
-		paramLeft = new PinholeRadial(paramLeft);
+		paramLeft = new CameraPinholeRadial(paramLeft);
 
 		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
@@ -290,7 +290,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static PointTransform_F32 transformRectToPixel_F32(PinholeRadial param,
+	public static PointTransform_F32 transformRectToPixel_F32(CameraPinholeRadial param,
 															  DenseMatrix64F rectify)
 	{
 		PointTransform_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
@@ -312,7 +312,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static PointTransform_F64 transformRectToPixel_F64(PinholeRadial param,
+	public static PointTransform_F64 transformRectToPixel_F64(CameraPinholeRadial param,
 															  DenseMatrix64F rectify)
 	{
 		PointTransform_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
@@ -333,7 +333,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from unrectified to rectified pixels
 	 */
-	public static PointTransform_F32 transformPixelToRect_F32(PinholeRadial param,
+	public static PointTransform_F32 transformPixelToRect_F32(CameraPinholeRadial param,
 															  DenseMatrix64F rectify)
 	{
 		PointTransform_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
@@ -352,7 +352,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static PointTransform_F64 transformPixelToRect_F64(PinholeRadial param,
+	public static PointTransform_F64 transformPixelToRect_F64(CameraPinholeRadial param,
 															  DenseMatrix64F rectify)
 	{
 		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
@@ -373,7 +373,7 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static PointTransform_F64 transformPixelToRectNorm_F64(PinholeRadial param,
+	public static PointTransform_F64 transformPixelToRectNorm_F64(CameraPinholeRadial param,
 																  DenseMatrix64F rectify,
 																  DenseMatrix64F rectifyK) {
 		if (rectifyK.get(0, 1) != 0)
@@ -431,7 +431,7 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageBase> ImageDistort<T,T>
-	rectifyImage(PinholeRadial param, DenseMatrix64F rectify , BorderType borderType, ImageType<T> imageType)
+	rectifyImage(CameraPinholeRadial param, DenseMatrix64F rectify , BorderType borderType, ImageType<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip ) {

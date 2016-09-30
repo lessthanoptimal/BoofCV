@@ -21,7 +21,7 @@ package boofcv.alg.depth;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
@@ -42,7 +42,7 @@ public class VisualDepthOps {
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
-	public static void depthTo3D(PinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
+	public static void depthTo3D(CameraPinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
 		PointTransform_F64 p2n = LensDistortionOps.transformPoint(param).undistort_F64(true,false);
@@ -78,7 +78,7 @@ public class VisualDepthOps {
 	 * @param cloud Output point cloud
 	 * @param cloudColor Output color for each point in the cloud
 	 */
-	public static void depthTo3D(PinholeRadial param , Planar<GrayU8> rgb , GrayU16 depth ,
+	public static void depthTo3D(CameraPinholeRadial param , Planar<GrayU8> rgb , GrayU16 depth ,
 								 FastQueue<Point3D_F64> cloud , FastQueueArray_I32 cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();

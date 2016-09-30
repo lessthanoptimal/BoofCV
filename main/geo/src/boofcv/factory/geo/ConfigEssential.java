@@ -19,7 +19,7 @@
 package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * Configuration parameters for estimating an essential matrix.
@@ -41,9 +41,9 @@ public class ConfigEssential implements Configuration {
 	/**
 	 * Intrinsic camera parameters.  Used to compute error in pixels.
 	 */
-	public PinholeRadial intrinsic;
+	public CameraPinholeRadial intrinsic;
 
-	public ConfigEssential(PinholeRadial intrinsic) {
+	public ConfigEssential(CameraPinholeRadial intrinsic) {
 		this.intrinsic = intrinsic;
 	}
 

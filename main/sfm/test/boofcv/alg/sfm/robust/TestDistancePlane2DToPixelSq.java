@@ -20,7 +20,7 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDistancePlane2DToPixelSq {
 
-	PinholeRadial intrinsic = new PinholeRadial(200,210,0,320,240,640,480).fsetRadial(0,0);
+	CameraPinholeRadial intrinsic = new CameraPinholeRadial(200,210,0,320,240,640,480).fsetRadial(0,0);
 
 	DistancePlane2DToPixelSq alg = new DistancePlane2DToPixelSq();
 	Se3_F64 planeToCamera;
