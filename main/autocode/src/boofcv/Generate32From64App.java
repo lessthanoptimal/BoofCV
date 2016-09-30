@@ -79,8 +79,11 @@ public class Generate32From64App {
 	}
 
 	public static void main( String args[] ) {
-		String directories[] = new String[]{"main/geo/src/boofcv/alg/distort/spherical",
-				"main/geo/test/boofcv/alg/distort/spherical"};
+		String directories[] = new String[]{
+				"main/geo/src/boofcv/alg/distort/spherical",
+				"main/ip/src/boofcv/struct/distort",
+				"main/geo/test/boofcv/alg/distort/spherical",
+				"main/ip/test/boofcv/struct/distort"};
 
 		for( String dir : directories ) {
 			new georegression.misc.autocode.Generate32From64App( dir ).process();

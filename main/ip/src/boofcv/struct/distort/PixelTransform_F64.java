@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,19 +24,11 @@ package boofcv.struct.distort;
  *
  * @author Peter Abeles
  */
-public abstract class PixelTransform_F64 {
+public abstract class PixelTransform_F64 implements PixelTransform {
 
 	// distorted pixel coordinates
 	public double distX;
 	public double distY;
-
-	/**
-	 * applies a transform to a pixel coordinate
-	 *
-	 * @param x Pixel x-coordinate
-	 * @param y Pixel y-coordinate
-	 */
-	public abstract void compute( int x , int y );
 
 	public double getDistX() {
 		return distX;

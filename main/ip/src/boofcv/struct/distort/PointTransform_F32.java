@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,5 +34,5 @@ public interface PointTransform_F32 {
 	 * @param y y-coordinate of point
 	 * @param out Transformed point location.
 	 */
-	public void compute( float x , float y , Point2D_F32 out );
+	public void compute( float x, float y, Point2D_F32 out);
 }

@@ -19,27 +19,16 @@
 package boofcv.struct.distort;
 
 /**
- * Extends {@link PointTransform_F32} and adds the ability to change the motion model
+ * Computes a transform in pixel coordinates
  *
  * @author Peter Abeles
  */
-public interface PointTransformModel_F32<Model> extends PointTransform_F32 {
-
+public interface PixelTransform {
 	/**
-	 * Specifies the distortion model used by the transform
-	 * @param model Distortion model
+	 * applies a transform to a pixel coordinate
+	 *
+	 * @param x Pixel x-coordinate
+	 * @param y Pixel y-coordinate
 	 */
-	public void setModel( Model model );
-
-	/**
-	 * Returns the active motion model
-	 * @return motion model
-	 */
-	public Model getModel();
-
-	/**
-	 * Returns a new instance of the motion model
-	 * @return new instance
-	 */
-	public Model newInstanceModel();
+	void compute( int x , int y );
 }

@@ -91,12 +91,13 @@ public class TestEquirectangularTools_F64 {
 		equiToNorm_reverse(tools, width/2, height/2);
 		equiToNorm_reverse(tools, 0, height/2);
 		equiToNorm_reverse(tools, width-1, height/2);
-		equiToNorm_reverse(tools, width/2, 0);
+//		equiToNorm_reverse(tools, width/2, 0); // this is a pathological case.  N to 1 mapping for vector
+		equiToNorm_reverse(tools, width/2, 1);
 		equiToNorm_reverse(tools, width/2, height-1);
 
 		for (int i = 0; i < 100; i++) {
 			int x = rand.nextInt(width);
-			int y = rand.nextInt(height);
+			int y = rand.nextInt(height-1)+1; // avoid pathological case
 
 			equiToNorm_reverse(tools,x,y);
 		}

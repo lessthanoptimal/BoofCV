@@ -18,8 +18,8 @@
 
 package boofcv.alg.distort.spherical;
 
+import boofcv.struct.distort.PixelTransform_F32;
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,23 +34,26 @@ public class TestEquirectangularRotate_F32 {
 	 */
 	@Test
 	public void simpleTests() {
-		Point2D_F32 found = new Point2D_F32();
 
 		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
 		alg.setImageShape(300,250);
 
 		// this is the standard configuration and there should be no change
 		alg.setCenter(0,0);
-		alg.compute(300.0f*0.5f, 250*0.5f, found);
-		assertEquals( 0 , found.distance(300.0f*0.5f, 250*0.5f), GrlConstants.FLOAT_TEST_TOL);
+		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
+		assertMatch( alg, 300.0f*0.5f, 250*0.5f);
 
 		alg.setCenter( (float)Math.PI/2.0f,0);
-		alg.compute(300.0f*0.5f, 250*0.5f, found);
-		assertEquals( 0 , found.distance(300.0f*0.75f, 250*0.5f), GrlConstants.FLOAT_TEST_TOL);
+		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
+		assertMatch( alg, 300.0f*0.75f, 250*0.5f);
 
 		alg.setCenter(0, (float)Math.PI/4.0f);
-		alg.compute(300.0f*0.5f, 250*0.5f, found);
-		assertEquals( 0 , found.distance(300.0f*0.5f, 250*0.75f), GrlConstants.FLOAT_TEST_TOL);
+		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
+		assertMatch( alg, 300.0f*0.5f, 250*0.75f);
+	}
 
+	private void assertMatch(PixelTransform_F32 tran , float x , float y ) {
+		assertEquals( x , tran.distX, GrlConstants.FLOAT_TEST_TOL);
+		assertEquals( y , tran.distY, GrlConstants.FLOAT_TEST_TOL);
 	}
 }

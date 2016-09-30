@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PixelTransform_F32;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.EulerType;
@@ -28,20 +28,25 @@ import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
- * Applies a point transform that can be used to re-render an equirectangular image with a new center.  This lets you
- * close which parts of the image should be highly distorted and which should not.
+ * Transforms the equirectangular image as if the input image was taken by the camera at the same location but with
+ * a rotation.    Includes a built in function to center the camera at a particular location to minimize the distortion.
  *
  * @author Peter Abeles
  */
-public class EquirectangularRotate_F32 implements PointTransform_F32 {
+public class EquirectangularRotate_F32 extends PixelTransform_F32 {
 
 	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
 	DenseMatrix64F R = CommonOps.identity(3,3);
 	Vector3D_F32 n = new Vector3D_F32();
+	Point2D_F32 out = new Point2D_F32();
 
 	float longitudeCenter;
 	float latitudeCenter;
+
+	int imgWidth;
+	Vector3D_F32[] vectors = new Vector3D_F32[0];
+
 
 	/**
 	 * Specifies the image's width and height
@@ -50,11 +55,41 @@ public class EquirectangularRotate_F32 implements PointTransform_F32 {
 	 * @param height Image height
 	 */
 	public void setImageShape( int width , int height ) {
+		this.imgWidth = width;
 		tools.configure(width, height);
+
+		// grow vectors array if needed
+		if( vectors.length < width*height ) {
+			Vector3D_F32[] tmp = new Vector3D_F32[width*height];
+
+			System.arraycopy(vectors,0,tmp,0,vectors.length);
+			for (int i = vectors.length; i < tmp.length; i++) {
+				tmp[i] = new Vector3D_F32();
+			}
+			vectors = tmp;
+		}
+
+		// precompute vectors for each pixel
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				tools.equiToNorm(x,y,vectors[y*width+x]);
+			}
+		}
+
+	}
+
+	@Override
+	public void compute(int x, int y) {
+		Vector3D_F32 v = vectors[y*imgWidth+x];
+		GeometryMath_F32.mult(R,v,n); // TODO make faster by not using an array based matrix
+		tools.normToEqui(n.x,n.y,n.z,out);
+
+		distX = out.x;
+		distY = out.y;
 	}
 
 	/**
-	 * Specifies which longitude/latitude will be along the displayed image center
+	 * Applies a rotation matrix which will center the view at the specified longitude/latitude
 	 *
 	 * @param longitudeCenter center longitude line. -pi to pi
 	 * @param latitudeCenter center latitude line. -pi/2 to pi/2
@@ -65,13 +100,14 @@ public class EquirectangularRotate_F32 implements PointTransform_F32 {
 		ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,latitudeCenter,0,longitudeCenter,R);
 	}
 
-	@Override
-	public void compute(float x, float y, Point2D_F32 out) {
-
-		tools.equiToNorm(x,y,n);
-		GeometryMath_F32.mult(R,n,n);
-		tools.normToEqui(n.x,n.y,n.z,out);
+	/**
+	 * Allows an arbitrary rotation matrix to be applied
+	 * @param R rotation matrix. 3x3
+	 */
+	public void setRotation( DenseMatrix64F R ) {
+		this.R.set(R);
 	}
+
 
 	public EquirectangularTools_F32 getTools() {
 		return tools;
@@ -84,4 +120,6 @@ public class EquirectangularRotate_F32 implements PointTransform_F32 {
 	public float getLatitudeCenter() {
 		return latitudeCenter;
 	}
+
+
 }

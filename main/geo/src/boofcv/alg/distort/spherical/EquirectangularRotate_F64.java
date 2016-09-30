@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.PixelTransform_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -33,15 +33,20 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class EquirectangularRotate_F64 implements PointTransform_F64 {
+public class EquirectangularRotate_F64 extends PixelTransform_F64 {
 
 	EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 
 	DenseMatrix64F R = CommonOps.identity(3,3);
 	Vector3D_F64 n = new Vector3D_F64();
+	Point2D_F64 out = new Point2D_F64();
 
 	double longitudeCenter;
 	double latitudeCenter;
+
+	int imgWidth;
+	Vector3D_F64[] vectors = new Vector3D_F64[0];
+
 
 	/**
 	 * Specifies the image's width and height
@@ -50,7 +55,37 @@ public class EquirectangularRotate_F64 implements PointTransform_F64 {
 	 * @param height Image height
 	 */
 	public void setImageShape( int width , int height ) {
+		this.imgWidth = width;
 		tools.configure(width, height);
+
+		// grow vectors array if needed
+		if( vectors.length < width*height ) {
+			Vector3D_F64[] tmp = new Vector3D_F64[width*height];
+
+			System.arraycopy(vectors,0,tmp,0,vectors.length);
+			for (int i = vectors.length; i < tmp.length; i++) {
+				tmp[i] = new Vector3D_F64();
+			}
+			vectors = tmp;
+		}
+
+		// precompute vectors for each pixel
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				tools.equiToNorm(x,y,vectors[y*width+x]);
+			}
+		}
+
+	}
+
+	@Override
+	public void compute(int x, int y) {
+		Vector3D_F64 v = vectors[y*imgWidth+x];
+		GeometryMath_F64.mult(R,v,n); // TODO make faster by not using an array based matrix
+		tools.normToEqui(n.x,n.y,n.z,out);
+
+		distX = out.x;
+		distY = out.y;
 	}
 
 	/**
@@ -73,13 +108,6 @@ public class EquirectangularRotate_F64 implements PointTransform_F64 {
 		this.R.set(R);
 	}
 
-	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-
-		tools.equiToNorm(x,y,n);
-		GeometryMath_F64.mult(R,n,n);
-		tools.normToEqui(n.x,n.y,n.z,out);
-	}
 
 	public EquirectangularTools_F64 getTools() {
 		return tools;
@@ -92,4 +120,6 @@ public class EquirectangularRotate_F64 implements PointTransform_F64 {
 	public double getLatitudeCenter() {
 		return latitudeCenter;
 	}
+
+
 }

@@ -65,12 +65,12 @@ public class EquirectangularTools_F32 {
 	}
 
 	public void normToEqui( float nx , float ny , float nz , Point2D_F32 rect ) {
-		float r = (float)Math.sqrt(nx*nx + ny*ny);
+		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
 
-		float lon = (float)Math.atan2(ny,nx);
-		float lat = UtilAngle.atanSafe(-nz,r);
+		/**/double lon = /**/Math.atan2(ny,nx);
+		/**/double lat = UtilAngle.atanSafe(-nz,r);
 
-		lonlatToEqui(lon,lat,rect);
+		lonlatToEqui( (float) lon, (float) lat,rect);
 	}
 
 	/**

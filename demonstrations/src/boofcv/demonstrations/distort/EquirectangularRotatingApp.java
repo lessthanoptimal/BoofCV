@@ -19,7 +19,6 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.spherical.EquirectangularRotate_F32;
 import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -47,15 +46,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Demonstrates recentering of equirectangular images
+ * Demonstrates re-rendering an equirectangular image after rotating it.
  *
  * @author Peter Abeles
  */
-public class EquirectangularRecenteringApp<T extends ImageBase> extends DemonstrationBase<T> {
+// TODO add rotational controls
+// TODo add more images
+public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T> {
 
 
 	EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
-	PointToPixelTransform_F32 transform;
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
@@ -69,7 +69,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 	T distorted;
 	T inputCopy;
 
-	public EquirectangularRecenteringApp(List<?> exampleInputs, ImageType<T> imageType) {
+	public EquirectangularRotatingApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
 		panelImage = new ImagePanel();
@@ -81,7 +81,6 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		distortImage = FactoryDistort.distort(true, interp, imageType);
 		distortImage.setRenderAll(true);
 
-		transform = new PointToPixelTransform_F32(distorter);
 
 		distorted = imageType.createImage(1,1);
 		inputCopy = imageType.createImage(1,1);
@@ -94,11 +93,11 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 
 				EquirectangularTools_F32 tools = distorter.getTools();
 
-				distorter.compute(e.getX(),e.getY(),r);
-				tools.equiToLonlat(r.x,r.y,latlon);
+				distorter.compute(e.getX(),e.getY());
+				tools.equiToLonlat(distorter.distX,distorter.distY,latlon);
 
 				distorter.setCenter(latlon.x,latlon.y);
-				distortImage.setModel(transform); // let it know the transform has changed
+				distortImage.setModel(distorter); // let it know the transform has changed
 
 				if( inputMethod == InputMethod.IMAGE ) {
 					renderOutput(inputCopy);
@@ -115,7 +114,7 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 			panelImage.setPreferredSize(new Dimension(width,height));
 			distorter.setImageShape(width, height);
-			distortImage.setModel(transform); // let it know the transform has changed
+			distortImage.setModel(distorter); // let it know the transform has changed
 		}
 
 		centerLon = centerLat = 0;
@@ -151,13 +150,13 @@ public class EquirectangularRecenteringApp<T extends ImageBase> extends Demonstr
 		List<PathLabel> examples = new ArrayList<PathLabel>();
 		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_half_dome.jpg")));
 
-		EquirectangularRecenteringApp app = new EquirectangularRecenteringApp(examples,type);
+		EquirectangularRotatingApp app = new EquirectangularRotatingApp(examples,type);
 
 		app.openFile(new File(examples.get(0).getPath()));
 
 		app.waitUntilDoneProcessing();
 
-		ShowImages.showWindow(app, "Tracking Rectangle",true);
+		ShowImages.showWindow(app, "Equirectanglar Image Rotator",true);
 
 	}
 }

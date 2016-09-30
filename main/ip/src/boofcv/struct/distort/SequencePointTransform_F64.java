@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,12 +33,12 @@ public class SequencePointTransform_F64 implements PointTransform_F64 {
 	 *
 	 * @param sequence Sequence of transforms.
 	 */
-	public SequencePointTransform_F64(PointTransform_F64... sequence) {
+	public SequencePointTransform_F64( PointTransform_F64... sequence) {
 		this.sequence = sequence;
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute( double x, double y, Point2D_F64 out) {
 		sequence[0].compute(x,y,out);
 		for( int i = 1; i < sequence.length; i++ ) {
 			sequence[i].compute(out.x,out.y,out);
