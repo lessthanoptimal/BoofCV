@@ -23,7 +23,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;

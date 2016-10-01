@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<boofcv.struct.calib.PinholeRadial>
+<boofcv.struct.calib.CameraPinholeRadial>
   <cx>308.4551818095542</cx>
   <cy>246.84300560315452</cy>
   <fx>701.0116882676376</fx>
@@ -28,4 +28,4 @@
   </radial>
   <skew>0.0</skew>
   <width>640</width>
-</boofcv.struct.calib.PinholeRadial>
+</boofcv.struct.calib.CameraPinholeRadial>

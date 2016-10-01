@@ -18,7 +18,7 @@
 
 package boofcv.android;
 
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -20,7 +20,7 @@ package boofcv.examples;
 
 import boofcv.io.UtilIO;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.calib.PinholeRadial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.VisualDepthParameters;
 
 /**
