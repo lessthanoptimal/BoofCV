@@ -120,4 +120,8 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform_F32 
 	public EquirectangularTools_F32 getTools() {
 		return tools;
 	}
+
+	public DenseMatrix64F getRotation() {
+		return R;
+	}
 }

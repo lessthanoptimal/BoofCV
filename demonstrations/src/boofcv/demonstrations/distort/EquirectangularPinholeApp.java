@@ -35,11 +35,21 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Vector3D_F64;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.ops.CommonOps;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -50,10 +60,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO Draw camera  center in equirectangular
 // TODO controls for pinhole.  width, height, FOV
 // TODO controls for camera orientation.  pitch, yaw, roll
-// TODO keyboard commands for camera should be relative to current camera orientation
 public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
 
 	EquirectangularToPinhole_F32 distorter = new EquirectangularToPinhole_F32();
@@ -64,17 +72,14 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	T equi;
 	T pinhole;
 
-	int camWidth = 320;
-	int camHeight = 240;
+	int camWidth = 400;
+	int camHeight = 300;
 	double hfov = 80; //  in degrees
-
-
-	float yaw,pitch,roll;
 
 	CameraPinhole cameraModel = new CameraPinhole();
 
 	ImagePanel panelPinhole = new ImagePanel();
-	ImagePanel panelEqui = new ImagePanel();
+	EquiViewPanel panelEqui = new EquiViewPanel();
 
 	public EquirectangularPinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -96,7 +101,10 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		panelPinhole.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				System.out.println("Key Event");
+				double pitch=0;
+				double yaw=0;
+				double roll=0;
+
 				switch( e.getKeyCode() ) {
 					case KeyEvent.VK_W: pitch += 0.01; break;
 					case KeyEvent.VK_S: pitch -= 0.01; break;
@@ -107,20 +115,54 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					default:
 						return;
 				}
-				System.out.println("yaw = "+yaw+" pitch "+pitch);
-				distorter.setDirection(roll, yaw, pitch);
+
+				DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+				DenseMatrix64F tmp = distorter.getRotation().copy();
+				CommonOps.mult(tmp,R,distorter.getRotation());
 				distortImage.setModel(distorter); // dirty the transform
-				if( inputMethod == InputMethod.IMAGE )
+				if( inputMethod == InputMethod.IMAGE ) {
 					rerenderPinhole();
+				}
 			}
 		});
+
+		panelEqui.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Point2D_F32 latlon = new Point2D_F32();
+
+				double scale = panelEqui.scale;
+
+				int x = (int)(e.getX()/scale);
+				int y = (int)(e.getY()/scale);
+
+				if( !equi.isInBounds(x,y))
+					return;
+				distorter.getTools().equiToLonlat(x,y,latlon);
+				distorter.setDirection(latlon.x,latlon.y,0);
+
+				// pinhole has a canonical view along +z
+				// equirectangular lon-lat uses +x
+				// this compensates for that
+				// roll rotation is to make the view appear "up"
+				DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,-Math.PI/2,null);
+				DenseMatrix64F tmp = distorter.getRotation().copy();
+				CommonOps.mult(tmp,A,distorter.getRotation());
+
+				distortImage.setModel(distorter); // let it know the transform has changed
+
+				if( inputMethod == InputMethod.IMAGE ) {
+					rerenderPinhole();
+				}
+			}
+		});
+
+
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
 
 		add(panelPinhole, BorderLayout.CENTER);
 		add(panelEqui, BorderLayout.SOUTH);
-
-
 	}
 
 	@Override
@@ -149,6 +191,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
 		panelPinhole.setBufferedImageSafe(buffPinhole);
+		panelEqui.repaint();
 	}
 
 
@@ -162,6 +205,42 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		cameraModel.fx = cameraModel.fy = f;
 		cameraModel.skew = 0;
+	}
+
+	/**
+	 * Draws a circle around the current view's center
+	 */
+	private class EquiViewPanel extends ImagePanel {
+		Vector3D_F64 v = new Vector3D_F64();
+		Point2D_F32 p = new Point2D_F32();
+		BasicStroke stroke0 = new BasicStroke(3);
+		BasicStroke stroke1 = new BasicStroke(6);
+		Ellipse2D.Double circle = new Ellipse2D.Double();
+
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			Graphics2D g2 = (Graphics2D)g;
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			DenseMatrix64F R = distorter.getRotation();
+
+			v.set(0,0,1); // canonical view is +z for pinhole cvamera
+			GeometryMath_F64.mult(R,v,v);
+
+			distorter.getTools().normToEqui((float)v.x,(float)v.y,(float)v.z,p);
+
+			circle.setFrame(p.x*scale-10,p.y*scale-10,20,20);
+
+			g2.setStroke(stroke1);
+			g2.setColor(Color.BLACK);
+			g2.draw(circle);
+
+			g2.setStroke(stroke0);
+			g2.setColor(Color.RED);
+			g2.draw(circle);
+		}
 	}
 
 	public static void main(String[] args) {
