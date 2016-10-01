@@ -39,15 +39,15 @@ public class TestEquirectangularRotate_F32 {
 		alg.setImageShape(300,250);
 
 		// this is the standard configuration and there should be no change
-		alg.setCenter(0,0);
+		alg.setDirection(0,0,0);
 		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
 		assertMatch( alg, 300.0f*0.5f, 250*0.5f);
 
-		alg.setCenter( (float)Math.PI/2.0f,0);
+		alg.setDirection( (float)Math.PI/2.0f,0,0);
 		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
 		assertMatch( alg, 300.0f*0.75f, 250*0.5f);
 
-		alg.setCenter(0, (float)Math.PI/4.0f);
+		alg.setDirection(0, (float)Math.PI/4.0f,0);
 		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
 		assertMatch( alg, 300.0f*0.5f, 250*0.75f);
 	}

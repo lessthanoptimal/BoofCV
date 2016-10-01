@@ -141,7 +141,12 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	private void rerenderPinhole() {
+//		long before = System.nanoTime();
 		distortImage.apply(equi,pinhole);
+//		long after = System.nanoTime();
+
+//		System.out.println("Rendering time "+(after-before)/1e6+" ms");
+
 		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
 		panelPinhole.setBufferedImageSafe(buffPinhole);
 	}

@@ -20,14 +20,8 @@ package boofcv.alg.distort.spherical;
 
 import boofcv.alg.distort.PixelToNormalized_F32;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.PixelTransform_F32;
-import georegression.geometry.ConvertRotation3D_F32;
-import georegression.geometry.GeometryMath_F32;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
 
 /**
  * Renders a pinhole camera view from an equirectangular image.  When no additional rotation
@@ -41,23 +35,10 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class EquirectangularToPinhole_F32 extends PixelTransform_F32 {
-
-	// function for doing match on equirectangular images
-	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+public class EquirectangularToPinhole_F32 extends EquirectangularDistortBase_F32 {
 
 	// camera model without distortion
 	CameraPinhole pinhole;
-
-	// rotation matrix
-	DenseMatrix64F direction = CommonOps.identity(3,3);
-
-	// storage for intermediate variables
-	Vector3D_F32 n = new Vector3D_F32();
-	Point2D_F32 out = new Point2D_F32();
-
-	// storage for precomputed pointing vectors for each pixel in pinhole camera
-	Vector3D_F32[] vectors = new Vector3D_F32[0];
 
 	/**
 	 * Specifies the pinhole camera
@@ -65,13 +46,7 @@ public class EquirectangularToPinhole_F32 extends PixelTransform_F32 {
 	 */
 	public void setPinhole( CameraPinhole pinhole ) {
 		this.pinhole = pinhole;
-
-		if( vectors.length < pinhole.width*pinhole.height ) {
-			vectors = new Vector3D_F32[pinhole.width * pinhole.height];
-			for (int i = 0; i < vectors.length; i++) {
-				vectors[i] = new Vector3D_F32();
-			}
-		}
+		declareVectors( pinhole.width, pinhole.height );
 
 		// computing the 3D ray through each pixel in the pinhole camera at it's canonical
 		// location
@@ -87,52 +62,5 @@ public class EquirectangularToPinhole_F32 extends PixelTransform_F32 {
 				v.set(norm.x,norm.y,1);
 			}
 		}
-	}
-
-	/**
-	 * Specify the shame of the equirectangular image
-	 *
-	 * @param width equirectangular image width
-	 * @param height equirectangular image height
-	 */
-	public void setEquirectangularShape(int width , int height ) {
-		tools.configure(width, height);
-	}
-
-	/**
-	 * Specifies the rotation offset from the canonical location using yaw and pitch.
-	 * @param yaw Radian from -pi to pi
-	 * @param pitch Radian from -pi/2 to pi/2
-	 * @param roll Radian from -pi to pi
-	 */
-	public void setDirection(float yaw, float pitch, float roll ) {
-		ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,pitch,yaw,roll,direction);
-	}
-
-	/**
-	 * Specifies direction using a rotation matrix
-	 * @param R rotation matrix
-	 */
-	public void setDirection( DenseMatrix64F R ) {
-		this.direction.set(R);
-	}
-
-	/**
-	 * Input is in pinhole camera pixel coordinates.  Output is in equirectangular coordinates
-	 *
-	 * @param x Pixel x-coordinate in rendered pinhole camera
-	 * @param y Pixel y-coordinate in rendered pinhole camera
-	 */
-	@Override
-	public void compute(int x, int y) {
-		// grab precomputed normalized image coordinate at canonical location
-		Vector3D_F32 v = vectors[y*pinhole.width+x];
-		// move to requested orientation
-		GeometryMath_F32.mult(direction,v,n); // TODO make faster by not using an array based matrix
-		// compute pixel coordinate
-		tools.normToEqui(n.x,n.y,n.z,out);
-
-		distX = out.x;
-		distY = out.y;
 	}
 }

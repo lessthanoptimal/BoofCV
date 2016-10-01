@@ -63,7 +63,7 @@ public class TestEquirectangularToPinhole_F64 {
 
 		alg.setPinhole(intrinsic);
 		alg.setEquirectangularShape(equiWidth,equiHeight);
-		alg.setDirection(0, Math.PI/2);
+		alg.setDirection(0, Math.PI/2, 0);
 
 		assertPointing(alg,imgWidth/2,imgHeight/2,1,0,0);
 	}

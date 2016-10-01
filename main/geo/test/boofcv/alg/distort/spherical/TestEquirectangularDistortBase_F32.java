@@ -18,32 +18,14 @@
 
 package boofcv.alg.distort.spherical;
 
+import org.junit.Test;
+
 /**
- * Transforms the equirectangular image as if the input image was taken by the camera at the same location but with
- * a rotation.    Includes a built in function to center the camera at a particular location to minimize the distortion.
- *
  * @author Peter Abeles
  */
-public class EquirectangularRotate_F32 extends EquirectangularDistortBase_F32 {
-
-
-
-	/**
-	 * Specifies the image's width and height
-	 *
-	 * @param width Image width
-	 * @param height Image height
-	 */
-	public void setImageShape( int width , int height ) {
-		tools.configure(width, height);
-		declareVectors(width, height);
-
-		// precompute vectors for each pixel
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				tools.equiToNorm(x,y,vectors[y*width+x]);
-			}
-		}
-
+public class TestEquirectangularDistortBase_F32 {
+	@Test
+	public void blank() {
+//		fail("intentionally empty since this is indirectly unit tested elsewhere");
 	}
 }

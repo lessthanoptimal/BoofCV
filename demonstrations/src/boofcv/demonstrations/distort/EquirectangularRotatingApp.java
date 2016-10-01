@@ -96,7 +96,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 				distorter.compute((int)(e.getX()/scale), (int)(e.getY()/scale));
 				tools.equiToLonlat(distorter.distX,distorter.distY,latlon);
 
-				distorter.setCenter(latlon.x,latlon.y);
+				distorter.setDirection(latlon.x,latlon.y,0);
 				distortImage.setModel(distorter); // let it know the transform has changed
 
 				if( inputMethod == InputMethod.IMAGE ) {
