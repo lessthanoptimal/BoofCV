@@ -103,9 +103,10 @@ public class EquirectangularToPinhole_F32 extends PixelTransform_F32 {
 	 * Specifies the rotation offset from the canonical location using yaw and pitch.
 	 * @param yaw Radian from -pi to pi
 	 * @param pitch Radian from -pi/2 to pi/2
+	 * @param roll Radian from -pi to pi
 	 */
-	public void setDirection(float yaw, float pitch ) {
-		ConvertRotation3D_F32.eulerToMatrix(EulerType.YXZ,pitch,0,yaw,direction);
+	public void setDirection(float yaw, float pitch, float roll ) {
+		ConvertRotation3D_F32.eulerToMatrix(EulerType.YZX,pitch,yaw,roll,direction);
 	}
 
 	/**

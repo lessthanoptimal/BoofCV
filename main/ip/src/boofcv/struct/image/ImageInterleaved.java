@@ -40,7 +40,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	public int numBands;
 
 	{
-		this.imageType = (ImageType)ImageType.il(0, getClass());
+		this.imageType = (ImageType<T>)ImageType.il(0, getClass());
 	}
 
 	/**

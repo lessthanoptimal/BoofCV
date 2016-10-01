@@ -140,7 +140,6 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		distortImage.apply(in,distorted);
 		ConvertBufferedImage.convertTo(distorted,rendered,true);
 		panelImage.setBufferedImageSafe(rendered);
-		panelImage.repaint();
 	}
 
 	public static void main(String[] args) {

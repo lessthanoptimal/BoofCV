@@ -27,12 +27,10 @@ import java.lang.reflect.Array;
  * Different primitive types (e.g. byte, short, float, double) are implemented by children of this class.
  * This image format is designed to allow quick and easy read/write access to each pixel and automatically supports sub-images.
  * </p>
- * <p/>
  * <p>
  * Most image operations work off of direct children of this class.  For operations which support images with
  * multiple bands or colors (e.g. RGB or planar cameras) there is the {@link ImageInterleaved} class and others.
  * </p>
- * <p/>
  * <p>
  * The image is defined by the following parameters:<br>
  * <dl>
@@ -46,17 +44,14 @@ import java.lang.reflect.Array;
  * <dd> Number of elements which need to be skipped over in the data array between rows.
  * </dl>
  * </p>
- * <p/>
  * <p>
  * Sub-images are images that are a rectangular image inside of a larger image.  The original image and the sub-image
  * share the same data array, so an operation in one will affect the other.   They are useful when only part of
  * the image needs to be processed.  All image processing operations support sub-images.
  * </p>
- * <p/>
  * <p>
- * Pixels can be directly accessed by elements. For example, to access the second band in an image with three color
- * bands at pixel (3,10) one would do:<br>
- * secondBand = img.data[ startIndex + 10*stride + 3 ]
+ * Pixels can be directly accessed by elements. For example, to access the pixel at (x = 3, y = 10) one would do:<br>
+ * pixelValue = img.data[ startIndex + 10*stride ]
  * </p>
  *
  * @author Peter Abeles
