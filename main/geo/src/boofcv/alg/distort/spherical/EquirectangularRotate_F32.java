@@ -41,7 +41,7 @@ public class EquirectangularRotate_F32 extends EquirectangularDistortBase_F32 {
 		// precompute vectors for each pixel
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				tools.equiToNorm(x,y,vectors[y*width+x]);
+				tools.equiToNormFV(x,y,vectors[y*width+x]);
 			}
 		}
 

@@ -46,20 +46,45 @@ public class TestEquirectangularTools_F64 {
 		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
 		tools.configure(width,height);
 
-		testCoordinate(tools, width/2, height/2);
-		testCoordinate(tools, 0, height/2);
-		testCoordinate(tools, width-1, height/2);
-		testCoordinate(tools, width/2, 0);
-		testCoordinate(tools, width/2, height-1);
+		equiToLonlat_reverse(tools, width/2, height/2);
+		equiToLonlat_reverse(tools, 0, height/2);
+		equiToLonlat_reverse(tools, width-1, height/2);
+		equiToLonlat_reverse(tools, width/2, 0);
+		equiToLonlat_reverse(tools, width/2, height-1);
 
 	}
 
-	private void testCoordinate(EquirectangularTools_F64 tools, double x , double y) {
+	private void equiToLonlat_reverse(EquirectangularTools_F64 tools, double x , double y) {
 		Point2D_F64 ll = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();
 
 		tools.equiToLonlat(x,y,ll);
 		tools.lonlatToEqui(ll.x,ll.y,r);
+
+		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+	}
+
+	@Test
+	public void equiToLonlatFV_reverse() {
+
+		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
+		tools.configure(width,height);
+
+		equiToLonlatFV_reverse(tools, width/2, height/2);
+		equiToLonlatFV_reverse(tools, 0, height/2);
+		equiToLonlatFV_reverse(tools, width-1, height/2);
+		equiToLonlatFV_reverse(tools, width/2, 0);
+		equiToLonlatFV_reverse(tools, width/2, height-1);
+
+	}
+
+	private void equiToLonlatFV_reverse(EquirectangularTools_F64 tools, double x , double y) {
+		Point2D_F64 ll = new Point2D_F64();
+		Point2D_F64 r = new Point2D_F64();
+
+		tools.equiToLonlatFV(x,y,ll);
+		tools.lonlatToEquiFV(ll.x,ll.y,r);
 
 		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
 		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
@@ -76,6 +101,20 @@ public class TestEquirectangularTools_F64 {
 
 		Vector3D_F64 found = new Vector3D_F64();
 		tools.equiToNorm(300.0/2.0, 250.0/2.0, found);
+
+		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(0.0,found.y, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(0.0,found.z, GrlConstants.DOUBLE_TEST_TOL);
+	}
+
+	@Test
+	public void equiToNormFV() {
+		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
+
+		tools.configure(300,250);
+
+		Vector3D_F64 found = new Vector3D_F64();
+		tools.equiToNormFV(300/2, (250-250/2-1), found);
 
 		assertEquals(1.0,found.x, GrlConstants.DOUBLE_TEST_TOL);
 		assertEquals(0.0,found.y, GrlConstants.DOUBLE_TEST_TOL);
@@ -110,6 +149,39 @@ public class TestEquirectangularTools_F64 {
 
 		tools.equiToNorm(x,y,n);
 		tools.normToEqui(n.x,n.y,n.z,r);
+
+		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);
+	}
+
+	@Test
+	public void equiToNorm_reverseFV() {
+
+		EquirectangularTools_F64 tools = new EquirectangularTools_F64();
+		tools.configure(width,height);
+
+		equiToNorm_reverseFV(tools, width/2, height/2);
+		equiToNorm_reverseFV(tools, 0, height/2);
+		equiToNorm_reverseFV(tools, width-1, height/2);
+		equiToNorm_reverseFV(tools, width/2, 0);
+//		equiToNorm_reverseFV(tools, width/2, height-1); // this is a pathological case.  N to 1 mapping for vector
+		equiToNorm_reverseFV(tools, width/2, height-2); // this is a pathological case.  N to 1 mapping for vector
+
+		for (int i = 0; i < 100; i++) {
+			int x = rand.nextInt(width);
+			int y = rand.nextInt(height-1)+1; // avoid pathological case
+
+			equiToNorm_reverse(tools,x,y);
+		}
+
+	}
+
+	private void equiToNorm_reverseFV(EquirectangularTools_F64 tools, double x , double y) {
+		Vector3D_F64 n = new Vector3D_F64();
+		Point2D_F64 r = new Point2D_F64();
+
+		tools.equiToNormFV(x,y,n);
+		tools.normToEquiFV(n.x,n.y,n.z,r);
 
 		assertEquals(x,r.x, GrlConstants.DOUBLE_TEST_TOL);
 		assertEquals(y,r.y, GrlConstants.DOUBLE_TEST_TOL);

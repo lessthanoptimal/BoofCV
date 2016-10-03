@@ -26,6 +26,9 @@ import georegression.struct.point.Vector3D_F32;
 
 /**
  * Contains common operations for handling coordinates in an equirectangular image.
+ * On most globes, a positive latitude corresponds to the north pole, or up, and negative towards the south pole.
+ * Images have 0 on the top and increase downwards.  To compensate for this the y-axis can be flipped.  This
+ * is indicated by functions with FV (flip vertical) on the end of their name.
  *
  * <p>
  * longtitude is along the x-axis and goes from -pi to pi<br>
@@ -73,15 +76,45 @@ public class EquirectangularTools_F32 {
 		lonlatToEqui( (float) lon, (float) lat,rect);
 	}
 
+	public void equiToNormFV(float x , float y , Vector3D_F32 norm ) {
+		equiToLonlatFV(x,y, temp);
+		ConvertCoordinates3D_F32.latlonToUnitVector(temp.y,temp.x, norm);
+	}
+
+	public void normToEquiFV( float nx , float ny , float nz , Point2D_F32 rect ) {
+		/**/double r = /**/Math.sqrt(nx*nx + ny*ny);
+
+		/**/double lon = /**/Math.atan2(ny,nx);
+		/**/double lat = UtilAngle.atanSafe(-nz,r);
+
+		lonlatToEquiFV( (float) lon, (float) lat,rect);
+	}
+
 	/**
 	 * Converts the equirectangular coordinate into a latitude and longitude
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
+	 * @param lonlat  (output) x = longitude, y = latitude
+	 */
+	public void equiToLonlat(float x , float y , Point2D_F32 lonlat ) {
+		lonlat.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
+		lonlat.y = (y/height - 0.5f)*GrlConstants.F_PI; // latitude
+	}
+
+	/**
+	 * <p>
+	 * Converts the equirectangular coordinate into a latitude and longitude.
+	 * Vertical equirectangular axis has been flipped
+	 * </p>
+	 * y' = height - y - 1
+	 *
+	 * @param x pixel coordinate in equirectangular image
+	 * @param y pixel coordinate in equirectangular image
 	 * @param latlon  (output) x = longitude, y = latitude
 	 */
-	public void equiToLonlat(float x , float y , Point2D_F32 latlon ) {
+	public void equiToLonlatFV(float x , float y , Point2D_F32 latlon ) {
 		latlon.x = (x/width - 0.5f)*GrlConstants.F_PI2; // longitude
-		latlon.y = (y/height - 0.5f)*GrlConstants.F_PI; // latitude
+		latlon.y = ((height-y-1.0f)/height - 0.5f)*GrlConstants.F_PI; // latitude
 	}
 
 	/**
@@ -93,5 +126,18 @@ public class EquirectangularTools_F32 {
 	public void lonlatToEqui(float lon , float lat , Point2D_F32 rect ) {
 		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
 		rect.y = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI + 0.5f)*height;
+	}
+
+	/**
+	 * Convert from latitude-longitude coordinates into equirectangular coordinates.
+	 * Vertical equirectangular axis has been flipped
+	 * @param lon Longitude
+	 * @param lat Latitude
+	 * @param rect (Output) equirectangular coordinate
+	 */
+	public void lonlatToEquiFV(float lon , float lat , Point2D_F32 rect ) {
+		rect.x = UtilAngle.wrapZeroToOne(lon / GrlConstants.F_PI2 + 0.5f)*width;
+		rect.y = UtilAngle.wrapZeroToOne(lat / GrlConstants.F_PI + 0.5f)*height;
+		rect.y = height - rect.y - 1;
 	}
 }

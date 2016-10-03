@@ -94,7 +94,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 
 				double scale = panelImage.scale;
 				distorter.compute((int)(e.getX()/scale), (int)(e.getY()/scale));
-				tools.equiToLonlat(distorter.distX,distorter.distY,latlon);
+				tools.equiToLonlatFV(distorter.distX,distorter.distY,latlon);
 
 				distorter.setDirection(latlon.x,latlon.y,0);
 				distortImage.setModel(distorter); // let it know the transform has changed

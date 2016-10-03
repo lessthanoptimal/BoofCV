@@ -62,16 +62,21 @@ import java.util.List;
  */
 // TODO controls for pinhole.  width, height, FOV
 // TODO controls for camera orientation.  pitch, yaw, roll
+// TODO center images in window horizontally?
 public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
 
 	EquirectangularToPinhole_F32 distorter = new EquirectangularToPinhole_F32();
 	ImageDistort<T,T> distortImage;
 
+	// output image fort pinhole and equirectangular image
 	BufferedImage buffPinhole = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
 	BufferedImage buffEqui = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
+
+	// BoofCV work image for rendering
 	T equi;
 	T pinhole;
 
+	// Camera parameters
 	int camWidth = 400;
 	int camHeight = 300;
 	double hfov = 80; //  in degrees
@@ -138,14 +143,14 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 				if( !equi.isInBounds(x,y))
 					return;
-				distorter.getTools().equiToLonlat(x,y,latlon);
+				distorter.getTools().equiToLonlatFV(x,y,latlon);
 				distorter.setDirection(latlon.x,latlon.y,0);
 
 				// pinhole has a canonical view along +z
 				// equirectangular lon-lat uses +x
 				// this compensates for that
 				// roll rotation is to make the view appear "up"
-				DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,-Math.PI/2,null);
+				DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,Math.PI/2,null);
 				DenseMatrix64F tmp = distorter.getRotation().copy();
 				CommonOps.mult(tmp,A,distorter.getRotation());
 
@@ -229,7 +234,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			v.set(0,0,1); // canonical view is +z for pinhole cvamera
 			GeometryMath_F64.mult(R,v,v);
 
-			distorter.getTools().normToEqui((float)v.x,(float)v.y,(float)v.z,p);
+			distorter.getTools().normToEquiFV((float)v.x,(float)v.y,(float)v.z,p);
 
 			circle.setFrame(p.x*scale-10,p.y*scale-10,20,20);
 

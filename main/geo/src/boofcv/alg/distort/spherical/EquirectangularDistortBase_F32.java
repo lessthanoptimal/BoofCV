@@ -111,7 +111,7 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform_F32 
 		// move to requested orientation
 		GeometryMath_F32.mult(R,v,n); // TODO make faster by not using an array based matrix
 		// compute pixel coordinate
-		tools.normToEqui(n.x,n.y,n.z,out);
+		tools.normToEquiFV(n.x,n.y,n.z,out);
 
 		distX = out.x;
 		distY = out.y;
