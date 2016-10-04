@@ -23,11 +23,19 @@ Version : 0.25
 - Added support for F64 to F32 autocoding from regular F64 classes
 - Spherical cameras
   * Equirectangular image support.  coordinates and redistortion
+  * Equirectangular distort to pinhole
+  * Equirectangular rotate image
 - Dirty flag was not being set to false for cached image distort single band
 - Changed minimum Java language level from 6 to 7
+- Camera Model
+  * Renamed IntrinsicParameters to CameraPinhole
+  * Broke distortion off into a separate class which extends CameraPinhole
+     - CameraPinholeRadial
 
+- TODO make how camera calibration is saved independent of data structure
 - TODO dual fisheye to equirectangular image
 - TODO fisheye
+- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: circular grid fiducial and calibration
 - TODO Regression: Chessboard image border to fiducial regression
 - TODO Unit test for getScaleAtRadius
