@@ -61,8 +61,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO controls for camera orientation.  pitch, yaw, roll
-// TODO center images in window horizontally?
 public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 	implements PinholePanel.Listener
 {
@@ -149,6 +147,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 				if( !equi.isInBounds(x,y))
 					return;
+				panelPinhole.grabFocus();
 				synchronized (imageLock) {
 					distorter.getTools().equiToLonlatFV(x,y,latlon);
 					distorter.setDirection(latlon.x,latlon.y,0);
@@ -231,7 +230,6 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 	@Override
 	public void updatedPinholeModel(int width, int height, double fov) {
 		final boolean shapeChanged = camWidth != width || camHeight != height;
-		System.out.println("Update pinhole model "+width+"  "+shapeChanged );
 
 		this.camWidth = width;
 		this.camHeight = height;
