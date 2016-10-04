@@ -44,6 +44,7 @@ import georegression.struct.point.Vector3D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -60,10 +61,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO controls for pinhole.  width, height, FOV
 // TODO controls for camera orientation.  pitch, yaw, roll
 // TODO center images in window horizontally?
-public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T> {
+public class EquirectangularPinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
+	implements PinholePanel.Listener
+{
 
 	EquirectangularToPinhole_F32 distorter = new EquirectangularToPinhole_F32();
 	ImageDistort<T,T> distortImage;
@@ -85,6 +87,8 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 	ImagePanel panelPinhole = new ImagePanel();
 	EquiViewPanel panelEqui = new EquiViewPanel();
+
+	Object imageLock = new Object();
 
 	public EquirectangularPinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
@@ -121,12 +125,14 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 						return;
 				}
 
-				DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
-				DenseMatrix64F tmp = distorter.getRotation().copy();
-				CommonOps.mult(tmp,R,distorter.getRotation());
-				distortImage.setModel(distorter); // dirty the transform
-				if( inputMethod == InputMethod.IMAGE ) {
-					rerenderPinhole();
+				synchronized (imageLock) {
+					DenseMatrix64F R = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,yaw,roll,pitch,null);
+					DenseMatrix64F tmp = distorter.getRotation().copy();
+					CommonOps.mult(tmp,R,distorter.getRotation());
+					distortImage.setModel(distorter); // dirty the transform
+					if (inputMethod == InputMethod.IMAGE) {
+						rerenderPinhole();
+					}
 				}
 			}
 		});
@@ -143,21 +149,23 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 				if( !equi.isInBounds(x,y))
 					return;
-				distorter.getTools().equiToLonlatFV(x,y,latlon);
-				distorter.setDirection(latlon.x,latlon.y,0);
+				synchronized (imageLock) {
+					distorter.getTools().equiToLonlatFV(x,y,latlon);
+					distorter.setDirection(latlon.x,latlon.y,0);
 
-				// pinhole has a canonical view along +z
-				// equirectangular lon-lat uses +x
-				// this compensates for that
-				// roll rotation is to make the view appear "up"
-				DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,Math.PI/2,null);
-				DenseMatrix64F tmp = distorter.getRotation().copy();
-				CommonOps.mult(tmp,A,distorter.getRotation());
+					// pinhole has a canonical view along +z
+					// equirectangular lon-lat uses +x
+					// this compensates for that
+					// roll rotation is to make the view appear "up"
+					DenseMatrix64F A = ConvertRotation3D_F64.eulerToMatrix(EulerType.YZX,Math.PI/2,0,Math.PI/2,null);
+					DenseMatrix64F tmp = distorter.getRotation().copy();
+					CommonOps.mult(tmp,A,distorter.getRotation());
 
-				distortImage.setModel(distorter); // let it know the transform has changed
+					distortImage.setModel(distorter); // let it know the transform has changed
 
-				if( inputMethod == InputMethod.IMAGE ) {
-					rerenderPinhole();
+					if (inputMethod == InputMethod.IMAGE) {
+						rerenderPinhole();
+					}
 				}
 			}
 		});
@@ -166,25 +174,33 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
 
+		JPanel controlPanel = new JPanel();
+		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
+		PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
+		controlPanel.add( controlPinhole );
+
+		add(controlPanel, BorderLayout.WEST );
 		add(panelPinhole, BorderLayout.CENTER);
 		add(panelEqui, BorderLayout.SOUTH);
 	}
 
 	@Override
 	public void processImage(BufferedImage buffered, T input) {
-		// create a copy of the input image for output purposes
-		if( buffEqui.getWidth() != buffered.getWidth() || buffEqui.getHeight() != buffered.getHeight() ) {
-			buffEqui = new BufferedImage(buffered.getWidth(),buffered.getHeight(),BufferedImage.TYPE_INT_BGR);
-			panelEqui.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
-			panelEqui.setBufferedImageSafe(buffEqui);
+		synchronized (imageLock) {
+			// create a copy of the input image for output purposes
+			if (buffEqui.getWidth() != buffered.getWidth() || buffEqui.getHeight() != buffered.getHeight()) {
+				buffEqui = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
+				panelEqui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
+				panelEqui.setBufferedImageSafe(buffEqui);
 
-			distorter.setEquirectangularShape(input.width,input.height);
-			distortImage.setModel(distorter);
+				distorter.setEquirectangularShape(input.width, input.height);
+				distortImage.setModel(distorter);
+			}
+			buffEqui.createGraphics().drawImage(buffered, 0, 0, null);
+			equi.setTo(input);
+
+			rerenderPinhole();
 		}
-		buffEqui.createGraphics().drawImage(buffered,0,0,null);
-		equi.setTo(input);
-
-		rerenderPinhole();
 	}
 
 	private void rerenderPinhole() {
@@ -210,6 +226,40 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 
 		cameraModel.fx = cameraModel.fy = f;
 		cameraModel.skew = 0;
+	}
+
+	@Override
+	public void updatedPinholeModel(int width, int height, double fov) {
+		final boolean shapeChanged = camWidth != width || camHeight != height;
+		System.out.println("Update pinhole model "+width+"  "+shapeChanged );
+
+		this.camWidth = width;
+		this.camHeight = height;
+		this.hfov = fov;
+
+		synchronized (imageLock) {
+			if( shapeChanged ) {
+				panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
+				pinhole.reshape(camWidth,camHeight);
+				buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
+			}
+			updateIntrinsic();
+			distorter.setPinhole(cameraModel);
+			distortImage.setModel(distorter);
+
+			if( inputMethod == InputMethod.IMAGE ) {
+				rerenderPinhole();
+			}
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if( shapeChanged ) {
+					panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
+				}
+			}
+		});
 	}
 
 	/**

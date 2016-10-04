@@ -19,24 +19,69 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.calib.CameraPinhole;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Panel which lets you select the shape and FOV for a pinhole camera
  *
  * @author Peter Abeles
  */
-public class PinholePanel extends StandardAlgConfigPanel {
-
-	CameraPinhole model;
+public class PinholePanel extends StandardAlgConfigPanel
+	implements ChangeListener
+{
 
 	JSpinner selectFOV;
 	JSpinner selectWidth;
 	JSpinner selectHeight;
 
+	double fov;
+	int width,height;
+
+	Listener listener;
+
+	public PinholePanel(  int width , int height , double fov ,
+						  Listener listener ) {
+		this.width = width;
+		this.height = height;
+		this.fov = fov;
+		this.listener = listener;
+
+		selectFOV = new JSpinner(new SpinnerNumberModel(80, 5, 175, 5));
+		selectFOV.setMaximumSize(selectFOV.getPreferredSize());
+		selectFOV.addChangeListener(this);
+
+		selectWidth = new JSpinner(new SpinnerNumberModel(400, 100, 800, 10));
+		selectWidth.setMaximumSize(selectWidth.getPreferredSize());
+		selectWidth.addChangeListener(this);
+
+		selectHeight = new JSpinner(new SpinnerNumberModel(300, 100, 800, 10));
+		selectHeight.setMaximumSize(selectHeight.getPreferredSize());
+		selectHeight.addChangeListener(this);
+
+		addLabeled(selectWidth,  "Image Width: ", this);
+		addLabeled(selectHeight, "Image Height: ", this);
+		addLabeled(selectFOV,    "Field-of-View: ", this);
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if( selectWidth == e.getSource() ) {
+			width = ((Number) selectWidth.getValue()).intValue();
+		} else if( selectHeight == e.getSource() ) {
+			height = ((Number) selectHeight.getValue()).intValue();
+		} else if( selectFOV == e.getSource() ) {
+			fov =  ((Number) selectFOV.getValue()).intValue();
+		} else {
+			return;
+		}
+		listener.updatedPinholeModel(width,height,fov);
+
+	}
+
 	public interface Listener {
-		void updatedPinholeModel( CameraPinhole model );
+		void updatedPinholeModel( int width , int height , double fov );
 	}
 }
