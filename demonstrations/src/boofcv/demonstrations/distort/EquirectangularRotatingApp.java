@@ -147,7 +147,9 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> examples = new ArrayList<PathLabel>();
-		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_half_dome.jpg")));
+		examples.add(new PathLabel("Half Dome 01", UtilIO.pathExample("spherical/equirectangular_half_dome_01.jpg")));
+		examples.add(new PathLabel("Half Dome 02", UtilIO.pathExample("spherical/equirectangular_half_dome_02.jpg")));
+		examples.add(new PathLabel("Glow Sticks", UtilIO.pathExample("spherical/equirectangular_glowsticks.jpg")));
 
 		EquirectangularRotatingApp app = new EquirectangularRotatingApp(examples,type);
 

@@ -301,7 +301,9 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> examples = new ArrayList<PathLabel>();
-		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("spherical/equirectangular_half_dome.jpg")));
+		examples.add(new PathLabel("Half Dome 01", UtilIO.pathExample("spherical/equirectangular_half_dome_01.jpg")));
+		examples.add(new PathLabel("Half Dome 02", UtilIO.pathExample("spherical/equirectangular_half_dome_02.jpg")));
+		examples.add(new PathLabel("Glow Sticks", UtilIO.pathExample("spherical/equirectangular_glowsticks.jpg")));
 
 		EquirectangularPinholeApp app = new EquirectangularPinholeApp(examples,type);
 
