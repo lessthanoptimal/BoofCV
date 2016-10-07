@@ -23,6 +23,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Panel which lets you select the shape and FOV for a pinhole camera
@@ -32,12 +34,13 @@ import javax.swing.event.ChangeListener;
 // TODO add a graphic to control it
 	// TODO some how enforce constraints on each angle's range?
 public class RotationPanel extends StandardAlgConfigPanel
-	implements ChangeListener
+	implements ChangeListener, ActionListener
 {
 
 	JSpinner selectPitch;
 	JSpinner selectYaw;
 	JSpinner selectRoll;
+	JButton home = new JButton("Home");
 
 	double pitch,yaw,roll; // angle in degrees
 
@@ -63,9 +66,12 @@ public class RotationPanel extends StandardAlgConfigPanel
 		selectRoll.setMaximumSize(selectRoll.getPreferredSize());
 		selectRoll.addChangeListener(this);
 
+		home.addActionListener(this);
+
 		addLabeled(selectPitch,"Pitch: ", this);
 		addLabeled(selectYaw,  "Yaw: ", this);
 		addLabeled(selectRoll, "Roll: ", this);
+		addAlignCenter(home,this);
 	}
 
 	@Override
@@ -100,6 +106,17 @@ public class RotationPanel extends StandardAlgConfigPanel
 				selectRoll.addChangeListener(RotationPanel.this);
 			}
 		});
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( e.getSource() == home ) {
+			yaw = pitch = roll = 0;
+			selectYaw.setValue(0);
+			selectRoll.setValue(0);
+			selectPitch.setValue(0);
+			listener.updatedOrientation(pitch,yaw,roll);
+		}
 	}
 
 	public interface Listener {

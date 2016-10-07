@@ -110,11 +110,11 @@ public class EquirectangularTools_F64 {
 	 *
 	 * @param x pixel coordinate in equirectangular image
 	 * @param y pixel coordinate in equirectangular image
-	 * @param latlon  (output) x = longitude, y = latitude
+	 * @param lonlat  (output) x = longitude, y = latitude
 	 */
-	public void equiToLonlatFV(double x , double y , Point2D_F64 latlon ) {
-		latlon.x = (x/width - 0.5)*GrlConstants.PI2; // longitude
-		latlon.y = ((height-y-1.0)/height - 0.5)*GrlConstants.PI; // latitude
+	public void equiToLonlatFV(double x , double y , Point2D_F64 lonlat ) {
+		lonlat.x = (x/width - 0.5)*GrlConstants.PI2; // longitude
+		lonlat.y = ((height-y-1.0)/height - 0.5)*GrlConstants.PI; // latitude
 	}
 
 	/**

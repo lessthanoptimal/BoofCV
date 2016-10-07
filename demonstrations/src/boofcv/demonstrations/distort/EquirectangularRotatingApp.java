@@ -35,6 +35,9 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.metric.UtilAngle;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 
 import java.awt.*;
@@ -52,10 +55,12 @@ import java.util.List;
  */
 // TODO add rotational controls
 // TODo add more images
-public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T> {
+public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T>
+implements RotationPanel.Listener
+{
 
 
-	EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
+	final EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
@@ -66,6 +71,8 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 	// todo add controls which allow lat and lon to be adjusted
 	ImagePanel panelImage;
 
+	RotationPanel panelRotate = new RotationPanel(0,0,0,this);
+
 	T distorted;
 	T inputCopy;
 
@@ -74,6 +81,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 
 		panelImage = new ImagePanel();
 		add(panelImage, BorderLayout.CENTER);
+		add(panelRotate, BorderLayout.WEST);
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
@@ -90,17 +98,19 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 			public void mouseClicked(MouseEvent e) {
 				Point2D_F32 latlon = new Point2D_F32();
 
-				EquirectangularTools_F32 tools = distorter.getTools();
+				synchronized (distorter) {
+					EquirectangularTools_F32 tools = distorter.getTools();
 
-				double scale = panelImage.scale;
-				distorter.compute((int)(e.getX()/scale), (int)(e.getY()/scale));
-				tools.equiToLonlatFV(distorter.distX,distorter.distY,latlon);
+					double scale = panelImage.scale;
+					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
+					tools.equiToLonlatFV(distorter.distX, distorter.distY, latlon);
+					panelRotate.setOrientation(UtilAngle.radianToDegree(latlon.y), UtilAngle.radianToDegree(latlon.x),0);
+					distorter.setDirection(latlon.x, latlon.y, 0);
+					distortImage.setModel(distorter); // let it know the transform has changed
 
-				distorter.setDirection(latlon.x,latlon.y,0);
-				distortImage.setModel(distorter); // let it know the transform has changed
-
-				if( inputMethod == InputMethod.IMAGE ) {
-					renderOutput(inputCopy);
+					if (inputMethod == InputMethod.IMAGE) {
+						renderOutput(inputCopy);
+					}
 				}
 			}
 		});
@@ -133,13 +143,31 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 			in = input;
 		}
 
-		renderOutput(in);
+		synchronized (distorter) {
+			renderOutput(in);
+		}
 	}
 
 	private void renderOutput(T in) {
 		distortImage.apply(in,distorted);
 		ConvertBufferedImage.convertTo(distorted,rendered,true);
 		panelImage.setBufferedImageSafe(rendered);
+	}
+
+	@Override
+	public void updatedOrientation(double pitch, double yaw, double roll) {
+		synchronized (distorter) {
+			ConvertRotation3D_F64.eulerToMatrix(EulerType.ZYX,
+					UtilAngle.degreeToRadian(yaw),
+					UtilAngle.degreeToRadian(pitch),
+					UtilAngle.degreeToRadian(roll),
+					distorter.getRotation());
+			distortImage.setModel(distorter); // let it know the transform has changed
+
+			if (inputMethod == InputMethod.IMAGE) {
+				renderOutput(inputCopy);
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -160,4 +188,6 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		ShowImages.showWindow(app, "Equirectanglar Image Rotator",true);
 
 	}
+
+
 }
