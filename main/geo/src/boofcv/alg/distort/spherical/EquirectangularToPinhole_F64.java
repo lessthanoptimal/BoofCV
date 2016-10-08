@@ -31,8 +31,6 @@ import georegression.struct.point.Vector3D_F64;
  *     <li>{@link #setEquirectangularShape}</li>
  * </ul>
  *
- *
- *
  * @author Peter Abeles
  */
 public class EquirectangularToPinhole_F64 extends EquirectangularDistortBase_F64 {

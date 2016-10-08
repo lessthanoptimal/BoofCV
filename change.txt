@@ -24,6 +24,7 @@ Version : 0.25
 - Spherical cameras
   * Equirectangular image support.  coordinates and redistortion
   * Equirectangular distort to pinhole
+  * Equirectangular distort to cylinder
   * Equirectangular rotate image
 - Dirty flag was not being set to false for cached image distort single band
 - Changed minimum Java language level from 6 to 7

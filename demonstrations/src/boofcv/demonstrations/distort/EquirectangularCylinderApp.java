@@ -19,7 +19,7 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.EquirectangularRotate_F32;
+import boofcv.alg.distort.spherical.EquirectangularToCylinder_F32;
 import boofcv.alg.distort.spherical.EquirectangularTools_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -40,6 +40,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F32;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -49,36 +50,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Demonstrates re-rendering an equirectangular image after rotating it.
+ * Demonstrates re-rendering an equirectangular image into a cylindrical image.
  *
  * @author Peter Abeles
  */
-public class EquirectangularRotatingApp<T extends ImageBase> extends DemonstrationBase<T>
-		implements RotationPanel.Listener
+public class EquirectangularCylinderApp<T extends ImageBase> extends DemonstrationBase<T>
+		implements RotationPanel.Listener, CylinderPanel.Listener
 {
-
-
-	final EquirectangularRotate_F32 distorter = new EquirectangularRotate_F32();
+	final EquirectangularToCylinder_F32 distorter = new EquirectangularToCylinder_F32();
 	ImageDistort<T,T> distortImage;
 
 	BufferedImage rendered = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
 
-	float centerLat;
-	float centerLon;
-
 	ImagePanel panelImage;
+	CylinderPanel panelCylinder;
 
 	RotationPanel panelRotate = new RotationPanel(0,0,0,this);
 
 	T distorted;
 	T inputCopy;
 
-	public EquirectangularRotatingApp(List<?> exampleInputs, ImageType<T> imageType) {
+
+
+	public EquirectangularCylinderApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-		panelImage = new ImagePanel();
-		add(panelImage, BorderLayout.CENTER);
-		add(panelRotate, BorderLayout.WEST);
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
@@ -87,7 +83,23 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		distortImage.setRenderAll(true);
 
 
-		distorted = imageType.createImage(1,1);
+		int imgWidth = 400;
+		int imgHeight = 300;
+		double vfov = UtilAngle.radian(120);
+		distorter.configure(imgWidth, imgHeight, (float)vfov);
+
+		JPanel controlPanel = new JPanel();
+		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
+		panelCylinder = new CylinderPanel(imgWidth,imgHeight,UtilAngle.degree(vfov),this);
+		controlPanel.add( panelCylinder );
+		controlPanel.add( panelRotate );
+		panelImage = new ImagePanel();
+		add(panelImage, BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.WEST);
+
+
+		rendered = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_INT_BGR);
+		distorted = imageType.createImage(imgWidth, imgHeight);
 		inputCopy = imageType.createImage(1,1);
 
 		panelImage.addMouseListener(new MouseAdapter() {
@@ -117,16 +129,11 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 	protected void handleInputChange(InputMethod method, int width, int height) {
 		super.handleInputChange(method, width, height);
 
-		if( rendered.getWidth() != width || rendered.getHeight() != height ) {
-			rendered = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
+		if( inputCopy.getWidth() != width || inputCopy.getHeight() != height ) {
 			panelImage.setPreferredSize(new Dimension(width,height));
-			distorter.setImageShape(width, height);
 			distortImage.setModel(distorter); // let it know the transform has changed
 		}
-
-		centerLon = centerLat = 0;
-		distorted.reshape(width,height);
-		distorter.setImageShape(width,height);
+		distorter.setEquirectangularShape(width, height);
 	}
 
 	@Override
@@ -167,6 +174,23 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		}
 	}
 
+	@Override
+	public void updateCylinder(int width, int height, double vfov) {
+		synchronized (distorter) {
+			distorter.configure(width,height,(float)UtilAngle.radian(vfov));
+			distortImage.setModel(distorter); // let it know the transform has changed
+
+			if( distorted.width != width || distorted.height != height ) {
+				rendered = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+				distorted.reshape(width, height);
+			}
+
+			if (inputMethod == InputMethod.IMAGE) {
+				renderOutput(inputCopy);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 
 		ImageType type = ImageType.pl(3, GrayU8.class);
@@ -176,7 +200,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		examples.add(new PathLabel("Half Dome 02", UtilIO.pathExample("spherical/equirectangular_half_dome_02.jpg")));
 		examples.add(new PathLabel("Glow Sticks", UtilIO.pathExample("spherical/equirectangular_glowsticks.jpg")));
 
-		EquirectangularRotatingApp app = new EquirectangularRotatingApp(examples,type);
+		EquirectangularCylinderApp app = new EquirectangularCylinderApp(examples,type);
 
 		app.openFile(new File(examples.get(0).getPath()));
 
@@ -185,6 +209,7 @@ public class EquirectangularRotatingApp<T extends ImageBase> extends Demonstrati
 		ShowImages.showWindow(app, "Equirectanglar Image Rotator",true);
 
 	}
+
 
 
 }
