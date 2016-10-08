@@ -5,7 +5,7 @@ package boofcv;
 option java_package = "boofcv.io.calibration";
 option java_outer_classname = "ProtoCameraModels";
 
-/* Description of a pinhole camera with no lens distortion */
+// Description of a pinhole camera with no lens distortion
 message Pinhole {
     /* image shape (units: pixels) */
     required int32 width = 1;
@@ -15,7 +15,7 @@ message Pinhole {
     required double fy = 4;
     /* skew parameter, typically 0 (units: pixels)*/
     required double skew = 5;
-	/* image center (units: pixels) */
+    /* image center (units: pixels) */
     required double cx = 6;
     required double cy = 7;
 }
@@ -29,4 +29,33 @@ message PinholeRadial {
     /* tangential distortion parameters */
     optional double t1 = 3;
     optional double t2 = 4;
+}
+
+// Rigid body transformation in 3D
+message Se3 {
+    // Translation
+    required double tx = 1;
+    required double ty = 2;
+    required double tz = 3;
+
+    // rotation matrix. r[row][col]
+    required double r00 = 4;
+    required double r01 = 5;
+    required double r02 = 6;
+    required double r10 = 7;
+    required double r11 = 8;
+    required double r12 = 9;
+    required double r20 = 10;
+    required double r21 = 11;
+    required double r22 = 12;
+}
+
+// Calibration for a stereo camera
+message StereoRadial {
+    // intrinsic parameters for left camera
+    required PinholeRadial left = 1;
+    // intrinsic parameters for right camera
+    required PinholeRadial right = 2;
+    // transform from right to left camera
+    required Se3 rightToLeft = 3;
 }

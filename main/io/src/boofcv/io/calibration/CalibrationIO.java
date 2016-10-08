@@ -20,12 +20,16 @@ package boofcv.io.calibration;
 
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.StereoParameters;
 import com.google.protobuf.TextFormat;
+import georegression.struct.se.Se3_F64;
 
 import java.io.*;
 import java.net.URL;
 
 /**
+ * Functions for loading and saving camera calibration related data structures from/to disk
+ *
  * @author Peter Abeles
  */
 public class CalibrationIO {
@@ -44,44 +48,69 @@ public class CalibrationIO {
 			throw new RuntimeException(e);
 		}
 
-		ProtoCameraModels.Pinhole.Builder p = ProtoCameraModels.Pinhole.newBuilder();
+		try {
+			if( parameters instanceof CameraPinholeRadial) {
+				CameraPinholeRadial radial = (CameraPinholeRadial)parameters;
 
-		p.setWidth( parameters.getWidth() );
-		p.setHeight( parameters.getHeight() );
-		p.setFx( parameters.fx );
-		p.setFy( parameters.fy );
-		p.setCx( parameters.cx );
-		p.setCy( parameters.cy );
-		p.setSkew( parameters.skew );
+				ProtoCameraModels.PinholeRadial.Builder pr = ProtoCameraModels.PinholeRadial.newBuilder();
+
+				boofToProto(radial, pr);
+
+				out.println("# Pinhole camera model with radial and tangential distortion");
+				out.println("# textual protobuf format");
+				out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+				out.println("# radial = radial distortion, t1,t2) = tangential distortion");
+				out.println();
+				TextFormat.print(pr,out);
+			} else {
+				ProtoCameraModels.Pinhole.Builder p = ProtoCameraModels.Pinhole.newBuilder();
+				boofToProto(parameters, p);
+
+				out.println("# Pinhole camera model");
+				out.println("# textual protobuf format");
+				out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+				out.println();
+				TextFormat.print(p,out);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		out.close();
+	}
+
+	/**
+	 * Saves stereo camera parameters to disk
+	 * @param parameters Stereo parameters
+	 * @param filePath path to file
+	 */
+	public static void save(StereoParameters parameters , String filePath ) {
+		PrintStream out;
+		try {
+			out = new PrintStream(filePath);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
 		try {
-		if( parameters instanceof CameraPinholeRadial) {
-			CameraPinholeRadial radial = (CameraPinholeRadial)parameters;
+			ProtoCameraModels.StereoRadial.Builder ps = ProtoCameraModels.StereoRadial.newBuilder();
+			ProtoCameraModels.PinholeRadial.Builder pl = ps.getLeftBuilder();
+			ProtoCameraModels.PinholeRadial.Builder pr = ps.getLeftBuilder();
+			ProtoCameraModels.Se3.Builder pr2l = ps.getRightToLeftBuilder();
 
-			ProtoCameraModels.PinholeRadial.Builder pr = ProtoCameraModels.PinholeRadial.newBuilder();
+			boofToProto(parameters.left, pl );
+			boofToProto(parameters.right, pr );
+			boofToProto(parameters.getRightToLeft(), pr2l );
 
-			pr.setPinhole(p.build());
-			pr.setT1(radial.getT1());
-			pr.setT2(radial.getT2());
-			if( radial.radial != null ) {
-				for (int i = 0; i < radial.radial.length; i++) {
-					pr.addRadial(radial.radial[i]);
-				}
-			}
+			ps.setLeft( pl.build() );
+			ps.setRight( pr.build() );
+			ps.setRightToLeft( pr2l.build() );
 
-			out.println("# Pinhole camera model with radial and tangential distortion");
+			out.println("# Stereo Camera Model");
 			out.println("# textual protobuf format");
-			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
-			out.println("# radial = radial distortion, t1,t2) = tangential distortion");
 			out.println();
-			TextFormat.print(pr,out);
-		} else {
-			out.println("# Pinhole camera model");
-			out.println("# textual protobuf format");
-			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
-			out.println();
-			TextFormat.print(p,out);
-		}
+			TextFormat.print(ps,out);
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -100,8 +129,6 @@ public class CalibrationIO {
 	 */
 	public static CameraPinhole loadPinhole( Reader reader ) {
 		try {
-//			ProtoCameraModels.Pinhole p =
-//					ProtoCameraModels.Pinhole.parseFrom(new FileInputStream(filePath));
 
 			ProtoCameraModels.Pinhole.Builder builder = ProtoCameraModels.Pinhole.newBuilder();
 			TextFormat.merge(reader, builder);
@@ -109,13 +136,7 @@ public class CalibrationIO {
 			ProtoCameraModels.Pinhole p = builder.build();
 
 			CameraPinhole model = new CameraPinhole();
-			model.width = p.getWidth();
-			model.height = p.getHeight();
-			model.skew = p.getSkew();
-			model.cx = p.getCx();
-			model.cy = p.getCy();
-			model.fx = p.getFx();
-			model.fy = p.getFy();
+			protoToBoof(p, model);
 
 			return model;
 		} catch (IOException e) {
@@ -130,37 +151,41 @@ public class CalibrationIO {
 	 */
 	public static CameraPinholeRadial loadPinholeRadial( Reader reader ) {
 		try {
-//			ProtoCameraModels.PinholeRadial pr =
-//					ProtoCameraModels.PinholeRadial.parseFrom(new FileInputStream(filePath));
 			ProtoCameraModels.PinholeRadial.Builder builder = ProtoCameraModels.PinholeRadial.newBuilder();
 			TextFormat.merge(reader, builder);
 
 			ProtoCameraModels.PinholeRadial pr = builder.build();
 
-			ProtoCameraModels.Pinhole p = pr.getPinhole();
-
 			CameraPinholeRadial model = new CameraPinholeRadial();
-			model.width = p.getWidth();
-			model.height = p.getHeight();
-			model.skew = p.getSkew();
-			model.cx = p.getCx();
-			model.cy = p.getCy();
-			model.fx = p.getFx();
-			model.fy = p.getFy();
-
-			if( pr.hasT1() )
-				model.t1 = pr.getT1();
-			if( pr.hasT2() )
-				model.t2 = pr.getT2();
-
-			if( pr.getRadialCount() > 0 ) {
-				model.radial = new double[pr.getRadialCount()];
-				for (int i = 0; i < model.radial.length; i++) {
-					model.radial[i] = pr.getRadial(i);
-				}
-			}
+			protoToBoof(pr, model);
 
 			return model;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Loads a stereo camera model with radial and tangential distortion from disk
+	 * @param reader Input to text
+	 * @return The camera model
+	 */
+	public static StereoParameters loadStereo( Reader reader ) {
+		try {
+			ProtoCameraModels.StereoRadial.Builder builder = ProtoCameraModels.StereoRadial.newBuilder();
+			TextFormat.merge(reader, builder);
+
+			ProtoCameraModels.StereoRadial ps = builder.build();
+
+			StereoParameters param = new StereoParameters();
+			param.left = new CameraPinholeRadial();
+			param.right = new CameraPinholeRadial();
+
+			protoToBoof(ps.getRightToLeft(), param.rightToLeft);
+			protoToBoof(ps.getLeft(), param.left);
+			protoToBoof(ps.getRight(), param.right);
+
+			return param;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -213,4 +238,88 @@ public class CalibrationIO {
 
 		throw new RuntimeException("Unknown model type");
 	}
+
+	private static void boofToProto( Se3_F64 boof, ProtoCameraModels.Se3.Builder proto) {
+		proto.setTx( boof.T.x );
+		proto.setTy( boof.T.y );
+		proto.setTz( boof.T.z );
+
+		proto.setR00( boof.R.data[0] );
+		proto.setR01( boof.R.data[1] );
+		proto.setR02( boof.R.data[2] );
+
+		proto.setR10( boof.R.data[3] );
+		proto.setR11( boof.R.data[4] );
+		proto.setR12( boof.R.data[5] );
+
+		proto.setR20( boof.R.data[6] );
+		proto.setR21( boof.R.data[7] );
+		proto.setR22( boof.R.data[8] );
+	}
+
+	private static void boofToProto( CameraPinholeRadial radial, ProtoCameraModels.PinholeRadial.Builder pr) {
+		ProtoCameraModels.Pinhole.Builder p = ProtoCameraModels.Pinhole.newBuilder();
+		boofToProto(radial, p);
+		pr.setPinhole(p.build());
+		pr.setT1(radial.getT1());
+		pr.setT2(radial.getT2());
+		if( radial.radial != null ) {
+			for (int i = 0; i < radial.radial.length; i++) {
+				pr.addRadial(radial.radial[i]);
+			}
+		}
+	}
+
+	private static void boofToProto(CameraPinhole parameters, ProtoCameraModels.Pinhole.Builder p) {
+		p.setWidth( parameters.getWidth() );
+		p.setHeight( parameters.getHeight() );
+		p.setFx( parameters.fx );
+		p.setFy( parameters.fy );
+		p.setCx( parameters.cx );
+		p.setCy( parameters.cy );
+		p.setSkew( parameters.skew );
+	}
+
+	private static void protoToBoof(ProtoCameraModels.Se3 proto, Se3_F64 boof) {
+		boof.T.x = proto.getTx();
+		boof.T.y = proto.getTy();
+		boof.T.z = proto.getTz();
+
+		boof.R.data[0] = proto.getR00();
+		boof.R.data[1] = proto.getR01();
+		boof.R.data[2] = proto.getR02();
+		boof.R.data[3] = proto.getR10();
+		boof.R.data[4] = proto.getR11();
+		boof.R.data[5] = proto.getR12();
+		boof.R.data[6] = proto.getR20();
+		boof.R.data[7] = proto.getR21();
+		boof.R.data[8] = proto.getR22();
+	}
+
+	private static void protoToBoof(ProtoCameraModels.PinholeRadial pr, CameraPinholeRadial model) {
+		protoToBoof(pr.getPinhole(), model);
+
+		if( pr.hasT1() )
+			model.t1 = pr.getT1();
+		if( pr.hasT2() )
+			model.t2 = pr.getT2();
+
+		if( pr.getRadialCount() > 0 ) {
+			model.radial = new double[pr.getRadialCount()];
+			for (int i = 0; i < model.radial.length; i++) {
+				model.radial[i] = pr.getRadial(i);
+			}
+		}
+	}
+
+	private static void protoToBoof(ProtoCameraModels.Pinhole p, CameraPinhole model) {
+		model.width = p.getWidth();
+		model.height = p.getHeight();
+		model.skew = p.getSkew();
+		model.cx = p.getCx();
+		model.cy = p.getCy();
+		model.fx = p.getFx();
+		model.fy = p.getFy();
+	}
+
 }
