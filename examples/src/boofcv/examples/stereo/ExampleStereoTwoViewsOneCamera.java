@@ -37,6 +37,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -76,7 +77,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		String imageDir = UtilIO.pathExample("stereo/");
 
 		// Camera parameters
-		CameraPinholeRadial intrinsic = UtilIO.loadXML(calibDir , "intrinsic.xml");
+		CameraPinholeRadial intrinsic = CalibrationIO.load(calibDir , "intrinsic.txt");
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");

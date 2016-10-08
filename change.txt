@@ -31,6 +31,8 @@ Version : 0.25
   * Renamed IntrinsicParameters to CameraPinhole
   * Broke distortion off into a separate class which extends CameraPinhole
      - CameraPinholeRadial
+- Protobuf
+  * Changed save format to textual protobugs for camera model parameters.  File format shouldn't need to change again
 
 - TODO make how camera calibration is saved independent of data structure
 - TODO dual fisheye to equirectangular image

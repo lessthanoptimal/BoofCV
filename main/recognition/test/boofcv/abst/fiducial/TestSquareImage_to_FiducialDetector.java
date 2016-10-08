@@ -23,6 +23,7 @@ import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -55,7 +56,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 
 	@Override
 	public CameraPinholeRadial loadIntrinsic() {
-		return UtilIO.loadXML(getClass().getResource("intrinsic.xml"));
+		return CalibrationIO.load(getClass().getResource("intrinsic.txt"));
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -72,7 +73,7 @@ public class ExampleCalibrateMonocularPoints {
 		// print the results to standard out
 		param.print();
 		// save to a file using XML
-		UtilIO.saveXML(param, "intrinsic.xml");
+		CalibrationIO.save(param, "intrinsic.txt");
 	}
 
 	/**

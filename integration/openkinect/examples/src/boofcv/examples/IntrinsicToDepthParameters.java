@@ -34,9 +34,9 @@ public class IntrinsicToDepthParameters {
 	public static void main( String args[] ) {
 		String baseDir = UtilIO.pathExample("kinect/");
 
-		String nameCalib = baseDir+"intrinsic.xml";
+		String nameCalib = baseDir+"intrinsic.txt";
 
-		IntrinsicParameters intrinsic = UtilIO.loadXML(nameCalib);
+		IntrinsicParameters intrinsic = CalibrationIO.load(nameCalib);
 
 		VisualDepthParameters depth = new VisualDepthParameters();
 

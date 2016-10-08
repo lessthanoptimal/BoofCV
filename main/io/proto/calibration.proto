@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package boofcv;
+
+option java_package = "boofcv.io.calibration";
+option java_outer_classname = "ProtoCameraModels";
+
+/* Description of a pinhole camera with no lens distortion */
+message Pinhole {
+    /* image shape (units: pixels) */
+    required int32 width = 1;
+    required int32 height = 2;
+    /* focal length along x and y axis (units: pixels) */
+    required double fx = 3;
+    required double fy = 4;
+    /* skew parameter, typically 0 (units: pixels)*/
+    required double skew = 5;
+	/* image center (units: pixels) */
+    required double cx = 6;
+    required double cy = 7;
+}
+
+// Description of pinhole camera with radian and tangential lens distortion
+message PinholeRadial {
+    required Pinhole pinhole = 1;
+
+    /* radial distortion parameters */
+    repeated double radial = 2;
+    /* tangential distortion parameters */
+    optional double t1 = 3;
+    optional double t2 = 4;
+}

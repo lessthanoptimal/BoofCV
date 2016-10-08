@@ -28,7 +28,7 @@ import boofcv.app.calib.ComputeGeometryScore;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
@@ -54,7 +54,7 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
 public class CameraCalibration extends BaseStandardInputApp {
 
 	protected String inputDirectory;
-	protected String outputFileName = "intrinsic.xml";
+	protected String outputFileName = "intrinsic.txt";
 	protected CalibrationDetector detector;
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
@@ -66,7 +66,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
-		System.out.println("                                     DEFAULT: \"intrinsic.xml\"");
+		System.out.println("                                     DEFAULT: \"intrinsic.txt\"");
 		System.out.println();
 		System.out.println("Input: File Options:  ");
 		System.out.println();
@@ -307,7 +307,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		}
 
 		// save results to a file and print out
-		UtilIO.saveXML(intrinsic,outputFileName);
+		CalibrationIO.save(intrinsic,outputFileName);
 
 		calibrationAlg.printStatistics();
 		System.out.println();
@@ -356,7 +356,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			frame.setVisible(false);
 
 			inputDirectory = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
-			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.xml").getPath();
+			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.txt").getPath();
 			handleDirectory();
 		}
 	}

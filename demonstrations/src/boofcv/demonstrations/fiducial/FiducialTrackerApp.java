@@ -37,6 +37,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -300,7 +301,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 			throw new RuntimeException("Unknown selection");
 		}
 
-		intrinsic = UtilIO.loadXML(media.openFile(path+"/intrinsic.xml"));
+		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.txt"));
 
 		detector.setIntrinsic(intrinsic);
 

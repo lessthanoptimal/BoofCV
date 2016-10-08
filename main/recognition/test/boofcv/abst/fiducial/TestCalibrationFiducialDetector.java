@@ -21,6 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -53,7 +54,7 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 
 	@Override
 	public CameraPinholeRadial loadIntrinsic() {
-		return UtilIO.loadXML(directory+"intrinsic.xml");
+		return CalibrationIO.load(directory,"intrinsic.txt");
 	}
 
 	@Override

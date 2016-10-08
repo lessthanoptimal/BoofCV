@@ -26,6 +26,7 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -55,7 +56,7 @@ public class ExampleFiducialImage {
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		CameraPinholeRadial param = UtilIO.loadXML(imagePath, "intrinsic.xml");
+		CameraPinholeRadial param = CalibrationIO.load(imagePath, "intrinsic.txt");
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 

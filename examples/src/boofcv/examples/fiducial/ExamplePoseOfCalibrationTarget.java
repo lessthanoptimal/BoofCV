@@ -26,6 +26,7 @@ import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
@@ -63,7 +64,7 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Load camera calibration
 		CameraPinholeRadial intrinsic =
-				UtilIO.loadXML(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.xml"));
+				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.txt"));
 
 		// load the video file
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");

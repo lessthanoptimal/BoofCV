@@ -29,6 +29,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.PointTransform_F32;
@@ -122,7 +123,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput(String name, int index) {
 		PathLabel refs = inputRefs.get(index);
 
-		CameraPinholeRadial param = UtilIO.loadXML(media.openFile(refs.getPath(0)));
+		CameraPinholeRadial param = CalibrationIO.load(media.openFile(refs.getPath(0)));
 		BufferedImage orig = media.openImage(refs.getPath(1));
 
 		configure(orig,param);
@@ -145,8 +146,8 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		String bumbleDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
-		inputs.add(new PathLabel("Sony HX5V",calibDir + "intrinsic.xml",imageDir + "dist_cyto_01.jpg"));
-		inputs.add(new PathLabel("BumbleBee2",bumbleDir+"intrinsicLeft.xml",bumbleDir + "left01.jpg"));
+		inputs.add(new PathLabel("Sony HX5V",calibDir + "intrinsic.txt",imageDir + "dist_cyto_01.jpg"));
+		inputs.add(new PathLabel("BumbleBee2",bumbleDir+"intrinsicLeft.txt",bumbleDir + "left01.jpg"));
 
 		app.setInputList(inputs);
 

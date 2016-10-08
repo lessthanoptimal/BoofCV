@@ -47,8 +47,8 @@ public class BatchRemoveLensDistortion {
 	public static void printHelpAndExit(String[] args) {
 		System.out.println("Expected 1 flag and 3 arguments, had "+args.length+" instead");
 		System.out.println();
-		System.out.println("<file path regex> <path to intrinsic.xml> <output directory>");
-		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.xml");
+		System.out.println("<file path regex> <path to intrinsic.txt> <output directory>");
+		System.out.println("path/to/input/image\\d*.jpg path/to/intrinsic.txt");
 		System.out.println();
 		System.out.println("Flags:");
 		System.out.println("-rename  Rename files on output to image%0d.png");

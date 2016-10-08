@@ -24,6 +24,7 @@ import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -106,7 +107,7 @@ public class ExampleCalibrateMonocular {
 		CameraPinholeRadial intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
-		UtilIO.saveXML(intrinsic, "intrinsic.xml");
+		CalibrationIO.save(intrinsic, "intrinsic.txt");
 
 		calibrationAlg.printStatistics();
 		System.out.println();

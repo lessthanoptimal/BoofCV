@@ -22,6 +22,7 @@ import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
@@ -69,7 +70,7 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 	}
 
 	private static void perform(String directory, FiducialDetector detector) {
-		CameraPinholeRadial intrinsic = UtilIO.loadXML(directory + "intrinsic.xml");
+		CameraPinholeRadial intrinsic = CalibrationIO.load(directory , "intrinsic.txt");
 
 //		intrinsic.radial = null;
 //		intrinsic.t1 = intrinsic.t2 = 0;

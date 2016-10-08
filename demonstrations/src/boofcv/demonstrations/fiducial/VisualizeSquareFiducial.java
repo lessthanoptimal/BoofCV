@@ -36,6 +36,7 @@ import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -63,7 +64,7 @@ public class VisualizeSquareFiducial {
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		CameraPinholeRadial intrinsic = nameIntrinsic == null ? null : (CameraPinholeRadial)UtilIO.loadXML(nameIntrinsic);
+		CameraPinholeRadial intrinsic = nameIntrinsic == null ? null : (CameraPinholeRadial) CalibrationIO.load(nameIntrinsic);
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
@@ -163,8 +164,8 @@ public class VisualizeSquareFiducial {
 
 		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 
-		app.process(directory+"/image0000.jpg",directory+"/intrinsic.xml");
-		app.process(directory+"/image0001.jpg",directory+"/intrinsic.xml");
-		app.process(directory+"/image0002.jpg",directory+"/intrinsic.xml");
+		app.process(directory+"/image0000.jpg",directory+"/intrinsic.txt");
+		app.process(directory+"/image0001.jpg",directory+"/intrinsic.txt");
+		app.process(directory+"/image0002.jpg",directory+"/intrinsic.txt");
 	}
 }

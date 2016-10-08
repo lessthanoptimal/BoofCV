@@ -19,7 +19,7 @@
 package boofcv.examples;
 
 import boofcv.alg.depth.VisualDepthOps;
-import boofcv.io.UtilIO;
+import boofcv.io.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
@@ -45,9 +45,9 @@ public class CreateRgbPointCloudFileApp {
 
 		String nameRgb = baseDir+"rgb0000000.ppm";
 		String nameDepth = baseDir+"depth0000000.depth";
-		String nameCalib = baseDir+"intrinsic.xml";
+		String nameCalib = baseDir+"intrinsic.txt";
 
-		IntrinsicParameters param = UtilIO.loadXML(nameCalib);
+		IntrinsicParameters param = CalibrationIO.load(nameCalib);
 
 		GrayU16 depth = new GrayU16(1,1);
 		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);

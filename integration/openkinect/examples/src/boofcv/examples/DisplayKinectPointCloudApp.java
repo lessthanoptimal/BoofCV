@@ -49,9 +49,9 @@ public class DisplayKinectPointCloudApp {
 
 		String nameRgb = baseDir+"basket.ppm";
 		String nameDepth = baseDir+"basket.depth";
-		String nameCalib = baseDir+"intrinsic.xml";
+		String nameCalib = baseDir+"intrinsic.txt";
 
-		IntrinsicParameters param = UtilIO.loadXML(nameCalib);
+		IntrinsicParameters param = CalibrationIO.load(nameCalib);
 
 		GrayU16 depth = new GrayU16(1,1);
 		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);

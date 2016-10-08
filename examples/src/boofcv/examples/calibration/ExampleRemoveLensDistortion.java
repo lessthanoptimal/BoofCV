@@ -21,6 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImagePanel;
@@ -34,6 +35,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * All real camera lens have distortion.  This distortion causes large errors when attempting to recover the
@@ -50,11 +52,15 @@ import java.awt.image.BufferedImage;
 public class ExampleRemoveLensDistortion {
 
 	public static void main( String args[] ) {
-		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
+		String calibDir = UtilIO.pathExample("/home/pja/projects/boofcv/data/example/fiducial/image/examples/");
 		String imageDir = UtilIO.pathExample("structure/");
 
 		// load calibration parameters from the previously calibrated camera
-		CameraPinholeRadial param = UtilIO.loadXML(calibDir , "intrinsic.xml");
+//		CameraPinholeRadial param = CalibrationIO.loadPinholeRadial(new File(calibDir , "intrinsic.param"));
+		CameraPinholeRadial param = CalibrationIO.load(calibDir , "intrinsic.txt");
+
+		CalibrationIO.save(param, new File(calibDir,"intrinsic.txt"));
+		CameraPinholeRadial foo = CalibrationIO.load(new File(calibDir,"intrinsic.txt"));
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");
