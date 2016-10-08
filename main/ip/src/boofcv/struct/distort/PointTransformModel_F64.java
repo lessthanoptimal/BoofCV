@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,17 +29,17 @@ public interface PointTransformModel_F64<Model> extends PointTransform_F64 {
 	 * Specifies the distortion model used by the transform
 	 * @param model Distortion model
 	 */
-	public void setModel( Model model );
+	void setModel( Model model );
 
 	/**
 	 * Returns the active motion model
 	 * @return motion model
 	 */
-	public Model getModel();
+	Model getModel();
 
 	/**
 	 * Returns a new instance of the motion model
 	 * @return new instance
 	 */
-	public Model newInstanceModel();
+	Model newInstanceModel();
 }

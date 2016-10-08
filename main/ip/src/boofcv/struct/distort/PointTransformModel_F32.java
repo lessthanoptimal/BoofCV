@@ -29,17 +29,17 @@ public interface PointTransformModel_F32<Model> extends PointTransform_F32 {
 	 * Specifies the distortion model used by the transform
 	 * @param model Distortion model
 	 */
-	public void setModel( Model model );
+	void setModel( Model model );
 
 	/**
 	 * Returns the active motion model
 	 * @return motion model
 	 */
-	public Model getModel();
+	Model getModel();
 
 	/**
 	 * Returns a new instance of the motion model
 	 * @return new instance
 	 */
-	public Model newInstanceModel();
+	Model newInstanceModel();
 }

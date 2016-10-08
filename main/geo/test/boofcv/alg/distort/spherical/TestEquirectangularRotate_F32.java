@@ -49,7 +49,7 @@ public class TestEquirectangularRotate_F32 {
 
 		alg.setDirection(0, (float)Math.PI/4.0f,0);
 		alg.compute((int)(300.0f*0.5f), (int)(250*0.5f));
-		assertMatch( alg, 300.0f*0.5f, 250*0.75f);
+		assertMatch( alg, 300.0f*0.5f, 250*0.25f);
 	}
 
 	private void assertMatch(PixelTransform_F32 tran , float x , float y ) {
