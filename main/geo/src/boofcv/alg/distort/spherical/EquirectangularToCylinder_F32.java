@@ -39,7 +39,7 @@ public class EquirectangularToCylinder_F32 extends EquirectangularDistortBase_F3
 
 	/**
 	 * Configures the rendered cylinder
-	 * 
+	 *
 	 * @param width Cylinder width in pixels
 	 * @param height Cylinder height in pixels
 	 * @param vfov vertical FOV in radians

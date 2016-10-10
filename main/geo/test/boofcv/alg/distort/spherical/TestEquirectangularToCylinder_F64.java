@@ -18,16 +18,73 @@
 
 package boofcv.alg.distort.spherical;
 
+import georegression.metric.UtilAngle;
+import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestEquirectangularToCylinder_F64 {
+
+	/**
+	 * The latitude and longitude should be zero when sampling the middle of the cylindrical image
+	 */
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void pointingAtZero() {
+
+		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		alg.setEquirectangularShape(400,500);
+
+		// height has an odd number to make it evenly divisible, e.g. (301-1)/2
+		alg.configure(200,301, UtilAngle.radian(100));
+
+		// center of rendered image
+		alg.compute(100,150);
+
+		// center of output image with y-axis inverted
+		assertEquals(200,alg.distX, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(500-250-1,alg.distY, GrlConstants.DOUBLE_TEST_TOL);
+	}
+
+	/**
+	 * Make sure the requested VFOV is the actual
+	 */
+	@Test
+	public void checkFOV() {
+		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		alg.setEquirectangularShape(400,500);
+
+		alg.configure(200,300, UtilAngle.radian(100));
+
+		Point2D_F64 ll = new Point2D_F64();
+
+		alg.compute(100,0);
+		alg.getTools().equiToLonlat(alg.distX,alg.distY,ll);
+		double lat0 = ll.y;
+		alg.compute(100,299);
+		alg.getTools().equiToLonlat(alg.distX,alg.distY,ll);
+		double lat1 = ll.y;
+
+
+		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.DOUBLE_TEST_TOL);
+	}
+
+	/**
+	 * Crude vector check.  Make sure it's pointing -z at top of image and +z at bottom
+	 */
+	@Test
+	public void checkVectors() {
+		EquirectangularToCylinder_F64 alg = new EquirectangularToCylinder_F64();
+		alg.setEquirectangularShape(400, 500);
+		alg.configure(200, 300, UtilAngle.radian(100));
+
+		assertTrue( alg.vectors[0].z < 0 );
+		assertTrue( alg.vectors[299*200].z > 0 );
+
 	}
 }
