@@ -33,10 +33,10 @@ Version : 0.25
   * Broke distortion off into a separate class which extends CameraPinhole
      - CameraPinholeRadial
 - Protobuf
-  * Changed save format to textual protobufs for camera model parameters.  File format shouldn't need to change again
+  * Changed save format to textual protobufs for camera model parameters.
+  * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
 - Deleted BoofAndroidFiles because you can now simply use the protobuf format
 
-- TODO make how camera calibration is saved independent of data structure
 - TODO dual fisheye to equirectangular image
 - TODO fisheye
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end

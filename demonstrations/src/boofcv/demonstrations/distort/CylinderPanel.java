@@ -53,11 +53,11 @@ public class CylinderPanel extends StandardAlgConfigPanel
 		selectVFOV.setMaximumSize(selectVFOV.getPreferredSize());
 		selectVFOV.addChangeListener(this);
 
-		selectWidth = new JSpinner(new SpinnerNumberModel(400, 100, 800, 10));
+		selectWidth = new JSpinner(new SpinnerNumberModel(width, 100, 800, 10));
 		selectWidth.setMaximumSize(selectWidth.getPreferredSize());
 		selectWidth.addChangeListener(this);
 
-		selectHeight = new JSpinner(new SpinnerNumberModel(200, 100, 800, 10));
+		selectHeight = new JSpinner(new SpinnerNumberModel(height, 100, 800, 10));
 		selectHeight.setMaximumSize(selectHeight.getPreferredSize());
 		selectHeight.addChangeListener(this);
 
