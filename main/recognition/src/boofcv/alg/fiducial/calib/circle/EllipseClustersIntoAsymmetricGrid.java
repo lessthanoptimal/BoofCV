@@ -32,20 +32,20 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an asymmetric
+ * grid.  In an asymmetric grid each row is offset by 1/2 the horizontal spacing between.  This forms a sawtooth
+ * pattern vertically.
+ *
  * @author Peter Abeles
  */
 public class EllipseClustersIntoAsymmetricGrid {
 
-	private FastQueue<Grid> grids = new FastQueue<Grid>(Grid.class,true);
+	private FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
 	public static double CONTOUR_ANGLE_MIN = Math.PI*0.8;
 	public static int MAX_LINE_LENGTH = 10000;
 
-
 	public static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
-
-	// storage for all the found valid asymmetric grids
-	private FastQueue<Grid> found = new FastQueue<Grid>(Grid.class,true);
 
 	// Information on each ellipse/node in a cluster
 	private FastQueue<NodeInfo> listInfo = new FastQueue<NodeInfo>(NodeInfo.class,true);
@@ -59,8 +59,6 @@ public class EllipseClustersIntoAsymmetricGrid {
 	LineSegment2D_F64 line0111 = new LineSegment2D_F64();
 	LineSegment2D_F64 line1001 = new LineSegment2D_F64();
 	Point2D_F64 intersection = new Point2D_F64();
-
-
 
 	public EllipseClustersIntoAsymmetricGrid() {
 
@@ -78,9 +76,15 @@ public class EllipseClustersIntoAsymmetricGrid {
 		});
 	}
 
+	/**
+	 * Computes grids from the clusters.  Call {@link #getGrids()} to retrieve the results.
+	 *
+	 * @param ellipses (input) List of all the ellipses
+	 * @param clusters (Input) Description of all the clusters
+	 */
 	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> clusters ) {
 
-		found.reset();
+		foundGrids.reset();
 
 		for (int i = 0; i < clusters.size(); i++) {
 			computeClusterInfo(ellipses, clusters.get(i));
@@ -124,7 +128,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	}
 
 	void combineGrids( List<List<NodeInfo>> outerGrid , List<List<NodeInfo>> innerGrid ) {
-		Grid g = grids.grow();
+		Grid g = foundGrids.grow();
 
 
 	}
@@ -437,6 +441,13 @@ public class EllipseClustersIntoAsymmetricGrid {
 		return best;
 	}
 
+	/**
+	 * Returns the set of grids which were found
+	 * @return found grids
+	 */
+	public FastQueue<Grid> getGrids() {
+		return foundGrids;
+	}
 
 	public static class NodeInfo {
 		EllipseRotated_F64 ellipse;

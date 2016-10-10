@@ -101,7 +101,7 @@ public class FactoryImageBorder {
 	 *
 	 * @param imageType Type of image being processed.
 	 * @param borderType Which border algorithm should it use.
-	 * @return The requested {@link ImageBorder).
+	 * @return The requested {@link ImageBorder}.
 	 */
 	public static <T extends ImageGray> ImageBorder<T>
 	single(Class<T> imageType, BorderType borderType)
@@ -156,7 +156,7 @@ public class FactoryImageBorder {
 	 *
 	 * @param imageType Type of image being processed.
 	 * @param borderType Which border algorithm should it use.
-	 * @return The requested {@link ImageBorder).
+	 * @return The requested {@link ImageBorder}.
 	 */
 	public static <T extends ImageInterleaved> ImageBorder<T>
 	interleaved(Class<T> imageType, BorderType borderType)
