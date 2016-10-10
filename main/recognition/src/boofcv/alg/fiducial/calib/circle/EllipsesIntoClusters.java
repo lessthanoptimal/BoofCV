@@ -49,12 +49,12 @@ public class EllipsesIntoClusters {
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 2;
 
-	private NearestNeighbor<EllipseRotated_F64> search = FactoryNearestNeighbor.kdtree();
+	private NearestNeighbor<Node> search = FactoryNearestNeighbor.kdtree();
 	private FastQueue<double[]> searchPoints;
-	private FastQueue<NnData<EllipseRotated_F64>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<Node>> searchResults = new FastQueue(NnData.class,true);
 
-	private FastQueue<Node> nodes = new FastQueue(Node.class,true);
-	private FastQueue<List<Node>> clusters;
+	FastQueue<Node> nodes = new FastQueue<>(Node.class,true);
+	FastQueue<List<Node>> clusters;
 
 	/**
 	 * Configures clustering
@@ -83,7 +83,7 @@ public class EllipsesIntoClusters {
 		clusters = new FastQueue(List.class,true) {
 			@Override
 			protected List<Node> createInstance() {
-				return new ArrayList<Node>();
+				return new ArrayList<>();
 			}
 		};
 	}
@@ -92,7 +92,7 @@ public class EllipsesIntoClusters {
 	 * Processes the ellipses and creates clusters.
 	 *
 	 * @param ellipses Set of unordered ellipses
-	 * @param output Resulting found clusters
+	 * @param output Resulting found clusters.  Cleared automatically.
 	 */
 	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> output ) {
 
@@ -119,6 +119,7 @@ public class EllipsesIntoClusters {
 
 			// Only search the maximum of the major axis times two
 			double maxDistance = e1.a * spaceToDiameterRatio;
+			maxDistance *= maxDistance;
 
 			searchResults.reset();
 			// + 1 on max neighbors because this ellipse is returned
@@ -130,21 +131,23 @@ public class EllipsesIntoClusters {
 			if( node1.cluster == -1 ) {
 				node1.cluster = clusters.size;
 				cluster1 = clusters.grow();
+				cluster1.clear();
+				cluster1.add( node1 );
 			} else {
 				cluster1 = clusters.get( node1.cluster );
 			}
 
 			// only accept ellipses which have a similar size
 			for (int j = 0; j < searchResults.size(); j++) {
-				NnData<EllipseRotated_F64> d = searchResults.get(j);
-				EllipseRotated_F64 e2 = d.data;
+				NnData<Node> d = searchResults.get(j);
+				EllipseRotated_F64 e2 = ellipses.get(d.data.which);
 				if( e2 == e1 )
 					continue;
 
 				// smallest shape divided by largest shape
 				double ratio = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
 
-				Node node2 = nodes.get(j);
+				Node node2 = nodes.get(d.data.which);
 
 				// connect if they have a similar size to each other
 				if( ratio >= sizeSimilarityTolerance ) {
@@ -173,6 +176,7 @@ public class EllipsesIntoClusters {
 	private void init(List<EllipseRotated_F64> ellipses) {
 		searchPoints.resize(ellipses.size());
 		nodes.resize(ellipses.size());
+		clusters.reset();
 
 		for (int i = 0; i < ellipses.size(); i++) {
 			EllipseRotated_F64 e = ellipses.get(i);
@@ -186,7 +190,7 @@ public class EllipsesIntoClusters {
 			n.cluster = -1;
 		}
 
-		search.setPoints(searchPoints.toList(),ellipses);
+		search.setPoints(searchPoints.toList(),nodes.toList());
 	}
 
 	/**

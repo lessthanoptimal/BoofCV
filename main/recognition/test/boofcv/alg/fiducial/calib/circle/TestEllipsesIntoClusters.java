@@ -18,42 +18,166 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import georegression.misc.GrlConstants;
+import georegression.struct.shapes.EllipseRotated_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestEllipsesIntoClusters {
+	/**
+	 * Just make sure it doesn't blow up with an empty input
+	 */
 	@Test
 	public void emptyInput() {
-		fail("Implement");
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+
+		alg.process(input,output);
+
+		assertEquals( 0 , output.size());
 	}
 
+	/**
+	 * Makes sure the output is cleared
+	 */
 	@Test
-	public void noClusters() {
-		fail("Implement");
+	public void outputCleared() {
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+
+		output.add( new ArrayList<EllipsesIntoClusters.Node>());
+
+		alg.process(input,output);
+
+		assertEquals( 0 , output.size());
 	}
 
-
+	/**
+	 * Points should not be clustered together due to distance apart
+	 */
 	@Test
-	public void oneCluster() {
-		fail("Implement");
+	public void noCluster_distance() {
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		input.add(new EllipseRotated_F64(0,0,2,1,0));
+		input.add(new EllipseRotated_F64(4.1,0,2,1,0));
+
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+		alg.process(input,output);
+		assertEquals( 0 , output.size());
+
+		// a positive case for sanity right at the border
+		input.get(1).center.x = 4;
+		alg.process(input,output);
+		assertEquals( 1 , output.size());
+	}
+
+	/**
+	 * Points should not be clustered together due difference in side
+	 */
+	@Test
+	public void noCluster_size() {
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		input.add(new EllipseRotated_F64(0,0,2,1,0));
+		input.add(new EllipseRotated_F64(2,0,0.999,1,0));
+
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+		alg.process(input,output);
+		assertEquals( 0 , output.size());
+
+		// a positive case for sanity right at the border
+		input.get(1).a = 1.0;
+		alg.process(input,output);
+		assertEquals( 1 , output.size());
 	}
 
 	@Test
 	public void multipleClusters() {
-		fail("Implement");
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		// two clusters differentiated by size
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		input.add(new EllipseRotated_F64(0,0,2,1,0));
+		input.add(new EllipseRotated_F64(1,0,2,1,0));
+		input.add(new EllipseRotated_F64(1,0,8,1,0));
+
+		input.add(new EllipseRotated_F64(0,0,8,1,0));
+		input.add(new EllipseRotated_F64(2.2,0,2,1,0));
+		input.add(new EllipseRotated_F64(2.2,0,8,1,0));
+
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+		alg.process(input,output);
+		assertEquals( 2 , output.size());
+
+		for (int i = 0; i < 2; i++) {
+			assertEquals( 3 , output.get(i).size());
+			double expected = input.get(output.get(i).get(0).which).a;
+			for (int j = 0; j < 3; j++) {
+				assertEquals(expected, input.get( output.get(i).get(j).which).a, GrlConstants.DOUBLE_TEST_TOL);
+			}
+		}
 	}
 
 	@Test
 	public void multipleCalls() {
-		fail("Implement");
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.0,0.5);
+
+		// two clusters differentiated by size
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		input.add(new EllipseRotated_F64(0,0,2,1,0));
+		input.add(new EllipseRotated_F64(1,0,2,1,0));
+		input.add(new EllipseRotated_F64(1,0,8,1,0));
+
+		input.add(new EllipseRotated_F64(0,0,8,1,0));
+		input.add(new EllipseRotated_F64(2.2,0,2,1,0));
+		input.add(new EllipseRotated_F64(2.2,0,8,1,0));
+
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+
+		// call it twice to see if it resets
+		alg.process(input,output);
+		alg.process(input,output);
+
+		assertEquals( 2 , output.size());
+		for (int i = 0; i < 2; i++) {
+			assertEquals(3, output.get(i).size());
+		}
 	}
 
 	@Test
 	public void joinClusters() {
-		fail("Implement");
+		List<EllipsesIntoClusters.Node> mouth = new ArrayList<>();
+		List<EllipsesIntoClusters.Node> food = new ArrayList<>();
+
+		mouth.add( new EllipsesIntoClusters.Node());
+		mouth.add( new EllipsesIntoClusters.Node());
+
+		for (int i = 0; i < 4; i++) {
+			food.add( new EllipsesIntoClusters.Node());
+		}
+
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5);
+		alg.clusters.add(mouth);
+		alg.clusters.add(food);
+
+		alg.joinClusters(0,1);
+
+		assertEquals(6,mouth.size());
+		assertEquals(0,food.size());
+
 	}
 }
