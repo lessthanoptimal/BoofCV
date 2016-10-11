@@ -26,8 +26,83 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestEllipseClustersIntoAsymmetricGrid {
+
+	/**
+	 * See if it can handle a very easy case
+	 */
 	@Test
-	public void stuff() {
+	public void process() {
+		fail("implement");
+	}
+
+	/**
+	 * Call process multiple times and see if it blows up
+	 */
+	@Test
+	public void process_multiple_calls() {
+		fail("implement");
+	}
+
+	/**
+	 * Give it input with a grid that's too small and see if it blows up
+	 */
+	@Test
+	public void process_too_small() {
+		fail("implement");
+	}
+
+	@Test
+	public void combineGrids() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkGridSize() {
+		fail("implement");
+	}
+
+	@Test
+	public void checkDuplicates() {
+		fail("implement");
+	}
+
+	@Test
+	public void findInnerGrid() {
+		fail("implement");
+	}
+
+	@Test
+	public void selectSeedNext() {
+		fail("implement");
+	}
+
+	@Test
+	public void findLine() {
+		fail("implement");
+	}
+
+	@Test
+	public void selectSeedCorner() {
+		fail("implement");
+	}
+
+	@Test
+	public void findContour() {
+		fail("implement");
+	}
+
+	@Test
+	public void findLargestAnglesForAllNodes() {
+		fail("implement");
+	}
+
+	@Test
+	public void addEdgesToInfo() {
+		fail("implement");
+	}
+
+	@Test
+	public void computeClusterInfo() {
 		fail("implement");
 	}
 }

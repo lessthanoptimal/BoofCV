@@ -32,9 +32,11 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an asymmetric
+ * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an asymmetric
  * grid.  In an asymmetric grid each row is offset by 1/2 the horizontal spacing between.  This forms a sawtooth
- * pattern vertically.
+ * pattern vertically.</p>
+ *
+ * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
  *
  * @author Peter Abeles
  */
@@ -42,9 +44,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 	private FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
-	public static double CONTOUR_ANGLE_MIN = Math.PI*0.8;
-	public static int MAX_LINE_LENGTH = 10000;
-
+	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
 	public static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
 
 	// Information on each ellipse/node in a cluster
@@ -87,8 +87,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 		foundGrids.reset();
 
 		for (int i = 0; i < clusters.size(); i++) {
-			computeClusterInfo(ellipses, clusters.get(i));
+			List<Node> cluster = clusters.get(i);
+			int clusterSize = cluster.size();
+			computeClusterInfo(ellipses, cluster);
 
+			// finds all the nodes in the outside of the cluster
 			if( !findContour() )
 				continue;
 
@@ -96,8 +99,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 			NodeInfo corner = selectSeedCorner();
 
 			// find the row and column which the corner is a member of
-			List<NodeInfo> cornerRow = findLine(corner,corner.left);
-			List<NodeInfo> cornerColumn = findLine(corner,corner.right);
+			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize);
+			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize);
 
 			// Go down the columns and find each of the rows
 			List<List<NodeInfo>> outerGrid = new ArrayList<List<NodeInfo>>();
@@ -109,31 +112,93 @@ public class EllipseClustersIntoAsymmetricGrid {
 				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed);
 				if( next == null )
 					throw new RuntimeException("Outer column with a row that has only one element");
-				List<NodeInfo> row = findLine( seed , next);
+				List<NodeInfo> row = findLine( seed , next, clusterSize);
 				outerGrid.add( row );
 			}
 
-			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid);
+			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid, clusterSize);
 
-			sanityCheckGrid(outerGrid,innerGrid);
+			// perform sanity checks
+			if( !checkGridSize(outerGrid,innerGrid, cluster.size()) ) {
+				continue;
+			}
 
-			// TODO now do the same for the inner grid
+			if( !checkDuplicates(outerGrid) || !checkDuplicates(innerGrid)) {
+				continue;
+			}
+
+			// combine inner and outer grids together
+			combineGrids(outerGrid,innerGrid);
 		}
 	}
 
-	void sanityCheckGrid( List<List<NodeInfo>> outerGrid , List<List<NodeInfo>> innerGrid ) {
-		// cobined should be the same as the original cluster's size
+	/**
+	 * Makes sure the found grid is the same size as the original cluster.  If it's not then.
+	 * not all the nodes were used.  All lists must have he same size too.
+	 */
+	boolean checkGridSize(List<List<NodeInfo>> outerGrid ,
+						  List<List<NodeInfo>> innerGrid ,
+						  int clusterSize ) {
+		int total = 0;
+		int expected = outerGrid.get(0).size();
+		for (int i = 0; i < outerGrid.size(); i++) {
+			if( expected != outerGrid.get(i).size() )
+				return false;
+			total += outerGrid.get(i).size();
+		}
+		expected = innerGrid.get(0).size();
+		for (int i = 0; i < innerGrid.size(); i++) {
+			if( expected != outerGrid.get(i).size() )
+				return false;
+			total += innerGrid.get(i).size();
+		}
 
-		// no duplicates
+		return total == clusterSize;
 	}
 
+	/**
+	 * Checks to see if any node is used more than once
+	 */
+	boolean checkDuplicates(List<List<NodeInfo>> grid ) {
+
+		for (int i = 0; i < grid.size(); i++) {
+			List<NodeInfo> list = grid.get(i);
+			for (int j = 0; j < list.size(); j++) {
+				NodeInfo n = list.get(j);
+				if( n.marked )
+					return false;
+				n.marked = true;
+			}
+		}
+		return true;
+	}
+
+
+	/**
+	 * Combines the inner and outer grid into one grid for output.  See {@link Grid} for a discussion
+	 * on how elements are ordered internally.
+	 */
 	void combineGrids( List<List<NodeInfo>> outerGrid , List<List<NodeInfo>> innerGrid ) {
 		Grid g = foundGrids.grow();
+		g.reset();
 
+		g.columns = outerGrid.get(0).size() + innerGrid.get(0).size();
+		g.rows = outerGrid.size() + innerGrid.size();
 
+		for (int row = 0; row < g.rows; row++) {
+			List<NodeInfo> list;
+			if( row%2 == 0 ) {
+				list = outerGrid.get(row/2);
+			} else {
+				list = innerGrid.get(row/2);
+			}
+			for (int i = 0; i < list.size(); i++) {
+				g.ellipses.add( list.get(i).ellipse );
+			}
+		}
 	}
 
-	List<List<NodeInfo>> findInnerGrid( List<List<NodeInfo>> outerGrid ) {
+	List<List<NodeInfo>> findInnerGrid( List<List<NodeInfo>> outerGrid , int clusterSize) {
 		NodeInfo c00 = outerGrid.get(0).get(0);
 		NodeInfo c01 = outerGrid.get(0).get(1);
 		NodeInfo c10 = outerGrid.get(1).get(0);
@@ -144,8 +209,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
 		NodeInfo colNext = selectSeedNext(c00,c10,corner);
 
-		List<NodeInfo> row = findLine(corner, rowNext);
-		List<NodeInfo> column = findLine(corner, colNext);
+		List<NodeInfo> row = findLine(corner, rowNext, clusterSize);
+		List<NodeInfo> column = findLine(corner, colNext, clusterSize);
 
 		List<List<NodeInfo>> grid = new ArrayList<List<NodeInfo>>();
 
@@ -155,7 +220,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 				List<NodeInfo> prev = grid.get(i - 1);
 				NodeInfo seed = column.get(i);
 				NodeInfo next = selectSeedNext(prev.get(0), prev.get(1), seed);
-				row = findLine(seed, next);
+				row = findLine(seed, next, clusterSize);
 				if (row == null)
 					throw new RuntimeException("Inner grid missing a row");
 				grid.add(row);
@@ -257,13 +322,13 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 * @param next Second ellipse, specified direction of line relative to seed
 	 * @return All the nodes along the line
 	 */
-	static protected List<NodeInfo> findLine( NodeInfo seed , NodeInfo next ) {
+	static protected List<NodeInfo> findLine( NodeInfo seed , NodeInfo next , int clusterSize ) {
 		double anglePrev = direction(seed, next);
 
 		List<NodeInfo> line = new ArrayList<NodeInfo>();
 		line.add( seed );
 
-		for( int i = 0; i < MAX_LINE_LENGTH; i++) {
+		for( int i = 0; i < clusterSize+1; i++) {
 			// find the child of next which is within tolerance and closest to it
 			double bestDistance = Double.MAX_VALUE;
 			double bestAngle = Double.NaN;
@@ -315,7 +380,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 
 		addEdgesToInfo(cluster);
-		findLargestAngle();
+		findLargestAnglesForAllNodes();
 	}
 
 	/**
@@ -345,7 +410,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	/**
 	 * Finds the two edges with the greatest angular distance between them.
 	 */
-	private void findLargestAngle() {
+	private void findLargestAnglesForAllNodes() {
 		for (int i = 0; i < listInfo.size(); i++) {
 			NodeInfo info = listInfo.get(i);
 
@@ -367,43 +432,37 @@ public class EllipseClustersIntoAsymmetricGrid {
 		}
 	}
 
+	/**
+	 * Finds nodes in the outside of the grid.  First the node in the grid with the largest 'angleBetween'
+	 * is selected as a seed.  It is assumed at this node must be on the contour.  Then the graph is traversed
+	 * in CCW direction until a loop is formed.
+	 *
+	 * @return true if valid and false if invalid
+	 */
 	private boolean findContour() {
-		contour.reset();
-
-		// mark nodes as being part of the contour
-		for (int i = 0; i < listInfo.size(); i++) {
+		// find the node with the largest angleBetween
+		NodeInfo seed = listInfo.get(0);
+		for (int i = 1; i < listInfo.size(); i++) {
 			NodeInfo info = listInfo.get(i);
 
-			if( info.angleBetween >= CONTOUR_ANGLE_MIN ) {
-				info.contour = true;
-				contour.add( info );
+			if( info.angleBetween > seed.angleBetween ) {
+				seed = info;
 			}
 		}
 
-		if( contour.size < 4 )
-			return false;
-
-		// Quick sanity check that makes sure all nodes on the contour link to contours
-		for (int i = 0; i < contour.size(); i++) {
-			NodeInfo info = contour.get(i);
-			if( !info.left.contour || !info.right.contour )
-				return false;
+		// trace around the contour
+		contour.reset();
+		contour.add( seed );
+		seed.contour = true;
+		NodeInfo current = seed.right;
+		while( current != seed && contour.size() < listInfo.size() ) {
+			contour.add( current );
+			seed.contour = true;
+			current = current.right;
 		}
 
-		int total = contour.size;
-		NodeInfo current = contour.get(0);
-		NodeInfo start = current;
-		contour.reset();
-
-		do {
-			// there must be a cycle some place
-			if( contour.size >= total )
-				return false;
-			contour.add( current );
-			current = current.right;
-		} while( start != current );
-
-		return contour.size == total;
+		// fail if it is too small or was cycling
+		return !(contour.size < 4 || contour.size >= listInfo.size());
 	}
 
 	/**
@@ -452,17 +511,25 @@ public class EllipseClustersIntoAsymmetricGrid {
 	public static class NodeInfo {
 		EllipseRotated_F64 ellipse;
 
+		// List of all the ellipses connected to this one in CCW order
 		FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
 
+		// flag used to indicate if a node is along the shape's contour
 		boolean contour;
+		// the largest angle between two nodes is angleBetween and
+		// left is before right in CCW direction
 		NodeInfo left,right;
 		double angleBetween;
+
+		// used to indicate if it has been inspected already
+		boolean marked;
 
 		public void reset() {
 			contour = false;
 			ellipse = null;
 			left = right = null;
 			angleBetween = 0;
+			marked = false;
 			edges.reset();
 		}
 	}
@@ -472,11 +539,30 @@ public class EllipseClustersIntoAsymmetricGrid {
 		double angle;
 	}
 
+	/**
+	 * Specifies the grid.  Note that the grid is 'sparse'.  every other node is skipped implicitly.
+	 * This is caused by the asymmetry.  Each row is offset by one circle/grid element.
+	 *
+	 * <pre>Examples:
+	 * 3x6 grid will have 9 elements total.
+	 * grid(0,0) = [0]
+	 * grid(0,2) = [1]
+	 * grid(0,4) = [2]
+	 * grid(1,1) = [3]
+	 * grid(1,3) = [4]
+	 * grid(1,5) = [5]
+	 * </pre>
+	 */
 	public static class Grid
 	{
 		public List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
 		public int rows;
 		public int columns;
+
+		public void reset() {
+			rows = columns = -1;
+			ellipses.clear();
+		}
 	}
 
 }
