@@ -48,12 +48,12 @@ public class EllipseClustersIntoAsymmetricGrid {
 	public static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
 
 	// Information on each ellipse/node in a cluster
-	private FastQueue<NodeInfo> listInfo = new FastQueue<NodeInfo>(NodeInfo.class,true);
+	FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo.class,true);
 	// Used to sort edges in a node.  used instead of built in sorting algorithm to maximize memory being recycled
-	private QuickSortComparator<Edge> sorter;
+	QuickSortComparator<Edge> sorter;
 
 	// All ellipses in the contour around the grid
-	private FastQueue<NodeInfo> contour = new FastQueue<NodeInfo>(NodeInfo.class,false);
+	FastQueue<NodeInfo> contour = new FastQueue<>(NodeInfo.class,false);
 
 	// Local storage in one of the functions below.  Here to minimize GC
 	LineSegment2D_F64 line0111 = new LineSegment2D_F64();
@@ -378,7 +378,6 @@ public class EllipseClustersIntoAsymmetricGrid {
 			info.ellipse = t;
 		}
 
-
 		addEdgesToInfo(cluster);
 		findLargestAnglesForAllNodes();
 	}
@@ -386,7 +385,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	/**
 	 * Adds edges to node info and computes their orientation
 	 */
-	private void addEdgesToInfo(List<Node> cluster) {
+	void addEdgesToInfo(List<Node> cluster) {
 		for (int i = 0; i < cluster.size(); i++) {
 			Node n = cluster.get(i);
 			NodeInfo infoA = listInfo.get(i);
@@ -410,14 +409,14 @@ public class EllipseClustersIntoAsymmetricGrid {
 	/**
 	 * Finds the two edges with the greatest angular distance between them.
 	 */
-	private void findLargestAnglesForAllNodes() {
+	void findLargestAnglesForAllNodes() {
 		for (int i = 0; i < listInfo.size(); i++) {
 			NodeInfo info = listInfo.get(i);
 
 			if( info.edges.size < 2 )
 				continue;
 
-			for (int j = 0, k = info.edges.size-1; j < info.edges.size; k=j,j++) {
+			for (int k = 0, j = info.edges.size-1; k < info.edges.size; j=k,k++) {
 				double angleA = info.edges.get(j).angle;
 				double angleB = info.edges.get(k).angle;
 
