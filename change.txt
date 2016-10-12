@@ -21,7 +21,7 @@ Version : 0.25
 - Association
   * Added helpful error messages when src and dst are not set
 - Added support for F64 to F32 autocoding from regular F64 classes
-- Spherical cameras
+- 360 / Spherical camera support
   * Equirectangular image support.  coordinates and redistortion
   * Equirectangular distort to pinhole
   * Equirectangular distort to cylinder
@@ -37,6 +37,7 @@ Version : 0.25
   * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
 - Deleted BoofAndroidFiles because you can now simply use the protobuf format
 
+- TODO integrate DeepBoof scene classification
 - TODO dual fisheye to equirectangular image
 - TODO fisheye
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end

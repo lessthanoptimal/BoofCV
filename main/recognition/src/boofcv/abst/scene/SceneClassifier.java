@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,63 @@ package boofcv.abst.scene;
 
 import boofcv.struct.image.ImageBase;
 
+import java.io.File;
+import java.util.List;
+
 /**
+ * High level interface for scene classification.  In scene classification a label is applied to the image to describe
+ * what is being shown in it.  This interface provides support for classifiers with a finite number of categories.
+ *
  * @author Peter Abeles
  */
 public interface SceneClassifier<T extends ImageBase> {
 
-	public boolean classify( T image );
+	/**
+	 * Loads the model at the specified location.  See documentation of the classifier for what needs to be
+	 * passed in here.
+	 *
+	 * @param path Path to directory or file containing the model
+	 */
+	void loadModel( File path );
 
-	public int getType();
+	/**
+	 * Process the image and determine which category it belongs to.  Will throw an exception if the model has
+	 * not been loaded yet.
+	 *
+	 * @param image Image being processed
+	 */
+	void classify( T image );
+
+	/**
+	 * Returns the category which was the best fit.
+	 * @return best fit category
+	 */
+	String getBestResult();
+
+	/**
+	 * Returns a list of all the likely categories for the image.  What is likely is implementation dependent.
+	 * Each category should be included at least once and might not be included at all.
+	 * @return List of categories and scores
+	 */
+	List<Score> getAllResults();
+
+	/**
+	 * Returns a list of all the possible categories that a scene can be classified as
+	 * @return Names of categories
+	 */
+	List<String> getCategories();
+
+	/**
+	 * Provides information on the score for a specific category when multiple results are requested
+	 */
+	class Score {
+		/**
+		 * The score associated with a particular category.  Score's meaning is implementation dependent.
+		 */
+		public double score;
+		/**
+		 * The category
+		 */
+		public String category;
+	}
 }
