@@ -21,6 +21,7 @@ package boofcv.abst.scene;
 import boofcv.struct.image.ImageBase;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface SceneClassifier<T extends ImageBase> {
 	 *
 	 * @param path Path to directory or file containing the model
 	 */
-	void loadModel( File path );
+	void loadModel( File path ) throws IOException;
 
 	/**
 	 * Process the image and determine which category it belongs to.  Will throw an exception if the model has
@@ -51,7 +52,7 @@ public interface SceneClassifier<T extends ImageBase> {
 	 * Returns the category which was the best fit.
 	 * @return best fit category
 	 */
-	String getBestResult();
+	int getBestResult();
 
 	/**
 	 * Returns a list of all the likely categories for the image.  What is likely is implementation dependent.
@@ -77,6 +78,11 @@ public interface SceneClassifier<T extends ImageBase> {
 		/**
 		 * The category
 		 */
-		public String category;
+		public int category;
+
+		public void set( double score , int category ) {
+			this.score = score;
+			this.category = category;
+		}
 	}
 }

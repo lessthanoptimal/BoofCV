@@ -4,6 +4,9 @@ dependencies {
     compile project(':main:geo')
     compile project(':main:sfm')
 
+    ['main','models'].each {String a ->
+        compile group: 'org.deepboof', name: a, version: '0.2-SNAPSHOT'}
+
     testCompile project(':main:io')
     testCompile project(':main:visualize')
 }

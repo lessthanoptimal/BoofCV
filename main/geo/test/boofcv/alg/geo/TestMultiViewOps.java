@@ -19,7 +19,6 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
-import boofcv.struct.Tuple2;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -30,6 +29,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.Tuple2;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;

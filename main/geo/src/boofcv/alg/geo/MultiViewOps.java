@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.h.HomographyInducedStereo2Line;
 import boofcv.alg.geo.h.HomographyInducedStereo3Pts;
 import boofcv.alg.geo.h.HomographyInducedStereoLinePt;
 import boofcv.alg.geo.trifocal.TrifocalExtractEpipoles;
-import boofcv.struct.Tuple2;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PairLineNorm;
 import boofcv.struct.geo.TrifocalTensor;
@@ -32,6 +31,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.Tuple2;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.factory.DecompositionFactory;
 import org.ejml.interfaces.decomposition.QRDecomposition;
