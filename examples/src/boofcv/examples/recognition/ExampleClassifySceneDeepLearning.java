@@ -24,7 +24,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import deepboof.io.DatabaseOps;
+import deepboof.datasets.UtilCifar10;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -38,35 +38,8 @@ import java.util.List;
  */
 public class ExampleClassifySceneDeepLearning {
 
-	public static File downloadModel( File path ) {
-		if( !path.isDirectory() )
-			path = path.getParentFile();
-
-		File pathToModel = new File(path,"likevgg_cifar10");
-		if( !path.exists() ) {
-			if (!path.mkdirs())
-				throw new IllegalArgumentException("Failed to make path");
-		} else {
-
-			// check to see if the data already exists.  If so just return
-			if( new File(pathToModel,"YuvStatistics.txt").exists() &&
-					new File(pathToModel,"model.net").exists() )
-				return pathToModel;
-
-			// TODO check md5sum
-		}
-
-		System.out.println("Obtaining network model.  size = 125 MB");
-		DatabaseOps.download("http://heanet.dl.sourceforge.net/project/deepboof/networks/v1/likevgg_cifar10.zip",path);
-		DatabaseOps.decompressZip(new File(path,"likevgg_cifar10.zip"),path,true);
-
-
-
-		return pathToModel;
-	}
-
 	public static void main(String[] args) throws IOException {
-		File modelHome = downloadModel( new File("download_data") );
+		File modelHome = UtilCifar10.downloadModelVggLike( new File("download_data") );
 
 		SceneClassifier<Planar<GrayF32>> classifier = new SceneClassifierVggLike();
 		classifier.loadModel(modelHome);
