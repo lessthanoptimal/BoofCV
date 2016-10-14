@@ -25,41 +25,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestIntrinsicParameters {
-
-	@Test
-	public void constructor_K() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
-
-		assertEquals(200,p.fx,1e-8);
-		assertEquals(210,p.fy,1e-8);
-		assertEquals(1,p.skew,1e-8);
-		assertEquals(320,p.cx,1e-8);
-		assertEquals(240,p.cy,1e-8);
-		assertEquals(640,p.width,1e-8);
-		assertEquals(380,p.height,1e-8);
-		assertTrue(p.radial==null);
-		assertEquals(0,p.t1,1e-8);
-		assertEquals(0,p.t2, 1e-8);
-	}
-
-	@Test
-	public void fsetK() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
-
-		assertTrue(p == p.fsetK(201, 211, 2, 321, 241, 641, 381));
-
-		assertEquals(201,p.fx,1e-8);
-		assertEquals(211,p.fy,1e-8);
-		assertEquals(2,p.skew,1e-8);
-		assertEquals(321,p.cx,1e-8);
-		assertEquals(241,p.cy,1e-8);
-		assertEquals(641,p.width,1e-8);
-		assertEquals(381,p.height,1e-8);
-		assertTrue(p.radial==null);
-		assertEquals(0,p.t1,1e-8);
-		assertEquals(0,p.t2, 1e-8);
-	}
+public class TestCameraPinholeRadial {
 
 	@Test
 	public void fsetRadial() {

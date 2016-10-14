@@ -5,6 +5,11 @@ Next Release
 
 Less High Priority Next Release
 
+- Stereo Rectification
+  * Make it easier.  Single class like in pyboof
+- Stereo Disparity
+  * make float images contain actual disparity, not offset.  negative values for invalid
+
 - Regression
   * Chessboard image border to fiducial regression
   * Support binary features in Detect/Describe regression
