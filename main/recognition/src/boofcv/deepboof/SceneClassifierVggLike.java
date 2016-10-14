@@ -24,13 +24,14 @@ import boofcv.alg.filter.stat.ImageLocalNormalization;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import deepboof.Function;
 import deepboof.datasets.UtilCifar10;
 import deepboof.graph.FunctionSequence;
 import deepboof.io.torch7.ParseBinaryTorch7;
 import deepboof.io.torch7.SequenceAndParameters;
-import deepboof.models.ModelIO;
+import deepboof.models.DeepModelIO;
 import deepboof.models.YuvStatistics;
 import deepboof.tensors.Tensor_F32;
 import org.ddogleg.struct.FastQueue;
@@ -42,6 +43,8 @@ import java.util.List;
 import static deepboof.misc.TensorOps.WI;
 
 /**
+ * TODO comment
+ *
  * @author Peter Abeles
  */
 public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> {
@@ -63,6 +66,8 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 
 	List<String> categoryNames = UtilCifar10.getClassNames();
 
+	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(ImageType.pl(3,GrayF32.class));
+
 	/**
 	 * Expects there to be two files in the provided directory:
 	 * YuvStatistics.txt
@@ -73,7 +78,7 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 	 */
 	@Override
 	public void loadModel(File directory)  throws IOException {
-		stats = ModelIO.load(new File(directory,"YuvStatistics.txt"));
+		stats = DeepModelIO.load(new File(directory,"YuvStatistics.txt"));
 
 		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> sequence =
 				new ParseBinaryTorch7().parseIntoBoof(new File(directory,"model.net"));
@@ -100,7 +105,7 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 			rgb32 = image;
 		} else {
 			rgb32 = this.rgb32;
-			massageInto32x32(image, rgb32);
+			massage.massage(image,rgb32);
 		}
 		ColorYuv.rgbToYuv_F32(rgb32,yuv32);
 
@@ -129,10 +134,6 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 		}
 	}
 
-	private void massageInto32x32( Planar<GrayF32> input , Planar<GrayF32> output) {
-
-	}
-
 	@Override
 	public int getBestResult() {
 		return categoryBest;
@@ -146,5 +147,9 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 	@Override
 	public List<String> getCategories() {
 		return categoryNames;
+	}
+
+	public Planar<GrayF32> getRgb32() {
+		return rgb32;
 	}
 }
