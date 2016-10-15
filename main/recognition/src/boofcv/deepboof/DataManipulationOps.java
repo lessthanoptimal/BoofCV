@@ -24,10 +24,18 @@ import boofcv.struct.image.Planar;
 import deepboof.tensors.Tensor_F32;
 
 /**
+ * Functions for manipulating data by transforming it or converting its format.  For use with DeepBoof
+ *
  * @author Peter Abeles
  */
 public class DataManipulationOps {
 
+	/**
+	 * Normalizes a gray scale image by first subtracting the mean then dividing by stdev.
+	 * @param image Image that is to be normalized
+	 * @param mean Value which is subtracted by it
+	 * @param stdev The divisor
+	 */
 	public static void normalize(GrayF32 image , float mean , float stdev ) {
 		for (int y = 0; y < image.height; y++) {
 			int index = image.startIndex + y*image.stride;
@@ -39,11 +47,17 @@ public class DataManipulationOps {
 		}
 	}
 
+	/**
+	 * Converts the double array into a 1D float kernel
+	 * @param kernel Kernel in array format
+	 * @return The kernel
+	 */
 	public static Kernel1D_F32 create1D_F32( double[] kernel ) {
 		Kernel1D_F32 k = new Kernel1D_F32(kernel.length);
 		for (int i = 0; i < kernel.length; i++) {
 			k.data[i] = (float)kernel[i];
 		}
+		k.offset = kernel.length/2;
 		return k;
 	}
 

@@ -23,6 +23,7 @@ import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.shapes.EllipseRotated_F64;
+import org.ddogleg.struct.Tuple2;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -91,22 +92,106 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void selectSeedCorner() {
-		fail("implement");
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		NodeInfo best = new NodeInfo();
+		best.angleBetween = Math.PI/2.0;
+
+		for (int i = 0; i < 10; i++) {
+			NodeInfo n = new NodeInfo();
+			n.angleBetween = 2.0*Math.PI*i/10.0 + 0.01;
+			alg.contour.add( n );
+
+			if( i == 4 )
+				alg.contour.add( best );
+		}
+
+		NodeInfo found = alg.selectSeedCorner();
+
+		assertTrue(found == best);
 	}
 
 	@Test
 	public void findContour() {
-		fail("implement");
+		// create a grid from which a known solution can be easily extracted
+		int rows = 5;
+		int cols = 4;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		// use internal algorithm to set up its data structure.  Correct of this function is
+		// directly tested elsewhere
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		// now find the contour
+		assertTrue(alg.findContour());
+
+		assertEquals(cols*2+(rows-2)*2, alg.contour.size);
 	}
 
-	@Test
-	public void computeNodeInfo() {
+	/**
+	 * Creates a regular grid of nodes and sets up the angle and neighbors correctly
+	 * @param rows
+	 * @param cols
+	 * @return
+	 */
+	private Tuple2<List<Node>,List<EllipseRotated_F64>> createRegularGrid( int rows , int cols ) {
 		List<Node> cluster = new ArrayList<>();
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		
+		for (int row = 0, i = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++, i++) {
+				ellipses.add( new EllipseRotated_F64(col,row,0.1,0.1,0) );
+				cluster.add( new Node());
+				cluster.get(i).which = i;
+			}
+		}
 
-		fail("implement");
+		for (int row = 0, i=0; row < rows; row++) {
+			for (int col = 0; col < cols; col++, i++) {
+				Node a = cluster.get(i);
+
+				if( col > 0 )
+					a.connections.add(i-1);
+				if( row > 0 )
+					a.connections.add(i-cols);
+				if( col < cols-1 )
+					a.connections.add(i+1);
+				if( row < rows-1 )
+					a.connections.add(i+cols);
+			}
+		}
+
+		return new Tuple2<>(cluster,ellipses);
+	}
+
+	/**
+	 * This test just checks to see if a node info is created for each node passed in and that
+	 * the ellipse is assinged to it.  The inner functions are tested elsewhere
+	 */
+	@Test
+	public void computeNodeInfo() {
+		List<Node> nodes = new ArrayList<>();
+		nodes.add( createNode(0, 1,2,3));
+		nodes.add( createNode(1, 0,2,4));
+		nodes.add( createNode(2, 0,1));
+		nodes.add( createNode(3, 0));
+		nodes.add( createNode(4));
+
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
+		for (int i = 0; i < nodes.size(); i++) {
+			ellipses.add( new EllipseRotated_F64());
+		}
+		
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		alg.computeNodeInfo(ellipses,nodes);
+
+		assertEquals( nodes.size(), alg.listInfo.size);
+		for (int i = 0; i < nodes.size(); i++) {
+			assertTrue( ellipses.get(i) == alg.listInfo.get(i).ellipse);
+		}
 	}
 
 	/**

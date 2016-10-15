@@ -441,7 +441,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 *
 	 * @return true if valid and false if invalid
 	 */
-	private boolean findContour() {
+	boolean findContour() {
 		// find the node with the largest angleBetween
 		NodeInfo seed = listInfo.get(0);
 		for (int i = 1; i < listInfo.size(); i++) {
@@ -484,7 +484,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 * Selects the node on the contour which is closest to 90 degrees and is thus likely to be
 	 * a node on the corner
 	 */
-	private NodeInfo selectSeedCorner() {
+	NodeInfo selectSeedCorner() {
 		NodeInfo best = null;
 		double bestError = Double.MAX_VALUE;
 
