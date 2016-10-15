@@ -18,7 +18,7 @@
 
 package boofcv.deepboof;
 
-import boofcv.abst.scene.SceneClassifier;
+import boofcv.abst.scene.ImageClassifier;
 import boofcv.alg.color.ColorYuv;
 import boofcv.alg.filter.stat.ImageLocalNormalization;
 import boofcv.core.image.border.BorderType;
@@ -47,7 +47,7 @@ import static deepboof.misc.TensorOps.WI;
  *
  * @author Peter Abeles
  */
-public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> {
+public class ImageClassifierVggLikeCifar10 implements ImageClassifier<Planar<GrayF32>> {
 
 	FunctionSequence<Tensor_F32,Function<Tensor_F32>> network;
 
@@ -66,7 +66,8 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 
 	List<String> categoryNames = UtilCifar10.getClassNames();
 
-	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(ImageType.pl(3,GrayF32.class));
+	ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
+	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(imageType);
 
 	/**
 	 * Expects there to be two files in the provided directory:
@@ -89,6 +90,11 @@ public class SceneClassifierVggLike implements SceneClassifier<Planar<GrayF32>> 
 		BorderType type = BorderType.valueOf(stats.border);
 		localNorm = new ImageLocalNormalization<>(GrayF32.class, type);
 		kernel = DataManipulationOps.create1D_F32(stats.kernel);
+	}
+
+	@Override
+	public ImageType<Planar<GrayF32>> getInputType() {
+		return imageType;
 	}
 
 	/**

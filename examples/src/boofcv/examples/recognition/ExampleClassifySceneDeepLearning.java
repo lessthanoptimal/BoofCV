@@ -18,8 +18,8 @@
 
 package boofcv.examples.recognition;
 
-import boofcv.abst.scene.SceneClassifier;
-import boofcv.deepboof.SceneClassifierVggLike;
+import boofcv.abst.scene.ImageClassifier;
+import boofcv.deepboof.ImageClassifierVggLikeCifar10;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
@@ -41,31 +41,28 @@ public class ExampleClassifySceneDeepLearning {
 	public static void main(String[] args) throws IOException {
 		File modelHome = UtilCifar10.downloadModelVggLike( new File("download_data") );
 
-		SceneClassifier<Planar<GrayF32>> classifier = new SceneClassifierVggLike();
+		ImageClassifier<Planar<GrayF32>> classifier = new ImageClassifierVggLikeCifar10();
 		classifier.loadModel(modelHome);
 
 		// TODO get test images
-		String images[] = new String[]{"horse6.jpg","airplane.jpg","bird.jpg"};
+		String images[] = new String[]{"horse6.jpg","airplane.jpg"};
 
-		for( String imageName : images ) {
-			BufferedImage buffered = UtilImageIO.loadImage(imageName);
-			if (buffered == null)
-				throw new RuntimeException("Couldn't find input image");
+		BufferedImage buffered = UtilImageIO.loadImage(images[1]);
+		if( buffered == null)
+			throw new RuntimeException("Couldn't find input image");
 
-			Planar<GrayF32> image = new Planar<>(GrayF32.class, buffered.getWidth(), buffered.getHeight(), 3);
-			ConvertBufferedImage.convertFromMulti(buffered, image, true, GrayF32.class);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,buffered.getWidth(), buffered.getHeight(), 3);
+		ConvertBufferedImage.convertFromMulti(buffered,image,true,GrayF32.class);
 
-			classifier.classify(image);
+		classifier.classify(image);
 
-			List<String> categories = classifier.getCategories();
-			System.out.println();
-			System.out.println("         " + imageName);
-			System.out.println("Selected " + categories.get(classifier.getBestResult()));
-			System.out.println();
+		List<String> categories = classifier.getCategories();
+		System.out.println();
+		System.out.println("Selected "+categories.get( classifier.getBestResult()));
+		System.out.println();
 
-			for (SceneClassifier.Score score : classifier.getAllResults()) {
-				System.out.printf("%20s  %f\n", categories.get(score.category), score.score);
-			}
+		for( ImageClassifier.Score score : classifier.getAllResults() ) {
+			System.out.printf("%20s  %f\n",categories.get(score.category),score.score);
 		}
 	}
 }

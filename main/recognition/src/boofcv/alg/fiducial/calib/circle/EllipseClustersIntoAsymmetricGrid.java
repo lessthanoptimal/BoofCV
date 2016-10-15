@@ -89,7 +89,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		for (int i = 0; i < clusters.size(); i++) {
 			List<Node> cluster = clusters.get(i);
 			int clusterSize = cluster.size();
-			computeClusterInfo(ellipses, cluster);
+			computeNodeInfo(ellipses, cluster);
 
 			// finds all the nodes in the outside of the cluster
 			if( !findContour() )
@@ -365,7 +365,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 				seed.ellipse.center.x - next.ellipse.center.x );
 	}
 
-	void computeClusterInfo(List<EllipseRotated_F64> ellipses , List<Node> cluster ) {
+	/**
+	 * For each cluster create a {@link NodeInfo} and compute different properties
+	 */
+	void computeNodeInfo(List<EllipseRotated_F64> ellipses , List<Node> cluster ) {
 
 		// create an info object for each member inside of the cluster
 		listInfo.reset();

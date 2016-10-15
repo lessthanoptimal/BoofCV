@@ -20,25 +20,14 @@ package boofcv.abst.scene;
 
 import boofcv.struct.image.ImageBase;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
- * High level interface for scene classification.  In scene classification a label is applied to the image to describe
- * what is being shown in it.  This interface provides support for classifiers with a finite number of categories.
+ * High level interface for a classifier which assigns a single category to an image.
  *
  * @author Peter Abeles
  */
-public interface SceneClassifier<T extends ImageBase> {
-
-	/**
-	 * Loads the model at the specified location.  See documentation of the classifier for what needs to be
-	 * passed in here.
-	 *
-	 * @param path Path to directory or file containing the model
-	 */
-	void loadModel( File path ) throws IOException;
+public interface ImageClassifier<T extends ImageBase<T>> extends ImageModelBase<T> {
 
 	/**
 	 * Process the image and determine which category it belongs to.  Will throw an exception if the model has

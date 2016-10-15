@@ -100,7 +100,12 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	}
 
 	@Test
-	public void computeClusterInfo() {
+	public void computeNodeInfo() {
+		List<Node> cluster = new ArrayList<>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
+
+		
+
 		fail("implement");
 	}
 
