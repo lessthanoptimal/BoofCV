@@ -23,9 +23,9 @@ Version : 0.25
 - Added support for F64 to F32 autocoding from regular F64 classes
 - 360 / Spherical camera support
   * Equirectangular image support.  coordinates and redistortion
-  * Equirectangular distort to pinhole
-  * Equirectangular distort to cylinder
-  * Equirectangular rotate image
+  * Equirectangular to pinhole
+  * Equirectangular to cylinder
+  * Equirectangular rotate
 - Dirty flag was not being set to false for cached image distort single band
 - Changed minimum Java language level from 6 to 7
 - Camera Model
@@ -36,8 +36,10 @@ Version : 0.25
   * Changed save format to textual protobufs for camera model parameters.
   * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
 - Deleted BoofAndroidFiles because you can now simply use the protobuf format
+- Deep Learning
+  * Integrated in DeepBoof to provide support for deep artificial neural networks (ANN)
+  * Pre trained VGG-like model is provided for scene classification
 
-- TODO integrate DeepBoof scene classification
 - TODO dual fisheye to equirectangular image
 - TODO fisheye
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
