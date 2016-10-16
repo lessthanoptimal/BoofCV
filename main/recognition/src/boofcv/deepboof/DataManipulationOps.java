@@ -53,11 +53,10 @@ public class DataManipulationOps {
 	 * @return The kernel
 	 */
 	public static Kernel1D_F32 create1D_F32( double[] kernel ) {
-		Kernel1D_F32 k = new Kernel1D_F32(kernel.length);
+		Kernel1D_F32 k = new Kernel1D_F32(kernel.length,kernel.length/2);
 		for (int i = 0; i < kernel.length; i++) {
 			k.data[i] = (float)kernel[i];
 		}
-		k.offset = kernel.length/2;
 		return k;
 	}
 
