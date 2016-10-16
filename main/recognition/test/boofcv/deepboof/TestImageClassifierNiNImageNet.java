@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestSceneClassifierVggLike {
+public class TestImageClassifierNiNImageNet {
 	@Test
 	public void stuff() {
 		fail("implement");

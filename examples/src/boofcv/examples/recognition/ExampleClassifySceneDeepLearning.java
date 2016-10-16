@@ -19,7 +19,7 @@
 package boofcv.examples.recognition;
 
 import boofcv.abst.scene.ImageClassifier;
-import boofcv.deepboof.ImageClassifierVggLikeCifar10;
+import boofcv.deepboof.ImageClassifierVggCifar10;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
@@ -41,7 +41,7 @@ public class ExampleClassifySceneDeepLearning {
 	public static void main(String[] args) throws IOException {
 		File modelHome = UtilCifar10.downloadModelVggLike( new File("download_data") );
 
-		ImageClassifier<Planar<GrayF32>> classifier = new ImageClassifierVggLikeCifar10();
+		ImageClassifier<Planar<GrayF32>> classifier = new ImageClassifierVggCifar10();
 		classifier.loadModel(modelHome);
 
 		// TODO get test images

@@ -130,6 +130,8 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 		Planar<GrayF32> rgb;
 		if( image.width == imageSize && image.height == imageSize ) {
 			rgb = image;
+		} else if( image.width < imageSize || image.height < imageSize ) {
+			throw new IllegalArgumentException("Image width or height is too small");
 		} else {
 			rgb = this.imageRgb;
 			massage.massage(image,rgb);

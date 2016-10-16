@@ -47,14 +47,16 @@ import static deepboof.misc.TensorOps.WI;
  *
  * @author Peter Abeles
  */
-public class ImageClassifierVggLikeCifar10 implements ImageClassifier<Planar<GrayF32>> {
+public class ImageClassifierVggCifar10 implements ImageClassifier<Planar<GrayF32>> {
 
 	FunctionSequence<Tensor_F32,Function<Tensor_F32>> network;
 
-	Planar<GrayF32> rgb32 = new Planar<>(GrayF32.class,32,32,3);
-	Planar<GrayF32> yuv32 = new Planar<>(GrayF32.class,32,32,3);
+	final int inputSize = 32;
 
-	Tensor_F32 tensorYuv = new Tensor_F32(1,3,32,32);
+	Planar<GrayF32> rgb32 = new Planar<>(GrayF32.class,inputSize,inputSize,3);
+	Planar<GrayF32> yuv32 = new Planar<>(GrayF32.class,inputSize,inputSize,3);
+
+	Tensor_F32 tensorYuv = new Tensor_F32(1,3,inputSize,inputSize);
 	Tensor_F32 output;
 
 	ImageLocalNormalization<GrayF32> localNorm;
@@ -107,8 +109,10 @@ public class ImageClassifierVggLikeCifar10 implements ImageClassifier<Planar<Gra
 	public void classify(Planar<GrayF32> image) {
 		// shrink then convert into YUV
 		Planar<GrayF32> rgb32;
-		if( image.width == 32 && image.height == 32 ) {
+		if( image.width == inputSize && image.height == inputSize ) {
 			rgb32 = image;
+		} else if( image.width < inputSize || image.height < inputSize ) {
+			throw new IllegalArgumentException("Image width or height is too small");
 		} else {
 			rgb32 = this.rgb32;
 			massage.massage(image,rgb32);
