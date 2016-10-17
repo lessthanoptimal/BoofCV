@@ -26,8 +26,19 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestClipAndReduce {
+
 	@Test
-	public void stuff() {
+	public void massage_clipped() {
+		fail("implement");
+	}
+
+	@Test
+	public void massage_scaled() {
+		fail("implement");
+	}
+
+	@Test
+	public void clipInput() {
 		fail("implement");
 	}
 }
