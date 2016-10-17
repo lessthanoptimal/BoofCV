@@ -33,7 +33,8 @@ public interface ImageClassifier<T extends ImageBase<T>> extends ImageModelBase<
 	 * Process the image and determine which category it belongs to.  Will throw an exception if the model has
 	 * not been loaded yet.
 	 *
-	 * @param image Image being processed
+	 * @param image Image being processed.  All pixel values have a range of 0 to 255.  If a color image then the
+	 *              bands will be in red, green, blue order.
 	 */
 	void classify( T image );
 

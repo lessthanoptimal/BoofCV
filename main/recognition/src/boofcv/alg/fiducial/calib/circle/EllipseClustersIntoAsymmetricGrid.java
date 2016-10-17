@@ -327,6 +327,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 		List<NodeInfo> line = new ArrayList<NodeInfo>();
 		line.add( seed );
+		line.add( next );
 
 		for( int i = 0; i < clusterSize+1; i++) {
 			// find the child of next which is within tolerance and closest to it
@@ -361,8 +362,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 	}
 
 	private static double direction(NodeInfo seed, NodeInfo next) {
-		return Math.atan2( seed.ellipse.center.y - next.ellipse.center.y ,
-				seed.ellipse.center.x - next.ellipse.center.x );
+		return Math.atan2( next.ellipse.center.y - seed.ellipse.center.y ,
+				next.ellipse.center.x - seed.ellipse.center.x );
 	}
 
 	/**

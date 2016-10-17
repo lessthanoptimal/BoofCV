@@ -69,7 +69,7 @@ public class ImageClassifierVggCifar10 implements ImageClassifier<Planar<GrayF32
 	List<String> categoryNames = UtilCifar10.getClassNames();
 
 	ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(imageType);
+	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true,imageType);
 
 	/**
 	 * Expects there to be two files in the provided directory:

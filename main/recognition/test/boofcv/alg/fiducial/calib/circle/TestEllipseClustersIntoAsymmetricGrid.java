@@ -82,12 +82,37 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void selectSeedNext() {
-		fail("implement");
+		// create a grid from which a known solution can be easily extracted
+		int rows = 5; int cols = 4;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+
+		NodeInfo found = EllipseClustersIntoAsymmetricGrid.selectSeedNext(
+				alg.listInfo.get(0),alg.listInfo.get(1),alg.listInfo.get(cols));
+
+		assertTrue( found == alg.listInfo.get(cols+1));
 	}
 
 	@Test
 	public void findLine() {
-		fail("implement");
+		// create a grid from which a known solution can be easily extracted
+		int rows = 5; int cols = 4;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows,cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		List<NodeInfo> line;
+		line = EllipseClustersIntoAsymmetricGrid.findLine(alg.listInfo.get(0),alg.listInfo.get(1),5*4);
+
+		assertEquals(4, line.size());
+		for (int i = 0; i < cols; i++) {
+			assertEquals( line.get(i).ellipse.center.x , i , 1e-6 );
+			assertEquals( line.get(i).ellipse.center.y , 0 , 1e-6 );
+		}
 	}
 
 	@Test

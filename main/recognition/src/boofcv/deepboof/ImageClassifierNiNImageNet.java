@@ -19,6 +19,7 @@
 package boofcv.deepboof;
 
 import boofcv.abst.scene.ImageClassifier;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -46,6 +47,7 @@ import static deepboof.misc.TensorOps.WI;
  */
 // https://gist.github.com/szagoruyko/0f5b4c5e2d2b18472854
 // https://github.com/soumith/imagenet-multiGPU.torch/blob/master/models/ninbn.lua
+// https://github.com/szagoruyko/torch-opencv-demos
 // TODO compare to torch results
 public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF32>> {
 
@@ -59,16 +61,18 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 	List<String> categories = new ArrayList<>();
 
 	ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(imageType);
 
-	int imageSize = 256;
+	// Resizes input image for the network
+	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true,imageType);
+
+//	int imageSize = 256;
 	int imageCrop = 224;
 
-	// Regular input image
-	Planar<GrayF32> imageRgb = new Planar<>(GrayF32.class,imageSize,imageSize,3);
-	// Input image after cropping
-	Planar<GrayF32> cropRgbSub;
-	Planar<GrayF32> cropRgb = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
+	//  Input image adjusted to network input size
+	Planar<GrayF32> imageRgb = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
+
+	// Input image with the bands in the correct order
+	Planar<GrayF32> imageBgr = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
 
 	// Storage for the tensor into the image
 	Tensor_F32 tensorInput = new Tensor_F32(1,3,imageCrop,imageCrop);
@@ -122,33 +126,34 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 	 * The original implementation takes in an image then crops it randomly.  This is primarily for training but is
 	 * replicated here to reduce the number of differences
 	 *
-	 * @param image Image being processed
+	 * @param image Image being processed.  Must be RGB image.  Pixel values must have values from 0 to 255.
 	 */
 	@Override
 	public void classify(Planar<GrayF32> image) {
 		// Shrink the image to input size
-		Planar<GrayF32> rgb;
-		if( image.width == imageSize && image.height == imageSize ) {
-			rgb = image;
-		} else if( image.width < imageSize || image.height < imageSize ) {
+		if( image.width == imageCrop && image.height == imageCrop ) {
+			this.imageRgb.setTo(image);
+		} else if( image.width < imageCrop || image.height < imageCrop ) {
 			throw new IllegalArgumentException("Image width or height is too small");
 		} else {
-			rgb = this.imageRgb;
-			massage.massage(image,rgb);
+			massage.massage(image,imageRgb);
 		}
 
-		// crop it now
-		// TODO do something more intelligent here
-		cropRgbSub = rgb.subimage(0,0,imageCrop,imageCrop, cropRgbSub);
-		cropRgb.setTo(cropRgbSub);
+		// image net is BGR color order
+		imageBgr.bands[0] = imageRgb.bands[2];
+		imageBgr.bands[1] = imageRgb.bands[1];
+		imageBgr.bands[2] = imageRgb.bands[0];
 
-		// Normalize the image
+		// image needs to be between 0 and 1
+		GPixelMath.divide(imageBgr,255,imageBgr);
+
+		// Normalize the image's statistics
 		for (int band = 0; band < 3; band++) {
-			DataManipulationOps.normalize(cropRgb.getBand(band),mean[band],stdev[band]);
+			DataManipulationOps.normalize(imageBgr.getBand(band),mean[band],stdev[band]);
 		}
 
 		// Convert into a tensor and process
-		DataManipulationOps.imageToTensor(cropRgb,tensorInput,0);
+		DataManipulationOps.imageToTensor(imageBgr,tensorInput,0);
 
 		network.process(tensorInput,tensorOutput);
 

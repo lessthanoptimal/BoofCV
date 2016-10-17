@@ -47,7 +47,10 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	// class used to distort the image/shrink it
 	ImageDistort<T,T> distort;
 
-	public ClipAndReduce(ImageType<T> imageType ) {
+	boolean clip;
+
+	public ClipAndReduce( boolean clip , ImageType<T> imageType ) {
+		this.clip = clip;
 		InterpolatePixel<T> interp =
 				FactoryInterpolation.createPixel(0,255, TypeInterpolate.BILINEAR, BorderType.EXTENDED,imageType);
 		distort = FactoryDistort.distort(false,interp,imageType);
@@ -60,15 +63,23 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	 * @param output Output image
 	 */
 	public void massage( T input , T output ) {
-		T inputAdjusted = clipInput(input, output);
+		if( clip ) {
+			T inputAdjusted = clipInput(input, output);
 
-		// configure a simple change in scale for both axises
-		double scale = input.width / (double) output.width;
-		transform.a11 = (float)scale;
-		transform.a22 = (float)scale;
+			// configure a simple change in scale for both axises
+			double scale = input.width / (double) output.width;
+			transform.a11 = (float) scale;
+			transform.a22 = (float) scale;
+			// this change is automatically reflected in the distortion class.  It is configured to cache nothing
 
-		// this change is automatically reflected in the distortion class.  It is configured to cache nothing
-		distort.apply(input, output);
+			distort.apply(inputAdjusted, output);
+		} else {
+			// scale each axis independently.  It will have the whole image but it will be distorted
+			transform.a11 = (float) (input.width / (double) output.width);
+			transform.a22 = (float) (input.height / (double) output.height);
+
+			distort.apply(input, output);
+		}
 
 	}
 
