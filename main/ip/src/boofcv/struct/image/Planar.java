@@ -245,6 +245,19 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 		return out;
 	}
 
+	/**
+	 * Changes the bands order
+	 * @param order The new band order
+	 */
+	public void reorderBands( int ...order ) {
+		T[] bands = (T[]) Array.newInstance(type, order.length);
+
+		for (int i = 0; i < order.length; i++) {
+			bands[i] = this.bands[order[i]];
+		}
+		this.bands = bands;
+	}
+
 	public void setBandType(Class<T> type) {
 		this.type = type;
 	}

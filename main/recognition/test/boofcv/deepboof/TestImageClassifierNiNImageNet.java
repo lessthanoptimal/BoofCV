@@ -18,16 +18,44 @@
 
 package boofcv.deepboof;
 
+import boofcv.abst.scene.ImageClassifier;
+import deepboof.io.torch7.ParseBinaryTorch7;
+import deepboof.tensors.Tensor_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
+// TODO convert into a regression test
 public class TestImageClassifierNiNImageNet {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compareToTorch() throws IOException {
+		File path = new File("test/boofcv/deepboof");
+
+		Tensor_F32 input = new ParseBinaryTorch7().parseIntoBoof(new File(path,"nin_input"));
+		Tensor_F32 output = new ParseBinaryTorch7().parseIntoBoof(new File(path,"nin_output"));
+
+		ImageClassifierNiNImageNet alg = new ImageClassifierNiNImageNet();
+		alg.loadModel(new File("../../"));
+
+		// skip all the proccessing
+		alg.innerProcess(input);
+
+		List<ImageClassifier.Score> scores = alg.getAllResults();
+
+		for (int i = 0; i < scores.size(); i++) {
+			ImageClassifier.Score score = scores.get(i);
+
+			float expected = output.get(0,score.category);
+
+//			System.out.printf("%6.2f    %6.2f\n",expected,score.score);
+			assertEquals(expected,score.score,1e-4f);
+		}
 	}
 }

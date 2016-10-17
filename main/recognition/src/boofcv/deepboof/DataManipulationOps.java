@@ -87,4 +87,33 @@ public class DataManipulationOps {
 			System.arraycopy(band.data, 0,output.d,indexOut,length);
 		}
 	}
+
+	public static Planar<GrayF32> tensorToImage( Tensor_F32 input , Planar<GrayF32> output , int miniBatch ) {
+		if( input.getDimension() != 4 )
+			throw new IllegalArgumentException("Input should be 4-DOF.  batch + spatial (channel,height,width)");
+
+		int bands = input.length(1);
+		int height = input.length(2);
+		int width = input.length(3);
+
+		if( output == null ) {
+			output = new Planar<>(GrayF32.class,width,height,bands);
+		} else {
+			if (input.length(1) != output.getNumBands())
+				throw new IllegalArgumentException("Number of bands don't match");
+			if (input.length(2) != output.getHeight())
+				throw new IllegalArgumentException("Spatial height doesn't match");
+			if (input.length(3) != output.getWidth())
+				throw new IllegalArgumentException("Spatial width doesn't match");
+		}
+		for (int i = 0; i < bands; i++) {
+			int indexIn = input.idx(miniBatch,i,0,0);
+			GrayF32 band = output.getBand(i);
+
+			int length = output.width*output.height;
+			System.arraycopy(input.d,indexIn,band.data,0,length);
+		}
+
+		return output;
+	}
 }

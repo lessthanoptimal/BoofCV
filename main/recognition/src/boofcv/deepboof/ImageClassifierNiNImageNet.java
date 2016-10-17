@@ -130,6 +130,14 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 	 */
 	@Override
 	public void classify(Planar<GrayF32> image) {
+		preprocess(image);
+		innerProcess(tensorInput);
+	}
+
+	/**
+	 * Massage the input image into a format recognized by the network
+	 */
+	private void preprocess(Planar<GrayF32> image) {
 		// Shrink the image to input size
 		if( image.width == imageCrop && image.height == imageCrop ) {
 			this.imageRgb.setTo(image);
@@ -152,9 +160,12 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 			DataManipulationOps.normalize(imageBgr.getBand(band),mean[band],stdev[band]);
 		}
 
-		// Convert into a tensor and process
+		// convert into a tensor
 		DataManipulationOps.imageToTensor(imageBgr,tensorInput,0);
+	}
 
+
+	protected void innerProcess( Tensor_F32 tensorInput ) {
 		network.process(tensorInput,tensorOutput);
 
 		// TODO turn into a function

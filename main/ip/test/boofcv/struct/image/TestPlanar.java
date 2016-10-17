@@ -172,4 +172,9 @@ public class TestPlanar {
 		BoofTesting.assertEquals(imgA, imgB, 1e-8);
 		BoofTesting.assertEquals(imgA, found, 1e-8);
 	}
+
+	@Test
+	public void reorderBands() {
+		fail("IMplement");
+	}
 }

@@ -20,6 +20,8 @@ package boofcv.deepboof;
 
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.fail;
 
 /**
@@ -27,7 +29,7 @@ import static org.junit.Assert.fail;
  */
 public class TestImageClassifierVggCifar10 {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void compareToTorch() throws IOException {
+		fail("Implement"); // TODO convert into regression test
 	}
 }
