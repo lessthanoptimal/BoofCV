@@ -18,27 +18,22 @@
 
 package boofcv.deepboof;
 
-import boofcv.abst.scene.ImageClassifier;
 import boofcv.alg.color.ColorYuv;
 import boofcv.alg.filter.stat.ImageLocalNormalization;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import deepboof.Function;
 import deepboof.datasets.UtilCifar10;
-import deepboof.graph.FunctionSequence;
 import deepboof.io.torch7.ParseBinaryTorch7;
 import deepboof.io.torch7.SequenceAndParameters;
 import deepboof.models.DeepModelIO;
 import deepboof.models.YuvStatistics;
 import deepboof.tensors.Tensor_F32;
-import org.ddogleg.struct.FastQueue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import static deepboof.misc.TensorOps.WI;
 
@@ -47,29 +42,21 @@ import static deepboof.misc.TensorOps.WI;
  *
  * @author Peter Abeles
  */
-public class ImageClassifierVggCifar10 implements ImageClassifier<Planar<GrayF32>> {
+public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 
-	FunctionSequence<Tensor_F32,Function<Tensor_F32>> network;
+	static final int inputSize = 32;
 
-	final int inputSize = 32;
-
-	Planar<GrayF32> rgb32 = new Planar<>(GrayF32.class,inputSize,inputSize,3);
-	Planar<GrayF32> yuv32 = new Planar<>(GrayF32.class,inputSize,inputSize,3);
-
-	Tensor_F32 tensorYuv = new Tensor_F32(1,3,inputSize,inputSize);
-	Tensor_F32 output;
+	Planar<GrayF32> imageYuv = new Planar<>(GrayF32.class,inputSize,inputSize,3);
 
 	ImageLocalNormalization<GrayF32> localNorm;
 	YuvStatistics stats;
 	Kernel1D_F32 kernel;
 
-	FastQueue<Score> categoryScores = new FastQueue<>(Score.class,true);
-	int categoryBest;
+	public ImageClassifierVggCifar10() {
+		super(inputSize);
+		categories.addAll(UtilCifar10.getClassNames());
 
-	List<String> categoryNames = UtilCifar10.getClassNames();
-
-	ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true,imageType);
+	}
 
 	/**
 	 * Expects there to be two files in the provided directory:
@@ -86,8 +73,8 @@ public class ImageClassifierVggCifar10 implements ImageClassifier<Planar<GrayF32
 		SequenceAndParameters<Tensor_F32, Function<Tensor_F32>> sequence =
 				new ParseBinaryTorch7().parseIntoBoof(new File(directory,"model.net"));
 
-		network = sequence.createForward(3,32,32);
-		output = new Tensor_F32(WI(1,network.getOutputShape()));
+		network = sequence.createForward(3,inputSize,inputSize);
+		tensorOutput = new Tensor_F32(WI(1,network.getOutputShape()));
 
 		BorderType type = BorderType.valueOf(stats.border);
 		localNorm = new ImageLocalNormalization<>(GrayF32.class, type);
@@ -95,71 +82,16 @@ public class ImageClassifierVggCifar10 implements ImageClassifier<Planar<GrayF32
 	}
 
 	@Override
-	public ImageType<Planar<GrayF32>> getInputType() {
-		return imageType;
-	}
+	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
+		super.preprocess(image);
 
-	/**
-	 * Classifies the input image.  The input image can be any shape, but will be mangled until
-	 * it's 32x32 internally.   It must be an RGB image with pixel values from 0 to 255.
-	 *
-	 * @param image Image being processed
-	 */
-	@Override
-	public void classify(Planar<GrayF32> image) {
-		// shrink then convert into YUV
-		Planar<GrayF32> rgb32;
-		if( image.width == inputSize && image.height == inputSize ) {
-			rgb32 = image;
-		} else if( image.width < inputSize || image.height < inputSize ) {
-			throw new IllegalArgumentException("Image width or height is too small");
-		} else {
-			rgb32 = this.rgb32;
-			massage.massage(image,rgb32);
-		}
-		ColorYuv.rgbToYuv_F32(rgb32,yuv32);
+		ColorYuv.rgbToYuv_F32(imageRgb, imageYuv);
 
 		// Normalize the image
-		localNorm.zeroMeanStdOne(kernel,yuv32.getBand(0),255.0,1e-4,yuv32.getBand(0));
-		DataManipulationOps.normalize(yuv32.getBand(1), (float)stats.meanU, (float)stats.stdevU);
-		DataManipulationOps.normalize(yuv32.getBand(2), (float)stats.meanV, (float)stats.stdevV);
+		localNorm.zeroMeanStdOne(kernel, imageYuv.getBand(0),255.0,1e-4, imageYuv.getBand(0));
+		DataManipulationOps.normalize(imageYuv.getBand(1), (float)stats.meanU, (float)stats.stdevU);
+		DataManipulationOps.normalize(imageYuv.getBand(2), (float)stats.meanV, (float)stats.stdevV);
 
-		// Convert it from an image into a tensor
-		DataManipulationOps.imageToTensor(yuv32,tensorYuv,0);
-
-		// Feed it through the CNN
-		network.process(tensorYuv,output);
-
-		// Examine and save results
-		categoryScores.reset();
-		double scoreBest = -Double.MAX_VALUE;
-		categoryBest = -1;
-		for (int category = 0; category < output.length(1); category++) {
-			double score = output.get(0,category);
-			categoryScores.grow().set(score,category);
-			if( score > scoreBest ) {
-				scoreBest = score;
-				categoryBest = category;
-			}
-		}
-	}
-
-	@Override
-	public int getBestResult() {
-		return categoryBest;
-	}
-
-	@Override
-	public List<Score> getAllResults() {
-		return categoryScores.toList();
-	}
-
-	@Override
-	public List<String> getCategories() {
-		return categoryNames;
-	}
-
-	public Planar<GrayF32> getRgb32() {
-		return rgb32;
+		return imageYuv;
 	}
 }

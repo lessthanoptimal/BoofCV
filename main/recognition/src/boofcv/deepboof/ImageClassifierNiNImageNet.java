@@ -18,24 +18,19 @@
 
 package boofcv.deepboof;
 
-import boofcv.abst.scene.ImageClassifier;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import deepboof.Function;
-import deepboof.graph.FunctionSequence;
 import deepboof.io.torch7.ConvertTorchToBoofForward;
 import deepboof.io.torch7.ParseAsciiTorch7;
 import deepboof.io.torch7.ParseBinaryTorch7;
 import deepboof.io.torch7.SequenceAndParameters;
 import deepboof.io.torch7.struct.*;
 import deepboof.tensors.Tensor_F32;
-import org.ddogleg.struct.FastQueue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static deepboof.misc.TensorOps.WI;
@@ -49,38 +44,22 @@ import static deepboof.misc.TensorOps.WI;
 // https://github.com/soumith/imagenet-multiGPU.torch/blob/master/models/ninbn.lua
 // https://github.com/szagoruyko/torch-opencv-demos
 // TODO compare to torch results
-public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF32>> {
-
-	FunctionSequence<Tensor_F32,Function<Tensor_F32>> network;
+public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 
 	// normalization parameters
 	float mean[];
 	float stdev[];
 
-	// List of all the categories
-	List<String> categories = new ArrayList<>();
-
-	ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
-
-	// Resizes input image for the network
-	ClipAndReduce<Planar<GrayF32>> massage = new ClipAndReduce<>(true,imageType);
-
 //	int imageSize = 256;
-	int imageCrop = 224;
+	private static final int imageCrop = 224;
 
-	//  Input image adjusted to network input size
-	Planar<GrayF32> imageRgb = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
 
 	// Input image with the bands in the correct order
 	Planar<GrayF32> imageBgr = new Planar<>(GrayF32.class,imageCrop,imageCrop,3);
 
-	// Storage for the tensor into the image
-	Tensor_F32 tensorInput = new Tensor_F32(1,3,imageCrop,imageCrop);
-	Tensor_F32 tensorOutput;
-
-	// storage for the final output
-	FastQueue<Score> categoryScores = new FastQueue<>(Score.class,true);
-	int categoryBest;
+	public ImageClassifierNiNImageNet() {
+		super(imageCrop);
+	}
 
 	@Override
 	public void loadModel(File directory) throws IOException {
@@ -117,35 +96,12 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 		return ret;
 	}
 
-	@Override
-	public ImageType<Planar<GrayF32>> getInputType() {
-		return imageType;
-	}
-
-	/**
-	 * The original implementation takes in an image then crops it randomly.  This is primarily for training but is
-	 * replicated here to reduce the number of differences
-	 *
-	 * @param image Image being processed.  Must be RGB image.  Pixel values must have values from 0 to 255.
-	 */
-	@Override
-	public void classify(Planar<GrayF32> image) {
-		preprocess(image);
-		innerProcess(tensorInput);
-	}
 
 	/**
 	 * Massage the input image into a format recognized by the network
 	 */
-	private void preprocess(Planar<GrayF32> image) {
-		// Shrink the image to input size
-		if( image.width == imageCrop && image.height == imageCrop ) {
-			this.imageRgb.setTo(image);
-		} else if( image.width < imageCrop || image.height < imageCrop ) {
-			throw new IllegalArgumentException("Image width or height is too small");
-		} else {
-			massage.massage(image,imageRgb);
-		}
+	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
+		super.preprocess(image);
 
 		// image net is BGR color order
 		imageBgr.bands[0] = imageRgb.bands[2];
@@ -160,41 +116,6 @@ public class ImageClassifierNiNImageNet implements ImageClassifier<Planar<GrayF3
 			DataManipulationOps.normalize(imageBgr.getBand(band),mean[band],stdev[band]);
 		}
 
-		// convert into a tensor
-		DataManipulationOps.imageToTensor(imageBgr,tensorInput,0);
-	}
-
-
-	protected void innerProcess( Tensor_F32 tensorInput ) {
-		network.process(tensorInput,tensorOutput);
-
-		// TODO turn into a function
-		// Examine and save results
-		categoryScores.reset();
-		double scoreBest = -Double.MAX_VALUE;
-		categoryBest = -1;
-		for (int category = 0; category < tensorOutput.length(1); category++) {
-			double score = tensorOutput.get(0,category);
-			categoryScores.grow().set(score,category);
-			if( score > scoreBest ) {
-				scoreBest = score;
-				categoryBest = category;
-			}
-		}
-	}
-
-	@Override
-	public int getBestResult() {
-		return categoryBest;
-	}
-
-	@Override
-	public List<Score> getAllResults() {
-		return categoryScores.toList();
-	}
-
-	@Override
-	public List<String> getCategories() {
-		return categories;
+		return imageBgr;
 	}
 }

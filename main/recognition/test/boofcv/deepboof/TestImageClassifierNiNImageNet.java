@@ -21,6 +21,7 @@ package boofcv.deepboof;
 import boofcv.abst.scene.ImageClassifier;
 import deepboof.io.torch7.ParseBinaryTorch7;
 import deepboof.tensors.Tensor_F32;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,14 +29,24 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Peter Abeles
  */
 // TODO convert into a regression test
 public class TestImageClassifierNiNImageNet {
+
+	@Before
+	public void downloadModels() {
+		if( !"true".equals(System.getProperty("runSlowTests")))
+			return;
+	}
+
 	@Test
 	public void compareToTorch() throws IOException {
+		assumeTrue("true".equals(System.getProperty("runSlowTests")));
+
 		File path = new File("test/boofcv/deepboof");
 
 		Tensor_F32 input = new ParseBinaryTorch7().parseIntoBoof(new File(path,"nin_input"));
@@ -44,7 +55,8 @@ public class TestImageClassifierNiNImageNet {
 		ImageClassifierNiNImageNet alg = new ImageClassifierNiNImageNet();
 		alg.loadModel(new File("../../"));
 
-		// skip all the proccessing
+		// Call an inner function which processes the tensor
+		// much easier to compare against the original network this way
 		alg.innerProcess(input);
 
 		List<ImageClassifier.Score> scores = alg.getAllResults();

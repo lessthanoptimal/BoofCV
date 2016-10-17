@@ -39,8 +39,8 @@ Version : 0.25
 - Deep Learning
   * Integrated in DeepBoof to provide support for deep artificial neural networks (ANN)
 - Image Classification
-  * Pre trained VGG-like trained on CIFAR10  (10 categories at 89.9%)
-  * Pre trained Network-in-Network trained on ImageNet (1000 categories at 62.6%)  TODO validate correctness
+  * VGG trained on CIFAR10  (10 categories at 89.9%)
+  * Network-in-Network trained on ImageNet (1000 categories at 62.6%)
 
 - TODO dual fisheye to equirectangular image
 - TODO fisheye
