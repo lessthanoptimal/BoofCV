@@ -19,35 +19,42 @@
 package boofcv.examples.recognition;
 
 import boofcv.abst.scene.ImageClassifier;
-import boofcv.deepboof.ImageClassifierVggCifar10;
+import boofcv.factory.scene.ClassifierAndSource;
+import boofcv.factory.scene.FactoryImageClassifier;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
-import deepboof.datasets.UtilCifar10;
+import deepboof.io.DeepBoofDataBaseOps;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * // TODO comment
+ * This example shows how to create an image classifier using the high level factory, download the model, load it,
+ * process images, and then look at the results.
  *
  * @author Peter Abeles
  */
-public class ExampleClassifySceneDeepLearning {
+// TODO visualize results.  Show image and the class labels
+public class ExampleImageClassification {
 
 	public static void main(String[] args) throws IOException {
-		File modelHome = UtilCifar10.downloadModelVggLike( new File("download_data") );
+		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();
+//		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet();
 
-		ImageClassifier<Planar<GrayF32>> classifier = new ImageClassifierVggCifar10();
-		classifier.loadModel(modelHome);
+		File path = DeepBoofDataBaseOps.downloadModel(cs.getSource(),new File("download_data"));
+
+		ImageClassifier<Planar<GrayF32>> classifier = cs.getClassifier();
+		classifier.loadModel(path);
 
 		// TODO get test images
-		String images[] = new String[]{"horse6.jpg","airplane.jpg"};
+		String images[] = new String[]{"horse4.jpg","airplane.jpg"};
 
-		BufferedImage buffered = UtilImageIO.loadImage(images[1]);
+		BufferedImage buffered = UtilImageIO.loadImage(images[0]);
 		if( buffered == null)
 			throw new RuntimeException("Couldn't find input image");
 
@@ -61,8 +68,10 @@ public class ExampleClassifySceneDeepLearning {
 		System.out.println("Selected "+categories.get( classifier.getBestResult()));
 		System.out.println();
 
-		for( ImageClassifier.Score score : classifier.getAllResults() ) {
-			System.out.printf("%20s  %f\n",categories.get(score.category),score.score);
+		List<ImageClassifier.Score> scores = new ArrayList<>(classifier.getAllResults());
+		int N = Math.min(5,scores.size());
+		for( ImageClassifier.Score score : scores.subList(0,N) ) {
+			System.out.printf(" %7.3f  %s\n",score.score,categories.get(score.category));
 		}
 	}
 }
