@@ -99,8 +99,8 @@ public class VisualizeSquareBinaryFiducial {
 
 	public static class Detector extends DetectFiducialSquareBinary<GrayF32> {
 
-		public List<GrayU8> squares = new ArrayList<GrayU8>();
-		public List<GrayF32> squaresGray = new ArrayList<GrayF32>();
+		public List<GrayU8> squares = new ArrayList<>();
+		public List<GrayF32> squaresGray = new ArrayList<>();
 
 		protected Detector( int gridWidth, double borderWidth , InputToBinary<GrayF32> inputToBinary ) {
 			super(gridWidth,borderWidth,0.65,inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class)

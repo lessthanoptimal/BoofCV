@@ -45,12 +45,12 @@ public class TestDescribePointSurfPlanar {
 	 */
 	@Test
 	public void compareToSingleBand() {
-		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,width,height,3);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
 
 		GImageMiscOps.addUniform(input,rand,0,200);
 
-		DescribePointSurf<GrayF32> desc = new DescribePointSurf<GrayF32>(GrayF32.class);
-		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<GrayF32>(desc,3);
+		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
+		DescribePointSurfPlanar<GrayF32> alg = new DescribePointSurfPlanar<>(desc,3);
 
 		GrayF32 gray = ConvertImage.average(input,null);
 

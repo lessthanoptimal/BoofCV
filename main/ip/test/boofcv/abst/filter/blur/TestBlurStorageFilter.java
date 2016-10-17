@@ -50,7 +50,7 @@ public class TestBlurStorageFilter {
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("gaussian",c,-1,2);
+			BlurStorageFilter alg = new BlurStorageFilter<>("gaussian",c,-1,2);
 
 			GBlurImageOps.gaussian(input,found,-1,2,storage);
 
@@ -70,7 +70,7 @@ public class TestBlurStorageFilter {
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("mean",c,2);
+			BlurStorageFilter alg = new BlurStorageFilter<>("mean",c,2);
 
 			GBlurImageOps.mean(input,found,2,storage);
 
@@ -89,7 +89,7 @@ public class TestBlurStorageFilter {
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<GrayU8>("median",c,2);
+			BlurStorageFilter alg = new BlurStorageFilter<>("median",c,2);
 
 			GBlurImageOps.median(input,found,2);
 

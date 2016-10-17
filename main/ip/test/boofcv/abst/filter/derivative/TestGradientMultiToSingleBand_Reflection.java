@@ -48,8 +48,8 @@ public class TestGradientMultiToSingleBand_Reflection {
 			assertTrue(alg.getInputType().getFamily() == ImageType.Family.PLANAR );
 			assertTrue(alg.getOutputType() == GrayF32.class);
 
-			Planar<GrayF32> inX = new Planar<GrayF32>(GrayF32.class,10,12,3);
-			Planar<GrayF32> inY = new Planar<GrayF32>(GrayF32.class,10,12,3);
+			Planar<GrayF32> inX = new Planar<>(GrayF32.class,10,12,3);
+			Planar<GrayF32> inY = new Planar<>(GrayF32.class,10,12,3);
 			GrayF32 outX = new GrayF32(10,12);
 			GrayF32 outY = new GrayF32(10,12);
 

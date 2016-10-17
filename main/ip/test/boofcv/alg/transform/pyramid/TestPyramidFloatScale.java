@@ -53,7 +53,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 	public void _update(GrayF32 input) {
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
-		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<GrayF32>(interp,new double[]{3,5},imageType);
+		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<>(interp,new double[]{3,5},imageType);
 		alg.process(input);
 
 		// test the first layer
@@ -77,7 +77,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 		double a[] = BoofMiscOps.convertTo_F64(scales);
-		return new PyramidFloatScale<GrayF32>(interp,a,imageType);
+		return new PyramidFloatScale<>(interp,a,imageType);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 	@Test
 	public void checkSigmas() {
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
-		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<GrayF32>(interp,new double[]{3,5},imageType);
+		PyramidFloatScale<GrayF32> alg = new PyramidFloatScale<>(interp,new double[]{3,5},imageType);
 
 		for( int i = 0; i < 2; i++ ) {
 			assertEquals(0,alg.getSigma(0),1e-8);

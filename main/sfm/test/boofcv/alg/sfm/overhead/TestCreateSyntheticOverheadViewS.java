@@ -57,7 +57,7 @@ public class TestCreateSyntheticOverheadViewS {
 		Se3_F64 planeToCamera = cameraToPlane.invert(null);
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
-		CreateSyntheticOverheadViewS<GrayF32> alg = new CreateSyntheticOverheadViewS<GrayF32>(interp);
+		CreateSyntheticOverheadViewS<GrayF32> alg = new CreateSyntheticOverheadViewS<>(interp);
 
 		alg.configure(param,planeToCamera,centerX,centerY,cellSize,overheadW,overheadH);
 

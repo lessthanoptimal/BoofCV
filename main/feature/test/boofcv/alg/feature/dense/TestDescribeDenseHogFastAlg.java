@@ -51,7 +51,7 @@ public class TestDescribeDenseHogFastAlg {
 
 	@Test
 	public void growCellArray() {
-		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<GrayF32>(10,8,2,2,1,imageType);
+		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,8,2,2,1,imageType);
 
 		helper.growCellArray(64,32);
 		assertEquals(8*4,helper.cells.length);
@@ -75,7 +75,7 @@ public class TestDescribeDenseHogFastAlg {
 		int x0 = 5, x1 = 67;
 		int y0 = 9, y1 = 89;
 
-		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<GrayF32>(10,8,2,2,1,imageType);
+		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,8,2,2,1,imageType);
 
 		GrayF32 input = new GrayF32(120,110);
 		helper.setInput(input);
@@ -109,7 +109,7 @@ public class TestDescribeDenseHogFastAlg {
 
 	@Test
 	public void computeDescriptor() {
-		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<GrayF32>(10,8,2,2,1,imageType);
+		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,8,2,2,1,imageType);
 
 		helper.growCellArray(imgWidth, imgHeight);
 		int stride = helper.cellCols;
@@ -151,7 +151,7 @@ public class TestDescribeDenseHogFastAlg {
 
 		int cellWidth = 8;
 
-		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<GrayF32>(10,cellWidth,3,3,1,imageType);
+		DescribeDenseHogFastAlg<GrayF32> helper = new DescribeDenseHogFastAlg<>(10,cellWidth,3,3,1,imageType);
 
 		helper.setInput(new GrayF32(imgWidth,imgHeight));
 		helper.growCellArray(imgWidth, imgHeight);

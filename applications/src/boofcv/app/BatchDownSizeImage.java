@@ -153,7 +153,7 @@ public class BatchDownSizeImage {
 				if( info.getNumBands() == 1 ) {
 					input = new GrayU8(info.getWidth(),info.getHeight());
 				} else {
-					input = new Planar<GrayU8>(GrayU8.class,info.getWidth(),info.getHeight(),info.getNumBands());
+					input = new Planar<>(GrayU8.class,info.getWidth(),info.getHeight(),info.getNumBands());
 				}
 
 				// Now declare storage for the small image

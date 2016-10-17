@@ -60,7 +60,7 @@ public class BenchmarkFastIntensity< T extends ImageGray> {
 	}
 
 	public class FAST9 extends PerformerBase {
-		ImplFastIntensity9<GrayU8> corner = new ImplFastIntensity9<GrayU8>(new ImplFastHelper_U8(60));
+		ImplFastIntensity9<GrayU8> corner = new ImplFastIntensity9<>(new ImplFastHelper_U8(60));
 
 		@Override
 		public void process() {
@@ -69,7 +69,7 @@ public class BenchmarkFastIntensity< T extends ImageGray> {
 	}
 
 	public class FAST12 extends PerformerBase {
-		ImplFastIntensity12<GrayU8> corner = new ImplFastIntensity12<GrayU8>(new ImplFastHelper_U8(60));
+		ImplFastIntensity12<GrayU8> corner = new ImplFastIntensity12<>(new ImplFastHelper_U8(60));
 
 		@Override
 		public void process() {

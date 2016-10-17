@@ -32,6 +32,6 @@ public class TestDescribePointSurfMod  extends BaseTestDescribeSurf<GrayF32,Gray
 
 	@Override
 	public DescribePointSurf<GrayF32> createAlg() {
-		return new DescribePointSurfMod<GrayF32>(GrayF32.class);
+		return new DescribePointSurfMod<>(GrayF32.class);
 	}
 }

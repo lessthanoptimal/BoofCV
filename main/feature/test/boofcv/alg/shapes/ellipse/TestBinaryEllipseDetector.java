@@ -162,9 +162,9 @@ public class TestBinaryEllipseDetector {
 
 	private static BinaryEllipseDetector<GrayU8> create() {
 		BinaryEllipseDetectorPixel ellipseDetector = new BinaryEllipseDetectorPixel();
-		SnapToEllipseEdge<GrayU8> ellipseRefiner = new SnapToEllipseEdge<GrayU8>(20,2,GrayU8.class);
-		EdgeIntensityEllipse<GrayU8> intensityCheck = new EdgeIntensityEllipse<GrayU8>(2.0,20,THRESHOLD,GrayU8.class);
+		SnapToEllipseEdge<GrayU8> ellipseRefiner = new SnapToEllipseEdge<>(20,2,GrayU8.class);
+		EdgeIntensityEllipse<GrayU8> intensityCheck = new EdgeIntensityEllipse<>(2.0,20,THRESHOLD,GrayU8.class);
 
-		return new BinaryEllipseDetector<GrayU8>(ellipseDetector,ellipseRefiner,intensityCheck,GrayU8.class);
+		return new BinaryEllipseDetector<>(ellipseDetector,ellipseRefiner,intensityCheck,GrayU8.class);
 	}
 }

@@ -46,7 +46,7 @@ public class ImageSelectorAndSaver {
 	public static int LENGTH = 50;
 
 	RemovePerspectiveDistortion<GrayF32> removePerspective =
-			new RemovePerspectiveDistortion<GrayF32>(LENGTH, LENGTH, ImageType.single(GrayF32.class));
+			new RemovePerspectiveDistortion<>(LENGTH, LENGTH, ImageType.single(GrayF32.class));
 
 	GrayF32 templateOriginal = new GrayF32(LENGTH, LENGTH);
 	GrayF32 template = new GrayF32(LENGTH, LENGTH);

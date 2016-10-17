@@ -72,7 +72,7 @@ public class TestUtilImageIO {
 	@Test
 	public void loadImage_saveImage_PPM() throws IOException {
 
-		Planar<GrayU8> orig = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		Planar<GrayU8> orig = new Planar<>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(orig,rand,0,256);
 
 		UtilImageIO.savePPM(orig,"temp.ppm",null);

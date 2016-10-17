@@ -114,7 +114,7 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray>
 
 
 	public static void main( String args[] ) {
-		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<GrayU8>(GrayU8.class);
+		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<>(GrayU8.class);
 
 //		String fileName = UtilIO.pathExample("tracking/track_peter.mjpeg");
 		String fileName = UtilIO.pathExample("tracking/snow_follow_car.mjpeg");

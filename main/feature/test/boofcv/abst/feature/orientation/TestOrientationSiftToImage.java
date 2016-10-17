@@ -45,7 +45,7 @@ public class TestOrientationSiftToImage {
 		OrientationHistogramSift<GrayF32> orig = FactoryOrientationAlgs.sift(null,GrayF32.class);
 
 		OrientationSiftToImage<GrayF32> alg =
-				new OrientationSiftToImage<GrayF32>(orig,ss,GrayF32.class);
+				new OrientationSiftToImage<>(orig,ss,GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
 		tests.setup(angleTol, (int)(pixelRadiusAtRadius1+0.5), alg, GrayF32.class);

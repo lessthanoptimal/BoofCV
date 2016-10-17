@@ -266,9 +266,9 @@ public class ShowLensDistortion<T extends ImageGray>
 	public static void main(String args[]) {
 
 //		ShowImageBlurApp<GrayF32> app
-//				= new ShowImageBlurApp<GrayF32>(GrayF32.class);
+//				= new ShowImageBlurApp<>(GrayF32.class);
 		ShowLensDistortion<GrayU8> app
-				= new ShowLensDistortion<GrayU8>(GrayU8.class);
+				= new ShowLensDistortion<>(GrayU8.class);
 
 		List<PathLabel> inputs = new ArrayList<PathLabel>();
 

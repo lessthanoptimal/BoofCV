@@ -97,7 +97,7 @@ public class TestWaveletTransformInt {
 		GrayS32 storage = new GrayS32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
-		WaveletTransformInt<GrayU8> alg = new WaveletTransformInt<GrayU8>(desc,N,0,255,GrayU8.class);
+		WaveletTransformInt<GrayU8> alg = new WaveletTransformInt<>(desc,N,0,255,GrayU8.class);
 		alg.transform(orig8,found);
 
 		// see if the two techniques produced the same results

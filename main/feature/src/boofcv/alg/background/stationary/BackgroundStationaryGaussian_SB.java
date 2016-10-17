@@ -39,7 +39,7 @@ public class BackgroundStationaryGaussian_SB<T extends ImageGray>
 	protected GImageGray inputWrapper;
 
 	// background is composed of two channels.  0 = mean, 1 = variance
-	Planar<GrayF32> background = new Planar<GrayF32>(GrayF32.class,1,1,2);
+	Planar<GrayF32> background = new Planar<>(GrayF32.class,1,1,2);
 
 	/**
 	 * Configurations background removal.

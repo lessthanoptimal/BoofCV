@@ -126,11 +126,11 @@ public class DenoiseAccuracyStudyApp {
 
 
 		FilterImageInterface<GrayF32,GrayF32> filter;
-		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran,FactoryDenoiseWaveletAlg.visu(GrayF32.class));
+		filter = new WaveletDenoiseFilter<>(waveletTran,FactoryDenoiseWaveletAlg.visu(GrayF32.class));
 		ret.add( new TestItem(filter,"Visu "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran, FactoryDenoiseWaveletAlg.bayes(null,GrayF32.class));
+		filter = new WaveletDenoiseFilter<>(waveletTran, FactoryDenoiseWaveletAlg.bayes(null,GrayF32.class));
 		ret.add( new TestItem(filter,"Bayes "+waveletName+" L = "+numLevels));
-		filter = new WaveletDenoiseFilter<GrayF32>(waveletTran,FactoryDenoiseWaveletAlg.sure(GrayF32.class));
+		filter = new WaveletDenoiseFilter<>(waveletTran,FactoryDenoiseWaveletAlg.sure(GrayF32.class));
 		ret.add( new TestItem(filter,"Sure "+waveletName+" L = "+numLevels));
 
 		return ret;

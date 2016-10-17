@@ -57,7 +57,7 @@ public class TestCirculantTracker {
 	public void meanShift() {
 		int w = 32;
 
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
 
 		int peakX = 13;
 		int peakY = 17;
@@ -87,7 +87,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(a, rand, 0, 200);
 		GImageMiscOps.fillUniform(b,rand,0,200);
 
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a, 5, 6, 20, 25);
 
 		shiftCopy(2,4,a,b);
@@ -117,7 +117,7 @@ public class TestCirculantTracker {
 	@Test
 	public void computeGaussianWeights() {
 		int w = 16;
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,w,255,interp);
 
 		alg.gaussianWeight.reshape(w,w);
 		alg.gaussianWeightDFT.reshape(w, w);
@@ -172,7 +172,7 @@ public class TestCirculantTracker {
 		GImageMiscOps.fillUniform(b,rand,0,200);
 		shiftCopy(0,0,a,b);
 
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a,5,6,20,25);
 
 		alg.updateTrackLocation(b);
@@ -211,7 +211,7 @@ public class TestCirculantTracker {
 		ImageMiscOps.fill(a, 100);
 		ImageMiscOps.fill(b,200);
 
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,64,255,interp);
 		alg.initialize(a,0,0,20,25);
 
 		// copy its internal value
@@ -256,7 +256,7 @@ public class TestCirculantTracker {
 		GrayF64 target = new GrayF64(32,32);
 		GrayF64 k = new GrayF64(32,32);
 
-		CirculantTracker<GrayF32> alg = new CirculantTracker<GrayF32>(1f/16,0.2,1e-2,0.075,1.0,32,255,interp);
+		CirculantTracker<GrayF32> alg = new CirculantTracker<>(1f/16,0.2,1e-2,0.075,1.0,32,255,interp);
 		alg.initialize(new GrayF32(32,32),0,0,32,32);
 
 		// create a shape inside the image

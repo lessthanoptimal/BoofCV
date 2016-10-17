@@ -35,7 +35,7 @@ public class TestPyramidDiscrete {
 	 */
 	@Test
 	public void setScaling_positive() {
-		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<GrayU8>(GrayU8.class,false);
+		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<>(GrayU8.class,false);
 
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,200);
@@ -56,7 +56,7 @@ public class TestPyramidDiscrete {
 	 */
 	@Test
 	public void setScaling_negative() {
-		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<GrayU8>(GrayU8.class,true);
+		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<>(GrayU8.class,true);
 
 		try {
 			pyramid.setScaleFactors(1,2,5);

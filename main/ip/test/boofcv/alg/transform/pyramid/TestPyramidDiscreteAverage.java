@@ -42,7 +42,7 @@ public class TestPyramidDiscreteAverage {
 		GrayF32 input = new GrayF32(40,80);
 		ImageMiscOps.fillUniform(input, rand, -20, 50);
 
-		PyramidDiscreteAverage<GrayF32> alg = new PyramidDiscreteAverage<GrayF32>(GrayF32.class,true,1,2,4);
+		PyramidDiscreteAverage<GrayF32> alg = new PyramidDiscreteAverage<>(GrayF32.class,true,1,2,4);
 
 		alg.process(input);
 

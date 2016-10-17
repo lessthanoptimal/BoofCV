@@ -37,7 +37,7 @@ public class TestImageGradientThenReduce {
 		HelperGradient gradient = new HelperGradient();
 		HelperReduce reduce = new HelperReduce();
 
-		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,10,12,3);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,10,12,3);
 		GrayF32 outDerivX = new GrayF32(10,12);
 		GrayF32 outDerivY = new GrayF32(10,12);
 

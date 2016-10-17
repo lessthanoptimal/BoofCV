@@ -60,7 +60,7 @@ public class BackgroundStationaryGaussian_PL<T extends ImageGray>
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<GrayF32>(GrayF32.class,1,1,2*numBands);
+		background = new Planar<>(GrayF32.class,1,1,2*numBands);
 		bgWrapper = FactoryGImageMultiBand.create(background.getImageType());
 		bgWrapper.wrap(background);
 

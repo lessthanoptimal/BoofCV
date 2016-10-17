@@ -44,7 +44,7 @@ public class OpenKinectStreamingTest {
 		NativeLibrary.addSearchPath("freenect", OpenKinectExampleParam.PATH_TO_SHARED_LIBRARY);
 	}
 
-	Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
+	Planar<GrayU8> rgb = new Planar<>(GrayU8.class,1,1,3);
 	GrayU16 depth = new GrayU16(1,1);
 
 	BufferedImage outRgb;

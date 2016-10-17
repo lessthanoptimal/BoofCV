@@ -52,7 +52,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		extrinsic.T.x=8;
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
 		assertTrue(this.param == null);
 		alg.setCalibration(new MonoPlaneParameters(intrinsic,extrinsic));
 
@@ -68,7 +68,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		CameraPinholeRadial intrinsic = createIntrinsic();
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
 		alg.setCalibration(new MonoPlaneParameters(intrinsic, new Se3_F64()));
 
 		GrayF32 inputImage = new GrayF32(width,height);
@@ -86,7 +86,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		Dummy dummy = new Dummy();
 
-		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
 
 		assertTrue(type == alg.getImageType());
 	}

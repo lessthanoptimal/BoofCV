@@ -69,7 +69,7 @@ public class TestVisualDepthOps {
 		depth.set(200,80,3400);
 		depth.set(600,420,50);
 
-		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,width,height,3);
 		GImageMiscOps.fillUniform(rgb, rand, 0, 200);
 
 		FastQueue<Point3D_F64> pts = new FastQueue<Point3D_F64>(Point3D_F64.class,true);

@@ -69,7 +69,7 @@ public class BenchmarkDisparityAlgs {
 		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);
 		ImplDisparityScoreSadRect_U8<GrayU8> alg =
-				new ImplDisparityScoreSadRect_U8<GrayU8>(min,max,radiusX,radiusY,compDisp);
+				new ImplDisparityScoreSadRect_U8<>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -84,7 +84,7 @@ public class BenchmarkDisparityAlgs {
 		DisparitySelect<float[],GrayU8> compDisp =
 				new ImplSelectRectStandard_F32_U8(250,2,0.1);
 		ImplDisparityScoreSadRect_F32<GrayU8> alg =
-				new ImplDisparityScoreSadRect_F32<GrayU8>(min,max,radiusX,radiusY,compDisp);
+				new ImplDisparityScoreSadRect_F32<>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -97,7 +97,7 @@ public class BenchmarkDisparityAlgs {
 		DisparitySelect<int[],GrayF32> compDisp =
 				new SelectRectSubpixel.S32_F32(250,2,0.1);
 		ImplDisparityScoreSadRect_U8<GrayF32> alg =
-				new ImplDisparityScoreSadRect_U8<GrayF32>(min,max,radiusX,radiusY,compDisp);
+				new ImplDisparityScoreSadRect_U8<>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {
@@ -112,7 +112,7 @@ public class BenchmarkDisparityAlgs {
 		DisparitySelect<int[],GrayU8> compDisp =
 				new ImplSelectRectStandard_S32_U8(250,2,0.1);
 		ImplDisparityScoreSadRectFive_U8<GrayU8> alg =
-				new ImplDisparityScoreSadRectFive_U8<GrayU8>(min,max,radiusX,radiusY,compDisp);
+				new ImplDisparityScoreSadRectFive_U8<>(min,max,radiusX,radiusY,compDisp);
 
 		@Override
 		public void process() {

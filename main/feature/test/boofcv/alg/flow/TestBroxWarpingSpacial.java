@@ -60,7 +60,7 @@ public class TestBroxWarpingSpacial {
 		pyr1.process(original1);
 		pyr2.process(original2);
 
-		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 		alg.process(pyr1,pyr2);
 
 		for( int y = 0; y < height; y++ ) {
@@ -74,7 +74,7 @@ public class TestBroxWarpingSpacial {
 
 	@Test
 	public void computePsiDataPsiGradient() {
-		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 		alg.resizeForLayer(width, height);
 
 		GrayF32 image1 = new GrayF32(width,height);
@@ -155,7 +155,7 @@ public class TestBroxWarpingSpacial {
 		ImageMiscOps.fillUniform(v,rand,-1,1);
 		ImageMiscOps.fillUniform(psi,rand,-1,1);
 
-		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 		alg.resizeForLayer(width,height);
 
 		alg.computeDivUVD_safe(5,6,u,v,psi,divU,divV,divD);
@@ -196,7 +196,7 @@ public class TestBroxWarpingSpacial {
 
 	@Test
 	public void s() {
-		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<GrayF32>(new ConfigBroxWarping(),interpolate);
+		BroxWarpingSpacial<GrayF32> alg = new BroxWarpingSpacial<>(new ConfigBroxWarping(),interpolate);
 
 		alg.resizeForLayer(10,13);
 		GrayF32 a = alg.warpImage2;

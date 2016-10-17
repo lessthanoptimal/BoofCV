@@ -33,7 +33,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<GrayF32>();
+		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,false);
 		alg.setObjectRadius(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationSlidingWindow_F32 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<GrayF32>();
+		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationSlidingWindow_F32 alg = new ImplOrientationSlidingWindow_F32(1.0/2.0,N,window,true);
 		alg.setObjectRadius(r);

@@ -33,7 +33,7 @@ public class TestImplOrientationImageAverage_U8 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationImageTests<GrayU8> tests = new GenericOrientationImageTests<GrayU8>();
+		GenericOrientationImageTests<GrayU8> tests = new GenericOrientationImageTests<>();
 
 		OrientationImageAverage<GrayU8> alg = new ImplOrientationImageAverage_U8(1.0/2.0,r);
 

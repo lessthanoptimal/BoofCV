@@ -109,8 +109,8 @@ public class BatchRemoveLensDistortion {
 
 		System.out.println("Found a total of "+files.size()+" matching files");
 
-		Planar<GrayF32> distoredImg = new Planar<GrayF32>(GrayF32.class,param.width,param.height,3);
-		Planar<GrayF32> undistoredImg = new Planar<GrayF32>(GrayF32.class,param.width,param.height,3);
+		Planar<GrayF32> distoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
+		Planar<GrayF32> undistoredImg = new Planar<>(GrayF32.class,param.width,param.height,3);
 
 		ImageDistort distort = LensDistortionOps.imageRemoveDistortion(adjustmentType, BorderType.ZERO, param, paramAdj,
 				(ImageType) distoredImg.getImageType());

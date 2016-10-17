@@ -172,7 +172,7 @@ public class ConvertNV21 {
 	public static Planar<GrayU8> nv21ToMsYuv_U8(byte[] data , int width , int height ,
 												Planar<GrayU8> output ) {
 		if( output == null ) {
-			output = new Planar<GrayU8>(GrayU8.class,width,height,3);
+			output = new Planar<>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -194,7 +194,7 @@ public class ConvertNV21 {
 	public static Planar<GrayU8> nv21ToMsRgb_U8(byte[] data , int width , int height ,
 												Planar<GrayU8> output ) {
 		if( output == null ) {
-			output = new Planar<GrayU8>(GrayU8.class,width,height,3);
+			output = new Planar<>(GrayU8.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -238,7 +238,7 @@ public class ConvertNV21 {
 	public static Planar<GrayF32> nv21ToMsYuv_F32(byte[] data , int width , int height ,
 												  Planar<GrayF32> output ) {
 		if( output == null ) {
-			output = new Planar<GrayF32>(GrayF32.class,width,height,3);
+			output = new Planar<>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )
@@ -260,7 +260,7 @@ public class ConvertNV21 {
 	public static Planar<GrayF32> nv21ToMsRgb_F32(byte[] data , int width , int height ,
 												  Planar<GrayF32> output ) {
 		if( output == null ) {
-			output = new Planar<GrayF32>(GrayF32.class,width,height,3);
+			output = new Planar<>(GrayF32.class,width,height,3);
 		} else if( output.width != width || output.height != height )
 			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
 		else if( output.getNumBands() != 3 )

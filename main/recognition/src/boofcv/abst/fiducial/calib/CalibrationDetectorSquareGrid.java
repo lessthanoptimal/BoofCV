@@ -60,7 +60,7 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 		BinaryPolygonDetector<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
-		detect = new DetectSquareGridFiducial<GrayF32>(config.numRows,config.numCols,
+		detect = new DetectSquareGridFiducial<>(config.numRows,config.numCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
 		layoutPoints = createLayout(config.numRows, config.numCols, config.squareWidth,config.spaceWidth);

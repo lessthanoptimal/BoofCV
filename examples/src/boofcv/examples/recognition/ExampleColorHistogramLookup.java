@@ -67,8 +67,8 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> coupledHueSat( List<File> images  ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
-		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
+		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
@@ -112,8 +112,8 @@ public class ExampleColorHistogramLookup {
 		List<TupleDesc_F64> histogramList = new ArrayList<TupleDesc_F64>();
 		histogramList.add(histogramHue); histogramList.add(histogramValue);
 
-		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
-		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
+		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
@@ -145,7 +145,7 @@ public class ExampleColorHistogramLookup {
 	public static List<double[]> coupledRGB( List<File> images ) {
 		List<double[]> points = new ArrayList<double[]>();
 
-		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,1,1,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
 
 		for( File f : images ) {
 			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());

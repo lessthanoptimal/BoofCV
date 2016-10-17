@@ -63,8 +63,8 @@ public class TestConvertYV12 {
 				ImageType.il(3, ImageDataType.U8),ImageType.il(3, ImageDataType.F32)};
 
 		byte[] data = random(width,height);
-		Planar<GrayU8> yuv = new Planar<GrayU8>(GrayU8.class,width,height,3);
-		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		Planar<GrayU8> yuv = new Planar<>(GrayU8.class,width,height,3);
+		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,width,height,3);
 
 		yv12ToMulti(data, width, height, yuv);
 		ColorYuv.ycbcrToRgb_U8(yuv,rgb);

@@ -40,8 +40,8 @@ public class TestGradientReduceToSingle {
 
 	@Test
 	public void maxf_plf32_f32() {
-		Planar<GrayF32> inX = new Planar<GrayF32>(GrayF32.class,width,height,numbands);
-		Planar<GrayF32> inY = new Planar<GrayF32>(GrayF32.class,width,height,numbands);
+		Planar<GrayF32> inX = new Planar<>(GrayF32.class,width,height,numbands);
+		Planar<GrayF32> inY = new Planar<>(GrayF32.class,width,height,numbands);
 		GrayF32 outX = new GrayF32(width,height);
 		GrayF32 outY = new GrayF32(width,height);
 
@@ -76,8 +76,8 @@ public class TestGradientReduceToSingle {
 
 	@Test
 	public void maxf_plfu8_u8() {
-		Planar<GrayU8> inX = new Planar<GrayU8>(GrayU8.class,width,height,numbands);
-		Planar<GrayU8> inY = new Planar<GrayU8>(GrayU8.class,width,height,numbands);
+		Planar<GrayU8> inX = new Planar<>(GrayU8.class,width,height,numbands);
+		Planar<GrayU8> inY = new Planar<>(GrayU8.class,width,height,numbands);
 		GrayU8 outX = new GrayU8(width,height);
 		GrayU8 outY = new GrayU8(width,height);
 

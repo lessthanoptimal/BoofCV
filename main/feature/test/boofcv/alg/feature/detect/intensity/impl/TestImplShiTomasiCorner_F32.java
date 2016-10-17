@@ -82,7 +82,7 @@ public class TestImplShiTomasiCorner_F32 {
 		GrayF32 expected = new GrayF32(derivX_F.width,derivX_F.height);
 		GrayF32 found = new GrayF32(derivX_F.width,derivX_F.height);
 
-		ImplSsdCornerNaive<GrayF32> ssd_I = new ImplSsdCornerNaive<GrayF32>(width, height, 3, false);
+		ImplSsdCornerNaive<GrayF32> ssd_I = new ImplSsdCornerNaive<>(width, height, 3, false);
 		ssd_I.process(derivX_F, derivY_F,expected);
 
 		ImplShiTomasiCorner_F32 ssd_F = new ImplShiTomasiCorner_F32( 3);

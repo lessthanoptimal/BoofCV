@@ -52,7 +52,7 @@ public class TestDescribeDenseHogAlg {
 		int cases[] = new int[]{3,4};
 
 		for( int widthCells : cases ) {
-			DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(10,pixelsPerCell,widthCells,widthCells+1,1,imageType);
+			DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<>(10,pixelsPerCell,widthCells,widthCells+1,1,imageType);
 
 			int widthPixelsX = widthCells*pixelsPerCell;
 			int widthPixelsY = (widthCells+1)*pixelsPerCell;
@@ -94,7 +94,7 @@ public class TestDescribeDenseHogAlg {
 	@Test
 	public void computeCellHistogram() {
 
-		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<>(
 				10,pixelsPerCell, widthCellsX, widthCellsY,1,imageType);
 
 		helper.setInput(new GrayF32(imgWidth,imgHeight));
@@ -129,7 +129,7 @@ public class TestDescribeDenseHogAlg {
 
 	@Test
 	public void addToHistogram() {
-		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<GrayF32>(
+		DescribeDenseHogAlg<GrayF32> helper = new DescribeDenseHogAlg<>(
 				10,pixelsPerCell, widthCellsX, widthCellsX +1,1,imageType);
 
 		helper.histogram = new double[10*widthCellsX*widthCellsY];

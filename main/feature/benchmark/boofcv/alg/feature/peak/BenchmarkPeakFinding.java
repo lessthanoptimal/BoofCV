@@ -114,12 +114,12 @@ public class BenchmarkPeakFinding<T extends ImageGray> {
 
 	public static void main( String args[] ) {
 		BenchmarkPeakFinding<GrayU8>
-				benchmark_U8 = new BenchmarkPeakFinding<GrayU8>(GrayU8.class);
+				benchmark_U8 = new BenchmarkPeakFinding<>(GrayU8.class);
 
 		benchmark_U8.evaluateAll();
 
 		BenchmarkPeakFinding<GrayF32>
-				benchmark_F32 = new BenchmarkPeakFinding<GrayF32>(GrayF32.class);
+				benchmark_F32 = new BenchmarkPeakFinding<>(GrayF32.class);
 
 		benchmark_F32.evaluateAll();
 	}

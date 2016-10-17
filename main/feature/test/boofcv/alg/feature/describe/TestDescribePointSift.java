@@ -53,7 +53,7 @@ public class TestDescribePointSift {
 		GImageMiscOps.fillUniform(derivY,rand,-100,100);
 
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		List<Point2D_I32> testPoints = new ArrayList<Point2D_I32>();
@@ -79,7 +79,7 @@ public class TestDescribePointSift {
 		GrayF32 derivY = new GrayF32(200,200);
 
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		int r = alg.getCanonicalRadius();
 		ImageMiscOps.fillRectangle(derivX,5.0f,60,60,2*r,2*r);
 
@@ -123,7 +123,7 @@ public class TestDescribePointSift {
 		ImageMiscOps.fill(derivX,5.0f);
 		
 		DescribePointSift<GrayF32> alg =
-				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		alg.setImageGradient(derivX,derivY);
 
 		for( int i = 0; i < 8; i++ ) {

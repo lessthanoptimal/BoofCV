@@ -42,7 +42,7 @@ public class TestScoreLineSegmentEdge {
 
 		ImageMiscOps.fillRectangle(image, value, 20, 30, 40, 40);
 
-		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<GrayU8>(20,GrayU8.class);
+		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<>(20,GrayU8.class);
 		alg.setImage(image);
 
 		// compute the edge along the top edge
@@ -66,7 +66,7 @@ public class TestScoreLineSegmentEdge {
 
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
-		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<GrayU8>(20,GrayU8.class);
+		ScoreLineSegmentEdge<GrayU8> alg = new ScoreLineSegmentEdge<>(20,GrayU8.class);
 		alg.setImage(image);
 
 		// all along image border, check each border

@@ -135,7 +135,7 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,w,h,2);
+		Planar<GrayU8> image = new Planar<>(GrayU8.class,w,h,2);
 		image.bands[0] = band;
 		image.bands[1] = band;
 
@@ -162,7 +162,7 @@ public class TestComputeRegionMeanColor {
 				c,c,c,c,c,
 				d,d,d,d,d};
 
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,w,h,2);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,w,h,2);
 		image.bands[0] = band;
 		image.bands[1] = band;
 

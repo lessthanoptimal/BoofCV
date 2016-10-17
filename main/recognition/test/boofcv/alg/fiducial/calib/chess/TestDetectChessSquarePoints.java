@@ -111,7 +111,7 @@ public class TestDetectChessSquarePoints {
 		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessSquarePoints<GrayU8> alg =
-				new DetectChessSquarePoints<GrayU8>(rows, cols,2, detectorSquare);
+				new DetectChessSquarePoints<>(rows, cols,2, detectorSquare);
 
 //		System.out.println("test grid "+ gridWidth + " " + gridHeight);
 		assertTrue(alg.process(gray, binary));
@@ -188,7 +188,7 @@ public class TestDetectChessSquarePoints {
 		BinaryPolygonDetector<GrayU8> detectorSquare = FactoryShapeDetector.
 				polygon(new ConfigPolygonDetector(4,4),GrayU8.class);
 		DetectChessSquarePoints<GrayU8> alg =
-				new DetectChessSquarePoints<GrayU8>(gridWidth,gridHeight,2, detectorSquare);
+				new DetectChessSquarePoints<>(gridWidth,gridHeight,2, detectorSquare);
 
 		assertFalse(alg.process(gray, binary));
 	}
@@ -239,7 +239,7 @@ public class TestDetectChessSquarePoints {
 
 		int shapes[][] = new int[][]{{4,5},{2,3},{3,2},{2,2}};
 
-		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<GrayU8>(2,2,0.01,null);
+		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<>(2,2,0.01,null);
 
 		for( int[]shape : shapes ) {
 //			System.out.println(shape[0]+" "+shape[1]);
@@ -311,7 +311,7 @@ public class TestDetectChessSquarePoints {
 	@Test
 	public void computeCalibrationPoints() {
 
-		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<GrayU8>(2,2,0.01,null);
+		DetectChessSquarePoints<GrayU8> alg = new DetectChessSquarePoints<>(2,2,0.01,null);
 
 		double w = TestSquareRegularClustersIntoGrids.DEFAULT_WIDTH;
 

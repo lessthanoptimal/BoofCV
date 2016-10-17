@@ -45,7 +45,7 @@ public class TestStereoDisparityWtoNaive {
 
 					@Override
 					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new StereoDisparityWtoNaive<GrayU8>(minDisparity,maxDisparity,2,3);
+						alg = new StereoDisparityWtoNaive<>(minDisparity,maxDisparity,2,3);
 					}
 
 					@Override public int getBorderX() { return 2; }

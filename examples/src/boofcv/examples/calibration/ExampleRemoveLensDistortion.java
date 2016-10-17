@@ -21,12 +21,12 @@ package boofcv.examples.calibration;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.core.image.border.BorderType;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -94,7 +94,7 @@ public class ExampleRemoveLensDistortion {
 									   Planar<GrayF32> distortedImg,
 									   ImageDistort allInside, ImageDistort fullView ) {
 		// render the results
-		Planar<GrayF32> undistortedImg = new Planar<GrayF32>(GrayF32.class,
+		Planar<GrayF32> undistortedImg = new Planar<>(GrayF32.class,
 				distortedImg.getWidth(),distortedImg.getHeight(),distortedImg.getNumBands());
 
 		allInside.apply(distortedImg, undistortedImg);

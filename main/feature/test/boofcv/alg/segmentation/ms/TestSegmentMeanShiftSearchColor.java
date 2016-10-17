@@ -54,7 +54,7 @@ public class TestSegmentMeanShiftSearchColor {
 	 */
 	@Test
 	public void simpleTest() {
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
@@ -98,7 +98,7 @@ public class TestSegmentMeanShiftSearchColor {
 
 	@Test
 	public void findPeak_inside() {
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillRectangle(image, 20, 4, 2, 5, 5);
 
@@ -122,7 +122,7 @@ public class TestSegmentMeanShiftSearchColor {
 	}
 
 	private void findPeak_border(int cx, int cy, int startX, int startY) {
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,2);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,2);
 
 		GImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
@@ -148,7 +148,7 @@ public class TestSegmentMeanShiftSearchColor {
 	}
 
 	public void compareToGray( boolean fast ) {
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,20,25,1);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,20,25,1);
 
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
@@ -163,7 +163,7 @@ public class TestSegmentMeanShiftSearchColor {
 						(30,0.05f,interpMB,2,2,200,fast,imageType);
 
 		SegmentMeanShiftSearchGray<GrayF32> algSB =
-				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interpSB,2,2,200,fast);
+				new SegmentMeanShiftSearchGray<>(30,0.05f,interpSB,2,2,200,fast);
 
 		algMB.process(image);
 		algSB.process(image.getBand(0));

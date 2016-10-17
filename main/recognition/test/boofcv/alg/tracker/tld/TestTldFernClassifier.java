@@ -208,7 +208,7 @@ public class TestTldFernClassifier {
 	private TldFernClassifier<GrayU8> createAlg() {
 		InterpolatePixelS<GrayU8> interpolate = FactoryInterpolation.bilinearPixelS(
 				GrayU8.class, BorderType.EXTENDED);
-		return new TldFernClassifier<GrayU8>(rand,numFerns,8,numLearnRandom,10,interpolate);
+		return new TldFernClassifier<>(rand,numFerns,8,numLearnRandom,10,interpolate);
 	}
 
 	private int countNum( boolean positive , TldFernManager manager ) {

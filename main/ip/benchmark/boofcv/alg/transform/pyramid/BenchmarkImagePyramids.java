@@ -69,7 +69,7 @@ public class BenchmarkImagePyramids {
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		pyramidD = new PyramidDiscreteSampleBlur<GrayF32>(kernel,2,GrayF32.class,true,scalesD);
+		pyramidD = new PyramidDiscreteSampleBlur<>(kernel,2,GrayF32.class,true,scalesD);
 
 		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, GrayF32.class);
 

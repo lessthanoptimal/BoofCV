@@ -68,7 +68,7 @@ public class TestStereoProcessingBase {
 		right.set((int)lensRight.x,(int)lensRight.y,200);
 
 		// test the algorithm
-		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<GrayU8>(GrayU8.class);
+		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<>(GrayU8.class);
 		alg.setCalibration(param);
 
 		alg.setImages(left,right);
@@ -100,7 +100,7 @@ public class TestStereoProcessingBase {
 		Point2D_F64 lensRight = new Point2D_F64();
 		SfmTestHelper.renderPointPixel(param,X,lensLeft,lensRight);
 
-		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<GrayU8>(GrayU8.class);
+		StereoProcessingBase<GrayU8> alg = new StereoProcessingBase<>(GrayU8.class);
 		alg.setCalibration(param);
 
 		// Rectify the points

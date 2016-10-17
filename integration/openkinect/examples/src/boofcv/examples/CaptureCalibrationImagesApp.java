@@ -90,7 +90,7 @@ public class CaptureCalibrationImagesApp implements KeyListener, StreamOpenKinec
 
 		buffRgb = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 
-		savedRgb = new Planar<GrayU8>(GrayU8.class,w,h,3);
+		savedRgb = new Planar<>(GrayU8.class,w,h,3);
 		savedDepth = new GrayU16(w,h);
 
 		gui = ShowImages.showWindow(buffRgb, "Kinect RGB");

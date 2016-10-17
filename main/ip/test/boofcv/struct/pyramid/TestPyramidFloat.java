@@ -35,7 +35,7 @@ public class TestPyramidFloat {
 	@Test
 	public void setScaling() {
 		// see if all the layers are set correctly
-		PyramidFloat<GrayU8> pyramid = new DummyFloat<GrayU8>(GrayU8.class);
+		PyramidFloat<GrayU8> pyramid = new DummyFloat<>(GrayU8.class);
 
 		pyramid.setScaleFactors(1,2,5.5);
 		pyramid.initialize(width,height);

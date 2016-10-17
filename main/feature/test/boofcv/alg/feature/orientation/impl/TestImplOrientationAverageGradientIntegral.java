@@ -34,7 +34,7 @@ public class TestImplOrientationAverageGradientIntegral {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
 				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,0,GrayF32.class);
@@ -46,7 +46,7 @@ public class TestImplOrientationAverageGradientIntegral {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
 				new ImplOrientationAverageGradientIntegral(1.0/2.0,r,1,2,-1,GrayF32.class);

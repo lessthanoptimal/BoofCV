@@ -82,7 +82,7 @@ public class TestColorRgb {
 
 	@Test
 	public void planar_U8() {
-		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,20,30,3);
+		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,20,30,3);
 		GrayU8 gray = new GrayU8(20,30);
 
 		GImageMiscOps.fillUniform(rgb,rand,0,150);
@@ -105,7 +105,7 @@ public class TestColorRgb {
 
 	@Test
 	public void planar_F32() {
-		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class, 20, 30, 3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 20, 30, 3);
 		GrayF32 gray = new GrayF32(20, 30);
 
 		GImageMiscOps.fillUniform(rgb, rand, 0, 150);

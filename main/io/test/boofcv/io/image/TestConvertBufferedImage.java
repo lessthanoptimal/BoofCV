@@ -586,7 +586,7 @@ public class TestConvertBufferedImage {
 
 	@Test
 	public void orderBandsIntoRGB() {
-		Planar<GrayU8> input = new Planar<GrayU8>(GrayU8.class, 10, 10, 3);
+		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
 
 		GrayU8 band0 = input.getBand(0);
 		GrayU8 band1 = input.getBand(1);
@@ -613,7 +613,7 @@ public class TestConvertBufferedImage {
 		assertTrue(band2 == input.getBand(2));
 
 		// 4-band images
-		input = new Planar<GrayU8>(GrayU8.class, 10, 10, 4);
+		input = new Planar<>(GrayU8.class, 10, 10, 4);
 
 		band0 = input.getBand(0);
 		band1 = input.getBand(1);

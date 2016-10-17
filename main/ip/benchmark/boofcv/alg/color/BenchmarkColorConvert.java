@@ -75,8 +75,8 @@ public class BenchmarkColorConvert {
 		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
 		System.out.println();
 
-		src_F32 = new Planar<GrayF32>(GrayF32.class,imgWidth,imgHeight,3);
-		dst_F32 = new Planar<GrayF32>(GrayF32.class,imgWidth,imgHeight,3);
+		src_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
+		dst_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
 
 		GImageMiscOps.addUniform(src_F32,rand,0,255);
 

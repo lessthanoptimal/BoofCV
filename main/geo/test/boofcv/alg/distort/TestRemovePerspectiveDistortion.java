@@ -57,7 +57,7 @@ public class TestRemovePerspectiveDistortion {
 
 		// now reverse it with the class
 		RemovePerspectiveDistortion<GrayF32> alg =
-				new RemovePerspectiveDistortion<GrayF32>(30,40, ImageType.single(GrayF32.class));
+				new RemovePerspectiveDistortion<>(30,40, ImageType.single(GrayF32.class));
 
 		assertTrue(alg.apply(input, topLeft, topRight, bottomRight, bottomLeft));
 

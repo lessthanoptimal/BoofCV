@@ -50,7 +50,7 @@ public class ExampleOverheadView {
 		Se3_F64 groundToLeft = UtilIO.loadXML(UtilIO.pathExample("road/ground_to_left_01.xml"));
 
 		CreateSyntheticOverheadView<Planar<GrayU8>> generateOverhead =
-				new CreateSyntheticOverheadViewPL<GrayU8>(TypeInterpolate.BILINEAR,3,GrayU8.class);
+				new CreateSyntheticOverheadViewPL<>(TypeInterpolate.BILINEAR,3,GrayU8.class);
 
 		// size of cells in the overhead image in world units
 		double cellSize = 0.05;
@@ -63,7 +63,7 @@ public class ExampleOverheadView {
 		int overheadHeight = selectMapSize.getOverheadHeight();
 
 		Planar<GrayU8> overheadRGB =
-				new Planar<GrayU8>(GrayU8.class,overheadWidth,overheadHeight,3);
+				new Planar<>(GrayU8.class,overheadWidth,overheadHeight,3);
 		generateOverhead.configure(stereoParam.left,groundToLeft,
 				selectMapSize.getCenterX(), selectMapSize.getCenterY(), cellSize,overheadRGB.width,overheadRGB.height);
 

@@ -38,7 +38,7 @@ public class TestPlanar {
 
 	@Test
 	public void constructor() {
-		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,imgWidth, imgHeight, 3);
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
 		assertTrue(GrayU8.class == img.getBandType());
 		assertTrue(3 == img.bands.length);
@@ -52,7 +52,7 @@ public class TestPlanar {
 
 	@Test
 	public void getBand() {
-		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,imgWidth, imgHeight, 3);
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,imgWidth, imgHeight, 3);
 
 		assertTrue(img.getBand(0) != null);
 
@@ -72,7 +72,7 @@ public class TestPlanar {
 
 	@Test
 	public void subimage() {
-		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 		assertFalse(img.isSubimage());
 
 		Planar<GrayU8> sub = img.subimage(2,3,4,6, null);
@@ -88,7 +88,7 @@ public class TestPlanar {
 
 	@Test
 	public void reshape() {
-		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 
 		// reshape to something smaller
 		img.reshape(5,4);
@@ -103,7 +103,7 @@ public class TestPlanar {
 
 	@Test
 	public void reshape_subimage() {
-		Planar<GrayU8> img = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
 		img = img.subimage(0,0,2,2, null);
 
 		try {
@@ -114,18 +114,18 @@ public class TestPlanar {
 
 	@Test
 	public void setTo() {
-		Planar<GrayU8> a = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> a = new Planar<>(GrayU8.class,5, 10, 3);
 		a.getBand(0).set(1,2,3);
 		a.getBand(1).set(2,1,4);
 		a.getBand(2).set(2,2,5);
 
-		Planar<GrayU8> b = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> b = new Planar<>(GrayU8.class,5, 10, 3);
 		b.setTo(a);
 
 		BoofTesting.assertEquals(a,b,1e-8);
 
 		// try a sub-image now
-		Planar<GrayU8> c = new Planar<GrayU8>(GrayU8.class,20, 20, 3);
+		Planar<GrayU8> c = new Planar<>(GrayU8.class,20, 20, 3);
 		c = c.subimage(7,8,12,18, null);
 		c.setTo(a);
 
@@ -137,8 +137,8 @@ public class TestPlanar {
 	 */
 	@Test
 	public void setTo_mismatch() {
-		Planar<GrayU8> a = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
-		Planar<GrayU8> b = new Planar<GrayU8>(GrayU8.class,6, 11, 3);
+		Planar<GrayU8> a = new Planar<>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> b = new Planar<>(GrayU8.class,6, 11, 3);
 
 		a.setTo(b);
 
@@ -150,7 +150,7 @@ public class TestPlanar {
 	public void serialize() throws IOException, ClassNotFoundException {
 
 		// randomly fill the image
-		Planar<GrayU8> imgA = new Planar<GrayU8>(GrayU8.class,5, 10, 3);
+		Planar<GrayU8> imgA = new Planar<>(GrayU8.class,5, 10, 3);
 		GImageMiscOps.fillUniform(imgA, rand, -10, 10);
 
 		// make a copy of the original
@@ -175,6 +175,16 @@ public class TestPlanar {
 
 	@Test
 	public void reorderBands() {
-		fail("IMplement");
+		Planar<GrayU8> img = new Planar<>(GrayU8.class,5, 10, 3);
+
+		GrayU8 band0 = img.getBand(0);
+		GrayU8 band1 = img.getBand(1);
+		GrayU8 band2 = img.getBand(2);
+
+		img.reorderBands(2,0,1);
+
+		assertTrue( band0 == img.getBand(1));
+		assertTrue( band1 == img.getBand(2));
+		assertTrue( band2 == img.getBand(0));
 	}
 }

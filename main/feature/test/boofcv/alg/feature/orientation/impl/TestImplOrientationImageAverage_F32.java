@@ -33,7 +33,7 @@ public class TestImplOrientationImageAverage_F32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationImageTests<GrayF32> tests = new GenericOrientationImageTests<GrayF32>();
+		GenericOrientationImageTests<GrayF32> tests = new GenericOrientationImageTests<>();
 
 		OrientationImageAverage<GrayF32> alg = new ImplOrientationImageAverage_F32(1.0/2.0,r);
 

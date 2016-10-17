@@ -34,6 +34,6 @@ public class TestImplDisparityScoreSadRectFive_U8 extends ChecksImplDisparitySco
 	@Override
 	protected DisparityScoreWindowFive<GrayU8, GrayU8>
 	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, DisparitySelect compDisp) {
-		return new ImplDisparityScoreSadRectFive_U8<GrayU8>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		return new ImplDisparityScoreSadRectFive_U8<>(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 	}
 }

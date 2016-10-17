@@ -39,9 +39,9 @@ public class PlaybackXugglerVideo {
 			fileName = args[0];
 		}
 
-		XugglerSimplified<GrayU8> sequence = new XugglerSimplified<GrayU8>(fileName, ImageType.single(GrayU8.class));
+		XugglerSimplified<GrayU8> sequence = new XugglerSimplified<>(fileName, ImageType.single(GrayU8.class));
 
-		PlaybackImageSequence<GrayU8> player = new PlaybackImageSequence<GrayU8>(sequence);
+		PlaybackImageSequence<GrayU8> player = new PlaybackImageSequence<>(sequence);
 
 		player.process();
 

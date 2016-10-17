@@ -85,12 +85,12 @@ public class BenchmarkTemplateIntensity<T extends ImageGray> {
 
 	public static void main( String args[] ) {
 		BenchmarkTemplateIntensity<GrayU8>
-				benchmark_U8 = new BenchmarkTemplateIntensity<GrayU8>(GrayU8.class);
+				benchmark_U8 = new BenchmarkTemplateIntensity<>(GrayU8.class);
 
 		benchmark_U8.evaluateAll();
 
 		BenchmarkTemplateIntensity<GrayF32>
-				benchmark_F32 = new BenchmarkTemplateIntensity<GrayF32>(GrayF32.class);
+				benchmark_F32 = new BenchmarkTemplateIntensity<>(GrayF32.class);
 
 		benchmark_F32.evaluateAll();
 	}

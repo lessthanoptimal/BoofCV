@@ -91,7 +91,7 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 
 	@Override
 	public <InternalImage> InternalImage getGuiImage() {
-		Planar<GrayU8> boofColor = new Planar<GrayU8>(GrayU8.class,
+		Planar<GrayU8> boofColor = new Planar<>(GrayU8.class,
 				frameCurrent.getWidth(),frameCurrent.getHeight(),3);
 
 		BufferedImage output = new BufferedImage(boofColor.width,boofColor.height,BufferedImage.TYPE_INT_RGB);

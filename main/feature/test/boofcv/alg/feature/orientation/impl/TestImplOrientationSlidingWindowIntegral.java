@@ -34,7 +34,7 @@ public class TestImplOrientationSlidingWindowIntegral {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
 				new ImplOrientationSlidingWindowIntegral(0.3, 1, Math.PI/3,r,0, 4,GrayF32.class);
@@ -46,7 +46,7 @@ public class TestImplOrientationSlidingWindowIntegral {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
 				new ImplOrientationSlidingWindowIntegral(0.3, 1, Math.PI/3,r,2, 4,GrayF32.class);

@@ -38,7 +38,7 @@ public class TestMsToGrayMotion2D {
 		Dummy child = new Dummy();
 		PlToGrayMotion2D alg = new PlToGrayMotion2D(child, GrayF32.class);
 
-		Planar<GrayF32> ms = new Planar<GrayF32>(GrayF32.class,20,30,3);
+		Planar<GrayF32> ms = new Planar<>(GrayF32.class,20,30,3);
 
 		assertTrue(alg.process(ms));
 		assertTrue(child.input != null );

@@ -50,7 +50,7 @@ public class StreamOpenKinectRgbDepth {
 	// image with depth information
 	private GrayU16 depth = new GrayU16(1,1);
 	// image with color information
-	private Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
+	private Planar<GrayU8> rgb = new Planar<>(GrayU8.class,1,1,3);
 
 	// thread which synchronized video streams
 	private CombineThread thread;

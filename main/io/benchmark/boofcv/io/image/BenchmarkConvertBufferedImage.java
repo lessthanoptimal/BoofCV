@@ -108,7 +108,7 @@ public class BenchmarkConvertBufferedImage {
 	
 	public static void main( String args[] ) {
 		imgInt8 = new GrayU8(imgWidth,imgHeight);
-		multiInt8 = new Planar<GrayU8>(GrayU8.class,imgWidth,imgHeight,3);
+		multiInt8 = new Planar<>(GrayU8.class,imgWidth,imgHeight,3);
 		
 		GImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
 		for( int i = 0; i < multiInt8.getNumBands(); i++ )

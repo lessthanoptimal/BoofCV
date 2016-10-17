@@ -37,7 +37,7 @@ public class TestImplOrientationImageAverageIntegral {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		double scale = 1.0/radiusToScale;
 
@@ -51,7 +51,7 @@ public class TestImplOrientationImageAverageIntegral {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<GrayF32>();
+		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
 
 		double scale = 1.0/radiusToScale;
 

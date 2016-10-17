@@ -60,7 +60,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(img, BorderType.EXTENDED);
 
-		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
+		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<>(interp,scales,sigmas,imageType);
 
 		alg.process(img);
 
@@ -92,7 +92,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 		for( int i = 0; i < sigmas.length; i++ )
 			sigmas[i] = i+1;
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(imageType,BorderType.EXTENDED);
-		return new PyramidFloatGaussianScale<GrayF32>(interp,a,sigmas,imageType);
+		return new PyramidFloatGaussianScale<>(interp,a,sigmas,imageType);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.
 				bilinearPixelS(GrayF32.class,BorderType.EXTENDED);
 		double scales[] = new double[]{1,1};
-		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
+		PyramidFloatGaussianScale<GrayF32> alg = new PyramidFloatGaussianScale<>(interp,scales,sigmas,imageType);
 
 		// easy case with no adjustment to the scales
 		assertEquals(1,alg.getSigma(0),1e-6);
@@ -112,7 +112,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 
 		// now the input image is being scaled
 		scales = new double[]{2,3};
-		alg = new PyramidFloatGaussianScale<GrayF32>(interp,scales,sigmas,imageType);
+		alg = new PyramidFloatGaussianScale<>(interp,scales,sigmas,imageType);
 		assertEquals(1,alg.getSigma(0),1e-6);
 		assertEquals(4.123105625617661,alg.getSigma(1),0.001);
 	}

@@ -35,7 +35,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  */
 public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObjectRectangleTests<Planar<GrayU8>> {
 
-	Planar<GrayU8> original = new Planar<GrayU8>(GrayU8.class,width,height,3);
+	Planar<GrayU8> original = new Planar<>(GrayU8.class,width,height,3);
 
 	boolean multiColor;
 
@@ -44,7 +44,7 @@ public abstract class ColorTrackerObjectRectangleTests extends GenericTrackerObj
 
 		this.multiColor = multiColor;
 
-		input = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		input = new Planar<>(GrayU8.class,width,height,3);
 	}
 
 	@Override

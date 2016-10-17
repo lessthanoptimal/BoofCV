@@ -61,7 +61,7 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 				new AssociateMaxDistanceNaive<TupleDesc_B>(score,true,400,20);
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
-				new WrapDescribeBrief<GrayF32>(brief,GrayF32.class);
+				new WrapDescribeBrief<>(brief,GrayF32.class);
 
 		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
 				EasyGeneralFeatureDetector<GrayF32,GrayF32>(corner,GrayF32.class,GrayF32.class);

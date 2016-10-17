@@ -39,7 +39,7 @@ public class TestSparseIntegralGradientKernel
 		IntegralKernel kernelX = DerivativeIntegralImage.kernelDerivX(radius,null);
 		IntegralKernel kernelY = DerivativeIntegralImage.kernelDerivY(radius,null);
 
-		alg = new SparseIntegralGradientKernel<GrayF32>(kernelX,kernelY);
+		alg = new SparseIntegralGradientKernel<>(kernelX,kernelY);
 	}
 
 	@Test

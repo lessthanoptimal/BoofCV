@@ -59,7 +59,7 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		ImageMiscOps.fillUniform(output,rand,0,100);
 
 		FhEdgeWeights<GrayU8> edgeWeights = new FhEdgeWeights4_U8();
-		SegmentFelzenszwalbHuttenlocher04<GrayU8> alg = new SegmentFelzenszwalbHuttenlocher04<GrayU8>(200,10,edgeWeights);
+		SegmentFelzenszwalbHuttenlocher04<GrayU8> alg = new SegmentFelzenszwalbHuttenlocher04<>(200,10,edgeWeights);
 
 		alg.process(image,output);
 

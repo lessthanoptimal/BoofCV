@@ -403,7 +403,7 @@ public class ConvertImage {
 	 */
 	public static Planar<GrayU8> convert(InterleavedU8 input , Planar<GrayU8> output ) {
 		if (output == null) {
-			output = new Planar<GrayU8>(GrayU8.class,input.width, input.height,input.numBands);
+			output = new Planar<>(GrayU8.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}
@@ -2839,7 +2839,7 @@ public class ConvertImage {
 	 */
 	public static Planar<GrayF32> convert(InterleavedF32 input , Planar<GrayF32> output ) {
 		if (output == null) {
-			output = new Planar<GrayF32>(GrayF32.class,input.width, input.height,input.numBands);
+			output = new Planar<>(GrayF32.class,input.width, input.height,input.numBands);
 		} else {
 			InputSanityCheck.checkSameShape(input, output);
 		}

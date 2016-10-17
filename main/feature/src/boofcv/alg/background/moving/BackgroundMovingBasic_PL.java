@@ -60,7 +60,7 @@ public class BackgroundMovingBasic_PL<T extends ImageGray, Motion extends Invert
 		this.interpolationInput = FactoryInterpolation.createPixelMB(0, 255, interpType,BorderType.EXTENDED,imageType);
 
 		int numBands = imageType.getNumBands();
-		background = new Planar<GrayF32>(GrayF32.class,1,1,numBands);
+		background = new Planar<>(GrayF32.class,1,1,numBands);
 
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, ImageType.pl(numBands, GrayF32.class));

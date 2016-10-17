@@ -420,7 +420,7 @@ public class TestBaseDetectFiducialSquare {
 
 	public static class Dummy extends BaseDetectFiducialSquare<GrayU8> {
 
-		public List<GrayF32> detected = new ArrayList<GrayF32>();
+		public List<GrayF32> detected = new ArrayList<>();
 
 		protected Dummy() {
 			super(FactoryThresholdBinary.globalFixed(50,true,GrayU8.class),

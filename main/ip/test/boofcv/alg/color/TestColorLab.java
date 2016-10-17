@@ -38,8 +38,8 @@ public class TestColorLab {
 
 	@Test
 	public void rgbToLab_U8() {
-		Planar<GrayU8> input = new Planar<GrayU8>(GrayU8.class,20,25,3);
-		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,20,25,3);
+		Planar<GrayU8> input = new Planar<>(GrayU8.class,20,25,3);
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorLab.rgbToLab_U8(input, output);
@@ -69,8 +69,8 @@ public class TestColorLab {
 
 	@Test
 	public void rgbToLab_F32() {
-		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,20,25,3);
-		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,20,25,3);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,20,25,3);
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorLab.rgbToLab_F32(input,output);

@@ -48,7 +48,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.0f,0.0f,0.1f,calcHistogram);
 
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,100,150,3);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,100,150,3);
 
 		// odd width and height so samples land on pixels
 		render(image,50,40,21,31);
@@ -82,7 +82,7 @@ public class TestTrackerMeanShiftComaniciu2003 {
 		LocalWeightedHistogramRotRect calcHistogram = new LocalWeightedHistogramRotRect(30,3,10,3,255,interpolate);
 		TrackerMeanShiftComaniciu2003 alg = new TrackerMeanShiftComaniciu2003(false,100,1e-8f,0.1f,0.0f,0.1f,calcHistogram);
 
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,100,150,3);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,100,150,3);
 
 		// odd width and height so samples land on pixels
 		render(image,50,40,21,31);

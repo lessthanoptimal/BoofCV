@@ -61,7 +61,7 @@ public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
-				new WrapDescribeBrief<GrayF32>(brief,GrayF32.class);
+				new WrapDescribeBrief<>(brief,GrayF32.class);
 
 		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
 				EasyGeneralFeatureDetector<GrayF32,GrayF32>(corner,GrayF32.class,GrayF32.class);

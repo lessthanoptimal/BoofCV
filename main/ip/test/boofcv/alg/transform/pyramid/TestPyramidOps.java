@@ -49,7 +49,7 @@ public class TestPyramidOps {
 
 	@Test
 	public void declareOutput() {
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<GrayF32>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 		in.initialize(width,height);
 		GrayF32[] out = PyramidOps.declareOutput(in,GrayF32.class);
 
@@ -65,7 +65,7 @@ public class TestPyramidOps {
 	public void filter() {
 		FilterImageInterface<GrayF32,GrayF32> filter = FactoryBlurFilter.gaussian(GrayF32.class,-1,1);
 
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<GrayF32>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 
 		in.initialize(width,height);
 		GrayF32[] out = PyramidOps.declareOutput(in,GrayF32.class);
@@ -86,7 +86,7 @@ public class TestPyramidOps {
 	public void gradient() {
 		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
 
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<GrayF32>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 		in.initialize(width, height);
 
 		GrayF32[] outX = PyramidOps.declareOutput(in,GrayF32.class);

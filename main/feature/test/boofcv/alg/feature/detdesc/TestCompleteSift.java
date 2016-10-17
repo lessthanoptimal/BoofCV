@@ -77,9 +77,9 @@ public class TestCompleteSift {
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,1,true,true,true));
 		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,300);
 		OrientationHistogramSift<GrayF32> ori =
-				new OrientationHistogramSift<GrayF32>(36,1.5,GrayF32.class);
+				new OrientationHistogramSift<>(36,1.5,GrayF32.class);
 		DescribePointSift<GrayF32> describe =
-				new DescribePointSift<GrayF32>(4,4,8,1.5,0.5,0.2,GrayF32.class);
+				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 
 		return new CompleteSift(ss,10,limiter,ori,describe);
 	}

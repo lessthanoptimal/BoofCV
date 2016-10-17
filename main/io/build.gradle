@@ -2,7 +2,6 @@ dependencies {
     compile project(':main:ip')
     compile project(':main:calibration')
 
-    //    compile files("$libpath/lib/xstream-1.4.4.jar")
     compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.7'
     compile 'com.google.protobuf:protobuf-java:2.6.1'
 }

@@ -143,7 +143,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_PL_U8() {
-		Planar<GrayU8> image = new Planar<GrayU8>(GrayU8.class,width,height,2);
+		Planar<GrayU8> image = new Planar<>(GrayU8.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
 		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
@@ -173,7 +173,7 @@ public class TestHistogramFeatureOps {
 		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(image,rand,0,255);
 
-		Planar<GrayU8> ms = new Planar<GrayU8>(GrayU8.class,width,height,1);
+		Planar<GrayU8> ms = new Planar<>(GrayU8.class,width,height,1);
 		ms.setBand(0,image);
 
 		TupleDesc_F64 expected = new TupleDesc_F64(256);
@@ -190,7 +190,7 @@ public class TestHistogramFeatureOps {
 
 	@Test
 	public void histogram_PL_F32() {
-		Planar<GrayF32> image = new Planar<GrayF32>(GrayF32.class,width,height,2);
+		Planar<GrayF32> image = new Planar<>(GrayF32.class,width,height,2);
 
 		GeneralizedImageOps.setM(image, 2, 3, 20, 30);
 		GeneralizedImageOps.setM(image, 2, 4, 20, 30);
@@ -220,7 +220,7 @@ public class TestHistogramFeatureOps {
 		GrayF32 image = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(image,rand,-100,100);
 
-		Planar<GrayF32> ms = new Planar<GrayF32>(GrayF32.class,width,height,1);
+		Planar<GrayF32> ms = new Planar<>(GrayF32.class,width,height,1);
 		ms.setBand(0,image);
 
 		TupleDesc_F64 expected = new TupleDesc_F64(200);

@@ -41,7 +41,7 @@ public class TestLoadFileImageSequence {
 	@Test
 	public void basicLoadTest() {
 
-		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
+		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<>(ImageType.single(GrayF32.class),
 				imagePath,"png");
 
 		assertTrue(alg.getImageType().getFamily() == ImageType.Family.GRAY);
@@ -68,7 +68,7 @@ public class TestLoadFileImageSequence {
 	 */
 	@Test
 	public void checkLoop() {
-		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<GrayF32>(ImageType.single(GrayF32.class),
+		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<>(ImageType.single(GrayF32.class),
 				imagePath,"png");
 		alg.setLoop(true);
 

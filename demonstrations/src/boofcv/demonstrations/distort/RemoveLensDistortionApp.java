@@ -73,7 +73,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		dist = ConvertBufferedImage.convertFromMulti(orig, null,true, GrayF32.class);
 
 		// storage for undistorted image
-		undist = new Planar<GrayF32>(GrayF32.class,
+		undist = new Planar<>(GrayF32.class,
 				dist.getWidth(),dist.getHeight(),dist.getNumBands());
 
 		// show results and draw a horizontal line where the user clicks to see rectification easier

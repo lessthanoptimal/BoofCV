@@ -35,7 +35,7 @@ public class TestImplDisparitySparseScoreSadRect_F32 extends ChecksImplDisparity
 	@Override
 	public DisparityScoreSadRect<GrayF32, GrayU8> createDense(int minDisparity, int maxDisparity,
 															  int radiusX, int radiusY) {
-		return new ImplDisparityScoreSadRect_F32<GrayU8>(minDisparity,maxDisparity,radiusX,radiusY,
+		return new ImplDisparityScoreSadRect_F32<>(minDisparity,maxDisparity,radiusX,radiusY,
 				new ImplSelectRectBasicWta_F32_U8());
 	}
 

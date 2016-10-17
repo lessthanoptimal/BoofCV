@@ -47,7 +47,7 @@ public class TestDescribePointBrief {
 
 		BlurFilter<GrayU8> filterBlur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
 		Helper helper = new Helper();
-		DescribePointBrief<GrayU8> alg = new DescribePointBrief<GrayU8>(helper,filterBlur);
+		DescribePointBrief<GrayU8> alg = new DescribePointBrief<>(helper,filterBlur);
 
 		alg.setImage(input);
 		alg.process(15,20,null);

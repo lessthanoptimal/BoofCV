@@ -47,7 +47,7 @@ public class BackgroundStationaryBasic_PL<T extends ImageGray>
 
 		int numBands = imageType.getNumBands();
 
-		background = new Planar<GrayF32>(GrayF32.class,1,1,numBands);
+		background = new Planar<>(GrayF32.class,1,1,numBands);
 
 		inputWrapper = FactoryGImageMultiBand.create(imageType);
 

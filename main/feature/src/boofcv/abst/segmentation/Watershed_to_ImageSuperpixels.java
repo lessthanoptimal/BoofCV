@@ -63,7 +63,7 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase> implements Image
 		this.rule = rule;
 
 		if( minimumSize > 0 )
-			pruneSmall = new MergeSmallRegions<GrayU8>(minimumSize,rule,new ComputeRegionMeanColor.U8());
+			pruneSmall = new MergeSmallRegions<>(minimumSize,rule,new ComputeRegionMeanColor.U8());
 	}
 
 	@Override

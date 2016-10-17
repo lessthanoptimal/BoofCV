@@ -50,7 +50,7 @@ public class CreateRgbPointCloudFileApp {
 		IntrinsicParameters param = CalibrationIO.load(nameCalib);
 
 		GrayU16 depth = new GrayU16(1,1);
-		Planar<GrayU8> rgb = new Planar<GrayU8>(GrayU8.class,1,1,3);
+		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,1,1,3);
 
 		UtilImageIO.loadPPM_U8(nameRgb, rgb, null);
 		UtilOpenKinect.parseDepth(nameDepth,depth,null);

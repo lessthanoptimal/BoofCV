@@ -80,9 +80,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		distRight = ConvertBufferedImage.convertFromMulti(origRight, null, true, GrayF32.class);
 
 		// storage for undistorted + rectified images
-		rectLeft = new Planar<GrayF32>(GrayF32.class,
+		rectLeft = new Planar<>(GrayF32.class,
 				distLeft.getWidth(),distLeft.getHeight(),distLeft.getNumBands());
-		rectRight = new Planar<GrayF32>(GrayF32.class,
+		rectRight = new Planar<>(GrayF32.class,
 				distRight.getWidth(),distRight.getHeight(),distRight.getNumBands());
 
 		// Compute rectification

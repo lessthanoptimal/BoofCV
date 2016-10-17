@@ -50,7 +50,7 @@ public class TestSnapToEllipseEdge {
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
 
-		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<GrayU8>(30,1,GrayU8.class);
+		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
 		alg.setImage(image);
 		assertTrue(alg.process(target,found));
@@ -71,7 +71,7 @@ public class TestSnapToEllipseEdge {
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
 
-		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<GrayU8>(30,1,GrayU8.class);
+		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
 		alg.setImage(image);
 		assertTrue(alg.process(target,found));
@@ -99,7 +99,7 @@ public class TestSnapToEllipseEdge {
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
 
-		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<GrayU8>(30,1,GrayU8.class);
+		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(30,1,GrayU8.class);
 
 		alg.setImage(image);
 		assertTrue(alg.process(input,found));
@@ -145,7 +145,7 @@ public class TestSnapToEllipseEdge {
 		ImageMiscOps.addUniform(image,rand,-5,5);
 
 		int numContour = 20;
-		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<GrayU8>(numContour,1,GrayU8.class);
+		SnapToEllipseEdge<GrayU8> alg = new SnapToEllipseEdge<>(numContour,1,GrayU8.class);
 
 		alg.setImage(image);
 		alg.computePointsAndWeights(target);

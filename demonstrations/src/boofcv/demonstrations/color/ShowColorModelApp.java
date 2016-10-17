@@ -68,8 +68,8 @@ public class ShowColorModelApp
 		addAlgorithm(0,"XYZ",3);
 		addAlgorithm(0, "LAB", 4);
 
-		input = new Planar<GrayF32>(GrayF32.class, 1, 1 , 3);
-		output = new Planar<GrayF32>(GrayF32.class, 1, 1 , 3);
+		input = new Planar<>(GrayF32.class, 1, 1 , 3);
+		output = new Planar<>(GrayF32.class, 1, 1 , 3);
 
 		setMainGUI(gui);
 	}

@@ -380,7 +380,7 @@ public class UtilImageIO {
 		readLine(in);
 
 		if( storage == null || storage.getNumBands() != 3 )
-			storage = new Planar<GrayU8>(GrayU8.class,w,h,3 );
+			storage = new Planar<>(GrayU8.class,w,h,3 );
 		else
 			storage.reshape(w,h);
 

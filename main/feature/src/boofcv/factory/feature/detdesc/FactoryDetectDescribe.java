@@ -78,9 +78,9 @@ public class FactoryDetectDescribe {
 
 		SiftScaleSpace scaleSpace = new SiftScaleSpace(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<GrayF32>(
+		OrientationHistogramSift<GrayF32> orientation = new OrientationHistogramSift<>(
 				configOri.histogramSize,configOri.sigmaEnlarge,GrayF32.class);
-		DescribePointSift<GrayF32> describe = new DescribePointSift<GrayF32>(
+		DescribePointSift<GrayF32> describe = new DescribePointSift<>(
 				configDesc.widthSubregion,configDesc.widthGrid, configDesc.numHistogramBins,
 				configDesc.sigmaToPixels, configDesc.weightingSigmaFraction,
 				configDesc.maxDescriptorElementValue,GrayF32.class);

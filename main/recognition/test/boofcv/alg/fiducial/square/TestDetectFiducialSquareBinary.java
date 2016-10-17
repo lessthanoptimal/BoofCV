@@ -78,7 +78,7 @@ public class TestDetectFiducialSquareBinary {
 			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
 
 			DetectFiducialSquareBinary<GrayU8> alg =
-					new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+					new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
 							inputToBinary,squareDetector, GrayU8.class);
 			alg.setLengthSide(2);
 			alg.configure(intrinsic, false);
@@ -115,7 +115,7 @@ public class TestDetectFiducialSquareBinary {
 				ImageMiscOps.rotateCCW(input.clone(), input);
 			}
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+					new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
 							inputToBinary,squareDetector,GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -135,7 +135,7 @@ public class TestDetectFiducialSquareBinary {
 		ImageMiscOps.fillUniform(input,rand,0,255);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<GrayU8>(gridWidth,borderWidth,blackBorderFraction,
+				new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
 						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -145,17 +145,17 @@ public class TestDetectFiducialSquareBinary {
 	@Test
 	public void getNumberOfDistinctFiducials() {
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<GrayU8>(3,borderWidth,blackBorderFraction,
+				new DetectFiducialSquareBinary<>(3,borderWidth,blackBorderFraction,
 						inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(32,alg.getNumberOfDistinctFiducials());
 
-		alg = new DetectFiducialSquareBinary<GrayU8>(4,borderWidth,blackBorderFraction,
+		alg = new DetectFiducialSquareBinary<>(4,borderWidth,blackBorderFraction,
 				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(4096,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<GrayU8>(5,borderWidth,blackBorderFraction,
+		alg = new DetectFiducialSquareBinary<>(5,borderWidth,blackBorderFraction,
 				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(2097152,alg.getNumberOfDistinctFiducials());
-		alg = new DetectFiducialSquareBinary<GrayU8>(6,borderWidth,blackBorderFraction,
+		alg = new DetectFiducialSquareBinary<>(6,borderWidth,blackBorderFraction,
 				inputToBinary,squareDetector,GrayU8.class);
 		assertEquals(4294967296L, alg.getNumberOfDistinctFiducials());
 	}
@@ -169,7 +169,7 @@ public class TestDetectFiducialSquareBinary {
 		GrayF32 input = create(DetectFiducialSquareBinary.w, number,3, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<GrayU8>(3,borderWidth,blackBorderFraction,
+				new DetectFiducialSquareBinary<>(3,borderWidth,blackBorderFraction,
 						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -187,7 +187,7 @@ public class TestDetectFiducialSquareBinary {
 		GrayF32 input = create(DetectFiducialSquareBinary.w, number,5, borderWidth);
 
 		DetectFiducialSquareBinary alg =
-				new DetectFiducialSquareBinary<GrayU8>(5,borderWidth,blackBorderFraction,
+				new DetectFiducialSquareBinary<>(5,borderWidth,blackBorderFraction,
 						inputToBinary,squareDetector,GrayU8.class);
 
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -210,7 +210,7 @@ public class TestDetectFiducialSquareBinary {
 			GrayF32 input = create(DetectFiducialSquareBinary.w, number,4, border);
 
 			DetectFiducialSquareBinary alg =
-					new DetectFiducialSquareBinary<GrayU8>(gridWidth,border,blackBorderFraction,
+					new DetectFiducialSquareBinary<>(gridWidth,border,blackBorderFraction,
 							inputToBinary,squareDetector,GrayU8.class);
 
 			BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();

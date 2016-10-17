@@ -53,7 +53,7 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillUniform(image, rand, 0, 256);
 
 		SegmentMeanShiftSearchGray<GrayF32> alg =
-				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,100, false);
+				new SegmentMeanShiftSearchGray<>(30,0.05f,interp,2,2,100, false);
 
 		alg.process(image);
 
@@ -97,7 +97,7 @@ public class TestSegmentMeanShiftSearchGray {
 
 		// works better with this example when its uniform
 		SegmentMeanShiftSearchGray<GrayF32> alg =
-				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,3, false);
+				new SegmentMeanShiftSearchGray<>(30,0.05f,interp,2,2,3, false);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -119,7 +119,7 @@ public class TestSegmentMeanShiftSearchGray {
 		ImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
 		SegmentMeanShiftSearchGray<GrayF32> alg =
-				new SegmentMeanShiftSearchGray<GrayF32>(30,0.05f,interp,2,2,100, false);
+				new SegmentMeanShiftSearchGray<>(30,0.05f,interp,2,2,100, false);
 
 		interp.setImage(image);
 		alg.image = image;

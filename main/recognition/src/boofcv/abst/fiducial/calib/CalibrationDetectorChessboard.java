@@ -59,7 +59,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
 
-		alg = new DetectChessboardFiducial<GrayF32>(
+		alg = new DetectChessboardFiducial<>(
 				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,
 				refineLine,refineCorner,inputToBinary);
 

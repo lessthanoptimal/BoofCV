@@ -46,18 +46,18 @@ public class TestDetectDescribeSurfPlanar {
 
 	@Test
 	public void basicTest() {
-		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,width,height,3);
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,width,height,3);
 
 		GImageMiscOps.addUniform(input, rand, 0, 200);
 
-		DescribePointSurf<GrayF32> desc = new DescribePointSurf<GrayF32>(GrayF32.class);
-		DescribePointSurfPlanar<GrayF32> descMulti = new DescribePointSurfPlanar<GrayF32>(desc,3);
+		DescribePointSurf<GrayF32> desc = new DescribePointSurf<>(GrayF32.class);
+		DescribePointSurfPlanar<GrayF32> descMulti = new DescribePointSurfPlanar<>(desc,3);
 
 		FastHessianFeatureDetector<GrayF32> detector = FactoryInterestPointAlgs.fastHessian(null);
 		OrientationIntegral<GrayF32> orientation = FactoryOrientationAlgs.sliding_ii(null, GrayF32.class);
 
 		DetectDescribeSurfPlanar<GrayF32> alg =
-				new DetectDescribeSurfPlanar<GrayF32>(detector,orientation,descMulti);
+				new DetectDescribeSurfPlanar<>(detector,orientation,descMulti);
 
 		GrayF32 gray = ConvertImage.average(input, null);
 

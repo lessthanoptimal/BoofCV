@@ -91,9 +91,9 @@ public class TestColorHsv {
 
 	@Test
 	public void Planar_F32() {
-		Planar<GrayF32> rgb = new Planar<GrayF32>(GrayF32.class,10,15,3);
-		Planar<GrayF32> hsv = new Planar<GrayF32>(GrayF32.class,10,15,3);
-		Planar<GrayF32> found = new Planar<GrayF32>(GrayF32.class,10,15,3);
+		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,10,15,3);
+		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,10,15,3);
+		Planar<GrayF32> found = new Planar<>(GrayF32.class,10,15,3);
 
 		GImageMiscOps.fillUniform(rgb, rand, 0, 255);
 

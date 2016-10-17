@@ -74,7 +74,7 @@ public class BackgroundMovingGaussian_PL<T extends ImageGray, Motion extends Inv
 		this.interpolateInput = FactoryInterpolation.createPixelMB(0, 255,
 				TypeInterpolate.BILINEAR, BorderType.EXTENDED, imageType);
 
-		background = new Planar<GrayF32>(GrayF32.class,1,1,2*numBands);
+		background = new Planar<>(GrayF32.class,1,1,2*numBands);
 		this.interpolationBG = FactoryInterpolation.createPixelMB(
 				0, 255, interpType, BorderType.EXTENDED, background.getImageType());
 		this.interpolationBG.setImage(background);

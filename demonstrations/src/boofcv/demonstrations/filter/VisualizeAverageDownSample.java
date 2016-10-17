@@ -36,14 +36,14 @@ public class VisualizeAverageDownSample {
 	public static void main(String[] args) {
 		BufferedImage original = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		Planar<GrayF32> input = new Planar<GrayF32>(GrayF32.class,
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,
 				original.getWidth(),original.getHeight(),3);
 
 		ConvertBufferedImage.convertFromMulti(original,input,true,GrayF32.class);
 
-		Planar<GrayF32> output = new Planar<GrayF32>(GrayF32.class,
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,
 				original.getWidth()/3,original.getHeight()/3,3);
-		Planar<GrayF32> output2 = new Planar<GrayF32>(GrayF32.class,
+		Planar<GrayF32> output2 = new Planar<>(GrayF32.class,
 				original.getWidth()/3,original.getHeight()/3,3);
 
 		AverageDownSampleOps.down(input, output);

@@ -108,7 +108,7 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testFastQueue() {
-		FastQueue<GrayU8> list = new FastQueue<GrayU8>(GrayU8.class,false);
+		FastQueue<GrayU8> list = new FastQueue<>(GrayU8.class,false);
 
 		list.add(new GrayU8(1,2));
 		list.add(new GrayU8(2,4));

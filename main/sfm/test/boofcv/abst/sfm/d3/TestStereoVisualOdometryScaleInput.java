@@ -51,7 +51,7 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
 		alg.setCalibration(p);
 
 		assertEquals(320, parameters.left.width);
@@ -65,7 +65,7 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
 		alg.setCalibration(p);
 
 		GrayF32 left = new GrayF32(width,height);
@@ -88,7 +88,7 @@ public class TestStereoVisualOdometryScaleInput {
 		StereoParameters p = createStereoParam();
 		Dummy dummy = new Dummy();
 
-		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<GrayF32>(dummy,0.5);
+		StereoVisualOdometryScaleInput<GrayF32> alg = new StereoVisualOdometryScaleInput<>(dummy,0.5);
 
 		assertTrue(type == alg.getImageType());
 	}

@@ -80,7 +80,7 @@ public class TestMergeSmallRegions {
 		ComputeRegionMeanColor<GrayU8> mean = new ComputeRegionMeanColor.U8();
 		mean.process(image,pixelToRegion,memberCount,regionColor);
 
-		MergeSmallRegions<GrayU8> alg = new MergeSmallRegions<GrayU8>(3, ConnectRule.FOUR,mean);
+		MergeSmallRegions<GrayU8> alg = new MergeSmallRegions<>(3, ConnectRule.FOUR,mean);
 
 		alg.process(image, pixelToRegion, memberCount, regionColor);
 

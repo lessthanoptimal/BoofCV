@@ -32,7 +32,7 @@ public class TestTldDetection {
 
 	@Test
 	public void computeTemplateConfidence() {
-		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
+		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new TldParameters();
 		alg.config.confidenceThresholdUpper = 0.6;
 		alg.template = new HelperTemplate();
@@ -58,7 +58,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_largerN() {
-		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
+		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
@@ -80,7 +80,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_smaller() {
-		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
+		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 
@@ -101,7 +101,7 @@ public class TestTldDetection {
 	 */
 	@Test
 	public void selectBestRegionsFern_larger() {
-		TldDetection<GrayU8> alg = new TldDetection<GrayU8>();
+		TldDetection<GrayU8> alg = new TldDetection<>();
 		alg.config = new TldParameters();
 		alg.config.maximumCascadeConsider = 20;
 

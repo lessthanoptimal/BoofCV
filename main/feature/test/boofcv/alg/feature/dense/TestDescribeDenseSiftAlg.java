@@ -58,7 +58,7 @@ public class TestDescribeDenseSiftAlg {
 	}
 
 	public void process(GrayF32 derivX, GrayF32 derivY) {
-		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<>(4,4,8,0.5,0.2,10,10,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -102,7 +102,7 @@ public class TestDescribeDenseSiftAlg {
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<>(4,4,8,0.5,0.2,10,10,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 
@@ -131,8 +131,8 @@ public class TestDescribeDenseSiftAlg {
 		GImageMiscOps.fillUniform(derivX,rand,0,200);
 		GImageMiscOps.fillUniform(derivY,rand,0,200);
 
-		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<GrayF32>(4,4,8,0.5,0.2,10,10,GrayF32.class);
-		DescribePointSift<GrayF32> algTest = new DescribePointSift<GrayF32>(4,4,8,1,0.5,0.2,GrayF32.class);
+		DescribeDenseSiftAlg<GrayF32> alg = new DescribeDenseSiftAlg<>(4,4,8,0.5,0.2,10,10,GrayF32.class);
+		DescribePointSift<GrayF32> algTest = new DescribePointSift<>(4,4,8,1,0.5,0.2,GrayF32.class);
 
 		alg.setImageGradient(derivX,derivY);
 		algTest.setImageGradient(derivX,derivY);

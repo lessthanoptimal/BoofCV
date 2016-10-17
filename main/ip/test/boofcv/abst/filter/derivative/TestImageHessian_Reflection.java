@@ -48,7 +48,7 @@ public class TestImageHessian_Reflection {
 
 		Method m = HessianFromGradient.class.getMethod("hessianSobel",GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
 
-		ImageHessian_Reflection<GrayF32> alg = new ImageHessian_Reflection<GrayF32>(m);
+		ImageHessian_Reflection<GrayF32> alg = new ImageHessian_Reflection<>(m);
 
 		alg.process(derivX,derivY,derivXX,derivXY,derivYY);
 	}

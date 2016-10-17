@@ -35,7 +35,7 @@ public class TestImplDisparitySparseScoreSadRect_S16 extends ChecksImplDisparity
 	@Override
 	public DisparityScoreSadRect<GrayS16, GrayU8> createDense(int minDisparity, int maxDisparity,
 															  int radiusX, int radiusY) {
-		return new ImplDisparityScoreSadRect_S16<GrayU8>(minDisparity,maxDisparity,radiusX,radiusY,
+		return new ImplDisparityScoreSadRect_S16<>(minDisparity,maxDisparity,radiusX,radiusY,
 				new ImplSelectRectBasicWta_S32_U8());
 	}
 

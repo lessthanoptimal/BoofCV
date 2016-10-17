@@ -143,7 +143,7 @@ public class VisualizeSquareFiducial {
 
 	public static class Detector extends BaseDetectFiducialSquare<GrayF32> {
 
-		public List<GrayF32> squares = new ArrayList<GrayF32>();
+		public List<GrayF32> squares = new ArrayList<>();
 
 		protected Detector() {
 			super(inputToBinary,FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4,4), GrayF32.class),

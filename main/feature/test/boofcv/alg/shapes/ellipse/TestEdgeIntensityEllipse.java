@@ -51,7 +51,7 @@ public class TestEdgeIntensityEllipse {
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
 
-		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<GrayU8>(1.5,20,10.0,GrayU8.class);
+		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<>(1.5,20,10.0,GrayU8.class);
 		alg.setImage(image);
 
 		assertTrue(alg.process(ellipse));
@@ -79,7 +79,7 @@ public class TestEdgeIntensityEllipse {
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
 
-		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<GrayU8>(1.5,20,10.0,GrayU8.class);
+		EdgeIntensityEllipse<GrayU8> alg = new EdgeIntensityEllipse<>(1.5,20,10.0,GrayU8.class);
 		alg.setImage(image);
 
 		assertTrue(alg.process(ellipse));

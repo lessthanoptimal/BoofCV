@@ -69,7 +69,7 @@ public class TestDetectFiducialSquareImage {
 
 		GrayU8 pattern = rendered.subimage(2*w,2*w,rendered.width-2*w,rendered.height-2*w,null).clone();
 
-		DetectFiducialSquareImage<GrayU8> alg = new DetectFiducialSquareImage<GrayU8>(
+		DetectFiducialSquareImage<GrayU8> alg = new DetectFiducialSquareImage<>(
 				inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
@@ -124,7 +124,7 @@ public class TestDetectFiducialSquareImage {
 
 		// process it in different orientations
 		DetectFiducialSquareImage<GrayU8> alg =
-				new DetectFiducialSquareImage<GrayU8>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
+				new DetectFiducialSquareImage<>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 
 		alg.addPattern(threshold(pattern, 125), 1.0);
 		BaseDetectFiducialSquare.Result result = new BaseDetectFiducialSquare.Result();
@@ -165,7 +165,7 @@ public class TestDetectFiducialSquareImage {
 		}
 
 		DetectFiducialSquareImage<GrayU8> alg =
-				new DetectFiducialSquareImage<GrayU8>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
+				new DetectFiducialSquareImage<>(inputToBinary,squareDetector,0.25,0.65,0.1,GrayU8.class);
 
 		alg.addPattern(threshold(image, 100), 1.0);
 

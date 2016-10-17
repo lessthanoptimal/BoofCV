@@ -65,7 +65,7 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Gray
 
 		DetectDescribeFusion<GrayF32,TupleDesc_B> fused =
 				new DetectDescribeFusion<GrayF32,TupleDesc_B>(
-						detector,null,new WrapDescribeBrief<GrayF32>(brief,GrayF32.class));
+						detector,null,new WrapDescribeBrief<>(brief,GrayF32.class));
 
 		DdaManagerDetectDescribePoint<GrayF32,TupleDesc_B> manager;
 		manager = new DdaManagerDetectDescribePoint<GrayF32,TupleDesc_B>(fused);

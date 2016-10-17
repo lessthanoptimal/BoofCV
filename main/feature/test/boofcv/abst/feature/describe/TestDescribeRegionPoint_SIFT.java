@@ -87,6 +87,6 @@ public class TestDescribeRegionPoint_SIFT {
 		SiftScaleSpace ss = new SiftScaleSpace(0,4,3,1.6);
 		DescribePointSift<GrayF32> desc = FactoryDescribePointAlgs.sift(null,GrayF32.class);
 
-		return new DescribeRegionPoint_SIFT<GrayF32>(ss,desc,GrayF32.class);
+		return new DescribeRegionPoint_SIFT<>(ss,desc,GrayF32.class);
 	}
 }

@@ -18,13 +18,11 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.struct.image.GrayU8;
-
 /**
  * @author Peter Abeles
  */
 public class TestImplFastIntensity10 extends GenericImplFastIntensity {
 	public TestImplFastIntensity10() {
-		super(new ImplFastIntensity10<GrayU8>(new ImplFastHelper_U8(20)), 10, 20);
+		super(new ImplFastIntensity10<>(new ImplFastHelper_U8(20)), 10, 20);
 	}
 }

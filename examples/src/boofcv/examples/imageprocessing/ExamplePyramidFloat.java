@@ -85,8 +85,8 @@ public class ExamplePyramidFloat<T extends ImageGray> {
 	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
 
-		ExamplePyramidFloat<GrayF32> app = new ExamplePyramidFloat<GrayF32>(GrayF32.class);
-//		ExamplePyramidFloat<GrayU8> app = new ExamplePyramidFloat<GrayU8>(GrayU8.class);
+		ExamplePyramidFloat<GrayF32> app = new ExamplePyramidFloat<>(GrayF32.class);
+//		ExamplePyramidFloat<GrayU8> app = new ExamplePyramidFloat<>(GrayU8.class);
 
 		app.standard();
 		app.process(image);

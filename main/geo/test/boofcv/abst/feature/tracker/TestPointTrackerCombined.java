@@ -63,7 +63,7 @@ public class TestPointTrackerCombined extends StandardPointTracker<GrayF32> {
 
 		PointTracker<GrayF32> pointTracker = FactoryPointTracker.combined(
 				detector, null,
-				new WrapDescribeBrief<GrayF32>(brief,GrayF32.class),
+				new WrapDescribeBrief<>(brief,GrayF32.class),
 				association, null, 20, GrayF32.class);
 
 		return pointTracker;

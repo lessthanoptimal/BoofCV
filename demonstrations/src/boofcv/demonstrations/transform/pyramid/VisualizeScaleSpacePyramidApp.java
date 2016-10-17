@@ -93,8 +93,8 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageGray>
 
 	public static void main( String args[] ) {
 
-//		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<GrayF32>(GrayF32.class);
-		VisualizeScaleSpacePyramidApp<GrayU8> app = new VisualizeScaleSpacePyramidApp<GrayU8>(GrayU8.class);
+//		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<>(GrayF32.class);
+		VisualizeScaleSpacePyramidApp<GrayU8> app = new VisualizeScaleSpacePyramidApp<>(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));

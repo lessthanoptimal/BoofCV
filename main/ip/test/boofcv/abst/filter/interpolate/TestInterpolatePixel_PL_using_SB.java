@@ -53,9 +53,9 @@ public class TestInterpolatePixel_PL_using_SB {
 		InterpolatePixelS<GrayF32> interpB =
 				FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
-		InterpolatePixelMB<Planar<GrayF32>> alg = new InterpolatePixel_PL_using_SB<GrayF32>(interpB);
+		InterpolatePixelMB<Planar<GrayF32>> alg = new InterpolatePixel_PL_using_SB<>(interpB);
 
-		Planar<GrayF32> mb = new Planar<GrayF32>(GrayF32.class,width,height,2);
+		Planar<GrayF32> mb = new Planar<>(GrayF32.class,width,height,2);
 		mb.bands[0] = image0;
 		mb.bands[1] = image1;
 
