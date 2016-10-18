@@ -69,7 +69,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO create unit test for bright object
-	// TODO create a way to check to see if the black border is black
 public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 	// Storage for the found fiducials
@@ -314,7 +313,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 	/**
 	 * Computes the fraction of pixels inside the image border which are black
-	 * @param pixelThreshold  Pixel's less than this value are considered black
+	 * @param pixelThreshold Pixel's less than this value are considered black
 	 * @return fraction of border that's black
 	 */
 	protected double computeFractionBoundary( float pixelThreshold ) {

@@ -45,20 +45,20 @@ public class EllipseClustersIntoAsymmetricGrid {
 	private FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
 	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
-	public static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
+	private static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
 
 	// Information on each ellipse/node in a cluster
 	FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo.class,true);
 	// Used to sort edges in a node.  used instead of built in sorting algorithm to maximize memory being recycled
-	QuickSortComparator<Edge> sorter;
+	private QuickSortComparator<Edge> sorter;
 
 	// All ellipses in the contour around the grid
 	FastQueue<NodeInfo> contour = new FastQueue<>(NodeInfo.class,false);
 
 	// Local storage in one of the functions below.  Here to minimize GC
-	LineSegment2D_F64 line0111 = new LineSegment2D_F64();
-	LineSegment2D_F64 line1001 = new LineSegment2D_F64();
-	Point2D_F64 intersection = new Point2D_F64();
+	private LineSegment2D_F64 line0110 = new LineSegment2D_F64();
+	private LineSegment2D_F64 line0011 = new LineSegment2D_F64();
+	private Point2D_F64 intersection = new Point2D_F64();
 
 	public EllipseClustersIntoAsymmetricGrid() {
 
@@ -117,6 +117,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 			}
 
 			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid, clusterSize);
+
+			// see if it failed to find the inner grid
+			if( innerGrid == null )
+				continue;
 
 			// perform sanity checks
 			if( !checkGridSize(outerGrid,innerGrid, cluster.size()) ) {
@@ -213,6 +217,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 		NodeInfo c11 = outerGrid.get(1).get(1);
 
 		NodeInfo corner = selectInnerSeed( c00, c01, c10 , c11 );
+		if( corner == null )
+			return null;
 
 		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
 		NodeInfo colNext = selectSeedNext(c00,c10,corner);
@@ -287,12 +293,12 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 */
 	protected NodeInfo selectInnerSeed( NodeInfo c00 , NodeInfo c01 ,
 										NodeInfo c10 , NodeInfo c11 ) {
-		line0111.a.set(c00.ellipse.center);
-		line0111.b.set(c11.ellipse.center);
-		line1001.a.set(c10.ellipse.center);
-		line1001.b.set(c01.ellipse.center);
+		line0110.a.set(c01.ellipse.center);
+		line0110.b.set(c10.ellipse.center);
+		line0011.a.set(c00.ellipse.center);
+		line0011.b.set(c11.ellipse.center);
 
-		if( null == Intersection2D_F64.intersection(line0111,line1001,intersection) )
+		if( null == Intersection2D_F64.intersection(line0110, line0011,intersection) )
 			return null;
 
 		// pick the best solution from two perspectives.  Two perspectives are used

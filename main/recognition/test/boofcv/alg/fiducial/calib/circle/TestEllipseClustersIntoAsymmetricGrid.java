@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.NodeIn
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.Tuple2;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.findClosestEdge;
 import static org.junit.Assert.*;
 
 /**
@@ -82,12 +84,39 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void selectInnerSeed() {
+		NodeInfo n00 = setNodeInfo(null,-2,0);
+		NodeInfo n01 = setNodeInfo(null,-2,1);
+		NodeInfo n11 = setNodeInfo(null,-1,1);
+		NodeInfo n10 = setNodeInfo(null,-1,0);
 
+		NodeInfo n = setNodeInfo(null,-1.5,0.5); // solution
+		NodeInfo f = setNodeInfo(null,-0.5,0.8); // some noise
+
+		n00.edges.grow().target = n;
+		n00.edges.grow().target = f;
+		n01.edges.grow().target = n;
+		n01.edges.grow().target = f;
+		n11.edges.grow().target = n;
+		n11.edges.grow().target = f;
+		n10.edges.grow().target = n;
+		n10.edges.grow().target = f;
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		NodeInfo found = alg.selectInnerSeed(n00,n01,n10,n11);
+		assertTrue( found == n );
 	}
 
 	@Test
-	public void findClosestEdge() {
+	public void findClosestEdge_() {
+		NodeInfo n = setNodeInfo(null,-2,0);
+		n.edges.grow().target = setNodeInfo(null,2,2);
+		n.edges.grow().target = setNodeInfo(null,2,0);
+		n.edges.grow().target = setNodeInfo(null,-2,-2);
 
+		assertTrue( n.edges.get(0).target == findClosestEdge(n,new Point2D_F64(2,1.5)));
+		assertTrue( n.edges.get(1).target == findClosestEdge(n,new Point2D_F64(1.9,0)));
+		assertTrue( n.edges.get(2).target == findClosestEdge(n,new Point2D_F64(-2,-1)));
 	}
 
 	@Test
@@ -314,8 +343,10 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	}
 
-	private static void setNodeInfo( NodeInfo node , double x , double y ) {
+	private static NodeInfo setNodeInfo( NodeInfo node , double x , double y ) {
+		if( node == null ) node = new NodeInfo();
 		node.ellipse = new EllipseRotated_F64(x,y,1,1,0);
+		return node;
 	}
 
 	private static Node createNode( int which , int ...connections) {
