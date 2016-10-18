@@ -41,6 +41,7 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 	String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 
 	public TestCalibrationFiducialDetector() {
+		pixelAndProjectedTol = 10;
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
 	}

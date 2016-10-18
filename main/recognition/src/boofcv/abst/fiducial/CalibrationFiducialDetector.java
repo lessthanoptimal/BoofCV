@@ -79,6 +79,8 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	// average of width and height
 	double width;
 
+	CameraPinholeRadial intrinsic;
+
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
@@ -263,7 +265,34 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 
 	@Override
 	public void setIntrinsic(CameraPinholeRadial intrinsic) {
+		this.intrinsic = intrinsic;
 		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+	}
+
+	@Override
+	public CameraPinholeRadial getIntrinsics() {
+		return intrinsic;
+	}
+
+	/**
+	 * Returns the detection point average location.  This will NOT be the same as the geometric center.
+	 *
+	 * @param which Fiducial's index
+	 * @param location (output) Storage for the transform. modified.
+	 */
+	@Override
+	public void getImageLocation(int which, Point2D_F64 location) {
+		CalibrationObservation view = detector.getDetectedPoints();
+
+		location.set(0,0);
+		for (int i = 0; i < view.size(); i++) {
+			CalibrationObservation.Point p = view.get(i);
+			location.x += p.pixel.x;
+			location.y += p.pixel.y;
+		}
+
+		location.x /= view.size();
+		location.y /= view.size();
 	}
 
 	@Override

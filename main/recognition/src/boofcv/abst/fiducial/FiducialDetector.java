@@ -21,6 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -66,6 +67,12 @@ public interface FiducialDetector<T extends ImageBase>
 	void setIntrinsic( CameraPinholeRadial intrinsic );
 
 	/**
+	 * Returns the intrinsic parameters that it
+	 * @return intrinsic parameters
+	 */
+	CameraPinholeRadial getIntrinsics();
+
+	/**
 	 * The total number of targets found
 	 * @return number of targets found
 	 */
@@ -78,6 +85,18 @@ public interface FiducialDetector<T extends ImageBase>
 	 * @param fiducialToCamera (output) Storage for the transform. modified.
 	 */
 	void getFiducialToCamera(int which, Se3_F64 fiducialToCamera);
+
+	/**
+	 * Returns where in the image the fiducial is.  Typically this will be the fiducial's visual center.  Note that
+	 * the visual center is unlikely to be the projection of the 3D geometric center.  To find the former you need
+	 * to reproject it using the found fiducialToCamera.
+	 *
+	 * <p>NOTE: The reprojected center might not be the same as the location returned here.</p>
+	 *
+	 * @param which Fiducial's index
+	 * @param location (output) Storage for the transform. modified.
+	 */
+	void getImageLocation(int which , Point2D_F64 location );
 
 	/**
 	 * If applicable, returns the ID of the fiducial found.

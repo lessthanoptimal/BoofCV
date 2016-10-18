@@ -48,8 +48,8 @@ import java.util.List;
 public class ExampleImageClassification {
 
 	public static void main(String[] args) throws IOException {
-//		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();
-		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet();
+		ClassifierAndSource cs = FactoryImageClassifier.vgg_cifar10();
+//		ClassifierAndSource cs = FactoryImageClassifier.nin_imagenet();
 
 		File path = DeepBoofDataBaseOps.downloadModel(cs.getSource(),new File("download_data"));
 

@@ -41,6 +41,9 @@ Version : 0.25
 - Image Classification
   * VGG trained on CIFAR10  (10 categories at 89.9%)
   * Network-in-Network trained on ImageNet (1000 categories at 62.6%)
+- FiducialDetector
+  * Added getIntrinsics()
+  * Added getImageLocation()
 
 - TODO dual fisheye to equirectangular image
 - TODO fisheye

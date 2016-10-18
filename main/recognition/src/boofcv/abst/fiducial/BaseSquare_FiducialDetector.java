@@ -19,10 +19,15 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
+import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.alg.fiducial.square.StabilitySquareFiducialEstimate;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.UtilLine2D_F64;
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.line.LineGeneral2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
@@ -40,6 +45,12 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 
 	ImageType<T> type;
 
+	CameraPinholeRadial intrinsic;
+
+	// Used for finding the center of the square
+	LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
+	LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
+
 	public BaseSquare_FiducialDetector(Detector alg) {
 		this.alg = alg;
 		this.type = ImageType.single(alg.getInputType());
@@ -52,8 +63,29 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 
 	@Override
 	public void setIntrinsic(CameraPinholeRadial intrinsic) {
+		this.intrinsic = intrinsic;
 		alg.configure(intrinsic,true);
 		stability = new StabilitySquareFiducialEstimate(alg.getPoseEstimator());
+	}
+
+	@Override
+	public CameraPinholeRadial getIntrinsics() {
+		return intrinsic;
+	}
+
+	/**
+	 * Return the intersection of two lines defined by opposing corners.  This should also be the geometric center
+	 * @param which Fiducial's index
+	 * @param location (output) Storage for the transform. modified.
+	 */
+	@Override
+	public void getImageLocation(int which, Point2D_F64 location) {
+		FoundFiducial f = alg.getFound().get(which);
+
+		UtilLine2D_F64.convert(f.location.a,f.location.c,line02);
+		UtilLine2D_F64.convert(f.location.b,f.location.d,line13);
+
+		Intersection2D_F64.intersection(line02,line13,location);
 	}
 
 	@Override

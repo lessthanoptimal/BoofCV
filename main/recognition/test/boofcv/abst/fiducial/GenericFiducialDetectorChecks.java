@@ -19,10 +19,14 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.distort.FDistort;
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
@@ -36,6 +40,9 @@ import static org.junit.Assert.*;
  * @author Peter Abeles
  */
 public abstract class GenericFiducialDetectorChecks {
+
+	// tolerance for difference between pixel location and geometric center from reprojection
+	protected double pixelAndProjectedTol = 3.0;
 
 	protected List<ImageType> types = new ArrayList<ImageType>();
 
@@ -96,15 +103,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 			assertTrue(detector.totalFound()>= 1);
 
-			long foundID[] = new long[ detector.totalFound() ];
-			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
-
-			for (int i = 0; i < detector.totalFound(); i++) {
-				foundID[i] = detector.getId(i);
-				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToCamera(i, pose);
-				foundPose.add(pose);
-			}
+			Results results = extractResults(detector);
 
 			// run it again with a changed intrinsic that's incorrect
 			intrinsic.radial = null;
@@ -113,14 +112,19 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			// results should have changed
-			if( foundID.length == detector.totalFound()) {
-				assertEquals(foundID.length, detector.totalFound());
+			if( results.foundID.length == detector.totalFound()) {
+				assertEquals(results.foundID.length, detector.totalFound());
 				for (int i = 0; i < detector.totalFound(); i++) {
-//				assertEquals(foundID[i],detector.getId(i));
+					assertEquals(results.foundID[i],detector.getId(i));
 					Se3_F64 pose = new Se3_F64();
+					Point2D_F64 pixel = new Point2D_F64();
 					detector.getFiducialToCamera(i, pose);
-					assertTrue(pose.getT().distance(foundPose.get(i).T) > 1e-4);
-					assertFalse(MatrixFeatures.isIdentical(pose.getR(), foundPose.get(i).R, 1e-4));
+					detector.getImageLocation(i, pixel);
+					assertTrue(pose.getT().distance(results.foundPose.get(i).T) > 1e-4);
+					assertFalse(MatrixFeatures.isIdentical(pose.getR(), results.foundPose.get(i).R, 1e-4));
+					// pixel location is based on the observed location, thus changing the intrinsics should not
+					// affect it
+					assertTrue(results.foundPixel.get(i).distance(pixel) <= 1e-4 );
 				}
 			} else {
 				// clearly changed
@@ -131,13 +135,13 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			// see if it produced exactly the same results
-			assertEquals(foundID.length,detector.totalFound());
+			assertEquals(results.foundID.length,detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(foundID[i],detector.getId(i));
+				assertEquals(results.foundID[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
+				assertEquals(0,pose.getT().distance(results.foundPose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.foundPose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -175,27 +179,19 @@ public abstract class GenericFiducialDetectorChecks {
 
 			assertTrue(detector.totalFound()>= 1);
 
-			long foundID[] = new long[ detector.totalFound() ];
-			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
-
-			for (int i = 0; i < detector.totalFound(); i++) {
-				foundID[i] = detector.getId(i);
-				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToCamera(i, pose);
-				foundPose.add(pose);
-			}
+			Results results = extractResults(detector);
 
 			// run it again
 			detector.detect(image);
 
 			// see if it produced exactly the same results
-			assertEquals(foundID.length,detector.totalFound());
+			assertEquals(results.foundID.length,detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(foundID[i],detector.getId(i));
+				assertEquals(results.foundID[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
+				assertEquals(0,pose.getT().distance(results.foundPose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.foundPose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -294,6 +290,67 @@ public abstract class GenericFiducialDetectorChecks {
 				}
 				assertTrue(matched);
 			}
+		}
+	}
+
+	@Test
+	public void checkImageLocation() {
+		for( ImageType type : types ) {
+
+			ImageBase image = loadImage(type);
+			FiducialDetector detector = createDetector(type);
+
+			CameraPinholeRadial intrinsic = loadIntrinsic();
+			assertTrue(intrinsic.isDistorted());
+
+			detector.setIntrinsic(intrinsic);
+
+			detector.detect(image);
+
+			assertTrue(detector.totalFound() >= 1);
+
+			for (int i = 0; i < detector.totalFound(); i++) {
+				Se3_F64 pose = new Se3_F64();
+				Point2D_F64 pixel = new Point2D_F64();
+				detector.getFiducialToCamera(i, pose);
+				detector.getImageLocation(i, pixel);
+
+				Point2D_F64 found = new Point2D_F64();
+				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, pose);
+				worldToPixel.transform(new Point3D_F64(0,0,0),found);
+
+				// see if the reprojected is near the pixel location
+				assertTrue( found.distance(pixel) <= pixelAndProjectedTol);
+			}
+		}
+	}
+
+	private Results extractResults( FiducialDetector detector ) {
+		Results out = new Results(detector.totalFound());
+
+		for (int i = 0; i < detector.totalFound(); i++) {
+			Se3_F64 pose = new Se3_F64();
+			Point2D_F64 pixel = new Point2D_F64();
+			detector.getFiducialToCamera(i, pose);
+			detector.getImageLocation(i, pixel);
+
+			out.foundID[i] = detector.getId(i);
+			out.foundPose.add(pose);
+			out.foundPixel.add(pixel);
+		}
+
+		return out;
+	}
+
+	private static class Results {
+		public long foundID[];
+		public List<Se3_F64> foundPose = new ArrayList<>();
+		public List<Point2D_F64> foundPixel = new ArrayList<>();
+
+		public Results( int N ) {
+			foundID = new long[ N ];
+			foundPose = new ArrayList<>();
+			foundPixel = new ArrayList<>();
 		}
 	}
 }
