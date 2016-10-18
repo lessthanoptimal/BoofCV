@@ -125,9 +125,7 @@ public class JCodecSimplified<T extends ImageBase> implements SimpleImageSequenc
 	public void reset() {
 		try {
 			grabber = new FrameGrab(NIOUtils.readableFileChannel(new File(filename)));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (JCodecException e) {
+		} catch (IOException | JCodecException e) {
 			throw new RuntimeException(e);
 		}
 		try {

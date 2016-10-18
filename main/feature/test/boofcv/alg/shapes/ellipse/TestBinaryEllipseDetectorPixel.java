@@ -50,7 +50,7 @@ public class TestBinaryEllipseDetectorPixel {
 	@Test
 	public void basicOnImage() {
 
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> expected = new ArrayList<>();
 		expected.add( new EllipseRotated_F64(30,38,10,8,0));
 		expected.add( new EllipseRotated_F64(115,80,20,15,Math.PI/2.0));
 
@@ -66,7 +66,7 @@ public class TestBinaryEllipseDetectorPixel {
 		// compare against expected results
 		List<BinaryEllipseDetectorPixel.Found> found = alg.getFound();
 
-		List<EllipseRotated_F64> foundEllipses = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> foundEllipses = new ArrayList<>();
 
 		for( BinaryEllipseDetectorPixel.Found f : found ) {
 			assertTrue( f.contour.size() > 10);
@@ -81,8 +81,8 @@ public class TestBinaryEllipseDetectorPixel {
 	 */
 	@Test
 	public void undistortContour() {
-		List<Point2D_I32> input = new ArrayList<Point2D_I32>();
-		FastQueue<Point2D_F64> output = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		List<Point2D_I32> input = new ArrayList<>();
+		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64.class, true);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));
@@ -107,8 +107,8 @@ public class TestBinaryEllipseDetectorPixel {
 	public void undistortContour_WithDistortion() {
 
 
-		List<Point2D_I32> input = new ArrayList<Point2D_I32>();
-		FastQueue<Point2D_F64> output = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		List<Point2D_I32> input = new ArrayList<>();
+		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64.class, true);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));

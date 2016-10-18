@@ -52,7 +52,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	// used to search for neighbors that which are candidates for connecting
 	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree();
 	private FastQueue<double[]> searchPoints;
-	private List<SquareNode> searchSquareList = new ArrayList<SquareNode>();
+	private List<SquareNode> searchSquareList = new ArrayList<>();
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
 	/**

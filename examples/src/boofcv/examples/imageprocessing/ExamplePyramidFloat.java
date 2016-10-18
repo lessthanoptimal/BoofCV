@@ -69,7 +69,7 @@ public class ExamplePyramidFloat<T extends ImageGray> {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 		pyramid.process(input);
 
-		ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+		ImagePyramidPanel<T> gui = new ImagePyramidPanel<>();
 		gui.set(pyramid, true);
 		gui.render();
 

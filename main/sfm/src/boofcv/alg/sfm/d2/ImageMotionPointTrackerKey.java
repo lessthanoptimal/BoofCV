@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,7 +120,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase, IT extends Invertib
 		if( tracks.size() == 0 )
 			return false;
 
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> pairs = new ArrayList<>();
 		for( PointTrack t : tracks ) {
 			pairs.add((AssociatedPair)t.getCookie());
 		}

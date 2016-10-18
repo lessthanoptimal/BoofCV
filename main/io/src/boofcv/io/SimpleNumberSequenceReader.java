@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class SimpleNumberSequenceReader {
 	
 	public List<Double> read( Reader input ) throws IOException {
 		this.input = input;
-		sequence = new ArrayList<Double>();
+		sequence = new ArrayList<>();
 		int v = input.read();
 
 		while( v >= 0 ) {

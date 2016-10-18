@@ -553,12 +553,12 @@ public class BinaryImageOps {
 														   int numLabels ,
 														   FastQueue<Point2D_I32> queue )
 	{
-		List<List<Point2D_I32>> ret = new ArrayList<List<Point2D_I32>>();
+		List<List<Point2D_I32>> ret = new ArrayList<>();
 		for( int i = 0; i < numLabels+1; i++ ) {
 			ret.add( new ArrayList<Point2D_I32>() );
 		}
 		if( queue == null ) {
-			queue = new FastQueue<Point2D_I32>(numLabels,Point2D_I32.class,true);
+			queue = new FastQueue<>(numLabels, Point2D_I32.class, true);
 		} else
 			queue.reset();
 

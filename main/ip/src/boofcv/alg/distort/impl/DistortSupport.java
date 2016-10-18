@@ -104,6 +104,6 @@ public class DistortSupport {
 	{
 		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
 		bandDistort.setModel(dstToSrc);
-		return new ImplImageDistort_PL<Input,Output>(bandDistort);
+		return new ImplImageDistort_PL<>(bandDistort);
 	}
 }

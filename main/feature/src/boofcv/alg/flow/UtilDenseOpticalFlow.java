@@ -106,7 +106,7 @@ public class UtilDenseOpticalFlow {
 				scaleSigmas[i] = layerSigma;
 			}
 
-			return new PyramidFloatGaussianScale<T>(interp,scaleFactors,scaleSigmas,imageType);
+			return new PyramidFloatGaussianScale<>(interp, scaleFactors, scaleSigmas, imageType);
 		} else {
 			double scaleFactors[] = new double[ numScales ];
 
@@ -115,7 +115,7 @@ public class UtilDenseOpticalFlow {
 				scaleFactors[i] = scaleFactors[i-1]/scale;
 			}
 
-			return new PyramidFloatScale<T>(interp,scaleFactors,imageType);
+			return new PyramidFloatScale<>(interp, scaleFactors, imageType);
 		}
 	}
 }

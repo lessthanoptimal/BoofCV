@@ -128,7 +128,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	}
 
 	public void setLabels(List<String> labels) {
-		this.labels = new ArrayList<String>(labels);
+		this.labels = new ArrayList<>(labels);
 	}
 
 	public int getHighlightCategory() {
@@ -329,7 +329,7 @@ public class ConfusionMatrixPanel extends JPanel {
 	public static void main(String[] args) {
 		DenseMatrix64F m = RandomMatrices.createRandom(5,5,0,1,new Random(234));
 
-		List<String> labels = new ArrayList<String>();
+		List<String> labels = new ArrayList<>();
 		for (int i = 0; i < m.numRows; i++) {
 			labels.add("Label "+i);
 		}

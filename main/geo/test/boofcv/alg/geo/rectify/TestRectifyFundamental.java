@@ -122,7 +122,7 @@ public class TestRectifyFundamental {
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
-		pairs = new ArrayList<AssociatedPair>();
+		pairs = new ArrayList<>();
 
 		for(Point3D_F64 p1 : worldPts) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);

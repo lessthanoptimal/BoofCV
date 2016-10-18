@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class SimpleStringNumberReader {
 	public boolean read( Reader input )  {
 		this.input = input;
 		try {
-			sequence = new ArrayList<Object>();
+			sequence = new ArrayList<>();
 			where = 0;
 			int v = input.read();
 

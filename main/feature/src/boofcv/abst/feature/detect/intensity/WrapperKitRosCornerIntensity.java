@@ -50,9 +50,7 @@ public class WrapperKitRosCornerIntensity<I extends ImageGray,D extends ImageGra
 
 		try {
 			m.invoke(null,intensity,derivX,derivY,derivXX,derivYY,derivXY);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

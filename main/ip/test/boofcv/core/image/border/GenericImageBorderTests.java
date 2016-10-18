@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import java.util.Random;
 public abstract class GenericImageBorderTests<T extends ImageBase> {
 
 	Random rand = new Random(234);
-	List<ImageType<T>> imageTypes = new ArrayList<ImageType<T>>();
+	List<ImageType<T>> imageTypes = new ArrayList<>();
 
 	int width = 20;
 	int height = 25;

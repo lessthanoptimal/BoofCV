@@ -325,7 +325,7 @@ public class BoofMiscOps {
 	 * @return List of files that are in the directory and match the prefix.
 	 */
 	public static List<String> directoryList( String directory , String prefix ) {
-		List<String> ret = new ArrayList<String>();
+		List<String> ret = new ArrayList<>();
 
 		File d = new File(directory);
 

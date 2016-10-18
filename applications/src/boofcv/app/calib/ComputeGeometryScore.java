@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ComputeGeometryScore {
 	Zhang99ComputeTargetHomography computeHomography;
 	Zhang99CalibrationMatrixFromHomographies computeCalib;
 
-	List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
+	List<DenseMatrix64F> homographies = new ArrayList<>();
 
 	double score = 0;
 

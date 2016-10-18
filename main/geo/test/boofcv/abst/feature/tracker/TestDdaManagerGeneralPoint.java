@@ -58,19 +58,19 @@ public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score,400, true));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 400, true));
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
 				new WrapDescribeBrief<>(brief,GrayF32.class);
 
 		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
-				EasyGeneralFeatureDetector<GrayF32,GrayF32>(corner,GrayF32.class,GrayF32.class);
+				EasyGeneralFeatureDetector<>(corner, GrayF32.class, GrayF32.class);
 
 		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
-		manager = new DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B>(easy,describe,2);
+		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
 		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociate<GrayF32, TupleDesc_B>(manager,association,false);
+				new DetectDescribeAssociate<>(manager, association, false);
 		return tracker;
 	}
 }

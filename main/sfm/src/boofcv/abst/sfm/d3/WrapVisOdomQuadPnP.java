@@ -86,7 +86,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc>
 	public List<Point2D_F64> getAllTracks() {
 		FastQueue<VisOdomQuadPnP.QuadView> features =  alg.getQuadViews();
 
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> ret = new ArrayList<>();
 		for( VisOdomQuadPnP.QuadView v : features.toList() )
 			ret.add(v.v2); // new left camera
 

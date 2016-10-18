@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 	FastQueue<Desc> listDst;
 
 	protected StandardAssociateDescriptionChecks( Class<Desc> descType ) {
-		listSrc = new FastQueue<Desc>(descType,false);
-		listDst = new FastQueue<Desc>(descType,false);
+		listSrc = new FastQueue<>(descType, false);
+		listDst = new FastQueue<>(descType, false);
 	}
 
 	public void allTests() {

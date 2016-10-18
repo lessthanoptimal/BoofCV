@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	// computes match score between two descriptions
 	private ScoreAssociation<Desc> scorer;
 	// storage for associated features
-	private FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(AssociatedIndex.class,true);
+	private FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
 	// stores indexes of unassociated source features
 	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 	// creates a list of unassociated features from the list of matches
@@ -52,8 +52,8 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 
 
 	// stores rectified coordinates of observations in left and right images
-	private FastQueue<Point2D_F64> locationLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-	private FastQueue<Point2D_F64> locationRight = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	private FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64.class, true);
+	private FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64.class, true);
 	// stores reference to descriptions in left and right iamges
 	private FastQueue<Desc> descriptionsLeft;
 	private FastQueue<Desc> descriptionsRight;
@@ -62,8 +62,8 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	{
 		super(locationTolerance,locationTolerance);
 		this.scorer = scorer;
-		descriptionsLeft = new FastQueue<Desc>(descType,false);
-		descriptionsRight = new FastQueue<Desc>(descType,false);
+		descriptionsLeft = new FastQueue<>(descType, false);
+		descriptionsRight = new FastQueue<>(descType, false);
 	}
 
 	/**

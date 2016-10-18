@@ -39,7 +39,7 @@ public class TestGeneralToInterestPoint {
 		Helper detector = new Helper();
 		detector.maximum = true;
 		GeneralToInterestPoint<GrayF32,GrayF32> alg =
-				new GeneralToInterestPoint<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 
 		alg.detect(input);
 
@@ -60,7 +60,7 @@ public class TestGeneralToInterestPoint {
 	public void checkMinimumsMaximums() {
 		Helper detector = new Helper();
 		GeneralToInterestPoint<GrayF32,GrayF32> alg =
-				new GeneralToInterestPoint<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+				new GeneralToInterestPoint<>(detector, 2.5, GrayF32.class, GrayF32.class);
 
 		// both turned off
 		alg.detect(input);

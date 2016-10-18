@@ -85,7 +85,7 @@ public class VisualizeLineRansac<I extends ImageGray, D extends ImageGray> {
 		GridLineModelFitter fitter = new GridLineModelFitter((float)(Math.PI*0.75));
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
+				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
@@ -130,7 +130,7 @@ public class VisualizeLineRansac<I extends ImageGray, D extends ImageGray> {
 
 	public static void main( String args[] ) {
 		VisualizeLineRansac<GrayF32,GrayF32> app =
-				new VisualizeLineRansac<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+				new VisualizeLineRansac<>(GrayF32.class, GrayF32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes01.png"));

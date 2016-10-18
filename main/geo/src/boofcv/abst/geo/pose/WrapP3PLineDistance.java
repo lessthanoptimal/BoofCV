@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,8 @@ public class WrapP3PLineDistance implements EstimateNofPnP {
 
 	// storage for 3D point clouds.
 	// World = point in world coordinate system and Camera = camera coordinates sytsem
-	private List<Point3D_F64> cloudWorld = new ArrayList<Point3D_F64>();
-	private List<Point3D_F64> cloudCamera = new ArrayList<Point3D_F64>();
+	private List<Point3D_F64> cloudWorld = new ArrayList<>();
+	private List<Point3D_F64> cloudCamera = new ArrayList<>();
 
 	public WrapP3PLineDistance(P3PLineDistance alg,
 							   MotionTransformPoint<Se3_F64, Point3D_F64> motionFit )

@@ -36,7 +36,7 @@ public class TestImplAverageDownSample {
 
 
 	public static List<Method> find( String name ) {
-		List<Method> ret = new ArrayList<Method>();
+		List<Method> ret = new ArrayList<>();
 
 		Method methods[] = ImplAverageDownSample.class.getMethods();
 

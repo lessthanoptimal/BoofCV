@@ -97,7 +97,7 @@ public class FastHessianFeatureDetector<II extends ImageGray> {
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
 	// List of found feature points
-	private FastQueue<ScalePoint> foundPoints = new FastQueue<ScalePoint>(10,ScalePoint.class,true);
+	private FastQueue<ScalePoint> foundPoints = new FastQueue<>(10, ScalePoint.class, true);
 
 	// size of detected feature at the smallest scale
 	private int initialSize;

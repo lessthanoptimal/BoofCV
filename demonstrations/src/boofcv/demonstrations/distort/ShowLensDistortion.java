@@ -85,8 +85,8 @@ public class ShowLensDistortion<T extends ImageGray>
 	public ShowLensDistortion(Class<T> imageType) {
 
 		this.imageType = imageType;
-		input = new Planar<T>(imageType, 1, 1 , 3);
-		output = new Planar<T>(imageType, 1, 1 , 3);
+		input = new Planar<>(imageType, 1, 1, 3);
+		output = new Planar<>(imageType, 1, 1, 3);
 		addToToolbar(createRadialSelect());
 
 		setMainGUI(gui);
@@ -270,7 +270,7 @@ public class ShowLensDistortion<T extends ImageGray>
 		ShowLensDistortion<GrayU8> app
 				= new ShowLensDistortion<>(GrayU8.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));

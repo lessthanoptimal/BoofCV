@@ -66,7 +66,7 @@ public class HoughTransformLinePolar {
 	// extracts line from the transform
 	NonMaxSuppression extractor;
 	// stores returned lines
-	FastQueue<LineParametric2D_F32> lines = new FastQueue<LineParametric2D_F32>(10,LineParametric2D_F32.class,true);
+	FastQueue<LineParametric2D_F32> lines = new FastQueue<>(10, LineParametric2D_F32.class, true);
 	// origin of the transform coordinate system
 	int originX;
 	int originY;

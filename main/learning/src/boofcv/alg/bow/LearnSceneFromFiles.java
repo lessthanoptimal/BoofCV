@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public abstract class LearnSceneFromFiles {
 
 	protected Random rand;
 
-	protected List<String> scenes = new ArrayList<String>();
+	protected List<String> scenes = new ArrayList<>();
 
 	// The minimum number of images in each type of set
 	int minimumTrain;
@@ -115,10 +115,10 @@ public abstract class LearnSceneFromFiles {
 
 	public void loadThenSplit( File directory ) {
 		Map<String,List<String>> all = findImages(directory);
-		train = new HashMap<String,List<String>>();
+		train = new HashMap<>();
 		if( fractionCross != 0 )
-			cross = new HashMap<String,List<String>>();
-		test = new HashMap<String,List<String>>();
+			cross = new HashMap<>();
+		test = new HashMap<>();
 
 		Set<String> keys = all.keySet();
 
@@ -149,7 +149,7 @@ public abstract class LearnSceneFromFiles {
 
 	private void createSubSet(String key, List<String> allImages, Map<String,List<String>> subset ,
 							  int start , int end ) {
-		List<String> trainImages = new ArrayList<String>();
+		List<String> trainImages = new ArrayList<>();
 		for (int i = start; i < end; i++) {
 			trainImages.add(allImages.get(i));
 		}
@@ -165,15 +165,15 @@ public abstract class LearnSceneFromFiles {
 		if( files == null )
 			return null;
 
-		List<File> imageDirectories = new ArrayList<File>();
+		List<File> imageDirectories = new ArrayList<>();
 		for( File f : files ) {
 			if( f.isDirectory() ) {
 				imageDirectories.add(f);
 			}
 		}
-		Map<String,List<String>> out = new HashMap<String,List<String>>();
+		Map<String,List<String>> out = new HashMap<>();
 		for( File d : imageDirectories ) {
-			List<String> images = new ArrayList<String>();
+			List<String> images = new ArrayList<>();
 
 			files = d.listFiles();
 			if( files == null )

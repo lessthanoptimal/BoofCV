@@ -50,7 +50,7 @@ public class FactoryIntensityPoint {
 	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureIntensity<I,D>  fast( int pixelTol, int minCont, Class<I> imageType ) {
 		FastCornerIntensity<I> alg =  FactoryIntensityPointAlg.fast(pixelTol, minCont, imageType);
-		return new WrapperFastCornerIntensity<I, D>(alg);
+		return new WrapperFastCornerIntensity<>(alg);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class FactoryIntensityPoint {
 										 boolean weighted, Class<D> derivType)
 	{
 		HarrisCornerIntensity<D> alg =  FactoryIntensityPointAlg.harris(windowRadius, kappa, weighted, derivType);
-		return new WrapperGradientCornerIntensity<I, D>(alg);
+		return new WrapperGradientCornerIntensity<>(alg);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class FactoryIntensityPoint {
 	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureIntensity<I,D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType) {
 		ShiTomasiCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
-		return new WrapperGradientCornerIntensity<I, D>(alg);
+		return new WrapperGradientCornerIntensity<>(alg);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureIntensity<I,D>  kitros( Class<D> derivType ) {
-		return new WrapperKitRosCornerIntensity<I, D>(derivType);
+		return new WrapperKitRosCornerIntensity<>(derivType);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class FactoryIntensityPoint {
 	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureIntensity<I,D>  median( int radius , Class<I> imageType ) {
 		BlurStorageFilter<I> filter = FactoryBlurFilter.median(imageType,radius);
-		return new WrapperMedianCornerIntensity<I, D>(filter,imageType);
+		return new WrapperMedianCornerIntensity<>(filter, imageType);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray, D extends ImageGray>
 	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
-		return new WrapperHessianBlobIntensity<I, D>(type,derivType);
+		return new WrapperHessianBlobIntensity<>(type, derivType);
 	}
 
 	/**
@@ -135,6 +135,6 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray>
 	GeneralFeatureIntensity<I,?> laplacian() {
-		return new WrapperLaplacianBlobIntensity<I>();
+		return new WrapperLaplacianBlobIntensity<>();
 	}
 }

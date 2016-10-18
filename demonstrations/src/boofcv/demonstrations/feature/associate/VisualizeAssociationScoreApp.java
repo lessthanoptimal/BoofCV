@@ -107,7 +107,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray, D extends ImageGr
 		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 
 		controlPanel = new VisualizeScorePanel(this);
-		scorePanel = new AssociationScorePanel<TupleDesc>(3);
+		scorePanel = new AssociationScorePanel<>(3);
 
 		JPanel gui = new JPanel();
 		gui.setLayout(new BorderLayout());
@@ -170,10 +170,10 @@ public class VisualizeAssociationScoreApp<T extends ImageGray, D extends ImageGr
 	 * recycled to avoid threading issues.
 	 */
 	private void processImage() {
-		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
-		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
-		final List<TupleDesc> leftDesc = new ArrayList<TupleDesc>();
-		final List<TupleDesc> rightDesc = new ArrayList<TupleDesc>();
+		final List<Point2D_F64> leftPts = new ArrayList<>();
+		final List<Point2D_F64> rightPts = new ArrayList<>();
+		final List<TupleDesc> leftDesc = new ArrayList<>();
+		final List<TupleDesc> rightDesc = new ArrayList<>();
 
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Compute Feature Information",
@@ -287,7 +287,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray, D extends ImageGr
 
 		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(imageType, derivType);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave",
 				UtilIO.pathExample("stitch/cave_01.jpg"), UtilIO.pathExample("stitch/cave_02.jpg")));
 		inputs.add(new PathLabel("Kayak",

@@ -123,7 +123,7 @@ public class CalibrationDetectorChessboard implements CalibrationDetector {
 	 */
 	public static List<Point2D_F64> gridChess(int numRows, int numCols, double squareWidth)
 	{
-		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> all = new ArrayList<>();
 
 		// convert it into the number of calibration points
 		numCols = numCols - 1;

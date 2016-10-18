@@ -128,7 +128,7 @@ public class TestColorRgb {
 
 	@Test
 	public void planar_F64() {
-		Planar<GrayF64> rgb = new Planar<GrayF64>(GrayF64.class, 20, 30, 3);
+		Planar<GrayF64> rgb = new Planar<>(GrayF64.class, 20, 30, 3);
 		GrayF64 gray = new GrayF64(20, 30);
 
 		GImageMiscOps.fillUniform(rgb, rand, 0, 150);

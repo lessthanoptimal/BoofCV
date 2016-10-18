@@ -101,7 +101,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
 		this.maxCornerChangePixel = maxCornerChangePixel;
-		this.snapToEdge = new SnapToLineEdge<T>(lineSamples,sampleRadius,imageType);
+		this.snapToEdge = new SnapToLineEdge<>(lineSamples, sampleRadius, imageType);
 		this.imageType = imageType;
 
 		previous = new Polygon2D_F64(1);
@@ -115,7 +115,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 	public RefinePolygonLineToImage(int numSides ,Class<T> imageType) {
 		previous = new Polygon2D_F64(numSides);
 		this.imageType = imageType;
-		this.snapToEdge = new SnapToLineEdge<T>(20,1,imageType);
+		this.snapToEdge = new SnapToLineEdge<>(20, 1, imageType);
 	}
 
 	/**

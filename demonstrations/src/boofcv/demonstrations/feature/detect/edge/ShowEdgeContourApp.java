@@ -131,7 +131,7 @@ public class ShowEdgeContourApp<T extends ImageGray, D extends ImageGray>
 	@Override
 	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
 
-		activeAlg = ((Integer)cookie).intValue();
+		activeAlg = (Integer) cookie;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -211,11 +211,11 @@ public class ShowEdgeContourApp<T extends ImageGray, D extends ImageGray>
 
 	public static void main( String args[] ) {
 		ShowEdgeContourApp<GrayF32,GrayF32> app =
-				new ShowEdgeContourApp<GrayF32, GrayF32>(GrayF32.class, GrayF32.class);
+				new ShowEdgeContourApp<>(GrayF32.class, GrayF32.class);
 //		ShowFeatureOrientationApp<GrayU8, GrayS16> app =
 //				new ShowFeatureOrientationApp<GrayU8,GrayS16>(input,GrayU8.class, GrayS16.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("Room",UtilIO.pathExample("indoors01.jpg")));
 		inputs.add(new PathLabel("Objects",UtilIO.pathExample("simple_objects.jpg")));

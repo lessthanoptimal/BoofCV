@@ -62,13 +62,13 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 	public EllipseClustersIntoAsymmetricGrid() {
 
-		sorter = new QuickSortComparator<Edge>(new Comparator<Edge>(){
+		sorter = new QuickSortComparator<>(new Comparator<Edge>() {
 
 			@Override
 			public int compare(Edge o1, Edge o2) {
-				if( o1.angle < o2.angle )
+				if (o1.angle < o2.angle)
 					return -1;
-				else if( o1.angle > o2.angle )
+				else if (o1.angle > o2.angle)
 					return 1;
 				else
 					return 0;
@@ -103,7 +103,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize);
 
 			// Go down the columns and find each of the rows
-			List<List<NodeInfo>> outerGrid = new ArrayList<List<NodeInfo>>();
+			List<List<NodeInfo>> outerGrid = new ArrayList<>();
 			outerGrid.add( cornerRow );
 
 			for (int j = 1; j < cornerColumn.size(); j++) {
@@ -198,6 +198,14 @@ public class EllipseClustersIntoAsymmetricGrid {
 		}
 	}
 
+	/**
+	 * The outside grid has been found now the inner grid needs to be found.  The inner grid is offset
+	 * by 1/2 the spacing from the outer grid.
+	 *
+	 * @param outerGrid The outer grid which was already found
+	 * @param clusterSize Number of elements in the cluster.  used to catch bad code instead of looping forever
+	 * @return The inner grid
+	 */
 	List<List<NodeInfo>> findInnerGrid( List<List<NodeInfo>> outerGrid , int clusterSize) {
 		NodeInfo c00 = outerGrid.get(0).get(0);
 		NodeInfo c01 = outerGrid.get(0).get(1);
@@ -212,7 +220,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		List<NodeInfo> row = findLine(corner, rowNext, clusterSize);
 		List<NodeInfo> column = findLine(corner, colNext, clusterSize);
 
-		List<List<NodeInfo>> grid = new ArrayList<List<NodeInfo>>();
+		List<List<NodeInfo>> grid = new ArrayList<>();
 
 		if( row != null ) {
 			grid.add(row);
@@ -228,7 +236,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		} else {
 			// Inner grid is composed of only a single column
 			for (int i = 0; i < column.size(); i++) {
-				List<NodeInfo> l = new ArrayList<NodeInfo>();
+				List<NodeInfo> l = new ArrayList<>();
 				l.add( column.get(i) );
 				grid.add( l );
 			}
@@ -325,7 +333,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	static protected List<NodeInfo> findLine( NodeInfo seed , NodeInfo next , int clusterSize ) {
 		double anglePrev = direction(seed, next);
 
-		List<NodeInfo> line = new ArrayList<NodeInfo>();
+		List<NodeInfo> line = new ArrayList<>();
 		line.add( seed );
 		line.add( next );
 
@@ -515,7 +523,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		EllipseRotated_F64 ellipse;
 
 		// List of all the ellipses connected to this one in CCW order
-		FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
+		FastQueue<Edge> edges = new FastQueue<>(Edge.class, true);
 
 		// flag used to indicate if a node is along the shape's contour
 		boolean contour;
@@ -558,7 +566,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 */
 	public static class Grid
 	{
-		public List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
+		public List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		public int rows;
 		public int columns;
 

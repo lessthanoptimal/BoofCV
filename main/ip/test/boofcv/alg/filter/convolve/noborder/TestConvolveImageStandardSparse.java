@@ -121,9 +121,7 @@ public class TestConvolveImageStandardSparse {
 			String description = method.getName()+" "+inputImage.getClass().getSimpleName()+" "+method.getParameterTypes().length;
 
 			assertEquals(description,(int)expectedOutput,result.intValue());
-		} catch (IllegalAccessException e) {                                                         
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class TestDistanceScaleTranslateRotate2DSq {
 		a.p2.x += 3.5;
 		AssociatedPair b = apply(2.15,2,model);
 
-		List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> obs = new ArrayList<>();
 		obs.add(a);
 		obs.add(b);
 

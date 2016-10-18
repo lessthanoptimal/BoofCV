@@ -75,9 +75,7 @@ public class WrapperHessianBlobIntensity<I extends ImageGray, D extends ImageGra
 					m.invoke(null,intensity,derivXX,derivYY);
 					break;
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

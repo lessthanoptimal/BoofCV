@@ -1241,7 +1241,7 @@ public final class ProtoCameraModels {
             }
             case 17: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                radial_ = new java.util.ArrayList<java.lang.Double>();
+                radial_ = new java.util.ArrayList<>();
                 mutable_bitField0_ |= 0x00000002;
               }
               radial_.add(input.readDouble());
@@ -1251,7 +1251,7 @@ public final class ProtoCameraModels {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
-                radial_ = new java.util.ArrayList<java.lang.Double>();
+                radial_ = new java.util.ArrayList<>();
                 mutable_bitField0_ |= 0x00000002;
               }
               while (input.getBytesUntilLimit() > 0) {
@@ -1834,11 +1834,10 @@ public final class ProtoCameraModels {
           boofcv.io.calibration.ProtoCameraModels.Pinhole, boofcv.io.calibration.ProtoCameraModels.Pinhole.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeOrBuilder> 
           getPinholeFieldBuilder() {
         if (pinholeBuilder_ == null) {
-          pinholeBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              boofcv.io.calibration.ProtoCameraModels.Pinhole, boofcv.io.calibration.ProtoCameraModels.Pinhole.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeOrBuilder>(
-                  pinhole_,
-                  getParentForChildren(),
-                  isClean());
+          pinholeBuilder_ = new com.google.protobuf.SingleFieldBuilder<>(
+				  pinhole_,
+				  getParentForChildren(),
+				  isClean());
           pinhole_ = null;
         }
         return pinholeBuilder_;
@@ -1848,7 +1847,7 @@ public final class ProtoCameraModels {
       private java.util.List<java.lang.Double> radial_ = java.util.Collections.emptyList();
       private void ensureRadialIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          radial_ = new java.util.ArrayList<java.lang.Double>(radial_);
+          radial_ = new java.util.ArrayList<>(radial_);
           bitField0_ |= 0x00000002;
          }
       }
@@ -4286,11 +4285,10 @@ public final class ProtoCameraModels {
           boofcv.io.calibration.ProtoCameraModels.PinholeRadial, boofcv.io.calibration.ProtoCameraModels.PinholeRadial.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeRadialOrBuilder> 
           getLeftFieldBuilder() {
         if (leftBuilder_ == null) {
-          leftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              boofcv.io.calibration.ProtoCameraModels.PinholeRadial, boofcv.io.calibration.ProtoCameraModels.PinholeRadial.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeRadialOrBuilder>(
-                  left_,
-                  getParentForChildren(),
-                  isClean());
+          leftBuilder_ = new com.google.protobuf.SingleFieldBuilder<>(
+				  left_,
+				  getParentForChildren(),
+				  isClean());
           left_ = null;
         }
         return leftBuilder_;
@@ -4439,11 +4437,10 @@ public final class ProtoCameraModels {
           boofcv.io.calibration.ProtoCameraModels.PinholeRadial, boofcv.io.calibration.ProtoCameraModels.PinholeRadial.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeRadialOrBuilder> 
           getRightFieldBuilder() {
         if (rightBuilder_ == null) {
-          rightBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              boofcv.io.calibration.ProtoCameraModels.PinholeRadial, boofcv.io.calibration.ProtoCameraModels.PinholeRadial.Builder, boofcv.io.calibration.ProtoCameraModels.PinholeRadialOrBuilder>(
-                  right_,
-                  getParentForChildren(),
-                  isClean());
+          rightBuilder_ = new com.google.protobuf.SingleFieldBuilder<>(
+				  right_,
+				  getParentForChildren(),
+				  isClean());
           right_ = null;
         }
         return rightBuilder_;
@@ -4592,11 +4589,10 @@ public final class ProtoCameraModels {
           boofcv.io.calibration.ProtoCameraModels.Se3, boofcv.io.calibration.ProtoCameraModels.Se3.Builder, boofcv.io.calibration.ProtoCameraModels.Se3OrBuilder> 
           getRightToLeftFieldBuilder() {
         if (rightToLeftBuilder_ == null) {
-          rightToLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              boofcv.io.calibration.ProtoCameraModels.Se3, boofcv.io.calibration.ProtoCameraModels.Se3.Builder, boofcv.io.calibration.ProtoCameraModels.Se3OrBuilder>(
-                  rightToLeft_,
-                  getParentForChildren(),
-                  isClean());
+          rightToLeftBuilder_ = new com.google.protobuf.SingleFieldBuilder<>(
+				  rightToLeft_,
+				  getParentForChildren(),
+				  isClean());
           rightToLeft_ = null;
         }
         return rightToLeftBuilder_;

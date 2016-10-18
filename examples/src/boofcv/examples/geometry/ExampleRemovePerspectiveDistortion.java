@@ -47,7 +47,7 @@ public class ExampleRemovePerspectiveDistortion {
 		Planar<GrayF32> input = ConvertBufferedImage.convertFromMulti(buffered, null, true, GrayF32.class);
 
 		RemovePerspectiveDistortion<Planar<GrayF32>> removePerspective =
-				new RemovePerspectiveDistortion<Planar<GrayF32>>(400,500, ImageType.pl(3,GrayF32.class));
+				new RemovePerspectiveDistortion<>(400, 500, ImageType.pl(3, GrayF32.class));
 
 		// Specify the corners in the input image of the region.
 		// Order matters! top-left, top-right, bottom-right, bottom-left

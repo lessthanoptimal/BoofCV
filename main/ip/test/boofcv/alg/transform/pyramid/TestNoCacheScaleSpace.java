@@ -50,7 +50,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getScaledImage() {
 		NoCacheScaleSpace<GrayF32,GrayF32> alg =
-				new NoCacheScaleSpace<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+				new NoCacheScaleSpace<>(GrayF32.class, GrayF32.class);
 
 		int radius = FactoryKernelGaussian.radiusForSigma(1.2,0);
 		GrayF32 expected = BlurImageOps.gaussian(original,null,1.2,radius,null);
@@ -66,7 +66,7 @@ public class TestNoCacheScaleSpace {
 	@Test
 	public void getDerivative() {
 		NoCacheScaleSpace<GrayF32,GrayF32> alg =
-				new NoCacheScaleSpace<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+				new NoCacheScaleSpace<>(GrayF32.class, GrayF32.class);
 
 		double target = 2.3;
 

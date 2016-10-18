@@ -158,7 +158,7 @@ public class VideoDisplayLinesApp<I extends ImageGray, D extends ImageGray>
 	public static void main( String args[] ) {
 		VideoDisplayLinesApp app = new VideoDisplayLinesApp(GrayF32.class, GrayF32.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Apartment", UtilIO.pathExample("lines_indoors.mjpeg")));
 
 		app.setInputList(inputs);

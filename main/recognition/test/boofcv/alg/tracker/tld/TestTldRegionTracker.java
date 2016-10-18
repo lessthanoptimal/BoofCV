@@ -125,6 +125,6 @@ public class TestTldRegionTracker {
 		PyramidKltTracker<GrayU8,GrayS16> tracker =
 				FactoryTrackerAlg.kltPyramid(new KltConfig(), GrayU8.class, GrayS16.class);
 
-		return new TldRegionTracker<GrayU8,GrayS16>(10,5,100,gradient,tracker,GrayU8.class,GrayS16.class);
+		return new TldRegionTracker<>(10, 5, 100, gradient, tracker, GrayU8.class, GrayS16.class);
 	}
 }

@@ -187,7 +187,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase, IT extends Inverti
 		AccessPointTracks access = (AccessPointTracks)alg.getMotion();
 
 		List<Point2D_F64> tracks = access.getAllTracks();
-		List<Point2D_F64> inliers = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> inliers = new ArrayList<>();
 
 		for( int i = 0; i < tracks.size(); i++ ) {
 			if( access.isInlier(i) )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
 public class ImageLinePanel extends JPanel {
 
 	public BufferedImage background;
-	public List<LineSegment2D_F32> lines = new ArrayList<LineSegment2D_F32>();
+	public List<LineSegment2D_F32> lines = new ArrayList<>();
 
 	public synchronized void setBackground(BufferedImage background) {
 		this.background = background;

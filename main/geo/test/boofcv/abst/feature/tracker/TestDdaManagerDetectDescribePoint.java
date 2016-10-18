@@ -61,16 +61,16 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Gray
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 400, true));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 400, true));
 
 		DetectDescribeFusion<GrayF32,TupleDesc_B> fused =
-				new DetectDescribeFusion<GrayF32,TupleDesc_B>(
-						detector,null,new WrapDescribeBrief<>(brief,GrayF32.class));
+				new DetectDescribeFusion<>(
+						detector, null, new WrapDescribeBrief<>(brief, GrayF32.class));
 
 		DdaManagerDetectDescribePoint<GrayF32,TupleDesc_B> manager;
-		manager = new DdaManagerDetectDescribePoint<GrayF32,TupleDesc_B>(fused);
+		manager = new DdaManagerDetectDescribePoint<>(fused);
 		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociate<GrayF32, TupleDesc_B>(manager,association,false);
+				new DetectDescribeAssociate<>(manager, association, false);
 		return tracker;
 	}
 }

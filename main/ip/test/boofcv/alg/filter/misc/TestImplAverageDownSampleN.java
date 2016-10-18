@@ -78,9 +78,7 @@ public class TestImplAverageDownSampleN {
 
 			try {
 				m.invoke(null, input, region, found);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 			naive(input,region,expected);

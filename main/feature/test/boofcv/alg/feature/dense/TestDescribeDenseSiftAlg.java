@@ -137,7 +137,7 @@ public class TestDescribeDenseSiftAlg {
 		alg.setImageGradient(derivX,derivY);
 		algTest.setImageGradient(derivX,derivY);
 
-		List<Point2D_I32> samplePoints = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> samplePoints = new ArrayList<>();
 		samplePoints.add( new Point2D_I32(30,35));
 		samplePoints.add( new Point2D_I32(45,10));
 		samplePoints.add( new Point2D_I32(60,12));

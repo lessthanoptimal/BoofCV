@@ -38,7 +38,7 @@ public class SquareCrossClustersIntoGrids {
 	// verbose debug output
 	private boolean verbose = false;
 
-	FastQueue<SquareGrid> grids = new FastQueue<SquareGrid>(SquareGrid.class,true);
+	FastQueue<SquareGrid> grids = new FastQueue<>(SquareGrid.class, true);
 
 	// indicates if a fatal error was found in the grid
 	protected boolean invalid;
@@ -120,7 +120,7 @@ public class SquareCrossClustersIntoGrids {
 			return;
 
 		// Add the next rows to the list, one after another
-		List<List<SquareNode>> listRows = new ArrayList<List<SquareNode>>();// TODO remove memory declaration here
+		List<List<SquareNode>> listRows = new ArrayList<>();// TODO remove memory declaration here
 		listRows.add(firstRow);
 		while(true ) {
 			List<SquareNode> previous = listRows.get(listRows.size()-1);
@@ -225,7 +225,7 @@ public class SquareCrossClustersIntoGrids {
 	List<SquareNode> firstRow1( SquareNode seed ) {
 		for (int i = 0; i < seed.corners.size(); i++) {
 			if( isOpenEdge(seed,i) ) {
-				List<SquareNode> list = new ArrayList<SquareNode>();
+				List<SquareNode> list = new ArrayList<>();
 				seed.graph = 0;
 
 				// Doesn't know which direction it can traverse along.  See figure that out
@@ -239,7 +239,7 @@ public class SquareCrossClustersIntoGrids {
 					list.add(seed);
 					if( !addToRow(seed,i,-1,true,list) ) return null;
 				} else if( dst.edges[l] != null ){
-					List<SquareNode> tmp = new ArrayList<SquareNode>();
+					List<SquareNode> tmp = new ArrayList<>();
 					if( !addToRow(seed,i, 1,true,tmp) ) return null;
 					flipAdd(tmp, list);
 					list.add(seed);
@@ -261,8 +261,8 @@ public class SquareCrossClustersIntoGrids {
 		int indexLower = lowerEdgeIndex(seed);
 		int indexUpper = addOffset(indexLower,1,seed.corners.size());
 
-		List<SquareNode> listDown = new ArrayList<SquareNode>();
-		List<SquareNode> list = new ArrayList<SquareNode>();
+		List<SquareNode> listDown = new ArrayList<>();
+		List<SquareNode> list = new ArrayList<>();
 
 		if( !addToRow(seed,indexUpper,1,true,listDown) ) return null;
 		flipAdd(listDown, list);
@@ -280,8 +280,8 @@ public class SquareCrossClustersIntoGrids {
 	 * @return true if a row was added to grid and false if not
 	 */
 	boolean addNextRow( SquareNode seed , List<List<SquareNode>> grid ) {
-		List<SquareNode> row = new ArrayList<SquareNode>();
-		List<SquareNode> tmp = new ArrayList<SquareNode>();
+		List<SquareNode> row = new ArrayList<>();
+		List<SquareNode> tmp = new ArrayList<>();
 
 		int numConnections = numberOfOpenEdges(seed);
 		if( numConnections == 0 ) {

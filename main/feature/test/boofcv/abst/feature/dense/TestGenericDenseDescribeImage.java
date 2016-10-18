@@ -119,7 +119,7 @@ public class TestGenericDenseDescribeImage {
 		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;
 		ImageBase image;
-		FastQueue<Point2D_I32> points = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class, true);
 		int count = 0;
 
 		@Override

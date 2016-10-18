@@ -54,13 +54,13 @@ public abstract class CommonTrifocalChecks {
 
 	DenseMatrix64F F2,F3;
 
-	List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
+	List<Point3D_F64> worldPts = new ArrayList<>();
 	// observation in pixels for all views
-	List<AssociatedTriple> observations = new ArrayList<AssociatedTriple>();
+	List<AssociatedTriple> observations = new ArrayList<>();
 	// observations where the first view is in normalized image coordinates
-	List<AssociatedTriple> observationsSpecial = new ArrayList<AssociatedTriple>();
+	List<AssociatedTriple> observationsSpecial = new ArrayList<>();
 	// All observations are in normalized image coordinates
-	List<AssociatedTriple> observationsNorm = new ArrayList<AssociatedTriple>();
+	List<AssociatedTriple> observationsNorm = new ArrayList<>();
 
 	public CommonTrifocalChecks() {
 		se2 = new Se3_F64();

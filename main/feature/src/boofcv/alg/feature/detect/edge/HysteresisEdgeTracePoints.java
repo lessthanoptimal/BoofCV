@@ -52,12 +52,12 @@ public class HysteresisEdgeTracePoints {
 	private GrayS8 direction; // 4-direction
 
 	// List of found contours in the image
-	private List<EdgeContour> contours = new ArrayList<EdgeContour>();
+	private List<EdgeContour> contours = new ArrayList<>();
 
 	// list of segments which have yet to be explored
-	private List<EdgeSegment> open = new ArrayList<EdgeSegment>();
+	private List<EdgeSegment> open = new ArrayList<>();
 
-	private FastQueue<Point2D_I32> queuePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32.class, true);
 
 	// the active contour which is being traced
 	private EdgeContour e;

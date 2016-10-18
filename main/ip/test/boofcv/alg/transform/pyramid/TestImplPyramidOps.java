@@ -68,9 +68,7 @@ public class TestImplPyramidOps {
 
 		try {
 			m.invoke(null,input,output,2,interp);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 

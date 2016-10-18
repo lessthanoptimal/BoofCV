@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class EnsureUniqueAssociation {
 	// An element for each 'dst' feature.  Only the best association with the lowest score is saved here.
 	AssociatedIndex[] bestScores = new AssociatedIndex[1];
 	// The final output list with the best associations
-	FastQueue<AssociatedIndex> unambiguous = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,false);
+	FastQueue<AssociatedIndex> unambiguous = new FastQueue<>(100, AssociatedIndex.class, false);
 
 	/**
 	 * Removes ambiguous associations.  Call {@link #getMatches()} to get the list of unambiguous

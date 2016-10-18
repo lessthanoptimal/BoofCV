@@ -82,7 +82,7 @@ public class TestDescribeDenseHogFastAlg {
 
 		helper.process();
 
-		List<TupleDesc_F64> expected = new ArrayList<TupleDesc_F64>();
+		List<TupleDesc_F64> expected = new ArrayList<>();
 
 		// use a different more brute force technique to find all the descriptors contained inside the region
 		// take advantage of the descriptors being computed in a row major order
@@ -97,7 +97,7 @@ public class TestDescribeDenseHogFastAlg {
 			}
 		}
 
-		List<TupleDesc_F64> found = new ArrayList<TupleDesc_F64>();
+		List<TupleDesc_F64> found = new ArrayList<>();
 		helper.getDescriptorsInRegion(x0,y0,x1,y1,found);
 
 		assertEquals(expected.size(),found.size());

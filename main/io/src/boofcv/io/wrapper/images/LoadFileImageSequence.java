@@ -46,7 +46,7 @@ public class LoadFileImageSequence<T extends ImageBase> implements SimpleImageSe
 	String suffix;
 
 	int index;
-	java.util.List<String> fileNames = new ArrayList<String>();
+	java.util.List<String> fileNames = new ArrayList<>();
 
 	// type of image it outputs
 	ImageType<T> type;

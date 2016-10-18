@@ -63,10 +63,10 @@ public class FeatureLaplacePyramid<T extends ImageGray, D extends ImageGray>
 	private float baseThreshold;
 	// location of recently computed features in layers
 	protected int spaceIndex = 0;
-	protected List<Point2D_I16> maximums = new ArrayList<Point2D_I16>();
+	protected List<Point2D_I16> maximums = new ArrayList<>();
 
 	// List of found feature points
-	protected List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
+	protected List<ScalePoint> foundPoints = new ArrayList<>();
 
 	protected AnyImageDerivative<T, D> computeDerivative;
 

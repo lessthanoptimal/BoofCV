@@ -53,7 +53,7 @@ public class TestDepthSparse3D {
 			}
 		};
 
-		DepthSparse3D<GrayU16> alg = new DepthSparse3D.I<GrayU16>(2.1);
+		DepthSparse3D<GrayU16> alg = new DepthSparse3D.I<>(2.1);
 		alg.configure(param,v2d);
 
 		alg.setDepthImage(depth);

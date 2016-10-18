@@ -51,9 +51,7 @@ public class ConvolutionTestHelper {
 		try {
 			ImageGray img = (ImageGray) imageType.newInstance();
 			return (ImageGray)img._createNew(width, height);
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

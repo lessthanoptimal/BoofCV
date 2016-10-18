@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,7 +165,7 @@ public class ConvertBitmap {
 	public static <T extends ImageGray>
 	Planar<T> bitmapToMS( Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
 		if( output == null ) {
-			output = new Planar<T>( type , input.getWidth() , input.getHeight() , 4 );
+			output = new Planar<>(type, input.getWidth(), input.getHeight(), 4);
 		} else if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}

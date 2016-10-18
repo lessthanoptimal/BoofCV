@@ -65,7 +65,7 @@ public class ExampleColorHistogramLookup {
 	 * from hue and saturation only, which makes it lighting independent.
 	 */
 	public static List<double[]> coupledHueSat( List<File> images  ) {
-		List<double[]> points = new ArrayList<double[]>();
+		List<double[]> points = new ArrayList<>();
 
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
 		Planar<GrayF32> hsv = new Planar<>(GrayF32.class,1,1,3);
@@ -103,13 +103,13 @@ public class ExampleColorHistogramLookup {
 	 * worse results since the basic assumption that hue and saturation are decoupled is most of the time false.
 	 */
 	public static List<double[]> independentHueSat( List<File> images  ) {
-		List<double[]> points = new ArrayList<double[]>();
+		List<double[]> points = new ArrayList<>();
 
 		// The number of bins is an important parameter.  Try adjusting it
 		TupleDesc_F64 histogramHue = new TupleDesc_F64(30);
 		TupleDesc_F64 histogramValue = new TupleDesc_F64(30);
 
-		List<TupleDesc_F64> histogramList = new ArrayList<TupleDesc_F64>();
+		List<TupleDesc_F64> histogramList = new ArrayList<>();
 		histogramList.add(histogramHue); histogramList.add(histogramValue);
 
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
@@ -143,7 +143,7 @@ public class ExampleColorHistogramLookup {
 	 * depend on lighting conditions and might not produce the accurate results.
 	 */
 	public static List<double[]> coupledRGB( List<File> images ) {
-		List<double[]> points = new ArrayList<double[]>();
+		List<double[]> points = new ArrayList<>();
 
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class,1,1,3);
 
@@ -175,7 +175,7 @@ public class ExampleColorHistogramLookup {
 	 * similar images.
 	 */
 	public static List<double[]> histogramGray( List<File> images ) {
-		List<double[]> points = new ArrayList<double[]>();
+		List<double[]> points = new ArrayList<>();
 
 		GrayU8 gray = new GrayU8(1,1);
 		for( File f : images ) {

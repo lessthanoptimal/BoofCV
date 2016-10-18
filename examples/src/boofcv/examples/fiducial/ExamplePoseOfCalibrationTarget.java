@@ -96,7 +96,7 @@ public class ExamplePoseOfCalibrationTarget {
 		MousePauseHelper pauseHelper = new MousePauseHelper(gui);
 
 		// saves the target's center location
-		List<Point3D_F64> path = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> path = new ArrayList<>();
 
 		// Process each frame in the video sequence
 		Se3_F64 targetToCamera = new Se3_F64();

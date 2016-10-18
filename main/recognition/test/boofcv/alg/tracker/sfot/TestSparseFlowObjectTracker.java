@@ -76,8 +76,8 @@ public class TestSparseFlowObjectTracker {
 
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
 
-		SparseFlowObjectTracker<GrayU8,GrayS16> alg = new SparseFlowObjectTracker<GrayU8, GrayS16>(
-				config,GrayU8.class,GrayS16.class,gradient);
+		SparseFlowObjectTracker<GrayU8,GrayS16> alg = new SparseFlowObjectTracker<>(
+				config, GrayU8.class, GrayS16.class, gradient);
 
 		RectangleRotate_F64 region0 = new RectangleRotate_F64(120,140,30,40,0.1);
 		RectangleRotate_F64 region1 = new RectangleRotate_F64();

@@ -72,9 +72,9 @@ public class ShowImageBlurApp<T extends ImageGray>
 		addAlgorithm(0,"Median",2);
 
 		this.imageType = imageType;
-		input = new Planar<T>(imageType, 1, 1 , 3);
-		output = new Planar<T>(imageType, 1, 1 , 3);
-		storage = new Planar<T>(imageType, 1, 1 , 3);
+		input = new Planar<>(imageType, 1, 1, 3);
+		output = new Planar<>(imageType, 1, 1, 3);
+		storage = new Planar<>(imageType, 1, 1, 3);
 
 		addToToolbar(createRadialSelect());
 
@@ -231,7 +231,7 @@ public class ShowImageBlurApp<T extends ImageGray>
 //		ShowImageBlurApp<GrayF32> app = new ShowImageBlurApp<>(GrayF32.class);
 		ShowImageBlurApp<GrayU8> app = new ShowImageBlurApp<>(GrayU8.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));

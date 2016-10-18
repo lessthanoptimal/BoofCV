@@ -49,7 +49,7 @@ public class HysteresisEdgeTraceMark {
 	private float lower;
 
 	// list of points which have yet to be explored
-	private FastQueue<Point2D_I32> open = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> open = new FastQueue<>(Point2D_I32.class, true);
 
 	// point which is current being examined
 	private Point2D_I32 active = new Point2D_I32();

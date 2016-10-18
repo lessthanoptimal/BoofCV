@@ -82,8 +82,8 @@ public class ExampleFeatureSurf {
 		// define the feature detection algorithm
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 0, 5, true));
-		FastHessianFeatureDetector<II> detector = 
-				new FastHessianFeatureDetector<II>(extractor,200,2, 9,4,4,6);
+		FastHessianFeatureDetector<II> detector =
+				new FastHessianFeatureDetector<>(extractor, 200, 2, 9, 4, 4, 6);
 
 		// estimate orientation
 		OrientationIntegral<II> orientation = 
@@ -103,7 +103,7 @@ public class ExampleFeatureSurf {
 
 		List<ScalePoint> points = detector.getFoundPoints();
 
-		List<BrightFeature> descriptions = new ArrayList<BrightFeature>();
+		List<BrightFeature> descriptions = new ArrayList<>();
 
 		for( ScalePoint p : points ) {
 			// estimate orientation

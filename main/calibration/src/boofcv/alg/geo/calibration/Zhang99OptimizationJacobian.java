@@ -58,7 +58,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN {
 	private int numParam, numFuncs;
 
 	// description of the calibration grid
-	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
+	private List<Point3D_F64> grid = new ArrayList<>();
 
 	// List of observation sets.  Required so that it knows the total number of observations in each set
 	private List<CalibrationObservation> observationSets;

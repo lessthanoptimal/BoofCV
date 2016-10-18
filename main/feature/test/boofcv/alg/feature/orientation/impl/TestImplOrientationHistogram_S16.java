@@ -33,7 +33,7 @@ public class TestImplOrientationHistogram_S16 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationHistogram_S16 alg = new ImplOrientationHistogram_S16(r,N,false);
 		alg.setObjectToSample(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationHistogram_S16 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationHistogram_S16 alg = new ImplOrientationHistogram_S16(1.0/2.0,N,false);
 		alg.setObjectToSample(r);

@@ -47,7 +47,7 @@ public class TestTldLearning {
 		TldLearning alg = new TldLearning(rand,config,template,variance,fern,detection);
 
 
-		FastQueue<ImageRectangle> regions = new FastQueue<ImageRectangle>(ImageRectangle.class,true);
+		FastQueue<ImageRectangle> regions = new FastQueue<>(ImageRectangle.class, true);
 		regions.grow();
 		regions.grow();
 		regions.grow();

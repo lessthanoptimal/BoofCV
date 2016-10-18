@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,9 +75,7 @@ public class FactoryVisualPanel {
 				}
 			}
 			return false;
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

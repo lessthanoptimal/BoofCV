@@ -57,8 +57,8 @@ public class TestWrapDisparitySparseSadRect {
 				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,
 						minDisparity,maxDisparity,r,r,-1,-1,-1,GrayF32.class);
 		StereoDisparitySparse<GrayF32> alg =
-				new WrapDisparitySparseSadRect<float[],GrayF32>(
-						new ImplDisparitySparseScoreSadRect_F32(minDisparity,maxDisparity,r,r),
+				new WrapDisparitySparseSadRect<>(
+						new ImplDisparitySparseScoreSadRect_F32(minDisparity, maxDisparity, r, r),
 						new ImplSelectSparseBasicWta_F32());
 
 		validator.process(left,right);

@@ -71,9 +71,9 @@ public class FactoryMultiViewRobust {
 		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimatorPnP);
+				new EstimatorToGenerator<>(estimatorPnP);
 
-		return new LeastMedianOfSquares<Se3_F64, Point2D3D>(lmeds.randSeed, lmeds.totalCycles, manager, generator, distance);
+		return new LeastMedianOfSquares<>(lmeds.randSeed, lmeds.totalCycles, manager, generator, distance);
 	}
 
 	/**
@@ -94,12 +94,12 @@ public class FactoryMultiViewRobust {
 		distance.setIntrinsic(pnp.intrinsic.fx,pnp.intrinsic.fy,pnp.intrinsic.skew);
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimatorPnP);
+				new EstimatorToGenerator<>(estimatorPnP);
 
 		// convert from pixels to pixels squared
 		double threshold = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<Se3_F64, Point2D3D>(ransac.randSeed, manager, generator, distance,ransac.maxIterations,threshold);
+		return new Ransac<>(ransac.randSeed, manager, generator, distance, ransac.maxIterations, threshold);
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class FactoryMultiViewRobust {
 						intrinsic.fx, intrinsic.fy, intrinsic.skew);
 
 
-		return new LeastMedianOfSquares<Se3_F64, AssociatedPair>
+		return new LeastMedianOfSquares<>
 				(lmeds.randSeed, lmeds.totalCycles, manager, generateEpipolarMotion, distanceSe3);
 
 	}
@@ -172,7 +172,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTOL = ransac.inlierThreshold * ransac.inlierThreshold * 2.0;
 
-		return new Ransac<Se3_F64, AssociatedPair>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
+		return new Ransac<>(ransac.randSeed, manager, generateEpipolarMotion, distanceSe3,
 				ransac.maxIterations, ransacTOL);
 	}
 
@@ -201,8 +201,8 @@ public class FactoryMultiViewRobust {
 		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(homography.normalize);
 		DistanceHomographySq distance = new DistanceHomographySq();
 
-		return new LeastMedianOfSquares<Homography2D_F64,AssociatedPair>
-				(lmeds.randSeed,lmeds.totalCycles,manager,modelFitter,distance);
+		return new LeastMedianOfSquares<>
+				(lmeds.randSeed, lmeds.totalCycles, manager, modelFitter, distance);
 	}
 
 	/**
@@ -232,7 +232,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTol = ransac.inlierThreshold*ransac.inlierThreshold;
 
-		return new Ransac<Homography2D_F64,AssociatedPair>
-				(ransac.randSeed,manager,modelFitter,distance,ransac.maxIterations,ransacTol);
+		return new Ransac<>
+				(ransac.randSeed, manager, modelFitter, distance, ransac.maxIterations, ransacTol);
 	}
 }

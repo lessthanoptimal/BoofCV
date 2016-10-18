@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,9 +43,9 @@ public class GenerateAffine2D implements
 	MotionAffinePoint2D_F64 fitter = new MotionAffinePoint2D_F64();
 
 	// key frame points
-	List<Point2D_F64> from = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> from = new ArrayList<>();
 	// current frame points
-	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> to = new ArrayList<>();
 
 	@Override
 	public boolean fitModel(List<AssociatedPair> dataSet, Affine2D_F64 initial, Affine2D_F64 found) {

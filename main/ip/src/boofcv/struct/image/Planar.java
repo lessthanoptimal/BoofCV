@@ -158,7 +158,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 		if (x1 > width || y1 > height)
 			throw new IllegalArgumentException("x1 or y1 is more than the width or height respectively");
 
-		Planar<T> ret = new Planar<T>(type,bands.length);
+		Planar<T> ret = new Planar<>(type, bands.length);
 		ret.stride = Math.max(width, stride);
 		ret.width = x1 - x0;
 		ret.height = y1 - y0;
@@ -222,7 +222,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	 */
 	@Override
 	public Planar<T> _createNew(int imgWidth, int imgHeight) {
-		return new Planar<T>(type,imgWidth,imgHeight,bands.length);
+		return new Planar<>(type, imgWidth, imgHeight, bands.length);
 	}
 
 	/**
@@ -232,7 +232,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	 * @return New image
 	 */
 	public Planar<T> partialSpectrum(int ...which ) {
-		Planar<T> out = new Planar<T>(getBandType(),which.length);
+		Planar<T> out = new Planar<>(getBandType(), which.length);
 
 		out.setWidth(width);
 		out.setHeight(height);

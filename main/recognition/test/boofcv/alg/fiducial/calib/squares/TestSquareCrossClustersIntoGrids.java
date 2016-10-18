@@ -176,7 +176,7 @@ public class TestSquareCrossClustersIntoGrids {
 	{
 		List<SquareNode> cluster = createCluster(skip,top,bottom);
 		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
-		List<List<SquareNode>> ordered = new ArrayList<List<SquareNode>>();
+		List<List<SquareNode>> ordered = new ArrayList<>();
 
 		// mark the first row as traversed, which it will be
 		for (int i = 0; i < top; i++) {
@@ -294,7 +294,7 @@ public class TestSquareCrossClustersIntoGrids {
 						   int seed , int seedCorner , int sign , boolean skip ,
 						   int expected[] )
 	{
-		List<SquareNode> row = new ArrayList<SquareNode>();
+		List<SquareNode> row = new ArrayList<>();
 
 		SquareCrossClustersIntoGrids alg = new SquareCrossClustersIntoGrids();
 		alg.addToRow(cluster.get(seed),seedCorner,sign,skip,row);
@@ -331,7 +331,7 @@ public class TestSquareCrossClustersIntoGrids {
 			total += levels[i];
 		}
 
-		List<SquareNode> out = new ArrayList<SquareNode>();
+		List<SquareNode> out = new ArrayList<>();
 		for (int i = 0; i < total; i++) {
 			out.add( new SquareNode());
 			out.get(i).graph = SquareNode.RESET_GRAPH;
@@ -375,7 +375,7 @@ public class TestSquareCrossClustersIntoGrids {
 
 	@Test
 	public void findSeedNode() {
-		List<SquareNode> cluster = new ArrayList<SquareNode>();
+		List<SquareNode> cluster = new ArrayList<>();
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());
 		cluster.add( new SquareNode());

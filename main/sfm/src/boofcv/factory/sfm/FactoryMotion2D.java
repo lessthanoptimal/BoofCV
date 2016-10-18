@@ -112,13 +112,13 @@ public class FactoryMotion2D {
 				new Ransac(123123,manager,fitter,distance,ransacIterations,inlierThreshold);
 
 		ImageMotionPointTrackerKey<I,IT> lowlevel =
-				new ImageMotionPointTrackerKey<I, IT>(tracker,modelMatcher,modelRefiner,motionModel,outlierPrune);
+				new ImageMotionPointTrackerKey<>(tracker, modelMatcher, modelRefiner, motionModel, outlierPrune);
 
 		ImageMotionPtkSmartRespawn<I,IT> smartRespawn =
-				new ImageMotionPtkSmartRespawn<I, IT>(lowlevel,
-						absoluteMinimumTracks,respawnTrackFraction,respawnCoverageFraction );
+				new ImageMotionPtkSmartRespawn<>(lowlevel,
+						absoluteMinimumTracks, respawnTrackFraction, respawnCoverageFraction);
 
-		return new WrapImageMotionPtkSmartRespawn<I, IT>(smartRespawn);
+		return new WrapImageMotionPtkSmartRespawn<>(smartRespawn);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class FactoryMotion2D {
 		ImageDistort<I,I> distorter = FactoryDistort.distortSB(false, interp, imageType);
 		distorter.setRenderAll(false);
 
-		return new StitchingFromMotion2D<I, IT>(motion2D,distorter,transform,maxJumpFraction );
+		return new StitchingFromMotion2D<>(motion2D, distorter, transform, maxJumpFraction);
 	}
 
 	/**
@@ -178,6 +178,6 @@ public class FactoryMotion2D {
 				FactoryDistort.distortPL(false,interp, imageType);
 		distorter.setRenderAll(false);
 
-		return new StitchingFromMotion2D<Planar<I>, IT>(motion2D,distorter,transform,maxJumpFraction );
+		return new StitchingFromMotion2D<>(motion2D, distorter, transform, maxJumpFraction);
 	}
 }

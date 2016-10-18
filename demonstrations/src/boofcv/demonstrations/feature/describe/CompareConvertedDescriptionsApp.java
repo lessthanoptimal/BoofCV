@@ -63,8 +63,8 @@ public class CompareConvertedDescriptionsApp {
 
 		AssociateDescription<TD> assoc = FactoryAssociation.greedy(scorer,Double.MAX_VALUE,false);
 
-		List<Point2D_F64> locationSrc = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> locationDst = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> locationSrc = new ArrayList<>();
+		List<Point2D_F64> locationDst = new ArrayList<>();
 
 		GrayF32 input1 = ConvertBufferedImage.convertFrom(image1,(GrayF32)null);
 		GrayF32 input2 = ConvertBufferedImage.convertFrom(image2,(GrayF32)null);
@@ -91,7 +91,7 @@ public class CompareConvertedDescriptionsApp {
 								  DescribeRegionPoint<GrayF32,TD> describe ,
 								  List<Point2D_F64> location )
 	{
-		FastQueue<TD> list = new FastQueue<TD>(100,describe.getDescriptionType(),false);
+		FastQueue<TD> list = new FastQueue<>(100, describe.getDescriptionType(), false);
 
 		System.out.println("Detecting");
 		detector.detect(input);
@@ -127,7 +127,7 @@ public class CompareConvertedDescriptionsApp {
 				FactoryConvertTupleDesc.real_F64_S8(describeA.createDescription().size());
 
 		DescribeRegionPoint<GrayF32,TupleDesc_S8> describeB =
-				new DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8>(describeA,converter);
+				new DescribeRegionPointConvert<>(describeA, converter);
 
 		ScoreAssociation<TupleDesc_F64> scoreA = FactoryAssociation.scoreSad(TupleDesc_F64.class);
 		ScoreAssociation<TupleDesc_S8> scoreB = FactoryAssociation.scoreSad(TupleDesc_S8.class);

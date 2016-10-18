@@ -67,7 +67,7 @@ public class TestDetectFiducialSquareBinary {
 		ConvertImage.convert(rendered_F32,rendered);
 		GrayU8 input = new GrayU8(640,480);
 
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> expected = new ArrayList<>();
 		expected.add( new Point2D_F64(200,250+rendered.height));
 		expected.add( new Point2D_F64(200,250));
 		expected.add( new Point2D_F64(200+rendered.width,250));

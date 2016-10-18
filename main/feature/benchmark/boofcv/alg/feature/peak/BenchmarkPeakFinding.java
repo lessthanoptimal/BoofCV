@@ -47,7 +47,7 @@ public class BenchmarkPeakFinding<T extends ImageGray> {
 
 	T image;
 	Class<T> imageType;
-	List<Point2D_F32> locations = new ArrayList<Point2D_F32>();
+	List<Point2D_F32> locations = new ArrayList<>();
 
 	public BenchmarkPeakFinding( Class<T> imageType ) {
 		this.imageType = imageType;

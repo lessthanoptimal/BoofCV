@@ -34,6 +34,6 @@ public class TestImplImageDistortCache_I16 extends CommonImageDistortCacheTests<
 	@Override
 	public ImageDistortCache_SB<GrayS16,GrayS16> create(InterpolatePixelS<GrayS16> interp,
 														Class<GrayS16> imageType) {
-		return new ImplImageDistortCache_I16<GrayS16,GrayS16>(interp);
+		return new ImplImageDistortCache_I16<>(interp);
 	}
 }

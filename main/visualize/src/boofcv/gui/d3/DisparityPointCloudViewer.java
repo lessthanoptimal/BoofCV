@@ -52,7 +52,7 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class DisparityPointCloudViewer extends JPanel {
-	FastQueue<ColorPoint3D> cloud = new FastQueue<ColorPoint3D>(200,ColorPoint3D.class,true);
+	FastQueue<ColorPoint3D> cloud = new FastQueue<>(200, ColorPoint3D.class, true);
 
 	// distance between the two camera centers
 	double baseline;

@@ -167,7 +167,7 @@ public class FactoryDescribeRegionPoint {
 
 		DescribePointSift<GrayF32> alg = FactoryDescribePointAlgs.sift(configDescribe,GrayF32.class);
 
-		return new DescribeRegionPoint_SIFT<T>(ss,alg,imageType);
+		return new DescribeRegionPoint_SIFT<>(ss, alg, imageType);
 	}
 
 	/**
@@ -194,9 +194,9 @@ public class FactoryDescribeRegionPoint {
 				FactoryBriefDefinition.gaussian2(new Random(123), config.radius, config.numPoints);
 
 		if( config.fixed) {
-			return new WrapDescribeBrief<T>(FactoryDescribePointAlgs.brief(definition,filter),imageType);
+			return new WrapDescribeBrief<>(FactoryDescribePointAlgs.brief(definition, filter), imageType);
 		} else {
-			return new WrapDescribeBriefSo<T>(FactoryDescribePointAlgs.briefso(definition, filter),imageType);
+			return new WrapDescribeBriefSo<>(FactoryDescribePointAlgs.briefso(definition, filter), imageType);
 		}
 	}
 

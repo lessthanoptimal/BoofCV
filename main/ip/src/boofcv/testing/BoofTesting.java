@@ -154,9 +154,7 @@ public class BoofTesting {
 
 			try {
 				m.invoke(testClass, inputs);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 
@@ -263,9 +261,7 @@ public class BoofTesting {
 				}
 			}
 
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -278,7 +274,7 @@ public class BoofTesting {
 	public static Method findMethod(Class<?> type, String name, Class<?>... params) {
 		Method methods[] = type.getMethods();
 
-		List<Method> found = new ArrayList<Method>();
+		List<Method> found = new ArrayList<>();
 		for (Method m : methods) {
 			if (m.getName().compareTo(name) != 0)
 				continue;
@@ -368,9 +364,7 @@ public class BoofTesting {
 
 		try {
 			m.invoke(null,inputs);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -402,11 +396,7 @@ public class BoofTesting {
 
 				total++;
 			}
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 

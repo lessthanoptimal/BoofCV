@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64,Stereo2D3D
 	private DistanceFromModel<Se3_F64,Point2D3D> distance;
 
 	// Stereo observations converted into a monocular observation
-	private FastQueue<Point2D3D> monoPoints = new FastQueue<Point2D3D>(10,Point2D3D.class,true);
+	private FastQueue<Point2D3D> monoPoints = new FastQueue<>(10, Point2D3D.class, true);
 
 	// known transform from left camera view into the right camera view
 	private Se3_F64 leftToRight = new Se3_F64();
@@ -52,7 +52,7 @@ public class PnPStereoEstimator implements GeoModelEstimator1<Se3_F64,Stereo2D3D
 	// computed transform from worldToRight
 	private Se3_F64 worldToRight = new Se3_F64();
 
-	private FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(4,Se3_F64.class,true);
+	private FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);
 
 	// extra observation used for testing solutions
 	int extraForTest;

@@ -93,7 +93,7 @@ public class SiftDetector {
 	double edgeThreshold;
 
 	// all the found detections in a single octave
-	protected FastQueue<ScalePoint> detections = new FastQueue<ScalePoint>(ScalePoint.class,true);
+	protected FastQueue<ScalePoint> detections = new FastQueue<>(ScalePoint.class, true);
 
 	// Computes image derivatives. used in edge rejection
 	ImageConvolveSparse<GrayF32,?> derivXX;

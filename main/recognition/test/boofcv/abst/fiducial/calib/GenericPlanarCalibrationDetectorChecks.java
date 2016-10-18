@@ -57,7 +57,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	GrayF32 original;
 	GrayF32 distorted;
-	List<CalibrationObservation> solutions = new ArrayList<CalibrationObservation>();
+	List<CalibrationObservation> solutions = new ArrayList<>();
 
 	PointTransform_F32 d2o;
 	PointTransform_F64 o2d;
@@ -173,7 +173,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	}
 
 	public void checkList(CalibrationObservation found , boolean applyTransform ) {
-		List<CalibrationObservation> expectedList = new ArrayList<CalibrationObservation>();
+		List<CalibrationObservation> expectedList = new ArrayList<>();
 
 		if( !applyTransform ) {
 			expectedList.addAll(this.solutions);
@@ -227,7 +227,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
 		// Specify the pixel coordinates from destination to target
-		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
+		ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
 		associatedPairs.add(new AssociatedPair(x0, y0, 0, 0));
 		associatedPairs.add(new AssociatedPair(x1, y1, width-1, 0));
 		associatedPairs.add(new AssociatedPair(x2, y2, width-1, height-1));

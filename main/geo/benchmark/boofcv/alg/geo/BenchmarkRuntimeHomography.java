@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class BenchmarkRuntimeHomography extends ArtificialStereoScene {
 	static final int NUM_POINTS = 500;
 	static final boolean PIXELS = true;
 
-	List<AssociatedPair> pairs4 = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> pairs4 = new ArrayList<>();
 
 	DenseMatrix64F H = new DenseMatrix64F(3,3);
 

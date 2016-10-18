@@ -46,14 +46,14 @@ public class FactoryTrackerObjectAlgs {
 	TldTracker<T,D> createTLD( TldParameters config ,
 							   InterpolatePixelS<T> interpolate , ImageGradient<T,D> gradient ,
 							   Class<T> imageType , Class<D> derivType ) {
-		return new TldTracker<T,D>(config,interpolate,gradient,imageType,derivType);
+		return new TldTracker<>(config, interpolate, gradient, imageType, derivType);
 	}
 
 	public static <T extends ImageGray,D extends ImageGray>
 	SparseFlowObjectTracker<T,D> createSparseFlow( SfotConfig config ,
 												   Class<T> imageType , Class<D> derivType ,
 												   ImageGradient<T, D> gradient) {
-		return new SparseFlowObjectTracker<T,D>(config,imageType,derivType,gradient);
+		return new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);
 	}
 
 	public static <T extends ImageMultiBand>
@@ -133,11 +133,11 @@ public class FactoryTrackerObjectAlgs {
 				config.interpolation, BorderType.EXTENDED,imageType);
 
 		LocalWeightedHistogramRotRect<T> hist =
-				new LocalWeightedHistogramRotRect<T>(config.numSamples,config.numSigmas,config.numHistogramBins,
-						imageType.getNumBands(),config.maxPixelValue,interp);
+				new LocalWeightedHistogramRotRect<>(config.numSamples, config.numSigmas, config.numHistogramBins,
+						imageType.getNumBands(), config.maxPixelValue, interp);
 
-		return new TrackerMeanShiftComaniciu2003<T>(
-				config.updateHistogram,config.meanShiftMaxIterations,config.meanShiftMinimumChange,
-				config.scaleWeight,config.minimumSizeRatio,config.scaleChange,hist);
+		return new TrackerMeanShiftComaniciu2003<>(
+				config.updateHistogram, config.meanShiftMaxIterations, config.meanShiftMinimumChange,
+				config.scaleWeight, config.minimumSizeRatio, config.scaleChange, hist);
 	}
 }

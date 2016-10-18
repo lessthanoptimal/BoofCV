@@ -50,7 +50,7 @@ public class CompleteSift extends SiftDetector
 	// storage for found features
 	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
-	FastQueue<ScalePoint> locations = new FastQueue<ScalePoint>(ScalePoint.class,false);
+	FastQueue<ScalePoint> locations = new FastQueue<>(ScalePoint.class, false);
 	GrowQueue_F64 orientations = new GrowQueue_F64();
 
 	// used to compute the image gradient

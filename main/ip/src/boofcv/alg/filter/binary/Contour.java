@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,11 +37,11 @@ public class Contour {
 	/**
 	 * External contour around the blob.
 	 */
-	public List<Point2D_I32> external = new ArrayList<Point2D_I32>();
+	public List<Point2D_I32> external = new ArrayList<>();
 	/**
 	 * Internal contours that are inside the blob.
 	 */
-	public List<List<Point2D_I32>> internal = new ArrayList<List<Point2D_I32>>();
+	public List<List<Point2D_I32>> internal = new ArrayList<>();
 
 	public void reset() {
 		id = -1;
@@ -57,7 +57,7 @@ public class Contour {
       }
 
       for( List<Point2D_I32> l : ret.internal ) {
-         List<Point2D_I32> a = new ArrayList<Point2D_I32>();
+         List<Point2D_I32> a = new ArrayList<>();
 
          for( Point2D_I32 p : l ) {
             a.add( p.copy() );

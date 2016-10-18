@@ -133,9 +133,7 @@ public class TestConvolveNormalizedStandardSparse {
 		try {
 			Number result = (Number)method.invoke(null,inputKernel,inputKernel,inputImage,targetX,targetY,inputStorage);
 			assertEquals(expectedOutput,result.floatValue(),1e-4);
-		} catch (IllegalAccessException e) {                                                         
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -53,8 +53,8 @@ public class PyramidKltForCombined<I extends ImageGray, D extends ImageGray> {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(inputType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput,interpDeriv,config);
-		tracker = new PyramidKltTracker<I,D>(klt);
+		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
+		tracker = new PyramidKltTracker<>(klt);
 	}
 
 	protected PyramidKltForCombined() {

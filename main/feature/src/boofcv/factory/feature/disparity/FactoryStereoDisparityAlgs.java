@@ -87,8 +87,8 @@ public class FactoryStereoDisparityAlgs {
 						   int regionRadiusX, int regionRadiusY,
 						   DisparitySelect<int[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRect_U8<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRect_U8<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static <T extends ImageGray> DisparityScoreSadRect<GrayS16,T>
@@ -96,8 +96,8 @@ public class FactoryStereoDisparityAlgs {
 							  int regionRadiusX, int regionRadiusY,
 							  DisparitySelect<int[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRect_S16<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRect_S16<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static <T extends ImageGray> DisparityScoreSadRect<GrayF32,T>
@@ -105,8 +105,8 @@ public class FactoryStereoDisparityAlgs {
 							  int regionRadiusX, int regionRadiusY,
 							  DisparitySelect<float[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRect_F32<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRect_F32<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static <T extends ImageGray> DisparityScoreWindowFive<GrayU8,T>
@@ -114,8 +114,8 @@ public class FactoryStereoDisparityAlgs {
 								  int regionRadiusX, int regionRadiusY,
 								  DisparitySelect<int[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRectFive_U8<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRectFive_U8<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static <T extends ImageGray> DisparityScoreWindowFive<GrayS16,T>
@@ -123,8 +123,8 @@ public class FactoryStereoDisparityAlgs {
 								  int regionRadiusX, int regionRadiusY,
 								  DisparitySelect<int[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRectFive_S16<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRectFive_S16<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static <T extends ImageGray> DisparityScoreWindowFive<GrayF32,T>
@@ -132,8 +132,8 @@ public class FactoryStereoDisparityAlgs {
 								   int regionRadiusX, int regionRadiusY,
 								   DisparitySelect<float[],T> computeDisparity)
 	{
-		return new ImplDisparityScoreSadRectFive_F32<T>(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY,computeDisparity);
+		return new ImplDisparityScoreSadRectFive_F32<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
 	public static DisparitySparseScoreSadRect<int[],GrayU8>

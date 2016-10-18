@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public class GenerateSe2_AssociatedPair implements
 {
 	MotionTransformPoint<Se2_F64, Point2D_F64> estimate;
 
-	List<Point2D_F64> from = new ArrayList<Point2D_F64>();
-	List<Point2D_F64> to = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> from = new ArrayList<>();
+	List<Point2D_F64> to = new ArrayList<>();
 
 	public GenerateSe2_AssociatedPair(MotionTransformPoint<Se2_F64, Point2D_F64> estimate) {
 		this.estimate = estimate;

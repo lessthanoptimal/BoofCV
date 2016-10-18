@@ -70,11 +70,11 @@ public class FactoryFiducial {
 				polygon(configFiducial.squareDetector,imageType);
 
 		final DetectFiducialSquareBinary<T> alg =
-				new DetectFiducialSquareBinary<T>(configFiducial.gridWidth,
+				new DetectFiducialSquareBinary<>(configFiducial.gridWidth,
 						configFiducial.borderWidthFraction, configFiducial.minimumBlackBorderFraction,
-						binary,squareDetector,imageType);
+						binary, squareDetector, imageType);
 		alg.setAmbiguityThreshold(configFiducial.ambiguousThreshold);
-		return new SquareBinary_to_FiducialDetector<T>(alg,configFiducial.targetWidth);
+		return new SquareBinary_to_FiducialDetector<>(alg, configFiducial.targetWidth);
 	}
 
 	/**
@@ -104,11 +104,11 @@ public class FactoryFiducial {
 		InputToBinary<T> binary = FactoryThresholdBinary.threshold(configThreshold, imageType);
 		BinaryPolygonDetector<T> squareDetector =
 				FactoryShapeDetector.polygon(configFiducial.squareDetector, imageType);
-		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<T>(binary,
-				squareDetector,configFiducial.borderWidthFraction,configFiducial.minimumBlackBorderFraction,
-				configFiducial.maxErrorFraction,imageType);
+		DetectFiducialSquareImage<T> alg = new DetectFiducialSquareImage<>(binary,
+				squareDetector, configFiducial.borderWidthFraction, configFiducial.minimumBlackBorderFraction,
+				configFiducial.maxErrorFraction, imageType);
 
-		return new SquareImage_to_FiducialDetector<T>(alg);
+		return new SquareImage_to_FiducialDetector<>(alg);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class FactoryFiducial {
 
 		config.refineWithCorners = false;
 
-		return new CalibrationFiducialDetector<T>(config,imageType);
+		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
 	/**
@@ -140,12 +140,12 @@ public class FactoryFiducial {
 
 		config.refineWithCorners = false;
 
-		return new CalibrationFiducialDetector<T>(config,imageType);
+		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
 	public static <T extends ImageGray>
 	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
 
-		return new CalibrationFiducialDetector<T>(config,imageType);
+		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 }

@@ -53,7 +53,7 @@ public class VideoSequenceSimulator<I extends ImageGray> {
 	BufferedImage workImage;
 	I outputImage;
 
-	List<Square> squares = new ArrayList<Square>();
+	List<Square> squares = new ArrayList<>();
 	protected Class<I> inputType;
 
 	public VideoSequenceSimulator( int width , int height, Class<I> inputType ) {

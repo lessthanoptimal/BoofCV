@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,8 @@ public class TldAdjustRegion {
 		ModelGenerator<ScaleTranslate2D,AssociatedPair> generator = new GenerateScaleTranslate2D();
 		DistanceFromModel<ScaleTranslate2D,AssociatedPair> distance = new DistanceScaleTranslate2DSq();
 
-		estimateMotion = new LeastMedianOfSquares<ScaleTranslate2D, AssociatedPair>(123123,numCycles,Double.MAX_VALUE,
-				0,manager,generator,distance);
+		estimateMotion = new LeastMedianOfSquares<>(123123, numCycles, Double.MAX_VALUE,
+				0, manager, generator, distance);
 	}
 
 	public void init( int imageWidth , int imageHeight ) {

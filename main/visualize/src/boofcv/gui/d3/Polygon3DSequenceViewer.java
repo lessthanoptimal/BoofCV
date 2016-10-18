@@ -43,7 +43,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		MouseMotionListener {
 
 	// the shapes it's drawing
-	List<Poly> polygons = new ArrayList<Poly>();
+	List<Poly> polygons = new ArrayList<>();
 
 	// transform from world frame to camera frame
 	Se3_F64 worldToCamera = new Se3_F64();

@@ -71,8 +71,8 @@ public class TestBinaryPolygonDetector {
 
 	Class imageTypes[] = new Class[]{GrayU8.class, GrayF32.class};
 
-	List<Rectangle2D_I32> rectangles = new ArrayList<Rectangle2D_I32>();
-	List<Polygon2D_F64> distorted = new ArrayList<Polygon2D_F64>();
+	List<Rectangle2D_I32> rectangles = new ArrayList<>();
+	List<Polygon2D_F64> distorted = new ArrayList<>();
 
 	Affine2D_F64 transform = new Affine2D_F64();
 
@@ -174,7 +174,7 @@ public class TestBinaryPolygonDetector {
 	@Test
 	public void easyTestMultipleShapes() {
 
-		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> polygons = new ArrayList<>();
 		polygons.add(new Polygon2D_F64(20, 20, 40, 50, 80, 20));
 		polygons.add(new Polygon2D_F64(20, 60, 20, 90, 40, 90,40, 60));
 
@@ -400,7 +400,7 @@ public class TestBinaryPolygonDetector {
 	 */
 	@Test
 	public void rejectShapes_concave() {
-		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> polygons = new ArrayList<>();
 		polygons.add(new Polygon2D_F64(20,20, 80,20, 80,80, 40,40, 20,80));
 
 		for( Class imageType : imageTypes ) {
@@ -419,7 +419,7 @@ public class TestBinaryPolygonDetector {
 	 */
 	@Test
 	public void detect_concave() {
-		List<Polygon2D_F64> polygons = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> polygons = new ArrayList<>();
 		Polygon2D_F64 expected = new Polygon2D_F64(20, 20, 20, 80, 40, 40, 80, 80, 80, 20);
 		polygons.add(expected);
 
@@ -440,7 +440,7 @@ public class TestBinaryPolygonDetector {
 
 	@Test
 	public void touchesBorder_false() {
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 
 		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.getLabeled().reshape(20,30);
@@ -458,7 +458,7 @@ public class TestBinaryPolygonDetector {
 
 	@Test
 	public void touchesBorder_true() {
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 
 		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.getLabeled().reshape(20,30);
@@ -549,7 +549,7 @@ public class TestBinaryPolygonDetector {
 		alg.distToUndist = tranTo;
 		alg.getLabeled().reshape(width,height);
 
-		List<Point2D_I32> positive = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> positive = new ArrayList<>();
 		positive.add( new Point2D_I32(20,0));
 		positive.add( new Point2D_I32(width-1,30));
 		positive.add( new Point2D_I32(0,30));
@@ -562,7 +562,7 @@ public class TestBinaryPolygonDetector {
 			assertTrue(alg.isUndistortedOnBorder(new Point2D_F64(x,y),0.7f));
 		}
 
-		List<Point2D_I32> negative = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> negative = new ArrayList<>();
 		negative.add( new Point2D_I32(20,5));
 		negative.add( new Point2D_I32(width-3,30));
 		negative.add( new Point2D_I32(7,30));

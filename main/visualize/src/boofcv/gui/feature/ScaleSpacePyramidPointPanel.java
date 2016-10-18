@@ -41,10 +41,10 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 
 	private PyramidFloat ss;
 	BufferedImage background;
-	List<ScalePoint> points = new ArrayList<ScalePoint>();
-	List<ScalePoint> unused = new ArrayList<ScalePoint>();
+	List<ScalePoint> points = new ArrayList<>();
+	List<ScalePoint> unused = new ArrayList<>();
 	BufferedImage levelImage;
-	List<ScalePoint> levelPoints = new ArrayList<ScalePoint>();
+	List<ScalePoint> levelPoints = new ArrayList<>();
 
 	int activeLevel = 0;
 

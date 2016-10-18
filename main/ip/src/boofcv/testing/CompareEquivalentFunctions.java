@@ -120,9 +120,7 @@ public abstract class CompareEquivalentFunctions {
 			validationResult = validation.invoke(null,validationParamSub);
 
 			compareResults(targetResult,targetParamSub,validationResult,validationParamSub);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

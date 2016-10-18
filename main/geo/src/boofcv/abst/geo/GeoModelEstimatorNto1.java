@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public abstract class GeoModelEstimatorNto1<Model,Point> implements GeoModelEsti
 	private int numTest;
 
 	// list of points passed to the algorithm
-	private List<Point> list = new ArrayList<Point>();
+	private List<Point> list = new ArrayList<>();
 
 	// storage for initial set of solutions
 	private FastQueue<Model> solutions;

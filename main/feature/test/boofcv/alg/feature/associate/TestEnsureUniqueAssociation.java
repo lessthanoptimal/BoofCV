@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestEnsureUniqueAssociation {
 	@Test
 	public void basicTest() {
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
 
 		matches.grow().setAssociation(0,1,10);
 		matches.grow().setAssociation(1,0,20);

@@ -45,7 +45,7 @@ public class FactoryFeatureExtractor {
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 NonMaxSuppression extractor,
 										 int maxFeatures ) {
-		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<I, D>(intensity, extractor);
+		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractor);
 		det.setMaxFeatures(maxFeatures);
 
 		return det;

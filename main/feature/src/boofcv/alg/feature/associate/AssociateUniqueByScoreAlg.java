@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,9 @@ public class AssociateUniqueByScoreAlg {
 	private GrowQueue_F64 scores = new GrowQueue_F64();
 
 	// storage for found solutions
-	private FastQueue<AssociatedIndex> firstPass = new FastQueue<AssociatedIndex>(AssociatedIndex.class,false);
+	private FastQueue<AssociatedIndex> firstPass = new FastQueue<>(AssociatedIndex.class, false);
 	// final output of pruned matches
-	private FastQueue<AssociatedIndex> pruned = new FastQueue<AssociatedIndex>(AssociatedIndex.class,false);
+	private FastQueue<AssociatedIndex> pruned = new FastQueue<>(AssociatedIndex.class, false);
 
 	/**
 	 * Configures algorithm.

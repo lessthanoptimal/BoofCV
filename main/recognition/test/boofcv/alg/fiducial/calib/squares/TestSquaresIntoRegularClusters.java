@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestSquaresIntoRegularClusters {
 	 */
 	@Test
 	public void process() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -62,7 +62,7 @@ public class TestSquaresIntoRegularClusters {
 
 	@Test
 	public void computeNodeInfo() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
 
@@ -96,7 +96,7 @@ public class TestSquaresIntoRegularClusters {
 	@Test
 	public void connectNodes_oneCluster() {
 
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -116,7 +116,7 @@ public class TestSquaresIntoRegularClusters {
 	 */
 	@Test
 	public void connectNodes_twoCluster() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		double width = 1;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
@@ -163,7 +163,7 @@ public class TestSquaresIntoRegularClusters {
 	 */
 	@Test
 	public void considerConnect_nominal() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1));
 		squares.add(new Polygon2D_F64(2, 1, 4, 1, 4, -1, 2, -1));
 
@@ -181,7 +181,7 @@ public class TestSquaresIntoRegularClusters {
 	 */
 	@Test
 	public void considerConnect_shape_offset() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1,1,  1,1,  1,-1,  -1,-1));
 		squares.add(new Polygon2D_F64( 3,2,  5,1,  5,-1,   3,-2));
 
@@ -199,7 +199,7 @@ public class TestSquaresIntoRegularClusters {
 	 */
 	@Test
 	public void considerConnect_shape_size() {
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add(new Polygon2D_F64(-1, 1, 1, 1, 1, -1, -1, -1));
 		squares.add(new Polygon2D_F64(2, 4, 10, 4, 10, -4, 2, -4));
 

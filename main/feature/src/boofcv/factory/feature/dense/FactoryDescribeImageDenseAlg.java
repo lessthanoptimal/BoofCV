@@ -35,8 +35,8 @@ public class FactoryDescribeImageDenseAlg {
 	DescribeDenseHogAlg<T> hog(ConfigDenseHoG config , ImageType<T> imageType ) {
 		config.checkValidity();
 
-		return new DescribeDenseHogAlg<T>(config.orientationBins, config.pixelsPerCell,
-				config.cellsPerBlockX,config.cellsPerBlockY,
+		return new DescribeDenseHogAlg<>(config.orientationBins, config.pixelsPerCell,
+				config.cellsPerBlockX, config.cellsPerBlockY,
 				config.stepBlock, imageType);
 
 	}

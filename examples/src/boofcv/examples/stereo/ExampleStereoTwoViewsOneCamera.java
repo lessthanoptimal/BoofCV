@@ -94,7 +94,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		List<AssociatedPair> matchedCalibrated = convertToNormalizedCoordinates(matchedFeatures, intrinsic);
 
 		// Robustly estimate camera motion
-		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> inliers = new ArrayList<>();
 		Se3_F64 leftToRight = estimateCameraMotion(intrinsic, matchedCalibrated, inliers);
 
 		drawInliers(origLeft, origRight, intrinsic, inliers);
@@ -166,7 +166,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		PointTransform_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
-		List<AssociatedPair> calibratedFeatures = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
 		for (AssociatedPair p : matchedFeatures) {
 			AssociatedPair c = new AssociatedPair();
@@ -232,7 +232,7 @@ public class ExampleStereoTwoViewsOneCamera {
 								   List<AssociatedPair> normalized) {
 		PointTransform_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 
-		List<AssociatedPair> pixels = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> pixels = new ArrayList<>();
 
 		for (AssociatedPair n : normalized) {
 			AssociatedPair p = new AssociatedPair();

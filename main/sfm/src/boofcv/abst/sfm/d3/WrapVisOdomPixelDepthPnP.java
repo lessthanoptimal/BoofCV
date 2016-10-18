@@ -54,7 +54,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray>
 	Class<T> imageType;
 	boolean success;
 
-	List<PointTrack> active = new ArrayList<PointTrack>();
+	List<PointTrack> active = new ArrayList<>();
 
 	public WrapVisOdomPixelDepthPnP(VisOdomPixelDepthPnP<T> alg,
 									StereoSparse3D<T> stereo,

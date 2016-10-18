@@ -137,7 +137,7 @@ public class TestBundleAdjustmentCalibratedDense {
 	public static List<ViewPointObservations> createObservations(
 			CalibratedPoseAndPoint model , int numViews , int numPoints  )
 	{
-		List<ViewPointObservations> ret = new ArrayList<ViewPointObservations>();
+		List<ViewPointObservations> ret = new ArrayList<>();
 		
 		for( int view = 0; view < numViews; view++ ) {
 

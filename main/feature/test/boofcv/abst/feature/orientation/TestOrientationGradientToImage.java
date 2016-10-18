@@ -44,8 +44,8 @@ public class TestOrientationGradientToImage {
 				FactoryDerivative.sobel(GrayF32.class,null);
 
 		OrientationGradientToImage<GrayF32,GrayF32>
-				alg = new OrientationGradientToImage<GrayF32, GrayF32>(orig,gradient,
-				GrayF32.class,GrayF32.class);
+				alg = new OrientationGradientToImage<>(orig, gradient,
+				GrayF32.class, GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
 		tests.setup(angleTol,r*2+1,alg,GrayF32.class);

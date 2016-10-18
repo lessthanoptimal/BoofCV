@@ -55,8 +55,8 @@ import java.util.List;
 public class CalibrateStereoPlanar {
 
 	// transform from world to camera in each view
-	List<Se3_F64> viewLeft = new ArrayList<Se3_F64>();
-	List<Se3_F64> viewRight = new ArrayList<Se3_F64>();
+	List<Se3_F64> viewLeft = new ArrayList<>();
+	List<Se3_F64> viewRight = new ArrayList<>();
 
 	// calibrates the left and right camera image
 	CalibrateMonoPlanar calibLeft;
@@ -163,15 +163,15 @@ public class CalibrateStereoPlanar {
 	private Se3_F64 computeRightToLeft() {
 		// location of points in the world coordinate system
 		List<Point2D_F64> points2D = layout;
-		List<Point3D_F64> points3D = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> points3D = new ArrayList<>();
 
 		for( Point2D_F64 p : points2D ) {
 			points3D.add( new Point3D_F64(p.x,p.y,0));
 		}
 
 		// create point cloud in each view
-		List<Point3D_F64> left = new ArrayList<Point3D_F64>();
-		List<Point3D_F64> right = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> left = new ArrayList<>();
+		List<Point3D_F64> right = new ArrayList<>();
 
 		for( int i = 0; i < viewLeft.size(); i++ ) {
 			Se3_F64 worldToLeft = viewLeft.get(i);

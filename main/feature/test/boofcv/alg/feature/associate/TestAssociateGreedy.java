@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
 		alg.setMaxFitError(0.5);
 
 		alg.associate(a,b);
@@ -64,14 +64,14 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
 
 		// large margin for error
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
 		alg.setMaxFitError(10);
 
 		alg.associate(a,b);
 		assertEquals(2,alg.getPairs()[1]);
 
 		// small margin for error, no association
-		alg = new AssociateGreedy<TupleDesc_F64>(score,false);
+		alg = new AssociateGreedy<>(score, false);
 		alg.setMaxFitError(0.1);
 		alg.associate(a,b);
 		assertEquals(-1,alg.getPairs()[1]);
@@ -82,7 +82,7 @@ public class TestAssociateGreedy {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
 
-		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<TupleDesc_F64>(score,true);
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, true);
 		alg.setMaxFitError(10);
 
 		alg.associate(a,b);

@@ -74,7 +74,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 
 	// Known 3D location of points on calibration grid and current obsrevations
 	List<Point2D3D> points2D3D;
-	List<Point2D3D> used2D3D = new ArrayList<Point2D3D>();
+	List<Point2D3D> used2D3D = new ArrayList<>();
 
 	// average of width and height
 	double width;
@@ -135,7 +135,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		this.width = width;
 
 		List<Point2D_F64> layout = detector.getLayout();
-		points2D3D = new ArrayList<Point2D3D>();
+		points2D3D = new ArrayList<>();
 		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			Point2D3D p = new Point2D3D();

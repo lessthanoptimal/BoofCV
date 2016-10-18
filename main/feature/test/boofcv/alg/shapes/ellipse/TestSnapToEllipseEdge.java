@@ -45,7 +45,7 @@ public class TestSnapToEllipseEdge {
 		EllipseRotated_F64 target = new EllipseRotated_F64(80,85,50,40,0);
 		EllipseRotated_F64 found = new EllipseRotated_F64();
 
-		List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
@@ -66,7 +66,7 @@ public class TestSnapToEllipseEdge {
 		EllipseRotated_F64 target = new EllipseRotated_F64(35,85,50,40,0);
 		EllipseRotated_F64 found = new EllipseRotated_F64();
 
-		List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
@@ -94,7 +94,7 @@ public class TestSnapToEllipseEdge {
 		input.b *= 1.05;
 		input.phi = 0.04;
 
-		List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);
@@ -135,7 +135,7 @@ public class TestSnapToEllipseEdge {
 	public void computePointsAndWeights() {
 		EllipseRotated_F64 target = new EllipseRotated_F64(80,85,50,40,0);
 
-		List<EllipseRotated_F64> ellipses = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 		ellipses.add( target);
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,300,ellipses, 0);

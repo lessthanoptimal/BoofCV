@@ -199,7 +199,7 @@ public class TestRefinePolygonCornersToImage extends BaseFitPolygon{
 	public void pickEndIndex_bug0() {
 		RefinePolygonCornersToImage<GrayU8> alg = new RefinePolygonCornersToImage<>(GrayU8.class);
 		alg.setPixelsAway(6);
-		alg.contour = new ArrayList<Point2D_I32>();
+		alg.contour = new ArrayList<>();
 		alg.splits = new GrowQueue_I32();
 
 		for (int i = 0; i < 100; i++) {

@@ -32,14 +32,14 @@ import java.util.List;
  */
 public class SquaresIntoClusters {
 
-	protected FastQueue<SquareNode> nodes = new FastQueue<SquareNode>(SquareNode.class,true);
+	protected FastQueue<SquareNode> nodes = new FastQueue<>(SquareNode.class, true);
 
 	// storage for found clusters
 	protected FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList.class,true);
 
 	// storage for open list when clustering points
-	protected List<SquareNode> open = new ArrayList<SquareNode>();
-	protected RecycleManager<SquareEdge> edges = new RecycleManager<SquareEdge>(SquareEdge.class);
+	protected List<SquareNode> open = new ArrayList<>();
+	protected RecycleManager<SquareEdge> edges = new RecycleManager<>(SquareEdge.class);
 
 	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
 	protected LineSegment2D_F64 lineB = new LineSegment2D_F64();

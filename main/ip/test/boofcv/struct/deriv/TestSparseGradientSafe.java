@@ -42,7 +42,7 @@ public class TestSparseGradientSafe {
 	public void checkMakeBorderSafe() {
 		Dummy d = new Dummy();
 		SparseImageGradient<GrayF32,GradientValue_F32> safe =
-				new SparseGradientSafe<GrayF32, GradientValue_F32>(d);
+				new SparseGradientSafe<>(d);
 
 		// read the border case
 		GradientValue_F32 v = safe.compute(0,0);

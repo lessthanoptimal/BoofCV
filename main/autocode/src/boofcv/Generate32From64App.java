@@ -21,7 +21,6 @@ package boofcv;
 import georegression.misc.autocode.ConvertFile32From64;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
@@ -71,8 +70,6 @@ public class Generate32From64App {
 		try {
 			System.out.println( "Examining " + f.getName() );
 			new ConvertFile32From64( f ).process();
-		} catch( FileNotFoundException e ) {
-			throw new RuntimeException( e );
 		} catch( IOException e ) {
 			throw new RuntimeException( e );
 		}

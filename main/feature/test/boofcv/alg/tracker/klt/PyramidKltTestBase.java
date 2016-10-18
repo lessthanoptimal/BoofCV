@@ -74,6 +74,6 @@ public class PyramidKltTestBase {
 	private PyramidKltTracker<GrayF32,GrayF32> createDefaultTracker() {
 		KltTracker<GrayF32, GrayF32> klt = TestKltTracker.createDefaultTracker();
 
-		return new PyramidKltTracker<GrayF32,GrayF32>(klt);
+		return new PyramidKltTracker<>(klt);
 	}
 }

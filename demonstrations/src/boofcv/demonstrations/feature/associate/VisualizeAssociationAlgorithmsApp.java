@@ -64,10 +64,10 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageGray>
 
 	boolean processedImage = false;
 
-	FastQueue<TupleDesc_F64> features0 = new FastQueue<TupleDesc_F64>(1,TupleDesc_F64.class,false);
-	FastQueue<Point2D_F64> points0 = new FastQueue<Point2D_F64>(1,Point2D_F64.class,true);
-	FastQueue<TupleDesc_F64> features1 = new FastQueue<TupleDesc_F64>(1,TupleDesc_F64.class,false);
-	FastQueue<Point2D_F64> points1 = new FastQueue<Point2D_F64>(1,Point2D_F64.class,true);
+	FastQueue<TupleDesc_F64> features0 = new FastQueue<>(1, TupleDesc_F64.class, false);
+	FastQueue<Point2D_F64> points0 = new FastQueue<>(1, Point2D_F64.class, true);
+	FastQueue<TupleDesc_F64> features1 = new FastQueue<>(1, TupleDesc_F64.class, false);
+	FastQueue<Point2D_F64> points1 = new FastQueue<>(1, Point2D_F64.class, true);
 
 
 	public VisualizeAssociationAlgorithmsApp( Class<T> imageType ) {
@@ -180,7 +180,7 @@ public class VisualizeAssociationAlgorithmsApp<T extends ImageGray>
 
 		VisualizeAssociationAlgorithmsApp app = new VisualizeAssociationAlgorithmsApp(imageType);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("Cave",
 				UtilIO.pathExample("stitch/cave_01.jpg"), UtilIO.pathExample("stitch/cave_02.jpg")));

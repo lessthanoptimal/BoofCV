@@ -102,7 +102,7 @@ public class DenoiseAccuracyStudyApp {
 
 
 	public static List<TestItem> createStandard(int minLevel , int maxLevel ) {
-		List<TestItem> ret = new ArrayList<TestItem>();
+		List<TestItem> ret = new ArrayList<>();
 
 		ret.addAll( addSpacial() );
 		for( int numLevels = minLevel; numLevels <= maxLevel; numLevels++ ) {
@@ -119,7 +119,7 @@ public class DenoiseAccuracyStudyApp {
 	protected static List<TestItem> createWaveletFilters( WaveletDescription<WlCoef_F32> waveletDesc ,
 														  int numLevels , String waveletName )
 	{
-		List<TestItem> ret = new ArrayList<TestItem>();
+		List<TestItem> ret = new ArrayList<>();
 
 		WaveletTransform<GrayF32, GrayF32,WlCoef_F32> waveletTran =
 				FactoryWaveletTransform.create_F32(waveletDesc,numLevels,0,255);
@@ -138,7 +138,7 @@ public class DenoiseAccuracyStudyApp {
 
 	protected static List<TestItem> addSpacial()
 	{
-		List<TestItem> ret = new ArrayList<TestItem>();
+		List<TestItem> ret = new ArrayList<>();
 
 		FilterImageInterface<GrayF32,GrayF32> filter;
 		filter = FactoryBlurFilter.gaussian(GrayF32.class,-1,2);
@@ -197,7 +197,7 @@ public class DenoiseAccuracyStudyApp {
 
 		String path = UtilIO.pathExample("standard/");
 
-		List<String> fileNames = new ArrayList<String>();
+		List<String> fileNames = new ArrayList<>();
 		fileNames.add(path+"barbara.jpg");
 		fileNames.add(path+"lena512.jpg");
 		fileNames.add(path+"peppers256.jpg");

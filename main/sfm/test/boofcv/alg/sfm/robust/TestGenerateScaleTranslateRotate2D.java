@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class TestGenerateScaleTranslateRotate2D {
 			AssociatedPair b = TestDistanceScaleTranslateRotate2DSq.apply(2,3,model);
 			AssociatedPair c = TestDistanceScaleTranslateRotate2DSq.apply(-3,2,model);
 
-			List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
+			List<AssociatedPair> obs = new ArrayList<>();
 			obs.add(a);
 			obs.add(b);
 			obs.add(c);

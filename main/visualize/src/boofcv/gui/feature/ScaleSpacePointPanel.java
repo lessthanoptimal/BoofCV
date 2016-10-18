@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ public class ScaleSpacePointPanel extends JPanel {
 
 	GaussianScaleSpace ss;
 	BufferedImage background;
-	List<ScalePoint> points = new ArrayList<ScalePoint>();
-	List<ScalePoint> unused = new ArrayList<ScalePoint>();
+	List<ScalePoint> points = new ArrayList<>();
+	List<ScalePoint> unused = new ArrayList<>();
 	BufferedImage levelImage;
-	List<ScalePoint> levelPoints = new ArrayList<ScalePoint>();
+	List<ScalePoint> levelPoints = new ArrayList<>();
 
 	int activeLevel = 0;
 	double scaleToRadius;

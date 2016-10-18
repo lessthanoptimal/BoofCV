@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TldFernManager {
 	TldFernFeature table[];
 
 	// storage for unused ferns which can be recycled
-	Stack<TldFernFeature> unusedFern = new Stack<TldFernFeature>();
+	Stack<TldFernFeature> unusedFern = new Stack<>();
 
 	/**
 	 * Configures the manager

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -316,7 +316,7 @@ public class FactoryMultiView {
 			return new WrapPnPLepetitEPnP(alg);
 		}
 
-		FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(4,Se3_F64.class,true);
+		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);
 
 		return new EstimateNto1ofPnP(computePnP_N(which,-1),solutions,numTest);
 	}

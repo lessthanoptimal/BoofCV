@@ -79,7 +79,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void checkFoundOrientation() {
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> expected = new ArrayList<>();
 		expected.add( new Point2D_F64(200,300+120));
 		expected.add( new Point2D_F64(200,300));
 		expected.add( new Point2D_F64(200+120,300));
@@ -219,7 +219,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void lensRemoval() {
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> expected = new ArrayList<>();
 		expected.add( new Point2D_F64(60,300+120));
 		expected.add( new Point2D_F64(60,300));
 		expected.add( new Point2D_F64(60+120,300));
@@ -297,7 +297,7 @@ public class TestBaseDetectFiducialSquare {
 	 */
 	@Test
 	public void intrinsicNotSet() {
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> expected = new ArrayList<>();
 		expected.add( new Point2D_F64(200,300+120));
 		expected.add( new Point2D_F64(200,300));
 		expected.add( new Point2D_F64(200+120,300));
@@ -405,7 +405,7 @@ public class TestBaseDetectFiducialSquare {
 		int w = pattern.width;
 		int h = pattern.height;
 
-		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
+		ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
 		associatedPairs.add(new AssociatedPair(where.a,new Point2D_F64(0,0)));
 		associatedPairs.add(new AssociatedPair(where.b,new Point2D_F64(w,0)));
 		associatedPairs.add(new AssociatedPair(where.c,new Point2D_F64(w,h)));

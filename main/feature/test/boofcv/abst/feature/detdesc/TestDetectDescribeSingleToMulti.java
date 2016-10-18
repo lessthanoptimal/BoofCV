@@ -35,7 +35,7 @@ public class TestDetectDescribeSingleToMulti {
 		Helper helper = new Helper();
 
 		DetectDescribeSingleToMulti<GrayF32,TupleDesc_F64> alg =
-				new DetectDescribeSingleToMulti<GrayF32,TupleDesc_F64>(helper);
+				new DetectDescribeSingleToMulti<>(helper);
 
 		assertFalse(helper.calledDetect);
 		alg.process(null);

@@ -47,25 +47,25 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	protected DdaFeatureManager<I,Desc> manager;
 
 	// location of interest points
-	protected FastQueue<Point2D_F64> locDst = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
-	protected FastQueue<Point2D_F64> locSrc = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
+	protected FastQueue<Point2D_F64> locDst = new FastQueue<>(10, Point2D_F64.class, false);
+	protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(10, Point2D_F64.class, true);
 	// description of interest points
 	protected FastQueue<Desc> featSrc;
 	protected FastQueue<Desc> featDst;
 
 	// all tracks
-	protected List<PointTrack> tracksAll = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksAll = new ArrayList<>();
 	// recently associated tracks
-	protected List<PointTrack> tracksActive = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksActive = new ArrayList<>();
 	// tracks not matched to any recent features
-	protected List<PointTrack> tracksInactive = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksInactive = new ArrayList<>();
 	// tracks dropped by the tracker
-	protected List<PointTrack> tracksDropped = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksDropped = new ArrayList<>();
 	// tracks recently spawned
-	protected List<PointTrack> tracksNew = new ArrayList<PointTrack>();
+	protected List<PointTrack> tracksNew = new ArrayList<>();
 
 	// previously declared tracks which are being recycled
-	protected List<PointTrack> unused = new ArrayList<PointTrack>();
+	protected List<PointTrack> unused = new ArrayList<>();
 
 	// Data returned by associate
 	protected FastQueue<AssociatedIndex> matches;
@@ -93,8 +93,8 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 		this.associate = associate;
 		this.updateDescription = updateDescription;
 
-		featSrc = new FastQueue<Desc>(10,manager.getDescriptionType(),false);
-		featDst = new FastQueue<Desc>(10,manager.getDescriptionType(),false);
+		featSrc = new FastQueue<>(10, manager.getDescriptionType(), false);
+		featDst = new FastQueue<>(10, manager.getDescriptionType(), false);
 	}
 
 	protected DetectDescribeAssociate() {
@@ -310,7 +310,7 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	@Override
 	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		list.addAll(tracksActive);
 		return list;
@@ -319,7 +319,7 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	@Override
 	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		list.addAll(tracksDropped);
 		return list;
@@ -328,7 +328,7 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	@Override
 	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		list.addAll(tracksNew);
 		return list;
@@ -337,7 +337,7 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	@Override
 	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		list.addAll(tracksAll);
 		return list;
@@ -346,7 +346,7 @@ public class DetectDescribeAssociate<I extends ImageGray, Desc extends TupleDesc
 	@Override
 	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		list.addAll(tracksInactive);
 		return list;

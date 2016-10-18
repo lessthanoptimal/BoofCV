@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class TestRefinePolyLineCorner {
 		int x0 = 10,y0 = 15;
 		int x1 = 60,y1 = 99;
 
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> points = new ArrayList<>();
 		addPoints(x0,y0,x1,y0,points);
 		addPoints(x1,y0,x1,y1,points);
 		addPoints(x1,y1,x0,y1,points);
@@ -77,7 +77,7 @@ public class TestRefinePolyLineCorner {
 		int x0 = 10,y0 = 15;
 		int x1 = 60,y1 = 99;
 
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> points = new ArrayList<>();
 		addPoints(x0,y0,x1,y0,points);
 		addPoints(x1,y0,x1,y1,points);
 		addPoints(x1,y1,x0,y1,points);
@@ -105,7 +105,7 @@ public class TestRefinePolyLineCorner {
 	 */
 	@Test
 	public void fit_six_sides() {
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> points = new ArrayList<>();
 		addPoints(0,0,20,0,points);
 		addPoints(20,0,20,20,points);
 		addPoints(20,20,40,20,points);
@@ -144,7 +144,7 @@ public class TestRefinePolyLineCorner {
 	 */
 	@Test
 	public void optimize_easy() {
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
 
@@ -159,7 +159,7 @@ public class TestRefinePolyLineCorner {
 	 */
 	@Test
 	public void optimize_kinky() {
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 		addPoints(0, 0, 20, 0, contour);
 		addPoints(20, 0, 20, 20, contour);
 
@@ -177,7 +177,7 @@ public class TestRefinePolyLineCorner {
 	public void distanceSum() {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			contour.add( new Point2D_I32(i,2));
 		}
@@ -214,7 +214,7 @@ public class TestRefinePolyLineCorner {
 		RefinePolyLineCorner alg = new RefinePolyLineCorner(true);
 
 		GrowQueue_I32 corners = new GrowQueue_I32();
-		List<Point2D_I32> contour = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> contour = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			assertFalse(alg.fit(contour, corners));
 			corners.add(i);

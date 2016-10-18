@@ -52,9 +52,7 @@ public class ImageHessianDirect_Reflection<Input extends ImageGray, Output exten
 	public void process(Input inputImage , Output derivXX, Output derivYY, Output derivXY) {
 		try {
 			m.invoke(null,inputImage, derivXX, derivYY, derivXY, border);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

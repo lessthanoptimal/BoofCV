@@ -68,7 +68,7 @@ public class ExampleVisualOdometryDepth {
 				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
 						GrayU8.class, GrayS16.class);
 
-		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<GrayU16>(1e-3);
+		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
 		// declares the algorithm
 		DepthVisualOdometry<GrayU8,GrayU16> visualOdometry =

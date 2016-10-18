@@ -62,8 +62,8 @@ public class FactoryPointTrackerTwoPass {
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,imageType);
 
-		return new PointTrackerTwoPassKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
-				gradient,interpInput,interpDeriv);
+		return new PointTrackerTwoPassKltPyramid<>(config.config, config.templateRadius, pyramid, detector,
+				gradient, interpInput, interpDeriv);
 	}
 
 	public static <I extends ImageGray, D extends ImageGray, Desc extends TupleDesc>
@@ -74,14 +74,14 @@ public class FactoryPointTrackerTwoPass {
 							   double scale,
 							   Class<I> imageType) {
 
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detector,imageType,null);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
 
-		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<I,D,Desc>(easy,describe,scale);
+		DdaManagerGeneralPoint<I,D,Desc> manager = new DdaManagerGeneralPoint<>(easy, describe, scale);
 
 		if( associate2 == null )
 			associate2 = associate1;
 
-		return new DetectDescribeAssociateTwoPass<I,Desc>(manager,associate1,associate2,false);
+		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, false);
 	}
 
 	public static <I extends ImageGray, Desc extends TupleDesc>
@@ -91,11 +91,11 @@ public class FactoryPointTrackerTwoPass {
 							   boolean updateDescription ) {
 
 
-		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<I,Desc>(detectDescribe);
+		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detectDescribe);
 
 		if( associate2 == null )
 			associate2 = associate1;
 
-		return new DetectDescribeAssociateTwoPass<I,Desc>(manager, associate1,associate2,updateDescription);
+		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, updateDescription);
 	}
 }

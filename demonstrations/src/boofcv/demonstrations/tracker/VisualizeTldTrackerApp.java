@@ -60,7 +60,7 @@ public class VisualizeTldTrackerApp<T extends ImageGray,D extends ImageGray>
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
-		tracker = new TldTracker<T, D>(new TldParameters(),interpolate,gradient,imageType,derivType);
+		tracker = new TldTracker<>(new TldParameters(), interpolate, gradient, imageType, derivType);
 	}
 
 	public void process( final SimpleImageSequence<T> sequence ) {

@@ -45,7 +45,7 @@ public class TestFeatureLaplacePyramid extends GenericFeatureScaleDetectorTests 
 		AnyImageDerivative<GrayF32, GrayF32> deriv =  GImageDerivativeOps.
 				derivativeForScaleSpace(GrayF32.class, GrayF32.class);
 
-		return new FeatureLaplacePyramid<GrayF32, GrayF32>(detector, sparseLaplace, deriv, 1);
+		return new FeatureLaplacePyramid<>(detector, sparseLaplace, deriv, 1);
 	}
 
 	@Override

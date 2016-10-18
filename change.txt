@@ -22,7 +22,7 @@ Version : 0.25
   * Added helpful error messages when src and dst are not set
 - Added support for F64 to F32 autocoding from regular F64 classes
 - 360 / Spherical camera support
-  * Equirectangular image support.  coordinates and redistortion
+  * Equirectangular image support
   * Equirectangular to pinhole
   * Equirectangular to cylinder
   * Equirectangular rotate
@@ -78,7 +78,7 @@ Version : 0.24
 - Module "all" can be used to import everything in boofcv/main AND boofcv/integration
 - Adjusted assisted calibration so that it's possible to provide a custom output directory
 - Video
-  * Xuggler's Maven repository has taken it down.  Effectively killing the zombie project
+  * Xuggler's Maven repository was taken down.  Effectively killing the zombie project
   * JavaCV has been integrated in as a replacement.
 
 ---------------------------------------------

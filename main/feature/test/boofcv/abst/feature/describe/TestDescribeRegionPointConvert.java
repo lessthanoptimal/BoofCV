@@ -37,7 +37,7 @@ public class TestDescribeRegionPointConvert {
 		DummyDescribe original = new DummyDescribe();
 
 		DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8> alg =
-				new DescribeRegionPointConvert<GrayF32,TupleDesc_F64,TupleDesc_S8>(original,convert);
+				new DescribeRegionPointConvert<>(original, convert);
 
 		TupleDesc_S8 found = alg.createDescription();
 		assertTrue(found.value.length==5);

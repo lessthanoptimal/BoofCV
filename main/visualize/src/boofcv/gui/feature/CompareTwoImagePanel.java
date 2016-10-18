@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	protected List<Point2D_F64> leftPts,rightPts;
 
 	// draw a selected pair
-	List<Integer> selected = new ArrayList<Integer>();
+	List<Integer> selected = new ArrayList<>();
 	protected boolean selectedIsLeft;
 
 	// can it select more than one?

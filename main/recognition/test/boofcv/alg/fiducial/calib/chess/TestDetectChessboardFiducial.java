@@ -161,7 +161,7 @@ public class TestDetectChessboardFiducial {
 
 	public List<Point2D_F64> calibrationPoints(int numRows, int numCols) {
 
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> ret = new ArrayList<>();
 
 		for( int y = 0; y < numRows-1; y++) {
 			for( int x = 0; x < numCols-1; x++ ) {
@@ -199,7 +199,7 @@ public class TestDetectChessboardFiducial {
 
 	@Test
 	public void touchedBorder_rotate() {
-		List<Se2_F64> transforms = new ArrayList<Se2_F64>();
+		List<Se2_F64> transforms = new ArrayList<>();
 
 		transforms.add( new Se2_F64(0,0,0.1));
 		transforms.add( new Se2_F64(w-100,0,0.1));

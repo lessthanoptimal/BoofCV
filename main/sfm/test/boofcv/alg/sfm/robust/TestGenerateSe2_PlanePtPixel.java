@@ -50,7 +50,7 @@ public class TestGenerateSe2_PlanePtPixel {
 	Se3_F64 planeToCamera;
 	Se2_F64 motion2D;
 
-	List<PlanePtPixel> observations = new ArrayList<PlanePtPixel>();
+	List<PlanePtPixel> observations = new ArrayList<>();
 
 	public TestGenerateSe2_PlanePtPixel() {
 		// Easier to make up a plane in this direction

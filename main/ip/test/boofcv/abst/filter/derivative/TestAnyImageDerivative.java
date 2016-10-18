@@ -45,7 +45,7 @@ public class TestAnyImageDerivative {
 	@Test
 	public void changeInputImageSize() {
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
-		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<GrayF32,GrayF32>(kernelX,GrayF32.class,GrayF32.class);
+		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<>(kernelX, GrayF32.class, GrayF32.class);
 		alg.setInput(original);
 		alg.getDerivative(true);
 
@@ -78,7 +78,7 @@ public class TestAnyImageDerivative {
 
 		Kernel1D_F32 kernelX = (Kernel1D_F32)GradientThree.getKernelX(false);
 
-		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<GrayF32,GrayF32>(kernelX,GrayF32.class,GrayF32.class);
+		AnyImageDerivative<GrayF32,GrayF32> alg = new AnyImageDerivative<>(kernelX, GrayF32.class, GrayF32.class);
 		alg.setInput(original);
 
 		// do one out of order which will force it to meet all the dependencies

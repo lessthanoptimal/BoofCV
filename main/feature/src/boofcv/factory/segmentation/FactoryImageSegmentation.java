@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class FactoryImageSegmentation {
 
 		SegmentMeanShift<T> ms = FactorySegmentationAlg.meanShift(config,imageType);
 
-		return new MeanShift_to_ImageSuperpixels<T>(ms,config.connectRule);
+		return new MeanShift_to_ImageSuperpixels<>(ms, config.connectRule);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class FactoryImageSegmentation {
 	{
 		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
 
-		return new Slic_to_ImageSuperpixels<T>(ms);
+		return new Slic_to_ImageSuperpixels<>(ms);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class FactoryImageSegmentation {
 
 		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
 
-		return new Fh04_to_ImageSuperpixels<T>(fh,config.connectRule);
+		return new Fh04_to_ImageSuperpixels<>(fh, config.connectRule);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class FactoryImageSegmentation {
 
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(config.connectRule);
 
-		Watershed_to_ImageSuperpixels ret = new Watershed_to_ImageSuperpixels<T>(watershed,config.minimumRegionSize,config.connectRule);
+		Watershed_to_ImageSuperpixels ret = new Watershed_to_ImageSuperpixels<>(watershed, config.minimumRegionSize, config.connectRule);
 		ret.setImageType(imageType);
 		return ret;
 	}

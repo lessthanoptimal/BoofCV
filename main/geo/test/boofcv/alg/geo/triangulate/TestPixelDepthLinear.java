@@ -57,8 +57,8 @@ public class TestPixelDepthLinear {
 		Point2D_F64 x3 = new Point2D_F64(C.x/C.z,C.y/C.z);
 
 		// setup data structures
-		List<Se3_F64> listMotion = new ArrayList<Se3_F64>();
-		List<Point2D_F64> listPoint = new ArrayList<Point2D_F64>();
+		List<Se3_F64> listMotion = new ArrayList<>();
+		List<Point2D_F64> listPoint = new ArrayList<>();
 
 		listMotion.add(motion1);
 		listMotion.add(motion2);

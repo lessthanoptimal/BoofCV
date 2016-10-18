@@ -178,7 +178,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray, D extends Image
 
 		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
 		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));
 		inputs.add(new PathLabel("Forest",UtilIO.pathExample("scale/rainforest_01.jpg")));

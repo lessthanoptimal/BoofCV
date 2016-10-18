@@ -97,7 +97,7 @@ public class VisualizeHoughPolar<I extends ImageGray, D extends ImageGray> {
 
 	public static void main( String args[] ) {
 		VisualizeHoughPolar<GrayF32,GrayF32> app =
-				new VisualizeHoughPolar<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+				new VisualizeHoughPolar<>(GrayF32.class, GrayF32.class);
 
 		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg"));

@@ -53,7 +53,7 @@ public class TestSe3FromEssentialGenerator {
 		motion.getT().set(2,-0.1,0.1);
 
 		// define observations
-		List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> obs = new ArrayList<>();
 
 		for( int i = 0; i < 8; i++ ) {
 			Point3D_F64 p = new Point3D_F64(rand.nextGaussian()*0.1,rand.nextGaussian()*0.1,3+rand.nextGaussian()*0.1);

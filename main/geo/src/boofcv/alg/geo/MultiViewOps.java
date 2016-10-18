@@ -891,9 +891,9 @@ public class MultiViewOps {
 		List<Vector3D_F64> solutionsN = d.getSolutionsN();
 		List<Se3_F64> solutionsSe = d.getSolutionsSE();
 
-		List<Tuple2<Se3_F64,Vector3D_F64>> ret = new ArrayList<Tuple2<Se3_F64,Vector3D_F64>>();
+		List<Tuple2<Se3_F64,Vector3D_F64>> ret = new ArrayList<>();
 		for( int i = 0; i < 4; i++ ) {
-			ret.add( new Tuple2<Se3_F64, Vector3D_F64>(solutionsSe.get(i),solutionsN.get(i)));
+			ret.add(new Tuple2<>(solutionsSe.get(i), solutionsN.get(i)));
 		}
 
 

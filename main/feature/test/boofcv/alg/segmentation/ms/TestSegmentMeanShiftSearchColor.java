@@ -59,8 +59,8 @@ public class TestSegmentMeanShiftSearchColor {
 		GImageMiscOps.fillUniform(image, rand, 0, 256);
 
 		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
-				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
-						(30,0.05f,interp,2,2,200,false,imageType);
+				new SegmentMeanShiftSearchColor<>
+						(30, 0.05f, interp, 2, 2, 200, false, imageType);
 
 		alg.process(image);
 
@@ -104,8 +104,8 @@ public class TestSegmentMeanShiftSearchColor {
 
 		// works better with this example when its uniform
 		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
-				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
-						(30,0.05f,interp,2,2,3,false,imageType);
+				new SegmentMeanShiftSearchColor<>
+						(30, 0.05f, interp, 2, 2, 3, false, imageType);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -127,8 +127,8 @@ public class TestSegmentMeanShiftSearchColor {
 		GImageMiscOps.fillRectangle(image, 20, cx - 2, cy - 2, 5, 5);
 
 		SegmentMeanShiftSearchColor<Planar<GrayF32>> alg =
-				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
-						(30,0.05f,interp,2,2,200,false,imageType);
+				new SegmentMeanShiftSearchColor<>
+						(30, 0.05f, interp, 2, 2, 200, false, imageType);
 
 		interp.setImage(image);
 		alg.image = image;
@@ -159,8 +159,8 @@ public class TestSegmentMeanShiftSearchColor {
 				GrayF32.class, BorderType.EXTENDED);
 
 		SegmentMeanShiftSearchColor<Planar<GrayF32>> algMB =
-				new SegmentMeanShiftSearchColor<Planar<GrayF32>>
-						(30,0.05f,interpMB,2,2,200,fast,imageType);
+				new SegmentMeanShiftSearchColor<>
+						(30, 0.05f, interpMB, 2, 2, 200, fast, imageType);
 
 		SegmentMeanShiftSearchGray<GrayF32> algSB =
 				new SegmentMeanShiftSearchGray<>(30,0.05f,interpSB,2,2,200,fast);

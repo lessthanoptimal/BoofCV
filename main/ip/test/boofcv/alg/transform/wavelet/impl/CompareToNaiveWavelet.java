@@ -74,9 +74,7 @@ public class CompareToNaiveWavelet {
 
 			try {
 				testMethod.invoke(this,m);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 
@@ -113,9 +111,7 @@ public class CompareToNaiveWavelet {
 			}
 			try {
 				m.invoke(null,args);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 		}

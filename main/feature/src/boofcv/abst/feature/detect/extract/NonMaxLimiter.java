@@ -39,7 +39,7 @@ public class NonMaxLimiter {
 	QueueCorner originalMin = new QueueCorner();
 	QueueCorner originalMax = new QueueCorner();
 
-	FastQueue<LocalExtreme> localExtreme = new FastQueue<LocalExtreme>(LocalExtreme.class,true);
+	FastQueue<LocalExtreme> localExtreme = new FastQueue<>(LocalExtreme.class, true);
 
 	/**
 	 * Configures the limiter

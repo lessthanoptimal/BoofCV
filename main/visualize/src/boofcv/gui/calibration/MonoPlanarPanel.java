@@ -75,10 +75,10 @@ public class MonoPlanarPanel extends JPanel implements ItemListener ,
 
 	int selectedImage = 0;
 
-	List<String> names = new ArrayList<String>();
-	List<BufferedImage> images = new ArrayList<BufferedImage>();
-	List<CalibrationObservation> features = new ArrayList<CalibrationObservation>();
-	List<ImageResults> results = new ArrayList<ImageResults>();
+	List<String> names = new ArrayList<>();
+	List<BufferedImage> images = new ArrayList<>();
+	List<CalibrationObservation> features = new ArrayList<>();
+	List<ImageResults> results = new ArrayList<>();
 
 	int errorScale = 20;
 

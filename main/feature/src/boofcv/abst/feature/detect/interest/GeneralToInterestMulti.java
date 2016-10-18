@@ -42,8 +42,8 @@ public class GeneralToInterestMulti<T extends ImageGray, D extends ImageGray>
 	protected double radius;
 
 	// list of found points
-	protected FastQueue<Point2D_F64> foundMin = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
-	protected FastQueue<Point2D_F64> foundMax = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
+	protected FastQueue<Point2D_F64> foundMin = new FastQueue<>(10, Point2D_F64.class, true);
+	protected FastQueue<Point2D_F64> foundMax = new FastQueue<>(10, Point2D_F64.class, true);
 
 	// sets for each type of detected feature
 	protected FoundPointSO sets[];
@@ -51,7 +51,7 @@ public class GeneralToInterestMulti<T extends ImageGray, D extends ImageGray>
 	public GeneralToInterestMulti(GeneralFeatureDetector<T, D> detector,
 								  double radius,
 								  Class<T> imageType, Class<D> derivType) {
-		this.detector = new EasyGeneralFeatureDetector<T, D>(detector,imageType,derivType);
+		this.detector = new EasyGeneralFeatureDetector<>(detector, imageType, derivType);
 		this.radius = radius;
 
 		if( detector.isDetectMinimums() && detector.isDetectMaximums()) {

@@ -71,7 +71,7 @@ public class FactoryWaveletTransform {
 			  int numLevels , int minPixelValue , int maxPixelValue ,
 			  Class<T> imageType )
 	{
-		return new WaveletTransformInt<T>(waveletDesc,numLevels,minPixelValue,maxPixelValue,imageType);
+		return new WaveletTransformInt<>(waveletDesc, numLevels, minPixelValue, maxPixelValue, imageType);
 	}
 
 	/**

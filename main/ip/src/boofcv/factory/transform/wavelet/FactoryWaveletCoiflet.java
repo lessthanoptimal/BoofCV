@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,8 +84,8 @@ public class FactoryWaveletCoiflet {
 		coef.wavelet[4] = coef.scaling[1];
 		coef.wavelet[5] = -coef.scaling[0];
 
-		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(coef);
+		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<>(coef);
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),coef,inverse);
+		return new WaveletDescription<>(new BorderIndex1D_Wrap(), coef, inverse);
 	}
 }

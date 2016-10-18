@@ -70,7 +70,7 @@ public class CalibrateMonoPlanar {
 	protected CameraPinholeRadial foundIntrinsic;
 
 	// Information on calibration targets and results
-	protected List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
+	protected List<CalibrationObservation> observations = new ArrayList<>();
 	protected List<ImageResults> errors;
 
 	public boolean verbose = false;
@@ -108,7 +108,7 @@ public class CalibrateMonoPlanar {
 	 * Resets internal data structures.  Must call before adding images
 	 */
 	public void reset() {
-		observations = new ArrayList<CalibrationObservation>();
+		observations = new ArrayList<>();
 		errors = null;
 		heightImg = widthImg = 0;
 	}
@@ -188,7 +188,7 @@ public class CalibrateMonoPlanar {
 		double residuals[] = new double[grid.size()*observation.size()*2];
 		function.process(param,residuals);
 
-		List<ImageResults> ret = new ArrayList<ImageResults>();
+		List<ImageResults> ret = new ArrayList<>();
 
 		int N = grid.size();
 		int index = 0;

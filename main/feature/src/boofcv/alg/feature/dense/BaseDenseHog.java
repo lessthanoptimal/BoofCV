@@ -44,7 +44,7 @@ public abstract class BaseDenseHog<Input extends ImageBase> {
 	FastQueue<TupleDesc_F64> descriptions;
 
 	// Location of each descriptor in the image, top-left corner (lower extents)
-	FastQueue<Point2D_I32> locations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32.class, true);
 
 	int orientationBins; // number of orientation bins computed in a block
 	int pixelsPerCell; // number of pixels wide a cell is

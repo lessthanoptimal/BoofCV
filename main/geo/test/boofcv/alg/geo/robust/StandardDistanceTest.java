@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public abstract class StandardDistanceTest<Model,Data> {
 		Model m = createRandomModel();
 		alg.setModel(m);
 
-		List<Data> obs = new ArrayList<Data>();
+		List<Data> obs = new ArrayList<>();
 		double expected[] = new double[10];
 		double found[] = new double[10];
 

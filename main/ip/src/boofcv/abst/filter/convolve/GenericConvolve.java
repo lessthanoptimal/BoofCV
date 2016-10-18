@@ -89,9 +89,7 @@ public class GenericConvolve<Input extends ImageGray, Output extends ImageGray>
 						m.invoke(null,kernel,input,output, borderRule);
 				}
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

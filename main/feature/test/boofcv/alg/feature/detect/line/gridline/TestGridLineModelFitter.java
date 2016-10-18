@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class TestGridLineModelFitter {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
 
 		// angle test should use half-circle and this should pass
-		List<Edgel> l = new ArrayList<Edgel>();
+		List<Edgel> l = new ArrayList<>();
 		l.add( new Edgel(0,0,(float)Math.PI/2f));
 		l.add( new Edgel(1,0,(float)-Math.PI/2f));
 
@@ -63,7 +63,7 @@ public class TestGridLineModelFitter {
 		GridLineModelFitter alg = new GridLineModelFitter(0.1f);
 
 		// angle test should use half-circle and this should pass
-		List<Edgel> l = new ArrayList<Edgel>();
+		List<Edgel> l = new ArrayList<>();
 		l.add( new Edgel(1,0,0f));
 		l.add( new Edgel(1,2,(float)Math.PI));
 

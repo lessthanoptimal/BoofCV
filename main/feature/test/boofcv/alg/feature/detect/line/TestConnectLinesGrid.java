@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestConnectLinesGrid {
 	 */
 	@Test
 	public void connectInSameRegion() {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,3));
 		grid.get(0,0).add(new LineSegment2D_F32(2,3,4,6));
@@ -64,7 +64,7 @@ public class TestConnectLinesGrid {
 	 */
 	@Test
 	public void checkHalfCircleAngle() {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,0,2));
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,0.001f,-2));
@@ -97,7 +97,7 @@ public class TestConnectLinesGrid {
 	 */
 	@Test
 	public void checkAngleTolerance() {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));
 		grid.get(0,0).add(new LineSegment2D_F32(2,0,4,4));
@@ -119,7 +119,7 @@ public class TestConnectLinesGrid {
 	 */
 	@Test
 	public void checkTangentTolerance() {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));
 		grid.get(0,0).add(new LineSegment2D_F32(2,1,4,1));
@@ -140,7 +140,7 @@ public class TestConnectLinesGrid {
 	 */
 	@Test
 	public void checkParallelTolerance() {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(1,1);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(1, 1);
 
 		grid.get(0,0).add(new LineSegment2D_F32(0,0,2,0));
 		grid.get(0,0).add(new LineSegment2D_F32(3,0,5,0));
@@ -157,7 +157,7 @@ public class TestConnectLinesGrid {
 	}
 
 	private void checkConnectNeighbor( int x , int y ) {
-		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<LineSegment2D_F32>(3,3);
+		MatrixOfList<LineSegment2D_F32> grid = new MatrixOfList<>(3, 3);
 
 		grid.get(1,1).add(new LineSegment2D_F32(0,0,2,3));
 		grid.get(x,y).add(new LineSegment2D_F32(2,3,4,6));

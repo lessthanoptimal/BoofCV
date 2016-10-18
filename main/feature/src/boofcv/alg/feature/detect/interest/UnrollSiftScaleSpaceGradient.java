@@ -37,9 +37,9 @@ public class UnrollSiftScaleSpaceGradient {
 	SiftScaleSpace scaleSpace;
 
 	// scale images that are using
-	List<ImageScale> usedScales = new ArrayList<ImageScale>();
+	List<ImageScale> usedScales = new ArrayList<>();
 	// storage for all possible scales
-	List<ImageScale> allScales = new ArrayList<ImageScale>();
+	List<ImageScale> allScales = new ArrayList<>();
 
 	// used to compute the image gradient
 	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,null);

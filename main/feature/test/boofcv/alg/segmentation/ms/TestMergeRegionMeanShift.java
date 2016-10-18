@@ -46,7 +46,7 @@ public class TestMergeRegionMeanShift {
 		regionMemberCount.size = 4;
 
 		FastQueue<float[]> regionColor = createList(5,1,6,4);
-		FastQueue<Point2D_I32> modeLocation = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32.class, true);
 		modeLocation.grow().set(0,0);
 		modeLocation.grow().set(3,3);
 		modeLocation.grow().set(0,1);

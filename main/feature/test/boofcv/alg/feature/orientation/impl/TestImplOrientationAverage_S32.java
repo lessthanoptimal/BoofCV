@@ -33,7 +33,7 @@ public class TestImplOrientationAverage_S32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,false);
 		alg.setSampleRadius(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationAverage_S32 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationAverage_S32 alg = new ImplOrientationAverage_S32(1.0/2.0,true);
 		alg.setSampleRadius(r);

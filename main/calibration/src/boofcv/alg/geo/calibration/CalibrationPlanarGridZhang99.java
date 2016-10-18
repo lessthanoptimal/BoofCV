@@ -133,8 +133,8 @@ public class CalibrationPlanarGridZhang99 {
 	protected Zhang99ParamAll initialParam( List<CalibrationObservation> observations )
 	{
 		status("Estimating Homographies");
-		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
-		List<Se3_F64> motions = new ArrayList<Se3_F64>();
+		List<DenseMatrix64F> homographies = new ArrayList<>();
+		List<Se3_F64> motions = new ArrayList<>();
 
 		for( CalibrationObservation obs : observations ) {
 			if( !computeHomography.computeHomography(obs) )

@@ -54,7 +54,7 @@ public class BenchmarkDisparityAlgs {
 	public static class Naive extends PerformerBase {
 
 		StereoDisparityWtoNaive<GrayU8> alg =
-				new StereoDisparityWtoNaive<GrayU8> (0,max,radiusX,radiusY);
+				new StereoDisparityWtoNaive<>(0, max, radiusX, radiusY);
 
 		@Override
 		public void process() {

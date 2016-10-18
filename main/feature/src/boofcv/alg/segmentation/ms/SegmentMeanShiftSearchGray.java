@@ -42,7 +42,7 @@ public class SegmentMeanShiftSearchGray<T extends ImageGray> extends SegmentMean
 	protected float meanGray;
 
 	// Mean-shift trajectory history
-	protected FastQueue<Point2D_F32> history = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
+	protected FastQueue<Point2D_F32> history = new FastQueue<>(Point2D_F32.class, true);
 
 	public SegmentMeanShiftSearchGray(int maxIterations, float convergenceTol,
 									  InterpolatePixelS<T> interpolate,

@@ -72,9 +72,7 @@ public class TestImplMedianSortNaive {
 
 		try {
 			m.invoke(null,_image,_found,1,null);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 

@@ -33,7 +33,7 @@ public class TestImplOrientationSlidingWindow_S16 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationSlidingWindow_S16 alg = new ImplOrientationSlidingWindow_S16(r,N,window,false);
 		alg.setObjectRadius(r);
@@ -44,7 +44,7 @@ public class TestImplOrientationSlidingWindow_S16 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<GrayS16>();
+		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationSlidingWindow_S16 alg = new ImplOrientationSlidingWindow_S16(r,N,window,true);
 		alg.setObjectRadius(r);

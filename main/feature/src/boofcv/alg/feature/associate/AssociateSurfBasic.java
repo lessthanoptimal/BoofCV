@@ -39,14 +39,14 @@ public class AssociateSurfBasic {
 	AssociateDescription<TupleDesc_F64> assoc;
 
 	// features segmented by laplace sign
-	FastQueue<Helper> srcPositive = new FastQueue<Helper>(10,Helper.class,true);
-	FastQueue<Helper> srcNegative = new FastQueue<Helper>(10,Helper.class,true);
+	FastQueue<Helper> srcPositive = new FastQueue<>(10, Helper.class, true);
+	FastQueue<Helper> srcNegative = new FastQueue<>(10, Helper.class, true);
 
-	FastQueue<Helper> dstPositive = new FastQueue<Helper>(10,Helper.class,true);
-	FastQueue<Helper> dstNegative = new FastQueue<Helper>(10,Helper.class,true);
+	FastQueue<Helper> dstPositive = new FastQueue<>(10, Helper.class, true);
+	FastQueue<Helper> dstNegative = new FastQueue<>(10, Helper.class, true);
 
 	// stores output matches
-	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,true);
+	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
 
 	// indexes of unassociated features
 	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();

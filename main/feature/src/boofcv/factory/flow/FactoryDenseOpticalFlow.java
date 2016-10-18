@@ -72,10 +72,10 @@ public class FactoryDenseOpticalFlow {
 		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, inputType);
 
 		PyramidKltTracker<I, D> tracker = FactoryTrackerAlg.kltPyramid(configKlt.config, inputType, derivType);
-		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<I, D>(tracker,numLayers,radius);
+		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<>(tracker, numLayers, radius);
 		ImageGradient<I, D> gradient = FactoryDerivative.sobel(inputType,derivType);
 
-		return new FlowKlt_to_DenseOpticalFlow<I,D>(flowKlt,gradient,pyramidA,pyramidB,inputType,derivType);
+		return new FlowKlt_to_DenseOpticalFlow<>(flowKlt, gradient, pyramidA, pyramidB, inputType, derivType);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class FactoryDenseOpticalFlow {
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
-		return new FlowBlock_to_DenseOpticalFlow<T>(alg,config.pyramidScale,config.maxPyramidLayers,imageType);
+		return new FlowBlock_to_DenseOpticalFlow<>(alg, config.pyramidScale, config.maxPyramidLayers, imageType);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class FactoryDenseOpticalFlow {
 		else
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
-		return new HornSchunck_to_DenseOpticalFlow<T,D>(alg, ImageType.single(imageType));
+		return new HornSchunck_to_DenseOpticalFlow<>(alg, ImageType.single(imageType));
 	}
 
 	/**
@@ -151,9 +151,9 @@ public class FactoryDenseOpticalFlow {
 		InterpolatePixelS<GrayF32> interpolate =
 				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, GrayF32.class);
 
-		HornSchunckPyramid<T> alg = new HornSchunckPyramid<T>(config,interpolate);
+		HornSchunckPyramid<T> alg = new HornSchunckPyramid<>(config, interpolate);
 
-		return new HornSchunckPyramid_to_DenseOpticalFlow<T>(alg,imageType);
+		return new HornSchunckPyramid_to_DenseOpticalFlow<>(alg, imageType);
 	}
 
 	public static <T extends ImageGray>
@@ -165,8 +165,8 @@ public class FactoryDenseOpticalFlow {
 		InterpolatePixelS<GrayF32> interpolate =
 				FactoryInterpolation.createPixelS(0,255,config.interpolation, BorderType.EXTENDED, GrayF32.class);
 
-		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<T>(config,interpolate);
+		BroxWarpingSpacial<T> alg = new BroxWarpingSpacial<>(config, interpolate);
 
-		return new BroxWarpingSpacial_to_DenseOpticalFlow<T>(alg,imageType);
+		return new BroxWarpingSpacial_to_DenseOpticalFlow<>(alg, imageType);
 	}
 }

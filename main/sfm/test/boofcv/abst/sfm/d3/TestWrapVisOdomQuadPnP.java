@@ -48,7 +48,7 @@ public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<GrayF32
 				FactoryIntensityPoint.shiTomasi(1, false, GrayF32.class);
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 0, true, false, true));
 		GeneralFeatureDetector<GrayF32,GrayF32> general =
-				new GeneralFeatureDetector<GrayF32,GrayF32>(intensity,nonmax);
+				new GeneralFeatureDetector<>(intensity, nonmax);
 		general.setMaxFeatures(600);
 		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,GrayF32.class,GrayF32.class);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);

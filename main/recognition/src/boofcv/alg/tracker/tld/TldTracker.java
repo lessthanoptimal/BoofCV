@@ -76,7 +76,7 @@ public class TldTracker<T extends ImageGray, D extends ImageGray> {
 	private ImageRectangle trackerRegion_I32 = new ImageRectangle();
 
 	// Region used inside detection cascade
-	private FastQueue<ImageRectangle> cascadeRegions = new FastQueue<ImageRectangle>(ImageRectangle.class,true);
+	private FastQueue<ImageRectangle> cascadeRegions = new FastQueue<>(ImageRectangle.class, true);
 
 	// Image pyramid of input image
 	private PyramidDiscrete<T> imagePyramid;
@@ -124,16 +124,16 @@ public class TldTracker<T extends ImageGray, D extends ImageGray> {
 
 		PyramidKltTracker<T, D> tracker = FactoryTrackerAlg.kltPyramid(config.trackerConfig, imageType, derivType);
 
-		tracking = new TldRegionTracker<T, D>(config.trackerGridWidth,config.trackerFeatureRadius,
-				config.maximumErrorFB,gradient,tracker,imageType,derivType);
+		tracking = new TldRegionTracker<>(config.trackerGridWidth, config.trackerFeatureRadius,
+				config.maximumErrorFB, gradient, tracker, imageType, derivType);
 		adjustRegion = new TldAdjustRegion(config.motionIterations);
-		variance = new TldVarianceFilter<T>(imageType);
-		template = new TldTemplateMatching<T>(interpolate);
-		fern = new TldFernClassifier<T>(
-				rand,config.numFerns,config.fernSize,20,0.5f,interpolate);
+		variance = new TldVarianceFilter<>(imageType);
+		template = new TldTemplateMatching<>(interpolate);
+		fern = new TldFernClassifier<>(
+				rand, config.numFerns, config.fernSize, 20, 0.5f, interpolate);
 
-		detection = new TldDetection<T>(fern,template,variance,config);
-		learning = new TldLearning<T>(rand,config,template,variance,fern,detection);
+		detection = new TldDetection<>(fern, template, variance, config);
+		learning = new TldLearning<>(rand, config, template, variance, fern, detection);
 	}
 
 	/**

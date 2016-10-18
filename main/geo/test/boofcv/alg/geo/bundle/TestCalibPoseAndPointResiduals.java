@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class TestCalibPoseAndPointResiduals {
 		configure(model,numViews,numPoints,rand);
 		
 		// generate observations from the model
-		List<ViewPointObservations> obs = new ArrayList<ViewPointObservations>();
+		List<ViewPointObservations> obs = new ArrayList<>();
 		
 		for( int view = 0; view < numViews; view++ ) {
 			Se3_F64 m = model.getWorldToCamera(view);

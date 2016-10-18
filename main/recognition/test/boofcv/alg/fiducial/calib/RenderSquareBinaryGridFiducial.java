@@ -38,11 +38,11 @@ public class RenderSquareBinaryGridFiducial {
 	public int squareWidth = 40;
 
 
-	public List<Quadrilateral_F64> expectedCorners = new ArrayList<Quadrilateral_F64>();
+	public List<Quadrilateral_F64> expectedCorners = new ArrayList<>();
 
 	public List<Point2D_F64> getOrderedExpectedPoints( int numRows, int numCols ) {
 
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> points = new ArrayList<>();
 
 		for (int row = 0; row < numRows; row++) {
 			for (int col = 0; col < numCols; col++) {

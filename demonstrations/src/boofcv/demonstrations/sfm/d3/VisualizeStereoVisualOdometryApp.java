@@ -304,7 +304,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 150, true));
+					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
 
 			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
 
@@ -314,7 +314,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
 							kltConfig, 50, null, null, imageType, derivType);
 
-			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
+			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<>(tracker);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, twopass, imageType);
 		} else if( whichAlg == 3 ) {
@@ -425,7 +425,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray>
 
 //		app.setMediaManager(new XugglerMediaManager());
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Inside", UtilIO.pathExample("vo/library/config.txt")));
 		inputs.add(new PathLabel("Outside", UtilIO.pathExample("vo/backyard/config.txt")));
 		inputs.add(new PathLabel("Urban", UtilIO.pathExample("vo/rockville/config.txt")));

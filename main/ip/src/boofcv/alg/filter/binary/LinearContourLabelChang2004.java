@@ -63,9 +63,9 @@ public class LinearContourLabelChang2004 {
 	private GrayU8 border = new GrayU8(1,1);
 
 	// predeclared/recycled data structures
-	private FastQueue<Point2D_I32> storagePoints = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-	private FastQueue<List<Point2D_I32>> storageLists = new FastQueue<List<Point2D_I32>>((Class)ArrayList.class,true);
-	private FastQueue<Contour> contours = new FastQueue<Contour>(Contour.class,true);
+	private FastQueue<Point2D_I32> storagePoints = new FastQueue<>(Point2D_I32.class, true);
+	private FastQueue<List<Point2D_I32>> storageLists = new FastQueue<>((Class) ArrayList.class, true);
+	private FastQueue<Contour> contours = new FastQueue<>(Contour.class, true);
 
 	// internal book keeping variables
 	private int x,y,indexIn,indexOut;

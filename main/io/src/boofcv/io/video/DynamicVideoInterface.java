@@ -64,13 +64,13 @@ public class DynamicVideoInterface implements VideoInterface {
 			try {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(new FileInputStream(fileName));
-				return new JpegByteImageSequence<T>(imageType,data,false);
+				return new JpegByteImageSequence<>(imageType, data, false);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
 		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
 			try {
-				return new ImageStreamSequence<T>(fileName,true,imageType);
+				return new ImageStreamSequence<>(fileName, true, imageType);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
@@ -110,9 +110,7 @@ public class DynamicVideoInterface implements VideoInterface {
 			return (VideoInterface) c.newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

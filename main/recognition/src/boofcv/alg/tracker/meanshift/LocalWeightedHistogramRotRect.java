@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase> {
 	protected float histogram[];
 
 	// list of sample points.  in square coordinates.  where 0.5 is 1/2 the width or height
-	protected List<Point2D_F32> samplePts = new ArrayList<Point2D_F32>();
+	protected List<Point2D_F32> samplePts = new ArrayList<>();
 
 	/**
 	 * Configures histogram calculation.

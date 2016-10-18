@@ -77,7 +77,7 @@ public class TestDenseOpticalFlowKlt {
 	protected DenseOpticalFlowKlt<GrayF32,GrayF32> createAlg() {
 		PyramidKltTracker<GrayF32, GrayF32> tracker =
 				FactoryTrackerAlg.kltPyramid(config.config, GrayF32.class, GrayF32.class);
-		return new DenseOpticalFlowKlt<GrayF32, GrayF32>(tracker,config.pyramidScaling.length,3);
+		return new DenseOpticalFlowKlt<>(tracker, config.pyramidScaling.length, 3);
 	}
 
 	/**

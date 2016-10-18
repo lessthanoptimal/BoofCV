@@ -38,7 +38,7 @@ public class TestGeneralToInterestMulti {
 		Helper detector = new Helper();
 		detector.maximum = true;
 		GeneralToInterestMulti<GrayF32,GrayF32> alg =
-				new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+				new GeneralToInterestMulti<>(detector, 2.5, GrayF32.class, GrayF32.class);
 
 		alg.detect(input);
 
@@ -64,14 +64,14 @@ public class TestGeneralToInterestMulti {
 		GeneralToInterestMulti<GrayF32,GrayF32> alg;
 
 		// just minimums
-		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+		alg = new GeneralToInterestMulti<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		assertEquals(1,alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
 
 		// both minimums and maximums
 		detector.maximum = true;
-		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+		alg = new GeneralToInterestMulti<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		assertEquals(2,alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(5,alg.getFeatureSet(0).getNumberOfFeatures());
@@ -79,7 +79,7 @@ public class TestGeneralToInterestMulti {
 
 		// just maximums
 		detector.minimum = false;
-		alg = new GeneralToInterestMulti<GrayF32,GrayF32>(detector,2.5, GrayF32.class,GrayF32.class);
+		alg = new GeneralToInterestMulti<>(detector, 2.5, GrayF32.class, GrayF32.class);
 		assertEquals(1, alg.getNumberOfSets());
 		alg.detect(input);
 		assertEquals(6,alg.getFeatureSet(0).getNumberOfFeatures());

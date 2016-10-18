@@ -62,7 +62,7 @@ public class FactoryTrackerAlg {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		return new KltTracker<I, D>(interpInput, interpDeriv,config);
+		return new KltTracker<>(interpInput, interpDeriv, config);
 	}
 
 	/**
@@ -90,8 +90,8 @@ public class FactoryTrackerAlg {
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv, config);
-		return new PyramidKltTracker<I, D>(klt);
+		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
+		return new PyramidKltTracker<>(klt);
 	}
 
 	/**
@@ -116,9 +116,9 @@ public class FactoryTrackerAlg {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<I, D>(kltConfig.config,
-				kltConfig.templateRadius,kltConfig.pyramidScaling,imageType,derivType);
+		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<>(kltConfig.config,
+				kltConfig.templateRadius, kltConfig.pyramidScaling, imageType, derivType);
 
-		return new CombinedTrackerScalePoint<I, D, Desc>(klt,detector,associate);
+		return new CombinedTrackerScalePoint<>(klt, detector, associate);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.util.Random;
 public class GeoTestingOps {
 
 	public static List<Point3D_F64> createList3_F64( int N ) {
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 		for( int i = 0; i < N; i++ ) {
 			ret.add( new Point3D_F64());
 		}
@@ -46,7 +46,7 @@ public class GeoTestingOps {
 													 double minZ, double maxZ,
 													 int num, Random rand)
 	{
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 
 		for( int i = 0; i < num; i++ ) {
 			double x = rand.nextDouble()*(maxX-minX)+minX;
@@ -63,7 +63,7 @@ public class GeoTestingOps {
 													 double minY, double maxY,
 													 int num, Random rand)
 	{
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> ret = new ArrayList<>();
 
 		for( int i = 0; i < num; i++ ) {
 			double x = rand.nextDouble()*(maxX-minX)+minX;

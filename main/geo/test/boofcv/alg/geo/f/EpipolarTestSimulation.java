@@ -60,8 +60,8 @@ public abstract class EpipolarTestSimulation {
 		worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
-		pairs = new ArrayList<AssociatedPair>();
-		currentObs = new ArrayList<Point2D_F64>();
+		pairs = new ArrayList<>();
+		currentObs = new ArrayList<>();
 
 		for(Point3D_F64 p1 : worldPts) {
 			Point3D_F64 p2 = SePointOps_F64.transform(worldToCamera, p1, null);
@@ -81,7 +81,7 @@ public abstract class EpipolarTestSimulation {
 	}
 
 	public List<AssociatedPair> randomPairs( int N ) {
-		List<AssociatedPair> ret = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> ret = new ArrayList<>();
 
 		while( ret.size() < N ) {
 			AssociatedPair p = pairs.get(rand.nextInt(pairs.size()));

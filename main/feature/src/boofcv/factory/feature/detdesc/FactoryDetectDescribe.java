@@ -88,7 +88,7 @@ public class FactoryDetectDescribe {
 		NonMaxSuppression nns = FactoryFeatureExtractor.nonmax(configDetector.extract);
 		NonMaxLimiter nonMax = new NonMaxLimiter(nns,configDetector.maxFeaturesPerScale);
 		CompleteSift dds = new CompleteSift(scaleSpace,configDetector.edgeR,nonMax,orientation,describe);
-		return new DetectDescribe_CompleteSift<T>(dds);
+		return new DetectDescribe_CompleteSift<>(dds);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		return new WrapDetectDescribeSurf<T,II>( detector, orientation, describe );
+		return new WrapDetectDescribeSurf<>(detector, orientation, describe);
 	}
 
 	/**
@@ -157,10 +157,10 @@ public class FactoryDetectDescribe {
 
 		if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			DescribePointSurfPlanar<II> describeMulti =
-					new DescribePointSurfPlanar<II>(describe,imageType.getNumBands());
+					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
 			DetectDescribeSurfPlanar<II> deteDesc =
-					new DetectDescribeSurfPlanar<II>(detector,orientation,describeMulti);
+					new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
 
 			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
 		} else {
@@ -236,10 +236,10 @@ public class FactoryDetectDescribe {
 
 		if( imageType.getFamily() == ImageType.Family.PLANAR) {
 			DescribePointSurfPlanar<II> describeMulti =
-					new DescribePointSurfPlanar<II>(describe,imageType.getNumBands());
+					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
 			DetectDescribeSurfPlanar<II> deteDesc =
-					new DetectDescribeSurfPlanar<II>(detector,orientation,describeMulti);
+					new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
 
 			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
 		} else {
@@ -260,7 +260,7 @@ public class FactoryDetectDescribe {
 	DetectDescribePoint<T,D> fuseTogether( InterestPointDetector<T> detector,
 										   OrientationImage<T> orientation,
 										   DescribeRegionPoint<T, D> describe) {
-		return new DetectDescribeFusion<T, D>(detector,orientation,describe);
+		return new DetectDescribeFusion<>(detector, orientation, describe);
 	}
 
 }

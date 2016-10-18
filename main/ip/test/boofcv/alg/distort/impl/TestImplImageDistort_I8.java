@@ -38,7 +38,7 @@ public class TestImplImageDistort_I8 extends GeneralImageDistortTests<GrayU8>{
 	@Override
 	public ImageDistort<GrayU8,GrayU8> createDistort(PixelTransform_F32 dstToSrc,
 													 InterpolatePixel<GrayU8> interp) {
-		ImageDistort<GrayU8,GrayU8> ret = new ImplImageDistort_I8<GrayU8,GrayU8>((InterpolatePixelS)interp);
+		ImageDistort<GrayU8,GrayU8> ret = new ImplImageDistort_I8<>((InterpolatePixelS) interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

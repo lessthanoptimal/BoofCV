@@ -55,7 +55,7 @@ public class FactoryPyramid {
 
 		Kernel1D kernel = FactoryKernelGaussian.gaussian(kernelType,sigma,radius);
 
-		return new PyramidDiscreteSampleBlur<T>(kernel,sigma,imageType,saveOriginalReference,scaleFactors);
+		return new PyramidDiscreteSampleBlur<>(kernel, sigma, imageType, saveOriginalReference, scaleFactors);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class FactoryPyramid {
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-		return new PyramidFloatGaussianScale<T>(interp,scaleFactors,sigmas,imageType);
+		return new PyramidFloatGaussianScale<>(interp, scaleFactors, sigmas, imageType);
 	}
 
 	/**

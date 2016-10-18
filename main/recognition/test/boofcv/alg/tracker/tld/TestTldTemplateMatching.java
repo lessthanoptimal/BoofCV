@@ -156,7 +156,7 @@ public class TestTldTemplateMatching {
 		alg.computeNccDescriptor(b,2,3,17,18);
 		alg.computeNccDescriptor(c,20,32,40,60);
 
-		List<NccFeature> list = new ArrayList<NccFeature>();
+		List<NccFeature> list = new ArrayList<>();
 		list.add(b);
 		list.add(c);
 

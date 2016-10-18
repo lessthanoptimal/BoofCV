@@ -86,12 +86,12 @@ public class ShapeFittingOps {
 			refine.fit(sequence,splits);
 		}
 
-		FastQueue<PointIndex_I32> output = new FastQueue<PointIndex_I32>(PointIndex_I32.class,true);
+		FastQueue<PointIndex_I32> output = new FastQueue<>(PointIndex_I32.class, true);
 		indexToPointIndex(sequence,splits,output);
 
 
 
-		return new ArrayList<PointIndex_I32>(output.toList());
+		return new ArrayList<>(output.toList());
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class ShapeFittingOps {
 															  FitData<EllipseRotated_F64> outputStorage ) {
 
 		if( outputStorage == null ) {
-			outputStorage = new FitData<EllipseRotated_F64>(new EllipseRotated_F64());
+			outputStorage = new FitData<>(new EllipseRotated_F64());
 		}
 
 		// Compute the optimal algebraic error
@@ -180,7 +180,7 @@ public class ShapeFittingOps {
 	 * @return Converted points
 	 */
 	public static List<Point2D_F64> convert_I32_F64(List<Point2D_I32> points) {
-		List<Point2D_F64> pointsF = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> pointsF = new ArrayList<>();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_I32 p = points.get(i);
 			pointsF.add( new Point2D_F64(p.x,p.y));
@@ -201,7 +201,7 @@ public class ShapeFittingOps {
 	public static FitData<Circle2D_F64> averageCircle_I32(List<Point2D_I32> points, GrowQueue_F64 optional,
 														  FitData<Circle2D_F64> outputStorage) {
 		if( outputStorage == null ) {
-			outputStorage = new FitData<Circle2D_F64>(new Circle2D_F64());
+			outputStorage = new FitData<>(new Circle2D_F64());
 		}
 		if( optional == null ) {
 			optional = new GrowQueue_F64();
@@ -260,7 +260,7 @@ public class ShapeFittingOps {
 	public static FitData<Circle2D_F64> averageCircle_F64(List<Point2D_F64> points, GrowQueue_F64 optional,
 														  FitData<Circle2D_F64> outputStorage) {
 		if( outputStorage == null ) {
-			outputStorage = new FitData<Circle2D_F64>(new Circle2D_F64());
+			outputStorage = new FitData<>(new Circle2D_F64());
 		}
 		if( optional == null ) {
 			optional = new GrowQueue_F64();

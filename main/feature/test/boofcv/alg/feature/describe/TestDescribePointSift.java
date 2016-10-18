@@ -56,7 +56,7 @@ public class TestDescribePointSift {
 				new DescribePointSift<>(4,4,8,1.5,0.5,0.2,GrayF32.class);
 		alg.setImageGradient(derivX,derivY);
 
-		List<Point2D_I32> testPoints = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> testPoints = new ArrayList<>();
 		testPoints.add( new Point2D_I32(100,0));
 		testPoints.add( new Point2D_I32(100,199));
 		testPoints.add( new Point2D_I32(0,100));

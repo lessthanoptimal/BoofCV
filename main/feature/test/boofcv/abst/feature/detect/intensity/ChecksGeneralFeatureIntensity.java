@@ -37,8 +37,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class ChecksGeneralFeatureIntensity<I extends ImageGray, D extends ImageGray>
 {
-	public List<Class> listInputTypes = new ArrayList<Class>();
-	public List<Class> listDerivTypes = new ArrayList<Class>();
+	public List<Class> listInputTypes = new ArrayList<>();
+	public List<Class> listDerivTypes = new ArrayList<>();
 
 
 	Random rand = new Random(234);

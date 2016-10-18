@@ -57,15 +57,15 @@ public class CombinedTrackerScalePoint
 	protected AssociateDescription<TD> associate;
 
 	// all active tracks that have been tracked purely by KLT
-	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksPureKlt = new ArrayList<>();
 	// tracks that had been dropped by KLT but have been reactivated
-	protected List<CombinedTrack<TD>> tracksReactivated = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksReactivated = new ArrayList<>();
 	// tracks that are not actively being tracked
-	protected List<CombinedTrack<TD>> tracksDormant = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksDormant = new ArrayList<>();
 	// recently spawned tracks
-	protected List<CombinedTrack<TD>> tracksSpawned = new ArrayList<CombinedTrack<TD>>();
+	protected List<CombinedTrack<TD>> tracksSpawned = new ArrayList<>();
 	// track points whose data is to be reused
-	protected Stack<CombinedTrack<TD>> tracksUnused = new Stack<CombinedTrack<TD>>();
+	protected Stack<CombinedTrack<TD>> tracksUnused = new Stack<>();
 
 	// local storage used by association
 	protected FastQueue<TD> detectedDesc;
@@ -90,8 +90,8 @@ public class CombinedTrackerScalePoint
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
-		detectedDesc = new FastQueue<TD>(10,detector.getDescriptionType(),false);
-		knownDesc = new FastQueue<TD>(10,detector.getDescriptionType(),false);
+		detectedDesc = new FastQueue<>(10, detector.getDescriptionType(), false);
+		knownDesc = new FastQueue<>(10, detector.getDescriptionType(), false);
 
 		this.associate = associate;
 	}
@@ -186,7 +186,7 @@ public class CombinedTrackerScalePoint
 			if( tracksUnused.size() > 0 ) {
 				track = tracksUnused.pop();
 			} else {
-				track = new CombinedTrack<TD>();
+				track = new CombinedTrack<>();
 				track.desc = detector.createDescription();
 				track.track = trackerKlt.createNewTrack();
 			}
@@ -243,7 +243,7 @@ public class CombinedTrackerScalePoint
 	 */
 	public void associateAllToDetected() {
 		// initialize data structures
-		List<CombinedTrack<TD>> all = new ArrayList<CombinedTrack<TD>>();
+		List<CombinedTrack<TD>> all = new ArrayList<>();
 		all.addAll(tracksReactivated);
 		all.addAll(tracksDormant);
 		all.addAll(tracksPureKlt);

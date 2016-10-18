@@ -235,9 +235,7 @@ public class TestConvertRaster {
 				m.invoke(null, input, output);
 				BoofTesting.checkEquals(input, output, false, 1f);
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -271,9 +269,7 @@ public class TestConvertRaster {
 				BoofTesting.checkEquals(output, input, false, 1f);
 			}
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

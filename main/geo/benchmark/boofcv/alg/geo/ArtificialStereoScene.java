@@ -68,9 +68,9 @@ public class ArtificialStereoScene {
 			worldPoints = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 
 		// transform points into second camera's reference frame
-		pairs = new ArrayList<AssociatedPair>();
-		observationCurrent = new ArrayList<Point2D_F64>();
-		observationPose = new ArrayList<Point2D3D>();
+		pairs = new ArrayList<>();
+		observationCurrent = new ArrayList<>();
+		observationPose = new ArrayList<>();
 
 		for(Point3D_F64 p1 : worldPoints) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
@@ -115,7 +115,7 @@ public class ArtificialStereoScene {
 	}
 	
 	private List<Point3D_F64> createPlanarScene( int N ) {
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			double x = (rand.nextDouble()-0.5)*2;

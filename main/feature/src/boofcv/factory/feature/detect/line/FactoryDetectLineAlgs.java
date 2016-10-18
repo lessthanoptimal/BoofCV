@@ -71,7 +71,7 @@ public class FactoryDetectLineAlgs {
 		GridLineModelFitter fitter = new GridLineModelFitter((float)thresholdAngle);
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
+				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 
 		GridRansacLineDetector<D> alg;
 		if( derivType == GrayF32.class )  {
@@ -86,7 +86,7 @@ public class FactoryDetectLineAlgs {
 		if( connectLines )
 			connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
 
-		return new DetectLineSegmentsGridRansac<I,D>(alg,connect,gradient,thresholdEdge,imageType,derivType);
+		return new DetectLineSegmentsGridRansac<>(alg, connect, gradient, thresholdEdge, imageType, derivType);
 	}
 
 	/**
@@ -112,8 +112,8 @@ public class FactoryDetectLineAlgs {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFoot<I,D>(config.localMaxRadius,config.minCounts,config.minDistanceFromOrigin,
-				config.thresholdEdge,config.maxLines,gradient);
+		return new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts, config.minDistanceFromOrigin,
+				config.thresholdEdge, config.maxLines, gradient);
 	}
 
 	/**
@@ -139,9 +139,9 @@ public class FactoryDetectLineAlgs {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFootSubimage<I,D>(config.localMaxRadius,
-				config.minCounts,config.minDistanceFromOrigin,config.thresholdEdge,
-				config.totalHorizontalDivisions,config.totalVerticalDivisions,config.maxLines,gradient);
+		return new DetectLineHoughFootSubimage<>(config.localMaxRadius,
+				config.minCounts, config.minDistanceFromOrigin, config.thresholdEdge,
+				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines, gradient);
 	}
 
 	/**
@@ -166,8 +166,8 @@ public class FactoryDetectLineAlgs {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughPolar<I,D>(config.localMaxRadius,config.minCounts,config.resolutionRange,
-				config.resolutionAngle,config.thresholdEdge,config.maxLines,gradient);
+		return new DetectLineHoughPolar<>(config.localMaxRadius, config.minCounts, config.resolutionRange,
+				config.resolutionAngle, config.thresholdEdge, config.maxLines, gradient);
 	}
 
 }

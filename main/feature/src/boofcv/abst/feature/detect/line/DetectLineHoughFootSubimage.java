@@ -132,7 +132,7 @@ public class DetectLineHoughFootSubimage<I extends ImageGray, D extends ImageGra
 
 		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
 
-		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		List<LineParametric2D_F32> ret = new ArrayList<>();
 		post.reset();
 
 		for( int i = 0; i < totalVerticalDivisions; i++ ) {

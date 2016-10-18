@@ -48,8 +48,8 @@ public class FactoryDescribePointAlgs {
 		config.checkValidity();
 
 
-		return new DescribePointSurf<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,
-				config.weightSigma,config.useHaar,imageType);
+		return new DescribePointSurf<>(config.widthLargeGrid, config.widthSubRegion, config.widthSample,
+				config.weightSigma, config.useHaar, imageType);
 	}
 
 	public static <T extends ImageGray>
@@ -58,14 +58,14 @@ public class FactoryDescribePointAlgs {
 			config = new ConfigSurfDescribe.Stability();
 		config.checkValidity();
 
-		return new DescribePointSurfMod<T>(config.widthLargeGrid,config.widthSubRegion,config.widthSample,
-				config.overLap,config.sigmaLargeGrid,config.sigmaSubRegion,config.useHaar,imageType);
+		return new DescribePointSurfMod<>(config.widthLargeGrid, config.widthSubRegion, config.widthSample,
+				config.overLap, config.sigmaLargeGrid, config.sigmaSubRegion, config.useHaar, imageType);
 	}
 
 	public static <T extends ImageGray>
 	DescribePointSurfPlanar<T> surfColor(DescribePointSurf<T> describe , int numBands ) {
 
-		return new DescribePointSurfPlanar<T>(describe,numBands);
+		return new DescribePointSurfPlanar<>(describe, numBands);
 	}
 
 	public static <T extends ImageGray>
@@ -82,7 +82,7 @@ public class FactoryDescribePointAlgs {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
 
-		return new DescribePointBrief<T>(compare,filterBlur);
+		return new DescribePointBrief<>(compare, filterBlur);
 	}
 
 	// todo remove filterBlur for all BRIEF change to radius,sigma,type
@@ -92,7 +92,7 @@ public class FactoryDescribePointAlgs {
 
 		InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
-		return new DescribePointBriefSO<T>(definition,filterBlur,interp);
+		return new DescribePointBriefSO<>(definition, filterBlur, interp);
 	}
 
 	public static <T extends ImageGray>

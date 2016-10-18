@@ -123,7 +123,7 @@ public abstract class ChecksImplDisparityScoreSadRect<Image extends ImageGray,Di
 
 		DisparityScoreSadRect<Image,Disparity> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
 		StereoDisparityWtoNaive<Image> naive =
-				new StereoDisparityWtoNaive<Image>(minDisparity,maxDisparity,radiusX,radiusY);
+				new StereoDisparityWtoNaive<>(minDisparity, maxDisparity, radiusX, radiusY);
 
 		Disparity found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 		GrayF32 expected = new GrayF32(w,h);

@@ -65,7 +65,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray, Derivative extends
 	private PyramidKltTracker<Image, Derivative> klt;
 	private PyramidKltFeature track;
 
-	private FastQueue<AssociatedPair> pairs = new FastQueue<AssociatedPair>(AssociatedPair.class,true);
+	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class, true);
 
 	// used for estimating motion from track locations
 	private LeastMedianOfSquares<ScaleTranslateRotate2D,AssociatedPair> estimateMotion;
@@ -103,8 +103,8 @@ public class SparseFlowObjectTracker<Image extends ImageGray, Derivative extends
 		GenerateScaleTranslateRotate2D generator = new GenerateScaleTranslateRotate2D();
 		DistanceScaleTranslateRotate2DSq distance = new DistanceScaleTranslateRotate2DSq();
 
-		estimateMotion = new LeastMedianOfSquares<ScaleTranslateRotate2D, AssociatedPair>(
-				config.randSeed,config.robustCycles,Double.MAX_VALUE,0,manager,generator,distance);
+		estimateMotion = new LeastMedianOfSquares<>(
+				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, generator, distance);
 	}
 
 	public void init( Image input , RectangleRotate_F64 region ) {

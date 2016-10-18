@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	public AssociateDescription<TupleDesc_F64> createAlg() {
 		// exhaustive algorithm will produce perfect results
 		NearestNeighbor<Integer> exhaustive = FactoryNearestNeighbor.exhaustive();
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<TupleDesc_F64>(exhaustive,1);
+		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(exhaustive, 1);
 		return alg;
 	}
 
@@ -62,14 +62,14 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	@Test
 	public void various() {
 
-		Dummy<Integer> nn = new Dummy<Integer>();
+		Dummy<Integer> nn = new Dummy<>();
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<TupleDesc_F64>(nn,10);
+		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn, 10);
 
-		FastQueue<TupleDesc_F64> src = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
-		FastQueue<TupleDesc_F64> dst = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
 
 		for( int i = 0; i < 5; i++ ) {
 			src.add( new TupleDesc_F64(10));

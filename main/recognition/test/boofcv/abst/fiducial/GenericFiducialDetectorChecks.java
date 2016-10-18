@@ -44,7 +44,7 @@ public abstract class GenericFiducialDetectorChecks {
 	// tolerance for difference between pixel location and geometric center from reprojection
 	protected double pixelAndProjectedTol = 3.0;
 
-	protected List<ImageType> types = new ArrayList<ImageType>();
+	protected List<ImageType> types = new ArrayList<>();
 
 	public abstract ImageBase loadImage(ImageType imageType);
 
@@ -211,7 +211,7 @@ public abstract class GenericFiducialDetectorChecks {
 			assertTrue(detector.totalFound()>= 1);
 
 			long foundID[] = new long[ detector.totalFound() ];
-			List<Se3_F64> foundPose = new ArrayList<Se3_F64>();
+			List<Se3_F64> foundPose = new ArrayList<>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
 				foundID[i] = detector.getId(i);

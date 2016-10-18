@@ -65,7 +65,7 @@ public class DetectSquareGridFiducial<T extends ImageGray> {
 	SquareRegularClustersIntoGrids c2g;
 
 	// output results.  Grid of calibration points in row-major order
-	List<Point2D_F64> calibrationPoints = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> calibrationPoints = new ArrayList<>();
 	int calibRows;
 	int calibCols;
 
@@ -150,8 +150,8 @@ public class DetectSquareGridFiducial<T extends ImageGray> {
 		return false;
 	}
 
-	List<Point2D_F64> row0 = new ArrayList<Point2D_F64>();
-	List<Point2D_F64> row1 = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> row0 = new ArrayList<>();
+	List<Point2D_F64> row1 = new ArrayList<>();
 	/**
 	 * Extracts the calibration points from the corners of a fully ordered grid
 	 */

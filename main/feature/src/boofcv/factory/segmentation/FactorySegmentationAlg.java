@@ -106,9 +106,9 @@ public class FactorySegmentationAlg {
 		MergeRegionMeanShift merge = new MergeRegionMeanShift(spacialRadius/2+1,Math.max(1,colorRadius/2));
 
 		MergeSmallRegions<T> prune = config.minimumRegionSize >= 2 ?
-				new MergeSmallRegions<T>(config.minimumRegionSize,config.connectRule,regionColor) : null;
+				new MergeSmallRegions<>(config.minimumRegionSize, config.connectRule, regionColor) : null;
 
-		return new SegmentMeanShift<T>(search,merge,prune,config.connectRule);
+		return new SegmentMeanShift<>(search, merge, prune, config.connectRule);
 	}
 
 	public static <T extends ImageBase>
@@ -161,7 +161,7 @@ public class FactorySegmentationAlg {
 		FhEdgeWeights<T> edgeWeights = weightsFelzenszwalb04(config.connectRule,imageType);
 
 		SegmentFelzenszwalbHuttenlocher04<T> alg =
-				new SegmentFelzenszwalbHuttenlocher04<T>(config.K,config.minimumRegionSize,edgeWeights);
+				new SegmentFelzenszwalbHuttenlocher04<>(config.K, config.minimumRegionSize, edgeWeights);
 
 		if( config.approximateSortBins > 0 ) {
 			alg.configureApproximateSort(config.approximateSortBins);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,10 +37,10 @@ public class BenchmarkRuntimeFundamental extends ArtificialStereoScene{
 	static final int NUM_POINTS = 500;
 	static final boolean FUNDAMENTAL = false;
 
-	List<AssociatedPair> pairs8 = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> pairs7 = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> pairs6 = new ArrayList<AssociatedPair>();
-	List<AssociatedPair> pairs5 = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> pairs8 = new ArrayList<>();
+	List<AssociatedPair> pairs7 = new ArrayList<>();
+	List<AssociatedPair> pairs6 = new ArrayList<>();
+	List<AssociatedPair> pairs5 = new ArrayList<>();
 
 	DenseMatrix64F found = new DenseMatrix64F(3,3);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	private DescribeRegionPoint<T,Desc> describe;
 
 	// Data structures used when associating left and right cameras
-	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
-	private FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
+	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64.class, false);
+	private FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64.class, false);
 	private FastQueue<Desc> descLeft,descRight;
 
 	// matches features between left and right images
@@ -96,7 +96,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	private Se3_F64 leftToRight = new Se3_F64();
 
 	// List of tracks from left image that remain after geometric filters have been applied
-	private List<PointTrack> candidates = new ArrayList<PointTrack>();
+	private List<PointTrack> candidates = new ArrayList<>();
 
 	// transform from key frame to world frame
 	private Se3_F64 keyToWorld = new Se3_F64();
@@ -219,7 +219,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	private void refineMotionEstimate() {
 
 		// use observations from the inlier set
-		List<Stereo2D3D> data = new ArrayList<Stereo2D3D>();
+		List<Stereo2D3D> data = new ArrayList<>();
 
 		int N = matcher.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
@@ -251,7 +251,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	 */
 	private boolean estimateMotion() {
 		// organize the data
-		List<Stereo2D3D> data = new ArrayList<Stereo2D3D>();
+		List<Stereo2D3D> data = new ArrayList<>();
 
 		for( PointTrack l : candidates ) {
 			LeftTrackInfo info = l.getCookie();

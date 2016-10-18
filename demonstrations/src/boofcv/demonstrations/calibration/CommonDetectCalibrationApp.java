@@ -131,7 +131,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			int rgb = key << 8 | (255 - key);
 			g2.setColor(new Color(rgb));
 
-			java.util.List<SquareEdge> edges = new ArrayList<SquareEdge>();
+			java.util.List<SquareEdge> edges = new ArrayList<>();
 
 			for( SquareNode n : graph ) {
 				for (int j = 0; j < n.edges.length; j++) {

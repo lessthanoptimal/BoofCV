@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,11 +62,7 @@ public class Help {
 				printHelp();
 				System.out.println();
 				System.out.println("Can't find application for "+args[0]);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 		} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class ArrayVsListAccess {
 
 	private static class ListAccess extends PerformerBase
 	{
-		List<Double> data = new ArrayList<Double>();
+		List<Double> data = new ArrayList<>();
 		int ret;
 
 		public ListAccess( double data [] ) {
@@ -94,7 +94,7 @@ public class ArrayVsListAccess {
 
 	private static class FastQueueAccess extends PerformerBase
 	{
-		FastQueue<Double> queue = new FastQueue<Double>(100,Double.class,false);
+		FastQueue<Double> queue = new FastQueue<>(100, Double.class, false);
 		int ret;
 
 		public FastQueueAccess( double data [] ) {
@@ -121,7 +121,7 @@ public class ArrayVsListAccess {
 
 	private static class FastQueueAccessRaw extends PerformerBase
 	{
-		FastQueue<Double> queue = new FastQueue<Double>(100,Double.class,false);
+		FastQueue<Double> queue = new FastQueue<>(100, Double.class, false);
 		int ret;
 
 		public FastQueueAccessRaw( double data [] ) {

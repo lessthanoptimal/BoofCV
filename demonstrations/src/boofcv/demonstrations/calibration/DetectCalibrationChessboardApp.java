@@ -116,7 +116,7 @@ public class DetectCalibrationChessboardApp
 
 	public static void main(String args[]) throws FileNotFoundException {
 
-		List<String> examples = new ArrayList<String>();
+		List<String> examples = new ArrayList<>();
 
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));

@@ -118,9 +118,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 		try {
 			m.invoke(null,input,derivX,derivY,output);
 			assertTrue((output.get(2,2)==0)==suppressed);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -202,9 +200,7 @@ public class TestImplEdgeNonMaxSuppressionCrude {
 			}
 
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

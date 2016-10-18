@@ -51,7 +51,7 @@ public enum AutoTypeImage {
 
 	private Class<?> primitiveType;
 
-	AutoTypeImage(Class<?> imageType ) {
+	AutoTypeImage(Class<?> imageType ) throws RuntimeException {
 
 		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
@@ -61,9 +61,7 @@ public enum AutoTypeImage {
 			dataType = primitiveType.getSimpleName();
 
 
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

@@ -33,7 +33,7 @@ public class TestImplOrientationHistogram_S32 {
 
 	@Test
 	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(r,N,false);
 
@@ -43,7 +43,7 @@ public class TestImplOrientationHistogram_S32 {
 
 	@Test
 	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<GrayS32>();
+		GenericOrientationGradientTests<GrayS32> tests = new GenericOrientationGradientTests<>();
 
 		ImplOrientationHistogram_S32 alg = new ImplOrientationHistogram_S32(1.0/2.0,N,true);
 		alg.setObjectToSample(r);

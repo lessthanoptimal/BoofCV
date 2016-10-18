@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,9 +36,9 @@ public class TldTemplatePanel extends JPanel {
 
 	int scale = 2;
 
-	List<BufferedImage> templates = new ArrayList<BufferedImage>();
+	List<BufferedImage> templates = new ArrayList<>();
 
-	Stack<BufferedImage> unused = new Stack<BufferedImage>();
+	Stack<BufferedImage> unused = new Stack<>();
 
 	public TldTemplatePanel(int featureWidth) {
 		this.featureWidth = featureWidth;

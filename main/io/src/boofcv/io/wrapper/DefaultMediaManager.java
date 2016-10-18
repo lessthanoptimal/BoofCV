@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class DefaultMediaManager implements MediaManager {
 
 	public static final DefaultMediaManager INSTANCE = new DefaultMediaManager();
 
-	Map<String,BufferedImage> cachedImage = new HashMap<String, BufferedImage>();
+	Map<String,BufferedImage> cachedImage = new HashMap<>();
 	VideoInterface videoInterface = new DynamicVideoInterface();
 	WebcamInterface webcamInterface = new DynamicWebcamInterface();
 

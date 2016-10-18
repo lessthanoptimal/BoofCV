@@ -42,7 +42,7 @@ public class TestImageMotionPtkSmartRespawn {
 	GrayF32 input = new GrayF32(50,60);
 
 	// the found feature match set
-	List<AssociatedPair> matchSet = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> matchSet = new ArrayList<>();
 
 	/**
 	 * Test the positive case when nothing should go wrong
@@ -52,7 +52,7 @@ public class TestImageMotionPtkSmartRespawn {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,10,0.5,0.5);
+				new ImageMotionPtkSmartRespawn<>(motion, 10, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -87,7 +87,7 @@ public class TestImageMotionPtkSmartRespawn {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
+				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -117,7 +117,7 @@ public class TestImageMotionPtkSmartRespawn {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
+				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -144,7 +144,7 @@ public class TestImageMotionPtkSmartRespawn {
 		DummyMotion motion = new DummyMotion();
 
 		ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64> alg =
-				new ImageMotionPtkSmartRespawn<GrayF32,Affine2D_F64>(motion,20,0.5,0.5);
+				new ImageMotionPtkSmartRespawn<>(motion, 20, 0.5, 0.5);
 
 		// first pass causes tracks to be spawned
 		assertTrue(alg.process(input));
@@ -160,7 +160,7 @@ public class TestImageMotionPtkSmartRespawn {
 	}
 
 	private List<AssociatedPair> createGoodFeatureList( int num ) {
-		List<AssociatedPair> ret = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> ret = new ArrayList<>();
 
 		// maximize the area
 		ret.add( createPair(0,0));
@@ -178,7 +178,7 @@ public class TestImageMotionPtkSmartRespawn {
 	}
 
 	private List<AssociatedPair> createBadCoverageList( int num ) {
-		List<AssociatedPair> ret = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> ret = new ArrayList<>();
 
 		// maximize the area
 		ret.add( createPair(0,0));
@@ -291,27 +291,27 @@ public class TestImageMotionPtkSmartRespawn {
 
 		@Override
 		public List<PointTrack> getAllTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<PointTrack> getNewTracks(List<PointTrack> list) {
-			return new ArrayList<PointTrack>();
+			return new ArrayList<>();
 		}
 
 		@Override

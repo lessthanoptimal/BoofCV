@@ -96,9 +96,9 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase> {
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
-	protected FastQueue<Edge> edges = new FastQueue<Edge>(Edge.class,true);
+	protected FastQueue<Edge> edges = new FastQueue<>(Edge.class, true);
 	// list of edges which were not matched to anything.  used to merge small regions
-	protected FastQueue<Edge> edgesNotMatched = new FastQueue<Edge>(Edge.class,false);
+	protected FastQueue<Edge> edgesNotMatched = new FastQueue<>(Edge.class, false);
 	// Size of each region
 	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
 	// This is equivalent to Int(C) + tau(C) in Equation 4.

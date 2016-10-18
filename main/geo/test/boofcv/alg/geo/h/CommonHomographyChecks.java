@@ -60,7 +60,7 @@ public class CommonHomographyChecks {
 		pts = createRandomPlane(rand,d,numPoints);
 
 		// transform points into second camera's reference frame
-		pairs = new ArrayList<AssociatedPair>();
+		pairs = new ArrayList<>();
 		for(Point3D_F64 p1 : pts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
@@ -81,7 +81,7 @@ public class CommonHomographyChecks {
 	 */
 	public static List<Point3D_F64> createRandomPlane( Random rand , double d , int N )
 	{
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			double x = (rand.nextDouble()-0.5)*2;

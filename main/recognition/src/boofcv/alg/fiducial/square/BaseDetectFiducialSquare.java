@@ -73,7 +73,7 @@ import java.util.List;
 public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 	// Storage for the found fiducials
-	private FastQueue<FoundFiducial> found = new FastQueue<FoundFiducial>(FoundFiducial.class,true);
+	private FastQueue<FoundFiducial> found = new FastQueue<>(FoundFiducial.class, true);
 
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;
@@ -91,7 +91,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	private RefineEpipolar refineHomography = FactoryMultiView.refineHomography(1e-4,100, EpipolarError.SAMPSON);
 	private DenseMatrix64F H = new DenseMatrix64F(3,3);
 	private DenseMatrix64F H_refined = new DenseMatrix64F(3,3);
-	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<AssociatedPair>();
+	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
 	private ImageDistort<T,GrayF32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
 

@@ -63,9 +63,7 @@ public class WrapperMedianCornerIntensity<I extends ImageGray, D extends ImageGr
 		medianFilter.process(input,medianImage);
 		try {
 			m.invoke(null,intensity,input,medianImage);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

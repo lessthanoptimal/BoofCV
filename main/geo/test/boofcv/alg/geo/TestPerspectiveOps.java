@@ -325,7 +325,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void splitAssociated_pair() {
-		List<AssociatedPair> list = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
@@ -335,8 +335,8 @@ public class TestPerspectiveOps {
 			list.add(p);
 		}
 
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
 
 		PerspectiveOps.splitAssociated(list,list1,list2);
 
@@ -351,7 +351,7 @@ public class TestPerspectiveOps {
 
 	@Test
 	public void splitAssociated_triple() {
-		List<AssociatedTriple> list = new ArrayList<AssociatedTriple>();
+		List<AssociatedTriple> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedTriple p = new AssociatedTriple();
 
@@ -362,9 +362,9 @@ public class TestPerspectiveOps {
 			list.add(p);
 		}
 
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list3 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
+		List<Point2D_F64> list3 = new ArrayList<>();
 
 		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 

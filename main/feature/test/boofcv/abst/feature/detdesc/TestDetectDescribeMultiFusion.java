@@ -108,7 +108,7 @@ public class TestDetectDescribeMultiFusion {
 
 	private static class DummyDetector implements DetectorInterestPointMulti {
 
-		List<Found> sets = new ArrayList<Found>();
+		List<Found> sets = new ArrayList<>();
 
 		public DummyDetector( int num ) {
 			for( int i = 0; i < num; i++ ) {

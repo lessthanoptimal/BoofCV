@@ -71,7 +71,7 @@ public class GenericCalibrationGrid {
 
 	public static List<Point3D_F64> gridPoints3D( List<Point2D_F64> obs2D )
 	{
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 
 		for( Point2D_F64 p2 : obs2D ) {
 			ret.add(new Point3D_F64(p2.x,p2.y,0));
@@ -98,7 +98,7 @@ public class GenericCalibrationGrid {
 
 	public static List<Point2D_F64> observations( DenseMatrix64F H, List<Point2D_F64> obs2D )
 	{
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> ret = new ArrayList<>();
 
 		for( Point2D_F64 p2 : obs2D ) {
 			Point2D_F64 t = new Point2D_F64();
@@ -137,7 +137,7 @@ public class GenericCalibrationGrid {
 	 * @param N Number of homographies
 	 */
 	public static List<DenseMatrix64F> createHomographies( DenseMatrix64F K , int N , Random rand ) {
-		List<DenseMatrix64F> homographies = new ArrayList<DenseMatrix64F>();
+		List<DenseMatrix64F> homographies = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			Vector3D_F64 T = new Vector3D_F64();
@@ -244,7 +244,7 @@ public class GenericCalibrationGrid {
 	public static List<CalibrationObservation> createObservations( Zhang99ParamAll config,
 															  List<Point2D_F64> grid)
 	{
-		List<CalibrationObservation> ret = new ArrayList<CalibrationObservation>();
+		List<CalibrationObservation> ret = new ArrayList<>();
 
 		Point3D_F64 cameraPt = new Point3D_F64();
 		Point2D_F64 calibratedPt = new Point2D_F64();

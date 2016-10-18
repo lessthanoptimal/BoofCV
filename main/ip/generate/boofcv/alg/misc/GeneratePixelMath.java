@@ -48,7 +48,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printAbs();
 		printInvert();
 
-		List<TwoTemplate> listTwo = new ArrayList<TwoTemplate>();
+		List<TwoTemplate> listTwo = new ArrayList<>();
 		listTwo.add( new Multiple());
 		listTwo.add( new Divide());
 		listTwo.add( new Plus());

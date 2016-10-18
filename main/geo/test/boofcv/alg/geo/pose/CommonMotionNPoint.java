@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,11 +61,11 @@ public class CommonMotionNPoint {
 			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 		}
 
-		cameraPts = new ArrayList<Point3D_F64>();
+		cameraPts = new ArrayList<>();
 
 		// transform points into second camera's reference frame
-		assocPairs = new ArrayList<AssociatedPair>();
-		pointPose = new ArrayList<Point2D3D>();
+		assocPairs = new ArrayList<>();
+		pointPose = new ArrayList<>();
 		for(Point3D_F64 p1 : worldPts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 

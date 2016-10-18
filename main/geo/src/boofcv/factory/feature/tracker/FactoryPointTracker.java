@@ -138,8 +138,8 @@ public class FactoryPointTracker {
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true,imageType);
 
-		return new PointTrackerKltPyramid<I, D>(config.config,config.templateRadius,pyramid,detector,
-				gradient,interpInput,interpDeriv,derivType);
+		return new PointTrackerKltPyramid<>(config.config, config.templateRadius, pyramid, detector,
+				gradient, interpInput, interpDeriv, derivType);
 	}
 
 	/**
@@ -167,14 +167,14 @@ public class FactoryPointTracker {
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
 		AssociateDescription2D<BrightFeature> generalAssoc =
-				new AssociateDescTo2D<BrightFeature>(new WrapAssociateSurfBasic(assoc));
+				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfFast(configDetector, configDescribe, configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<I,BrightFeature>(fused);
+		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
 
-		return new DetectDescribeAssociate<I,BrightFeature>(manager, generalAssoc,false);
+		return new DetectDescribeAssociate<>(manager, generalAssoc, false);
 	}
 
 	/**
@@ -202,14 +202,14 @@ public class FactoryPointTracker {
 		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
 
 		AssociateDescription2D<BrightFeature> generalAssoc =
-				new AssociateDescTo2D<BrightFeature>(new WrapAssociateSurfBasic(assoc));
+				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
 
 		DetectDescribePoint<I,BrightFeature> fused =
 				FactoryDetectDescribe.surfStable(configDetector,configDescribe,configOrientation,imageType);
 
-		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<I,BrightFeature>(fused);
+		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
 
-		return new DetectDescribeAssociate<I,BrightFeature>(manager, generalAssoc,false);
+		return new DetectDescribeAssociate<>(manager, generalAssoc, false);
 	}
 
 	/**
@@ -236,17 +236,17 @@ public class FactoryPointTracker {
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detectPoint,imageType,derivType);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detectPoint, imageType, derivType);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, maxAssociationError, true));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief,imageType),1.0);
+				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
 
-		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
+		return new DetectDescribeAssociate<>(manager, association, false);
 	}
 
 	/**
@@ -271,18 +271,18 @@ public class FactoryPointTracker {
 				FactoryBlurFilter.gaussian(imageType, 0, 4));
 
 		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configFast, configExtract, imageType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(corner,imageType,null);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, null);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<TupleDesc_B>(
+				new AssociateDescTo2D<>(
 						FactoryAssociation.greedy(score, maxAssociationError, true));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
-				new DdaManagerGeneralPoint<I,D,TupleDesc_B>(easy,new WrapDescribeBrief<I>(brief,imageType),1.0);
+				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
 
-		return new DetectDescribeAssociate<I,TupleDesc_B>(manager, association,false);
+		return new DetectDescribeAssociate<>(manager, association, false);
 	}
 
 	/**
@@ -308,18 +308,18 @@ public class FactoryPointTracker {
 		DescribePointPixelRegionNCC<I> alg = FactoryDescribePointAlgs.pixelRegionNCC(w, w, imageType);
 
 		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(corner,imageType,derivType);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, derivType);
 
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
 		AssociateDescription2D<NccFeature> association =
-				new AssociateDescTo2D<NccFeature>(
+				new AssociateDescTo2D<>(
 						FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
 
 		DdaManagerGeneralPoint<I,D,NccFeature> manager =
-				new DdaManagerGeneralPoint<I,D,NccFeature>(easy,new WrapDescribePixelRegionNCC<I>(alg,imageType),1.0);
+				new DdaManagerGeneralPoint<>(easy, new WrapDescribePixelRegionNCC<>(alg, imageType), 1.0);
 
-		return new DetectDescribeAssociate<I,NccFeature>(manager, association,false);
+		return new DetectDescribeAssociate<>(manager, association, false);
 	}
 
 	/**
@@ -342,13 +342,13 @@ public class FactoryPointTracker {
 										boolean updateDescription ) {
 
 		DetectDescribeFusion<I,Desc> fused =
-				new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
+				new DetectDescribeFusion<>(detector, orientation, describe);
 
 		DdaManagerDetectDescribePoint<I,Desc> manager =
-				new DdaManagerDetectDescribePoint<I,Desc>(fused);
+				new DdaManagerDetectDescribePoint<>(fused);
 
 		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<I,Desc>(manager, associate,updateDescription);
+				new DetectDescribeAssociate<>(manager, associate, updateDescription);
 
 		return dat;
 	}
@@ -359,10 +359,10 @@ public class FactoryPointTracker {
 										boolean updateDescription ) {
 
 		DdaManagerDetectDescribePoint<I,Desc> manager =
-				new DdaManagerDetectDescribePoint<I,Desc>(detDesc);
+				new DdaManagerDetectDescribePoint<>(detDesc);
 
 		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<I,Desc>(manager, associate,updateDescription);
+				new DetectDescribeAssociate<>(manager, associate, updateDescription);
 
 		return dat;
 	}
@@ -474,7 +474,7 @@ public class FactoryPointTracker {
 							 int reactivateThreshold,
 							 Class<I> imageType)
 	{
-		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<I,Desc>(detector,orientation,describe);
+		DetectDescribeFusion<I,Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
 
 		return combined(fused,associate, kltConfig, reactivateThreshold,imageType);
 	}
@@ -505,7 +505,7 @@ public class FactoryPointTracker {
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
 				FactoryTrackerAlg.combined(detector,associate, kltConfig,imageType,derivType);
 
-		return new PointTrackerCombined<I,D,Desc>(tracker,reactivateThreshold,imageType,derivType);
+		return new PointTrackerCombined<>(tracker, reactivateThreshold, imageType, derivType);
 	}
 
 
@@ -516,12 +516,12 @@ public class FactoryPointTracker {
 						double scale,
 						Class<I> imageType) {
 
-		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<I, D>(detector,imageType,null);
+		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
 
 		DdaManagerGeneralPoint<I,D,Desc> manager =
-				new DdaManagerGeneralPoint<I,D,Desc>(easy,describe,scale);
+				new DdaManagerGeneralPoint<>(easy, describe, scale);
 
-		return new DetectDescribeAssociate<I,Desc>(manager,associate,false);
+		return new DetectDescribeAssociate<>(manager, associate, false);
 	}
 
 	/**

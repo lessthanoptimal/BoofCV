@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,9 +56,7 @@ public class DynamicWebcamInterface implements WebcamInterface {
 			return (WebcamInterface) c.newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

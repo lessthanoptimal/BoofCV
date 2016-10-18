@@ -42,7 +42,7 @@ public class TestImageGradientThenReduce {
 		GrayF32 outDerivY = new GrayF32(10,12);
 
 		ImageGradientThenReduce<Planar<GrayF32>,Planar<GrayF32>,GrayF32> alg =
-				new ImageGradientThenReduce<Planar<GrayF32>,Planar<GrayF32>,GrayF32>(gradient,reduce);
+				new ImageGradientThenReduce<>(gradient, reduce);
 
 		alg.process(input,outDerivX,outDerivY);
 

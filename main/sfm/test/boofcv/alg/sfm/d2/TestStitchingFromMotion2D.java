@@ -54,7 +54,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -100,7 +100,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,motion0);
 		assertTrue(alg.process(image));
@@ -124,7 +124,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -146,7 +146,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -165,7 +165,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -195,7 +195,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distorter,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distorter, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));
@@ -238,7 +238,7 @@ public class TestStitchingFromMotion2D {
 		StitchingTransform trans = FactoryStitchingTransform.createAffine_F64();
 
 		StitchingFromMotion2D<GrayF32,Affine2D_F64> alg =
-				new StitchingFromMotion2D<GrayF32,Affine2D_F64>(motion,distort,trans,0.3);
+				new StitchingFromMotion2D<>(motion, distort, trans, 0.3);
 
 		alg.configure(200,300,null);
 		assertTrue(alg.process(image));

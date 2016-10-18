@@ -64,7 +64,7 @@ public class TestGeneralFeatureDetector {
 		intensity.minimums = false;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(0, detector.getMinimums().size());
@@ -72,7 +72,7 @@ public class TestGeneralFeatureDetector {
 		// try detecting the negative features too
 		intensity.minimums = true;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, true));
-		detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(2, detector.getMinimums().size());
@@ -111,7 +111,7 @@ public class TestGeneralFeatureDetector {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true,true,true));
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
 		// only features inside the image should be found
@@ -125,7 +125,7 @@ public class TestGeneralFeatureDetector {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -151,7 +151,7 @@ public class TestGeneralFeatureDetector {
 		extractor.maximums = max;
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -173,7 +173,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -189,7 +189,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -206,7 +206,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 		detector.setMaxFeatures(1);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
@@ -224,7 +224,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -252,7 +252,7 @@ public class TestGeneralFeatureDetector {
 		intensity.maximums = false; extractor.maximums = false;
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor);
 
 		assertFalse(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
@@ -260,7 +260,7 @@ public class TestGeneralFeatureDetector {
 		intensity.minimums = true;  intensity.minimums = true;
 		intensity.maximums = false; extractor.maximums = false;
 
-		detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor);
 
 		assertTrue(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
@@ -268,7 +268,7 @@ public class TestGeneralFeatureDetector {
 		intensity.minimums = false; intensity.minimums = false;
 		intensity.maximums = true;  extractor.maximums = true;
 
-		detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor);
 
 		assertFalse(detector.isDetectMinimums());
 		assertTrue(detector.isDetectMaximums());

@@ -41,7 +41,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> localGaussian(int radius, double scale, boolean down, Class<T> inputType) {
-		return new LocalGaussianBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
+		return new LocalGaussianBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> localSauvola(int radius, float k, boolean down, Class<T> inputType) {
-		return new LocalSauvolaBinaryFilter<T>(radius,k,down,ImageType.single(inputType));
+		return new LocalSauvolaBinaryFilter<>(radius, k, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -69,13 +69,13 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> localSquare(int radius, double scale, boolean down, Class<T> inputType) {
-		return new LocalSquareBinaryFilter<T>(radius,scale,down,ImageType.single(inputType));
+		return new LocalSquareBinaryFilter<>(radius, scale, down, ImageType.single(inputType));
 	}
 
 	public static <T extends ImageGray>
 	InputToBinary<T> localSquareBlockMinMax(int regionWidth, double scale , boolean down,
 											double minimumSpread, Class<T> inputType) {
-		return new LocalSquareBlockMinMaxBinaryFilter<T>(minimumSpread,regionWidth,scale,down,inputType);
+		return new LocalSquareBlockMinMaxBinaryFilter<>(minimumSpread, regionWidth, scale, down, inputType);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> globalEntropy(int minValue, int maxValue, boolean down, Class<T> inputType) {
-		return new GlobalEntropyBinaryFilter<T>(minValue,maxValue,down,ImageType.single(inputType));
+		return new GlobalEntropyBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> globalFixed(double threshold, boolean down, Class<T> inputType) {
-		return new GlobalFixedBinaryFilter<T>(threshold,down,ImageType.single(inputType));
+		return new GlobalFixedBinaryFilter<>(threshold, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray>
 	InputToBinary<T> globalOtsu(int minValue, int maxValue, boolean down, Class<T> inputType) {
-		return new GlobalOtsuBinaryFilter<T>(minValue,maxValue,down,ImageType.single(inputType));
+		return new GlobalOtsuBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
 	}
 
 	/**

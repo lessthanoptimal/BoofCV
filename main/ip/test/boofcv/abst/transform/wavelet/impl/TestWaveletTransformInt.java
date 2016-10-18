@@ -61,7 +61,7 @@ public class TestWaveletTransformInt {
 		GrayS32 storage = new GrayS32(dimen.width,dimen.height);
 		WaveletTransformOps.transformN(desc,orig.clone(),expected,storage,N);
 
-		WaveletTransformInt<GrayS32> alg = new WaveletTransformInt<GrayS32>(desc,N,0,255,GrayS32.class);
+		WaveletTransformInt<GrayS32> alg = new WaveletTransformInt<>(desc, N, 0, 255, GrayS32.class);
 		alg.transform(orig,found);
 
 		// make sure the original input was not modified like it is in WaveletTransformOps

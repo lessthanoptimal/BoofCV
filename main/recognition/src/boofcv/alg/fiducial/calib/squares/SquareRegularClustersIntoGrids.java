@@ -42,7 +42,7 @@ public class SquareRegularClustersIntoGrids {
 	private int minimumElements;
 
 	// All valid graphics
-	FastQueue<SquareGrid> valid = new FastQueue<SquareGrid>(SquareGrid.class,true);
+	FastQueue<SquareGrid> valid = new FastQueue<>(SquareGrid.class, true);
 
 	/**
 	 * Configures class
@@ -119,7 +119,7 @@ public class SquareRegularClustersIntoGrids {
 	/**
 	 * Puts the un-ordered graph into a ordered grid which is a line.
 	 */
-	List<SquareNode> nodesLine = new ArrayList<SquareNode>();
+	List<SquareNode> nodesLine = new ArrayList<>();
 	void orderIntoLine(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles
@@ -169,8 +169,8 @@ public class SquareRegularClustersIntoGrids {
 	 * the grid is 2 by 2 or larger.
 	 * @param graph unordered nodes in a connected graph
 	 */
-	List<SquareNode> column = new ArrayList<SquareNode>();
-	List<SquareNode> ordered = new ArrayList<SquareNode>();
+	List<SquareNode> column = new ArrayList<>();
+	List<SquareNode> ordered = new ArrayList<>();
 	void orderIntoGrid(List<SquareNode> graph) {
 
 		// discard previous label information since its now being used to avoid cycles

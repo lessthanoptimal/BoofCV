@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class EdgeSegment {
 	/** which pixel in the segment did it spawn from */
 	public int parentPixel;
 	/** List of pixels in this segment */
-	public List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+	public List<Point2D_I32> points = new ArrayList<>();
 
 	public void reset() {
 		parent = -1;

@@ -231,7 +231,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 	void parseImage( int index , String []args ) {
 		boolean robust=true;
 
-		List<String> paths = new ArrayList<String>();
+		List<String> paths = new ArrayList<>();
 		GrowQueue_F64 sizes = new GrowQueue_F64();
 		double borderWidth = 0.25;
 

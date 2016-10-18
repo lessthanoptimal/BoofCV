@@ -143,7 +143,7 @@ public class WaveletVisualizeApp
 		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayU8.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));

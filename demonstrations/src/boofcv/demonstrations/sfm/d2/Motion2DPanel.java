@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ public abstract class Motion2DPanel extends JPanel
 	Homography2D_F64 currToWorld = new Homography2D_F64();
 
 	// copies of feature location for GUI thread
-	FastQueue<Point2D_F64> inliers = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
-	FastQueue<Point2D_F64> allTracks = new FastQueue<Point2D_F64>(300,Point2D_F64.class,true);
+	FastQueue<Point2D_F64> inliers = new FastQueue<>(300, Point2D_F64.class, true);
+	FastQueue<Point2D_F64> allTracks = new FastQueue<>(300, Point2D_F64.class, true);
 
 	boolean showImageView;
 	StitchingFromMotion2D.Corners corners;

@@ -132,7 +132,7 @@ public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
 		int maxCorners = 200;
 		int radius = 2;
 
-		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
+		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(imageType, 8 , 12));
 
@@ -142,10 +142,10 @@ public class VideoDetectCorners<T extends ImageGray, D extends ImageGray>
 		extractor.setIgnoreBorder(radius + 10);
 		extractor.setThresholdMaximum(10f);
 
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor);
 		detector.setMaxFeatures(maxCorners);
 
-		VideoDetectCorners<T, D> display = new VideoDetectCorners<T, D>(sequence, detector, derivType);
+		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, derivType);
 
 		display.process();
 	}

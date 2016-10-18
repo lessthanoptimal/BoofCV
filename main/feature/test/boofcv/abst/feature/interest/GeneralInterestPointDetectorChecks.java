@@ -129,8 +129,8 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray> {
 	 */
 	@Test
 	public void checkSubImage() {
-		List<Point2D_F64> original = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> found = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> original = new ArrayList<>();
+		List<Point2D_F64> found = new ArrayList<>();
 
 		detector.detect(image);
 

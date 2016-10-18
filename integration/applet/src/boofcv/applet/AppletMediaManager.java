@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,9 +127,9 @@ public class AppletMediaManager implements MediaManager {
 			VideoMjpegCodec codec = new VideoMjpegCodec();
 			List<byte[]> data = codec.read(byteStream);
 //			System.out.println("Loaded "+data.size()+" jpeg images!");
-			return new JpegByteImageSequence<T>(imageType,data,true);
+			return new JpegByteImageSequence<>(imageType, data, true);
 		} else if( type.compareToIgnoreCase("MPNG") == 0 ) {
-			return new ImageStreamSequence<T>(byteStream,true,imageType);
+			return new ImageStreamSequence<>(byteStream, true, imageType);
 		} else {
 			System.err.println("Unknown video type: "+type);
 		}

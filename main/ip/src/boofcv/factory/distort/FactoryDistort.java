@@ -106,7 +106,7 @@ public class FactoryDistort {
 	distortPL(boolean cached , InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
 		ImageDistort<Input, Output> distortSingle = distortSB(cached, interp, outputType);
-		return new ImplImageDistort_PL<Input, Output>(distortSingle);
+		return new ImplImageDistort_PL<>(distortSingle);
 	}
 
 	public static <Input extends ImageInterleaved, Output extends ImageInterleaved>

@@ -86,7 +86,7 @@ public class TestCannyEdgeDynamic {
 		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
-		CannyEdgeDynamic<GrayU8,GrayS16> alg = new CannyEdgeDynamic<GrayU8, GrayS16>(blur,gradient,true);
+		CannyEdgeDynamic<GrayU8,GrayS16> alg = new CannyEdgeDynamic<>(blur, gradient, true);
 
 		alg.process(input,0.2f,0.4f,null);
 

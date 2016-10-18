@@ -98,7 +98,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray>
 	public static void main( String args[] ) {
 		VisualizePyramidDiscreteApp<GrayF32> app = new VisualizePyramidDiscreteApp<>(GrayF32.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));

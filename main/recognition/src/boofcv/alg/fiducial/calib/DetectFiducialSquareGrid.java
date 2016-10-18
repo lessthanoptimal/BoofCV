@@ -57,7 +57,7 @@ public class DetectFiducialSquareGrid<T extends ImageGray> {
 	BaseDetectFiducialSquare<T> detector;
 
 	// found squares inside the image
-	FastQueue<Detection> detections = new FastQueue<Detection>(Detection.class,true);
+	FastQueue<Detection> detections = new FastQueue<>(Detection.class, true);
 
 	/**
 	 * Configures the fiducial detector.

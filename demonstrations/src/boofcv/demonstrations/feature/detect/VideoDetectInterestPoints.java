@@ -117,7 +117,7 @@ public class VideoDetectInterestPoints<T extends ImageGray>
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,imageType,derivType);
 //		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},imageType);
 
-		VideoDetectInterestPoints<T> display = new VideoDetectInterestPoints<T>(sequence, detector,orientation);
+		VideoDetectInterestPoints<T> display = new VideoDetectInterestPoints<>(sequence, detector, orientation);
 
 		display.process();
 	}

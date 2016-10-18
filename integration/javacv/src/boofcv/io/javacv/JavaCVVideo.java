@@ -30,6 +30,6 @@ public class JavaCVVideo implements VideoInterface {
 	@Override
 	public <T extends ImageBase> SimpleImageSequence<T>
 	load(String fileName, ImageType<T> imageType) {
-		return new JavaCVVideoImageSequence<T>(fileName,imageType);
+		return new JavaCVVideoImageSequence<>(fileName, imageType);
 	}
 }

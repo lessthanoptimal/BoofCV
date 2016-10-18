@@ -76,6 +76,6 @@ public class FactoryOrientation {
 
 		SiftScaleSpace ss = new SiftScaleSpace(
 				configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
-		return new OrientationSiftToImage<T>(ori,ss,imageType);
+		return new OrientationSiftToImage<>(ori, ss, imageType);
 	}
 }

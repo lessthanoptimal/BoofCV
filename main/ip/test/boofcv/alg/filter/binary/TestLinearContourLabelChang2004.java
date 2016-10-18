@@ -81,7 +81,7 @@ public class TestLinearContourLabelChang2004 {
 	List<Point2D_I32> local;
 
 	public TestLinearContourLabelChang2004() {
-		local = new ArrayList<Point2D_I32>();
+		local = new ArrayList<>();
 		local.add(new Point2D_I32(-1,-1));
 		local.add(new Point2D_I32( 0,-1));
 		local.add(new Point2D_I32( 1,-1));
@@ -207,7 +207,7 @@ public class TestLinearContourLabelChang2004 {
 
 			assertTrue(c.id > 0 );
 
-			List<Point2D_I32> found = new ArrayList<Point2D_I32>();
+			List<Point2D_I32> found = new ArrayList<>();
 			found.addAll(c.external);
 			for( int j = 0; j < c.internal.size(); j++ ) {
 				found.addAll(c.internal.get(j));
@@ -243,7 +243,7 @@ public class TestLinearContourLabelChang2004 {
 	 * Create an unordered list of all points in the internal and external contour
 	 */
 	private List<Point2D_I32> findContour8(GrayS32 labeled, int target) {
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> list = new ArrayList<>();
 
 		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
 
@@ -289,7 +289,7 @@ public class TestLinearContourLabelChang2004 {
 	 * Create an unordered list of all points in the internal and external contour
 	 */
 	private List<Point2D_I32> findContour4(GrayS32 labeled, int target) {
-		List<Point2D_I32> list = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> list = new ArrayList<>();
 
 		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
 
@@ -314,7 +314,7 @@ public class TestLinearContourLabelChang2004 {
 	}
 
 	private List<Point2D_I32> removeDuplicates( List<Point2D_I32> list ) {
-		List<Point2D_I32> ret = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> ret = new ArrayList<>();
 
 		for( int i = 0; i < list.size(); i++ ) {
 			Point2D_I32 p = list.get(i);

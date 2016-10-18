@@ -41,7 +41,7 @@ public class TestSquaresIntoCrossClusters {
 	public void process_simple() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add( createSquare(7,8));
 		squares.add( createSquare(9,8));
 		squares.add( createSquare(8,9));
@@ -69,7 +69,7 @@ public class TestSquaresIntoCrossClusters {
 	}
 
 	private List<BinaryPolygonDetector.Info> createInfo(List<Polygon2D_F64> squares) {
-		List<BinaryPolygonDetector.Info> squareInfo = new ArrayList<BinaryPolygonDetector.Info>();
+		List<BinaryPolygonDetector.Info> squareInfo = new ArrayList<>();
 		for (int i = 0; i < squares.size(); i++) {
 			squareInfo.add( new BinaryPolygonDetector.Info() );
 		}
@@ -83,7 +83,7 @@ public class TestSquaresIntoCrossClusters {
 	public void shapesOnBorder() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.05, -1);
 
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add( createSquare(7,8));
 		squares.add( createSquare(9,8));
 		squares.add( createSquare(8,9));
@@ -117,7 +117,7 @@ public class TestSquaresIntoCrossClusters {
 	public void process_connect_threshold() {
 		SquaresIntoCrossClusters alg = new SquaresIntoCrossClusters(0.2,-1);
 
-		List<Polygon2D_F64> squares = new ArrayList<Polygon2D_F64>();
+		List<Polygon2D_F64> squares = new ArrayList<>();
 		squares.add( createSquare(5,6));
 		squares.add( createSquare(6.20001,7));
 		squares.add( createSquare(6.1999999,5));

@@ -67,7 +67,7 @@ public class FeaturePyramid<T extends ImageGray, D extends ImageGray>
 	protected List<Point2D_I16> maximums[];
 
 	// List of found feature points
-	protected List<ScalePoint> foundPoints = new ArrayList<ScalePoint>();
+	protected List<ScalePoint> foundPoints = new ArrayList<>();
 
 	protected AnyImageDerivative<T, D> computeDerivative;
 
@@ -105,9 +105,9 @@ public class FeaturePyramid<T extends ImageGray, D extends ImageGray>
 			intensities[2] = new GrayF32(1, 1);
 
 			maximums = new List[3];
-			maximums[0] = new ArrayList<Point2D_I16>();
-			maximums[1] = new ArrayList<Point2D_I16>();
-			maximums[2] = new ArrayList<Point2D_I16>();
+			maximums[0] = new ArrayList<>();
+			maximums[1] = new ArrayList<>();
+			maximums[2] = new ArrayList<>();
 		}
 		foundPoints.clear();
 

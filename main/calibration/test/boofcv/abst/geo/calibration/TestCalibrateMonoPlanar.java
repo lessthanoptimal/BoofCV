@@ -49,7 +49,7 @@ public class TestCalibrateMonoPlanar {
 
 	GrayF32 blank = new GrayF32(intrinsic.width,intrinsic.height);
 
-	List<Se3_F64> targetToCamera = new ArrayList<Se3_F64>();
+	List<Se3_F64> targetToCamera = new ArrayList<>();
 
 	public TestCalibrateMonoPlanar() {
 		double z = 250;

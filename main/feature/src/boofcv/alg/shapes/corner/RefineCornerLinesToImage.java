@@ -110,7 +110,7 @@ public class RefineCornerLinesToImage<T extends ImageGray> {
 		this.cornerOffset = cornerOffset;
 		this.maxIterations = maxIterations;
 		this.convergeTolPixels = convergeTolPixels;
-		this.snapToEdge = new SnapToLineEdge<T>(maxLineSamples,sampleRadius,imageType);
+		this.snapToEdge = new SnapToLineEdge<>(maxLineSamples, sampleRadius, imageType);
 		this.maxLineSamples = maxLineSamples;
 		this.imageType = imageType;
 		this.maxCornerChange = maxCornerChange;

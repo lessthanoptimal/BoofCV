@@ -38,7 +38,7 @@ public class TestImplImageDistort_S32 extends GeneralImageDistortTests<GrayS32>{
 	@Override
 	public ImageDistort<GrayS32,GrayS32> createDistort(PixelTransform_F32 dstToSrc,
 													   InterpolatePixel<GrayS32> interp) {
-		ImageDistort<GrayS32,GrayS32> ret = new ImplImageDistort_S32<GrayS32>((InterpolatePixelS)interp);
+		ImageDistort<GrayS32,GrayS32> ret = new ImplImageDistort_S32<>((InterpolatePixelS) interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

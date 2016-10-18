@@ -59,7 +59,7 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageGray,G extend
 		SparseImageGradient<T,G> g;
 		// use a faster algorithm if it is entirely inside
 		if( !SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y, sampleWidth *period, kernelWidth *scale))  {
-			g = new SparseGradientSafe<T, G>(this.g);
+			g = new SparseGradientSafe<>(this.g);
 		} else {
 			g = this.g;
 		}

@@ -94,7 +94,7 @@ public class TestShapeFittingOps {
 	public void fitEllipse_F64() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> points = new ArrayList<>();
 		for( int i = 0; i < 20; i++ ) {
 			double theta = 2.0*(double)Math.PI*i/20;
 			points.add(UtilEllipse_F64.computePoint(theta, rotated, null));
@@ -125,7 +125,7 @@ public class TestShapeFittingOps {
 	public void fitEllipse_F64_error() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> points = new ArrayList<>();
 		for( int i = 0; i < 20; i++ ) {
 			double theta = 2.0*(double)Math.PI*i/20;
 			points.add(UtilEllipse_F64.computePoint(theta, rotated, null));
@@ -160,8 +160,8 @@ public class TestShapeFittingOps {
 	public void fitEllipse_I32() {
 		EllipseRotated_F64 rotated = new EllipseRotated_F64(1,2,3,2,-0.05);
 
-		List<Point2D_F64> pointsF = new ArrayList<Point2D_F64>();
-		List<Point2D_I32> pointsI = new ArrayList<Point2D_I32>();
+		List<Point2D_F64> pointsF = new ArrayList<>();
+		List<Point2D_I32> pointsI = new ArrayList<>();
 		for( int i = 0; i < 20; i++ ) {
 			double theta = 2.0*(double)Math.PI*i/20;
 			Point2D_F64 p = UtilEllipse_F64.computePoint(theta, rotated, null);
@@ -183,7 +183,7 @@ public class TestShapeFittingOps {
 
 	@Test
 	public void averageCircle_I32() {
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> points = new ArrayList<>();
 		points.add( new Point2D_I32(0,0));
 		points.add( new Point2D_I32(10,0));
 		points.add( new Point2D_I32(5,5));
@@ -220,7 +220,7 @@ public class TestShapeFittingOps {
 
 	@Test
 	public void averageCircle_F64() {
-		List<Point2D_F64> points = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> points = new ArrayList<>();
 		points.add( new Point2D_F64(0,0));
 		points.add( new Point2D_F64(10,0));
 		points.add( new Point2D_F64(5,5));
@@ -257,7 +257,7 @@ public class TestShapeFittingOps {
 	}
 
 	public static List<Point2D_I32> createRectangle_I32( int width , int height , int numPoints ) {
-		List<Point2D_I32> points = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> points = new ArrayList<>();
 
 		int length = width*2 + height*2 - 4;
 
@@ -292,7 +292,7 @@ public class TestShapeFittingOps {
 
 	public static List<Point2D_F64> createEllipse_F64( EllipseRotated_F64 ellipse , int numPoints ) {
 
-		List<Point2D_F64> sequence = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> sequence = new ArrayList<>();
 
 		for (int i = 0; i < numPoints; i++) {
 			double theta = 2.0*Math.PI*i/numPoints;

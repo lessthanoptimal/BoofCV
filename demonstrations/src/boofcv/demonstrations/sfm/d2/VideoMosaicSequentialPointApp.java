@@ -138,7 +138,7 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray, D extends ImageG
 
 		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Plane 1", UtilIO.pathExample("mosaic/airplane01.mjpeg")));
 		inputs.add(new PathLabel("Plane 2", UtilIO.pathExample("mosaic/airplane02.mjpeg")));
 		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));

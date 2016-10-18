@@ -56,10 +56,10 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 				}
 				webcam.open();
 
-				return new SimpleSequence<T>(webcam, imageType);
+				return new SimpleSequence<>(webcam, imageType);
 			} catch (RuntimeException ignore) {}
 		}
-		return new SimpleSequence<T>(device,width,height,imageType);
+		return new SimpleSequence<>(device, width, height, imageType);
 	}
 
 	public static class SimpleSequence<T extends ImageBase> implements SimpleImageSequence<T> {

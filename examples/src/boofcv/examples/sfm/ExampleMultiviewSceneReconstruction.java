@@ -86,13 +86,13 @@ public class ExampleMultiviewSceneReconstruction {
 	TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 	// List of visual features (e.g. SURF) descriptions in each image
-	List<FastQueue<BrightFeature>> imageVisualFeatures = new ArrayList<FastQueue<BrightFeature>>();
+	List<FastQueue<BrightFeature>> imageVisualFeatures = new ArrayList<>();
 	// List of visual feature locations as normalized image coordinates in each image
-	List<FastQueue<Point2D_F64>> imagePixels = new ArrayList<FastQueue<Point2D_F64>>();
+	List<FastQueue<Point2D_F64>> imagePixels = new ArrayList<>();
 	// Color of the pixel at each feature location
-	List<GrowQueue_I32> imageColors = new ArrayList<GrowQueue_I32>();
+	List<GrowQueue_I32> imageColors = new ArrayList<>();
 	// List of 3D features in each image
-	List<List<Feature3D>> imageFeature3D = new ArrayList<List<Feature3D>>();
+	List<List<Feature3D>> imageFeature3D = new ArrayList<>();
 
 	// Transform from world to each camera image
 	Se3_F64 motionWorldToCamera[];
@@ -103,7 +103,7 @@ public class ExampleMultiviewSceneReconstruction {
 	boolean processedImage[];
 
 	// List of all 3D features
-	List<Feature3D> featuresAll = new ArrayList<Feature3D>();
+	List<Feature3D> featuresAll = new ArrayList<>();
 
 	// used to provide initial estimate of the 3D scene
 	ModelMatcher<Se3_F64, AssociatedPair> estimateEssential;
@@ -139,7 +139,7 @@ public class ExampleMultiviewSceneReconstruction {
 		initializeReconstruction(colorImages, matrix, bestImage);
 
 		// Process rest of the images and compute 3D coordinates
-		List<Integer> seed = new ArrayList<Integer>();
+		List<Integer> seed = new ArrayList<>();
 		seed.add(bestImage);
 		performReconstruction(seed, -1, matrix);
 
@@ -212,7 +212,7 @@ public class ExampleMultiviewSceneReconstruction {
 			System.out.print("*");
 			BufferedImage colorImage = colorImages.get(i);
 			FastQueue<BrightFeature> features = new SurfFeatureQueue(64);
-			FastQueue<Point2D_F64> pixels = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
+			FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64.class, true);
 			GrowQueue_I32 colors = new GrowQueue_I32();
 			detectFeatures(colorImage, features, pixels, colors);
 
@@ -312,7 +312,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// Compute the 3D pose and find valid image features
 		Se3_F64 motionAtoB = new Se3_F64();
-		List<AssociatedIndex> inliers = new ArrayList<AssociatedIndex>();
+		List<AssociatedIndex> inliers = new ArrayList<>();
 
 		if( !estimateStereoPose(imageA, imageB, motionAtoB, inliers))
 			throw new RuntimeException("The first image pair is a bad keyframe!");
@@ -363,7 +363,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		System.out.println("--------- Total Parents "+parents.size());
 
-		List<Integer> children = new ArrayList<Integer>();
+		List<Integer> children = new ArrayList<>();
 
 		if( childAdd != -1 ) {
 			children.add(childAdd);
@@ -395,7 +395,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		// initially prune features using essential matrix
 		Se3_F64 dummy = new Se3_F64();
-		List<AssociatedIndex> inliers = new ArrayList<AssociatedIndex>();
+		List<AssociatedIndex> inliers = new ArrayList<>();
 
 		if( !estimateStereoPose(imageA, imageB, dummy, inliers))
 			throw new RuntimeException("The first image pair is a bad keyframe!");
@@ -406,9 +406,9 @@ public class ExampleMultiviewSceneReconstruction {
 		List<Feature3D> featuresB = imageFeature3D.get(imageB); // this should be empty
 
 		// create the associated pair for motion estimation
-		List<Point2D3D> features = new ArrayList<Point2D3D>();
-		List<AssociatedIndex> inputRansac = new ArrayList<AssociatedIndex>();
-		List<AssociatedIndex> unmatched = new ArrayList<AssociatedIndex>();
+		List<Point2D3D> features = new ArrayList<>();
+		List<AssociatedIndex> inputRansac = new ArrayList<>();
+		List<AssociatedIndex> unmatched = new ArrayList<>();
 		for (int i = 0; i < inliers.size(); i++) {
 			AssociatedIndex a = inliers.get(i);
 			Feature3D t = lookupFeature(featuresA, imageA, pixelsA.get(a.src));
@@ -559,7 +559,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// create the associated pair for motion estimation
 		FastQueue<Point2D_F64> pixelsA = imagePixels.get(imageA);
 		FastQueue<Point2D_F64> pixelsB = imagePixels.get(imageB);
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> pairs = new ArrayList<>();
 		for (int i = 0; i < matches.size(); i++) {
 			AssociatedIndex a = matches.get(i);
 			pairs.add(new AssociatedPair(pixelsA.get(a.src), pixelsB.get(a.dst)));
@@ -605,7 +605,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// estimate 3D position of the feature
 		Point3D_F64 worldPt = new Point3D_F64();
 		// observations in each frame that it's visible
-		FastQueue<Point2D_F64> obs = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
+		FastQueue<Point2D_F64> obs = new FastQueue<>(Point2D_F64.class, true);
 		// index of each frame its visible in
 		GrowQueue_I32 frame = new GrowQueue_I32();
 	}

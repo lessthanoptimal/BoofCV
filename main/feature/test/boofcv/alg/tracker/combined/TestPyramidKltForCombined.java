@@ -56,8 +56,8 @@ public class TestPyramidKltForCombined {
 	{
 		KltConfig config = new KltConfig();
 
-		return new PyramidKltForCombined<GrayF32,GrayF32>(config,5,scales,
-				GrayF32.class,GrayF32.class);
+		return new PyramidKltForCombined<>(config, 5, scales,
+				GrayF32.class, GrayF32.class);
 	}
 
 	@Before

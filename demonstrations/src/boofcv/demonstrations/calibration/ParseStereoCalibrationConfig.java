@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import java.util.List;
  */
 public class ParseStereoCalibrationConfig extends BaseCalibrationConfig {
 
-	public List<String> leftImages = new ArrayList<String>();
-	public List<String> rightImages = new ArrayList<String>();
+	public List<String> leftImages = new ArrayList<>();
+	public List<String> rightImages = new ArrayList<>();
 
 	public ParseStereoCalibrationConfig(MediaManager media) {
 		this.media = media;

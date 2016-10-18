@@ -248,7 +248,7 @@ public class ShapeFitContourApp
 
 	public static void main( String args[] ) {
 
-		List<String> examples = new ArrayList<String>();
+		List<String> examples = new ArrayList<>();
 		examples.add("particles01.jpg");
 		examples.add("shapes/shapes02.png");
 		examples.add("shapes/line_text_test_image.png");

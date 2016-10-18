@@ -71,7 +71,7 @@ public class ExampleVideoMosaic {
 
 		// wrap it so it output color images while estimating motion from gray
 		ImageMotion2D<Planar<GrayF32>,Homography2D_F64> motion2DColor =
-				new PlToGrayMotion2D<GrayF32,Homography2D_F64>(motion2D,GrayF32.class);
+				new PlToGrayMotion2D<>(motion2D, GrayF32.class);
 
 		// This fuses the images together
 		StitchingFromMotion2D<Planar<GrayF32>,Homography2D_F64>

@@ -272,7 +272,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 
 			String pathImg = new File(path,"../patterns").getPath();
-			List<String> names = new ArrayList<String>();
+			List<String> names = new ArrayList<>();
 			names.add("chicken.png");
 			names.add("yinyang.png");
 
@@ -348,7 +348,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 //		app.setBaseDirectory(UtilIO.pathExample("fiducial/"));
 //		app.loadInputData(UtilIO.pathExample("fiducial/fiducial.txt"));
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));

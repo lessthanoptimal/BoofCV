@@ -45,25 +45,25 @@ public class TldDetection<T extends ImageGray> {
 	private TldVarianceFilter<T> variance;
 
 	// Storage for results of the fern test on individual regions
-	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<TldRegionFernInfo>(TldRegionFernInfo.class,true);
+	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<>(TldRegionFernInfo.class, true);
 
 	protected TldParameters config;
 
 	// Storage for sorting of results
 	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
 	private GrowQueue_I32 storageIndexes = new GrowQueue_I32();
-	private List<ImageRectangle> storageRect = new ArrayList<ImageRectangle>();
+	private List<ImageRectangle> storageRect = new ArrayList<>();
 
 	// storage for regions which pass the fern test
-	protected List<ImageRectangle> fernRegions = new ArrayList<ImageRectangle>();
+	protected List<ImageRectangle> fernRegions = new ArrayList<>();
 
 	// list all regions which had the template test run on them
-	protected FastQueue<TldRegion> candidateDetections = new FastQueue<TldRegion>(TldRegion.class,true);
+	protected FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion.class, true);
 	// results from non-maximum suppression
-	private FastQueue<TldRegion> localMaximums = new FastQueue<TldRegion>(TldRegion.class,true);
+	private FastQueue<TldRegion> localMaximums = new FastQueue<>(TldRegion.class, true);
 
 	// list of regions which have almost the same confidence as the maximum
-	private List<ImageRectangle> ambiguousRegions = new ArrayList<ImageRectangle>();
+	private List<ImageRectangle> ambiguousRegions = new ArrayList<>();
 
 	private TldHelperFunctions helper = new TldHelperFunctions();
 
