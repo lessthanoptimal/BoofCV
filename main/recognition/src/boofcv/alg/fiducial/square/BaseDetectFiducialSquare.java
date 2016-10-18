@@ -211,6 +211,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		} else {
 			pointSquareToInput = transformHomography;
 			pointUndistToDist = new DoNothingTransform_F64();
+			squareDetector.clearLensDistortion();
 		}
 
 		poseEstimator.setIntrinsic(intrinsic);
@@ -366,12 +367,14 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
-		f.location.set(imageShape);
+		f.locationUndist.set(imageShape);
 
 		// put it back into input image coordinates
 		for (int j = 0; j < 4; j++) {
-			Point2D_F64 a = f.location.get(j);
-			pointUndistToDist.compute(a.x,a.y,a);
+			Point2D_F64 a = f.locationUndist.get(j);
+			Point2D_F64 b = f.locationDist.get(j);
+
+			pointUndistToDist.compute(a.x,a.y,b);
 		}
 
 		// estimate position
@@ -460,6 +463,10 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 	public double getBorderWidthFraction() {
 		return borderWidthFraction;
+	}
+
+	public PointTransform_F64 getPointUndistToDist() {
+		return pointUndistToDist;
 	}
 
 	public static class Result {

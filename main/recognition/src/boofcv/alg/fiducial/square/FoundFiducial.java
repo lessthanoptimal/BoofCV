@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,12 @@ public class FoundFiducial {
 	 *
 	 * <p>For the meaning of each corner see {@link BaseDetectFiducialSquare}. corner a = 0, b = 1, c = 2, d = 3</p>
 	 */
-	public Quadrilateral_F64 location = new Quadrilateral_F64();
+	public Quadrilateral_F64 locationDist = new Quadrilateral_F64();
+
+	/**
+	 * Fiducial corners in undistorted pixel coordinates
+	 */
+	public Quadrilateral_F64 locationUndist = new Quadrilateral_F64();
+
 }
 

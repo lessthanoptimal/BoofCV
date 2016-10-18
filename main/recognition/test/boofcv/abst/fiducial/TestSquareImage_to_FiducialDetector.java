@@ -39,12 +39,12 @@ import java.awt.image.BufferedImage;
  */
 public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
-
 	String directory = UtilIO.pathExample("fiducial/image/examples/");
 
 	public TestSquareImage_to_FiducialDetector() {
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
+		pixelAndProjectedTol = 1.0; // should be very close
 	}
 
 	@Override

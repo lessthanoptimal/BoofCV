@@ -82,10 +82,15 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 	public void getImageLocation(int which, Point2D_F64 location) {
 		FoundFiducial f = alg.getFound().get(which);
 
-		UtilLine2D_F64.convert(f.location.a,f.location.c,line02);
-		UtilLine2D_F64.convert(f.location.b,f.location.d,line13);
+		// compute intersection in undistorted pixels so that the intersection is the true
+		// geometric center of the square
+		UtilLine2D_F64.convert(f.locationUndist.a,f.locationUndist.c,line02);
+		UtilLine2D_F64.convert(f.locationUndist.b,f.locationUndist.d,line13);
 
 		Intersection2D_F64.intersection(line02,line13,location);
+
+		// apply lens distortion to the point so that it appears in the correct location
+		alg.getPointUndistToDist().compute(location.x,location.y, location);
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 
 	@Override
 	public boolean computeStability(int which, double disturbance, FiducialStability results) {
-		Quadrilateral_F64 quad = alg.getFound().get(which).location;
+		Quadrilateral_F64 quad = alg.getFound().get(which).locationDist;
 		if( !this.stability.process(disturbance, quad) ) {
 			return false;
 		}

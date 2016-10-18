@@ -133,6 +133,11 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 		this.snapToEdge.setTransform(undistToDist);
 	}
 
+	@Override
+	public void clearLensDistortion() {
+		this.snapToEdge.setTransform(null);
+	}
+
 	/**
 	 * Refines the fit a polygon by snapping it to the edges.
 	 *

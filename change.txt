@@ -44,6 +44,7 @@ Version : 0.25
 - FiducialDetector
   * Added getIntrinsics()
   * Added getImageLocation()
+  * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
 
 - TODO dual fisheye to equirectangular image
 - TODO fisheye

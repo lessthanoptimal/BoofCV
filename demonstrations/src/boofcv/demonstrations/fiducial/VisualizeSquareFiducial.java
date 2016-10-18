@@ -106,7 +106,7 @@ public class VisualizeSquareFiducial {
 
 			for (int i = 0; i < N; i++) {
 				// add back in lens distortion
-				Quadrilateral_F64 q = fiducials.get(i).location;
+				Quadrilateral_F64 q = fiducials.get(i).locationDist;
 
 				detector.computeTargetToWorld(q, 0.1, targetToWorld);
 				VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, 3, g2);
@@ -126,7 +126,7 @@ public class VisualizeSquareFiducial {
 		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		for (int i = 0; i < N; i++) {
 			// add back in lens distortion
-			Quadrilateral_F64 q = fiducials.get(i).location;
+			Quadrilateral_F64 q = fiducials.get(i).locationDist;
 //			g2.setStroke(new BasicStroke(2));
 //			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 			VisualizeShapes.drawArrowSubPixel(q,3,g2);

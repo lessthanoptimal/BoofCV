@@ -209,7 +209,7 @@ public class LensDistortionOps {
 			// ensure there are no strips of black
 			LensDistortionOps.roundInside(bound);
 		} else {
-			throw new IllegalArgumentException("Unsupported type "+type);
+			throw new IllegalArgumentException("If you don't want to adjust the view just call transformPoint()");
 		}
 
 		double scaleX = bound.width/param.width;

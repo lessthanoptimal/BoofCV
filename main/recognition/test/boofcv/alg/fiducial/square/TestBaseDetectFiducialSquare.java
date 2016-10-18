@@ -61,6 +61,17 @@ import static org.junit.Assert.*;
  */
 public class TestBaseDetectFiducialSquare {
 
+	List<Point3D_F64> worldPts = new ArrayList<>();
+
+	public TestBaseDetectFiducialSquare() {
+		// corners of the fiducial in world coordinates
+		double r = 2;
+		worldPts.add(new Point3D_F64(-0.5*r, -0.5*r, 0));
+		worldPts.add(new Point3D_F64(-0.5*r,  0.5*r, 0));
+		worldPts.add(new Point3D_F64( 0.5*r,  0.5*r, 0));
+		worldPts.add(new Point3D_F64( 0.5*r, -0.5*r, 0));
+	}
+
 	/**
 	 * Runs the entire processing loop with a very simple oriented fiducial.  Makes sure that the found projection
 	 * from fiducial to camera is consistent by transforming one of the corners and seeing if it ends up
@@ -75,14 +86,6 @@ public class TestBaseDetectFiducialSquare {
 		expected.add( new Point2D_F64(200+120,300+120));
 
 		CameraPinholeRadial intrinsic =new CameraPinholeRadial(500,500,0,320,240,640,480);
-
-		// corners of the fiducial in world coordinates
-		double r = 2;
-		List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
-		worldPts.add(new Point3D_F64(-0.5*r, -0.5*r, 0));
-		worldPts.add(new Point3D_F64(-0.5*r,  0.5*r, 0));
-		worldPts.add(new Point3D_F64( 0.5*r,  0.5*r, 0));
-		worldPts.add(new Point3D_F64( 0.5*r, -0.5*r, 0));
 
 		// create a pattern with a corner for orientation and put it into the image
 		GrayU8 pattern = createPattern(6*20, true);
@@ -107,7 +110,7 @@ public class TestBaseDetectFiducialSquare {
 			for (int j = 0; j < 4; j++) {
 				int index = j-i;
 				if( index < 0) index = 4 + index;
-				Point2D_F64 f = ff.location.get(index);
+				Point2D_F64 f = ff.locationDist.get(index);
 				Point2D_F64 e = expected.get((j+1)%4);
 				assertTrue(f.distance(e) <= 1e-8 );
 			}
@@ -151,7 +154,7 @@ public class TestBaseDetectFiducialSquare {
 
 		assertEquals(1,dummy.detected.size());
 
-		Quadrilateral_F64 found = dummy.getFound().get(0).location;
+		Quadrilateral_F64 found = dummy.getFound().get(0).locationDist;
 //		System.out.println("found "+found);
 //		System.out.println("where "+where);
 		checkMatch(where, found.a, tol);
@@ -254,14 +257,20 @@ public class TestBaseDetectFiducialSquare {
 
 		assertEquals(1, detector.getFound().size());
 		FoundFiducial ff = detector.getFound().get(0);
+		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, ff.targetToSensor);
 
 		// see if the returned corners
-		Point2D_F64 expectedImage = new Point2D_F64();
+		Point2D_F64 expectedDist = new Point2D_F64();
 		for (int j = 0; j < 4; j++) {
-			Point2D_F64 f = ff.location.get(j);
+			Point2D_F64 f = ff.locationDist.get(j);
 			Point2D_F64 e = expected.get((j + 1) % 4);
-			undistTodist.compute(e.x, e.y, expectedImage);
-			assertTrue(f.distance(expectedImage) <= 0.4 );
+			undistTodist.compute(e.x, e.y, expectedDist);
+			assertTrue(f.distance(expectedDist) <= 0.4 );
+
+			// see if the projection is as expected
+			Point2D_F64 rendered = new Point2D_F64();
+			worldToPixel.transform(worldPts.get((j+1)%4),rendered);
+			assertTrue(expectedDist.distance(rendered) <= 0.4 );
 		}
 
 		// The check to see if square is correctly undistorted is inside the processing function itself
@@ -316,7 +325,7 @@ public class TestBaseDetectFiducialSquare {
 			for (int j = 0; j < 4; j++) {
 				int index = j - i;
 				if (index < 0) index = 4 + index;
-				Point2D_F64 f = ff.location.get(index);
+				Point2D_F64 f = ff.locationDist.get(index);
 				Point2D_F64 e = expected.get((j + 1) % 4);
 				assertTrue(f.distance(e) <= 1e-8);
 			}

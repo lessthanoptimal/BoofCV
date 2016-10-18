@@ -55,8 +55,12 @@ public class BaseIntegralEdge<T extends ImageGray> {
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
 	public void setTransform( PixelTransform_F32 undistToDist ) {
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageGrayDistorted<T>(undistToDist,interpolate);
+		if( undistToDist != null ) {
+			InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
+			integralImage = new GImageGrayDistorted<T>(undistToDist, interpolate);
+		} else {
+			integralImage = FactoryGImageGray.create(imageType);
+		}
 	}
 
 	/**

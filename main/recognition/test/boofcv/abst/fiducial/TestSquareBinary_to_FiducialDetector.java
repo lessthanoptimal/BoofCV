@@ -46,6 +46,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	public TestSquareBinary_to_FiducialDetector() {
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
+		pixelAndProjectedTol = 1.0; // should be very close
 	}
 
 	@Override

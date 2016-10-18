@@ -93,15 +93,15 @@ public class TestLensDistortionOps {
 		}
 	}
 
-	private void checkBorderOutside(PointTransform_F64 tran, PointTransform_F64 tranInv) {
+	private void checkBorderOutside(PointTransform_F64 distToUndist, PointTransform_F64 undistToDist) {
 		for( int y = 0; y < height; y++ ) {
-			checkBorderOutside(0, y, tran, tranInv);
-			checkBorderOutside(width - 1, y, tran, tranInv);
+			checkBorderOutside(0, y, distToUndist, undistToDist);
+			checkBorderOutside(width - 1, y, distToUndist, undistToDist);
 		}
 
 		for( int x = 0; x < width; x++ ) {
-			checkBorderOutside(x, 0, tran, tranInv);
-			checkBorderOutside(x, height - 1, tran, tranInv);
+			checkBorderOutside(x, 0, distToUndist, undistToDist);
+			checkBorderOutside(x, height - 1, distToUndist, undistToDist);
 		}
 	}
 
@@ -128,9 +128,7 @@ public class TestLensDistortionOps {
 		double tol = 0.1;
 
 		String s = x+" "+y+" -> "+ pd.x+" "+ pd.y;
-		assertTrue(s,
-				pd.x <= 1 + tol || pd.x >= width - 1 - tol ||
-						pd.y <= 1 + tol || pd.y >= height - 1 - tol);
+		assertTrue(s, pd.x <= 1 + tol || pd.x >= width - 1 - tol || pd.y <= 1 + tol || pd.y >= height - 1 - tol);
 
 		// check the inverse
 		tranInv.compute(pd.x, pd.y, pd);

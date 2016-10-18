@@ -44,6 +44,12 @@ public interface RefineBinaryPolygon<T extends ImageGray> {
 	void setLensDistortion( int width , int height ,
 							PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist );
 
+
+	/**
+	 * Clears the previously set lens distortion
+	 */
+	void clearLensDistortion();
+
 	/**
 	 * Refines the initial polygon
 	 *

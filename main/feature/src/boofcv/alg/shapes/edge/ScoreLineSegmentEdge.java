@@ -18,12 +18,7 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.GImageGrayDistorted;
-import boofcv.core.image.border.BorderType;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.distort.PixelTransform_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 
@@ -56,19 +51,6 @@ public class ScoreLineSegmentEdge<T extends ImageGray> extends BaseIntegralEdge<
 								Class<T> imageType) {
 		super(imageType);
 		this.numSamples = numSamples;
-	}
-
-	/**
-	 * Used to specify a transform that is applied to pixel coordinates to bring them back into original input
-	 * image coordinates.  For example if the input image has lens distortion but the edge were found
-	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
-	 * image coordinates in order to read the pixel's value.
-	 *
-	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
-	 */
-	public void setTransform( PixelTransform_F32 undistToDist ) {
-		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		integralImage = new GImageGrayDistorted<T>(undistToDist,interpolate);
 	}
 
 	/**

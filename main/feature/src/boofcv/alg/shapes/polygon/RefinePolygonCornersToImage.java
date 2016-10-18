@@ -100,6 +100,11 @@ public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineB
 		this.refineCorner.getSnapToEdge().setTransform(undistToDist);
 	}
 
+	@Override
+	public void clearLensDistortion() {
+		this.refineCorner.getSnapToEdge().setTransform(null);
+	}
+
 	/**
 	 * Refines the corner estimates in the contour.
 	 *

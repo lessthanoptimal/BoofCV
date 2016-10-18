@@ -65,6 +65,11 @@ import java.util.List;
  * means that coordinates 5.0 &le; x &lt; 11.0 are all black.  11.0 is included, but note that the entire pixel 11 is white.
  * </p>
  *
+ * <p>Notes:
+ * <ul>
+ * <li>If a lens distortion model is provided for lens distortion, the returned polygon will be in undistorted.</li>
+ * </ul>
+ *
  * @author Peter Abeles
  */
 public class BinaryPolygonDetector<T extends ImageGray> {
@@ -137,7 +142,8 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 
 	/**
 	 * Configures the detector.
-	 *  @param minSides minimum number of sides
+	 *
+	 * @param minSides minimum number of sides
 	 * @param maxSides maximum number of sides
 	 * @param contourToPolygon Fits a crude polygon to the shape's binary contour
 	 * @param refinePolygon (Optional) Refines the polygon's lines.  Set to null to skip step
@@ -211,6 +217,19 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 		}
 
 		edgeIntensity.setTransform(undistToDist);
+	}
+
+	/**
+	 * Discard previously set lens distortion models
+	 */
+	public void clearLensDistortion() {
+		this.distToUndist = null;
+		this.undistToDist = null;
+		if( refinePolygon != null ) {
+			refinePolygon.clearLensDistortion();
+		}
+
+		edgeIntensity.setTransform(null);
 	}
 
 	/**

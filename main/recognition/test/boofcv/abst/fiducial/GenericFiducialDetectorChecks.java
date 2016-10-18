@@ -112,19 +112,19 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			// results should have changed
-			if( results.foundID.length == detector.totalFound()) {
-				assertEquals(results.foundID.length, detector.totalFound());
+			if( results.id.length == detector.totalFound()) {
+				assertEquals(results.id.length, detector.totalFound());
 				for (int i = 0; i < detector.totalFound(); i++) {
-					assertEquals(results.foundID[i],detector.getId(i));
+					assertEquals(results.id[i],detector.getId(i));
 					Se3_F64 pose = new Se3_F64();
 					Point2D_F64 pixel = new Point2D_F64();
 					detector.getFiducialToCamera(i, pose);
 					detector.getImageLocation(i, pixel);
-					assertTrue(pose.getT().distance(results.foundPose.get(i).T) > 1e-4);
-					assertFalse(MatrixFeatures.isIdentical(pose.getR(), results.foundPose.get(i).R, 1e-4));
+					assertTrue(pose.getT().distance(results.pose.get(i).T) > 1e-4);
+					assertFalse(MatrixFeatures.isIdentical(pose.getR(), results.pose.get(i).R, 1e-4));
 					// pixel location is based on the observed location, thus changing the intrinsics should not
 					// affect it
-					assertTrue(results.foundPixel.get(i).distance(pixel) <= 1e-4 );
+					assertTrue(results.pixel.get(i).distance(pixel) <= 2.0 );
 				}
 			} else {
 				// clearly changed
@@ -135,13 +135,13 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			// see if it produced exactly the same results
-			assertEquals(results.foundID.length,detector.totalFound());
+			assertEquals(results.id.length,detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(results.foundID[i],detector.getId(i));
+				assertEquals(results.id[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(results.foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.foundPose.get(i).R,1e-8));
+				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -185,13 +185,13 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.detect(image);
 
 			// see if it produced exactly the same results
-			assertEquals(results.foundID.length,detector.totalFound());
+			assertEquals(results.id.length,detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(results.foundID[i],detector.getId(i));
+				assertEquals(results.id[i],detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(results.foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.foundPose.get(i).R,1e-8));
+				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
 			}
 		}
 	}
@@ -310,17 +310,65 @@ public abstract class GenericFiducialDetectorChecks {
 			assertTrue(detector.totalFound() >= 1);
 
 			for (int i = 0; i < detector.totalFound(); i++) {
-				Se3_F64 pose = new Se3_F64();
+				Se3_F64 fidToCam = new Se3_F64();
 				Point2D_F64 pixel = new Point2D_F64();
-				detector.getFiducialToCamera(i, pose);
+				detector.getFiducialToCamera(i, fidToCam);
 				detector.getImageLocation(i, pixel);
 
-				Point2D_F64 found = new Point2D_F64();
-				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, pose);
-				worldToPixel.transform(new Point3D_F64(0,0,0),found);
+				Point2D_F64 rendered = new Point2D_F64();
+				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, fidToCam);
+				worldToPixel.transform(new Point3D_F64(0,0,0),rendered);
 
 				// see if the reprojected is near the pixel location
-				assertTrue( found.distance(pixel) <= pixelAndProjectedTol);
+				assertTrue( rendered.distance(pixel) <= pixelAndProjectedTol);
+			}
+		}
+	}
+
+	/**
+	 * Make sure lens distortion is removed if it was set previously and then removed
+	 */
+	@Test
+	public void clearLensDistortion() {
+		for( ImageType type : types ) {
+
+			ImageBase image = loadImage(type);
+			FiducialDetector detector = createDetector(type);
+
+			CameraPinholeRadial intrinsic = loadIntrinsic();
+			// remove lens distortion
+			intrinsic.radial = null;
+			intrinsic.t1 = intrinsic.t2 = 0;
+			assertFalse(intrinsic.isDistorted());
+
+			// save the results
+			detector.setIntrinsic(intrinsic);
+			detector.detect(image);
+			assertTrue(detector.totalFound() >= 1);
+
+			Results before = extractResults(detector);
+
+			// run with lens distortion
+			intrinsic = loadIntrinsic();
+			assertTrue(intrinsic.isDistorted());
+			detector.setIntrinsic(intrinsic);
+			detector.detect(image);
+
+			// remove lens distortion
+			intrinsic.radial = null;
+			intrinsic.t1 = intrinsic.t2 = 0;
+			assertFalse(intrinsic.isDistorted());
+			detector.setIntrinsic(intrinsic);
+			detector.detect(image);
+
+			Results after = extractResults(detector);
+
+			// see if it's the same
+			for (int i = 0; i < after.id.length; i++) {
+				assertEquals(before.id[i], after.id[i]);
+				assertEquals(0,before.pose.get(i).T.distance(after.pose.get(i).T),1e-8);
+				assertTrue(MatrixFeatures.isIdentical(before.pose.get(i).R,after.pose.get(i).R,1e-8));
+				assertEquals(0,before.pixel.get(i).distance(after.pixel.get(i)),1e-8);
 			}
 		}
 	}
@@ -334,23 +382,23 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.getFiducialToCamera(i, pose);
 			detector.getImageLocation(i, pixel);
 
-			out.foundID[i] = detector.getId(i);
-			out.foundPose.add(pose);
-			out.foundPixel.add(pixel);
+			out.id[i] = detector.getId(i);
+			out.pose.add(pose);
+			out.pixel.add(pixel);
 		}
 
 		return out;
 	}
 
 	private static class Results {
-		public long foundID[];
-		public List<Se3_F64> foundPose = new ArrayList<>();
-		public List<Point2D_F64> foundPixel = new ArrayList<>();
+		public long id[];
+		public List<Se3_F64> pose = new ArrayList<>();
+		public List<Point2D_F64> pixel = new ArrayList<>();
 
 		public Results( int N ) {
-			foundID = new long[ N ];
-			foundPose = new ArrayList<>();
-			foundPixel = new ArrayList<>();
+			id = new long[ N ];
+			pose = new ArrayList<>();
+			pixel = new ArrayList<>();
 		}
 	}
 }
