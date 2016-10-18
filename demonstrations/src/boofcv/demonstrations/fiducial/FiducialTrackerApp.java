@@ -96,6 +96,8 @@ public class FiducialTrackerApp<I extends ImageGray>
 	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
 	FiducialStability stabilityMax = new FiducialStability();
 
+	BufferedImage imageCopy;
+
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.pl(3, imageType));
 		this.imageClass = imageType;
@@ -176,11 +178,14 @@ public class FiducialTrackerApp<I extends ImageGray>
 		if( firstFrame ) {
 			panel.setPreferredSize(new Dimension(imageGUI.getWidth(),imageGUI.getHeight()));
 			firstFrame = false;
+
+			imageCopy = new BufferedImage(imageGUI.getWidth(),imageGUI.getHeight(),BufferedImage.TYPE_INT_RGB);
 		}
 
 		int height = getHeight();
 
-		Graphics2D g2 = imageGUI.createGraphics();
+		Graphics2D g2 = imageCopy.createGraphics();
+		g2.drawImage(imageGUI,0,0,null);
 		Se3_F64 targetToSensor = new Se3_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getFiducialToCamera(i, targetToSensor);
@@ -195,7 +200,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 			}
 		}
 
-		panel.setBufferedImageSafe(imageGUI);
+		panel.setBufferedImageSafe(imageCopy);
 		panel.repaint();
 	}
 
