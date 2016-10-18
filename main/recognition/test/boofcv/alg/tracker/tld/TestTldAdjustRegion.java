@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class TestTldAdjustRegion {
 	public void process() {
 		ScaleTranslate2D motion = new ScaleTranslate2D(1.5,2,3);
 
-		FastQueue<AssociatedPair> pairs = new FastQueue<AssociatedPair>(AssociatedPair.class,true);
+		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class, true);
 
 		for( int i = 0; i < 200; i++ ) {
 			AssociatedPair p = pairs.grow();

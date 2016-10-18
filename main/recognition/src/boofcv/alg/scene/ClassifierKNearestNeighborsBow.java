@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase,Desc extends Tup
 	 */
 	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
-		List<double[]> points = new ArrayList<double[]>(memory.size());
+		List<double[]> points = new ArrayList<>(memory.size());
 		for (int i = 0; i < memory.size(); i++) {
 			points.add( memory.get(i).getHistogram() );
 		}

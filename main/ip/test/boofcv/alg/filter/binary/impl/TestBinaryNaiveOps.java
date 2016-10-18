@@ -294,11 +294,7 @@ public class TestBinaryNaiveOps {
 			Method m = ImplBinaryNaiveOps.class.getMethod(methodName, GrayU8.class, GrayU8.class);
 			m.invoke(null, input, output);
 			return output;
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

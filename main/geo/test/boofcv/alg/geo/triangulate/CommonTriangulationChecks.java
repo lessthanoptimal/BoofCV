@@ -47,9 +47,9 @@ public class CommonTriangulationChecks {
 	
 	public void createScene() {
 		worldPoint = new Point3D_F64(0.1,-0.2,4);
-		motionWorldToCamera = new ArrayList<Se3_F64>();
-		obsPts = new ArrayList<Point2D_F64>();
-		essential = new ArrayList<DenseMatrix64F>();
+		motionWorldToCamera = new ArrayList<>();
+		obsPts = new ArrayList<>();
+		essential = new ArrayList<>();
 		
 		Point3D_F64 cameraPoint = new Point3D_F64();
 		

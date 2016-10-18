@@ -37,8 +37,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestContourTracer {
 
-	FastQueue<Point2D_I32> queue = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
-	List<Point2D_I32> found = new ArrayList<Point2D_I32>();
+	FastQueue<Point2D_I32> queue = new FastQueue<>(Point2D_I32.class, true);
+	List<Point2D_I32> found = new ArrayList<>();
 
 	@Before
 	public void init() {

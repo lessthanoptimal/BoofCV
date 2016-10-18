@@ -36,7 +36,7 @@ public class FactoryBlurFilter {
 	 * @return Median image filter.
 	 */
 	public static <T extends ImageGray> BlurStorageFilter<T> median(Class<T> type , int radius ) {
-		return new BlurStorageFilter<T>("median",type,radius);
+		return new BlurStorageFilter<>("median", type, radius);
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class FactoryBlurFilter {
 	 * @return mean image filter.
 	 */
 	public static <T extends ImageGray> BlurStorageFilter<T> mean(Class<T> type , int radius ) {
-		return new BlurStorageFilter<T>("mean",type,radius);
+		return new BlurStorageFilter<>("mean", type, radius);
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class FactoryBlurFilter {
 	 * @return mean image filter.
 	 */
 	public static <T extends ImageGray> BlurStorageFilter<T> gaussian(Class<T> type , double sigma , int radius ) {
-		return new BlurStorageFilter<T>("gaussian",type,sigma,radius);
+		return new BlurStorageFilter<>("gaussian", type, sigma, radius);
 	}
 }

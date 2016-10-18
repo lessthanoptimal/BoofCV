@@ -73,16 +73,15 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 			T inputAdjusted = clipInput(input, output);
 
 			// configure a simple change in scale for both axises
-			double scale = input.width / (double) output.width;
-			transform.a11 = (float) scale;
-			transform.a22 = (float) scale;
+			transform.a11 = input.width / (float) output.width;
+			transform.a22 = input.height / (float) output.height;
 			// this change is automatically reflected in the distortion class.  It is configured to cache nothing
 
 			distort.apply(inputAdjusted, output);
 		} else {
 			// scale each axis independently.  It will have the whole image but it will be distorted
-			transform.a11 = (float) (input.width / (double) output.width);
-			transform.a22 = (float) (input.height / (double) output.height);
+			transform.a11 = input.width / (float) output.width;
+			transform.a22 = input.height / (float) output.height;
 
 			distort.apply(input, output);
 		}
@@ -92,9 +91,9 @@ public class ClipAndReduce<T extends ImageBase<T>> {
 	/**
 	 * Clip the input image to ensure a constant aspect ratio
 	 */
-	private T clipInput(T input, T output) {
+	T clipInput(T input, T output) {
 		double ratioInput = input.width/(double)input.height;
-		double ratioOutput = input.width/(double)input.height;
+		double ratioOutput = output.width/(double)output.height;
 
 		T a = input;
 

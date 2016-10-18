@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	private ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
 
 	// location of tracks in the image that are included in the inlier set
-	private List<Point2D3DTrack> inlierTracks = new ArrayList<Point2D3DTrack>();
+	private List<Point2D3DTrack> inlierTracks = new ArrayList<>();
 
 	// transform from key frame to world frame
 	private Se3_F64 keyToWorld = new Se3_F64();
@@ -260,7 +260,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	 */
 	private boolean estimateMotion() {
 		List<PointTrack> active = tracker.getActiveTracks(null);
-		List<Point2D3D> obs = new ArrayList<Point2D3D>();
+		List<Point2D3D> obs = new ArrayList<>();
 
 		for( PointTrack t : active ) {
 			Point2D3D p = t.getCookie();

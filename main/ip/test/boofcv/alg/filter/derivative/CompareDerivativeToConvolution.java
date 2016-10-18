@@ -122,9 +122,7 @@ public class CompareDerivativeToConvolution {
 
 		} try {
 			m.invoke(null,testInputs);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public class WrapPnPLepetitEPnP implements Estimate1ofPnP {
 
 	PnPLepetitEPnP alg;
 
-	List<Point3D_F64> worldPts = new ArrayList<Point3D_F64>();
-	List<Point2D_F64> observed = new ArrayList<Point2D_F64>();
+	List<Point3D_F64> worldPts = new ArrayList<>();
+	List<Point2D_F64> observed = new ArrayList<>();
 
 	public WrapPnPLepetitEPnP(PnPLepetitEPnP alg ) {
 		this.alg = alg;

@@ -87,7 +87,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray>
 
 	@Override
 	public List<Point2D_F64> getAllTracks() {
-		List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> ret = new ArrayList<>();
 
 		for( PointTrack c : alg.getCandidates() ) {
 			ret.add(c);

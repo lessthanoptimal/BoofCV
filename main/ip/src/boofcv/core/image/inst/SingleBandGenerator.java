@@ -56,11 +56,7 @@ public class SingleBandGenerator<T extends ImageGray> implements ImageGenerator<
 	public T createInstance(int width, int height) {
 		try {
 			return constructor.newInstance(width,height);
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

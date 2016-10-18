@@ -43,7 +43,7 @@ public class TestPnPJacobianRodrigues {
 
 	PnPRodriguesCodec codec = new PnPRodriguesCodec();
 	ResidualsCodecToMatrix<Se3_F64,Point2D3D> func =
-			new ResidualsCodecToMatrix<Se3_F64,Point2D3D>(codec,new PnPResidualReprojection(), new Se3_F64());
+			new ResidualsCodecToMatrix<>(codec, new PnPResidualReprojection(), new Se3_F64());
 
 	/**
 	 * Compare to numerical differentiation
@@ -60,7 +60,7 @@ public class TestPnPJacobianRodrigues {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToCamera.getR());
 		worldToCamera.getT().set(-0.3,0.4,1);
 
-		List<Point2D3D> observations = new ArrayList<Point2D3D>();
+		List<Point2D3D> observations = new ArrayList<>();
 
 		for( int i = 0; i < numPoints; i++ ) {
 			Point2D3D p = new Point2D3D();

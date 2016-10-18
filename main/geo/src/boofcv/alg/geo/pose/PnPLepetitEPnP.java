@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -126,11 +126,11 @@ public class PnPLepetitEPnP {
 	protected List<Point3D_F64> nullPts[] = new ArrayList[4];
 
 	// control points in world coordinate frame
-	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
+	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<>(4, Point3D_F64.class, true);
 
 	// list of found solutions
-	private List<double []> solutions = new ArrayList<double[]>();
-	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
+	private List<double []> solutions = new ArrayList<>();
+	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<>(4, Point3D_F64.class, true);
 
 	// estimates rigid body motion between two associated sets of points
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
@@ -150,7 +150,7 @@ public class PnPLepetitEPnP {
 	// declaring data for local use inside a function
 	// in general its good to avoid declaring and destroying massive amounts of data in Java
 	// this is probably going too far though
-	private List<Point3D_F64> tempPts0 = new ArrayList<Point3D_F64>(); // 4 points stored in it
+	private List<Point3D_F64> tempPts0 = new ArrayList<>(); // 4 points stored in it
 	DenseMatrix64F A_temp = new DenseMatrix64F(1,1);
 	DenseMatrix64F v_temp = new DenseMatrix64F(3,1);
 	DenseMatrix64F w_temp = new DenseMatrix64F(1,1);
@@ -178,7 +178,7 @@ public class PnPLepetitEPnP {
 
 		for( int i = 0; i < 4; i++ ) {
 			tempPts0.add( new Point3D_F64());
-			nullPts[i] = new ArrayList<Point3D_F64>();
+			nullPts[i] = new ArrayList<>();
 			solutions.add( new double[4]);
 			for( int j = 0; j < 4; j++ ) {
 				nullPts[i].add( new Point3D_F64());

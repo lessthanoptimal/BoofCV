@@ -61,7 +61,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray,D extends ImageGray>
 	int numClicks = 0;
 	ImageRectangle target = new ImageRectangle();
 
-	private FastQueue<TldRegion> candidateDetections = new FastQueue<TldRegion>(TldRegion.class,true);
+	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion.class, true);
 
 
 	public VisualizeTldDetectionApp( BufferedImage input , Class<T> imageType ) {
@@ -75,7 +75,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray,D extends ImageGray>
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
-		tracker = new TldTracker<T,D>(new TldParameters(),interpolate,gradient,imageType,derivType);
+		tracker = new TldTracker<>(new TldParameters(), interpolate, gradient, imageType, derivType);
 		tracker.setPerformLearning(false);
 
 

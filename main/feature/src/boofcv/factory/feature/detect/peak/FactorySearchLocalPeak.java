@@ -43,8 +43,8 @@ public class FactorySearchLocalPeak {
 	public static <T extends ImageGray>
 	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelUniform_F32();
-		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights, imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak<T>(alg);
+		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType);
+		return new MeanShiftPeak_to_SearchLocalPeak<>(alg);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class FactorySearchLocalPeak {
 	public static <T extends ImageGray>
 	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
 		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
-		MeanShiftPeak<T> alg = new MeanShiftPeak<T>(maxIterations,convergenceTol,weights,imageType);
-		return new MeanShiftPeak_to_SearchLocalPeak<T>(alg);
+		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType);
+		return new MeanShiftPeak_to_SearchLocalPeak<>(alg);
 	}
 }

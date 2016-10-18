@@ -61,7 +61,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray> extends DescribeSiftCommo
 	GrayF32 savedMagnitude = new GrayF32(1,1);
 
 	// saved location of where in the image it sampled
-	FastQueue<Point2D_I32> sampleLocations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	FastQueue<Point2D_I32> sampleLocations = new FastQueue<>(Point2D_I32.class, true);
 
 	/**
 	 * Specifies SIFT descriptor structure and sampling frequency.

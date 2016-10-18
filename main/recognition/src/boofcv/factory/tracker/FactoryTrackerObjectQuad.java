@@ -63,9 +63,9 @@ public class FactoryTrackerObjectQuad {
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
 
-		TldTracker<T,D> tracker = new TldTracker<T,D>(config.parameters,interpolate,gradient,imageType,derivType);
+		TldTracker<T,D> tracker = new TldTracker<>(config.parameters, interpolate, gradient, imageType, derivType);
 
-		return new Tld_to_TrackerObjectQuad<T,D>(tracker,imageType);
+		return new Tld_to_TrackerObjectQuad<>(tracker, imageType);
 	}
 
 	/**
@@ -87,9 +87,9 @@ public class FactoryTrackerObjectQuad {
 
 		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<T,D>(config,imageType,derivType,gradient);
+		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);
 
-		return new Sfot_to_TrackObjectQuad<T,D>(tracker,imageType);
+		return new Sfot_to_TrackObjectQuad<>(tracker, imageType);
 	}
 
 	/**
@@ -136,9 +136,9 @@ public class FactoryTrackerObjectQuad {
 		}
 
 		TrackerMeanShiftLikelihood<T> alg =
-				new TrackerMeanShiftLikelihood<T>(likelihood,maxIterations,0.1f);
+				new TrackerMeanShiftLikelihood<>(likelihood, maxIterations, 0.1f);
 
-		return new Msl_to_TrackerObjectQuad<T>(alg,likelihood,imageType);
+		return new Msl_to_TrackerObjectQuad<>(alg, likelihood, imageType);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class FactoryTrackerObjectQuad {
 
 		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config,imageType);
 
-		return new Comaniciu2003_to_TrackerObjectQuad<T>(alg,imageType);
+		return new Comaniciu2003_to_TrackerObjectQuad<>(alg, imageType);
 	}
 
 	/**
@@ -175,6 +175,6 @@ public class FactoryTrackerObjectQuad {
 
 		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);
 
-		return new Circulant_to_TrackerObjectQuad<T>(alg,ImageType.single(imageType));
+		return new Circulant_to_TrackerObjectQuad<>(alg, ImageType.single(imageType));
 	}
 }

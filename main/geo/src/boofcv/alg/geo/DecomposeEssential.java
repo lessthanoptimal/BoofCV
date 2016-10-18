@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class DecomposeEssential {
 	DenseMatrix64F U,S,V;
 
 	// storage for the four possible solutions
-	List<Se3_F64> solutions = new ArrayList<Se3_F64>();
+	List<Se3_F64> solutions = new ArrayList<>();
 
 	// working copy of E
 	DenseMatrix64F E_copy = new DenseMatrix64F(3,3);

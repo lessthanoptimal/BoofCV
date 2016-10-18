@@ -361,6 +361,6 @@ public class TestKltTracker {
 		InterpolateRectangle<GrayF32> interp1 = FactoryInterpolation.bilinearRectangle(GrayF32.class);
 		InterpolateRectangle<GrayF32> interp2 = FactoryInterpolation.bilinearRectangle(GrayF32.class);
 
-		return new KltTracker<GrayF32, GrayF32>(interp1, interp2,config);
+		return new KltTracker<>(interp1, interp2, config);
 	}
 }

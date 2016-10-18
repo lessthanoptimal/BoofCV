@@ -49,7 +49,7 @@ public abstract class GenericBackgroundModelMovingChecks {
 
 	protected double backgroundOutsideTol = 0.01;
 
-	protected List<ImageType> imageTypes = new ArrayList<ImageType>();
+	protected List<ImageType> imageTypes = new ArrayList<>();
 
 	public abstract<T extends ImageBase>
 	BackgroundModelMoving<T,Homography2D_F32> create( ImageType<T> imageType );

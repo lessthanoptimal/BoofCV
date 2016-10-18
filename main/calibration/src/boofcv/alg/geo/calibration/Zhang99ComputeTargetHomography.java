@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class Zhang99ComputeTargetHomography {
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
 					" Filter these first please");
 
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> pairs = new ArrayList<>();
 		for( int i = 0; i < observedPoints.size(); i++ ) {
 			int which = observedPoints.get(i).index;
 			Point2D_F64 obs = observedPoints.get(i).pixel;

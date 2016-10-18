@@ -32,9 +32,7 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 {
 		try {
 			this.rowWrap = (BorderIndex1D)type.newInstance();
 			this.colWrap = (BorderIndex1D)type.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

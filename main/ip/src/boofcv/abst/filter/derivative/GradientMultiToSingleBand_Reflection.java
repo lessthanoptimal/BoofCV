@@ -50,9 +50,7 @@ public class GradientMultiToSingleBand_Reflection<Input extends ImageMultiBand, 
 	public void process(Input inDerivX, Input inDerivY, Output outDerivX, Output outDerivY) {
 		try {
 			m.invoke(null,inDerivX, inDerivY, outDerivX, outDerivY);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

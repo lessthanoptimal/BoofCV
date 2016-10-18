@@ -41,10 +41,10 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray,D extends ImageGr
 	extends PointTrackerKltPyramid<I,D> implements PointTrackerTwoPass<I>
 {
 	// list of active tracks before the current image is processed
-	List<PyramidKltFeature> originalActive = new ArrayList<PyramidKltFeature>();
+	List<PyramidKltFeature> originalActive = new ArrayList<>();
 
 	// list of tracks that were dropped, but won't really be dropped until tracking finishes
-	List<PyramidKltFeature> candidateDrop = new ArrayList<PyramidKltFeature>();
+	List<PyramidKltFeature> candidateDrop = new ArrayList<>();
 
 	// has finished tracking been called
 	boolean finishedTracking;
@@ -161,7 +161,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray,D extends ImageGr
 	@Override
 	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		if( finishedTracking )
 			addToList(active,list);

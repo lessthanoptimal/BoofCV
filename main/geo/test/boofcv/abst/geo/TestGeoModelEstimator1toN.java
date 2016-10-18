@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,19 +35,19 @@ import static org.junit.Assert.*;
  */
 public class TestGeoModelEstimator1toN {
 
-	List<AssociatedPair> points = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> points = new ArrayList<>();
 	FastQueue<DenseMatrix64F> solutions = new QueueMatrix(3, 3);
 
 	@Test
 	public void basicTest() {
 		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
-				new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(true));
+				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
 
 		assertEquals(1, solutions.size());
 
-		alg = new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(false));
+		alg = new GeoModelEstimator1toN<>(new Dummy(false));
 
 		assertFalse(alg.process(points,solutions));
 		assertEquals(0,solutions.size);
@@ -59,14 +59,14 @@ public class TestGeoModelEstimator1toN {
 	@Test
 	public void multipleCalls() {
 		GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair> alg =
-				new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(true));
+				new GeoModelEstimator1toN<>(new Dummy(true));
 
 		assertTrue(alg.process(points,solutions));
 		assertEquals(1, solutions.size());
 		assertTrue(alg.process(points,solutions));
 		assertEquals(1, solutions.size());
 
-		alg = new GeoModelEstimator1toN<DenseMatrix64F,AssociatedPair>(new Dummy(false));
+		alg = new GeoModelEstimator1toN<>(new Dummy(false));
 		assertFalse(alg.process(points,solutions));
 		assertFalse(alg.process(points,solutions));
 	}

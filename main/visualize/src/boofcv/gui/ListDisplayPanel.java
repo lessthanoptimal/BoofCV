@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ListDisplayPanel extends JPanel implements ListSelectionListener  {
 
-	final List<JPanel> panels = new ArrayList<JPanel>();
+	final List<JPanel> panels = new ArrayList<>();
 	private JPanel bodyPanel;
 	private JList listPanel;
 

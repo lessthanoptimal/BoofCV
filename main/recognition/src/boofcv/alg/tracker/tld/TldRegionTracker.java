@@ -75,7 +75,7 @@ public class TldRegionTracker< Image extends ImageGray, Derivative extends Image
 	private Track[] tracks;
 
 	// List showing how each active feature moved
-	private FastQueue<AssociatedPair> pairs = new FastQueue<AssociatedPair>(AssociatedPair.class,true);
+	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class, true);
 
 	// storage for computing error statistics
 	private double[] errorsFB;

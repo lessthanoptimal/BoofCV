@@ -145,7 +145,7 @@ public class GenerateImplFastIntensity extends CodeGeneratorBase {
 			return;
 		}
 
-		List<Candidate> candidates = new ArrayList<Candidate>();
+		List<Candidate> candidates = new ArrayList<>();
 
 		for( int i = 0; i < TOTAL_CIRCLE; i++ ) {
 			if( (testedField & (1 << i)) != 0 )

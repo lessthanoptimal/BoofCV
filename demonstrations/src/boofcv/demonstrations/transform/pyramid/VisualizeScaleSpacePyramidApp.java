@@ -45,7 +45,7 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageGray>
 	double scales[] = new double[]{1,1.2,2.4,3.6,4.8,6.0,12,20};
 
 	Class<T> imageType;
-	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+	ImagePyramidPanel<T> gui = new ImagePyramidPanel<>();
 	boolean processedImage = false;
 
 	public VisualizeScaleSpacePyramidApp(Class<T> imageType) {
@@ -96,7 +96,7 @@ public class VisualizeScaleSpacePyramidApp<T extends ImageGray>
 //		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<>(GrayF32.class);
 		VisualizeScaleSpacePyramidApp<GrayU8> app = new VisualizeScaleSpacePyramidApp<>(GrayU8.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));

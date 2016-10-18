@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class TestEnforceUniqueByScore {
 	private static class Dummy extends AssociateUniqueByScoreAlg {
 
 		boolean calledProcess = false;
-		FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
 		int numSource;
 		int numDestination;
 
@@ -126,7 +126,7 @@ public class TestEnforceUniqueByScore {
 		GrowQueue_I32 unSrc = new GrowQueue_I32();
 		GrowQueue_I32 unDst = new GrowQueue_I32();
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
 
 		@Override
 		public void associate() {

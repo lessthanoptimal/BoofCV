@@ -89,9 +89,7 @@ public class FilterImageReflection<Input extends ImageGray, Output extends Image
 			} else {
 				m.invoke(null, input, output);
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

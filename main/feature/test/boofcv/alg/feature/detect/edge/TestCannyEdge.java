@@ -215,7 +215,7 @@ public class TestCannyEdge {
 		BlurFilter<GrayU8> blur = FactoryBlurFilter.gaussian(GrayU8.class, -1, 1);
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.three(GrayU8.class, GrayS16.class);
 
-		return new CannyEdge<GrayU8,GrayS16>(blur,gradient,saveTrace);
+		return new CannyEdge<>(blur, gradient, saveTrace);
 	}
 
 	private void checkNeighbor( List<Point2D_I32> list ) {

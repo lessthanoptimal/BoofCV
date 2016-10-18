@@ -59,13 +59,13 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 	protected int templateRadius;
 
 	// list of features which are actively being tracked
-	protected List<PyramidKltFeature> active = new ArrayList<PyramidKltFeature>();
+	protected List<PyramidKltFeature> active = new ArrayList<>();
 	// list of features which were just spawned
-	protected List<PyramidKltFeature> spawned = new ArrayList<PyramidKltFeature>();
+	protected List<PyramidKltFeature> spawned = new ArrayList<>();
 	// list of features which were just dropped
-	protected List<PyramidKltFeature> dropped = new ArrayList<PyramidKltFeature>();
+	protected List<PyramidKltFeature> dropped = new ArrayList<>();
 	// feature data available for future tracking
-	protected List<PyramidKltFeature> unused = new ArrayList<PyramidKltFeature>();
+	protected List<PyramidKltFeature> unused = new ArrayList<>();
 
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
@@ -105,8 +105,8 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 		this.basePyramid = pyramid;
 		this.derivType = derivType;
 
-		KltTracker<I, D> klt = new KltTracker<I, D>(interpInput, interpDeriv,config);
-		tracker = new PyramidKltTracker<I, D>(klt);
+		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
+		tracker = new PyramidKltTracker<>(klt);
 
 		if( detector != null) {
 			if (detector.getRequiresHessian())
@@ -292,7 +292,7 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 	@Override
 	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		addToList(active,list);
 
@@ -305,7 +305,7 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 	@Override
 	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		return list;
 	}
@@ -313,7 +313,7 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 	@Override
 	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		addToList(dropped,list);
 
@@ -323,7 +323,7 @@ public class PointTrackerKltPyramid<I extends ImageGray,D extends ImageGray>
 	@Override
 	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
 		if( list == null )
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 
 		addToList(spawned,list);
 

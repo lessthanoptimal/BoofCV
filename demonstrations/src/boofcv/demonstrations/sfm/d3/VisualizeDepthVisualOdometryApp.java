@@ -285,7 +285,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<GrayU16>(1e-3);
+		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
 		PkltConfig pkltConfig = new PkltConfig();
 		pkltConfig.templateRadius = 3;
@@ -309,7 +309,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<TupleDesc_B>(FactoryAssociation.greedy(score, 150, true));
+					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
 
 			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
 
@@ -320,7 +320,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
 							pkltConfig, 50, null, null, imageType, derivType);
 
-			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<I>(tracker);
+			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<>(tracker);
 
 			return FactoryVisualOdometry.
 					depthDepthPnP(1.5, 120, 3, 200, 50, false, sparseDepth, twopass, imageType, GrayU16.class);
@@ -405,7 +405,7 @@ public class VisualizeDepthVisualOdometryApp<I extends ImageGray>
 
 		VisualizeDepthVisualOdometryApp app = new VisualizeDepthVisualOdometryApp(type);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Circle", UtilIO.pathExample("kinect/circle/config.txt")));
 		inputs.add(new PathLabel("Hallway", UtilIO.pathExample("kinect/straight/config.txt")));
 

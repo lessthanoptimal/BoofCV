@@ -219,7 +219,7 @@ public class DetectBlackPolygonApp<T extends ImageGray> extends DemonstrationBas
 
 	public static void main(String[] args) {
 
-		List<String> examples = new ArrayList<String>();
+		List<String> examples = new ArrayList<>();
 		examples.add("shapes/polygons01.jpg");
 		examples.add("shapes/shapes01.png");
 		examples.add("shapes/shapes02.png");

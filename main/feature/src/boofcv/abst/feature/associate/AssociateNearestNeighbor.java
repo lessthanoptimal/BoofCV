@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,19 +45,19 @@ public class AssociateNearestNeighbor<D extends TupleDesc_F64>
 {
 	// Nearest Neighbor algorithm and storage for the results
 	private NearestNeighbor<Integer> alg;
-	private NnData<Integer> result = new NnData<Integer>();
+	private NnData<Integer> result = new NnData<>();
 
 	// list of features in destination set that are to be searched for in the source list
 	private FastQueue<D> listDst;
 
 	// List of indexes.  Passed in as data associated with source points
-	private FastQueue<Integer> indexes = new FastQueue<Integer>(0,Integer.class,false);
+	private FastQueue<Integer> indexes = new FastQueue<>(0, Integer.class, false);
 
 	// storage for source points
-	private List<double[]> src = new ArrayList<double[]>();
+	private List<double[]> src = new ArrayList<>();
 
 	// List of final associated points
-	private FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(100,AssociatedIndex.class,true);
+	private FastQueue<AssociatedIndex> matches = new FastQueue<>(100, AssociatedIndex.class, true);
 
 	// creates a list of unassociated features from the list of matches
 	private FindUnassociated unassociated = new FindUnassociated();

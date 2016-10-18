@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class VideoMjpegCodec {
 	public List<byte[]> read( InputStream streamIn ) {
 		// read the whole movie in at once to make it faster
 
-		List<byte[]> ret = new ArrayList<byte[]>();
+		List<byte[]> ret = new ArrayList<>();
 		try {
 			byte[] b = convertToByteArray(streamIn);
 //			System.out.println("MJPEG file is "+b.length+" bytes");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	// true if it can only process the minimum number of observations
 	boolean onlyMinimum;
 
-	FastQueue<Se3_F64> solutions = new FastQueue<Se3_F64>(1,Se3_F64.class,true);
+	FastQueue<Se3_F64> solutions = new FastQueue<>(1, Se3_F64.class, true);
 
 	Se3_F64 worldToCamera0 = new Se3_F64();
 	Se3_F64 worldToCamera1 = new Se3_F64();
@@ -113,7 +113,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 		assertTrue(alg.process(inputs,solutions));
 		assertTrue(solutions.size() > 0 );
 
-		List<Se3_F64> orig = new ArrayList<Se3_F64>();
+		List<Se3_F64> orig = new ArrayList<>();
 		for( Se3_F64 m : solutions.toList() ) {
 			orig.add(m.copy());
 		}
@@ -142,7 +142,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 
 	@Test
 	public void checkZerosInput() {
-		List<Point2D3D> inputs = new ArrayList<Point2D3D>();
+		List<Point2D3D> inputs = new ArrayList<>();
 
 		for( int i = 0; i < 3; i++ ) {
 			inputs.add( new Point2D3D());

@@ -53,7 +53,7 @@ public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray, II extends I
 
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
-		bandII = new Planar<II>(integralType,1,1,alg.getNumBands());
+		bandII = new Planar<>(integralType, 1, 1, alg.getNumBands());
 
 		this.imageType = ImageType.pl(alg.getNumBands(), imageType);
 	}

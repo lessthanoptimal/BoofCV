@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ClusterVisualWords {
 	ComputeClusters<double[]> computeClusters;
 
 	// inner arrays extracted from the input features
-	List<double[]> tuples = new ArrayList<double[]>();
+	List<double[]> tuples = new ArrayList<>();
 
 	/**
 	 * Constructor which configures the cluster finder.

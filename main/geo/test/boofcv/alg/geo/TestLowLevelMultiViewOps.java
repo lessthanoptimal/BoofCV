@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestLowLevelMultiViewOps {
 
 	@Test
 	public void computeNormalization() {
-		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			Point2D_F64 p = new Point2D_F64();
 
@@ -54,7 +54,7 @@ public class TestLowLevelMultiViewOps {
 		DenseMatrix64F N = new DenseMatrix64F(3,3);
 		LowLevelMultiViewOps.computeNormalization(list, N);
 
-		List<Point2D_F64> transformed = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> transformed = new ArrayList<>();
 		for( Point2D_F64 p : list ) {
 			Point2D_F64 t = new Point2D_F64();
 			GeometryMath_F64.mult(N, p, t);
@@ -98,7 +98,7 @@ public class TestLowLevelMultiViewOps {
 	@Test
 	public void computeNormalization_two() {
 
-		List<AssociatedPair> list = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedPair p = new AssociatedPair();
 
@@ -108,8 +108,8 @@ public class TestLowLevelMultiViewOps {
 			list.add(p);
 		}
 
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
 
 		PerspectiveOps.splitAssociated(list,list1,list2);
 
@@ -134,7 +134,7 @@ public class TestLowLevelMultiViewOps {
 	@Test
 	public void computeNormalization_three() {
 
-		List<AssociatedTriple> list = new ArrayList<AssociatedTriple>();
+		List<AssociatedTriple> list = new ArrayList<>();
 		for( int i = 0; i < 12; i++ ) {
 			AssociatedTriple p = new AssociatedTriple();
 
@@ -145,9 +145,9 @@ public class TestLowLevelMultiViewOps {
 			list.add(p);
 		}
 
-		List<Point2D_F64> list1 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list2 = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> list3 = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list1 = new ArrayList<>();
+		List<Point2D_F64> list2 = new ArrayList<>();
+		List<Point2D_F64> list3 = new ArrayList<>();
 
 		PerspectiveOps.splitAssociated(list,list1,list2,list3);
 

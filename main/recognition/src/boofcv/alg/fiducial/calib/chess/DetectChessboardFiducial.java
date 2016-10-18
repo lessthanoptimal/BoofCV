@@ -79,9 +79,9 @@ public class DetectChessboardFiducial<T extends ImageGray> {
 
 		this.inputToBinary = inputToBinary;
 
-		findSeeds = new DetectChessSquarePoints<T>(numRows,numCols,maxCornerDistance, detectorSquare);
+		findSeeds = new DetectChessSquarePoints<>(numRows, numCols, maxCornerDistance, detectorSquare);
 
-		detectorSquare.setHelper(new ChessboardPolygonHelper<T>(detectorSquare,refineLine,refineCorner));
+		detectorSquare.setHelper(new ChessboardPolygonHelper<>(detectorSquare, refineLine, refineCorner));
 
 		reset();
 	}

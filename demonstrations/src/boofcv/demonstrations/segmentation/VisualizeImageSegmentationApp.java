@@ -246,7 +246,7 @@ public class VisualizeImageSegmentationApp <T extends ImageBase>
 //		app.setBaseDirectory(UtilIO.pathExample("segment/");
 //		app.loadInputData(UtilIO.pathExample("segment/segment.txt");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		inputs.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
 		inputs.add(new PathLabel("Man", UtilIO.pathExample("segment/berkeley_man.jpg")));

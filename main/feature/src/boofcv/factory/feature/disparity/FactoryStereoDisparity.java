@@ -137,7 +137,7 @@ public class FactoryStereoDisparity {
 		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
-		return new WrapDisparitySadRect<T,GrayU8>(alg);
+		return new WrapDisparitySadRect<>(alg);
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class FactoryStereoDisparity {
 		if( alg == null)
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 
-		return new WrapDisparitySadRect<T,GrayF32>(alg);
+		return new WrapDisparitySadRect<>(alg);
 	}
 
 	/**

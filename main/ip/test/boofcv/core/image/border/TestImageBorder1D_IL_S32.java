@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class TestImageBorder1D_IL_S32 extends GenericImageBorder1DTests<Interlea
 
 	@Override
 	public ImageBorder<InterleavedS32> wrap(InterleavedS32 image) {
-		ImageBorder1D_IL_S32<InterleavedS32> ret = new ImageBorder1D_IL_S32<InterleavedS32>(BorderIndex1D_Wrap.class);
+		ImageBorder1D_IL_S32<InterleavedS32> ret = new ImageBorder1D_IL_S32<>(BorderIndex1D_Wrap.class);
 		ret.setImage(image);
 		return ret;
 	}

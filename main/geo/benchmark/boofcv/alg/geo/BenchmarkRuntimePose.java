@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class BenchmarkRuntimePose extends ArtificialStereoScene {
 		Estimate1ofPnP alg;
 		String name;
 
-		List<Point2D3D> obs = new ArrayList<Point2D3D>();
+		List<Point2D3D> obs = new ArrayList<>();
 
 		public InterfacePNP(String name , Estimate1ofPnP alg) {
 			this.alg = alg;

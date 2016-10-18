@@ -47,8 +47,8 @@ public class TestAssociateStereo2D {
 
 	Point2D_F64 leftP = new Point2D_F64();
 	Point2D_F64 rightP = new Point2D_F64();
-	FastQueue<Point2D_F64> pointsLeft = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-	FastQueue<Point2D_F64> pointsRight = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64.class, true);
 	FastQueue<TupleDesc_F64> descLeft,descRight;
 
 
@@ -97,7 +97,7 @@ public class TestAssociateStereo2D {
 
 		descLeft.grow();descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<TupleDesc_F64>(scorer,0.5,TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
@@ -130,7 +130,7 @@ public class TestAssociateStereo2D {
 
 		descLeft.grow();descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<TupleDesc_F64>(scorer,0.5,TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
@@ -143,7 +143,7 @@ public class TestAssociateStereo2D {
 		assertEquals(1,alg.getMatches().size);
 
 		// make the tolerance tighter
-		alg = new AssociateStereo2D<TupleDesc_F64>(scorer,0.01,TupleDesc_F64.class);
+		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
 		alg.setCalibration(param);
 		alg.setSource(pointsLeft,descLeft);
 		alg.setDestination(pointsRight, descRight);
@@ -169,7 +169,7 @@ public class TestAssociateStereo2D {
 
 		descLeft.grow();descRight.grow();
 
-		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<TupleDesc_F64>(scorer,0.5,TupleDesc_F64.class);
+		AssociateStereo2D<TupleDesc_F64> alg = new AssociateStereo2D<>(scorer, 0.5, TupleDesc_F64.class);
 
 		alg.setCalibration(param);
 
@@ -182,7 +182,7 @@ public class TestAssociateStereo2D {
 		assertEquals(1,alg.getMatches().size);
 
 		// make the tolerance tighter
-		alg = new AssociateStereo2D<TupleDesc_F64>(scorer,0.01,TupleDesc_F64.class);
+		alg = new AssociateStereo2D<>(scorer, 0.01, TupleDesc_F64.class);
 		alg.setCalibration(param);
 		alg.setSource(pointsLeft,descLeft);
 		alg.setDestination(pointsRight, descRight);

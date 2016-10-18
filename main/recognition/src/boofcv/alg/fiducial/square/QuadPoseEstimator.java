@@ -77,9 +77,9 @@ public class QuadPoseEstimator {
 	protected Point2D3D[] points = new Point2D3D[4];
 
 	// observation in undistorted pixels
-	protected List<Point2D_F64> listObs = new ArrayList<Point2D_F64>();
+	protected List<Point2D_F64> listObs = new ArrayList<>();
 
-	private List<Point2D3D> inputP3P = new ArrayList<Point2D3D>();
+	private List<Point2D3D> inputP3P = new ArrayList<>();
 	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64.class,true);
 	private Se3_F64 outputFiducialToCamera = new Se3_F64();
 	private Se3_F64 foundEPNP = new Se3_F64();

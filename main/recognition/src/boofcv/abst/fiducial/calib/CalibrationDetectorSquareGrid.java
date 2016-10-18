@@ -93,7 +93,7 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 	 */
 	public static List<Point2D_F64> createLayout(int numRows, int numCols, double squareWidth, double spaceWidth)
 	{
-		List<Point2D_F64> all = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> all = new ArrayList<>();
 
 		double width = (numCols*squareWidth + (numCols-1)*spaceWidth);
 		double height = (numRows*squareWidth + (numRows-1)*spaceWidth);
@@ -105,8 +105,8 @@ public class CalibrationDetectorSquareGrid implements CalibrationDetector {
 			// this will be on the top of the black in the row
 			double y = startY + i*(squareWidth+spaceWidth)+squareWidth;
 
-			List<Point2D_F64> top = new ArrayList<Point2D_F64>();
-			List<Point2D_F64> bottom = new ArrayList<Point2D_F64>();
+			List<Point2D_F64> top = new ArrayList<>();
+			List<Point2D_F64> bottom = new ArrayList<>();
 
 			for( int j = 0; j < numCols; j++ ) {
 				double x = startX + j*(squareWidth+spaceWidth);

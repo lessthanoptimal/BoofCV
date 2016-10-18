@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestMatrixOfList {
 	public void reset() {
 		MatrixOfList a = new MatrixOfList(2,3);
 		for(List l : a.grid )
-			l.add(new Integer(1));
+			l.add(1);
 		a.reset();
 		for(List l : a.grid )
 			assertEquals(0,l.size());
@@ -62,7 +62,7 @@ public class TestMatrixOfList {
 		MatrixOfList a = new MatrixOfList(2,3);
 		a.reshape(3,4);
 		for(List l : a.grid )
-			l.add(new Integer(1));
+			l.add(1);
 		List<List> b = a.createSingleList();
 
 		assertEquals(12,b.size());

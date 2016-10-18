@@ -79,7 +79,7 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType,outputType);
+		return new GenericConvolveDown<>(m, kernel, border, skip, inputType, outputType);
 	}
 
 	/**
@@ -121,6 +121,6 @@ public class FactoryConvolveDown {
 			throw new IllegalArgumentException("The specified convolution cannot be found");
 		}
 
-		return new GenericConvolveDown<Input,Output>(m,kernel,border,skip,inputType,outputType);
+		return new GenericConvolveDown<>(m, kernel, border, skip, inputType, outputType);
 	}
 }

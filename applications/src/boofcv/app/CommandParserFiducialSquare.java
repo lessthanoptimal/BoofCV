@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,9 +52,9 @@ public class CommandParserFiducialSquare {
 
 	public String applicationDescription;
 
-	public List<String> patternNames = new ArrayList<String>();
+	public List<String> patternNames = new ArrayList<>();
 
-	public List<String> exampleNames = new ArrayList<String>();
+	public List<String> exampleNames = new ArrayList<>();
 
 	public CommandParserFiducialSquare(String nameOfPatterns) {
 		this.nameOfPatterns = nameOfPatterns;

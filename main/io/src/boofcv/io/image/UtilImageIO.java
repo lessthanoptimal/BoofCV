@@ -81,7 +81,7 @@ public class UtilImageIO {
 			}
 		});
 
-		List<BufferedImage> ret = new ArrayList<BufferedImage>();
+		List<BufferedImage> ret = new ArrayList<>();
 
 		for( File f : files ) {
 			BufferedImage img = loadImage(f.getAbsolutePath());

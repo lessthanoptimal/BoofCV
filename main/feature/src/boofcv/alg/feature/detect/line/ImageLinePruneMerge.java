@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ImageLinePruneMerge {
 
-	List<Data> lines = new ArrayList<Data>();
+	List<Data> lines = new ArrayList<>();
 
 	public void reset() {
 		lines.clear();
@@ -54,7 +54,7 @@ public class ImageLinePruneMerge {
 
 		float threshold = max*fraction;
 
-		List<Data> filtered = new ArrayList<Data>();
+		List<Data> filtered = new ArrayList<>();
 		for( Data d : lines ) {
 			if( d.intensity >= threshold ) {
 				filtered.add(d);
@@ -69,7 +69,7 @@ public class ImageLinePruneMerge {
 
 		sortByIntensity();
 
-		List<Data> filtered = new ArrayList<Data>();
+		List<Data> filtered = new ArrayList<>();
 		for( int i = 0; i < N; i++ ) {
 			filtered.add(lines.get(i));
 		}
@@ -94,7 +94,7 @@ public class ImageLinePruneMerge {
 		sortByIntensity();
 
 		float theta[] = new float[ lines.size() ];
-		List<LineSegment2D_F32> segments = new ArrayList<LineSegment2D_F32>(lines.size());
+		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());
 
 		for( int i = 0; i < lines.size(); i++ ) {
 			Data d = lines.get(i);
@@ -134,7 +134,7 @@ public class ImageLinePruneMerge {
 			}
 		}
 
-		List<Data>  filtered = new ArrayList<Data>();
+		List<Data>  filtered = new ArrayList<>();
 
 		for( int i = 0; i < segments.size(); i++ ) {
 			if( segments.get(i) != null ) {
@@ -146,7 +146,7 @@ public class ImageLinePruneMerge {
 	}
 
 	public List<LineParametric2D_F32> createList() {
-		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		List<LineParametric2D_F32> ret = new ArrayList<>();
 		for( Data d : lines ) {
 			ret.add(d.line);
 		}

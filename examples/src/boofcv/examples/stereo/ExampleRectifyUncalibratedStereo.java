@@ -119,7 +119,7 @@ public class ExampleRectifyUncalibratedStereo {
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(imageA, imageB);
 
 		// Prune matches using the epipolar constraint
-		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> inliers = new ArrayList<>();
 		DenseMatrix64F F = ExampleFundamentalMatrix.robustFundamental(matches, inliers);
 
 		// display the inlier matches found using the robust estimator

@@ -74,7 +74,7 @@ public class TestRemovePerspectiveDistortion {
 	private void applyForwardTransform(GrayF32 expected, GrayF32 input, Point2D_F64 topLeft, Point2D_F64 topRight, Point2D_F64 bottomRight, Point2D_F64 bottomLeft) {
 		Estimate1ofEpipolar computeHomography = FactoryMultiView.computeHomography(true);
 
-		ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
+		ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
 		associatedPairs.add( new AssociatedPair(topLeft,new Point2D_F64(0,0)));
 		associatedPairs.add( new AssociatedPair(topRight,new Point2D_F64(expected.width-1,0)));
 		associatedPairs.add( new AssociatedPair(bottomRight,new Point2D_F64(expected.width-1,expected.height-1)));

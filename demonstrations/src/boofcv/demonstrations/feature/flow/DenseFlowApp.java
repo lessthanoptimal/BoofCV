@@ -183,7 +183,7 @@ public class DenseFlowApp
 //		app.setBaseDirectory(UtilIO.pathExample("denseflow/");
 //		app.loadInputData(UtilIO.pathExample("denseflow/denseflow.txt");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("urban", UtilIO.pathExample("denseflow/Urban2_07.png"), UtilIO.pathExample("denseflow/Urban2_08.png")));
 		inputs.add(new PathLabel("dog",UtilIO.pathExample("denseflow/dogdance07.png"),UtilIO.pathExample("denseflow/dogdance08.png")));

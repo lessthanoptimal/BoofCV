@@ -53,7 +53,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase>
 	public VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
 		super(numAlgFamilies);
 
-		this.imageType = new ImageType<I>(ImageType.Family.GRAY, ImageDataType.classToType(imageClass),1);
+		this.imageType = new ImageType<>(ImageType.Family.GRAY, ImageDataType.classToType(imageClass), 1);
 		addToToolbar(createSelectDelay());
 	}
 

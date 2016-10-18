@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public abstract class StandardModelFitterTests<Model, Point> {
 		Model model = helper.createRandomModel();
 		Model found = helper.createRandomModel();
 
-		List<Point> dataSet = new ArrayList<Point>();
+		List<Point> dataSet = new ArrayList<>();
 
 		// give it perfect observations
 		for( int i = 0; i < numObs; i++ ) {

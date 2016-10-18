@@ -36,8 +36,8 @@ public class TestChessboardPolygonHelper {
 	public void filterPixelPolygon_noborder() {
 		ChessboardPolygonHelper alg = new ChessboardPolygonHelper(null,null,null);
 
-		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
-		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalUndist = new ArrayList<>();
+		List<Point2D_I32> externalDist = new ArrayList<>();
 		GrowQueue_I32 splits = new GrowQueue_I32();
 
 		splits.add(0);
@@ -56,8 +56,8 @@ public class TestChessboardPolygonHelper {
 		alg.width = 50;
 		alg.height = 60;
 
-		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
-		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalUndist = new ArrayList<>();
+		List<Point2D_I32> externalDist = new ArrayList<>();
 		GrowQueue_I32 splits = new GrowQueue_I32();
 
 		for (int i = 0; i < 100; i++) {
@@ -95,8 +95,8 @@ public class TestChessboardPolygonHelper {
 		alg.width = 50;
 		alg.height = 60;
 
-		List<Point2D_I32> externalUndist = new ArrayList<Point2D_I32>();
-		List<Point2D_I32> externalDist = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> externalUndist = new ArrayList<>();
+		List<Point2D_I32> externalDist = new ArrayList<>();
 		GrowQueue_I32 splits = new GrowQueue_I32();
 
 		for (int i = 0; i < 100; i++) {

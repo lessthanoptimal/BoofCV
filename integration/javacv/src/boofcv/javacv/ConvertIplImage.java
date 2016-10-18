@@ -20,7 +20,6 @@ package boofcv.javacv;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import org.bytedeco.javacpp.opencv_core.*;
 
 import java.nio.*;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,13 @@ public class TestPruneCloseTracks {
 	public void negative() {
 		PruneCloseTracks alg = new PruneCloseTracks(2,10,20);
 		
-		List<PointTrack> tracks = new ArrayList<PointTrack>();
+		List<PointTrack> tracks = new ArrayList<>();
 		// space them out far enough so that non of them should be dropped
 		tracks.add(new PointTrack(0,3,4));
 		tracks.add(new PointTrack(0, 0, 0));
 		tracks.add(new PointTrack(0, 5, 6));
 
-		List<PointTrack> dropped = new ArrayList<PointTrack>();
+		List<PointTrack> dropped = new ArrayList<>();
 		alg.process(tracks,dropped);
 		
 		assertEquals(0, dropped.size());
@@ -50,12 +50,12 @@ public class TestPruneCloseTracks {
 	public void positive() {
 		PruneCloseTracks alg = new PruneCloseTracks(2,10,20);
 
-		List<PointTrack> tracks = new ArrayList<PointTrack>();
+		List<PointTrack> tracks = new ArrayList<>();
 		tracks.add(new PointTrack(0,3,4));
 		tracks.add(new PointTrack(0, 0, 0));
 		tracks.add(new PointTrack(0, 2, 4));
 
-		List<PointTrack> dropped = new ArrayList<PointTrack>();
+		List<PointTrack> dropped = new ArrayList<>();
 		alg.process(tracks,dropped);
 
 		assertEquals(1, dropped.size());

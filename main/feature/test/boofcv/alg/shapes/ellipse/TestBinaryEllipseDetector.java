@@ -45,7 +45,7 @@ public class TestBinaryEllipseDetector {
 	 */
 	@Test
 	public void simpleCase() {
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 		expected.add( new EllipseRotated_F64(90,100,25,25,0));
@@ -68,7 +68,7 @@ public class TestBinaryEllipseDetector {
 	 */
 	@Test
 	public void filterByEdge() {
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 
@@ -94,7 +94,7 @@ public class TestBinaryEllipseDetector {
 	 */
 	@Test
 	public void distortedImage() {
-		List<EllipseRotated_F64> original = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> original = new ArrayList<>();
 
 		original.add( new EllipseRotated_F64(50,65,20,10,0.5));
 		original.add( new EllipseRotated_F64(90,100,25,25,0));
@@ -111,7 +111,7 @@ public class TestBinaryEllipseDetector {
 		alg.process(image, binary);
 
 		// adjust the ellipses using the transform
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> expected = new ArrayList<>();
 		for( EllipseRotated_F64 o : original ) {
 			EllipseRotated_F64 e = new EllipseRotated_F64(o);
 			e.center.x += 5;
@@ -128,7 +128,7 @@ public class TestBinaryEllipseDetector {
 	 */
 	@Test
 	public void autoRefineToggle() {
-		List<EllipseRotated_F64> expected = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> expected = new ArrayList<>();
 
 		expected.add( new EllipseRotated_F64(50,65,20,10,0.5));
 		expected.add( new EllipseRotated_F64(90,100,25,25,0));
@@ -143,7 +143,7 @@ public class TestBinaryEllipseDetector {
 		alg.process(image, binary);
 
 		List<EllipseRotated_F64> found = alg.getFoundEllipses().toList();
-		List<EllipseRotated_F64> refined = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> refined = new ArrayList<>();
 
 		for( EllipseRotated_F64 f : found ) {
 			EllipseRotated_F64 r = new EllipseRotated_F64(f);

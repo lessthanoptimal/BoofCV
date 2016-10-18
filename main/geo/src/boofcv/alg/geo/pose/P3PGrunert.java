@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class P3PGrunert implements P3PLineDistance {
 	private Polynomial poly = new Polynomial(5);
 
 	// storage for solutions
-	private FastQueue<PointDistance3> solutions = new FastQueue<PointDistance3>(4,PointDistance3.class,true);
+	private FastQueue<PointDistance3> solutions = new FastQueue<>(4, PointDistance3.class, true);
 
 	/**
 	 * Specifies the polynomial root finder.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class JCodecMediaManager implements MediaManager {
 
 	public static final JCodecMediaManager INSTANCE = new JCodecMediaManager();
 
-	Map<String,BufferedImage> cachedImage = new HashMap<String, BufferedImage>();
+	Map<String,BufferedImage> cachedImage = new HashMap<>();
 	
 	@Override
 	public Reader openFile(String fileName) {
@@ -84,18 +84,18 @@ public class JCodecMediaManager implements MediaManager {
 			try {
 				VideoMjpegCodec codec = new VideoMjpegCodec();
 				List<byte[]> data = codec.read(new FileInputStream(fileName));
-				return new JpegByteImageSequence<T>(type,data,false);
+				return new JpegByteImageSequence<>(type, data, false);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
 		} else if( fileName.endsWith("mpng") || fileName.endsWith("MPNG")) {
 			try {
-				return new ImageStreamSequence<T>(fileName,true,type);
+				return new ImageStreamSequence<>(fileName, true, type);
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
-			return new JCodecSimplified<T>(fileName,type);
+			return new JCodecSimplified<>(fileName, type);
 		}
 	}
 

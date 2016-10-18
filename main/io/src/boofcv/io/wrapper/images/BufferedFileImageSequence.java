@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class BufferedFileImageSequence<T extends ImageBase> implements SimpleIma
 
 		String[] files = directory.list(new Filter(suffix));
 
-		List<String> listNames = new ArrayList<String>();
+		List<String> listNames = new ArrayList<>();
 		for( String s : files ) {
 			listNames.add(s);
 		}

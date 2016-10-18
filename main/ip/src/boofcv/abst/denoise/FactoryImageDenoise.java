@@ -59,7 +59,7 @@ public class FactoryImageDenoise {
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser  = FactoryDenoiseWaveletAlg.visu(imageType);
 
-		return new WaveletDenoiseFilter<T>(descTran,denoiser);
+		return new WaveletDenoiseFilter<>(descTran, denoiser);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class FactoryImageDenoise {
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.bayes(null, imageType);
 
-		return new WaveletDenoiseFilter<T>(descTran,denoiser);
+		return new WaveletDenoiseFilter<>(descTran, denoiser);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class FactoryImageDenoise {
 		WaveletTransform descTran = createDefaultShrinkTransform(info, numLevels,minPixelValue,maxPixelValue);
 		DenoiseWavelet denoiser = FactoryDenoiseWaveletAlg.sure(imageType);
 
-		return new WaveletDenoiseFilter<T>(descTran,denoiser);
+		return new WaveletDenoiseFilter<>(descTran, denoiser);
 	}
 
 	/**

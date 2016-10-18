@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,8 +51,8 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	public synchronized void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
 											 FastQueue<AssociatedIndex> matches ) {
 
-		List<Point2D_F64> allLeft = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> allRight = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> allLeft = new ArrayList<>();
+		List<Point2D_F64> allRight = new ArrayList<>();
 
 		assocLeft = new int[ matches.size() ];
 		assocRight = new int[ matches.size() ];
@@ -91,8 +91,8 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	}
 
 	public synchronized void setAssociation( List<AssociatedPair> matches ) {
-		List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
-		List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> leftPts = new ArrayList<>();
+		List<Point2D_F64> rightPts = new ArrayList<>();
 
 		for( AssociatedPair p : matches ) {
 			leftPts.add(p.p1);

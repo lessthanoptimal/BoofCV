@@ -41,8 +41,8 @@ public class TestOrientationIntegralToImage {
 		OrientationIntegral<GrayF32> orig = FactoryOrientationAlgs.average_ii(config, GrayF32.class);
 
 		OrientationIntegralToImage<GrayF32,GrayF32>
-				alg = new OrientationIntegralToImage<GrayF32, GrayF32>(orig,
-				GrayF32.class,GrayF32.class);
+				alg = new OrientationIntegralToImage<>(orig,
+				GrayF32.class, GrayF32.class);
 
 		GenericOrientationImageTests tests = new GenericOrientationImageTests();
 		tests.setup(angleTol, r * 2 + 1, alg, GrayF32.class);

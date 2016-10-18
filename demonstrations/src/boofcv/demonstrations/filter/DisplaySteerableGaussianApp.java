@@ -50,7 +50,7 @@ public class DisplaySteerableGaussianApp <T extends ImageGray, K extends Kernel2
 //				new DisplaySteerableGaussianApp<GrayF32,Kernel2D_F32>(GrayF32.class);
 
 		DisplaySteerableGaussianApp<GrayS32, Kernel2D_I32> app =
-				new DisplaySteerableGaussianApp<GrayS32,Kernel2D_I32>(GrayS32.class);
+				new DisplaySteerableGaussianApp<>(GrayS32.class);
 
 		app.setPreferredSize(new Dimension(1000,480));
 

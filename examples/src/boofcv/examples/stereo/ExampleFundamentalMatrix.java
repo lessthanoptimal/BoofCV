@@ -89,11 +89,11 @@ public class ExampleFundamentalMatrix {
 
 		// How the error is measured
 		DistanceFromModelResidual<DenseMatrix64F,AssociatedPair> errorMetric =
-				new DistanceFromModelResidual<DenseMatrix64F,AssociatedPair>(new FundamentalResidualSampson());
+				new DistanceFromModelResidual<>(new FundamentalResidualSampson());
 
 		// Use RANSAC to estimate the Fundamental matrix
 		ModelMatcher<DenseMatrix64F,AssociatedPair> robustF =
-				new Ransac<DenseMatrix64F, AssociatedPair>(123123,managerF,generateF,errorMetric,6000,0.1);
+				new Ransac<>(123123, managerF, generateF, errorMetric, 6000, 0.1);
 
 		// Estimate the fundamental matrix while removing outliers
 		if( !robustF.process(matches) )
@@ -144,11 +144,11 @@ public class ExampleFundamentalMatrix {
 		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 1, true);
 
 		ExampleAssociatePoints<GrayF32,BrightFeature> findMatches =
-				new ExampleAssociatePoints<GrayF32,BrightFeature> (detDesc, associate, GrayF32.class);
+				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
 
 		findMatches.associate(left,right);
 
-		List<AssociatedPair> matches = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> matches = new ArrayList<>();
 		FastQueue<AssociatedIndex> matchIndexes = associate.getMatches();
 
 		for( int i = 0; i < matchIndexes.size; i++ ) {
@@ -172,7 +172,7 @@ public class ExampleFundamentalMatrix {
 		// Where the fundamental matrix is stored
 		DenseMatrix64F F;
 		// List of matches that matched the model
-		List<AssociatedPair> inliers = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> inliers = new ArrayList<>();
 
 		// estimate and print the results using a robust and simple estimator
 		// The results should be difference since there are many false associations in the simple model

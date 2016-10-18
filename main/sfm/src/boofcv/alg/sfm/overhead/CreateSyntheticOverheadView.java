@@ -66,7 +66,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 	// if an element is null that means there is no corresponding image pixel
 	protected Point2D_F32 mapPixels[];
 
-	private FastQueue<Point2D_F32> points = new FastQueue<Point2D_F32>(Point2D_F32.class,true);
+	private FastQueue<Point2D_F32> points = new FastQueue<>(Point2D_F32.class, true);
 
 	/**
 	 * Specifies camera configurations.

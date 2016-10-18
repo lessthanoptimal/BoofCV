@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,9 +60,9 @@ public class DecomposeHomography {
 
 	// storage for the four possible solutions
 	// Camera motion part of the solution
-	List<Se3_F64> solutionsSE = new ArrayList<Se3_F64>();
+	List<Se3_F64> solutionsSE = new ArrayList<>();
 	// normal of the plane
-	List<Vector3D_F64> solutionsN = new ArrayList<Vector3D_F64>();
+	List<Vector3D_F64> solutionsN = new ArrayList<>();
 
 	// used for internal house keeping during decomposition
 	Vector3D_F64 u1 = new Vector3D_F64();

@@ -35,8 +35,8 @@ public class BenchmarkDescriptorDistance {
 	static Random rand = new Random(234234);
 	static int NUM_FEATURES = 5000;
 
-	static List<TupleDesc_B>  binaryA = new ArrayList<TupleDesc_B>();
-	static List<TupleDesc_B>  binaryB = new ArrayList<TupleDesc_B>();
+	static List<TupleDesc_B>  binaryA = new ArrayList<>();
+	static List<TupleDesc_B>  binaryB = new ArrayList<>();
 
 	static {
 		for (int i = 0; i < NUM_FEATURES; i++) {

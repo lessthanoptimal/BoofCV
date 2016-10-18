@@ -289,7 +289,7 @@ public class TestBinaryImageOps {
 
 	@Test
 	public void labelToClusters() {
-		FastQueue<Point2D_I32> queue = new FastQueue<Point2D_I32>(16,Point2D_I32.class,true);
+		FastQueue<Point2D_I32> queue = new FastQueue<>(16, Point2D_I32.class, true);
 		GrayS32 labels = new GrayS32(4,4);
 		labels.data = new int[]{
 				1,2,3,4,

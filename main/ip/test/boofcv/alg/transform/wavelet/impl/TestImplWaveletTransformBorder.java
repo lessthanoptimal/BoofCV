@@ -131,9 +131,7 @@ public class TestImplWaveletTransformBorder extends CompareToNaiveWavelet {
 
 			try {
 				m.invoke(null,args);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
+			} catch (InvocationTargetException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 		}

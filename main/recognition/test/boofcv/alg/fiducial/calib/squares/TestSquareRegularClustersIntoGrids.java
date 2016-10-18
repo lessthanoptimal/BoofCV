@@ -38,7 +38,7 @@ public class TestSquareRegularClustersIntoGrids {
 
 	@Test
 	public void highLevelCheck() {
-		List<List<SquareNode>> clusters = new ArrayList<List<SquareNode>>();
+		List<List<SquareNode>> clusters = new ArrayList<>();
 
 		for (int length = 1; length <= 4; length++) {
 			clusters.add(createGrid(length, length));
@@ -143,12 +143,12 @@ public class TestSquareRegularClustersIntoGrids {
 		int numCols = 4;
 		List<SquareNode> nodes = createGrid(numRows, numCols);
 
-		List<SquareNode> column = new ArrayList<SquareNode>();
+		List<SquareNode> column = new ArrayList<>();
 		for (int i = 0; i < numRows; i++) {
 			column.add( nodes.get(i*numCols));
 		}
 
-		List<SquareNode> found = new ArrayList<SquareNode>();
+		List<SquareNode> found = new ArrayList<>();
 		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
 		assertFalse(alg.addRowsToGrid(column, found));
@@ -167,8 +167,8 @@ public class TestSquareRegularClustersIntoGrids {
 
 		SquareRegularClustersIntoGrids alg = new SquareRegularClustersIntoGrids(1);
 
-		List<SquareNode> row = new ArrayList<SquareNode>();
-		List<SquareNode> col = new ArrayList<SquareNode>();
+		List<SquareNode> row = new ArrayList<>();
+		List<SquareNode> col = new ArrayList<>();
 
 		checkAddLineToGrid(alg, nodes.get(0), nodes.get(1), row);
 		checkAddLineToGrid(alg, nodes.get(0), nodes.get(numCols), col);
@@ -225,7 +225,7 @@ public class TestSquareRegularClustersIntoGrids {
 	}
 
 	public static List<SquareNode> createGrid(int numRows, int numCols) {
-		List<SquareNode> nodes = new ArrayList<SquareNode>();
+		List<SquareNode> nodes = new ArrayList<>();
 		double w = DEFAULT_WIDTH;
 		for (int y = 0; y < numRows; y++) {
 			for (int x = 0; x < numCols; x++) {

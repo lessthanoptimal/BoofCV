@@ -47,7 +47,7 @@ public class DdaManagerGeneralPoint<I extends ImageGray, D extends ImageGray, De
 
 	// storage for descriptors
 	private FastQueue<Desc> descriptors;
-	private FastQueue<Point2D_F64> locations = new FastQueue<Point2D_F64>(100,Point2D_F64.class,true);
+	private FastQueue<Point2D_F64> locations = new FastQueue<>(100, Point2D_F64.class, true);
 
 	public DdaManagerGeneralPoint(EasyGeneralFeatureDetector<I, D> detector,
 								  DescribeRegionPoint<I, Desc> describe,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ public class ViewPointObservations {
 	FastQueue<PointIndexObservation> points;
 
 	public ViewPointObservations() {
-		points = new FastQueue<PointIndexObservation>(
-				10,PointIndexObservation.class,true);
+		points = new FastQueue<>(
+				10, PointIndexObservation.class, true);
 	}
 
 	public FastQueue<PointIndexObservation> getPoints() {

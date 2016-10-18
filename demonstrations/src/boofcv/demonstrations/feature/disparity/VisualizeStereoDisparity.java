@@ -433,7 +433,7 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 		String dirCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String dirImgs = UtilIO.pathExample("stereo/");
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Chair 1",  dirCalib+"stereo.xml",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
 //		inputs.add(new PathLabel("Chair 2",  dirCalib+"stereo.xml",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		inputs.add(new PathLabel("Stones 1", dirCalib+"stereo.xml",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));

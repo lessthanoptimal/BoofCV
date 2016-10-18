@@ -41,7 +41,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	EdgeIntensityEllipse<T> intensityCheck;
 
 	// storage for the output refined ellipses
-	FastQueue<EllipseRotated_F64> refined = new FastQueue<EllipseRotated_F64>(EllipseRotated_F64.class,true);
+	FastQueue<EllipseRotated_F64> refined = new FastQueue<>(EllipseRotated_F64.class, true);
 
 	Class<T> inputType;
 

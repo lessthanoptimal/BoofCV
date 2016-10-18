@@ -99,7 +99,7 @@ public class FactoryDetectPoint {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
-		GeneralFeatureIntensity<T, D> intensity = new WrapperKitRosCornerIntensity<T, D>(derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperKitRosCornerIntensity<>(derivType);
 		return createGeneral(intensity, configDetector);
 	}
 
@@ -123,7 +123,7 @@ public class FactoryDetectPoint {
 		ConfigGeneralDetector d = configDetector;
 
 		FastCornerIntensity<T> alg = FactoryIntensityPointAlg.fast(configFast.pixelTol, configFast.minContinuous, imageType);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<T, D>(alg);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperFastCornerIntensity<>(alg);
 		ConfigGeneralDetector configExtract =
 				new ConfigGeneralDetector(d.maxFeatures,d.radius,d.threshold,0,true,false,true);
 		return createGeneral(intensity, configExtract);
@@ -143,7 +143,7 @@ public class FactoryDetectPoint {
 			configDetector = new ConfigGeneralDetector();
 
 		BlurStorageFilter<T> medianFilter = FactoryBlurFilter.median(imageType, configDetector.radius);
-		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<T, D>(medianFilter, imageType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperMedianCornerIntensity<>(medianFilter, imageType);
 		return createGeneral(intensity, configDetector);
 	}
 
@@ -168,7 +168,7 @@ public class FactoryDetectPoint {
 	public static <T extends ImageGray, D extends ImageGray>
 	GeneralFeatureDetector<T, D> createGeneral(GradientCornerIntensity<D> cornerIntensity,
 											   ConfigGeneralDetector config) {
-		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<T, D>(cornerIntensity);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(cornerIntensity);
 		return createGeneral(intensity, config);
 	}
 
@@ -177,7 +177,7 @@ public class FactoryDetectPoint {
 											   ConfigGeneralDetector config ) {
 		config.ignoreBorder += config.radius;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
-		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<T, D>(intensity, extractor);
+		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor);
 		det.setMaxFeatures(config.maxFeatures);
 
 		return det;

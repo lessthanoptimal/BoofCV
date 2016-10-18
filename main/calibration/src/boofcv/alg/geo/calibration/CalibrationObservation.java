@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class CalibrationObservation {
 	/**
 	 * List of observations
 	 */
-	public List<Point> points = new ArrayList<Point>();
+	public List<Point> points = new ArrayList<>();
 
 	public void setTo( CalibrationObservation obs ) {
 		reset();

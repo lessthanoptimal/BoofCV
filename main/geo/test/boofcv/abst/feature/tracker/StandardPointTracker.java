@@ -339,7 +339,7 @@ public abstract class StandardPointTracker<T extends ImageGray> {
 		processImage((T)image);
 		tracker.spawnTracks();
 
-		List<PointTrack> input = new ArrayList<PointTrack>();
+		List<PointTrack> input = new ArrayList<>();
 		assertTrue(input == tracker.getAllTracks(input));
 
 		List<PointTrack> ret = tracker.getAllTracks(null);
@@ -356,7 +356,7 @@ public abstract class StandardPointTracker<T extends ImageGray> {
 		processImage((T)image);
 		tracker.spawnTracks();
 
-		List<PointTrack> input = new ArrayList<PointTrack>();
+		List<PointTrack> input = new ArrayList<>();
 		assertTrue(input == tracker.getActiveTracks(input));
 
 		List<PointTrack> ret = tracker.getActiveTracks(null);
@@ -377,7 +377,7 @@ public abstract class StandardPointTracker<T extends ImageGray> {
 		GImageMiscOps.fill(image, 0);
 		processImage((T)image);
 
-		List<PointTrack> input = new ArrayList<PointTrack>();
+		List<PointTrack> input = new ArrayList<>();
 		assertTrue( input == tracker.getInactiveTracks(input));
 
 		List<PointTrack> ret = tracker.getInactiveTracks(null);
@@ -395,7 +395,7 @@ public abstract class StandardPointTracker<T extends ImageGray> {
 		GImageMiscOps.fill(image, 0);
 		processImage((T)image);
 
-		List<PointTrack> input = new ArrayList<PointTrack>();
+		List<PointTrack> input = new ArrayList<>();
 		assertTrue( input == tracker.getDroppedTracks(input));
 		if( shouldDropTracks )
 			assertTrue( input.size() > 0 );
@@ -411,7 +411,7 @@ public abstract class StandardPointTracker<T extends ImageGray> {
 		processImage((T)image);
 		tracker.spawnTracks();
 
-		List<PointTrack> input = new ArrayList<PointTrack>();
+		List<PointTrack> input = new ArrayList<>();
 		assertTrue( input == tracker.getNewTracks(input));
 
 		List<PointTrack> ret = tracker.getNewTracks(null);

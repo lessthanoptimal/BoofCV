@@ -83,7 +83,7 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray> {
 		GridLineModelFitter fitter = new GridLineModelFitter(0.9f);
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
-				new Ransac<LinePolar2D_F32,Edgel>(123123,manager,fitter,distance,25,1);
+				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 		GridRansacLineDetector<D> alg = createDetector(regionSize,5,matcher);
 
 		alg.process(derivX,derivY,edgeImage);

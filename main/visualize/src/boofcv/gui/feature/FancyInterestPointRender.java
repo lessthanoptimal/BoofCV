@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class FancyInterestPointRender {
 
-	List<Point> points = new ArrayList<Point>();
-	List<Line> lines = new ArrayList<Line>();
-	List<Circle> circles = new ArrayList<Circle>();
-	List<VString> strings = new ArrayList<VString>();
+	List<Point> points = new ArrayList<>();
+	List<Line> lines = new ArrayList<>();
+	List<Circle> circles = new ArrayList<>();
+	List<VString> strings = new ArrayList<>();
 
 	public synchronized void draw( Graphics2D g2 ) {
 		for( Point p : points ) {

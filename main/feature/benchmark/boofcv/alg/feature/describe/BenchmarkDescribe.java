@@ -73,7 +73,7 @@ public class BenchmarkDescribe<I extends ImageGray, D extends ImageGray, II exte
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		integralType = GIntegralImageOps.getIntegralType(imageType);
 
-		colorMS = new Planar<I>(imageType,width,height,3);
+		colorMS = new Planar<>(imageType, width, height, 3);
 		GImageMiscOps.fillUniform(colorMS, rand, 0, 100);
 
 		gray = GConvertImage.average(colorMS,gray);

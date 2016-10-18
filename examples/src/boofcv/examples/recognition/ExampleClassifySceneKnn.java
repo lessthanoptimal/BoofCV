@@ -133,7 +133,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		System.out.println("Image Features");
 
 		// computes features in the training image set
-		List<TupleDesc_F64> features = new ArrayList<TupleDesc_F64>();
+		List<TupleDesc_F64> features = new ArrayList<>();
 		for( String scene : train.keySet() ) {
 			List<String> imagePaths = train.get(scene);
 			System.out.println("   " + scene);
@@ -173,7 +173,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
 		// Can use this classifier with saved results and avoid the
 
-		classifier = new ClassifierKNearestNeighborsBow<GrayU8,TupleDesc_F64>(nn,describeImage,featuresToHistogram);
+		classifier = new ClassifierKNearestNeighborsBow<>(nn, describeImage, featuresToHistogram);
 		classifier.setClassificationData(memory, getScenes().size());
 		classifier.setNumNeighbors(NUM_NEIGHBORS);
 	}
@@ -187,7 +187,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		List<String> scenes = getScenes();
 
 		List<HistogramScene> memory;// Processed results which will be passed into the k-NN algorithm
-		memory = new ArrayList<HistogramScene>();
+		memory = new ArrayList<>();
 
 		for( int sceneIndex = 0; sceneIndex < scenes.size(); sceneIndex++ ) {
 			String scene = scenes.get(sceneIndex);

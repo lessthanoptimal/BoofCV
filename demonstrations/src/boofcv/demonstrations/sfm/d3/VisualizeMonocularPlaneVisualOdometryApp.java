@@ -396,7 +396,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray>
 
 		VisualizeMonocularPlaneVisualOdometryApp app = new VisualizeMonocularPlaneVisualOdometryApp(type);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Simulation", UtilIO.pathExample("vo/drc/config_plane.txt")));
 
 		app.setInputList(inputs);

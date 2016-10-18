@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import static boofcv.alg.geo.pose.P3PGrunert.pow2;
 public class P3PFinsterwalder implements P3PLineDistance {
 
 	// storage for solutions
-	private FastQueue<PointDistance3> solutions = new FastQueue<PointDistance3>(4,PointDistance3.class,true);
+	private FastQueue<PointDistance3> solutions = new FastQueue<>(4, PointDistance3.class, true);
 
 	// square of a,b,c
 	private double a2,b2,c2;

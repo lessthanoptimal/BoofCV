@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class TestRelinearlize {
 			nullPts[i] = GeoTestingOps.randomPoints_F64(-1,1,-1,1,-1,1,numControl,rand);
 		}
 
-		nullPts[numControl-1] = new ArrayList<Point3D_F64>();
+		nullPts[numControl-1] = new ArrayList<>();
 		nullPts[numControl-1].add( new Point3D_F64(1,0,0));
 		nullPts[numControl-1].add( new Point3D_F64(0,1,0));
 		nullPts[numControl-1].add( new Point3D_F64(0,0,1));
@@ -111,7 +111,7 @@ public class TestRelinearlize {
 
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
-		FastQueue<Point3D_F64> worldPts = new FastQueue<Point3D_F64>(4,Point3D_F64.class,true);
+		FastQueue<Point3D_F64> worldPts = new FastQueue<>(4, Point3D_F64.class, true);
 		worldPts.grow().set(1,0,0);
 		worldPts.grow().set(0,1,0);
 		worldPts.grow().set(0,0,1);

@@ -61,7 +61,7 @@ public class DetectDescribeMultiFusion<T extends ImageGray, TD extends TupleDesc
 
 		info = new SetInfo[ detector.getNumberOfSets() ];
 		for( int i = 0; i < info.length; i++ ) {
-			info[i] = new SetInfo<TD>();
+			info[i] = new SetInfo<>();
 			info[i].descriptors = UtilFeature.createQueue(describe,10);
 		}
 	}
@@ -128,7 +128,7 @@ public class DetectDescribeMultiFusion<T extends ImageGray, TD extends TupleDesc
 	 */
 	private class SetInfo<TD extends TupleDesc> implements PointDescSet<TD>
 	{
-		FastQueue<Point2D_F64> location = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
+		FastQueue<Point2D_F64> location = new FastQueue<>(10, Point2D_F64.class, true);
 		FastQueue<TD> descriptors;
 
 		public void reset() {

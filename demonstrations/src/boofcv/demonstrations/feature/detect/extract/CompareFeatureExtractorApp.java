@@ -163,7 +163,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray
 
 		NonMaxSuppression extractor =
 				FactoryFeatureExtractor.nonmax(new ConfigExtract(minSeparation, threshold, radius, true));
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<T, D>(intensityAlg, extractor);
+		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg, extractor);
 		detector.setMaxFeatures(numFeatures);
 		detector.process(grayImage, derivX, derivY, derivXX, derivYY, derivXY);
 		QueueCorner foundCorners = detector.getMaximums();
@@ -248,7 +248,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray, D extends ImageGray
 	public static void main(String args[]) {
 		CompareFeatureExtractorApp app = new CompareFeatureExtractorApp(GrayF32.class, GrayF32.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));

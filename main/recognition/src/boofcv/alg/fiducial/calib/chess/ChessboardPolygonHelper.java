@@ -45,7 +45,7 @@ public class ChessboardPolygonHelper<T extends ImageGray> implements PolygonHelp
 
 	int width,height;
 
-	FastQueue<Point2D_F64> tmp = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> tmp = new FastQueue<>(Point2D_F64.class, true);
 
 	public ChessboardPolygonHelper(BinaryPolygonDetector<T> detectorSquare,
 								   RefineBinaryPolygon<T> refineLine ,

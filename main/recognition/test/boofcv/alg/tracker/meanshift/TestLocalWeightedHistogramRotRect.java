@@ -264,7 +264,7 @@ public class TestLocalWeightedHistogramRotRect {
 
 	static class DummyInterpolate implements InterpolatePixelMB {
 
-		List<Point2D_F32> list = new ArrayList<Point2D_F32>();
+		List<Point2D_F32> list = new ArrayList<>();
 
 		@Override
 		public void setBorder(ImageBorder border) {}

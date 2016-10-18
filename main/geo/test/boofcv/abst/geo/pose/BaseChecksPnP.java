@@ -65,7 +65,7 @@ public class BaseChecksPnP {
 		// transform from pixel coordinates to normalized pixel coordinates, which removes lens distortion
 		PointTransform_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 
-		List<Point2D3D> observations = new ArrayList<Point2D3D>();
+		List<Point2D3D> observations = new ArrayList<>();
 
 		Point2D_F64 norm = new Point2D_F64();
 		for (int i = 0; i < total; i++) {

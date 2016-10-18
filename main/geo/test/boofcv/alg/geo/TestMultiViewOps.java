@@ -684,8 +684,8 @@ public class TestMultiViewOps {
 
 		assertEquals(4, found.size());
 
-		List<Se3_F64> solutionsSE = new ArrayList<Se3_F64>();
-		List<Vector3D_F64> solutionsN = new ArrayList<Vector3D_F64>();
+		List<Se3_F64> solutionsSE = new ArrayList<>();
+		List<Vector3D_F64> solutionsN = new ArrayList<>();
 
 		for( Tuple2<Se3_F64,Vector3D_F64> t : found ) {
 			solutionsSE.add( t.data0 );

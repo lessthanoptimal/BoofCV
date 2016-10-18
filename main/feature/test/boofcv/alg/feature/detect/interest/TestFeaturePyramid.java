@@ -35,7 +35,7 @@ public class TestFeaturePyramid extends GenericFeatureScaleDetectorTests {
 		AnyImageDerivative<GrayF32, GrayF32> deriv =
 				GImageDerivativeOps.derivativeForScaleSpace(GrayF32.class, GrayF32.class);
 
-		return new FeaturePyramid<GrayF32, GrayF32>(detector, deriv, 1);
+		return new FeaturePyramid<>(detector, deriv, 1);
 	}
 
 	@Override

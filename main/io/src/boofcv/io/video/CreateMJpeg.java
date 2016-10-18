@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,7 +154,7 @@ public class CreateMJpeg {
 
 		File[] files = directory.listFiles();
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for( File f : files ) {
 			if( f.isFile() && f.getName().endsWith(".jpg")) {
 				list.add(f.getPath());

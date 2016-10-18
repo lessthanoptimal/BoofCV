@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,7 +128,7 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 
 		int N = 10;
 		double expected[] = new double[N*4];
-		List<Stereo2D3D> obs = new ArrayList<Stereo2D3D>();
+		List<Stereo2D3D> obs = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			// Point location in world frame

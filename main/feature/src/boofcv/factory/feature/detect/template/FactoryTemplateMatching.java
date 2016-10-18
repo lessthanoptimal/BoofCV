@@ -77,6 +77,6 @@ public class FactoryTemplateMatching {
 	TemplateMatching<T> createMatcher(TemplateScoreType type, Class<T> imageType) {
 		TemplateMatchingIntensity<T> intensity = createIntensity(type, imageType);
 
-		return new TemplateMatching<T>(intensity);
+		return new TemplateMatching<>(intensity);
 	}
 }

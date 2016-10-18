@@ -63,8 +63,8 @@ public class TestPnPStereoJacobianRodrigues extends CommonStereoMotionNPoint {
 
 		StereoPose storage = new StereoPose(new Se3_F64(),leftToRight);
 		ResidualsCodecToMatrix<StereoPose,Stereo2D3D> func =
-				new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>
-						(codec,new PnPStereoResidualReprojection(),storage);
+				new ResidualsCodecToMatrix<>
+						(codec, new PnPStereoResidualReprojection(), storage);
 
 		func.setObservations(pointPose);
 

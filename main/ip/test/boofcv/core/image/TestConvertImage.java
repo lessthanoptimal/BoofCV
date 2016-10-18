@@ -128,9 +128,7 @@ public class TestConvertImage {
 			ret = invokeConvertIntegerRange(m, input, null);
 			checkResultsIntegerRange(ret);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -216,9 +214,7 @@ public class TestConvertImage {
 			ret = (ImageGray<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -236,9 +232,7 @@ public class TestConvertImage {
 			ret = (ImageInterleaved<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -275,9 +269,7 @@ public class TestConvertImage {
 			ret = (Planar<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -314,9 +306,7 @@ public class TestConvertImage {
 			ret = (ImageInterleaved<?>)m.invoke(null,input,null);
 			BoofTesting.assertEquals(input, ret, tol);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -357,9 +347,7 @@ public class TestConvertImage {
 			ret = (ImageGray<?>)m.invoke(null,input,null);
 			checkMultiAverage(input, ret);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -413,9 +401,7 @@ public class TestConvertImage {
 			ret = (ImageGray<?>)m.invoke(null,input,null);
 			checkInterleavedAverage(input, ret);
 
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

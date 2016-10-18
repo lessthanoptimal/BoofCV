@@ -51,7 +51,7 @@ public class SnapToEllipseEdge<T extends ImageGray> extends BaseIntegralEdge<T> 
 
 	protected GrowQueue_F64 weights = new GrowQueue_F64();// storage for weights in line fitting
 	// storage for where the points that are sampled along the line
-	protected FastQueue<Point2D_F64> samplePts = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
+	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64.class, true);
 
 	protected FitEllipseWeightedAlgebraic fitter = new FitEllipseWeightedAlgebraic();
 

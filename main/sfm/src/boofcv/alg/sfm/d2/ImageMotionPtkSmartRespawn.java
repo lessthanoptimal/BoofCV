@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase, IT extends Invertib
 	protected PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
 
 	// stores list of tracks to prune
-	private List<PointTrack> prune = new ArrayList<PointTrack>();
+	private List<PointTrack> prune = new ArrayList<>();
 
 	// change the keyframe is the number of inliers drops below this number
 	private int absoluteMinimumTracks;

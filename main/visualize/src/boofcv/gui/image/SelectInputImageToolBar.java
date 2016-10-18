@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class SelectInputImageToolBar extends JPanel implements ActionListener
 {
 	JComboBox imageMenu;
-	java.util.List<Object> cookies = new ArrayList<Object>();
+	java.util.List<Object> cookies = new ArrayList<>();
 
 	Listener listener;
 

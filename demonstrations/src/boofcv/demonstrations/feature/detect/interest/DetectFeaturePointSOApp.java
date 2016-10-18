@@ -168,7 +168,7 @@ public class DetectFeaturePointSOApp<T extends ImageGray, D extends ImageGray>
 		DetectFeaturePointSOApp app = new DetectFeaturePointSOApp(GrayF32.class, GrayF32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayU8.class,GrayS16.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));

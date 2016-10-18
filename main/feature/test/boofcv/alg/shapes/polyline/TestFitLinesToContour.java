@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -198,7 +198,7 @@ public class TestFitLinesToContour {
 	}
 
 	private List<Point2D_I32> createSquare( int x0 , int y0 , int x1 , int y1 ) {
-		List<Point2D_I32> output = new ArrayList<Point2D_I32>();
+		List<Point2D_I32> output = new ArrayList<>();
 
 		for (int x = x0; x < x1; x++) {
 			output.add( new Point2D_I32(x,y0));

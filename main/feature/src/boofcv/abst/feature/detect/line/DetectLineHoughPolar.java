@@ -165,7 +165,7 @@ public class DetectLineHoughPolar<I extends ImageGray, D extends ImageGray> impl
 		alg.transform(binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
-		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		List<LineParametric2D_F32> ret = new ArrayList<>();
 		for( int i = 0; i < lines.size; i++ )
 			ret.add(lines.get(i));
 

@@ -163,7 +163,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray> extends Demonstrati
 
 	public static void main(String[] args) {
 
-		List<String> examples = new ArrayList<String>();
+		List<String> examples = new ArrayList<>();
 		examples.add("shapes/shapes02.png");
 		examples.add("shapes/concave01.jpg");
 		examples.add("shapes/polygons01.jpg");

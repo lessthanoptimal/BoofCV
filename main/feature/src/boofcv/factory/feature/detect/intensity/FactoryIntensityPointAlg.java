@@ -58,13 +58,13 @@ public class FactoryIntensityPointAlg {
 			throw new IllegalArgumentException("Unsupported image type "+imageType);
 
 		if( minCont == 9 ) {
-			return new ImplFastIntensity9<T>(helper);
+			return new ImplFastIntensity9<>(helper);
 		} else if( minCont == 10 ) {
-			return new ImplFastIntensity10<T>(helper);
+			return new ImplFastIntensity10<>(helper);
 		} else if( minCont == 11 ) {
-			return new ImplFastIntensity11<T>(helper);
+			return new ImplFastIntensity11<>(helper);
 		} else if( minCont == 12 ) {
-			return new ImplFastIntensity12<T>(helper);
+			return new ImplFastIntensity12<>(helper);
 		} else {
 			throw new IllegalArgumentException("Specified minCont is not supported");
 		}

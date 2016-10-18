@@ -44,7 +44,7 @@ public class GeneralToInterestPoint<T extends ImageGray, D extends ImageGray>
 	double radius;
 
 	// list of points it found
-	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<Point2D_F64>(10,Point2D_F64.class,true);
+	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64.class, true);
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
 								  double radius,

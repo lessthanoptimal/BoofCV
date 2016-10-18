@@ -182,7 +182,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray, D extends ImageGr
 
 		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
 		inputs.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
 		inputs.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));

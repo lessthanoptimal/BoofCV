@@ -145,7 +145,7 @@ public class DetectFeaturePyramidApp <T extends ImageGray, D extends ImageGray>
 
 		DetectFeaturePyramidApp app = new DetectFeaturePyramidApp(GrayF32.class,GrayF32.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));

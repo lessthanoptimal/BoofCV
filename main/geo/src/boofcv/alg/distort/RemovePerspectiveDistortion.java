@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class RemovePerspectiveDistortion<T extends ImageBase> {
 	PointTransformHomography_F32 homography = new PointTransformHomography_F32();
 
 	// storage for associated points between the two images
-	ArrayList<AssociatedPair> associatedPairs = new ArrayList<AssociatedPair>();
+	ArrayList<AssociatedPair> associatedPairs = new ArrayList<>();
 
 	// input and output images
 	T output;

@@ -65,7 +65,7 @@ public class FactoryInterestPoint {
 		if (feature.getRequiresHessian())
 			hessian = FactoryDerivative.hessianSobel(derivType);
 
-		return new GeneralToInterestPoint<T, D>(feature, gradient, hessian, scale,derivType);
+		return new GeneralToInterestPoint<>(feature, gradient, hessian, scale, derivType);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class FactoryInterestPoint {
 		else
 			ss = FactoryPyramid.scaleSpace(scales, inputType);
 
-		return new WrapFLPtoInterestPoint<T, D>(feature, ss);
+		return new WrapFLPtoInterestPoint<>(feature, ss);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class FactoryInterestPoint {
 		else
 			ss = FactoryPyramid.scaleSpace(scales, inputType);
 
-		return new WrapFPtoInterestPoint<T, D>(feature, ss);
+		return new WrapFPtoInterestPoint<>(feature, ss);
 	}
 
 	/**
@@ -144,6 +144,6 @@ public class FactoryInterestPoint {
 		NonMaxLimiter limiter = new NonMaxLimiter(nonmax,configDet.maxFeaturesPerScale);
 		SiftDetector detector = new SiftDetector(scaleSpace,configDet.edgeR,limiter);
 
-		return new WrapSiftDetector<T>(detector,imageType);
+		return new WrapSiftDetector<>(detector, imageType);
 	}
 }

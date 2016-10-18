@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,8 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	Se3_F64 cameraToWorld = new Se3_F64();
 
 	boolean computed;
-	FastQueue<Point2D_F64> pixels = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-	FastQueue<Point3D_F64> points3D = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
+	FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point3D_F64> points3D = new FastQueue<>(Point3D_F64.class, true);
 
 	Se3_F64 planeToCamera;
 	PointTransform_F64 normToPixel;

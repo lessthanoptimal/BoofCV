@@ -62,7 +62,7 @@ public class EdgeIntensityPolygon<T extends ImageGray>  {
 		this.cornerOffset = cornerOffset;
 		this.tangentDistance = tangentDistance;
 
-		scorer = new ScoreLineSegmentEdge<T>(numSamples,imageType);
+		scorer = new ScoreLineSegmentEdge<>(numSamples, imageType);
 	}
 
 	/**

@@ -49,7 +49,7 @@ public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisual
 		PointTrackerTwoPass<GrayU8> tracker = FactoryPointTrackerTwoPass.klt(config, configDetector,
 				GrayU8.class, GrayS16.class);
 
-		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<GrayU16>(depthUnits);
+		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(depthUnits);
 
 		return FactoryVisualOdometry.
 				depthDepthPnP(1.5, 120, 2, 200, 50, false, sparseDepth, tracker, GrayU8.class, GrayU16.class);

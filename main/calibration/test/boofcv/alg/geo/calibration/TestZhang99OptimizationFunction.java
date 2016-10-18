@@ -50,7 +50,7 @@ public class TestZhang99OptimizationFunction {
 		
 		List<Point2D_F64> gridPts = GenericCalibrationGrid.standardLayout();
 
-		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
+		List<CalibrationObservation> observations = new ArrayList<>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
 			observations.add( estimate(param,param.views[i],gridPts));
@@ -118,7 +118,7 @@ public class TestZhang99OptimizationFunction {
 
 		List<Point2D_F64> gridPts = GenericCalibrationGrid.standardLayout();
 
-		List<CalibrationObservation> observations = new ArrayList<CalibrationObservation>();
+		List<CalibrationObservation> observations = new ArrayList<>();
 
 		for( int i = 0; i < param.views.length; i++ ) {
 			CalibrationObservation set = estimate(param, param.views[i], gridPts);

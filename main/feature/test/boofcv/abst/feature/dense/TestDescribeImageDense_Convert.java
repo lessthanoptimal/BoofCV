@@ -80,12 +80,12 @@ public class TestDescribeImageDense_Convert {
 
 		@Override
 		public List<TupleDesc_F64> getDescriptions() {
-			return new ArrayList<TupleDesc_F64>();
+			return new ArrayList<>();
 		}
 
 		@Override
 		public List<Point2D_I32> getLocations() {
-			return new ArrayList<Point2D_I32>();
+			return new ArrayList<>();
 		}
 
 		@Override

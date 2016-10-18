@@ -75,7 +75,7 @@ public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W exten
 	// selected wavelet filter
 	DenoiseWavelet<T> denoiser;
 	WaveletDescription<W> waveletDesc;
-	List<WaveletDescription> waveletList = new ArrayList<WaveletDescription>();
+	List<WaveletDescription> waveletList = new ArrayList<>();
 
 	JPanel gui = new JPanel();
 	DenoiseInfoPanel info = new DenoiseInfoPanel();
@@ -88,7 +88,7 @@ public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W exten
 
 	D deriv;
 
-	Vector<BufferedImage> images = new Vector<BufferedImage>();
+	Vector<BufferedImage> images = new Vector<>();
 
 	boolean processedImage = false;
 
@@ -209,7 +209,7 @@ public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W exten
 		if( denoiser != null ) {
 			WaveletTransform<T, T,W> waveletTran =
 					FactoryWaveletTransform.create(imageType,waveletDesc,numLevels,0,255);
-			FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<T>(waveletTran,denoiser);
+			FilterImageInterface<T,T> filter = new WaveletDenoiseFilter<>(waveletTran, denoiser);
 
 			filter.process(noisy,output);
 		} else {
@@ -321,7 +321,7 @@ public class DenoiseVisualizeApp<T extends ImageGray,D extends ImageGray,W exten
 	public static void main( String args[] ) {
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(GrayF32.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
 		inputs.add(new PathLabel("barbara",UtilIO.pathExample("standard/barbara.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));

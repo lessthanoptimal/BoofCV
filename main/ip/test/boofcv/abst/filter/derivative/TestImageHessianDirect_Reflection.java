@@ -47,7 +47,7 @@ public class TestImageHessianDirect_Reflection {
 
 		Method m = HessianSobel.class.getMethod("process",GrayF32.class,GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
 
-		ImageHessianDirect_Reflection<GrayF32,GrayF32> alg = new ImageHessianDirect_Reflection<GrayF32,GrayF32>(m);
+		ImageHessianDirect_Reflection<GrayF32,GrayF32> alg = new ImageHessianDirect_Reflection<>(m);
 
 		alg.process(input,derivXX,derivYY,derivXY);
 	}

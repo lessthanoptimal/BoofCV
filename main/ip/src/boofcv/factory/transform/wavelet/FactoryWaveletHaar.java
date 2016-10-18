@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class FactoryWaveletHaar {
 				forward.denominatorScaling = 1;
 				forward.denominatorWavelet = 1;
 
-				WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<WlCoef_I32>(generateInv_I32());
+				WlBorderCoef<WlCoef_I32> inverse = new WlBorderCoefStandard<>(generateInv_I32());
 
 				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
 			}
@@ -52,7 +52,7 @@ public class FactoryWaveletHaar {
 				forward.scaling = new float[]{(float)(1.0/Math.sqrt(2)),(float)(1.0/Math.sqrt(2))};
 				forward.wavelet = new float[]{forward.scaling[0],-forward.scaling[0]};
 
-				WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
+				WlBorderCoef<WlCoef_F32> inverse = new WlBorderCoefStandard<>(forward);
 
 				return new WaveletDescription(new BorderIndex1D_Extend(),forward,inverse);
 			}

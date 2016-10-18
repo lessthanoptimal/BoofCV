@@ -84,7 +84,7 @@ public class ExampleCalibrateMonocularPoints {
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 		List<String> imageNames = BoofMiscOps.directoryList(directory, "left");
 
-		List<CalibrationObservation> ret = new ArrayList<CalibrationObservation>();
+		List<CalibrationObservation> ret = new ArrayList<>();
 
 		for( String n : imageNames ) {
 			CalibrationObservation set = new CalibrationObservation();

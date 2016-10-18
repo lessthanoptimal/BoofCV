@@ -74,7 +74,7 @@ public class TestDetectFiducialSquareImage {
 		alg.addPattern(threshold(pattern, 125), 2.0);
 		alg.configure(intrinsic,false);
 
-		List<Point2D_F64> expected = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> expected = new ArrayList<>();
 		expected.add( new Point2D_F64(200,250+rendered.height));
 		expected.add( new Point2D_F64(200,250));
 		expected.add( new Point2D_F64(200+rendered.width,250));

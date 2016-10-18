@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -2291,8 +2291,7 @@ public class GeneralPurposeFFT_F64_1D {
 		ipph = (ip + 1) / 2;
 		nbd = (ido - 1) / 2;
 		if (ido != 1) {
-			for (int ik = 0; ik < idl1; ik++)
-				out[out_off + ik] = in[in_off + ik];
+			System.arraycopy(in, in_off + 0, out, out_off + 0, idl1);
 			for (int j = 1; j < ip; j++) {
 				int idx1 = j * l1 * ido;
 				for (int k = 0; k < l1; k++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestUtilFeature {
 		feature0.value[5] = 10;
 		feature1.value[3] = 13;
 
-		List<TupleDesc_F64> list = new ArrayList<TupleDesc_F64>();
+		List<TupleDesc_F64> list = new ArrayList<>();
 		list.add(feature0);
 		list.add(feature1);
 

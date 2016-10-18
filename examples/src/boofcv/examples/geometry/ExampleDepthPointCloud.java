@@ -60,7 +60,7 @@ public class ExampleDepthPointCloud {
 		GrayU16 depth =
 				ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth),null,GrayU16.class);
 
-		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
+		FastQueue<Point3D_F64> cloud = new FastQueue<>(Point3D_F64.class, true);
 		FastQueueArray_I32 cloudColor = new FastQueueArray_I32(3);
 
 		VisualDepthOps.depthTo3D(param.visualParam, rgb, depth, cloud, cloudColor);

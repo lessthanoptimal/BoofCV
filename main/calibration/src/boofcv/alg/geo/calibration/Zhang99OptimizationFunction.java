@@ -38,7 +38,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 	private int N,M;
 	
 	// description of the calibration grid
-	private List<Point3D_F64> grid = new ArrayList<Point3D_F64>();
+	private List<Point3D_F64> grid = new ArrayList<>();
 	// optimization parameters
 	private Zhang99ParamAll param;
 

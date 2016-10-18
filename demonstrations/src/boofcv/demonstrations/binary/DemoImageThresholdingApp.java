@@ -158,7 +158,7 @@ public class DemoImageThresholdingApp<T extends ImageGray> extends SelectInputPa
 	public static void main( String args[] ) {
 		DemoImageThresholdingApp app = new DemoImageThresholdingApp(GrayF32.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));

@@ -79,8 +79,8 @@ public class ExampleAssociatePoints<T extends ImageGray, TD extends TupleDesc> {
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
 		// stores the location of detected interest points
-		pointsA = new ArrayList<Point2D_F64>();
-		pointsB = new ArrayList<Point2D_F64>();
+		pointsA = new ArrayList<>();
+		pointsB = new ArrayList<>();
 
 		// stores the description of detected interest points
 		FastQueue<TD> descA = UtilFeature.createQueue(detDesc,100);

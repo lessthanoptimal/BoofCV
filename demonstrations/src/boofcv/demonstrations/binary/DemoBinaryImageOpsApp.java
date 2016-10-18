@@ -202,7 +202,7 @@ public class DemoBinaryImageOpsApp<T extends ImageGray> extends SelectAlgorithmA
 	public static void main( String args[] ) {
 		DemoBinaryImageOpsApp app = new DemoBinaryImageOpsApp(GrayF32.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 

@@ -35,56 +35,56 @@ public class FactoryBinaryImageOps {
 	 * Filter implementation of {@link BinaryImageOps#erode4(GrayU8, int, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> erode4() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "erode4", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "erode4", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#erode8(GrayU8, int, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> erode8() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "erode8", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "erode8", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate4(GrayU8, int, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> dilate4() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "dilate4", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "dilate4", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate8(GrayU8, int, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> dilate8() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "dilate8", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "dilate8", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#edge4(GrayU8, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> edge4() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "edge4", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "edge4", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#edge8(GrayU8, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> edge8() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "edge8", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "edge8", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#removePointNoise(GrayU8, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> removePointNoise() {
-		return new FilterImageReflection<GrayU8, GrayU8>(BinaryImageOps.class, "removePointNoise", 0, 0, GrayU8.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "removePointNoise", 0, 0, GrayU8.class, GrayU8.class);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#labelToBinary(GrayS32, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayS32, GrayU8> labelToBinary() {
-		return new FilterImageReflection<GrayS32, GrayU8>(BinaryImageOps.class, "labelToBinary", 0, 0, GrayS32.class, GrayU8.class);
+		return new FilterImageReflection<>(BinaryImageOps.class, "labelToBinary", 0, 0, GrayS32.class, GrayU8.class);
 	}
 
 }

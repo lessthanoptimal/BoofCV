@@ -57,7 +57,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	// ratio of the length of a square to the distance separating the square
 	private double spaceToSquareRatio;
 
-	protected RecycleManager<SquareEdge> edges = new RecycleManager<SquareEdge>(SquareEdge.class);
+	protected RecycleManager<SquareEdge> edges = new RecycleManager<>(SquareEdge.class);
 
 	// Storage for line segments used to calculate center
 	private LineGeneral2D_F64 line = new LineGeneral2D_F64();

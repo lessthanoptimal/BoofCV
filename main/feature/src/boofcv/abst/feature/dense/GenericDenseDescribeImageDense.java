@@ -49,7 +49,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase, Desc extends Tu
 	int periodY;
 
 	FastQueue<Desc> descriptions;
-	FastQueue<Point2D_I32> locations = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32.class, true);
 
 	/**
 	 * Configures dense description.

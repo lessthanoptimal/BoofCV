@@ -64,8 +64,8 @@ public class FactoryDescribeImageDense {
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
 
-		return new GenericDenseDescribeImageDense<T,TupleDesc_F64>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS,
-				config.descriptorScale, config.sampling.periodX,config.sampling.periodY);
+		return new GenericDenseDescribeImageDense<>(surf, BoofDefaults.SURF_SCALE_TO_RADIUS,
+				config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class FactoryDescribeImageDense {
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
 
-		return new GenericDenseDescribeImageDense<T,TupleDesc_F64>( surf , BoofDefaults.SURF_SCALE_TO_RADIUS,
-				config.descriptorScale, config.sampling.periodX,config.sampling.periodY);
+		return new GenericDenseDescribeImageDense<>(surf, BoofDefaults.SURF_SCALE_TO_RADIUS,
+				config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class FactoryDescribeImageDense {
 
 		// If the data type isn't F32 convert it into that data type first
 		if( actualType != imageType ) {
-			return new DescribeImageDense_Convert<T, TupleDesc_F64>(output,imageType);
+			return new DescribeImageDense_Convert<>(output, imageType);
 		} else {
 			return output;
 		}

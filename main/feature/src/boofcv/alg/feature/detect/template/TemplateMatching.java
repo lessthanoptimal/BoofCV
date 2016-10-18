@@ -56,7 +56,7 @@ public class TemplateMatching<T extends ImageBase> {
 	private int indexes[] = new int[10];
 
 	// storage for final points
-	private FastQueue<Match> results = new FastQueue<Match>(10, Match.class, true);
+	private FastQueue<Match> results = new FastQueue<>(10, Match.class, true);
 
 	/**
 	 * Specifies internal algorithm

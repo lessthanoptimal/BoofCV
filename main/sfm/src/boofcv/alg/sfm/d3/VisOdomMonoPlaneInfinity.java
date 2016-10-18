@@ -69,7 +69,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 	// Motion estimator for points on plane.  Motion estimated is from key-frame to current-frame
 	private ModelMatcher<Se2_F64, PlanePtPixel> planeMotion;
 	// storage for data passed into planeMotion
-	private FastQueue<PlanePtPixel> planeSamples = new FastQueue<PlanePtPixel>(PlanePtPixel.class, true);
+	private FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel.class, true);
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;
@@ -99,9 +99,9 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 	private PointTransform_F64 pixelToNorm;
 
 	// tracks which are assumed to be at an infinite distance away
-	private List<PointTrack> tracksFar = new ArrayList<PointTrack>();
+	private List<PointTrack> tracksFar = new ArrayList<>();
 	// trans which lie on the ground plane
-	private List<PointTrack> tracksOnPlane = new ArrayList<PointTrack>();
+	private List<PointTrack> tracksOnPlane = new ArrayList<>();
 
 	// storage for normalized image coordinate
 	private Point2D_F64 n = new Point2D_F64();

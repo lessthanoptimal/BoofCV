@@ -58,19 +58,19 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 
 		// use an association algorithm which uses the track's pose information
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateMaxDistanceNaive<TupleDesc_B>(score,true,400,20);
+				new AssociateMaxDistanceNaive<>(score, true, 400, 20);
 
 		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
 				new WrapDescribeBrief<>(brief,GrayF32.class);
 
 		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
-				EasyGeneralFeatureDetector<GrayF32,GrayF32>(corner,GrayF32.class,GrayF32.class);
+				EasyGeneralFeatureDetector<>(corner, GrayF32.class, GrayF32.class);
 
 		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
-		manager = new DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B>(easy,describe,2);
+		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
 		DetectDescribeAssociateTwoPass<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociateTwoPass<GrayF32, TupleDesc_B>(manager,association,association,false);
+				new DetectDescribeAssociateTwoPass<>(manager, association, association, false);
 		return tracker;
 	}
 }

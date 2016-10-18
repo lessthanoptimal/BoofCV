@@ -38,7 +38,7 @@ import java.util.List;
 public class CreateFiducialSquareImage extends BaseFiducialSquare {
 
 	// Paths to image files containing fiducial patterns
-	List<String> imagePaths = new ArrayList<String>();
+	List<String> imagePaths = new ArrayList<>();
 
 	@Override
 	protected void printPatternDefinitions() {

@@ -185,7 +185,7 @@ public class TestCombinedTrackerScalePoint {
 
 		@Override
 		public FastQueue<AssociatedIndex> getMatches() {
-			FastQueue<AssociatedIndex> queue = new FastQueue<AssociatedIndex>(N,AssociatedIndex.class,true);
+			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex.class, true);
 
 			for( int i = 0; i < N; i++ ) {
 				queue.grow().setAssociation(i,i,1);

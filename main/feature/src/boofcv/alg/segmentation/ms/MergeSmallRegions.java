@@ -49,7 +49,7 @@ public class MergeSmallRegions<T extends ImageBase> extends RegionMergeTree {
 	protected GrowQueue_I32 segmentToPruneID = new GrowQueue_I32();
 
 	// Used to mark pixels as not being a member of any region
-	protected FastQueue<Node> pruneGraph = new FastQueue<Node>(Node.class,true);
+	protected FastQueue<Node> pruneGraph = new FastQueue<>(Node.class, true);
 
 	// Relative location of neighbors according to connection rule
 	protected Point2D_I32 connect[];

@@ -101,7 +101,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 
 	// storage for clusters and pixel information
 	protected FastQueue<Cluster> clusters;
-	protected FastQueue<Pixel> pixels = new FastQueue<Pixel>(Pixel.class,true);
+	protected FastQueue<Pixel> pixels = new FastQueue<>(Pixel.class, true);
 
 	// type of input image
 	protected ImageType<T> imageType;
@@ -119,7 +119,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 		this.imageType = imageType;
 
 		ComputeRegionMeanColor<T> regionColor = FactorySegmentationAlg.regionMeanColor(imageType);
-		this.mergeSmall = new MergeSmallRegions<T>(-1,connectRule,regionColor);
+		this.mergeSmall = new MergeSmallRegions<>(-1, connectRule, regionColor);
 		this.segment = new ClusterLabeledImage(connectRule);
 		this.regionColor = new ColorQueue_F32(numBands);
 
@@ -395,7 +395,7 @@ public abstract class SegmentSlic<T extends ImageBase> {
 	public static class Pixel
 	{
 		// list of clusters it is interacting with
-		public FastQueue<ClusterDistance> clusters = new FastQueue<ClusterDistance>(12,ClusterDistance.class,true);
+		public FastQueue<ClusterDistance> clusters = new FastQueue<>(12, ClusterDistance.class, true);
 
 		public void add( Cluster c , float distance ) {
 			// make sure it isn't already full.  THis should almost never happen

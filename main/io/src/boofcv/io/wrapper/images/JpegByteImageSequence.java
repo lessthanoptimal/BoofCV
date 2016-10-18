@@ -40,7 +40,7 @@ import java.util.List;
 public class JpegByteImageSequence<T extends ImageBase> implements SimpleImageSequence<T> {
 
 	int index;
-	List<byte[]> jpegData = new ArrayList<byte[]>();
+	List<byte[]> jpegData = new ArrayList<>();
 
 	// type of image it outputs
 	ImageType<T> imageType;

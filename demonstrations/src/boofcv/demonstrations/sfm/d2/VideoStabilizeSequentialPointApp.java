@@ -103,7 +103,7 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray, D extends Ima
 	public static void main( String args[] ) {
 		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(GrayF32.class, GrayF32.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
 		inputs.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
 		inputs.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));

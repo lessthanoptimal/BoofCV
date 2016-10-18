@@ -168,7 +168,7 @@ public class VisualizeImageHogCellApp<T extends ImageBase> extends Demonstration
 	}
 
 	public static void main(String[] args) {
-		List<String> examples = new ArrayList<String>();
+		List<String> examples = new ArrayList<>();
 
 		examples.add(UtilIO.pathExample("shapes/shapes01.png"));
 		examples.add(UtilIO.pathExample("shapes/shapes02.png"));

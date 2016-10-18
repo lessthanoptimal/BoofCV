@@ -97,9 +97,7 @@ public class StandardGradientChecks {
 			m1.invoke(null,input,derivX,derivY,border);
 			m2.invoke(null,derivX,derivXX,derivXY,border);
 			m2.invoke(null,derivY,derivYX,derivYY,border);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 

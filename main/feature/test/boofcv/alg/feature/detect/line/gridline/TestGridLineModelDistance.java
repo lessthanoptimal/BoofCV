@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class TestGridLineModelDistance {
 		alg.setModel(l);
 
 		double distance[] = new double[2];
-		List<Edgel> points = new ArrayList<Edgel>();
+		List<Edgel> points = new ArrayList<>();
 
 		points.add(new Edgel(5,5, theta));
 		points.add(new Edgel(0,0, theta));

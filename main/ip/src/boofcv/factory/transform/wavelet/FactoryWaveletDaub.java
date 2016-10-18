@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,9 +82,9 @@ public class FactoryWaveletDaub {
 		coef.wavelet[2] = coef.scaling[1];
 		coef.wavelet[3] = -coef.scaling[0];
 
-		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<WlCoef_F32>(coef);
+		WlBorderCoefStandard<WlCoef_F32> inverse = new WlBorderCoefStandard<>(coef);
 
-		return new WaveletDescription<WlCoef_F32>(new BorderIndex1D_Wrap(),coef,inverse);
+		return new WaveletDescription<>(new BorderIndex1D_Wrap(), coef, inverse);
 	}
 
 	/**
@@ -135,12 +135,12 @@ public class FactoryWaveletDaub {
 			inverse = computeBorderCoefficients(border,forward,inner);
 		} else if( borderType == BorderType.WRAP ) {
 			WlCoef_F32 inner = computeInnerInverseBiorthogonal(forward);
-			inverse = new WlBorderCoefStandard<WlCoef_F32>(inner);
+			inverse = new WlBorderCoefStandard<>(inner);
 			border = new BorderIndex1D_Wrap();
 		} else {
 			throw new IllegalArgumentException("Unsupported border type: "+borderType);
 		}
-		return new WaveletDescription<WlCoef_F32>(border,forward,inverse);
+		return new WaveletDescription<>(border, forward, inverse);
 
 	}
 
@@ -214,7 +214,7 @@ public class FactoryWaveletDaub {
 
 		int numBorder = UtilWavelet.borderForwardLower(inverse)/2;
 
-		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(numBorder,numBorder+1);
+		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<>(numBorder, numBorder + 1);
 		ret.setInnerCoef(inverse);
 
 		// add the lower coefficients first
@@ -305,7 +305,7 @@ public class FactoryWaveletDaub {
 
 		if( borderType == BorderType.WRAP ) {
 			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
-			inverse = new WlBorderCoefStandard<WlCoef_I32>(inner);
+			inverse = new WlBorderCoefStandard<>(inner);
 			border = new BorderIndex1D_Wrap();
 		} else if( borderType == BorderType.REFLECT ) {
 			WlCoef_I32 inner = computeInnerBiorthogonalInverse(forward);
@@ -314,7 +314,7 @@ public class FactoryWaveletDaub {
 		} else {
 			throw new IllegalArgumentException("Unsupported border type: "+borderType);
 		}
-		return new WaveletDescription<WlCoef_I32>(border,forward,inverse);
+		return new WaveletDescription<>(border, forward, inverse);
 
 	}
 
@@ -351,7 +351,7 @@ public class FactoryWaveletDaub {
 	public static WlBorderCoefFixed<WlCoef_I32> convertToInt( WlBorderCoefFixed<WlCoef_F32> orig ,
 															  WlCoef_I32 inner ) {
 		WlBorderCoefFixed<WlCoef_I32> ret =
-				new WlBorderCoefFixed<WlCoef_I32>(orig.getLowerLength(),orig.getUpperLength());
+				new WlBorderCoefFixed<>(orig.getLowerLength(), orig.getUpperLength());
 
 		for( int i = 0; i < orig.getLowerLength(); i++ ) {
 			WlCoef_F32 o = orig.getLower(i);

@@ -474,11 +474,7 @@ public class TestConvolveImageStandard {
 		try {
 			Method m = ConvolveImageStandard.class.getMethod(name, inputTypes);
 			m.invoke(null, inputs);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

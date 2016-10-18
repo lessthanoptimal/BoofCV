@@ -353,7 +353,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray>
 //		app.setBaseDirectory(UtilIO.pathExample("");
 //		app.loadInputData(UtilIO.pathExample("tracking/file_list.txt");
 
-		List<PathLabel> examples = new ArrayList<PathLabel>();
+		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("WildCat", UtilIO.pathExample("tracking/wildcat_robot.mjpeg")));
 		examples.add(new PathLabel("Tree", UtilIO.pathExample("tracking/tree.mjpeg")));
 		examples.add(new PathLabel("Book", UtilIO.pathExample("tracking/track_book.mjpeg")));

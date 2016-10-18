@@ -154,7 +154,7 @@ public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc
 	@Override
 	public List<PointTrack> getAllTracks(List<PointTrack> list) {
 		if( list == null ) {
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 		}
 
 		addToList(tracker.getReactivated(),list);
@@ -167,7 +167,7 @@ public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc
 	@Override
 	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
 		if( list == null ) {
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 		}
 
 		addToList(tracker.getReactivated(),list);
@@ -179,7 +179,7 @@ public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc
 	@Override
 	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
 		if( list == null ) {
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 		}
 
 		addToList(tracker.getDormant(),list);
@@ -190,7 +190,7 @@ public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc
 	@Override
 	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
 		if( list == null ) {
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 		}
 
 		// it never drops tracks
@@ -200,7 +200,7 @@ public class PointTrackerCombined<I extends ImageGray, D extends ImageGray, Desc
 	@Override
 	public List<PointTrack> getNewTracks(List<PointTrack> list) {
 		if( list == null ) {
-			list = new ArrayList<PointTrack>();
+			list = new ArrayList<>();
 		}
 
 		addToList(tracker.getSpawned(),list);

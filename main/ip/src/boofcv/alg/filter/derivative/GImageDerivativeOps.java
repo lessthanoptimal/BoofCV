@@ -283,9 +283,9 @@ public class GImageDerivativeOps {
 		KernelBase kernel = lookupKernelX(type,isInteger);
 
 		if( kernel instanceof Kernel1D )
-			return new AnyImageDerivative<I,D>((Kernel1D)kernel,inputType,derivType);
+			return new AnyImageDerivative<>((Kernel1D) kernel, inputType, derivType);
 		else
-			return new AnyImageDerivative<I,D>((Kernel2D)kernel,inputType,derivType);
+			return new AnyImageDerivative<>((Kernel2D) kernel, inputType, derivType);
 	}
 
 	/**

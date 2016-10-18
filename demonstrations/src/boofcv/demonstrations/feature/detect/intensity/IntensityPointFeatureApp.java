@@ -72,7 +72,7 @@ public class IntensityPointFeatureApp<T extends ImageGray, D extends ImageGray>
 		this.imageType = imageType;
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(imageType);
-		deriv = new AnyImageDerivative<T,D>(GradientThree.getKernelX(isInteger),imageType,derivType);
+		deriv = new AnyImageDerivative<>(GradientThree.getKernelX(isInteger), imageType, derivType);
 
 		addAlgorithm(0, "Laplacian", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.TRACE,derivType));
 		addAlgorithm(0, "Hessian Det", new WrapperHessianBlobIntensity<T,D>(HessianBlobIntensity.Type.DETERMINANT,derivType));
@@ -152,9 +152,9 @@ public class IntensityPointFeatureApp<T extends ImageGray, D extends ImageGray>
 //				new IntensityPointFeatureApp<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
 
 		IntensityPointFeatureApp<GrayU8, GrayS16> app =
-				new IntensityPointFeatureApp<GrayU8,GrayS16>(GrayU8.class,GrayS16.class);
+				new IntensityPointFeatureApp<>(GrayU8.class, GrayS16.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));

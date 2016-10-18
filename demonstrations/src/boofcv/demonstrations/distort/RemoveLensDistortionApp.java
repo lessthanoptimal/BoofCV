@@ -145,7 +145,7 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		String imageDir = UtilIO.pathExample("structure/");
 		String bumbleDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Sony HX5V",calibDir + "intrinsic.txt",imageDir + "dist_cyto_01.jpg"));
 		inputs.add(new PathLabel("BumbleBee2",bumbleDir+"intrinsicLeft.txt",bumbleDir + "left01.jpg"));
 

@@ -66,7 +66,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 		ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
 
-		List<CodeGenerator> functions = new ArrayList<CodeGenerator>();
+		List<CodeGenerator> functions = new ArrayList<>();
 		functions.add( new GenerateMin());
 		functions.add( new GenerateMax());
 		functions.add( new GenerateMaxAbs());

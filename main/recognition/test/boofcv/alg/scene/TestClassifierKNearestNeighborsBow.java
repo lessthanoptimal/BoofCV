@@ -50,7 +50,7 @@ public class TestClassifierKNearestNeighborsBow {
 		DummyDense features = new DummyDense();
 		DummyToWord toWords = new DummyToWord();
 
-		List<HistogramScene> memory = new ArrayList<HistogramScene>();
+		List<HistogramScene> memory = new ArrayList<>();
 		for (int i = 0; i < 12; i++) {
 			memory.add(new HistogramScene(NUM_WORDS));
 		}
@@ -114,7 +114,7 @@ public class TestClassifierKNearestNeighborsBow {
 
 	protected class DummyDense implements DescribeImageDense {
 
-		List<TupleDesc> descriptions = new ArrayList<TupleDesc>();
+		List<TupleDesc> descriptions = new ArrayList<>();
 
 		@Override
 		public void process(ImageBase input) {

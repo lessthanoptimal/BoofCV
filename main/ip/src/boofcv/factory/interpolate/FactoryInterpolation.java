@@ -156,7 +156,7 @@ public class FactoryInterpolation {
 	 */
 	public static <T extends ImageGray> InterpolatePixelMB<Planar<T>>
 	createPixelPL(InterpolatePixelS<T> singleBand) {
-		return new InterpolatePixel_PL_using_SB<T>(singleBand);
+		return new InterpolatePixel_PL_using_SB<>(singleBand);
 	}
 
 	public static <T extends ImageGray> InterpolatePixelS<T> bilinearPixelS(T image, BorderType borderType) {

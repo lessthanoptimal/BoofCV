@@ -38,8 +38,8 @@ import java.util.Stack;
 public class TldTemplateMatching<T extends ImageGray> {
 
 	// set of features for positive and negative examples
-	private List<NccFeature> templatePositive = new ArrayList<NccFeature>();
-	private List<NccFeature> templateNegative = new ArrayList<NccFeature>();
+	private List<NccFeature> templatePositive = new ArrayList<>();
+	private List<NccFeature> templateNegative = new ArrayList<>();
 
 	// storage for the feature in the region that's being processed.
 	private NccFeature observed = new NccFeature(15*15);
@@ -48,7 +48,7 @@ public class TldTemplateMatching<T extends ImageGray> {
 	private InterpolatePixelS<T> interpolate;
 
 	// storage for descriptors which can be recycled
-	protected Stack<NccFeature> unused = new Stack<NccFeature>();
+	protected Stack<NccFeature> unused = new Stack<>();
 
 	public TldTemplateMatching( InterpolatePixelS<T> interpolate ) {
 		this.interpolate = interpolate;

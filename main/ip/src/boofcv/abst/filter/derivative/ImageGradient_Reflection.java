@@ -53,9 +53,7 @@ public class ImageGradient_Reflection<Input extends ImageGray, Output extends Im
 	public void process(Input inputImage , Output derivX, Output derivY) {
 		try {
 			m.invoke(null,inputImage, derivX, derivY, border);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

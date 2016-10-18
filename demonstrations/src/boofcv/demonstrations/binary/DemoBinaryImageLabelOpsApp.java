@@ -258,7 +258,7 @@ public class DemoBinaryImageLabelOpsApp<T extends ImageGray> extends SelectAlgor
 	public static void main( String args[] ) {
 		DemoBinaryImageLabelOpsApp app = new DemoBinaryImageLabelOpsApp(GrayF32.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 

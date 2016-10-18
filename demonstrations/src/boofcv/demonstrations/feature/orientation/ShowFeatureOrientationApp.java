@@ -187,12 +187,12 @@ public class ShowFeatureOrientationApp<T extends ImageGray, D extends ImageGray>
 
 	public static void main(String args[]) {
 		ShowFeatureOrientationApp<GrayF32, GrayF32> app =
-				new ShowFeatureOrientationApp<GrayF32, GrayF32>(GrayF32.class, GrayF32.class);
+				new ShowFeatureOrientationApp<>(GrayF32.class, GrayF32.class);
 
 //		ShowFeatureOrientationApp<GrayU8, GrayS16> app =
 //				new ShowFeatureOrientationApp<GrayU8,GrayS16>(input,GrayU8.class, GrayS16.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		inputs.add(new PathLabel("beach", UtilIO.pathExample("scale/beach02.jpg")));

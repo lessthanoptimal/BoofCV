@@ -94,7 +94,7 @@ public class BenchmarkAssociationSpeedSurf {
 			BufferedImage image = ImageIO.read(new File(imageName));
 			GrayF32 gray = ConvertBufferedImage.convertFrom(image, (GrayF32) null);
 
-			FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, false);
+			FastQueue<TupleDesc_F64> ret = new FastQueue<>(10, TupleDesc_F64.class, false);
 
 			detector.detect(gray);
 			

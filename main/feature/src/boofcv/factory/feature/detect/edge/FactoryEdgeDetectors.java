@@ -54,8 +54,8 @@ public class FactoryEdgeDetectors {
 		ImageGradient<T,D> gradient = FactoryDerivative.three(imageType, derivType);
 
 		if( dynamicThreshold )
-			return new CannyEdgeDynamic<T,D>(blur,gradient,saveTrace);
+			return new CannyEdgeDynamic<>(blur, gradient, saveTrace);
 		else
-			return new CannyEdge<T,D>(blur,gradient,saveTrace);
+			return new CannyEdge<>(blur, gradient, saveTrace);
 	}
 }

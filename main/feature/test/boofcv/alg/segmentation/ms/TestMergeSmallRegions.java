@@ -249,7 +249,7 @@ public class TestMergeSmallRegions {
 		MergeSmallRegions alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
-		FastQueue<float[]> regionColor = new FastQueue<float[]>(float[].class,false);
+		FastQueue<float[]> regionColor = new FastQueue<>(float[].class, false);
 
 		for( int i = 0; i < N; i++ ) {
 			regionColor.add( new float[3]);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class HomographyInducedStereo3Pts {
 	public HomographyInducedStereo3Pts()
 	{
 		// ensure that the inputs are not modified
-		solver = new LinearSolverSafe<DenseMatrix64F>(LinearSolverFactory.linear(3));
+		solver = new LinearSolverSafe<>(LinearSolverFactory.linear(3));
 	}
 
    /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class LineImageOps {
 
 		float threshold = intensity[ indexSort[ lines.size()-1] ]*fraction;
 
-		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		List<LineParametric2D_F32> ret = new ArrayList<>();
 
 		for( int i = 0; i < lines.size(); i++ ) {
 			if( intensity[i] >= threshold ) {
@@ -84,7 +84,7 @@ public class LineImageOps {
 		sort.sort(intensity, lines.size(), indexSort);
 
 		float theta[] = new float[ lines.size() ];
-		List<LineSegment2D_F32> segments = new ArrayList<LineSegment2D_F32>(lines.size());
+		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());
 
 		for( int i = 0; i < lines.size(); i++ ) {
 			LineParametric2D_F32 l = lines.get(i);
@@ -119,7 +119,7 @@ public class LineImageOps {
 			}
 		}
 
-		List<LineParametric2D_F32> ret = new ArrayList<LineParametric2D_F32>();
+		List<LineParametric2D_F32> ret = new ArrayList<>();
 		for( int i = 0; i < segments.size(); i++ ) {
 			if( segments.get(i) != null ) {
 				ret.add( lines.get(i));
@@ -243,7 +243,7 @@ public class LineImageOps {
 		Point2D_F32 c = computePoint(l, t2);
 		Point2D_F32 d = computePoint(l, t3);
 
-		List<Point2D_F32> inside = new ArrayList<Point2D_F32>();
+		List<Point2D_F32> inside = new ArrayList<>();
 		checkAddInside(width , height , a, inside);
 		checkAddInside(width , height , b, inside);
 		checkAddInside(width , height , c, inside);

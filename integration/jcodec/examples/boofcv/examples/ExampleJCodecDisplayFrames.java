@@ -26,7 +26,6 @@ import boofcv.io.jcodec.JCodecSimplified;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
@@ -44,7 +43,7 @@ public class ExampleJCodecDisplayFrames {
 //		ImageType type = ImageType.pl(3, GrayF32.class);
 //		ImageType type = ImageType.single(GrayF32.class);
 
-		JCodecSimplified sequence = new JCodecSimplified<Planar<GrayU8>>(fileName,type);
+		JCodecSimplified sequence = new JCodecSimplified<>(fileName, type);
 
 		BufferedImage out;
 		if(sequence.hasNext()) {

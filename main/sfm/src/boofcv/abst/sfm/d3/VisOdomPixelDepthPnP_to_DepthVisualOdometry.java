@@ -58,7 +58,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	Class<Depth> depthType;
 	boolean success;
 
-	List<PointTrack> active = new ArrayList<PointTrack>();
+	List<PointTrack> active = new ArrayList<>();
 
 	public VisOdomPixelDepthPnP_to_DepthVisualOdometry(DepthSparse3D<Depth> sparse3D, VisOdomPixelDepthPnP<Vis> alg,
 													   DistanceModelMonoPixels<Se3_F64, Point2D3D> distance,

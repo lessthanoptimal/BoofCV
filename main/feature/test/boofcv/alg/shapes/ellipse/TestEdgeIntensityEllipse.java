@@ -46,7 +46,7 @@ public class TestEdgeIntensityEllipse {
 	 * Basic check to see if the score is higher when dead on.
 	 */
 	private void check(EllipseRotated_F64 ellipse) {
-		List<EllipseRotated_F64> list = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> list = new ArrayList<>();
 		list.add( ellipse );
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);
@@ -74,7 +74,7 @@ public class TestEdgeIntensityEllipse {
 	@Test
 	public void scoreInsideAndOutside() {
 		EllipseRotated_F64 ellipse = new EllipseRotated_F64(50,60,10,5,0.1);
-		List<EllipseRotated_F64> list = new ArrayList<EllipseRotated_F64>();
+		List<EllipseRotated_F64> list = new ArrayList<>();
 		list.add( ellipse );
 
 		GrayU8 image = TestBinaryEllipseDetectorPixel.renderEllipses(200,210, list, 0);

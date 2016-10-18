@@ -53,7 +53,7 @@ public class HoughTransformLineFootOfNorm {
 	// extracts line from the transform
 	NonMaxSuppression extractor;
 	// stores returned lines
-	FastQueue<LineParametric2D_F32> lines = new FastQueue<LineParametric2D_F32>(10,LineParametric2D_F32.class,true);
+	FastQueue<LineParametric2D_F32> lines = new FastQueue<>(10, LineParametric2D_F32.class, true);
 	// lines are ignored if they are less than this distance from the origin
 	// because the orientation can't be accurately estimated
 	int minDistanceFromOrigin;

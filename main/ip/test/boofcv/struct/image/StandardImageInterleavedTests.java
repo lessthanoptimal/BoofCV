@@ -191,12 +191,10 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved> 
 			Method m = img.getClass().getMethod(method, paramTypes);
 
 			return m.invoke(img, args);
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		} catch (NoSuchMethodException e) {
 			fail("The method " + method + " needs to be implemented");
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
 		} catch (InvocationTargetException e) {
 			throw (RuntimeException) e.getCause();
 		}

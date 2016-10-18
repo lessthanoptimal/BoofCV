@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class MatrixOfList<T> {
 		this.height = height;
 		grid = new ArrayList[ width*height ];
 		for( int i = 0; i < grid.length; i++ ) {
-			grid[i] = new ArrayList<T>();
+			grid[i] = new ArrayList<>();
 		}
 	}
 
@@ -46,7 +46,7 @@ public class MatrixOfList<T> {
 		if( width*height > grid.length ) {
 			grid = new ArrayList[ width*height ];
 			for( int i = 0; i < grid.length; i++ ) {
-				grid[i] = new ArrayList<T>();
+				grid[i] = new ArrayList<>();
 			}
 		}
 		this.width = width;
@@ -73,7 +73,7 @@ public class MatrixOfList<T> {
 	}
 
 	public List<T> createSingleList() {
-		List<T> ret = new ArrayList<T>();
+		List<T> ret = new ArrayList<>();
 
 		final int N = width*height;
 		for( int i = 0; i < N; i++ ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestBaseAssociateLocation2DFilter {
 
-	FastQueue<Point2D_F64> locationSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
-	FastQueue<Integer> descSrc = new FastQueue<Integer>(Integer.class,false);
-	FastQueue<Point2D_F64> locationDst = new FastQueue<Point2D_F64>(Point2D_F64.class,false);
-	FastQueue<Integer> descDst = new FastQueue<Integer>(Integer.class,false);
+	FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64.class, false);
+	FastQueue<Integer> descSrc = new FastQueue<>(Integer.class, false);
+	FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64.class, false);
+	FastQueue<Integer> descDst = new FastQueue<>(Integer.class, false);
 
 	@Before
 	public void init() {

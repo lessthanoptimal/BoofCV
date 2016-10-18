@@ -68,9 +68,7 @@ public class GenericConvolveDown<Input extends ImageGray, Output extends ImageGr
 	public void process(Input input, Output output) {
 		try {
 			m.invoke(null,kernel,input,output,skip);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

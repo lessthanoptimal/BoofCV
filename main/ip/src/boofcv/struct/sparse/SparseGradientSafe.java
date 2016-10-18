@@ -37,9 +37,7 @@ public class SparseGradientSafe<T extends ImageGray, G extends GradientValue>
 
 		try {
 			zero = (G) wrap.getGradientType().newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}

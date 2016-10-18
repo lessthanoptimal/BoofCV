@@ -99,9 +99,9 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	private RefineBinaryPolygon<T> refinePolygon;
 
 	// List of all squares that it finds
-	private FastQueue<Polygon2D_F64> found = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true);
+	private FastQueue<Polygon2D_F64> found = new FastQueue<>(Polygon2D_F64.class, true);
 	// extera information for found shapes
-	private FastQueue<Info> foundInfo = new FastQueue<Info>(Info.class,true);
+	private FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
 
 	// type of input image
 	private Class<T> inputType;
@@ -120,7 +120,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 
 	// storage for the contours associated with a found target.  used for debugging
 	// All contours are in distorted pixel coordiantes
-	private List<Contour> foundContours = new ArrayList<Contour>();
+	private List<Contour> foundContours = new ArrayList<>();
 
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform_F32 distToUndist, undistToDist;
@@ -138,7 +138,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	private PolygonHelper helper;
 
 	// storage for contour in undistorted image pixels
-	private FastQueue<Point2D_I32> contourUndist = new FastQueue<Point2D_I32>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> contourUndist = new FastQueue<>(Point2D_I32.class, true);
 
 	/**
 	 * Configures the detector.
@@ -167,7 +167,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 
 		setNumberOfSides(minSides,maxSides);
 		this.refinePolygon = refinePolygon;
-		this.edgeIntensity = new EdgeIntensityPolygon<T>(1,1.5,15,inputType);
+		this.edgeIntensity = new EdgeIntensityPolygon<>(1, 1.5, 15, inputType);
 		this.inputType = inputType;
 		this.minContourFraction = minContourFraction;
 		this.fitPolygon = contourToPolygon;

@@ -51,7 +51,7 @@ public class TestCalibrateStereoPlanar {
 
 	GrayF32 blank = new GrayF32(intrinsic.width,intrinsic.height);
 
-	List<Se3_F64> targetToLeft = new ArrayList<Se3_F64>();
+	List<Se3_F64> targetToLeft = new ArrayList<>();
 
 	Se3_F64 leftToRight = new Se3_F64();
 

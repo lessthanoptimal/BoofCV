@@ -72,9 +72,7 @@ public class Zhang99ParamAll extends Zhang99ParamCamera {
 		ret.x0 = x0;
 		ret.y0 = y0;
 
-		for( int i = 0; i < radial.length; i++ ) {
-			ret.radial[i] = radial[i];
-		}
+		System.arraycopy(radial, 0, ret.radial, 0, radial.length);
 
 		ret.t1 = t1;
 		ret.t2 = t2;

@@ -170,7 +170,7 @@ public class DetectLineApp<T extends ImageGray, D extends ImageGray>
 
 		DetectLineApp app = new DetectLineApp(imageType,derivType);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Objects", UtilIO.pathExample("simple_objects.jpg")));
 		inputs.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
 		app.setInputList(inputs);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestAssociateUniqueByScoreAlg {
 
-	FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(AssociatedIndex.class,true);
+	FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
 
 	@Test
 	public void checkSource() {

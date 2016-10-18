@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,8 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 
 		// since a reference is saved, stereoPose.worldToCam0 will be modified by the optimization
 		// algorithm internally
-		func = new ResidualsCodecToMatrix<StereoPose,Stereo2D3D>(
-				paramModel,new PnPStereoResidualReprojection(),stereoPose);
+		func = new ResidualsCodecToMatrix<>(
+				paramModel, new PnPStereoResidualReprojection(), stereoPose);
 
 		param = new double[paramModel.getParamLength()];
 	}

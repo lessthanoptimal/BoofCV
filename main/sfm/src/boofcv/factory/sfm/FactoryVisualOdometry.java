@@ -104,12 +104,12 @@ public class FactoryVisualOdometry {
 		GenerateSe2_PlanePtPixel generator = new GenerateSe2_PlanePtPixel();
 
 		ModelMatcher<Se2_F64, PlanePtPixel> motion =
-				new Ransac<Se2_F64, PlanePtPixel>(2323, manager, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		VisOdomMonoPlaneInfinity<T> alg =
-				new VisOdomMonoPlaneInfinity<T>(thresholdAdd,thresholdRetire,inlierPixelTol,motion,tracker);
+				new VisOdomMonoPlaneInfinity<>(thresholdAdd, thresholdRetire, inlierPixelTol, motion, tracker);
 
-		return new MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T>(alg,distance,generator,imageType);
+		return new MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<>(alg, distance, generator, imageType);
 	}
 
 	/**
@@ -159,9 +159,9 @@ public class FactoryVisualOdometry {
 
 
 		VisOdomMonoOverheadMotion2D<T> alg =
-				new VisOdomMonoOverheadMotion2D<T>(cellSize,maxCellsPerPixel,mapHeightFraction,motion2D,imageType);
+				new VisOdomMonoOverheadMotion2D<>(cellSize, maxCellsPerPixel, mapHeightFraction, motion2D, imageType);
 
-		return new MonoOverhead_to_MonocularPlaneVisualOdometry<T>(alg,imageType);
+		return new MonoOverhead_to_MonocularPlaneVisualOdometry<>(alg, imageType);
 	}
 
 	/**
@@ -189,20 +189,20 @@ public class FactoryVisualOdometry {
 										Class<T> imageType) {
 
 		// Range from sparse disparity
-		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<T>(sparseDisparity,imageType);
+		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
 
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
+				new EstimatorToGenerator<>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		RefinePnP refine = null;
 
@@ -211,9 +211,9 @@ public class FactoryVisualOdometry {
 		}
 
 		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<T>(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
+				new VisOdomPixelDepthPnP<>(thresholdAdd, thresholdRetire, doublePass, motion, pixelTo3D, refine, tracker, null, null);
 
-		return new WrapVisOdomPixelDepthPnP<T>(alg,pixelTo3D,distance,imageType);
+		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
 	/**
@@ -242,19 +242,19 @@ public class FactoryVisualOdometry {
 												 Class<Vis> visualType , Class<Depth> depthType ) {
 
 		// Range from sparse disparity
-		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<Depth>(sparseDepth);
+		ImagePixelTo3D pixelTo3D = new DepthSparse3D_to_PixelTo3D<>(sparseDepth);
 
 		Estimate1ofPnP estimator = FactoryMultiView.computePnP_1(EnumPNP.P3P_FINSTERWALDER,-1,2);
 		final DistanceModelMonoPixels<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<Se3_F64,Point2D3D>(estimator);
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<Se3_F64, Point2D3D>(2323, manager, generator, distance, ransacIterations, ransacTOL);
+				new Ransac<>(2323, manager, generator, distance, ransacIterations, ransacTOL);
 
 		RefinePnP refine = null;
 
@@ -262,11 +262,11 @@ public class FactoryVisualOdometry {
 			refine = FactoryMultiView.refinePnP(1e-12,refineIterations);
 		}
 
-		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<Vis>
-						(thresholdAdd,thresholdRetire ,doublePass,motion,pixelTo3D,refine,tracker,null,null);
+		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<>
+				(thresholdAdd, thresholdRetire, doublePass, motion, pixelTo3D, refine, tracker, null, null);
 
-		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis,Depth>
-				(sparseDepth,alg,distance, ImageType.single(visualType),depthType);
+		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
+				(sparseDepth, alg, distance, ImageType.single(visualType), depthType);
 	}
 
 	/**
@@ -301,24 +301,24 @@ public class FactoryVisualOdometry {
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo);
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
+				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
 
 		Class<Desc> descType = descriptor.getDescriptionType();
 		ScoreAssociation<Desc> scorer = FactoryAssociation.defaultScore(descType);
-		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
+		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
 
 		// need to make sure associations are unique
 		AssociateDescription2D<Desc> associateUnique = associateStereo;
 		if( !associateStereo.uniqueDestination() || !associateStereo.uniqueSource() ) {
-			associateUnique = new EnforceUniqueByScore.Describe2D<Desc>(associateStereo,true,true);
+			associateUnique = new EnforceUniqueByScore.Describe2D<>(associateStereo, true, true);
 		}
 
 		if( refineIterations > 0 ) {
@@ -327,10 +327,10 @@ public class FactoryVisualOdometry {
 
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
-		VisOdomDualTrackPnP<T,Desc> alg =  new VisOdomDualTrackPnP<T,Desc>(thresholdAdd,thresholdRetire,epipolarPixelTol,
-				trackerLeft,trackerRight,descriptor,associateUnique,triangulate,motion,refinePnP);
+		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
+				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP);
 
-		return new WrapVisOdomDualTrackPnP<T>(pnpStereo,distanceMono,distanceStereo,associateStereo,alg,refinePnP,imageType);
+		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);
 	}
 
 	/**
@@ -355,13 +355,13 @@ public class FactoryVisualOdometry {
 		PnPStereoEstimator pnpStereo = new PnPStereoEstimator(pnp,distanceMono,0);
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<Se3_F64,Stereo2D3D>(pnpStereo);
+		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
 		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
-				new Ransac<Se3_F64, Stereo2D3D>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
+				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
 
 		RefinePnPStereo refinePnP = null;
 
@@ -374,19 +374,19 @@ public class FactoryVisualOdometry {
 
 		AssociateDescription2D<Desc> assocSame;
 		if( maxDistanceF2F > 0 )
-			assocSame = new AssociateMaxDistanceNaive<Desc>(scorer,true,maxAssociationError,maxDistanceF2F);
+			assocSame = new AssociateMaxDistanceNaive<>(scorer, true, maxAssociationError, maxDistanceF2F);
 		else
-			assocSame = new AssociateDescTo2D<Desc>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
+			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
 
-		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<Desc>(scorer,epipolarPixelTol,descType);
+		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 
 		associateStereo.setThreshold(maxAssociationError);
 
-		VisOdomQuadPnP<T,Desc> alg = new VisOdomQuadPnP<T,Desc>(
-				detector,assocSame,associateStereo,triangulate,motion,refinePnP);
+		VisOdomQuadPnP<T,Desc> alg = new VisOdomQuadPnP<>(
+				detector, assocSame, associateStereo, triangulate, motion, refinePnP);
 
-		return new WrapVisOdomQuadPnP<T,Desc>(alg,refinePnP,associateStereo,distanceStereo,distanceMono,imageType);
+		return new WrapVisOdomQuadPnP<>(alg, refinePnP, associateStereo, distanceStereo, distanceMono, imageType);
 	}
 
 	/**
@@ -401,7 +401,7 @@ public class FactoryVisualOdometry {
 	 */
 	public static <T extends ImageBase> StereoVisualOdometry<T> scaleInput( StereoVisualOdometry<T> vo , double scaleFactor )
 	{
-		return new StereoVisualOdometryScaleInput<T>(vo,scaleFactor);
+		return new StereoVisualOdometryScaleInput<>(vo, scaleFactor);
 	}
 
 	/**
@@ -416,6 +416,6 @@ public class FactoryVisualOdometry {
 	 */
 	public static <T extends ImageBase> MonocularPlaneVisualOdometry<T> scaleInput( MonocularPlaneVisualOdometry<T> vo , double scaleFactor )
 	{
-		return new MonocularPlaneVisualOdometryScaleInput<T>(vo,scaleFactor);
+		return new MonocularPlaneVisualOdometryScaleInput<>(vo, scaleFactor);
 	}
 }

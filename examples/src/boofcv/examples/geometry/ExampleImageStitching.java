@@ -86,9 +86,9 @@ public class ExampleImageStitching {
 					  ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher )
 	{
 		// get the length of the description
-		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> pointsA = new ArrayList<>();
 		FastQueue<FD> descA = UtilFeature.createQueue(detDesc,100);
-		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> pointsB = new ArrayList<>();
 		FastQueue<FD> descB = UtilFeature.createQueue(detDesc,100);
 
 		// extract feature locations and descriptions from each image
@@ -102,7 +102,7 @@ public class ExampleImageStitching {
 
 		// create a list of AssociatedPairs that tell the model matcher how a feature moved
 		FastQueue<AssociatedIndex> matches = associate.getMatches();
-		List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> pairs = new ArrayList<>();
 
 		for( int i = 0; i < matches.size(); i++ ) {
 			AssociatedIndex match = matches.get(i);

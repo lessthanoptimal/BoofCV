@@ -39,9 +39,9 @@ public class TestEasyGeneralFeatureDetector {
 
 	@Test
 	public void requiresGradient() {
-		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(true,false);
+		Helper<GrayU8,GrayS16> detector = new Helper<>(true, false);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
+				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
 
 		assertTrue(alg.derivX != null);
 		assertTrue(alg.derivY != null);
@@ -57,9 +57,9 @@ public class TestEasyGeneralFeatureDetector {
 
 	@Test
 	public void requiresHessian() {
-		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(false,true);
+		Helper<GrayU8,GrayS16> detector = new Helper<>(false, true);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
+				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
 
 		// It uses the gradient to compute the hessian faster
 		assertTrue(alg.derivX != null);
@@ -75,9 +75,9 @@ public class TestEasyGeneralFeatureDetector {
 
 	@Test
 	public void checkExclude() {
-		Helper<GrayU8,GrayS16> detector = new Helper<GrayU8,GrayS16>(true,true);
+		Helper<GrayU8,GrayS16> detector = new Helper<>(true, true);
 		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<GrayU8, GrayS16>(detector,GrayU8.class,GrayS16.class);
+				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
 
 		alg.detect(image,new QueueCorner(10));
 

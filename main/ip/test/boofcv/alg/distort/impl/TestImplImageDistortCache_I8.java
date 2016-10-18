@@ -34,6 +34,6 @@ public class TestImplImageDistortCache_I8 extends CommonImageDistortCacheTests<G
 	@Override
 	public ImageDistortCache_SB<GrayU8,GrayU8> create(InterpolatePixelS<GrayU8> interp,
 													  Class<GrayU8> imageType) {
-		return new ImplImageDistortCache_I8<GrayU8,GrayU8>(interp);
+		return new ImplImageDistortCache_I8<>(interp);
 	}
 }

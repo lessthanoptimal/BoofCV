@@ -49,7 +49,7 @@ import java.awt.event.*;
  */
 public class PointCloudViewer extends JPanel
 		implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
-	FastQueue<ColorPoint3D> cloud = new FastQueue<ColorPoint3D>(200,ColorPoint3D.class,true);
+	FastQueue<ColorPoint3D> cloud = new FastQueue<>(200, ColorPoint3D.class, true);
 
 	// intrinsic camera parameters
 	DenseMatrix64F K;

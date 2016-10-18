@@ -54,7 +54,7 @@ public class DetectDescribeFusion<T extends ImageGray, TD extends TupleDesc>
 	// storage for found orientations
 	private GrowQueue_F64 featureRadiuses = new GrowQueue_F64(10);
 	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
-	private FastQueue<Point2D_F64> location = new FastQueue<Point2D_F64>(10,Point2D_F64.class,false);
+	private FastQueue<Point2D_F64> location = new FastQueue<>(10, Point2D_F64.class, false);
 
 	/**
 	 * Configures the algorithm.

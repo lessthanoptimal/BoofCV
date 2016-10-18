@@ -28,7 +28,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SquareGrid {
-	public List<SquareNode> nodes = new ArrayList<SquareNode>();
+	public List<SquareNode> nodes = new ArrayList<>();
 	public int columns;
 	public int rows;
 

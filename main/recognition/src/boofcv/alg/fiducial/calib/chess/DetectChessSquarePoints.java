@@ -53,7 +53,7 @@ public class DetectChessSquarePoints<T extends ImageGray> {
 
 	SquareGridTools tools = new SquareGridTools();
 
-	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<>(Point2D_F64.class, true);
 
 	// maximum distance two corners can be from each other
 	double maxCornerDistanceSq;

@@ -51,7 +51,7 @@ public class SurfPlanar_to_DetectDescribePoint<T extends ImageGray, II extends I
 
 		gray = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayII = GeneralizedImageOps.createSingleBand(integralType,1,1);
-		bandII = new Planar<II>(integralType,1,1,alg.getDescribe().getNumBands());
+		bandII = new Planar<>(integralType, 1, 1, alg.getDescribe().getNumBands());
 	}
 
 	@Override

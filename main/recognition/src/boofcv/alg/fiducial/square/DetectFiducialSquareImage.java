@@ -70,7 +70,7 @@ public class DetectFiducialSquareImage<T extends ImageGray>
 	private GrayU8 binary = new GrayU8(squareLength,squareLength);
 
 	// list of all known targets
-	private List<FiducialDef> targets = new ArrayList<FiducialDef>();
+	private List<FiducialDef> targets = new ArrayList<>();
 
 	// description of the current target candidate
 	private  short squareDef[] = new short[DESC_LENGTH];

@@ -44,7 +44,7 @@ public abstract class GenericBackgroundModelStationaryChecks {
 	int width = 60;
 	int height = 50;
 
-	protected List<ImageType> imageTypes = new ArrayList<ImageType>();
+	protected List<ImageType> imageTypes = new ArrayList<>();
 
 	public abstract<T extends ImageBase>
 	BackgroundModelStationary<T> create( ImageType<T> imageType );

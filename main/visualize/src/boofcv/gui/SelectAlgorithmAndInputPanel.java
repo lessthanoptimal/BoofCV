@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	protected String baseDirectory="";
 
 	// components which had been externally added
-	List<JComponent> addedComponents = new ArrayList<JComponent>();
+	List<JComponent> addedComponents = new ArrayList<>();
 
 	// what the original image was before any processing
 	protected BufferedImage inputImage;
@@ -87,7 +86,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 			toolbar.add( b);
 			b.addActionListener(this);
 			b.setMaximumSize(b.getPreferredSize());
-			algCookies[i] = new ArrayList<Object>();
+			algCookies[i] = new ArrayList<>();
 		}
 
 		toolbar.add(Box.createHorizontalGlue());
@@ -110,7 +109,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	public void loadInputData(String fileName) {
 		Reader r = media.openFile(fileName);
 
-		List<PathLabel> refs = new ArrayList<PathLabel>();
+		List<PathLabel> refs = new ArrayList<>();
 		try {
 			BufferedReader reader = new BufferedReader(r);
 
@@ -128,8 +127,6 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 
 			setInputList(refs);
 
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

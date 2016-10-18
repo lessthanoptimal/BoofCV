@@ -80,25 +80,25 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 		alg = FactoryDetectPoint.createHarris(configExtract, false, derivType);
 
 
-		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createHarris(configExtract, true, derivType);
-		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, derivType);
-		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
-		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createFast(
 				new ConfigFast(10,9),new ConfigGeneralDetector(maxFeatures,radius,10), imageType);
-		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);
-		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createMedian(configExtract, imageType);
-		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT, configExtract, derivType);
-		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		configExtract.detectMinimums = true;
 		alg = FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE, configExtract, derivType);
-		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<T,D>(alg,imageType,derivType));
+		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();
@@ -198,7 +198,7 @@ public class DetectFeaturePointApp<T extends ImageGray, D extends ImageGray>
 		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayF32.class, GrayF32.class);
 //		DetectFeaturePointApp app = new DetectFeaturePointApp(GrayU8.class,GrayS16.class);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("amoeba",UtilIO.pathExample("amoeba_shapes.jpg")));
 		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));

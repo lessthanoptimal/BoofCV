@@ -78,12 +78,10 @@ public class TestImplAverageDownSample2 {
 
 			try {
 				m.invoke(null, input, found);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
-			naive(input,2,expected);
+		naive(input,2,expected);
 
 			BoofTesting.assertEquals(found,expected,1e-4);
 	}

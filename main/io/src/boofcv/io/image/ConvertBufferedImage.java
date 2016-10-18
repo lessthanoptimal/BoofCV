@@ -440,7 +440,7 @@ public class ConvertBufferedImage {
 				numBands = raster.getNumBands();
 
 			if( dst == null)
-				dst = new Planar<T>(type,src.getWidth(),src.getHeight(),numBands);
+				dst = new Planar<>(type, src.getWidth(), src.getHeight(), numBands);
 			else if( dst.getNumBands() != numBands )
 				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
 
@@ -479,7 +479,7 @@ public class ConvertBufferedImage {
 		} catch( java.security.AccessControlException e) {
 			// Applets don't allow access to the raster()
 			if( dst == null )
-				dst = new Planar<T>(type,src.getWidth(),src.getHeight(),3);
+				dst = new Planar<>(type, src.getWidth(), src.getHeight(), 3);
 
 			if( type == GrayU8.class ) {
 				ConvertRaster.bufferedToMulti_U8(src, (Planar<GrayU8>) dst);

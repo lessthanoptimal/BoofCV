@@ -53,7 +53,7 @@ public abstract class DisplaySteerableBase<T extends ImageGray, K extends Kernel
 
 	T largeImg;
 
-	List<DisplayGaussianKernelApp.DerivType> order = new ArrayList<DisplayGaussianKernelApp.DerivType>();
+	List<DisplayGaussianKernelApp.DerivType> order = new ArrayList<>();
 
 	public DisplaySteerableBase(Class<T> imageType, Class<K> kernelType) {
 

@@ -53,8 +53,8 @@ public class StereoPlanarPanel extends JPanel
 	CalibratedImageGridPanel rightView = new CalibratedImageGridPanel();
 
 	// list of images and calibration results
-	List<BufferedImage> listLeft = new ArrayList<BufferedImage>();
-	List<BufferedImage> listRight = new ArrayList<BufferedImage>();
+	List<BufferedImage> listLeft = new ArrayList<>();
+	List<BufferedImage> listRight = new ArrayList<>();
 
 	List<ImageResults> leftResults;
 	List<ImageResults> rightResults;
@@ -73,7 +73,7 @@ public class StereoPlanarPanel extends JPanel
 	JTextArea maxErrorRight;
 
 	JList imageList;
-	List<String> names = new ArrayList<String>();
+	List<String> names = new ArrayList<>();
 
 	int selectedImage;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ public class TestAssociateDescTo2D {
 	public void basic() {
 		Dummy dummy = new Dummy();
 
-		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<TupleDesc_F64>(dummy);
+		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<>(dummy);
 
-		FastQueue<TupleDesc_F64> listSrc = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
-		FastQueue<TupleDesc_F64> listDst = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class,false);
+		FastQueue<TupleDesc_F64> listSrc = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastQueue<TupleDesc_F64> listDst = new FastQueue<>(10, TupleDesc_F64.class, false);
 
 		alg.setSource(null,listSrc);
 		alg.setDestination(null,listDst);
@@ -60,7 +60,7 @@ public class TestAssociateDescTo2D {
 		public FastQueue<TupleDesc_F64> listSrc;
 		public FastQueue<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
-		public FastQueue<AssociatedIndex> matches = new FastQueue<AssociatedIndex>(10,AssociatedIndex.class,false);
+		public FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, false);
 		public GrowQueue_I32 unassociatedSrc = new GrowQueue_I32(10);
 		public GrowQueue_I32 unassociatedDst = new GrowQueue_I32(10);
 		public double threshold;

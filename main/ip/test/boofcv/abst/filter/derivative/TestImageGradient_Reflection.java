@@ -46,7 +46,7 @@ public class TestImageGradient_Reflection {
 
 		Method m = GradientSobel.class.getMethod("process",GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
 
-		ImageGradient_Reflection<GrayF32,GrayF32> alg = new ImageGradient_Reflection<GrayF32,GrayF32>(m);
+		ImageGradient_Reflection<GrayF32,GrayF32> alg = new ImageGradient_Reflection<>(m);
 
 		alg.process(input,derivX,derivY);
 	}

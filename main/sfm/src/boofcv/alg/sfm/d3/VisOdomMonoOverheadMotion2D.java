@@ -94,7 +94,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase>
 
 		createOverhead = FactorySfmMisc.createOverhead(imageType);
 
-		overhead = new OverheadView<T>(imageType.createImage(1,1),0,0,cellSize);
+		overhead = new OverheadView<>(imageType.createImage(1, 1), 0, 0, cellSize);
 	}
 
 	/**

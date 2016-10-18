@@ -59,7 +59,7 @@ public class FactoryShapeDetector {
 		detector.setMinimumContour(config.minimumContour);
 		detector.setInternalContour(config.processInternal);
 
-		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<T>(config.numSampleContour,config.refineRadialSamples,imageType);
+		SnapToEllipseEdge<T> refine = new SnapToEllipseEdge<>(config.numSampleContour, config.refineRadialSamples, imageType);
 		refine.setConvergenceTol(config.convergenceTol);
 		refine.setMaxIterations(config.maxIterations);
 
@@ -67,12 +67,12 @@ public class FactoryShapeDetector {
 			refine = null;
 		}
 
-		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<T>(
+		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<>(
 				config.checkRadialDistance,
 				config.numSampleContour,
-				config.checkIntensityThreshold,imageType);
+				config.checkIntensityThreshold, imageType);
 
-		return new BinaryEllipseDetector<T>(detector,refine, check, imageType);
+		return new BinaryEllipseDetector<>(detector, refine, check, imageType);
 	}
 
 	/**
@@ -104,15 +104,15 @@ public class FactoryShapeDetector {
 			}
 		}
 
-		return new BinaryPolygonDetector<T>(config.minimumSides,config.maximumSides,contourToPolygon,
-				refinePolygon,config.minContourImageWidthFraction,
-				config.clockwise,config.convex, config.canTouchBorder, config.splitPenalty,
-				config.minimumEdgeIntensity,imageType);
+		return new BinaryPolygonDetector<>(config.minimumSides, config.maximumSides, contourToPolygon,
+				refinePolygon, config.minContourImageWidthFraction,
+				config.clockwise, config.convex, config.canTouchBorder, config.splitPenalty,
+				config.minimumEdgeIntensity, imageType);
 	}
 
 	public static <T extends ImageGray>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
-		return new RefinePolygonLineToImage<T>(
+		return new RefinePolygonLineToImage<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,
 				config.convergeTolPixels, config.maxCornerChangePixel,
@@ -121,7 +121,7 @@ public class FactoryShapeDetector {
 
 	public static <T extends ImageGray>
 	RefineBinaryPolygon<T> refinePolygon( ConfigRefinePolygonCornersToImage config , Class<T> imageType ) {
-		return new RefinePolygonCornersToImage<T>(
+		return new RefinePolygonCornersToImage<>(
 				config.endPointDistance,
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,

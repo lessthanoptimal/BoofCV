@@ -67,7 +67,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray> {
 	protected int minInlierSize;
 
 	// list of detected edge pixels in a region
-	protected FastQueue<Edgel> edgels = new FastQueue<Edgel>(30,Edgel.class,true);
+	protected FastQueue<Edgel> edgels = new FastQueue<>(30, Edgel.class, true);
 	// The maximum number of lines which can be detected in a region
 	protected int maxDetectLines;
 
@@ -75,7 +75,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray> {
 	private ModelMatcher<LinePolar2D_F32,Edgel> robustMatcher;
 
 	// list of lines found in each
-	private MatrixOfList<LineSegment2D_F32> foundLines = new MatrixOfList<LineSegment2D_F32>(1,1);
+	private MatrixOfList<LineSegment2D_F32> foundLines = new MatrixOfList<>(1, 1);
 
 	/**
 	 * Specifies major configuration parameters.

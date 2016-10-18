@@ -35,7 +35,7 @@ public class TestWrapDisparitySadRect {
 	public void borderSetToInvalid() {
 		int range = 4;
 		Foo foo = new Foo(1,1+range,2,2);
-		WrapDisparitySadRect<GrayF32,GrayF32> alg = new WrapDisparitySadRect<GrayF32, GrayF32>(foo);
+		WrapDisparitySadRect<GrayF32,GrayF32> alg = new WrapDisparitySadRect<>(foo);
 
 		GrayF32 l = new GrayF32(10,20);
 		GrayF32 r = new GrayF32(10,20);

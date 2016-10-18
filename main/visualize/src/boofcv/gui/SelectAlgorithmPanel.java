@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public abstract class SelectAlgorithmPanel extends JPanel
 {
 	JToolBar toolbar;
 	JComboBox algBox;
-	List<Object> algCookies = new ArrayList<Object>();
+	List<Object> algCookies = new ArrayList<>();
 	Component gui;
 
 	public SelectAlgorithmPanel() {

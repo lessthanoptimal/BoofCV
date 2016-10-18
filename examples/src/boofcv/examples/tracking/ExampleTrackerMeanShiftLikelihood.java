@@ -109,7 +109,7 @@ public class ExampleTrackerMeanShiftLikelihood {
 		RgbLikelihood likelihood = new RgbLikelihood(64,71,69);
 
 		TrackerMeanShiftLikelihood<Planar<GrayU8>> tracker =
-				new TrackerMeanShiftLikelihood<Planar<GrayU8>>(likelihood,50,0.1f);
+				new TrackerMeanShiftLikelihood<>(likelihood, 50, 0.1f);
 
 		// specify the target's initial location and initialize with the first frame
 		Planar<GrayU8> frame = video.next();

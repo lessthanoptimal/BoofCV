@@ -131,14 +131,14 @@ public abstract class PermuteWaveletCompare {
 		BorderIndex1D border;
 
 		if( type == BorderType.WRAP ) {
-			inverse = new WlBorderCoefStandard<WlCoef_F32>(forward);
+			inverse = new WlBorderCoefStandard<>(forward);
 			border = new BorderIndex1D_Wrap();
 		} else {
 			inverse = createFixedCoef_F32(forward);
 			border = new BorderIndex1D_Reflect();
 		}
 
-		return new WaveletDescription<WlCoef_F32>(border,forward,inverse);
+		return new WaveletDescription<>(border, forward, inverse);
 	}
 
 	private WlCoef_F32 createRandomCoef_F32(int offset, int length) {
@@ -166,7 +166,7 @@ public abstract class PermuteWaveletCompare {
 		numUpper = (numUpper + numUpper%2)/2;
 
 
-		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<WlCoef_F32>(numLower,numUpper);
+		WlBorderCoefFixed<WlCoef_F32> ret = new WlBorderCoefFixed<>(numLower, numUpper);
 		ret.setInnerCoef(forward);
 
 		for( int i = 0; i < numLower; i++ ) {
@@ -186,14 +186,14 @@ public abstract class PermuteWaveletCompare {
 		WlBorderCoef<WlCoef_I32> inverse;
 
 		if( type == BorderType.WRAP ) {
-			inverse = new WlBorderCoefStandard<WlCoef_I32>(forward);
+			inverse = new WlBorderCoefStandard<>(forward);
 			border = new BorderIndex1D_Wrap();
 		} else {
 			inverse = createFixedCoef_I32(forward);
 			border = new BorderIndex1D_Reflect();
 		}
 
-		return new WaveletDescription<WlCoef_I32>(border,forward,inverse);
+		return new WaveletDescription<>(border, forward, inverse);
 	}
 
 	private WlCoef_I32 createRandomCoef_I32(int offset, int length) {
@@ -228,7 +228,7 @@ public abstract class PermuteWaveletCompare {
 		numUpper = (numUpper + numUpper%2)/2;
 
 
-		WlBorderCoefFixed<WlCoef_I32> ret = new WlBorderCoefFixed<WlCoef_I32>(numLower,numUpper);
+		WlBorderCoefFixed<WlCoef_I32> ret = new WlBorderCoefFixed<>(numLower, numUpper);
 		ret.setInnerCoef(forward);
 
 		for( int i = 0; i < numLower; i++ ) {

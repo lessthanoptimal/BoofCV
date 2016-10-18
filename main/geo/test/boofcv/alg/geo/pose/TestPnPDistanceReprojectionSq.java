@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,7 @@ public class TestPnPDistanceReprojectionSq {
 		Se3_F64 worldToCamera = new Se3_F64();
 		worldToCamera.getT().set(0.1,-0.1,0.2);
 
-		List<Point2D3D> obs = new ArrayList<Point2D3D>();
+		List<Point2D3D> obs = new ArrayList<>();
 		for( int i = 0; i < expected.length; i++ ) {
 			Point3D_F64 X =
 					new Point3D_F64(rand.nextGaussian()*0.2,rand.nextGaussian()*0.2,2.3+rand.nextGaussian()*0.2);

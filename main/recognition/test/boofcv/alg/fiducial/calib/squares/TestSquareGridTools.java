@@ -81,7 +81,7 @@ public class TestSquareGridTools {
 		double x0 = 10;
 		double y0 = 20;
 
-		List<Point2D_F64> list = new ArrayList<Point2D_F64>();
+		List<Point2D_F64> list = new ArrayList<>();
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
@@ -107,7 +107,7 @@ public class TestSquareGridTools {
 	}
 
 	void flipColumns( SquareGrid grid ) {
-		List<SquareNode> tmp = new ArrayList<SquareNode>();
+		List<SquareNode> tmp = new ArrayList<>();
 
 		for (int row = 0; row < grid.rows; row++) {
 			for (int col = 0; col < grid.columns; col++) {

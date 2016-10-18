@@ -89,11 +89,11 @@ public class CommonStereoMotionNPoint {
 			worldPts = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, 2, 3, N, rand);
 		}
 
-		cameraLeftPts = new ArrayList<Point3D_F64>();
-		cameraRightPts = new ArrayList<Point3D_F64>();
+		cameraLeftPts = new ArrayList<>();
+		cameraRightPts = new ArrayList<>();
 
 		// transform points into second camera's reference frame
-		pointPose = new ArrayList<Stereo2D3D>();
+		pointPose = new ArrayList<>();
 		for(Point3D_F64 p1 : worldPts ) {
 			Point3D_F64 leftPt = SePointOps_F64.transform(worldToLeft, p1, null);
 			Point3D_F64 rightPt = SePointOps_F64.transform(leftToRight, leftPt, null);
@@ -122,7 +122,7 @@ public class CommonStereoMotionNPoint {
 	 */
 	public static List<Point3D_F64> createRandomPlane( Random rand , double d , int N )
 	{
-		List<Point3D_F64> ret = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> ret = new ArrayList<>();
 
 		for( int i = 0; i < N; i++ ) {
 			double x = (rand.nextDouble()-0.5)*2;

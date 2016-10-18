@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,8 +44,8 @@ public class TestAssociateSurfBasic {
 	 */
 	@Test
 	public void checkAssociateByIntensity() {
-		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
-		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
+		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
 
 		src.add( createDesc(true,10));
 		dst.add( createDesc(true,0));
@@ -63,8 +63,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void basicAssociation() {
-		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
-		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
+		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
 
 		// create a list where some should be matched and others not
 		src.add( createDesc(true,10));
@@ -127,8 +127,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void checkUnassociated() {
-		FastQueue<BrightFeature> src = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
-		FastQueue<BrightFeature> dst = new FastQueue<BrightFeature>(10,BrightFeature.class,false);
+		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
+		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
 
 		src.add( createDesc(true,10));
 		src.add( createDesc(true,12));

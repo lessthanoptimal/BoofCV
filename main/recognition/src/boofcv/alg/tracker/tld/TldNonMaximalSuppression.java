@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TldNonMaximalSuppression {
 	private double connectionThreshold;
 
 	// connection graph
-	private FastQueue<Connections> conn = new FastQueue<Connections>(Connections.class,true);
+	private FastQueue<Connections> conn = new FastQueue<>(Connections.class, true);
 
 	// used for computing the overlap between two regions
 	private TldHelperFunctions helper = new TldHelperFunctions();

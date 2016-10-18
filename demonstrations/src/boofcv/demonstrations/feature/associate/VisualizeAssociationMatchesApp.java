@@ -119,8 +119,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
 		orientation = FactoryOrientation.convertImage(orientationII,imageType);
 
-		imageLeft = new Planar<T>(imageType,1,1,3);
-		imageRight = new Planar<T>(imageType,1,1,3);
+		imageLeft = new Planar<>(imageType, 1, 1, 3);
+		imageRight = new Planar<>(imageType, 1, 1, 3);
 		grayLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		grayRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
@@ -192,8 +192,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 	}
 
 	private void processImage() {
-		final List<Point2D_F64> leftPts = new ArrayList<Point2D_F64>();
-		final List<Point2D_F64> rightPts = new ArrayList<Point2D_F64>();
+		final List<Point2D_F64> leftPts = new ArrayList<>();
+		final List<Point2D_F64> rightPts = new ArrayList<>();
 		FastQueue<TupleDesc> leftDesc = UtilFeature.createQueue(describe, 10);
 		FastQueue<TupleDesc> rightDesc = UtilFeature.createQueue(describe,10);
 
@@ -304,7 +304,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray, D extends Image
 
 		VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(imageType, derivType);
 
-		List<PathLabel> inputs = new ArrayList<PathLabel>();
+		List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("Cave",
 				UtilIO.pathExample("stitch/cave_01.jpg"), UtilIO.pathExample("stitch/cave_02.jpg")));

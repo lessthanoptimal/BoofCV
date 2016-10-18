@@ -162,7 +162,7 @@ public class ImageEnhanceApp
 
 		ImageEnhanceApp app = new ImageEnhanceApp();
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 
 		inputs.add(new PathLabel("dark", UtilIO.pathExample("enhance/dark.jpg")));
 		inputs.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));

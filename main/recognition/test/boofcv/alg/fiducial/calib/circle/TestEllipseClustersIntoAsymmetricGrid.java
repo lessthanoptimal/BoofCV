@@ -81,6 +81,16 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	}
 
 	@Test
+	public void selectInnerSeed() {
+
+	}
+
+	@Test
+	public void findClosestEdge() {
+
+	}
+
+	@Test
 	public void selectSeedNext() {
 		// create a grid from which a known solution can be easily extracted
 		int rows = 5; int cols = 4;

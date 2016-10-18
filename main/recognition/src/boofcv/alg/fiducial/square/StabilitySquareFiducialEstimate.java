@@ -46,7 +46,7 @@ public class StabilitySquareFiducialEstimate {
 	private Se3_F64 difference = new Se3_F64();
 
 	// storage for all the samples
-	private FastQueue<Se3_F64> samples = new FastQueue<Se3_F64>(Se3_F64.class,true);
+	private FastQueue<Se3_F64> samples = new FastQueue<>(Se3_F64.class, true);
 
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
 

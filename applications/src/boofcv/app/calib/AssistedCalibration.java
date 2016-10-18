@@ -103,7 +103,7 @@ public class AssistedCalibration {
 
 	CalibrationView view;
 
-	List<Point2D_F64> sides = new ArrayList<Point2D_F64>();
+	List<Point2D_F64> sides = new ArrayList<>();
 
 	Graphics2D g2;
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
@@ -118,7 +118,7 @@ public class AssistedCalibration {
 	State state = State.DETERMINE_SIZE;
 
 	// List of active magnets that need to be collected
-	List<Magnet> magnets = new ArrayList<Magnet>();
+	List<Magnet> magnets = new ArrayList<>();
 	int totalMagnets;
 
 	// Selects which image to save

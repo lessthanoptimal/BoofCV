@@ -49,7 +49,7 @@ public class VisualizePyramidFloatApp <T extends ImageGray>
 
 	Class<T> imageType;
 	InterpolatePixelS<T> interp;
-	ImagePyramidPanel<T> gui = new ImagePyramidPanel<T>();
+	ImagePyramidPanel<T> gui = new ImagePyramidPanel<>();
 	boolean processedImage = false;
 
 	public VisualizePyramidFloatApp( Class<T> imageType ) {
@@ -63,7 +63,7 @@ public class VisualizePyramidFloatApp <T extends ImageGray>
 		setInputImage(input);
 		final T gray = ConvertBufferedImage.convertFromSingle(input, null, imageType);
 
-		PyramidFloat<T> pyramid = new PyramidFloatScale<T>(interp,scales,imageType);
+		PyramidFloat<T> pyramid = new PyramidFloatScale<>(interp, scales, imageType);
 
 		pyramid.process(gray);
 
@@ -100,7 +100,7 @@ public class VisualizePyramidFloatApp <T extends ImageGray>
 //		VisualizePyramidFloatApp<GrayF32> app = new VisualizePyramidFloatApp<>(GrayF32.class);
 		VisualizePyramidFloatApp<GrayU8> app = new VisualizePyramidFloatApp<>(GrayU8.class);
 
-		java.util.List<PathLabel> inputs = new ArrayList<PathLabel>();
+		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
 		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));

@@ -47,7 +47,7 @@ public class TestTemplateMatching {
 	 */
 	@Test
 	public void basicTest_NOBORDER() {
-		expected = new ArrayList<Match>();
+		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(17, 15, 18));
 		expected.add(new Match(0, 0, 18)); // shouldn't detect this guy since its inside the border
@@ -68,7 +68,7 @@ public class TestTemplateMatching {
 	 */
 	@Test
 	public void basicTest_BORDER() {
-		expected = new ArrayList<Match>();
+		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(16, 15, 18));
 		expected.add(new Match(0, 0, 18));
@@ -88,7 +88,7 @@ public class TestTemplateMatching {
 	 */
 	@Test
 	public void maxMatches() {
-		expected = new ArrayList<Match>();
+		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(16, 15, 18));
 		expected.add(new Match(0, 0, 19));
@@ -110,7 +110,7 @@ public class TestTemplateMatching {
 
 	@Test
 	public void withMask() {
-		expected = new ArrayList<Match>();
+		expected = new ArrayList<>();
 		DummyIntensity intensity = new DummyIntensity(false, 4, 5);
 
 		TemplateMatching alg = new TemplateMatching(intensity);

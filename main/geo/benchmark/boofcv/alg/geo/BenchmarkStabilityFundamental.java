@@ -72,7 +72,7 @@ public class BenchmarkStabilityFundamental {
 	}
 
 	public void createSceneCube() {
-		scene = new ArrayList<Point3D_F64>();
+		scene = new ArrayList<>();
 
 		for( int i = 0; i < totalPoints; i++ ) {
 			Point3D_F64 p = new Point3D_F64();
@@ -86,7 +86,7 @@ public class BenchmarkStabilityFundamental {
 	}
 
 	public void createScenePlane() {
-		scene = new ArrayList<Point3D_F64>();
+		scene = new ArrayList<>();
 
 		for( int i = 0; i < totalPoints; i++ ) {
 			Point3D_F64 p = new Point3D_F64();
@@ -111,7 +111,7 @@ public class BenchmarkStabilityFundamental {
 	}
 
 	public void createObservations() {
-		observations = new ArrayList<AssociatedPair>();
+		observations = new ArrayList<>();
 
 		for( Point3D_F64 p1 : scene ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
@@ -149,7 +149,7 @@ public class BenchmarkStabilityFundamental {
 		Estimate1ofEpipolar estimator =
 				new EstimateNto1ofEpipolar(estimatorN,distance,1);
 
-		scores = new ArrayList<Double>();
+		scores = new ArrayList<>();
 		int failed = 0;
 
 		int numSamples = estimator.getMinimumPoints();
@@ -159,7 +159,7 @@ public class BenchmarkStabilityFundamental {
 		DenseMatrix64F F = new DenseMatrix64F(3,3);
 
 		for( int i = 0; i < 50; i++ ) {
-			List<AssociatedPair> pairs = new ArrayList<AssociatedPair>();
+			List<AssociatedPair> pairs = new ArrayList<>();
 
 			// create a unique set of pairs
 			while( pairs.size() < numSamples) {
@@ -196,7 +196,7 @@ public class BenchmarkStabilityFundamental {
 	}
 
 	public void evaluateAll( GeoModelEstimator1<DenseMatrix64F,AssociatedPair> estimator ) {
-		scores = new ArrayList<Double>();
+		scores = new ArrayList<>();
 		int failed = 0;
 
 		DenseMatrix64F F = new DenseMatrix64F(3,3);

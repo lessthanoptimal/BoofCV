@@ -85,9 +85,9 @@ public class BinaryEllipseDetectorPixel {
 
 	private boolean verbose = false;
 
-	private FastQueue<Point2D_F64> pointsF = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	private FastQueue<Point2D_F64> pointsF = new FastQueue<>(Point2D_F64.class, true);
 
-	private FastQueue<Found> found = new FastQueue<Found>(Found.class,true);
+	private FastQueue<Found> found = new FastQueue<>(Found.class, true);
 
 	/**
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted.

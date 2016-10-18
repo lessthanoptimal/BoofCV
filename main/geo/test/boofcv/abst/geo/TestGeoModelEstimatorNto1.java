@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 public class TestGeoModelEstimatorNto1 {
 
 	Random rand = new Random(234);
-	List<AssociatedPair> obs = new ArrayList<AssociatedPair>();
+	List<AssociatedPair> obs = new ArrayList<>();
 
 	DistanceEpipolarConstraint distance = new DistanceEpipolarConstraint();
 

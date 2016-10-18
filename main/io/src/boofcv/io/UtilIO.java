@@ -233,9 +233,7 @@ public class UtilIO {
 			in.close();
 			fileIn.close();
 			return obj;
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
+		} catch(IOException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}

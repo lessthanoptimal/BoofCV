@@ -37,7 +37,7 @@ import java.util.List;
 public class BenchmarkFiducialDetector<T extends ImageGray> {
 
 	FiducialDetector<T> detector;
-	List<T> images = new ArrayList<T>();
+	List<T> images = new ArrayList<>();
 	CameraPinholeRadial param;
 
 	public BenchmarkFiducialDetector(FiducialDetector<T> detector) {

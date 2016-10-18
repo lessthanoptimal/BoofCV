@@ -72,8 +72,8 @@ public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineB
 									   int maxIterations, double convergeTolPixels,double maxCornerChangePixels,
 									   Class<T> imageType) {
 		this.pixelsAway = endPointDistance;
-		this.refineCorner = new RefineCornerLinesToImage<T>(cornerOffset,maxLineSamples,sampleRadius,maxIterations,
-				convergeTolPixels,maxCornerChangePixels,imageType);
+		this.refineCorner = new RefineCornerLinesToImage<>(cornerOffset, maxLineSamples, sampleRadius, maxIterations,
+				convergeTolPixels, maxCornerChangePixels, imageType);
 	}
 
 	/**

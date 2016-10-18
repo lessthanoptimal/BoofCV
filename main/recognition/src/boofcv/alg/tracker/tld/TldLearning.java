@@ -52,7 +52,7 @@ public class TldLearning<T extends ImageGray> {
 	private GrowQueue_F64 storageMetric = new GrowQueue_F64();
 
 	// regions which need to have their ferns updated
-	private List<ImageRectangle> fernNegative = new ArrayList<ImageRectangle>();
+	private List<ImageRectangle> fernNegative = new ArrayList<>();
 
 	private ImageRectangle targetRegion_I32 = new ImageRectangle();
 

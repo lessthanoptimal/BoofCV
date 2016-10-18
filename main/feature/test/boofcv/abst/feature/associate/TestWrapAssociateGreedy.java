@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ public class TestWrapAssociateGreedy {
 			@Override
 			public AssociateDescription<TupleDesc_F64> createAlg() {
 				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<TupleDesc_F64>(score,false);
-				return new WrapAssociateGreedy<TupleDesc_F64>(greedy);
+				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, false);
+				return new WrapAssociateGreedy<>(greedy);
 			}
 		}.allTests();
 	}
@@ -45,8 +45,8 @@ public class TestWrapAssociateGreedy {
 			@Override
 			public AssociateDescription<TupleDesc_F64> createAlg() {
 				ScoreAssociateEuclidean_F64 score = new ScoreAssociateEuclidean_F64();
-				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<TupleDesc_F64>(score,true);
-				return new WrapAssociateGreedy<TupleDesc_F64>(greedy);
+				AssociateGreedy<TupleDesc_F64> greedy = new AssociateGreedy<>(score, true);
+				return new WrapAssociateGreedy<>(greedy);
 			}
 		}.allTests();
 	}

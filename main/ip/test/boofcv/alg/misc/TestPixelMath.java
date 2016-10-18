@@ -108,9 +108,7 @@ public class TestPixelMath {
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
+			} catch (InvocationTargetException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 

@@ -60,9 +60,9 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean isUndistorted = false;
 
 	// observed feature locations
-	List<CalibrationObservation> features = new ArrayList<CalibrationObservation>();
+	List<CalibrationObservation> features = new ArrayList<>();
 	// results of calibration
-	List<ImageResults> results = new ArrayList<ImageResults>();
+	List<ImageResults> results = new ArrayList<>();
 
 	// for displaying corrected image
 	Planar<GrayF32> origMS;

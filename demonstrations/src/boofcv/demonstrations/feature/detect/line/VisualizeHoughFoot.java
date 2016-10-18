@@ -77,7 +77,7 @@ public class VisualizeHoughFoot<I extends ImageGray, D extends ImageGray> {
 
 	public static void main( String args[] ) {
 		VisualizeHoughFoot<GrayF32,GrayF32> app =
-				new VisualizeHoughFoot<GrayF32,GrayF32>(GrayF32.class,GrayF32.class);
+				new VisualizeHoughFoot<>(GrayF32.class, GrayF32.class);
 
 //		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
 		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg")));

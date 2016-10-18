@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,9 +49,9 @@ public class FactoryAssociation {
 			double maxError ,
 			boolean backwardsValidation )
 	{
-		AssociateGreedy<D> alg = new AssociateGreedy<D>(score,backwardsValidation);
+		AssociateGreedy<D> alg = new AssociateGreedy<>(score, backwardsValidation);
 		alg.setMaxFitError(maxError);
-		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<D>(alg);
+		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<>(alg);
 		return ret;
 	}
 
@@ -70,7 +70,7 @@ public class FactoryAssociation {
 	public static AssociateDescription<TupleDesc_F64> kdtree( int dimension, int maxNodesSearched ) {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(maxNodesSearched);
 
-		return new AssociateNearestNeighbor<TupleDesc_F64>(nn,dimension);
+		return new AssociateNearestNeighbor<>(nn, dimension);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class FactoryAssociation {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdRandomForest(
 				maxNodesSearched,numTrees,numConsiderSplit,randomSeed);
 
-		return new AssociateNearestNeighbor<TupleDesc_F64>(nn,dimension);
+		return new AssociateNearestNeighbor<>(nn, dimension);
 	}
 
 	/**
