@@ -28,6 +28,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 	}
 
 	private static void perform(String directory, FiducialDetector detector) {
-		CameraPinholeRadial intrinsic = CalibrationIO.load(directory , "intrinsic.txt");
+		CameraPinholeRadial intrinsic = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
 
 //		intrinsic.radial = null;
 //		intrinsic.t1 = intrinsic.t2 = 0;

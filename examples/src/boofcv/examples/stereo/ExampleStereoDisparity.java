@@ -30,6 +30,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
@@ -39,6 +40,7 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * The disparity between two stereo images is used to estimate the range of objects inside
@@ -145,7 +147,7 @@ public class ExampleStereoDisparity {
 		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");
 
-		StereoParameters param = UtilIO.loadXML(calibDir , "stereo.xml");
+		StereoParameters param = CalibrationIO.load(new File(calibDir , "stereo.yaml"));
 
 		// load and convert images into a BoofCV format
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");

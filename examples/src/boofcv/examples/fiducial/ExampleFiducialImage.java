@@ -36,6 +36,7 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import static boofcv.io.image.UtilImageIO.loadImage;
 
@@ -56,7 +57,7 @@ public class ExampleFiducialImage {
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		CameraPinholeRadial param = CalibrationIO.load(imagePath, "intrinsic.txt");
+		CameraPinholeRadial param = CalibrationIO.load(new File(imagePath, "intrinsic.yaml"));
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 

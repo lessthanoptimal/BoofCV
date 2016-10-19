@@ -177,7 +177,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("BumbleBee",dir + "stereo.xml",dir + "left05.jpg",dir + "right05.jpg"));
+		inputs.add(new PathLabel("BumbleBee",dir + "stereo.yaml",dir + "left05.jpg",dir + "right05.jpg"));
 
 		app.setInputList(inputs);
 

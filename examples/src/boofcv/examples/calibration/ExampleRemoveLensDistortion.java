@@ -52,15 +52,11 @@ import java.io.File;
 public class ExampleRemoveLensDistortion {
 
 	public static void main( String args[] ) {
-		String calibDir = UtilIO.pathExample("/home/pja/projects/boofcv/data/example/fiducial/image/examples/");
+		String calibDir = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 		String imageDir = UtilIO.pathExample("structure/");
 
 		// load calibration parameters from the previously calibrated camera
-//		CameraPinholeRadial param = CalibrationIO.loadPinholeRadial(new File(calibDir , "intrinsic.param"));
-		CameraPinholeRadial param = CalibrationIO.load(calibDir , "intrinsic.txt");
-
-		CalibrationIO.save(param, new File(calibDir,"intrinsic.txt"));
-		CameraPinholeRadial foo = CalibrationIO.load(new File(calibDir,"intrinsic.txt"));
+		CameraPinholeRadial param = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
 
 		// load images and convert the image into a color BoofCV format
 		BufferedImage orig = UtilImageIO.loadImage(imageDir , "dist_cyto_01.jpg");

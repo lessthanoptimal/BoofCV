@@ -164,8 +164,8 @@ public class VisualizeSquareFiducial {
 
 		VisualizeSquareFiducial app = new VisualizeSquareFiducial();
 
-		app.process(directory+"/image0000.jpg",directory+"/intrinsic.txt");
-		app.process(directory+"/image0001.jpg",directory+"/intrinsic.txt");
-		app.process(directory+"/image0002.jpg",directory+"/intrinsic.txt");
+		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
+		app.process(directory+"/image0001.jpg",directory+"/intrinsic.yaml");
+		app.process(directory+"/image0002.jpg",directory+"/intrinsic.yaml");
 	}
 }

@@ -73,7 +73,7 @@ public class ExampleCalibrateMonocularPoints {
 		// print the results to standard out
 		param.print();
 		// save to a file using XML
-		CalibrationIO.save(param, "intrinsic.txt");
+		CalibrationIO.save(param, "intrinsic.yaml");
 	}
 
 	/**

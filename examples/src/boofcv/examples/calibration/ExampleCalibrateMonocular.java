@@ -107,7 +107,7 @@ public class ExampleCalibrateMonocular {
 		CameraPinholeRadial intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
-		CalibrationIO.save(intrinsic, "intrinsic.txt");
+		CalibrationIO.save(intrinsic, "intrinsic.yaml");
 
 		calibrationAlg.printStatistics();
 		System.out.println();

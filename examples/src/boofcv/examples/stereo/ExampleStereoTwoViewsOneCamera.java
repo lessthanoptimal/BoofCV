@@ -54,6 +54,7 @@ import org.ejml.data.DenseMatrix64F;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		String imageDir = UtilIO.pathExample("stereo/");
 
 		// Camera parameters
-		CameraPinholeRadial intrinsic = CalibrationIO.load(calibDir , "intrinsic.txt");
+		CameraPinholeRadial intrinsic = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");

@@ -54,7 +54,7 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
 public class CameraCalibration extends BaseStandardInputApp {
 
 	protected String inputDirectory;
-	protected String outputFileName = "intrinsic.txt";
+	protected String outputFileName = "intrinsic.yaml";
 	protected CalibrationDetector detector;
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
@@ -66,7 +66,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 		System.out.println("./application <output file> <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
 		System.out.println();
 		System.out.println("<output file>                        file name for output");
-		System.out.println("                                     DEFAULT: \"intrinsic.txt\"");
+		System.out.println("                                     DEFAULT: \"intrinsic.yaml\"");
 		System.out.println();
 		System.out.println("Input: File Options:  ");
 		System.out.println();
@@ -356,7 +356,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 			frame.setVisible(false);
 
 			inputDirectory = new File(OUTPUT_DIRECTORY, IMAGE_DIRECTORY).getPath();
-			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.txt").getPath();
+			outputFileName = new File(OUTPUT_DIRECTORY, "intrinsic.yaml").getPath();
 			handleDirectory();
 		}
 	}

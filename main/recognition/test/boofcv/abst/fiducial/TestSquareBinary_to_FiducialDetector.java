@@ -58,7 +58,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 
 	@Override
 	public CameraPinholeRadial loadIntrinsic() {
-		return CalibrationIO.load(new File(directory,"intrinsic.txt"));
+		return CalibrationIO.load(new File(directory,"intrinsic.yaml"));
 	}
 
 	@Override

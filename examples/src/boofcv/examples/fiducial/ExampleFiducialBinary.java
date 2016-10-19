@@ -36,6 +36,7 @@ import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Detects square binary fiducials inside an image, writes out there pose, and visualizes a virtual flat cube
@@ -49,7 +50,7 @@ public class ExampleFiducialBinary {
 		String directory = UtilIO.pathExample("fiducial/binary");
 
 		// load the lens distortion parameters and the input image
-		CameraPinholeRadial param = CalibrationIO.load(directory , "intrinsic.txt");
+		CameraPinholeRadial param = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
 		BufferedImage input = UtilImageIO.loadImage(directory , "image0000.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0001.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0002.jpg");

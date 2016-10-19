@@ -21,11 +21,15 @@ package boofcv.io.calibration;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
-import com.google.protobuf.TextFormat;
 import georegression.struct.se.Se3_F64;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Functions for loading and saving camera calibration related data structures from/to disk
@@ -33,9 +37,12 @@ import java.net.URL;
  * @author Peter Abeles
  */
 public class CalibrationIO {
+	public static String MODEL_PINHOLE = "pinhole";
+	public static String MODEL_PINHOLE_RADIAL_TAN = "pinhole_radial_tangential";
+	public static String MODEL_STEREO = "stereo_camera";
 
 	/**
-	 * Saves a camera model/parameters to disk.  Saved as a protobuf
+	 * Saves intrinsic camera model to disk
 	 *
 	 * @param parameters Camera parameters
 	 * @param filePath Path to where it should be saved
@@ -48,278 +55,231 @@ public class CalibrationIO {
 			throw new RuntimeException(e);
 		}
 
-		try {
-			if( parameters instanceof CameraPinholeRadial) {
-				CameraPinholeRadial radial = (CameraPinholeRadial)parameters;
+		Yaml yaml = createYmlObject();
 
-				ProtoCameraModels.PinholeRadial.Builder pr = ProtoCameraModels.PinholeRadial.newBuilder();
+		Map<String, Object> data = new HashMap<>();
 
-				boofToProto(radial, pr);
+		if( parameters instanceof CameraPinholeRadial) {
+			out.println("# Pinhole camera model with radial and tangential distortion");
+			out.println("# textual protobuf format");
+			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
+			out.println();
+			putModelRadial((CameraPinholeRadial)parameters,data);
+		} else {
 
-				out.println("# Pinhole camera model with radial and tangential distortion");
-				out.println("# textual protobuf format");
-				out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
-				out.println("# radial = radial distortion, t1,t2) = tangential distortion");
-				out.println();
-				TextFormat.print(pr,out);
-			} else {
-				ProtoCameraModels.Pinhole.Builder p = ProtoCameraModels.Pinhole.newBuilder();
-				boofToProto(parameters, p);
-
-				out.println("# Pinhole camera model");
-				out.println("# textual protobuf format");
-				out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
-				out.println();
-				TextFormat.print(p,out);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			out.println("# Pinhole camera model");
+			out.println("# textual protobuf format");
+			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+			out.println();
+			putModelPinhole(parameters,data);
 		}
+
+		yaml.dump(data,new OutputStreamWriter(out));
 
 		out.close();
 	}
+	public static <T extends CameraPinhole> void save(T parameters , File filePath ) {
+		save(parameters, filePath.getPath());
+	}
+
+	private static Yaml createYmlObject() {
+		DumperOptions options = new DumperOptions();
+		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		return new Yaml(options);
+	}
 
 	/**
-	 * Saves stereo camera parameters to disk
-	 * @param parameters Stereo parameters
-	 * @param filePath path to file
+	 * Saves stereo camera model to disk
+	 *
+	 * @param parameters Camera parameters
+	 * @param filePath Path to where it should be saved
 	 */
 	public static void save(StereoParameters parameters , String filePath ) {
-		PrintStream out;
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("model",MODEL_STEREO);
+		data.put("left",putModelRadial(parameters.left,null));
+		data.put("right",putModelRadial(parameters.right,null));
+		data.put("rightToLeft",putSe3(parameters.rightToLeft));
+
 		try {
-			out = new PrintStream(filePath);
+			PrintStream out = new PrintStream(filePath);
+			out.println("# Intrinsic and extrinsic parameters for a stereo camera pair");
+			Yaml yaml = createYmlObject();
+			yaml.dump(data,new OutputStreamWriter(out));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 
-		try {
-			ProtoCameraModels.StereoRadial.Builder ps = ProtoCameraModels.StereoRadial.newBuilder();
-			ProtoCameraModels.PinholeRadial.Builder pl = ps.getLeftBuilder();
-			ProtoCameraModels.PinholeRadial.Builder pr = ps.getLeftBuilder();
-			ProtoCameraModels.Se3.Builder pr2l = ps.getRightToLeftBuilder();
-
-			boofToProto(parameters.left, pl );
-			boofToProto(parameters.right, pr );
-			boofToProto(parameters.getRightToLeft(), pr2l );
-
-			ps.setLeft( pl.build() );
-			ps.setRight( pr.build() );
-			ps.setRightToLeft( pr2l.build() );
-
-			out.println("# Stereo Camera Model");
-			out.println("# textual protobuf format");
-			out.println();
-			TextFormat.print(ps,out);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		out.close();
 	}
 
-	public static <T extends CameraPinhole> void save( T parameters , File filePath ) {
-		save(parameters, filePath.getAbsolutePath());
+	public static void save(StereoParameters parameters , File filePath ) {
+		save(parameters, filePath.getPath());
 	}
 
-	/**
-	 * Loads a pinhole camera model from disk
-	 * @param reader Input to text
-	 * @return The camera model
-	 */
-	public static CameraPinhole loadPinhole( Reader reader ) {
+	public static <T> T load(URL path ) {
 		try {
-
-			ProtoCameraModels.Pinhole.Builder builder = ProtoCameraModels.Pinhole.newBuilder();
-			TextFormat.merge(reader, builder);
-
-			ProtoCameraModels.Pinhole p = builder.build();
-
-			CameraPinhole model = new CameraPinhole();
-			protoToBoof(p, model);
-
-			return model;
-		} catch (IOException e) {
+			return load( new InputStreamReader(path.openStream()) );
+		} catch (IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	/**
-	 * Loads a pinhole camera model with radial and tangential distortion from disk
-	 * @param reader Input to text
-	 * @return The camera model
-	 */
-	public static CameraPinholeRadial loadPinholeRadial( Reader reader ) {
+	public static <T> T load(File path ) {
 		try {
-			ProtoCameraModels.PinholeRadial.Builder builder = ProtoCameraModels.PinholeRadial.newBuilder();
-			TextFormat.merge(reader, builder);
-
-			ProtoCameraModels.PinholeRadial pr = builder.build();
-
-			CameraPinholeRadial model = new CameraPinholeRadial();
-			protoToBoof(pr, model);
-
-			return model;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Loads a stereo camera model with radial and tangential distortion from disk
-	 * @param reader Input to text
-	 * @return The camera model
-	 */
-	public static StereoParameters loadStereo( Reader reader ) {
-		try {
-			ProtoCameraModels.StereoRadial.Builder builder = ProtoCameraModels.StereoRadial.newBuilder();
-			TextFormat.merge(reader, builder);
-
-			ProtoCameraModels.StereoRadial ps = builder.build();
-
-			StereoParameters param = new StereoParameters();
-			param.left = new CameraPinholeRadial();
-			param.right = new CameraPinholeRadial();
-
-			protoToBoof(ps.getRightToLeft(), param.rightToLeft);
-			protoToBoof(ps.getLeft(), param.left);
-			protoToBoof(ps.getRight(), param.right);
-
-			return param;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static <T> T load( String directory , String name ) {
-		return load( new File(directory,name));
-	}
-
-	public static <T> T load( URL filePath ) {
-		return load( filePath.getPath());
-	}
-
-	public static <T> T load( File filePath ) {
-		return load( filePath.getAbsolutePath());
-	}
-
-	public static <T> T load( String filePath ) {
-		try {
-			return load( new FileReader(filePath));
+			return load( new FileReader(path));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	public static <T> T load( Reader reader ) {
-		// read the string into an array so that it can be read multiple times
-		String text = "";
-		char tmp[] = new char[1024];
-		while( true ) {
-			try {
-				int length = reader.read(tmp,0,tmp.length);
-				if( length > 0 ) {
-					text += new String(tmp,0,length);
+
+	public static <T> T load(String path ) {
+		try {
+			return load( new FileReader(path));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Loads intrinsic parameters from disk
+	 * @param reader Reader
+	 * @return Camera model
+	 */
+	public static <T> T load(Reader reader ) {
+		Yaml yaml = createYmlObject();
+
+		Map<String,Object> data = (Map<String, Object>) yaml.load(reader);
+
+		try {
+			reader.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return load(data);
+	}
+
+	private static <T> T load(Map<String, Object> data) {
+		String model = (String)data.get("model");
+
+		if( model.equals(MODEL_PINHOLE)) {
+			CameraPinhole parameters = new CameraPinhole();
+			loadPinhole((Map<String,Object> )data.get("pinhole"),parameters);
+
+			return (T)parameters;
+		} else if( model.equals(MODEL_PINHOLE_RADIAL_TAN) ) {
+			CameraPinholeRadial parameters = new CameraPinholeRadial();
+
+			loadPinhole((Map<String, Object>) data.get("pinhole"), parameters);
+
+			Map<String, Object> distortion = (Map<String, Object>) data.get("radial_tangential");
+			if( distortion.containsKey("radial") ) {
+				List<Double> list = (List<Double>) distortion.get("radial");
+				if( list != null ) {
+					parameters.radial = new double[list.size()];
+					for (int i = 0; i < list.size(); i++) {
+						parameters.radial[i] = list.get(i);
+					}
 				}
-				if( length != tmp.length )
-					break;
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
-		}
+			if( distortion.containsKey("t1"))
+				parameters.t1 = (double) distortion.get("t1");
+			if( distortion.containsKey("t2"))
+				parameters.t2 = (double) distortion.get("t2");
 
-		try {
-			return (T) loadPinholeRadial(new StringReader(text));
-		} catch (RuntimeException e) {
-		}
-		try {
-			return (T) loadPinhole(new StringReader(text));
-		} catch (RuntimeException e) {
-		}
-
-		throw new RuntimeException("Unknown model type");
-	}
-
-	private static void boofToProto( Se3_F64 boof, ProtoCameraModels.Se3.Builder proto) {
-		proto.setTx( boof.T.x );
-		proto.setTy( boof.T.y );
-		proto.setTz( boof.T.z );
-
-		proto.setR00( boof.R.data[0] );
-		proto.setR01( boof.R.data[1] );
-		proto.setR02( boof.R.data[2] );
-
-		proto.setR10( boof.R.data[3] );
-		proto.setR11( boof.R.data[4] );
-		proto.setR12( boof.R.data[5] );
-
-		proto.setR20( boof.R.data[6] );
-		proto.setR21( boof.R.data[7] );
-		proto.setR22( boof.R.data[8] );
-	}
-
-	private static void boofToProto( CameraPinholeRadial radial, ProtoCameraModels.PinholeRadial.Builder pr) {
-		ProtoCameraModels.Pinhole.Builder p = ProtoCameraModels.Pinhole.newBuilder();
-		boofToProto(radial, p);
-		pr.setPinhole(p.build());
-		pr.setT1(radial.getT1());
-		pr.setT2(radial.getT2());
-		if( radial.radial != null ) {
-			for (int i = 0; i < radial.radial.length; i++) {
-				pr.addRadial(radial.radial[i]);
-			}
+			return (T) parameters;
+		} else if( model.equals(MODEL_STEREO) ) {
+			StereoParameters parameters = new StereoParameters();
+			parameters.left = load((Map<String, Object>)data.get("left"));
+			parameters.right = load((Map<String, Object>)data.get("right"));
+			parameters.rightToLeft = loadSe3((Map<String, Object>)data.get("rightToLeft"),null);
+			return (T) parameters;
+		} else {
+			throw new RuntimeException("Unknown camera model: "+model);
 		}
 	}
 
-	private static void boofToProto(CameraPinhole parameters, ProtoCameraModels.Pinhole.Builder p) {
-		p.setWidth( parameters.getWidth() );
-		p.setHeight( parameters.getHeight() );
-		p.setFx( parameters.fx );
-		p.setFy( parameters.fy );
-		p.setCx( parameters.cx );
-		p.setCy( parameters.cy );
-		p.setSkew( parameters.skew );
+
+	private static Map<String,Object> putModelPinhole( CameraPinhole parameters , Map<String,Object> map ) {
+		if( map == null )
+			map = new HashMap<>();
+		map.put("model",MODEL_PINHOLE);
+		map.put("pinhole", putParamsPinhole(parameters));
+		return map;
 	}
 
-	private static void protoToBoof(ProtoCameraModels.Se3 proto, Se3_F64 boof) {
-		boof.T.x = proto.getTx();
-		boof.T.y = proto.getTy();
-		boof.T.z = proto.getTz();
+	private static Map<String,Object> putModelRadial( CameraPinholeRadial parameters , Map<String,Object> map ) {
+		if( map == null )
+			map = new HashMap<>();
 
-		boof.R.data[0] = proto.getR00();
-		boof.R.data[1] = proto.getR01();
-		boof.R.data[2] = proto.getR02();
-		boof.R.data[3] = proto.getR10();
-		boof.R.data[4] = proto.getR11();
-		boof.R.data[5] = proto.getR12();
-		boof.R.data[6] = proto.getR20();
-		boof.R.data[7] = proto.getR21();
-		boof.R.data[8] = proto.getR22();
+		map.put("model",MODEL_PINHOLE_RADIAL_TAN);
+		map.put("pinhole", putParamsPinhole(parameters));
+		map.put("radial_tangential", putParamsRadialTangent(parameters));
+
+		return map;
 	}
 
-	private static void protoToBoof(ProtoCameraModels.PinholeRadial pr, CameraPinholeRadial model) {
-		protoToBoof(pr.getPinhole(), model);
 
-		if( pr.hasT1() )
-			model.t1 = pr.getT1();
-		if( pr.hasT2() )
-			model.t2 = pr.getT2();
+	private static Map<String,Object> putParamsPinhole(CameraPinhole parameters  ) {
+		Map<String,Object> map = new HashMap<>();
 
-		if( pr.getRadialCount() > 0 ) {
-			model.radial = new double[pr.getRadialCount()];
-			for (int i = 0; i < model.radial.length; i++) {
-				model.radial[i] = pr.getRadial(i);
-			}
+		map.put("width",parameters.width);
+		map.put("height",parameters.height);
+		map.put("fx",parameters.fx);
+		map.put("fy",parameters.fy);
+		map.put("skew",parameters.skew);
+		map.put("cx",parameters.cx);
+		map.put("cy",parameters.cy);
+
+		return map;
+	}
+
+	private static Map<String,Object> putParamsRadialTangent(CameraPinholeRadial parameters ) {
+		Map<String,Object> map = new HashMap<>();
+
+		if( parameters.radial != null )
+			map.put("radial",parameters.radial);
+		map.put("t1",parameters.t1);
+		map.put("t2",parameters.t2);
+
+		return map;
+	}
+
+	private static Map<String,Object> putSe3( Se3_F64 transform ) {
+		Map<String,Object> map = new HashMap<>();
+
+		map.put("rotation",transform.R.data);
+		map.put("x",transform.T.x);
+		map.put("y",transform.T.y);
+		map.put("z",transform.T.z);
+
+		return map;
+	}
+
+	private static void loadPinhole(Map<String,Object> map , CameraPinhole parameters ) {
+		parameters.width = (int)map.get("width");
+		parameters.height = (int)map.get("height");
+		parameters.fx = (double)map.get("fx");
+		parameters.fy = (double)map.get("fy");
+		parameters.skew = (double)map.get("skew");
+		parameters.cx = (double)map.get("cx");
+		parameters.cy = (double)map.get("cy");
+	}
+
+	private static Se3_F64 loadSe3(Map<String,Object> map , Se3_F64 transform) {
+		if( transform == null )
+			transform = new Se3_F64();
+		List<Double> rotation = (List<Double>)map.get("rotation");
+
+		transform.T.x = (double)map.get("x");
+		transform.T.y = (double)map.get("y");
+		transform.T.z = (double)map.get("z");
+
+		for (int i = 0; i < 9; i++) {
+			transform.R.data[i] = rotation.get(i);
 		}
+		return transform;
 	}
-
-	private static void protoToBoof(ProtoCameraModels.Pinhole p, CameraPinhole model) {
-		model.width = p.getWidth();
-		model.height = p.getHeight();
-		model.skew = p.getSkew();
-		model.cx = p.getCx();
-		model.cy = p.getCy();
-		model.fx = p.getFx();
-		model.fy = p.getFy();
-	}
-
 }

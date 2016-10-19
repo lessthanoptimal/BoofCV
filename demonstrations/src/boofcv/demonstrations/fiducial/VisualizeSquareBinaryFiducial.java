@@ -125,6 +125,6 @@ public class VisualizeSquareBinaryFiducial {
 
 		VisualizeSquareBinaryFiducial app = new VisualizeSquareBinaryFiducial();
 
-		app.process(directory+"/image0000.jpg",directory+"/intrinsic.txt");
+		app.process(directory+"/image0000.jpg",directory+"/intrinsic.yaml");
 	}
 }

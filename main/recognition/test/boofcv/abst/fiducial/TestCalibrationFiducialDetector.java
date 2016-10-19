@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * @author Peter Abeles
@@ -55,7 +56,7 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 
 	@Override
 	public CameraPinholeRadial loadIntrinsic() {
-		return CalibrationIO.load(directory,"intrinsic.txt");
+		return CalibrationIO.load(new File(directory,"intrinsic.yaml"));
 	}
 
 	@Override

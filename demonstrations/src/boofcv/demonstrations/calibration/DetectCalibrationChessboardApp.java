@@ -118,6 +118,15 @@ public class DetectCalibrationChessboardApp
 
 		List<String> examples = new ArrayList<>();
 
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00100.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00200.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00300.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00400.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00500.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00600.png");
+		examples.add("/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00700.png");
+
+
 		for (int i = 1; i <= 11; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/stereo/Bumblebee2_Chess/left%02d.jpg",i)));
 		}

@@ -259,6 +259,6 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 		ShowImages.showWindow(app,"Planar Stereo Calibration",true);
 
-		app.process("stereo.xml");
+		app.process("stereo.yaml");
 	}
 }

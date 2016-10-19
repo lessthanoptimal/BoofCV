@@ -3,7 +3,7 @@ dependencies {
     compile project(':main:calibration')
 
     compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.7'
-    compile 'com.google.protobuf:protobuf-java:2.6.1'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.17'
 }
 
 idea {

@@ -306,7 +306,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 			throw new RuntimeException("Unknown selection");
 		}
 
-		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.txt"));
+		intrinsic = CalibrationIO.load(media.openFile(path+"/intrinsic.yaml"));
 
 		detector.setIntrinsic(intrinsic);
 

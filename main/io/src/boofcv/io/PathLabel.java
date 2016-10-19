@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.io;
 
+import java.io.File;
+
 /**
  * Object containing the path to a file and a label that is used to refer to the file
  * 
@@ -32,9 +34,20 @@ public class PathLabel {
 		this.path = new String[]{path};
 	}
 
+	/**
+	 * Specifies a label with multiple paths.  If only a label is passed in it is assumed to be a file path
+	 * and the label is extracted from the file's name.
+	 * @param label
+	 * @param path
+	 */
 	public PathLabel(String label, String ...path) {
-		this.label = label;
-		this.path = path;
+		if( path.length == 0 ) {
+			this.path = new String[]{label};
+			this.label = new File(label).getName();
+		} else {
+			this.label = label;
+			this.path = path;
+		}
 	}
 
 	public String getLabel() {

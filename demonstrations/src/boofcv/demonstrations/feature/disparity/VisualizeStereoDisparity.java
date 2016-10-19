@@ -434,14 +434,14 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 		String dirImgs = UtilIO.pathExample("stereo/");
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Chair 1",  dirCalib+"stereo.xml",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
-//		inputs.add(new PathLabel("Chair 2",  dirCalib+"stereo.xml",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
-		inputs.add(new PathLabel("Stones 1", dirCalib+"stereo.xml",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
-		inputs.add(new PathLabel("Lantern 1",dirCalib+"stereo.xml",dirImgs+"lantern01_left.jpg",dirImgs+"lantern01_right.jpg"));
-		inputs.add(new PathLabel("Wall 1",   dirCalib+"stereo.xml",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
-//		inputs.add(new PathLabel("Garden 1", dirCalib+"stereo.xml",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
-		inputs.add(new PathLabel("Garden 2", dirCalib+"stereo.xml",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
-		inputs.add(new PathLabel("Sundial 1", dirCalib+"stereo.xml",dirImgs+"sundial01_left.jpg",dirImgs+"sundial01_right.jpg"));
+		inputs.add(new PathLabel("Chair 1",  dirCalib+"stereo.yaml",dirImgs+"chair01_left.jpg",dirImgs+"chair01_right.jpg"));
+//		inputs.add(new PathLabel("Chair 2",  dirCalib+"stereo.yaml",dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
+		inputs.add(new PathLabel("Stones 1", dirCalib+"stereo.yaml",dirImgs+"stones01_left.jpg",dirImgs+"stones01_right.jpg"));
+		inputs.add(new PathLabel("Lantern 1",dirCalib+"stereo.yaml",dirImgs+"lantern01_left.jpg",dirImgs+"lantern01_right.jpg"));
+		inputs.add(new PathLabel("Wall 1",   dirCalib+"stereo.yaml",dirImgs+"wall01_left.jpg",dirImgs+"wall01_right.jpg"));
+//		inputs.add(new PathLabel("Garden 1", dirCalib+"stereo.yaml",dirImgs+"garden01_left.jpg",dirImgs+"garden01_right.jpg"));
+		inputs.add(new PathLabel("Garden 2", dirCalib+"stereo.yaml",dirImgs+"garden02_left.jpg",dirImgs+"garden02_right.jpg"));
+		inputs.add(new PathLabel("Sundial 1", dirCalib+"stereo.yaml",dirImgs+"sundial01_left.jpg",dirImgs+"sundial01_right.jpg"));
 
 		app.setInputList(inputs);
 

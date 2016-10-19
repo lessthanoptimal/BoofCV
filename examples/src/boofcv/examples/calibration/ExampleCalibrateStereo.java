@@ -24,6 +24,7 @@ import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -116,7 +117,7 @@ public class ExampleCalibrateStereo {
 		calibratorAlg.printStatistics();
 
 		// save results to a file and print out
-		UtilIO.saveXML(stereoCalib, "stereo.xml");
+		CalibrationIO.save(stereoCalib, "stereo.yaml");
 		stereoCalib.print();
 
 		// Note that the stereo baseline translation will be specified in the same units as the calibration grid.

@@ -56,7 +56,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 
 	@Override
 	public CameraPinholeRadial loadIntrinsic() {
-		return CalibrationIO.load(getClass().getResource("intrinsic.txt"));
+		return CalibrationIO.load(getClass().getResource("intrinsic.yaml"));
 	}
 
 	@Override

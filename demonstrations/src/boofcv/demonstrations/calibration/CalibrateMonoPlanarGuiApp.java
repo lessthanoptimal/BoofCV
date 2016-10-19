@@ -220,6 +220,6 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-		app.process("intrinsic.txt");
+		app.process("intrinsic.yaml");
 	}
 }

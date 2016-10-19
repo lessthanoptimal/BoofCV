@@ -64,7 +64,7 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Load camera calibration
 		CameraPinholeRadial intrinsic =
-				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.txt"));
+				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.yaml"));
 
 		// load the video file
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");

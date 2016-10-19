@@ -29,6 +29,7 @@ import boofcv.factory.feature.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.StereoParameters;
@@ -53,7 +54,7 @@ public class ExampleVisualOdometryStereo {
 		String directory = UtilIO.pathExample("vo/backyard/");
 
 		// load camera description and the video sequence
-		StereoParameters stereoParam = UtilIO.loadXML(media.openFile(directory + "stereo.xml"));
+		StereoParameters stereoParam = CalibrationIO.load(media.openFile(directory + "stereo.yaml"));
 		SimpleImageSequence<GrayU8> video1 = media.openVideo(directory + "left.mjpeg", ImageType.single(GrayU8.class));
 		SimpleImageSequence<GrayU8> video2 = media.openVideo(directory+"right.mjpeg", ImageType.single(GrayU8.class));
 

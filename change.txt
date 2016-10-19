@@ -32,8 +32,8 @@ Version : 0.25
   * Renamed IntrinsicParameters to CameraPinhole
   * Broke distortion off into a separate class which extends CameraPinhole
      - CameraPinholeRadial
-- Protobuf
-  * Changed save format to textual protobufs for camera model parameters.
+- YAML
+  * Changed save format to YAML for camera model parameters.
   * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
 - Deleted BoofAndroidFiles because you can now simply use the protobuf format
 - Deep Learning

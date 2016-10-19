@@ -27,6 +27,7 @@ import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
@@ -36,6 +37,7 @@ import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * <p>
@@ -60,7 +62,7 @@ public class ExampleRectifyCalibratedStereo {
 	public static void main( String args[] ) {
 		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 
-		StereoParameters param = UtilIO.loadXML(dir , "stereo.xml");
+		StereoParameters param = CalibrationIO.load(new File(dir , "stereo.yaml"));
 
 		// load images
 		BufferedImage origLeft = UtilImageIO.loadImage(dir,"left05.jpg");

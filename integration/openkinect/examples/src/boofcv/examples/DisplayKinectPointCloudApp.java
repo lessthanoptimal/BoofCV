@@ -49,7 +49,7 @@ public class DisplayKinectPointCloudApp {
 
 		String nameRgb = baseDir+"basket.ppm";
 		String nameDepth = baseDir+"basket.depth";
-		String nameCalib = baseDir+"intrinsic.txt";
+		String nameCalib = baseDir+"intrinsic.yaml";
 
 		IntrinsicParameters param = CalibrationIO.load(nameCalib);
 

@@ -45,7 +45,7 @@ public class CreateRgbPointCloudFileApp {
 
 		String nameRgb = baseDir+"rgb0000000.ppm";
 		String nameDepth = baseDir+"depth0000000.depth";
-		String nameCalib = baseDir+"intrinsic.txt";
+		String nameCalib = baseDir+"intrinsic.yaml";
 
 		IntrinsicParameters param = CalibrationIO.load(nameCalib);
 

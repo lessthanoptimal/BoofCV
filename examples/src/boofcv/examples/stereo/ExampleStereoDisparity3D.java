@@ -25,6 +25,7 @@ import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
@@ -36,6 +37,7 @@ import org.ejml.data.DenseMatrix64F;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Expanding upon ExampleStereoDisparity, this example demonstrates how to rescale an image for stereo processing and
@@ -62,7 +64,7 @@ public class ExampleStereoDisparity3D {
 		String calibDir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
 		String imageDir = UtilIO.pathExample("stereo/");
 
-		StereoParameters param = UtilIO.loadXML(calibDir , "stereo.xml");
+		StereoParameters param = CalibrationIO.load(new File(calibDir , "stereo.yaml"));
 
 		// load and convert images into a BoofCV format
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "chair01_left.jpg");
