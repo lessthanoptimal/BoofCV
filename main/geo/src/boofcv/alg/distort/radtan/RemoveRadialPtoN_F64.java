@@ -24,6 +24,8 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
+import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F64.removeRadial;
+
 /**
  * Converts the observed distorted pixels into normalized image coordinates.
  *
@@ -38,11 +40,6 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 
 	// distortion parameters
 	protected RadialTangential_F64 params;
-
-	// radial distortion magnitude
-	protected double sum;
-	// found tangential distortion
-	protected double tx,ty;
 
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
@@ -106,41 +103,9 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 		out.x = x;
 		out.y = y;
 
-		double radial[] = params.radial;
-		double t1 = params.t1,t2 = params.t2;
-
 		// initial estimate of undistorted point
 		GeometryMath_F64.mult(K_inv, out, out);
 
-		double origX = x = out.x;
-		double origY = y = out.y;
-
-		double prevSum = 0;
-
-		for( int iter = 0; iter < 20; iter++ ) {
-
-			// estimate the radial distance
-			double r2 = x*x + y*y;
-			double ri2 = r2;
-
-			sum = 0;
-			for( int i = 0; i < radial.length; i++ ) {
-				sum += radial[i]*ri2;
-				ri2 *= r2;
-			}
-
-			tx = 2*t1*x*y + t2*(r2 + 2*x*x);
-			ty = t1*(r2 + 2*y*y) + 2*t2*x*y;
-
-			x = (origX - tx)/(1+sum);
-			y = (origY - ty)/(1+sum);
-
-			if( Math.abs(prevSum-sum) <= tol ) {
-				break;
-			} else {
-				prevSum = sum;
-			}
-		}
-		out.set(x,y);
+		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol );
 	}
 }

@@ -19,7 +19,27 @@
 package boofcv.struct.calib;
 
 /**
+ * Common class for camera models
+ *
  * @author Peter Abeles
  */
-public class CameraUniversalMei {
+public class CameraModel {
+	/** image shape (units: pixels) */
+	public int width,height;
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
 }

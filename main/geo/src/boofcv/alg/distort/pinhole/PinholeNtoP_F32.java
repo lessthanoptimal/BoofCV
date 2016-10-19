@@ -18,31 +18,31 @@
 
 package boofcv.alg.distort.pinhole;
 
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Converts normalized pixel coordinate into pixel coordinate.
  *
  * @author Peter Abeles
  */
-public class PinholeN2toP_F64 implements Point2Transform2_F64 {
+public class PinholeNtoP_F32 implements Point2Transform2_F32 {
 
 	// camera calibration matrix
-	double fx, fy, skew, cx, cy;
+	float fx, fy, skew, cx, cy;
 
-	public PinholeN2toP_F64 set(double fx, double fy, double skew, double cx, double cy) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
+	public PinholeNtoP_F32 set(double fx, double fy, double skew, double cx, double cy) {
+		this.fx = (float)fx;
+		this.fy = (float)fy;
+		this.skew = (float)skew;
+		this.cx = (float)cx;
+		this.cy = (float)cy;
 		return this;
 	}
 
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute(float x, float y, Point2D_F32 out) {
 		out.x = fx * x + skew * y + cx;
 		out.y = fy * y + cy;
 	}

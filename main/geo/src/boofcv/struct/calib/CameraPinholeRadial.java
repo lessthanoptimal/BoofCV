@@ -24,7 +24,7 @@ import java.io.Serializable;
  * <p>Adds radial and tangential distortion to the intrinsic parameters of a {@link CameraPinhole pinhole camera}.</p?
  *
  * <p>
- * Radial and Tangental Distortion:<br>
+ * Radial and Tangential Distortion:<br>
  * x<sub>d</sub> = x<sub>n</sub> + x<sub>n</sub>[k<sub>1</sub> r<sup>2</sup> + ... + k<sub>n</sub> r<sup>2n</sup>] + dx<br>
  * dx<sub>u</sub> = [ 2t<sub>1</sub> u v + t<sub>2</sub>(r<sup>2</sup> + 2u<sup>2</sup>)] <br>
  * dx<sub>v</sub> = [ t<sub>1</sub>(r<sup>2</sup> + 2v<sup>2</sup>) + 2 t<sub>2</sub> u v]<br>

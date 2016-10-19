@@ -44,13 +44,13 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 			if( pixelOut ) {
 				return new DoNothing2Transform2_F64();
 			} else {
-				PinholePtoN2_F64 p2n = new PinholePtoN2_F64();
+				PinholePtoN_F64 p2n = new PinholePtoN_F64();
 				p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
 				return p2n;
 			}
 		} else {
 			if( pixelOut ) {
-				PinholeN2toP_F64 n2p = new PinholeN2toP_F64();
+				PinholeNtoP_F64 n2p = new PinholeNtoP_F64();
 				n2p.set(p.fx, p.fy, p.skew, p.cx, p.cy);
 				return n2p;
 			} else {
@@ -70,13 +70,13 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 			if( pixelOut ) {
 				return new DoNothing2Transform2_F32();
 			} else {
-				PinholePtoN2_F32 p2n = new PinholePtoN2_F32();
+				PinholePtoN_F32 p2n = new PinholePtoN_F32();
 				p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
 				return p2n;
 			}
 		} else {
 			if( pixelOut ) {
-				PinholeN2toP_F32 n2p = new PinholeN2toP_F32();
+				PinholeNtoP_F32 n2p = new PinholeNtoP_F32();
 				n2p.set(p.fx, p.fy, p.skew, p.cx, p.cy);
 				return n2p;
 			} else {

@@ -24,9 +24,9 @@ import boofcv.struct.distort.Point3Transform2_F32;
 import boofcv.struct.distort.Point3Transform2_F64;
 
 /**
- * Interface for creating transform between distorted and undistorted pixel/normalized-3D image
+ * Interface for creating transform between distorted and undistorted pixel/unit sphere
  * coordinates for camera models that supports FOV more than 180 degrees.  In this situation
- * the entire undistorted image can't be rendered onto a flat plane.  So there are no functions
+ * the entire undistorted image can't be rendered onto a flat plane.  Thus there are no functions
  * for working in undistorted pixels.
  *
  * @author Peter Abeles
@@ -36,42 +36,42 @@ public interface LensDistortionWideFOV {
 	/**
 	 * Applies lens distortion.
 	 * <pre>
-	 * (Input) Undistorted normalized-3D image coordinate
-	 * (Output) Distorted 2D pixel coordinates
+	 * (Input) Undistorted unit sphere coordinate
+	 * (Output) Distorted pixel coordinates
 	 * </pre>
 	 * @return Transform
 	 */
-	Point3Transform2_F64 distortNtoP_F64();
+	Point3Transform2_F64 distortStoP_F64();
 
 	/**
 	 * Applies lens distortion.
 	 * <pre>
-	 * (Input) Undistorted normalized-3D image coordinate
-	 * (Output) Distorted 2D pixel coordinates
+	 * (Input) Undistorted unit sphere coordinate
+	 * (Output) Distorted pixel coordinates
 	 * </pre>
 	 * @return Transform
 	 */
-	Point3Transform2_F32 distortNtoP_F32();
+	Point3Transform2_F32 distortStoP_F32();
 
 	/**
 	 * Removes lens distortion.
 	 * <pre>
-	 * (Input) Distorted 2D pixel coordinate
-	 * (Output) Undistorted normalized-3D image coordinates
+	 * (Input) Distorted pixel coordinate
+	 * (Output) Undistorted unit sphere coordinates
 	 * </pre>
 	 * @return Transform
 	 */
-	Point2Transform3_F64 undistortPtoN_F64();
+	Point2Transform3_F64 undistortPtoS_F64();
 
 	/**
 	 * Removes lens distortion.
 	 * <pre>
-	 * (Input) Distorted 2D pixel coordinate
-	 * (Output) Undistorted normalized-3D image coordinates
+	 * (Input) Distorted pixel coordinate
+	 * (Output) Undistorted unit sphere coordinates
 	 * </pre>
 	 * @return Transform
 	 */
-	Point2Transform3_F32 undistortPtoN_F32();
+	Point2Transform3_F32 undistortPtoS_F32();
 
 
 }

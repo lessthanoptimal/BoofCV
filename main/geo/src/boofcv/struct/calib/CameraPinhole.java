@@ -34,13 +34,10 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class CameraPinhole implements Serializable {
+public class CameraPinhole extends CameraModel implements Serializable {
 
 	// serialization version
 	public static final long serialVersionUID = 1L;
-
-	/** image shape (units: pixels) */
-	public int width,height;
 
 	/** focal length along x and y axis (units: pixels) */
 	public double fx,fy;
@@ -130,23 +127,6 @@ public class CameraPinhole implements Serializable {
 	public void setSkew(double skew) {
 		this.skew = skew;
 	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
 
 	public void print() {
 		System.out.println("Shape "+width+" "+height);

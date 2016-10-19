@@ -38,7 +38,7 @@ public class TestPinholePtoN2_F64 {
 
 	@Test
 	public void stuff() {
-		PinholePtoN2_F64 alg = new PinholePtoN2_F64();
+		PinholePtoN_F64 alg = new PinholePtoN_F64();
 		alg.set(fx,fy,skew,x_c,y_c);
 
 		Point2D_F64 in = new Point2D_F64(100,120);

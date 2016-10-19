@@ -19,10 +19,10 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.distort.pinhole.PinholeN2toP_F32;
-import boofcv.alg.distort.pinhole.PinholeN2toP_F64;
-import boofcv.alg.distort.pinhole.PinholePtoN2_F32;
-import boofcv.alg.distort.pinhole.PinholePtoN2_F64;
+import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
+import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
+import boofcv.alg.distort.pinhole.PinholePtoN_F32;
+import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -208,7 +208,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeNtoP_F64} should be used instead.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
@@ -232,7 +232,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link PinholeN2toP_F32} should be used instead.
+	 * If speed is a concern then {@link PinholeNtoP_F32} should be used instead.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
@@ -255,7 +255,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeNtoP_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -272,7 +272,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeNtoP_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -286,7 +286,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		PinholeN2toP_F64 alg = new PinholeN2toP_F64();
+		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		alg.compute(norm.x,norm.y,pixel);
@@ -297,7 +297,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN2_F64} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -321,7 +321,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN2_F32} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN_F32} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -345,7 +345,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN2_F64} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -359,7 +359,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		PinholePtoN2_F64 alg = new PinholePtoN2_F64();
+		PinholePtoN_F64 alg = new PinholePtoN_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		alg.compute(pixel.x,pixel.y,norm);

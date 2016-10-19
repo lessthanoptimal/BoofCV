@@ -18,9 +18,9 @@
 
 package boofcv.alg.distort.pinhole;
 
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -30,18 +30,18 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class PinholePtoN2_F64 implements Point2Transform2_F64 {
+public class PinholePtoN_F32 implements Point2Transform2_F32 {
 
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-	public void set(double fx, double fy, double skew, double cx, double cy ) {
+	public void set(double fx, double fy, double skew, double x_c, double y_c ) {
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
-		K_inv.set(0,2,cx);
-		K_inv.set(1,2,cy);
+		K_inv.set(0,2,x_c);
+		K_inv.set(1,2,y_c);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);
@@ -49,9 +49,9 @@ public class PinholePtoN2_F64 implements Point2Transform2_F64 {
 
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
+	public void compute(float x, float y, Point2D_F32 out) {
 		out.set(x,y);
 
-		GeometryMath_F64.mult(K_inv, out, out);
+		GeometryMath_F32.mult(K_inv, out, out);
 	}
 }

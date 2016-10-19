@@ -44,7 +44,7 @@ public class TestPinholeN2toP_F64 {
 
 		GeometryMath_F64.mult(K, pixel, expected);
 
-		PinholeN2toP_F64 alg = new PinholeN2toP_F64();
+		PinholeNtoP_F64 alg = new PinholeNtoP_F64();
 		alg.set(p.fx, p.fy, p.skew, p.cx, p.cy);
 
 		alg.compute(pixel.x, pixel.y, found);

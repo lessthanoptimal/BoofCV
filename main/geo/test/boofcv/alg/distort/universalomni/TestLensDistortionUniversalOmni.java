@@ -16,10 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalmei;
+package boofcv.alg.distort.universalomni;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class LensDistortionUniversalMei {
+public class TestLensDistortionUniversalOmni {
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 }

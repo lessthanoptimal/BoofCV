@@ -38,7 +38,7 @@ public class TestPinholePtoN2_F32 {
 
 	@Test
 	public void stuff() {
-		PinholePtoN2_F32 alg = new PinholePtoN2_F32();
+		PinholePtoN_F32 alg = new PinholePtoN_F32();
 		alg.set(fx,fy,skew,x_c,y_c);
 
 		Point2D_F32 in = new Point2D_F32(100,120);

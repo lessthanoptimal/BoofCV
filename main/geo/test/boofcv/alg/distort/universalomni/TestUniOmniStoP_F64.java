@@ -16,34 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.pinhole;
+package boofcv.alg.distort.universalomni;
 
-import boofcv.struct.distort.Point2Transform2_F32;
-import georegression.struct.point.Point2D_F32;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Converts normalized pixel coordinate into pixel coordinate.
- *
  * @author Peter Abeles
  */
-public class PinholeN2toP_F32 implements Point2Transform2_F32 {
-
-	// camera calibration matrix
-	float fx, fy, skew, cx, cy;
-
-	public PinholeN2toP_F32 set(double fx, double fy, double skew, double cx, double cy) {
-		this.fx = (float)fx;
-		this.fy = (float)fy;
-		this.skew = (float)skew;
-		this.cx = (float)cx;
-		this.cy = (float)cy;
-		return this;
-	}
-
-
-	@Override
-	public void compute(float x, float y, Point2D_F32 out) {
-		out.x = fx * x + skew * y + cx;
-		out.y = fy * y + cy;
+public class TestUniOmniStoP_F64 {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 }

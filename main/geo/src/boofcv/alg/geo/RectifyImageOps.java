@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.*;
-import boofcv.alg.distort.pinhole.PinholePtoN2_F64;
+import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -384,7 +384,7 @@ public class RectifyImageOps {
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
-		PinholePtoN2_F64 pixelToNorm = new PinholePtoN2_F64();
+		PinholePtoN_F64 pixelToNorm = new PinholePtoN_F64();
 		pixelToNorm.set(rectifyK.get(0, 0), rectifyK.get(1, 1),
 				rectifyK.get(0, 1),
 				rectifyK.get(0, 2), rectifyK.get(1, 2));

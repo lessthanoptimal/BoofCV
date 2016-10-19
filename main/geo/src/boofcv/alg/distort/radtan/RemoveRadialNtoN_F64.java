@@ -31,11 +31,6 @@ public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
 	// distortion parameters
 	protected RadialTangential_F64 params;
 
-	// radial distortion magnitude
-	protected double sum;
-	// found tangential distortion
-	protected double tx,ty;
-
 	private double tol=1e-10;
 
 	public RemoveRadialNtoN_F64() {
@@ -64,9 +59,22 @@ public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
 	@Override
 	public void compute(double x, double y, Point2D_F64 out)
 	{
-		double radial[] = params.radial;
-		double t1 = params.t1,t2 = params.t2;
+		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol );
+	}
 
+	/**
+	 * Static function for removing radial and tangential distortion
+	 *
+	 * @param x Distorted x-coordinate normalized image coordinate
+	 * @param y Distorted y-coordinate normalized image coordinate
+	 * @param radial Radial distortion parameters
+	 * @param t1 tangential distortion
+	 * @param t2 tangential distortion
+	 * @param out Undistorted normalized image coordinate
+	 * @param tol convergence tolerance
+	 */
+	public static void removeRadial(double x, double y, double[] radial, double t1, double t2,
+									Point2D_F64 out, double tol ) {
 		double origX = x;
 		double origY = y;
 
@@ -78,17 +86,17 @@ public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
 			double r2 = x*x + y*y;
 			double ri2 = r2;
 
-			sum = 0;
+			double sum = 0;
 			for( int i = 0; i < radial.length; i++ ) {
 				sum += radial[i]*ri2;
 				ri2 *= r2;
 			}
 
-			tx = 2*t1*x*y + t2*(r2 + 2*x*x);
-			ty = t1*(r2 + 2*y*y) + 2*t2*x*y;
+			double tx = 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+			double ty = t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
-			x = (origX - tx)/(1+sum);
-			y = (origY - ty)/(1+sum);
+			x = (origX - tx)/(1.0 + sum);
+			y = (origY - ty)/(1.0 + sum);
 
 			if( Math.abs(prevSum-sum) <= tol ) {
 				break;

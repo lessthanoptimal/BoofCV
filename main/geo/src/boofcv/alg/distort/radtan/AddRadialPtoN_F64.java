@@ -83,7 +83,7 @@ public class AddRadialPtoN_F64 implements Point2Transform2_F64 {
 	 */
 	@Override
 	public void compute(double x, double y, Point2D_F64 out) {
-		float sum = 0;
+		double sum = 0;
 
 		double radial[] = params.radial;
 		double t1 = params.t1, t2 = params.t2;

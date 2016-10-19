@@ -16,10 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalmei;
+package boofcv.alg.distort.pinhole;
+
+import boofcv.struct.distort.Point2Transform2_F64;
+import georegression.struct.point.Point2D_F64;
 
 /**
+ * Converts normalized pixel coordinate into pixel coordinate.
+ *
  * @author Peter Abeles
  */
-public class MeiN3toP_F64 {
+public class PinholeNtoP_F64 implements Point2Transform2_F64 {
+
+	// camera calibration matrix
+	double fx, fy, skew, cx, cy;
+
+	public PinholeNtoP_F64 set(double fx, double fy, double skew, double cx, double cy) {
+		this.fx = fx;
+		this.fy = fy;
+		this.skew = skew;
+		this.cx = cx;
+		this.cy = cy;
+		return this;
+	}
+
+
+	@Override
+	public void compute(double x, double y, Point2D_F64 out) {
+		out.x = fx * x + skew * y + cx;
+		out.y = fy * y + cy;
+	}
 }

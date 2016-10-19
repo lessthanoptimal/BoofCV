@@ -44,7 +44,7 @@ public class TestPinholeN2toP_F32 {
 
 		GeometryMath_F32.mult(K, pixel, expected);
 
-		PinholeN2toP_F32 alg = new PinholeN2toP_F32();
+		PinholeNtoP_F32 alg = new PinholeNtoP_F32();
 		alg.set(p.fx, p.fy, p.skew, p.cx, p.cy);
 
 		alg.compute(pixel.x, pixel.y, found);
