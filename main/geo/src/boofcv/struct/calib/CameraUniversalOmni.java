@@ -85,6 +85,22 @@ public class CameraUniversalOmni extends CameraPinhole {
 		set(original);
 	}
 
+	public CameraUniversalOmni fsetMirror( double mirrorOffset ) {
+		this.mirrorOffset = mirrorOffset;
+		return this;
+	}
+
+	public CameraUniversalOmni fsetRadial(double ...radial ) {
+		this.radial = radial.clone();
+		return this;
+	}
+
+	public CameraUniversalOmni fsetTangental(double t1 , double t2) {
+		this.t1 = t1;
+		this.t2 = t2;
+		return this;
+	}
+
 	/**
 	 * Assigns this model to be identical to the passed in model
 	 * @param original Model which is to be copied

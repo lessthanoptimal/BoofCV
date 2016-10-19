@@ -18,16 +18,18 @@
 
 package boofcv.alg.distort.universal;
 
-import org.junit.Test;
+import boofcv.alg.distort.GeneralLensDistortionWideFOVChecks;
+import boofcv.alg.distort.LensDistortionWideFOV;
 
-import static org.junit.Assert.fail;
+import static boofcv.alg.distort.universal.TestUniOmniPtoS_F64.createModel;
 
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionUniversalOmni {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestLensDistortionUniversalOmni extends GeneralLensDistortionWideFOVChecks {
+
+	@Override
+	public LensDistortionWideFOV create() {
+		return new LensDistortionUniversalOmni(createModel(0.5));
 	}
 }

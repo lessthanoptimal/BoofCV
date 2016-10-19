@@ -19,6 +19,7 @@
 package boofcv.alg.distort.universal;
 
 import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F32;
@@ -28,23 +29,28 @@ import boofcv.struct.distort.Point3Transform2_F64;
  * @author Peter Abeles
  */
 public class LensDistortionUniversalOmni implements LensDistortionWideFOV {
+	CameraUniversalOmni model;
+	public LensDistortionUniversalOmni(CameraUniversalOmni model ) {
+		this.model = model;
+	}
+
 	@Override
 	public Point3Transform2_F64 distortStoP_F64() {
-		return null;
+		return new UniOmniStoP_F64(model);
 	}
 
 	@Override
 	public Point3Transform2_F32 distortStoP_F32() {
-		return null;
+		return new UniOmniStoP_F32(model);
 	}
 
 	@Override
 	public Point2Transform3_F64 undistortPtoS_F64() {
-		return null;
+		return new UniOmniPtoS_F64(model);
 	}
 
 	@Override
 	public Point2Transform3_F32 undistortPtoS_F32() {
-		return null;
+		return new UniOmniPtoS_F32(model);
 	}
 }

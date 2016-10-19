@@ -103,7 +103,7 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 			float c0 = u*u + v*v + 1.0f;
 			float c1 = -2.0f*xi;
 			float c2 = xi*xi - 1;
-			a = (-c1 + (float)Math.sqrt(c1*c1 + 4.0f*c0*c2))/(2.0f*c0);
+			a = (-c1 + (float)Math.sqrt(c1*c1 - 4.0f*c0*c2))/(2.0f*c0);
 		}
 		out.x = u*a;
 		out.y = v*a;

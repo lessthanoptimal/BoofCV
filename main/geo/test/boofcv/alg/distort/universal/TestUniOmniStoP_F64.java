@@ -18,16 +18,32 @@
 
 package boofcv.alg.distort.universal;
 
+import boofcv.struct.calib.CameraUniversalOmni;
+import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static boofcv.alg.distort.universal.TestUniOmniPtoS_F64.createModel;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestUniOmniStoP_F64 {
+	/**
+	 * A point in the world center should appear in the image center
+	 */
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void worldIsImageCenter() {
+		CameraUniversalOmni model = createModel(0.5);
+
+		UniOmniStoP_F64 alg = new UniOmniStoP_F64();
+		alg.setModel(model);
+
+		Point2D_F64 found = new Point2D_F64(10,10);
+		alg.compute(0,0,1, found);  // directly forward on unit sphere
+
+		assertEquals(320,found.x, GrlConstants.DOUBLE_TEST_TOL);
+		assertEquals(240,found.y, GrlConstants.DOUBLE_TEST_TOL);
 	}
 }

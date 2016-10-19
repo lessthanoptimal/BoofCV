@@ -103,7 +103,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 			double c0 = u*u + v*v + 1.0;
 			double c1 = -2.0*xi;
 			double c2 = xi*xi - 1;
-			a = (-c1 + Math.sqrt(c1*c1 + 4.0*c0*c2))/(2.0*c0);
+			a = (-c1 + Math.sqrt(c1*c1 - 4.0*c0*c2))/(2.0*c0);
 		}
 		out.x = u*a;
 		out.y = v*a;
