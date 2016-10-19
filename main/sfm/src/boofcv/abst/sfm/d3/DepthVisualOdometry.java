@@ -23,7 +23,7 @@ package boofcv.abst.sfm.d3;
  */
 
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -70,7 +70,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase, Depth extends ImageG
 	 * @param paramVisual Intrinsic parameters for visual camera
 	 * @param visToDepth Transform from visual camera pixels into depth camera pixels
 	 */
-	public void setCalibration(CameraPinholeRadial paramVisual , PixelTransform_F32 visToDepth );
+	public void setCalibration(CameraPinholeRadial paramVisual , PixelTransform2_F32 visToDepth );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked

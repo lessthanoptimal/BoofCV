@@ -25,7 +25,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.homography.Homography2D_F32;
@@ -56,7 +56,7 @@ public class BenchmarkImageDistort<T extends ImageGray> {
 		ImageDistort<T,T> alg;
 
 		public HomographyBilinear_F32(Homography2D_F32 affine) {
-			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
+			PixelTransform2_F32 tran = new PixelTransformHomography_F32(affine);
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 			
 			alg = FactoryDistort.distortSB(false, interp, imageType);
@@ -73,7 +73,7 @@ public class BenchmarkImageDistort<T extends ImageGray> {
 		ImageDistort<T,T> alg;
 
 		public HomographyBilinearCrop_F32(Homography2D_F32 affine) {
-			PixelTransform_F32 tran = new PixelTransformHomography_F32(affine);
+			PixelTransform2_F32 tran = new PixelTransformHomography_F32(affine);
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 			alg = FactoryDistort.distortSB(false, interp, imageType);
@@ -90,7 +90,7 @@ public class BenchmarkImageDistort<T extends ImageGray> {
 		ImageDistort<T,T> alg;
 
 		public MapBilinear_F32( Homography2D_F32 homography ) {
-			PixelTransform_F32 tran = new PixelTransformHomography_F32(homography);
+			PixelTransform2_F32 tran = new PixelTransformHomography_F32(homography);
 			InterpolatePixelS<T> interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 			alg = FactoryDistort.distortSB(true, interp, imageType);

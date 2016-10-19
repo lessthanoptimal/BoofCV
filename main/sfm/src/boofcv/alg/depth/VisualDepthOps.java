@@ -22,7 +22,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -45,7 +45,7 @@ public class VisualDepthOps {
 	public static void depthTo3D(CameraPinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
-		PointTransform_F64 p2n = LensDistortionOps.transformPoint(param).undistort_F64(true,false);
+		Point2Transform2_F64 p2n = LensDistortionOps.transformPoint(param).undistort_F64(true,false);
 
 		Point2D_F64 n = new Point2D_F64();
 

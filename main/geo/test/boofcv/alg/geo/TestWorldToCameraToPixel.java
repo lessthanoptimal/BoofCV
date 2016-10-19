@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestWorldToCameraToPixel {
 	CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
-	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+	Point2Transform2_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 

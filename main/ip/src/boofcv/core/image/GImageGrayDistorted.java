@@ -19,7 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -27,12 +27,12 @@ import boofcv.struct.image.ImageGray;
  */
 public class GImageGrayDistorted<T extends ImageGray> implements GImageGray {
 
-	PixelTransform_F32 transform;
+	PixelTransform2_F32 transform;
 	InterpolatePixelS<T> interpolate;
 
 	int inputWidth,inputHeight;
 
-	public GImageGrayDistorted(PixelTransform_F32 transform,
+	public GImageGrayDistorted(PixelTransform2_F32 transform,
 							   InterpolatePixelS<T> interpolate) {
 		this.transform = transform;
 		this.interpolate = interpolate;

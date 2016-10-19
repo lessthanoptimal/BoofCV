@@ -26,7 +26,7 @@ import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.*;
 import georegression.struct.InvertibleTransform;
 
@@ -62,7 +62,7 @@ public class BackgroundMovingGaussian_SB <T extends ImageGray, Motion extends In
 	 * @param imageType Type of input image.
 	 */
 	public BackgroundMovingGaussian_SB(float learnRate, float threshold,
-									   PointTransformModel_F32<Motion> transform,
+									   Point2Transform2Model_F32<Motion> transform,
 									   TypeInterpolate interpType,
 									   Class<T> imageType)
 	{

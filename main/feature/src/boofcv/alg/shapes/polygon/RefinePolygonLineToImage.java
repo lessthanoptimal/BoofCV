@@ -19,7 +19,7 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.edge.SnapToLineEdge;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
@@ -50,7 +50,7 @@ import java.util.List;
  * </p>
  *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
- * and invoke {@link SnapToLineEdge#setTransform(PixelTransform_F32)}.</p>
+ * and invoke {@link SnapToLineEdge#setTransform(PixelTransform2_F32)}.</p>
  *
  * @author Peter Abeles
  */
@@ -129,7 +129,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 	}
 
 	@Override
-	public void setLensDistortion(int width, int height, PixelTransform_F32 distToUndist, PixelTransform_F32 undistToDist) {
+	public void setLensDistortion(int width, int height, PixelTransform2_F32 distToUndist, PixelTransform2_F32 undistToDist) {
 		this.snapToEdge.setTransform(undistToDist);
 	}
 
@@ -286,7 +286,7 @@ public class RefinePolygonLineToImage<T extends ImageGray> implements RefineBina
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( PixelTransform_F32 undistToDist ) {
+	public void setTransform( PixelTransform2_F32 undistToDist ) {
 		snapToEdge.setTransform(undistToDist);
 	}
 

@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PixelTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F64;
 import georegression.misc.GrlConstants;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class TestEquirectangularRotate_F64 {
 		assertMatch( alg, 300.0*0.5, 250*0.25);
 	}
 
-	private void assertMatch(PixelTransform_F64 tran , double x , double y ) {
+	private void assertMatch(PixelTransform2_F64 tran , double x , double y ) {
 		assertEquals( x , tran.distX, GrlConstants.DOUBLE_TEST_TOL);
 		assertEquals( y , tran.distY, GrlConstants.DOUBLE_TEST_TOL);
 	}

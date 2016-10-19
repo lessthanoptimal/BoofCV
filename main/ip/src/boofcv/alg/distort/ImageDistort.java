@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 
 
@@ -38,7 +38,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 *
 	 * @param dstToSrc Pixel coordinate transformation.
 	 */
-	public void setModel( PixelTransform_F32 dstToSrc );
+	public void setModel( PixelTransform2_F32 dstToSrc );
 
 	/**
 	 * Applies the transform to the entire destination image.

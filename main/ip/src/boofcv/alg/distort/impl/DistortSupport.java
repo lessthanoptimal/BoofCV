@@ -22,7 +22,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.distort.FactoryDistort;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -99,7 +99,7 @@ public class DistortSupport {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	ImageDistort<Planar<Input>,Planar<Output>>
-	createDistortPL(Class<Output> outputType, PixelTransform_F32 dstToSrc,
+	createDistortPL(Class<Output> outputType, PixelTransform2_F32 dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )
 	{
 		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);

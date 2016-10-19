@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PixelTransformHomography_F32;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F32;
@@ -37,7 +37,7 @@ public class FactoryStitchingTransform {
 
 		return new StitchingTransform<Affine2D_F64>() {
 			@Override
-			public PixelTransform_F32 convertPixel(Affine2D_F64 input, PixelTransform_F32 output) {
+			public PixelTransform2_F32 convertPixel(Affine2D_F64 input, PixelTransform2_F32 output) {
 				if( output != null ) {
 					((PixelTransformAffine_F32)output).set(input);
 				} else {
@@ -67,7 +67,7 @@ public class FactoryStitchingTransform {
 
 		return new StitchingTransform<Affine2D_F32>() {
 			@Override
-			public PixelTransform_F32 convertPixel(Affine2D_F32 input, PixelTransform_F32 output) {
+			public PixelTransform2_F32 convertPixel(Affine2D_F32 input, PixelTransform2_F32 output) {
 				if( output != null ) {
 					((PixelTransformAffine_F32)output).set(input);
 				} else {
@@ -93,7 +93,7 @@ public class FactoryStitchingTransform {
 	public static StitchingTransform<Homography2D_F32> createHomography_F32() {
 		return new StitchingTransform<Homography2D_F32>() {
 			@Override
-			public PixelTransform_F32 convertPixel(Homography2D_F32 input, PixelTransform_F32 output) {
+			public PixelTransform2_F32 convertPixel(Homography2D_F32 input, PixelTransform2_F32 output) {
 				if( output != null ) {
 					((PixelTransformHomography_F32)output).set(input);
 				} else {
@@ -119,7 +119,7 @@ public class FactoryStitchingTransform {
 	public static StitchingTransform<Homography2D_F64> createHomography_F64() {
 		return new StitchingTransform<Homography2D_F64>() {
 			@Override
-			public PixelTransform_F32 convertPixel(Homography2D_F64 input, PixelTransform_F32 output) {
+			public PixelTransform2_F32 convertPixel(Homography2D_F64 input, PixelTransform2_F32 output) {
 				if( output != null ) {
 					((PixelTransformHomography_F32)output).set(input);
 				} else {

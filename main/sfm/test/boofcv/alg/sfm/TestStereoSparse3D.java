@@ -22,7 +22,7 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -75,8 +75,8 @@ public class TestStereoSparse3D {
 		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),K1,X);
 		Point2D_F64 x2 = PerspectiveOps.renderPixel(param.rightToLeft.invert(null),K2,X);
 
-		PointTransform_F64 pixelToRect1 = RectifyImageOps.transformPixelToRect_F64(param.left, alg.rect1);
-		PointTransform_F64 pixelToRect2 = RectifyImageOps.transformPixelToRect_F64(param.right, alg.rect2);
+		Point2Transform2_F64 pixelToRect1 = RectifyImageOps.transformPixelToRect_F64(param.left, alg.rect1);
+		Point2Transform2_F64 pixelToRect2 = RectifyImageOps.transformPixelToRect_F64(param.right, alg.rect2);
 
 		// rectified coordinates
 		Point2D_F64 r1 = new Point2D_F64();

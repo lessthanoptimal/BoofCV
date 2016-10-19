@@ -21,7 +21,7 @@ package boofcv.alg.sfm.robust;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -51,7 +51,7 @@ public class TestDistancePlane2DToPixelSq {
 	Point2D_F64 pixelPtA = new Point2D_F64(150,75);
 	Point2D_F64 pixelPtB = new Point2D_F64();
 
-	PointTransform_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+	Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 	Point2D_F64 normPt = new Point2D_F64();
 
 	public TestDistancePlane2DToPixelSq() {

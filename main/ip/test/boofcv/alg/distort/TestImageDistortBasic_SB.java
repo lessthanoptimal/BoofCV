@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class TestImageDistortBasic_SB {
 
 	float offX=0,offY=0;
 
-	PixelTransform_F32 tran = new PixelTransform_F32() {
+	PixelTransform2_F32 tran = new PixelTransform2_F32() {
 		@Override
 		public void compute(int x, int y) {
 			distX = x+offX;

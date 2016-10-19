@@ -18,6 +18,8 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -74,7 +76,7 @@ public class LensDistortionOps {
 
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255, TypeInterpolate.BILINEAR,borderType, bandType);
 
-		PointTransform_F32 undistToDist = null;
+		Point2Transform2_F32 undistToDist = null;
 		switch( type ) {
 			case EXPAND:
 			case FULL_VIEW:
@@ -95,7 +97,7 @@ public class LensDistortionOps {
 	}
 
 	/**
-	 * Creates a {@link PointTransform_F32} for adding and removing lens distortion.
+	 * Creates a {@link Point2Transform2_F32} for adding and removing lens distortion.
 	 *
 	 * @param type The type of adjustment it will apply to the transform
 	 * @param param Intrinsic camera parameters.
@@ -105,12 +107,12 @@ public class LensDistortionOps {
 	 *                       is returned.
 	 * @return The requested transform
 	 */
-	public static PointTransform_F32 transform_F32(AdjustmentType type,
-												   CameraPinholeRadial param,
-												   CameraPinholeRadial paramAdj,
-												   boolean undistortedToDistorted)
+	public static Point2Transform2_F32 transform_F32(AdjustmentType type,
+													 CameraPinholeRadial param,
+													 CameraPinholeRadial paramAdj,
+													 boolean undistortedToDistorted)
 	{
-		PointTransform_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
+		Point2Transform2_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
 
 		RectangleLength2D_F32 bound;
 		if( type == AdjustmentType.FULL_VIEW ) {
@@ -148,13 +150,13 @@ public class LensDistortionOps {
 
 	/**
 	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
-	 * and {@link PointTransform_F32}
+	 * and {@link Point2Transform2_F32}
 	 */
-	private static PointTransform_F32 adjustmentTransform_F32(CameraPinholeRadial param,
-															  CameraPinholeRadial paramAdj,
-															  boolean undistToDist,
-															  PointTransform_F32 remove_p_to_p,
-															  DenseMatrix64F A) {
+	private static Point2Transform2_F32 adjustmentTransform_F32(CameraPinholeRadial param,
+																CameraPinholeRadial paramAdj,
+																boolean undistToDist,
+																Point2Transform2_F32 remove_p_to_p,
+																DenseMatrix64F A) {
 		DenseMatrix64F A_inv = null;
 
 		if( !undistToDist || paramAdj != null ) {
@@ -169,19 +171,19 @@ public class LensDistortionOps {
 		}
 
 		if( undistToDist ) {
-			PointTransform_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
+			Point2Transform2_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
 			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A);
 
-			return new SequencePointTransform_F32(adjust,add_p_to_p);
+			return new SequencePoint2Transform2_F32(adjust,add_p_to_p);
 		} else {
 			PointTransformHomography_F32 adjust = new PointTransformHomography_F32(A_inv);
 
-			return new SequencePointTransform_F32(remove_p_to_p,adjust);
+			return new SequencePoint2Transform2_F32(remove_p_to_p,adjust);
 		}
 	}
 
 	/**
-	 * Creates a {@link PointTransform_F64} for adding and removing lens distortion.
+	 * Creates a {@link Point2Transform2_F64} for adding and removing lens distortion.
 	 *
 	 * @param type The type of adjustment it will apply to the transform
 	 * @param param Intrinsic camera parameters.
@@ -191,12 +193,12 @@ public class LensDistortionOps {
 	 *                       is returned.
 	 * @return The requested transform
 	 */
-	public static PointTransform_F64 transform_F64(AdjustmentType type,
-												   CameraPinholeRadial param,
-												   CameraPinholeRadial paramAdj,
-												   boolean undistortedToDistorted)
+	public static Point2Transform2_F64 transform_F64(AdjustmentType type,
+													 CameraPinholeRadial param,
+													 CameraPinholeRadial paramAdj,
+													 boolean undistortedToDistorted)
 	{
-		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
+		Point2Transform2_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
 
 		RectangleLength2D_F64 bound;
 		if( type == AdjustmentType.FULL_VIEW ) {
@@ -234,13 +236,13 @@ public class LensDistortionOps {
 
 	/**
 	 * Given the lens distortion and the intrinsic adjustment matrix compute the new intrinsic parameters
-	 * and {@link PointTransform_F32}
+	 * and {@link Point2Transform2_F32}
 	 */
-	private static PointTransform_F64 adjustmentTransform_F64(CameraPinholeRadial param,
-															  CameraPinholeRadial paramAdj,
-															  boolean adjToDistorted,
-															  PointTransform_F64 remove_p_to_p,
-															  DenseMatrix64F A) {
+	private static Point2Transform2_F64 adjustmentTransform_F64(CameraPinholeRadial param,
+																CameraPinholeRadial paramAdj,
+																boolean adjToDistorted,
+																Point2Transform2_F64 remove_p_to_p,
+																DenseMatrix64F A) {
 		DenseMatrix64F A_inv = null;
 
 		if( !adjToDistorted || paramAdj != null ) {
@@ -255,20 +257,20 @@ public class LensDistortionOps {
 		}
 
 		if( adjToDistorted ) {
-			PointTransform_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
+			Point2Transform2_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
 			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A);
 
-			return new SequencePointTransform_F64(adjust,add_p_to_p);
+			return new SequencePoint2Transform2_F64(adjust,add_p_to_p);
 		} else {
 			PointTransformHomography_F64 adjust = new PointTransformHomography_F64(A_inv);
 
-			return new SequencePointTransform_F64(remove_p_to_p,adjust);
+			return new SequencePoint2Transform2_F64(remove_p_to_p,adjust);
 		}
 	}
 
 	/**
 	 * <p>
-	 * Creates the {@link LensDistortionPinhole lens distortion} for the specified camera parameters.
+	 * Creates the {@link LensDistortionNarrowFOV lens distortion} for the specified camera parameters.
 	 * Call this to create transforms to and from pixel and normalized image coordinates with and without
 	 * lens distortion.  Automatically switches algorithm depending on the type of distortion or lack thereof.
 	 * </p>
@@ -280,11 +282,11 @@ public class LensDistortionOps {
 	 * </p>
 	 *
 	 */
-	public static LensDistortionPinhole transformPoint(CameraPinholeRadial param) {
+	public static LensDistortionNarrowFOV transformPoint(CameraPinholeRadial param) {
 		if( param.isDistorted())
 			return new LensDistortionRadialTangential(param);
 		else
-			return new LensDistortionUndistorted(param);
+			return new LensDistortionPinhole(param);
 	}
 
 	/**
@@ -298,7 +300,7 @@ public class LensDistortionOps {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F32 boundBoxInside(int srcWidth, int srcHeight,
-												 PixelTransform_F32 transform) {
+												 PixelTransform2_F32 transform) {
 
 		float x0,y0,x1,y1;
 
@@ -343,7 +345,7 @@ public class LensDistortionOps {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F64 boundBoxInside(int srcWidth, int srcHeight,
-													   PixelTransform_F64 transform) {
+													   PixelTransform2_F64 transform) {
 
 		double x0,y0,x1,y1;
 

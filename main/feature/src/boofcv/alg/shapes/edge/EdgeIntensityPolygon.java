@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.edge;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -73,7 +73,7 @@ public class EdgeIntensityPolygon<T extends ImageGray>  {
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( PixelTransform_F32 undistToDist ) {
+	public void setTransform( PixelTransform2_F32 undistToDist ) {
 		scorer.setTransform(undistToDist);
 	}
 

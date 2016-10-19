@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 
 /**
@@ -32,7 +32,7 @@ public abstract class ImageDistortBasic<Input extends ImageBase,Output extends I
 		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image
-	protected PixelTransform_F32 dstToSrc;
+	protected PixelTransform2_F32 dstToSrc;
 	// sub pixel interpolation
 	protected Interpolate interp;
 
@@ -54,7 +54,7 @@ public abstract class ImageDistortBasic<Input extends ImageBase,Output extends I
 	}
 
 	@Override
-	public void setModel(PixelTransform_F32 dstToSrc) {
+	public void setModel(PixelTransform2_F32 dstToSrc) {
 		this.dstToSrc = dstToSrc;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
 
@@ -36,7 +36,7 @@ public class TestImplImageDistort_IL_F32 extends GeneralImageDistortTests<Interl
 
 	@Override
 	public ImageDistort<InterleavedF32, InterleavedF32>
-	createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<InterleavedF32> interp) {
+	createDistort(PixelTransform2_F32 dstToSrc, InterpolatePixel<InterleavedF32> interp) {
 		ImageDistort<InterleavedF32,InterleavedF32> ret = new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
 		ret.setModel(dstToSrc);
 		return ret;

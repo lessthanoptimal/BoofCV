@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class TestSequencePointTransform_F32 {
 	@Test
 	public void simpleTest() {
 
-		PointTransform_F32 a = new PointTransform_F32() {
+		Point2Transform2_F32 a = new Point2Transform2_F32() {
 			@Override
 			public void compute(float x, float y, Point2D_F32 out) {
 				out.x = x+1;
@@ -39,7 +39,7 @@ public class TestSequencePointTransform_F32 {
 			}
 		};
 
-		SequencePointTransform_F32 alg = new SequencePointTransform_F32(a,a);
+		SequencePoint2Transform2_F32 alg = new SequencePoint2Transform2_F32(a,a);
 
 		Point2D_F32 p = new Point2D_F32();
 		alg.compute(3,4,p);

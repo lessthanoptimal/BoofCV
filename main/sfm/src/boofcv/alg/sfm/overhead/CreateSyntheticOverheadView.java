@@ -21,7 +21,7 @@ package boofcv.alg.sfm.overhead;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -86,7 +86,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase>
 		this.overheadWidth = overheadWidth;
 		this.overheadHeight = overheadHeight;
 
-		PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
+		Point2Transform2_F64 normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false, true);
 
 		// Declare storage for precomputed pixel locations
 		int overheadPixels = overheadHeight*overheadWidth;

@@ -26,7 +26,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F64;
@@ -297,7 +297,7 @@ public class TestStitchingFromMotion2D {
 		int numApply = 0;
 
 		@Override
-		public void setModel(PixelTransform_F32 dstToSrc) {
+		public void setModel(PixelTransform2_F32 dstToSrc) {
 			numSetModel++;
 		}
 

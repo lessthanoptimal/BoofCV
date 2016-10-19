@@ -28,7 +28,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -76,7 +76,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	boolean showNumbers = true;
 
 	ImageDistort<GrayF32,GrayF32> undoRadial;
-	PointTransform_F32 remove_p_to_p;
+	Point2Transform2_F32 remove_p_to_p;
 
 	// how much errors are scaled up
 	double errorScale;
@@ -293,7 +293,7 @@ public class CalibratedImageGridPanel extends JPanel {
 	}
 
 	public static void drawNumbers( Graphics2D g2 , CalibrationObservation foundTarget ,
-									PointTransform_F32 transform ,
+									Point2Transform2_F32 transform ,
 									double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);

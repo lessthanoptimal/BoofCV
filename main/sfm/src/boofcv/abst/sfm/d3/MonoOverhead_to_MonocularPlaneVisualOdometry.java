@@ -24,7 +24,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.d3.VisOdomMonoOverheadMotion2D;
 import boofcv.alg.sfm.overhead.OverheadView;
 import boofcv.struct.calib.MonoPlaneParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -57,7 +57,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase>
 	FastQueue<Point3D_F64> points3D = new FastQueue<>(Point3D_F64.class, true);
 
 	Se3_F64 planeToCamera;
-	PointTransform_F64 normToPixel;
+	Point2Transform2_F64 normToPixel;
 
 	public MonoOverhead_to_MonocularPlaneVisualOdometry(VisOdomMonoOverheadMotion2D<T> alg, ImageType<T> imageType) {
 		this.alg = alg;

@@ -23,7 +23,7 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.sfm.ImagePixelTo3D;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.Point2D3DTrack;
@@ -69,9 +69,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 	// used to estimate a feature's 3D position from image range data
 	private ImagePixelTo3D pixelTo3D;
 	// converts from pixel to normalized image coordinates
-	private PointTransform_F64 pixelToNorm;
+	private Point2Transform2_F64 pixelToNorm;
 	// convert from normalized image coordinates to pixel
-	private PointTransform_F64 normToPixel;
+	private Point2Transform2_F64 normToPixel;
 
 	// non-linear refinement of pose estimate
 	private RefinePnP refine;
@@ -119,8 +119,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 								ImagePixelTo3D pixelTo3D,
 								RefinePnP refine ,
 								PointTrackerTwoPass<T> tracker ,
-								PointTransform_F64 pixelToNorm ,
-								PointTransform_F64 normToPixel )
+								Point2Transform2_F64 pixelToNorm ,
+								Point2Transform2_F64 normToPixel )
 	{
 		this.thresholdAdd = thresholdAdd;
 		this.thresholdRetire = thresholdRetire;
@@ -356,11 +356,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase> {
 		return inlierTracks;
 	}
 
-	public void setPixelToNorm(PointTransform_F64 pixelToNorm) {
+	public void setPixelToNorm(Point2Transform2_F64 pixelToNorm) {
 		this.pixelToNorm = pixelToNorm;
 	}
 
-	public void setNormToPixel(PointTransform_F64 normToPixel) {
+	public void setNormToPixel(Point2Transform2_F64 normToPixel) {
 		this.normToPixel = normToPixel;
 	}
 

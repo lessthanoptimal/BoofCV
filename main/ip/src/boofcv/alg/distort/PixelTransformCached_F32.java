@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.struct.point.Point2D_F32;
 
 /**
@@ -27,12 +27,12 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public class PixelTransformCached_F32 extends PixelTransform_F32 {
+public class PixelTransformCached_F32 extends PixelTransform2_F32 {
 
 	Point2D_F32 map[];
 	int width,height;
 
-	public PixelTransformCached_F32(int width, int height, PixelTransform_F32 transform ) {
+	public PixelTransformCached_F32(int width, int height, PixelTransform2_F32 transform ) {
 		this.width = width+1; // add one to the width since some stuff checks the outside border
 		this.height = height+1;
 

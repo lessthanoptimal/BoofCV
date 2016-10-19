@@ -10,6 +10,11 @@ Less High Priority Next Release
 - Stereo Disparity
   * make float images contain actual disparity, not offset.  negative values for invalid
 
+- Fiducials
+  * Have two interfaces.  One for detection and another for estimating their pose.
+  * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
+  * Pose: Have generalized code for going from control points to pose?
+
 - Regression
   * Chessboard image border to fiducial regression
   * Support binary features in Detect/Describe regression
@@ -53,6 +58,10 @@ Future
   * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
+  * For binary pattern, avoid pixels near the border with other regions.  Like aruco does.
+  * Consider alternative algorithm for small (or all) squares.  Contour -> gradient -> cluster/hough
+  * When optimizing the edges don't sample points tangent to the line sample points parallel to the adjacent sides
+    that way it will sample inside the square more often.  Maybe interpolate between slope of both sides?
 
 - Multi camera calibration using square binary patterns.
 

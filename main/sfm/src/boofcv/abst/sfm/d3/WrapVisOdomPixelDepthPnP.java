@@ -25,7 +25,7 @@ import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -101,8 +101,8 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray>
 
 		CameraPinholeRadial l = parameters.left;
 
-		PointTransform_F64 leftPixelToNorm = transformPoint(l).undistort_F64(true, false);
-		PointTransform_F64 leftNormToPixel = transformPoint(l).distort_F64(false, true);
+		Point2Transform2_F64 leftPixelToNorm = transformPoint(l).undistort_F64(true, false);
+		Point2Transform2_F64 leftNormToPixel = transformPoint(l).distort_F64(false, true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

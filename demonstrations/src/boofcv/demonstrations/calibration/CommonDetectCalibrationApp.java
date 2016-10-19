@@ -27,7 +27,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -367,7 +367,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	}
 
 	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
-									PointTransform_F32 transform ,
+									Point2Transform2_F32 transform ,
 									double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);

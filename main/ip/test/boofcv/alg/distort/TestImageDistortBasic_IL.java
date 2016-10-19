@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_IL_F32;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class TestImageDistortBasic_IL {
 
 	float offX=0,offY=0;
 
-	PixelTransform_F32 tran = new PixelTransform_F32() {
+	PixelTransform2_F32 tran = new PixelTransform2_F32() {
 		@Override
 		public void compute(int x, int y) {
 			distX = x+offX;

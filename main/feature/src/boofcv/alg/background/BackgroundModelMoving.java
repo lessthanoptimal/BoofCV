@@ -19,7 +19,7 @@
 package boofcv.alg.background;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -59,7 +59,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 {
 
 	// Convert the motion model into a usable format
-	protected PointTransformModel_F32<MotionModel> transform;
+	protected Point2Transform2Model_F32<MotionModel> transform;
 
 	// transforms
 	protected MotionModel homeToWorld;
@@ -83,7 +83,7 @@ public abstract class BackgroundModelMoving<T extends ImageBase,MotionModel exte
 	 * @param transform Point transform which can be used to apply the motion model
 	 * @param imageType Type of input image
 	 */
-	public BackgroundModelMoving(PointTransformModel_F32<MotionModel> transform, ImageType<T> imageType) {
+	public BackgroundModelMoving(Point2Transform2Model_F32<MotionModel> transform, ImageType<T> imageType) {
 		super(imageType);
 		this.transform = transform;
 

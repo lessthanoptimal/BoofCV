@@ -22,7 +22,7 @@ import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -39,7 +39,7 @@ public class StereoSparse3D<T extends ImageGray>
 	private StereoDisparitySparse<T> disparity;
 
 	// convert from left camera pixel coordinates into rectified coordinates
-	private PointTransform_F64 leftPixelToRect;
+	private Point2Transform2_F64 leftPixelToRect;
 
 	// storage for rectified pixel coordinate
 	private Point2D_F64 pixelRect = new Point2D_F64();

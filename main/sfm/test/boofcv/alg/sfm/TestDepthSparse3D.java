@@ -20,7 +20,7 @@ package boofcv.alg.sfm;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU16;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -44,7 +44,7 @@ public class TestDepthSparse3D {
 
 		CameraPinholeRadial param = new CameraPinholeRadial(1,1,0,5,10,w,h).fsetRadial(0,0);
 
-		PixelTransform_F32 v2d = new PixelTransform_F32() {
+		PixelTransform2_F32 v2d = new PixelTransform2_F32() {
 
 			@Override
 			public void compute(int x, int y) {

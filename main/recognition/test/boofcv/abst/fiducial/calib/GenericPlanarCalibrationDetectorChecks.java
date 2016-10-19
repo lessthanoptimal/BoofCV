@@ -31,9 +31,9 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
@@ -59,8 +59,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	GrayF32 distorted;
 	List<CalibrationObservation> solutions = new ArrayList<>();
 
-	PointTransform_F32 d2o;
-	PointTransform_F64 o2d;
+	Point2Transform2_F32 d2o;
+	Point2Transform2_F64 o2d;
 
 	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
 
@@ -147,7 +147,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 		createTransform(width / 5, height / 5, width * 4 / 5, height / 6, width - 1, height - 1, 0, height - 1);
 
-		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(d2o);
+		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(d2o);
 
 		ImageMiscOps.fill(distorted, 0xff);
 		DistortImageOps.distortSingle(original, distorted, pixelTransform,

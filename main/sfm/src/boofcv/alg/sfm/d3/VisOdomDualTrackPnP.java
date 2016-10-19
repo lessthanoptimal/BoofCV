@@ -26,7 +26,7 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.associate.StereoConsistencyCheck;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
@@ -86,8 +86,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase,Desc extends TupleDesc> {
 	private TriangulateTwoViewsCalibrated triangulate;
 
 	// convert for original image pixels into normalized image coordinates
-	private PointTransform_F64 leftImageToNorm;
-	private PointTransform_F64 rightImageToNorm;
+	private Point2Transform2_F64 leftImageToNorm;
+	private Point2Transform2_F64 rightImageToNorm;
 
 	// Ensures that the epipolar constraint still applies to the tracks
 	private StereoConsistencyCheck stereoCheck;

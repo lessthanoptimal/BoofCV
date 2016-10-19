@@ -37,7 +37,7 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -112,7 +112,7 @@ public class VisualizeStereoDisparity <T extends ImageGray, D extends ImageGray>
 	private boolean rectifiedImages = false;
 
 	// coordinate transform from left rectified image to its original pixels
-	PointTransform_F64 leftRectToPixel;
+	Point2Transform2_F64 leftRectToPixel;
 
 	public VisualizeStereoDisparity() {
 		super(1);

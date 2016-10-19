@@ -25,7 +25,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -68,9 +68,9 @@ public class QuadPoseEstimator {
 	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
-	private PointTransform_F64 distortedToUndistorted;
-	private PointTransform_F64 pixelToNorm;
-	private PointTransform_F64 normToPixel;
+	private Point2Transform2_F64 distortedToUndistorted;
+	private Point2Transform2_F64 pixelToNorm;
+	private Point2Transform2_F64 normToPixel;
 
 	// storage for inputs to estimation algorithms
 	// observations in normalized image coordinates

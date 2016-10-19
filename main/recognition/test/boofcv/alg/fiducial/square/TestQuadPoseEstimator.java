@@ -22,7 +22,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
@@ -93,7 +93,7 @@ public class TestQuadPoseEstimator {
 		alg.listObs.add(worldToPixel.transform(alg.points[2].location));
 		alg.listObs.add(worldToPixel.transform(alg.points[3].location));
 
-		PointTransform_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
 		for (int i = 0; i < 4; i++) {
 			Point2D_F64 pixel = alg.listObs.get(i);

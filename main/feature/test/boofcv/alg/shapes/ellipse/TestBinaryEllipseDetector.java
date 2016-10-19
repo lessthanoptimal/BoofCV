@@ -20,7 +20,7 @@ package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -105,8 +105,8 @@ public class TestBinaryEllipseDetector {
 		ThresholdImageOps.threshold(image,binary,30,true);
 
 		BinaryEllipseDetector<GrayU8> alg = create();
-		PixelTransform_F32 distToUndist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,5,8));
-		PixelTransform_F32 undistToDist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,-5,-8));
+		PixelTransform2_F32 distToUndist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,5,8));
+		PixelTransform2_F32 undistToDist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,-5,-8));
 		alg.setLensDistortion(distToUndist, undistToDist);
 		alg.process(image, binary);
 

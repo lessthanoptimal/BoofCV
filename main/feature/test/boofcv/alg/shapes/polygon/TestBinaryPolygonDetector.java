@@ -31,7 +31,7 @@ import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -110,8 +110,8 @@ public class TestBinaryPolygonDetector {
 
 		Affine2D_F32 a = new Affine2D_F32();
 		UtilAffine.convert(transform,a);
-		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		int numberOfSides = 4;
 		BinaryPolygonDetector alg = createDetector(imageType, useLines, numberOfSides,numberOfSides);
@@ -482,8 +482,8 @@ public class TestBinaryPolygonDetector {
 		transform.set(1.2,0,0,1.2,0,0);
 		UtilAffine.convert(transform,a);
 
-		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.setLensDistortion(width, height, tranTo, tranFrom);
@@ -541,8 +541,8 @@ public class TestBinaryPolygonDetector {
 		transform.set(1.2,0,0,1.2,0,0);
 		UtilAffine.convert(transform,a);
 
-		PixelTransform_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
 		alg.undistToDist = tranFrom;

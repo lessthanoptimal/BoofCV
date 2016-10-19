@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -41,7 +41,7 @@ public class WorldToCameraToPixel {
 	private Point3D_F64 cameraPt = new Point3D_F64();
 
 	// transform from normalized image coordinates into pixels
-	private PointTransform_F64 normToPixel;
+	private Point2Transform2_F64 normToPixel;
 
 	/**
 	 * Specifies intrinsic camera parameters and  the transform from world to camera.

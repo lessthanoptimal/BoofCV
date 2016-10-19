@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.radtan;
 
-import boofcv.alg.distort.TransformThenPixel_F64;
+import boofcv.alg.distort.Transform2ThenPixel_F64;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -53,7 +53,7 @@ public class TestRemoveRadialPtoN_F64 {
 		double undistY = 200.1;
 
 		AddRadialPtoN_F64 p_to_n = new AddRadialPtoN_F64().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
-		new TransformThenPixel_F64(p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
+		new Transform2ThenPixel_F64(p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
 
 		double distX = point.x;
 		double distY = point.y;

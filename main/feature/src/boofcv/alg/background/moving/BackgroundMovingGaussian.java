@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.background.moving;
 
 import boofcv.alg.background.BackgroundAlgorithmGaussian;
 import boofcv.alg.background.BackgroundModelMoving;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
@@ -63,7 +63,7 @@ public abstract class BackgroundMovingGaussian<T extends ImageBase, Motion exten
 	 * @param imageType Type of input image
 	 */
 	public BackgroundMovingGaussian(float learnRate, float threshold,
-									PointTransformModel_F32<Motion> transform, ImageType<T> imageType) {
+									Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType) {
 		super(transform, imageType);
 
 		if( threshold < 0 )

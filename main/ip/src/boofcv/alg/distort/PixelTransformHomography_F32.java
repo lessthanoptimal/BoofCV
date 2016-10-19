@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -30,7 +30,7 @@ import georegression.transform.homography.HomographyPointOps_F32;
  *
  * @author Peter Abeles
  */
-public class PixelTransformHomography_F32 extends PixelTransform_F32 {
+public class PixelTransformHomography_F32 extends PixelTransform2_F32 {
 
 	Homography2D_F32 homo = new Homography2D_F32();
 	Point2D_F32 tran = new Point2D_F32();

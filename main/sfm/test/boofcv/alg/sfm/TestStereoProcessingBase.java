@@ -23,7 +23,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
@@ -104,8 +104,8 @@ public class TestStereoProcessingBase {
 		alg.setCalibration(param);
 
 		// Rectify the points
-		PointTransform_F64 rectLeft = RectifyImageOps.transformPixelToRect_F64(param.left,alg.getRect1());
-		PointTransform_F64 rectRight = RectifyImageOps.transformPixelToRect_F64(param.right,alg.getRect2());
+		Point2Transform2_F64 rectLeft = RectifyImageOps.transformPixelToRect_F64(param.left,alg.getRect1());
+		Point2Transform2_F64 rectRight = RectifyImageOps.transformPixelToRect_F64(param.right,alg.getRect2());
 
 		Point2D_F64 l = new Point2D_F64();
 		Point2D_F64 r = new Point2D_F64();

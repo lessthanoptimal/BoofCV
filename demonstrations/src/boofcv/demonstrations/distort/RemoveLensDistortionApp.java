@@ -32,7 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 
@@ -85,17 +85,17 @@ public class RemoveLensDistortionApp extends SelectAlgorithmAndInputPanel {
 		});
 
 		// add different types of adjustments
-		PointTransform_F32 add_p_to_p = LensDistortionOps.transformPoint(param).distort_F32(true,true);
+		Point2Transform2_F32 add_p_to_p = LensDistortionOps.transformPoint(param).distort_F32(true,true);
 		addUndistorted("No Adjustment", add_p_to_p);
-		PointTransform_F32 shrink = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
+		Point2Transform2_F32 shrink = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
 		addUndistorted("Shrink", shrink);
-		PointTransform_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,param, null,true);
+		Point2Transform2_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,param, null,true);
 		addUndistorted("Full View", fullView);
 
 		hasProcessed = true;
 	}
 
-	private void addUndistorted(final String name, final PointTransform_F32 model) {
+	private void addUndistorted(final String name, final Point2Transform2_F32 model) {
 		// Set up image distort
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 		ImageDistort<GrayF32,GrayF32> undistorter =

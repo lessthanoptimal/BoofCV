@@ -27,7 +27,7 @@ import boofcv.alg.shapes.polyline.MinimizeEnergyPrune;
 import boofcv.alg.shapes.polyline.RefinePolyLineCorner;
 import boofcv.alg.shapes.polyline.SplitMergeLineFitLoop;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -123,7 +123,7 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	private List<Contour> foundContours = new ArrayList<>();
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform_F32 distToUndist, undistToDist;
+	protected PixelTransform2_F32 distToUndist, undistToDist;
 
 	boolean verbose = false;
 
@@ -195,8 +195,8 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion( int width , int height ,
-								   PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist ) {
+	public void setLensDistortion(int width , int height ,
+								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
 
 		this.distToUndist = distToUndist;
 		this.undistToDist = undistToDist;
@@ -605,11 +605,11 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 		this.edgeThreshold = edgeThreshold;
 	}
 
-	public PixelTransform_F32 getDistToUndist() {
+	public PixelTransform2_F32 getDistToUndist() {
 		return distToUndist;
 	}
 
-	public PixelTransform_F32 getUndistToDist() {
+	public PixelTransform2_F32 getUndistToDist() {
 		return undistToDist;
 	}
 

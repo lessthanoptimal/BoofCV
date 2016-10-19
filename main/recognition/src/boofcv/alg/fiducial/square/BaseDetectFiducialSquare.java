@@ -103,7 +103,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
 
 	// transform from undistorted to distorted image pixels
-	PointTransform_F64 pointUndistToDist;
+	Point2Transform2_F64 pointUndistToDist;
 
 	// boolean indicating if camera intrinsic parameters
 	boolean wasIntrinsicSet = false;
@@ -167,7 +167,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		removePerspective = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		// if no camera parameters is specified default to this
-		pointUndistToDist = new DoNothingTransform_F64();
+		pointUndistToDist = new DoNothing2Transform2_F64();
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
 	}
 
@@ -180,7 +180,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	 */
 	public void configure(CameraPinholeRadial intrinsic , boolean cache ) {
 		wasIntrinsicSet = true;
-		PointTransform_F32 pointSquareToInput;
+		Point2Transform2_F32 pointSquareToInput;
 		if( intrinsic.isDistorted() ) {
 
 			CameraPinholeRadial intrinsicUndist = new CameraPinholeRadial();
@@ -188,12 +188,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 			// full view so that none of the pixels are discarded and to ensure that all pixels in the undistorted
 			// image are bounded by the the input image's shape
 
-			PointTransform_F32 pointDistToUndist = LensDistortionOps.
+			Point2Transform2_F32 pointDistToUndist = LensDistortionOps.
 					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, intrinsicUndist, false);
-			PointTransform_F32 pointUndistToDist = LensDistortionOps.
+			Point2Transform2_F32 pointUndistToDist = LensDistortionOps.
 					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true);
-			PixelTransform_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-			PixelTransform_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
 			if( cache ) {
 				distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
@@ -202,21 +202,21 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 			squareDetector.setLensDistortion(intrinsic.width,intrinsic.height,distToUndist,undistToDist);
 
-			pointSquareToInput = new SequencePointTransform_F32(transformHomography,pointUndistToDist);
+			pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography,pointUndistToDist);
 
 			this.pointUndistToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);
 
 			intrinsic = intrinsicUndist;
 		} else {
 			pointSquareToInput = transformHomography;
-			pointUndistToDist = new DoNothingTransform_F64();
+			pointUndistToDist = new DoNothing2Transform2_F64();
 			squareDetector.clearLensDistortion();
 		}
 
 		poseEstimator.setIntrinsic(intrinsic);
 
 		// provide intrinsic camera parameters
-		PixelTransform_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
+		PixelTransform2_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
 		removePerspective.setModel(squareToInput);
 
 		binary.reshape(intrinsic.width,intrinsic.height);
@@ -464,7 +464,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		return borderWidthFraction;
 	}
 
-	public PointTransform_F64 getPointUndistToDist() {
+	public Point2Transform2_F64 getPointUndistToDist() {
 		return pointUndistToDist;
 	}
 

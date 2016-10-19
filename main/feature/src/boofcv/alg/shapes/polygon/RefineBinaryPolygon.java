@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -41,8 +41,8 @@ public interface RefineBinaryPolygon<T extends ImageGray> {
 	/**
 	 * Specifies lens distortion
 	 */
-	void setLensDistortion( int width , int height ,
-							PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist );
+	void setLensDistortion(int width , int height ,
+						   PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist );
 
 
 	/**

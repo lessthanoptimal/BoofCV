@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.*;
+import boofcv.alg.distort.pinhole.PinholePtoN2_F64;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.rectify.RectifyFundamental;
 import boofcv.alg.interpolate.InterpolatePixel;
@@ -28,10 +29,10 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
-import boofcv.struct.distort.SequencePointTransform_F32;
-import boofcv.struct.distort.SequencePointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.distort.SequencePoint2Transform2_F32;
+import boofcv.struct.distort.SequencePoint2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -123,7 +124,7 @@ public class RectifyImageOps {
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeRadial(paramLeft);
 
-		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
+		Point2Transform2_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -155,7 +156,7 @@ public class RectifyImageOps {
 	public static void fullViewLeft(int imageWidth,int imageHeight,
 									DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
 	{
-		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
+		Point2Transform2_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
@@ -188,7 +189,7 @@ public class RectifyImageOps {
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeRadial(paramLeft);
 
-		PointTransform_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
+		Point2Transform2_F32 tranLeft = transformPixelToRect_F32(paramLeft, rectifyLeft);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft));
@@ -219,7 +220,7 @@ public class RectifyImageOps {
 	public static void allInsideLeft( int imageWidth,int imageHeight,
 									  DenseMatrix64F rectifyLeft, DenseMatrix64F rectifyRight )
 	{
-		PointTransform_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
+		Point2Transform2_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
 		RectangleLength2D_F32 bound = LensDistortionOps.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft));
@@ -290,16 +291,16 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static PointTransform_F32 transformRectToPixel_F32(CameraPinholeRadial param,
-															  DenseMatrix64F rectify)
+	public static Point2Transform2_F32 transformRectToPixel_F32(CameraPinholeRadial param,
+																DenseMatrix64F rectify)
 	{
-		PointTransform_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
+		Point2Transform2_F32 add_p_to_p = transformPoint(param).distort_F32(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F32 removeRect = new PointTransformHomography_F32(rectifyInv);
 
-		return new SequencePointTransform_F32(removeRect,add_p_to_p);
+		return new SequencePoint2Transform2_F32(removeRect,add_p_to_p);
 	}
 
 	/**
@@ -312,16 +313,16 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static PointTransform_F64 transformRectToPixel_F64(CameraPinholeRadial param,
-															  DenseMatrix64F rectify)
+	public static Point2Transform2_F64 transformRectToPixel_F64(CameraPinholeRadial param,
+																DenseMatrix64F rectify)
 	{
-		PointTransform_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
+		Point2Transform2_F64 add_p_to_p = transformPoint(param).distort_F64(true, true);
 
 		DenseMatrix64F rectifyInv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectify,rectifyInv);
 		PointTransformHomography_F64 removeRect = new PointTransformHomography_F64(rectifyInv);
 
-		return new SequencePointTransform_F64(removeRect,add_p_to_p);
+		return new SequencePoint2Transform2_F64(removeRect,add_p_to_p);
 	}
 
 	/**
@@ -333,14 +334,14 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from unrectified to rectified pixels
 	 */
-	public static PointTransform_F32 transformPixelToRect_F32(CameraPinholeRadial param,
-															  DenseMatrix64F rectify)
+	public static Point2Transform2_F32 transformPixelToRect_F32(CameraPinholeRadial param,
+																DenseMatrix64F rectify)
 	{
-		PointTransform_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
+		Point2Transform2_F32 remove_p_to_p = transformPoint(param).undistort_F32(true, true);
 
 		PointTransformHomography_F32 rectifyPixel = new PointTransformHomography_F32(rectify);
 
-		return new SequencePointTransform_F32(remove_p_to_p,rectifyPixel);
+		return new SequencePoint2Transform2_F32(remove_p_to_p,rectifyPixel);
 	}
 
 	/**
@@ -352,14 +353,14 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static PointTransform_F64 transformPixelToRect_F64(CameraPinholeRadial param,
-															  DenseMatrix64F rectify)
+	public static Point2Transform2_F64 transformPixelToRect_F64(CameraPinholeRadial param,
+																DenseMatrix64F rectify)
 	{
-		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
+		Point2Transform2_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
-		return new SequencePointTransform_F64(remove_p_to_p,rectifyDistort);
+		return new SequencePoint2Transform2_F64(remove_p_to_p,rectifyDistort);
 	}
 
 	/**
@@ -373,22 +374,22 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static PointTransform_F64 transformPixelToRectNorm_F64(CameraPinholeRadial param,
-																  DenseMatrix64F rectify,
-																  DenseMatrix64F rectifyK) {
+	public static Point2Transform2_F64 transformPixelToRectNorm_F64(CameraPinholeRadial param,
+																	DenseMatrix64F rectify,
+																	DenseMatrix64F rectifyK) {
 		if (rectifyK.get(0, 1) != 0)
 			throw new IllegalArgumentException("Skew should be zero in rectified images");
 
-		PointTransform_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
+		Point2Transform2_F64 remove_p_to_p = transformPoint(param).undistort_F64(true, true);
 
 		PointTransformHomography_F64 rectifyDistort = new PointTransformHomography_F64(rectify);
 
-		PixelToNormalized_F64 pixelToNorm = new PixelToNormalized_F64();
+		PinholePtoN2_F64 pixelToNorm = new PinholePtoN2_F64();
 		pixelToNorm.set(rectifyK.get(0, 0), rectifyK.get(1, 1),
 				rectifyK.get(0, 1),
 				rectifyK.get(0, 2), rectifyK.get(1, 2));
 
-		return new SequencePointTransform_F64(remove_p_to_p, rectifyDistort, pixelToNorm);
+		return new SequencePoint2Transform2_F64(remove_p_to_p, rectifyDistort, pixelToNorm);
 	}
 
 	/**
@@ -444,7 +445,7 @@ public class RectifyImageOps {
 		ImageDistort<T,T> ret = FactoryDistort.distort(true, interp, imageType);
 		ret.setRenderAll(!skip);
 
-		PointTransform_F32 transform = transformRectToPixel_F32(param, rectify);
+		Point2Transform2_F32 transform = transformRectToPixel_F32(param, rectify);
 
 		ret.setModel(new PointToPixelTransform_F32(transform));
 

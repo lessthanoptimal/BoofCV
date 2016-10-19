@@ -35,9 +35,9 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -243,8 +243,8 @@ public class TestBaseDetectFiducialSquare {
 		// place the pattern right next to one of the corners to maximize distortion
 
 		// add lens distortion
-		PointTransform_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
-		PointTransform_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
+		Point2Transform2_F32 distToUndistort = LensDistortionOps.transformPoint(intrinsic).undistort_F32(true, true);
+		Point2Transform2_F64 undistTodist = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 		InterpolatePixelS interp = FactoryInterpolation.createPixelS(0, 255,
 				TypeInterpolate.BILINEAR, BorderType.ZERO, GrayU8.class);
 		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, interp, GrayU8.class);
@@ -418,7 +418,7 @@ public class TestBaseDetectFiducialSquare {
 
 		// Create the transform for distorting the image
 		PointTransformHomography_F32 homography = new PointTransformHomography_F32(H);
-		PixelTransform_F32 pixelTransform = new PointToPixelTransform_F32(homography);
+		PixelTransform2_F32 pixelTransform = new PointToPixelTransform_F32(homography);
 
 		// Apply distortion and show the results
 		DistortImageOps.distortSingle(pattern, output, pixelTransform, TypeInterpolate.BILINEAR, BorderType.SKIP);

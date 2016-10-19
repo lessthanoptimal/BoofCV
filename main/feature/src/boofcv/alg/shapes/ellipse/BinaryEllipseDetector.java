@@ -18,7 +18,7 @@
 
 package boofcv.alg.shapes.ellipse;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -80,7 +80,7 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion( PixelTransform_F32 distToUndist , PixelTransform_F32 undistToDist ) {
+	public void setLensDistortion(PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		if( this.ellipseRefiner != null )
 			this.ellipseRefiner.setTransform(undistToDist);

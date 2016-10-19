@@ -19,7 +19,7 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
@@ -38,7 +38,7 @@ public class ImplImageDistort_PL<Input extends ImageGray,Output extends ImageGra
 	}
 
 	@Override
-	public void setModel(PixelTransform_F32 dstToSrc) {
+	public void setModel(PixelTransform2_F32 dstToSrc) {
 		layerDistort.setModel(dstToSrc);
 	}
 

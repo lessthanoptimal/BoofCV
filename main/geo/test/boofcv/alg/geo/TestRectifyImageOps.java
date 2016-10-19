@@ -20,8 +20,8 @@ package boofcv.alg.geo;
 
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -59,12 +59,12 @@ public class TestRectifyImageOps {
 		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
 
 		// check left image
-		PointTransform_F32 tran = RectifyImageOps.transformPixelToRect_F32(param, rect1);
+		Point2Transform2_F32 tran = RectifyImageOps.transformPixelToRect_F32(param, rect1);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
 	}
 
-	private void checkInside(PointTransform_F32 tran) {
+	private void checkInside(Point2Transform2_F32 tran) {
 		for( int y = 0; y < height; y++ ) {
 			checkInside(0,y,tran);
 			checkInside(width-1,y,tran);
@@ -76,7 +76,7 @@ public class TestRectifyImageOps {
 		}
 	}
 
-	private void checkInside( int x , int y , PointTransform_F32 tran ) {
+	private void checkInside( int x , int y , Point2Transform2_F32 tran ) {
 		tran.compute(x, y, p);
 
 		float tol = 0.1f;
@@ -100,7 +100,7 @@ public class TestRectifyImageOps {
 		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
 
 		// check left image
-		PointTransform_F32 tran = RectifyImageOps.transformRectToPixel_F32(param, rect1);
+		Point2Transform2_F32 tran = RectifyImageOps.transformRectToPixel_F32(param, rect1);
 		checkInside(tran);
 		// the right view is not checked since it is not part of the contract
 	}
@@ -146,8 +146,8 @@ public class TestRectifyImageOps {
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
-		PointTransform_F32 forward = RectifyImageOps.transformPixelToRect_F32(param, rect);
-		PointTransform_F32 inverse = RectifyImageOps.transformRectToPixel_F32(param, rect);
+		Point2Transform2_F32 forward = RectifyImageOps.transformPixelToRect_F32(param, rect);
+		Point2Transform2_F32 inverse = RectifyImageOps.transformRectToPixel_F32(param, rect);
 
 		float x = 20,y=30;
 		Point2D_F32 out = new Point2D_F32();
@@ -172,8 +172,8 @@ public class TestRectifyImageOps {
 
 		DenseMatrix64F rect = new DenseMatrix64F(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
 
-		PointTransform_F64 forward = RectifyImageOps.transformPixelToRect_F64(param, rect);
-		PointTransform_F64 inverse = RectifyImageOps.transformRectToPixel_F64(param, rect);
+		Point2Transform2_F64 forward = RectifyImageOps.transformPixelToRect_F64(param, rect);
+		Point2Transform2_F64 inverse = RectifyImageOps.transformRectToPixel_F64(param, rect);
 
 		double x = 20,y=30;
 		Point2D_F64 out = new Point2D_F64();
@@ -204,8 +204,8 @@ public class TestRectifyImageOps {
 		DenseMatrix64F rectK_inv = new DenseMatrix64F(3,3);
 		CommonOps.invert(rectK,rectK_inv);
 
-		PointTransform_F32 tranRect = RectifyImageOps.transformPixelToRect_F32(param, rect);
-		PointTransform_F64 alg = RectifyImageOps.transformPixelToRectNorm_F64(param, rect, rectK);
+		Point2Transform2_F32 tranRect = RectifyImageOps.transformPixelToRect_F32(param, rect);
+		Point2Transform2_F64 alg = RectifyImageOps.transformPixelToRectNorm_F64(param, rect, rectK);
 
 		double x=10,y=20;
 

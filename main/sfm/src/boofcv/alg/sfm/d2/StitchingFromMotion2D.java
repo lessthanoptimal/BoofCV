@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
@@ -76,8 +76,8 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	// storage for the transform from current frame to the initial frame
 	private IT worldToCurr;
 
-	private PixelTransform_F32 tranWorldToCurr;
-	private PixelTransform_F32 tranCurrToWorld;
+	private PixelTransform2_F32 tranWorldToCurr;
+	private PixelTransform2_F32 tranCurrToWorld;
 
 	// storage for the stitched image
 	private I stitchedImage;
@@ -230,7 +230,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		IT currToWorld = (IT)worldToCurr.invert(null);
 		IT oldWorldToNewWorld = (IT) worldToInit.concat(currToWorld,null);
 
-		PixelTransform_F32 newToOld = converter.convertPixel(oldWorldToNewWorld,null);
+		PixelTransform2_F32 newToOld = converter.convertPixel(oldWorldToNewWorld,null);
 
 		// fill in the background color
 		GImageMiscOps.fill(workImage, 0);
@@ -264,7 +264,7 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 		workImage.reshape(widthStitch,heightStitch);
 		GImageMiscOps.fill(workImage, 0);
 		if( newToOldStitch != null ) {
-			PixelTransform_F32 newToOld = converter.convertPixel(newToOldStitch,null);
+			PixelTransform2_F32 newToOld = converter.convertPixel(newToOldStitch,null);
 			distorter.setModel(newToOld);
 			distorter.apply(stitchedImage, workImage);
 

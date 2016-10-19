@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -58,8 +58,8 @@ public class SfmTestHelper {
 		Point2D_F64 pixelRight =  PerspectiveOps.convertNormToPixel(param.right, normRight.x, normRight.y, null);
 
 		// take in account lens distortion
-		PointTransform_F32 distLeft = LensDistortionOps.transformPoint(param.left).distort_F32(true,true);
-		PointTransform_F32 distRight = LensDistortionOps.transformPoint(param.right).distort_F32(true,true);
+		Point2Transform2_F32 distLeft = LensDistortionOps.transformPoint(param.left).distort_F32(true,true);
+		Point2Transform2_F32 distRight = LensDistortionOps.transformPoint(param.right).distort_F32(true,true);
 
 		Point2D_F32 lensLeft = new Point2D_F32();
 		Point2D_F32 lensRight = new Point2D_F32();

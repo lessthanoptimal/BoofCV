@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -40,7 +40,7 @@ public class TestCameraPlaneProjection {
 	int width = 800;
 	int height = 850;
 	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0.002, 0);
-	PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(param).distort_F64(false,true);
+	Point2Transform2_F64 normToPixel = LensDistortionOps.transformPoint(param).distort_F64(false,true);
 
 	Se3_F64 planeToCamera;
 

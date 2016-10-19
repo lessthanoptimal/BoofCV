@@ -23,7 +23,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DenseMatrix64F;
@@ -38,8 +38,8 @@ import org.ejml.data.DenseMatrix64F;
 public class StereoConsistencyCheck {
 
 	// convert from original image pixels into rectified image pixels
-	protected PointTransform_F64 leftImageToRect;
-	protected PointTransform_F64 rightImageToRect;
+	protected Point2Transform2_F64 leftImageToRect;
+	protected Point2Transform2_F64 rightImageToRect;
 
 	// storage for rectified pixels
 	Point2D_F64 rectLeft = new Point2D_F64();

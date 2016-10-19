@@ -25,7 +25,7 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
@@ -90,8 +90,8 @@ public class VisOdomQuadPnP<T extends ImageGray,TD extends TupleDesc> {
 	private Se3_F64 leftToRight = new Se3_F64();
 
 	// convert for original image pixels into normalized image coordinates
-	private PointTransform_F64 leftImageToNorm;
-	private PointTransform_F64 rightImageToNorm;
+	private Point2Transform2_F64 leftImageToNorm;
+	private Point2Transform2_F64 rightImageToNorm;
 
 	// transform from the current view to the old view (left camera)
 	private Se3_F64 newToOld = new Se3_F64();

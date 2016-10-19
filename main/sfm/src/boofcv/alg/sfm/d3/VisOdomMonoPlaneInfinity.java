@@ -23,7 +23,7 @@ import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.geometry.GeometryMath_F64;
@@ -95,8 +95,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase> {
 	private PointTracker<T> tracker;
 
 	// converts pixels between normalized image coordinates and pixel coordinates
-	private PointTransform_F64 normToPixel;
-	private PointTransform_F64 pixelToNorm;
+	private Point2Transform2_F64 normToPixel;
+	private Point2Transform2_F64 pixelToNorm;
 
 	// tracks which are assumed to be at an infinite distance away
 	private List<PointTrack> tracksFar = new ArrayList<>();

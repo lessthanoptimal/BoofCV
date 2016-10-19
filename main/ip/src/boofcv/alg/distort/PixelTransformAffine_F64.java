@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.affine.AffinePointOps_F64;
@@ -29,7 +29,7 @@ import georegression.transform.affine.AffinePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class PixelTransformAffine_F64 extends PixelTransform_F64 {
+public class PixelTransformAffine_F64 extends PixelTransform2_F64 {
 
 	Affine2D_F64 affine = new Affine2D_F64();
 	Point2D_F64 tran = new Point2D_F64();

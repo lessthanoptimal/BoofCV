@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.alg.distort.PixelToNormalized_F32;
+import boofcv.alg.distort.pinhole.PinholePtoN2_F32;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Vector3D_F32;
@@ -48,7 +48,7 @@ public class EquirectangularToPinhole_F32 extends EquirectangularDistortBase_F32
 
 		// computing the 3D ray through each pixel in the pinhole camera at it's canonical
 		// location
-		PixelToNormalized_F32 pixelToNormalized = new PixelToNormalized_F32();
+		PinholePtoN2_F32 pixelToNormalized = new PinholePtoN2_F32();
 		pixelToNormalized.set(pinhole.fx,pinhole.fy,pinhole.skew,pinhole.cx,pinhole.cy);
 
 		Point2D_F32 norm = new Point2D_F32();

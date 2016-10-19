@@ -21,7 +21,7 @@ package boofcv.alg.shapes.polygon;
 import boofcv.alg.shapes.corner.RefineCornerLinesToImage;
 import boofcv.alg.shapes.edge.SnapToLineEdge;
 import boofcv.misc.CircularIndex;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -96,7 +96,7 @@ public class RefinePolygonCornersToImage<T extends ImageGray> implements RefineB
 	}
 
 	@Override
-	public void setLensDistortion(int width, int height, PixelTransform_F32 distToUndist, PixelTransform_F32 undistToDist) {
+	public void setLensDistortion(int width, int height, PixelTransform2_F32 distToUndist, PixelTransform2_F32 undistToDist) {
 		this.refineCorner.getSnapToEdge().setTransform(undistToDist);
 	}
 

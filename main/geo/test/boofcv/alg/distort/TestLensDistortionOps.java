@@ -20,8 +20,8 @@ package boofcv.alg.distort;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -52,8 +52,8 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
-		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
+		Point2Transform2_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, true);
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW, param, null, false);
 
 		checkBorderOutside(adjToDist,distToAdj);
 
@@ -69,8 +69,8 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial param = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, false);
+		Point2Transform2_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, true);
+		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, param, null, false);
 
 		checkBorderOutside(adjToDist,distToAdj);
 
@@ -81,7 +81,7 @@ public class TestLensDistortionOps {
 		checkBorderOutside(adjToDist,distToAdj);
 	}
 
-	private void checkBorderOutside(PointTransform_F32 tran, PointTransform_F32 tranInv) {
+	private void checkBorderOutside(Point2Transform2_F32 tran, Point2Transform2_F32 tranInv) {
 		for( int y = 0; y < height; y++ ) {
 			checkBorderOutside(0, y, tran, tranInv);
 			checkBorderOutside(width - 1, y, tran, tranInv);
@@ -93,7 +93,7 @@ public class TestLensDistortionOps {
 		}
 	}
 
-	private void checkBorderOutside(PointTransform_F64 distToUndist, PointTransform_F64 undistToDist) {
+	private void checkBorderOutside(Point2Transform2_F64 distToUndist, Point2Transform2_F64 undistToDist) {
 		for( int y = 0; y < height; y++ ) {
 			checkBorderOutside(0, y, distToUndist, undistToDist);
 			checkBorderOutside(width - 1, y, distToUndist, undistToDist);
@@ -105,7 +105,7 @@ public class TestLensDistortionOps {
 		}
 	}
 
-	private void checkBorderOutside(int x, int y, PointTransform_F32 tran, PointTransform_F32 tranInv) {
+	private void checkBorderOutside(int x, int y, Point2Transform2_F32 tran, Point2Transform2_F32 tranInv) {
 		tran.compute(x, y, pf);
 
 		float tol = 0.1f;
@@ -122,7 +122,7 @@ public class TestLensDistortionOps {
 		assertEquals(pf.y,y, 0.01f);
 	}
 
-	private void checkBorderOutside(int x, int y, PointTransform_F64 tran, PointTransform_F64 tranInv) {
+	private void checkBorderOutside(int x, int y, Point2Transform2_F64 tran, Point2Transform2_F64 tranInv) {
 		tran.compute(x, y, pd);
 
 		double tol = 0.1;
@@ -149,13 +149,13 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial orig = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		PointTransform_F32 distToAdj = LensDistortionOps.
+		Point2Transform2_F32 distToAdj = LensDistortionOps.
 				transform_F32(AdjustmentType.FULL_VIEW, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
@@ -178,13 +178,13 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial orig = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
+		Point2Transform2_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
 
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, orig, adjusted, false);
+		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, orig, adjusted, false);
 
 		Point2D_F64 adjPixel = new Point2D_F64();
 		Point2D_F64 normFound = new Point2D_F64();
@@ -206,8 +206,8 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial param =
 				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
-		PointTransform_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
-		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
+		Point2Transform2_F32 adjToDist = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, true);
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
@@ -224,8 +224,8 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial param =
 				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 1e-4);
 
-		PointTransform_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
+		Point2Transform2_F64 adjToDist = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, true);
+		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, param, null, false);
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
@@ -237,7 +237,7 @@ public class TestLensDistortionOps {
 		checkInside(adjToDist, distToAdj);
 	}
 
-	private void checkInside(PointTransform_F32 tran, PointTransform_F32 tranInv ) {
+	private void checkInside(Point2Transform2_F32 tran, Point2Transform2_F32 tranInv ) {
 		double closestT = Double.MAX_VALUE;
 		double closestB = Double.MAX_VALUE;
 
@@ -267,7 +267,7 @@ public class TestLensDistortionOps {
 		assertTrue(closestB < 1);
 	}
 
-	private void checkInside(PointTransform_F64 tran, PointTransform_F64 tranInv ) {
+	private void checkInside(Point2Transform2_F64 tran, Point2Transform2_F64 tranInv ) {
 		double closestT = Double.MAX_VALUE;
 		double closestB = Double.MAX_VALUE;
 
@@ -297,7 +297,7 @@ public class TestLensDistortionOps {
 		assertTrue(closestB < 1);
 	}
 
-	private void checkInside( int x , int y , PointTransform_F32 tran , PointTransform_F32 tranInv ) {
+	private void checkInside(int x , int y , Point2Transform2_F32 tran , Point2Transform2_F32 tranInv ) {
 		tran.compute(x, y, pf);
 
 		float tol = 0.1f;
@@ -313,7 +313,7 @@ public class TestLensDistortionOps {
 		assertEquals(pf.x, x, 0.01f);
 	}
 
-	private void checkInside( int x , int y , PointTransform_F64 tran , PointTransform_F64 tranInv ) {
+	private void checkInside(int x , int y , Point2Transform2_F64 tran , Point2Transform2_F64 tranInv ) {
 		tran.compute(x, y, pd);
 
 		double tol = 0.1f;
@@ -329,7 +329,7 @@ public class TestLensDistortionOps {
 		assertEquals(pd.x, x, 0.01);
 	}
 
-	private double distanceEdge( int x , int y ,  PointTransform_F32 tran ) {
+	private double distanceEdge( int x , int y ,  Point2Transform2_F32 tran ) {
 		tran.compute(x, y, pf);
 
 		double min = Double.MAX_VALUE;
@@ -342,7 +342,7 @@ public class TestLensDistortionOps {
 		return min;
 	}
 
-	private double distanceEdge( int x , int y ,  PointTransform_F64 tran ) {
+	private double distanceEdge( int x , int y ,  Point2Transform2_F64 tran ) {
 		tran.compute(x, y, pd);
 
 		double min = Double.MAX_VALUE;
@@ -368,13 +368,13 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial orig = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
+		Point2Transform2_F32 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F32(true, false);
 
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		PointTransform_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, orig, adjusted, false);
+		Point2Transform2_F32 distToAdj = LensDistortionOps.transform_F32(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F32 adjPixel = new Point2D_F32();
 		Point2D_F32 normFound = new Point2D_F32();
@@ -400,13 +400,13 @@ public class TestLensDistortionOps {
 		CameraPinholeRadial orig = new CameraPinholeRadial().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1, 0.05);
 
-		PointTransform_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
+		Point2Transform2_F64 distToNorm = LensDistortionOps.transformPoint(orig).undistort_F64(true, false);
 
 		Point2D_F64 norm = new Point2D_F64();
 		distToNorm.compute(pixelX, pixelY, norm);
 
 		CameraPinholeRadial adjusted = new CameraPinholeRadial();
-		PointTransform_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, orig, adjusted, false);
+		Point2Transform2_F64 distToAdj = LensDistortionOps.transform_F64(AdjustmentType.EXPAND, orig, adjusted, false);
 
 		Point2D_F64 adjPixel = new Point2D_F64();
 		Point2D_F64 normFound = new Point2D_F64();

@@ -26,7 +26,7 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -52,7 +52,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray, Motion extends Invert
 	protected GImageGray inputWrapper;
 
 	public BackgroundMovingBasic_SB(float learnRate, float threshold,
-									PointTransformModel_F32<Motion> transform,
+									Point2Transform2Model_F32<Motion> transform,
 									TypeInterpolate interpType,
 									Class<T> imageType) {
 		super(learnRate, threshold, transform, ImageType.single(imageType));

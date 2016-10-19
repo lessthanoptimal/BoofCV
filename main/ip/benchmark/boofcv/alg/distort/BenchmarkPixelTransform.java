@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.homography.Homography2D_F32;
 
@@ -38,10 +38,10 @@ public class BenchmarkPixelTransform {
 	public static final int TEST_TIME = 1000;
 
 	public static class TestPixelTransform_F32 implements Performer {
-		PixelTransform_F32 alg;
+		PixelTransform2_F32 alg;
 		String name;
 
-		public TestPixelTransform_F32(PixelTransform_F32 alg, String name ) {
+		public TestPixelTransform_F32(PixelTransform2_F32 alg, String name ) {
 			this.alg = alg;
 			this.name = name;
 		}
@@ -60,7 +60,7 @@ public class BenchmarkPixelTransform {
 	}
 
 	
-	private static void benchmark( PixelTransform_F32 alg , String name ) {
+	private static void benchmark(PixelTransform2_F32 alg , String name ) {
 		ProfileOperation.printOpsPerSec(new TestPixelTransform_F32(alg,name), TEST_TIME);
 	}
 	

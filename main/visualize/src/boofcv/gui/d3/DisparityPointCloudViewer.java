@@ -19,7 +19,7 @@
 package boofcv.gui.d3;
 
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -85,7 +85,7 @@ public class DisparityPointCloudViewer extends JPanel {
 	public double radius = 5;
 
 	// converts from rectified pixels into color image pixels
-	PointTransform_F64 rectifiedToColor;
+	Point2Transform2_F64 rectifiedToColor;
 	// storage for color image coordinate
 	Point2D_F64 colorPt = new Point2D_F64();
 
@@ -99,7 +99,7 @@ public class DisparityPointCloudViewer extends JPanel {
 	 */
 	public void configure(double baseline,
 						  DenseMatrix64F K,
-						  PointTransform_F64 rectifiedToColor,
+						  Point2Transform2_F64 rectifiedToColor,
 						  int minDisparity, int maxDisparity) {
 		this.K = K;
 		this.rectifiedToColor = rectifiedToColor;

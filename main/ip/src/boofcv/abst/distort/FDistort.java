@@ -31,8 +31,8 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F32;
@@ -60,7 +60,7 @@ public class FDistort
 	// specifies how the borders are handled
 	ImageDistort distorter;
 	InterpolatePixel interp;
-	PixelTransform_F32 outputToInput;
+	PixelTransform2_F32 outputToInput;
 
 	// type of border being used
 	BorderType borderType;
@@ -237,7 +237,7 @@ public class FDistort
 	/**
 	 * Used to manually specify a transform.  From output to input
 	 */
-	public FDistort transform( PixelTransform_F32 outputToInput ) {
+	public FDistort transform( PixelTransform2_F32 outputToInput ) {
 		this.outputToInput = outputToInput;
 		return this;
 	}
@@ -245,7 +245,7 @@ public class FDistort
 	/**
 	 * Used to manually specify a transform.  From output to input
 	 */
-	public FDistort transform( PointTransform_F32 outputToInput ) {
+	public FDistort transform( Point2Transform2_F32 outputToInput ) {
 		return transform( new PointToPixelTransform_F32(outputToInput));
 	}
 
@@ -313,7 +313,7 @@ public class FDistort
 	 * Applies a distortion which will rotate the input image by the specified amount.
 	 */
 	public FDistort rotate( double angleInputToOutput ) {
-		PixelTransform_F32 outputToInput = DistortSupport.transformRotate(input.width/2,input.height/2,
+		PixelTransform2_F32 outputToInput = DistortSupport.transformRotate(input.width/2,input.height/2,
 				output.width/2,output.height/2,(float)angleInputToOutput);
 
 		return transform(outputToInput);

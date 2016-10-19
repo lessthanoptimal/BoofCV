@@ -21,7 +21,7 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
 
@@ -36,7 +36,7 @@ public class TestImplImageDistort_S32 extends GeneralImageDistortTests<GrayS32>{
 	}
 
 	@Override
-	public ImageDistort<GrayS32,GrayS32> createDistort(PixelTransform_F32 dstToSrc,
+	public ImageDistort<GrayS32,GrayS32> createDistort(PixelTransform2_F32 dstToSrc,
 													   InterpolatePixel<GrayS32> interp) {
 		ImageDistort<GrayS32,GrayS32> ret = new ImplImageDistort_S32<>((InterpolatePixelS) interp);
 		ret.setModel(dstToSrc);

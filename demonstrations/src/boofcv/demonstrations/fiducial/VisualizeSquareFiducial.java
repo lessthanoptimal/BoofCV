@@ -40,7 +40,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -101,7 +101,7 @@ public class VisualizeSquareFiducial {
 		g2.setStroke(new BasicStroke(2));
 
 		if( intrinsic != null ) {
-			PointTransform_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
+			Point2Transform2_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
 			Se3_F64 targetToWorld = new Se3_F64();
 
 			for (int i = 0; i < N; i++) {
@@ -137,7 +137,7 @@ public class VisualizeSquareFiducial {
 		ShowImages.showWindow(squares,"Candidates");
 	}
 
-	private void apply( PointTransform_F64 dist , Point2D_F64 p , Point2D_F64 o ) {
+	private void apply(Point2Transform2_F64 dist , Point2D_F64 p , Point2D_F64 o ) {
 		dist.compute(p.x,p.y,o);
 	}
 

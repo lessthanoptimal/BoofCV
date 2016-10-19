@@ -24,8 +24,8 @@ import boofcv.alg.geo.DistanceModelMonoPixels;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -104,11 +104,11 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase, 
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeRadial paramVisual, PixelTransform_F32 visToDepth) {
+	public void setCalibration(CameraPinholeRadial paramVisual, PixelTransform2_F32 visToDepth) {
 		sparse3D.configure(paramVisual,visToDepth);
 
-		PointTransform_F64 leftPixelToNorm = transformPoint(paramVisual).undistort_F64(true,false);
-		PointTransform_F64 leftNormToPixel = transformPoint(paramVisual).distort_F64(false,true);
+		Point2Transform2_F64 leftPixelToNorm = transformPoint(paramVisual).undistort_F64(true,false);
+		Point2Transform2_F64 leftNormToPixel = transformPoint(paramVisual).distort_F64(false,true);
 
 		alg.setPixelToNorm(leftPixelToNorm);
 		alg.setNormToPixel(leftNormToPixel);

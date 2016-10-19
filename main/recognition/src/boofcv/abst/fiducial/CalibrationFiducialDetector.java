@@ -30,7 +30,7 @@ import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -55,7 +55,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	// detects the calibration target
 	CalibrationDetector detector;
 	// transform to remove lens distortion
-	PointTransform_F64 distortToUndistorted;
+	Point2Transform2_F64 distortToUndistorted;
 
 	// non-linear refinement of pose estimate
 	Estimate1ofPnP estimatePnP;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 
 /**
  * Pixel transform which sets the output to be exactly the same as the input
  *
  * @author Peter Abeles
  */
-public class DoNothingPixelTransform_F32 extends PixelTransform_F32 {
+public class DoNothingPixelTransform_F32 extends PixelTransform2_F32 {
 	@Override
 	public void compute(int x, int y) {
 		distX = x;

@@ -18,10 +18,14 @@
 
 package boofcv.alg.geo;
 
-import boofcv.alg.distort.*;
+import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.pinhole.PinholeN2toP_F32;
+import boofcv.alg.distort.pinhole.PinholeN2toP_F64;
+import boofcv.alg.distort.pinhole.PinholePtoN2_F32;
+import boofcv.alg.distort.pinhole.PinholePtoN2_F64;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F32;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.GeometryMath_F64;
@@ -204,7 +208,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
@@ -218,7 +222,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		PointTransform_F64 normToPixel = LensDistortionOps.transformPoint(param).distort_F64(false,true);
+		Point2Transform2_F64 normToPixel = LensDistortionOps.transformPoint(param).distort_F64(false,true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -228,7 +232,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link NormalizedToPixel_F32} should be used instead.
+	 * If speed is a concern then {@link PinholeN2toP_F32} should be used instead.
 	 * </p>
 	 *
 	 * @param param Intrinsic camera parameters
@@ -241,7 +245,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F32();
 
-		PointTransform_F32 normToPixel = LensDistortionOps.transformPoint(param).distort_F32(false, true);
+		Point2Transform2_F32 normToPixel = LensDistortionOps.transformPoint(param).distort_F32(false, true);
 
 		normToPixel.compute(x,y,pixel);
 
@@ -251,7 +255,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -268,7 +272,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from normalized image coordinates to the original image pixel coordinate.
-	 * If speed is a concern then {@link NormalizedToPixel_F64} should be used instead.
+	 * If speed is a concern then {@link PinholeN2toP_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -282,7 +286,7 @@ public class PerspectiveOps {
 		if( pixel == null )
 			pixel = new Point2D_F64();
 
-		NormalizedToPixel_F64 alg = new NormalizedToPixel_F64();
+		PinholeN2toP_F64 alg = new PinholeN2toP_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		alg.compute(norm.x,norm.y,pixel);
@@ -293,7 +297,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PixelToNormalized_F64} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN2_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -307,7 +311,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		PointTransform_F64 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F64(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -317,7 +321,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PixelToNormalized_F32} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN2_F32} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -331,7 +335,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		PointTransform_F32 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F32(true, false);
+		Point2Transform2_F32 pixelToNorm = LensDistortionOps.transformPoint(param).distort_F32(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 
@@ -341,7 +345,7 @@ public class PerspectiveOps {
 	/**
 	 * <p>
 	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PixelToNormalized_F64} should be used instead.
+	 * If speed is a concern then {@link PinholePtoN2_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -355,7 +359,7 @@ public class PerspectiveOps {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		PixelToNormalized_F64 alg = new PixelToNormalized_F64();
+		PinholePtoN2_F64 alg = new PinholePtoN2_F64();
 		alg.set(K.get(0,0),K.get(1,1),K.get(0,1),K.get(0,2),K.get(1,2));
 
 		alg.compute(pixel.x,pixel.y,norm);

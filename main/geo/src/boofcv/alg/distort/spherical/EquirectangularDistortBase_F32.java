@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.EulerType;
@@ -34,7 +34,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public abstract class EquirectangularDistortBase_F32 extends PixelTransform_F32 {
+public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32 {
 	// function for doing match on equirectangular images
 	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 

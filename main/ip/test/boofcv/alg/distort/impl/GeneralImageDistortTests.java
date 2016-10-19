@@ -25,7 +25,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 
 	}
 
-	public abstract ImageDistort<T,T> createDistort(PixelTransform_F32 dstToSrc, InterpolatePixel<T> interp );
+	public abstract ImageDistort<T,T> createDistort(PixelTransform2_F32 dstToSrc, InterpolatePixel<T> interp );
 
 
 	/**
@@ -222,7 +222,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase> {
 		}
 	}
 
-	public class BasicTransform extends PixelTransform_F32 {
+	public class BasicTransform extends PixelTransform2_F32 {
 
 
 		@Override

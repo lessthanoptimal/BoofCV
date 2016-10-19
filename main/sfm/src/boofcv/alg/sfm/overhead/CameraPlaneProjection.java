@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -42,9 +42,9 @@ public class CameraPlaneProjection {
 	// transform from camera to plane
 	private Se3_F64 cameraToPlane = new Se3_F64();
 	// converts from pixel to normalized image coordinates
-	private PointTransform_F64 pixelToNorm;
+	private Point2Transform2_F64 pixelToNorm;
 	// convert from normalized image coordinates to pixel
-	private PointTransform_F64 normToPixel;
+	private Point2Transform2_F64 normToPixel;
 
 	// location of point on plane in current ref frame in 3D
 	private Point3D_F64 plain3D = new Point3D_F64();

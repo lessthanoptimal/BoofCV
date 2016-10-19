@@ -41,8 +41,8 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.DoNothingTransform_F64;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.DoNothing2Transform2_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
@@ -165,7 +165,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
 
-		PointTransform_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 p_to_n = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
 								   List<AssociatedPair> normalized) {
-		PointTransform_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+		Point2Transform2_F64 n_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
 
 		List<AssociatedPair> pixels = new ArrayList<>();
 
@@ -262,7 +262,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		double baseline = motion.getT().norm();
 
-		gui.configure(baseline, rectifiedK, new DoNothingTransform_F64(), minDisparity, maxDisparity);
+		gui.configure(baseline, rectifiedK, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
 		gui.process(disparity, left);
 		gui.setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 

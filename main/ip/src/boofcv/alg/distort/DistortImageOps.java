@@ -27,9 +27,9 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle_F32;
 import boofcv.struct.ImageRectangle_F64;
-import boofcv.struct.distort.PixelTransform_F32;
-import boofcv.struct.distort.PixelTransform_F64;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform2_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -103,7 +103,7 @@ public class DistortImageOps {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	void distortSingle(Input input, Output output,
-					   PixelTransform_F32 transform,
+					   PixelTransform2_F32 transform,
 					   TypeInterpolate interpType, BorderType borderType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
@@ -133,7 +133,7 @@ public class DistortImageOps {
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
 	void distortSingle(Input input, Output output,
-					   boolean renderAll, PixelTransform_F32 transform,
+					   boolean renderAll, PixelTransform2_F32 transform,
 					   InterpolatePixelS<Input> interp)
 	{
 		Class<Output> inputType = (Class<Output>)input.getClass();
@@ -157,7 +157,7 @@ public class DistortImageOps {
 	public static <Input extends ImageGray,Output extends ImageGray,
 			M extends Planar<Input>,N extends Planar<Output>>
 	void distortPL(M input, N output,
-				   PixelTransform_F32 transform,
+				   PixelTransform2_F32 transform,
 				   BorderType borderType, TypeInterpolate interpType)
 	{
 		Class<Input> inputBandType = input.getBandType();
@@ -171,7 +171,7 @@ public class DistortImageOps {
 	}
 
 	/**
-	 * Easy way to create {@link ImageDistort} given {@link PixelTransform_F32}.  To improve
+	 * Easy way to create {@link ImageDistort} given {@link PixelTransform2_F32}.  To improve
 	 * performance the distortion is automatically cached.
 	 *
 	 * @see FactoryDistort
@@ -185,7 +185,7 @@ public class DistortImageOps {
 	 * @return The {@link ImageDistort}
 	 */
 	public static <Input extends ImageGray,Output extends ImageGray>
-	ImageDistort<Input,Output> createImageDistort(PointTransform_F32 transform,
+	ImageDistort<Input,Output> createImageDistort(Point2Transform2_F32 transform,
 												  TypeInterpolate interpType, BorderType borderType,
 												  Class<Input> inputType, Class<Output> outputType)
 	{
@@ -245,7 +245,7 @@ public class DistortImageOps {
 		float offX = 0;//(output.width+1)%2;
 		float offY = 0;//(output.height+1)%2;
 
-		PixelTransform_F32 model = DistortSupport.transformRotate(input.width / 2, input.height / 2,
+		PixelTransform2_F32 model = DistortSupport.transformRotate(input.width / 2, input.height / 2,
 				output.width / 2 - offX, output.height / 2 - offY, angleInputToOutput);
 
 		if( input instanceof ImageGray) {
@@ -287,7 +287,7 @@ public class DistortImageOps {
 	 */
 	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
 												  int dstWidth , int dstHeight ,
-												  PixelTransform_F32 transform )
+												  PixelTransform2_F32 transform )
 	{
 		RectangleLength2D_I32 ret = boundBox(srcWidth,srcHeight,transform);
 
@@ -314,7 +314,7 @@ public class DistortImageOps {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_I32 boundBox( int srcWidth , int srcHeight ,
-												  PixelTransform_F32 transform )
+												  PixelTransform2_F32 transform )
 	{
 		int x0,y0,x1,y1;
 
@@ -353,7 +353,7 @@ public class DistortImageOps {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F32 boundBox_F32( int srcWidth , int srcHeight ,
-													  PixelTransform_F32 transform )
+													  PixelTransform2_F32 transform )
 	{
 		ImageRectangle_F32 r=new ImageRectangle_F32();
 
@@ -377,7 +377,7 @@ public class DistortImageOps {
 		return new RectangleLength2D_F32(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
 	}
 
-	private static void updateBoundBox(PixelTransform_F32 transform, ImageRectangle_F32 r) {
+	private static void updateBoundBox(PixelTransform2_F32 transform, ImageRectangle_F32 r) {
 		if( transform.distX < r.x0 )
 			r.x0 = transform.distX;
 		else if( transform.distX > r.x1 )
@@ -398,7 +398,7 @@ public class DistortImageOps {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F64 boundBox_F64( int srcWidth , int srcHeight ,
-													  PixelTransform_F64 transform )
+													  PixelTransform2_F64 transform )
 	{
 		ImageRectangle_F64 r = new ImageRectangle_F64();
 
@@ -422,7 +422,7 @@ public class DistortImageOps {
 		return new RectangleLength2D_F64(r.x0,r.y0,r.x1-r.x0,r.y1-r.y0);
 	}
 
-	private static void updateBoundBox(PixelTransform_F64 transform, ImageRectangle_F64 r) {
+	private static void updateBoundBox(PixelTransform2_F64 transform, ImageRectangle_F64 r) {
 		if( transform.distX < r.x0 )
 			r.x0 = transform.distX;
 		else if( transform.distX > r.x1 )

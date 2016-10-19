@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestPointToPixelTransform_F32 {
 		assertEquals(expected.y,alg.distY,1e-6);
 	}
 
-	private static class Dummy implements PointTransform_F32 {
+	private static class Dummy implements Point2Transform2_F32 {
 
 		@Override
 		public void compute(float x, float y, Point2D_F32 out) {

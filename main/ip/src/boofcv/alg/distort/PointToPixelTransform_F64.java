@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform_F64;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.PixelTransform2_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Allows a {@link PointToPixelTransform_F64} to be invoked as a {@link PixelTransform_F64}.
+ * Allows a {@link PointToPixelTransform_F64} to be invoked as a {@link PixelTransform2_F64}.
  *
  * @author Peter Abeles
  */
-public class PointToPixelTransform_F64 extends PixelTransform_F64 {
-	PointTransform_F64 alg;
+public class PointToPixelTransform_F64 extends PixelTransform2_F64 {
+	Point2Transform2_F64 alg;
 
 	Point2D_F64 point = new Point2D_F64();
 
-	public PointToPixelTransform_F64(PointTransform_F64 alg) {
+	public PointToPixelTransform_F64(Point2Transform2_F64 alg) {
 		this.alg = alg;
 	}
 

@@ -21,7 +21,7 @@ package boofcv.factory.background;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.background.moving.*;
 import boofcv.alg.background.stationary.*;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
@@ -68,8 +68,8 @@ public class FactoryBackgroundModel {
 	 * @return new instance of the background model
 	 */
 	public static <T extends ImageBase, Motion extends InvertibleTransform<Motion>>
-	BackgroundMovingBasic<T,Motion> movingBasic( ConfigBackgroundBasic config ,
-												 PointTransformModel_F32<Motion> transform, ImageType<T> imageType ) {
+	BackgroundMovingBasic<T,Motion> movingBasic(ConfigBackgroundBasic config ,
+												Point2Transform2Model_F32<Motion> transform, ImageType<T> imageType ) {
 
 		config.checkValidity();
 
@@ -136,7 +136,7 @@ public class FactoryBackgroundModel {
 	 */
 	public static <T extends ImageBase,Motion extends InvertibleTransform<Motion>>
 	BackgroundMovingGaussian<T,Motion> movingGaussian( ConfigBackgroundGaussian config ,
-													   PointTransformModel_F32<Motion> transform,
+													   Point2Transform2Model_F32<Motion> transform,
 													   ImageType<T> imageType ) {
 
 		config.checkValidity();

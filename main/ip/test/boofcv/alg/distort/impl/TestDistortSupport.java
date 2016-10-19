@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.impl;
 
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class TestDistortSupport {
 		GrayF32 a = new GrayF32(25,30);
 		GrayF32 b = new GrayF32(15,25);
 
-		PixelTransform_F32 tran = DistortSupport.transformScale(a, b, null);
+		PixelTransform2_F32 tran = DistortSupport.transformScale(a, b, null);
 
 		// check edge cases at the image border
 		tran.compute(0,0);
@@ -55,7 +55,7 @@ public class TestDistortSupport {
 	@Test
 	public void distortRotate() {
 
-		PixelTransform_F32 tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
+		PixelTransform2_F32 tran = DistortSupport.transformRotate(13f,15.0f,13f,15f,(float)(-Math.PI/2.0));
 
 		// trivial case
 		tran.compute(13,15);

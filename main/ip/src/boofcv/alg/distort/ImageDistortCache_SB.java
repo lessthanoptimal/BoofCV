@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
@@ -40,7 +40,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray,Output extend
 	private InterpolatePixelS<Input> interp;
 
 	// transform
-	private PixelTransform_F32 dstToSrc;
+	private PixelTransform2_F32 dstToSrc;
 
 	// crop boundary
 	private int x0,y0,x1,y1;
@@ -62,7 +62,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray,Output extend
 	}
 
 	@Override
-	public void setModel(PixelTransform_F32 dstToSrc) {
+	public void setModel(PixelTransform2_F32 dstToSrc) {
 		this.dirty = true;
 		this.dstToSrc = dstToSrc;
 	}

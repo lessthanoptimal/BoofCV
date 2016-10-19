@@ -25,7 +25,7 @@ import boofcv.core.image.FactoryGImageMultiBand;
 import boofcv.core.image.GImageMultiBand;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PointTransformModel_F32;
+import boofcv.struct.distort.Point2Transform2Model_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
@@ -66,7 +66,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved, Motion exte
 	 * @param imageType Type of input image.
 	 */
 	public BackgroundMovingGaussian_IL(float learnRate, float threshold,
-									   PointTransformModel_F32<Motion> transform,
+									   Point2Transform2Model_F32<Motion> transform,
 									   TypeInterpolate interpType,
 									   ImageType<T> imageType)
 	{

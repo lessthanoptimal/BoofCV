@@ -21,7 +21,7 @@ package boofcv.alg.shapes.ellipse;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.distort.PixelTransform_F32;
+import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.fitting.ellipse.ClosestPointEllipseAngle_F64;
@@ -81,7 +81,7 @@ public class BinaryEllipseDetectorPixel {
 	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-8,100);
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform_F32 distToUndist;
+	protected PixelTransform2_F32 distToUndist;
 
 	private boolean verbose = false;
 
@@ -100,7 +100,7 @@ public class BinaryEllipseDetectorPixel {
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 */
-	public void setLensDistortion( PixelTransform_F32 distToUndist ) {
+	public void setLensDistortion( PixelTransform2_F32 distToUndist ) {
 		this.distToUndist = distToUndist;
 	}
 

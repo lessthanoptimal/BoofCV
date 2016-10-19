@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TestFlipVerticalNorm_F64 {
 	@Test
 	public void theSuperDuperTest() {
 		
-		FlipVerticalNorm_F64 alg = new FlipVerticalNorm_F64(new Dummy(),1);
+		FlipVerticalNorm2_F64 alg = new FlipVerticalNorm2_F64(new Dummy(),1);
 		
 		Point2D_F64 out = new Point2D_F64();
 		alg.compute(2,3,out);
@@ -41,7 +41,7 @@ public class TestFlipVerticalNorm_F64 {
 		assertEquals(3,-out.y,1e-8);
 	}
 	
-	private class Dummy implements PointTransform_F64 {
+	private class Dummy implements Point2Transform2_F64 {
 
 		@Override
 		public void compute(double x, double y, Point2D_F64 out) {

@@ -32,7 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.SurfFeatureQueue;
@@ -68,7 +68,7 @@ import java.util.List;
 public class ExampleMultiviewSceneReconstruction {
 
 	// Converts a point from pixel to normalized image coordinates
-	PointTransform_F64 pixelToNorm;
+	Point2Transform2_F64 pixelToNorm;
 
 	// ratio of matching features to unmatched features for two images to be considered connected
 	double connectThreshold = 0.3;
