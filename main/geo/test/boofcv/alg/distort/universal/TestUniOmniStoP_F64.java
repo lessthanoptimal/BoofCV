@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalomni;
+package boofcv.alg.distort.universal;
 
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestUniOmniPtoS_F64 {
+public class TestUniOmniStoP_F64 {
 	@Test
 	public void stuff() {
 		fail("Implement");

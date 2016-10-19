@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalomni;
+package boofcv.alg.distort.universal;
 
+import boofcv.alg.distort.radtan.RadialTangential_F64;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -30,30 +31,40 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class UniOmniStoP_F64 implements Point3Transform2_F64 {
+	double mirrorOffset;
+	// principle point / image center
+	protected double cx, cy;
+	// other intrinsic parameters
+	protected double fx,fy,skew;
 
-	public CameraUniversalOmni params;
+	// storage for distortion terms
+	protected RadialTangential_F64 distortion = new RadialTangential_F64();
 
-	public UniOmniStoP_F64(CameraUniversalOmni params) {
-		this.params = params;
+	public UniOmniStoP_F64(CameraUniversalOmni model) {
+		setModel(model);
 	}
 
 	public UniOmniStoP_F64() {
 	}
 
-	public CameraUniversalOmni getParams() {
-		return params;
-	}
+	public void setModel(CameraUniversalOmni model) {
+		this.mirrorOffset = (double)model.mirrorOffset;
 
-	public void setParams(CameraUniversalOmni params) {
-		this.params = params;
+		distortion.set(model.radial,model.t1,model.t2);
+
+		this.cx = (double)model.cx;
+		this.cy = (double)model.cy;
+		this.fx = (double)model.fx;
+		this.fy = (double)model.fy;
+		this.skew = (double)model.skew;
 	}
 
 	@Override
 	public void compute(double x, double y, double z, Point2D_F64 out) {
 
-		double[] radial = params.radial;
-		double t1 = params.t1;
-		double t2 = params.t2;
+		double[] radial = distortion.radial;
+		double t1 = distortion.t1;
+		double t2 = distortion.t2;
 
 		double r2 = x*x + y*y;
 		double ri2 = r2;
@@ -65,7 +76,7 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		}
 
 		// apply mirror offset
-		z += params.mirrorOffset;
+		z += mirrorOffset;
 
 		// compute normalized image coordinates
 		x /= z;
@@ -79,7 +90,7 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		y += t1*(r2 + 2*y*y) + 2*t2*x*y;
 
 		// project into pixels
-		out.x = params.fx * x + params.skew * y + params.cx;
-		out.y = params.fy * y + params.cy;
+		out.x = fx * x + skew * y + cx;
+		out.y = fy * y + cy;
 	}
 }

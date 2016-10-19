@@ -38,13 +38,8 @@ public class AddRadialNtoN_F32 implements Point2Transform2_F32 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialNtoN_F32 setDistortion(double[] radial, double t1, double t2) {
-		params = new RadialTangential_F32().set(radial,t1,t2);
-		return this;
-	}
-
-	public AddRadialNtoN_F32 setDistortion(float[] radial, float t1, float t2) {
-		params = new RadialTangential_F32().set(radial,t1,t2);
+	public AddRadialNtoN_F32 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
+		params = new RadialTangential_F32(radial,t1,t2);
 		return this;
 	}
 
@@ -57,7 +52,6 @@ public class AddRadialNtoN_F32 implements Point2Transform2_F32 {
 	 */
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
-		float sum = 0;
 
 		float[] radial = params.radial;
 		float t1 = params.t1;
@@ -66,6 +60,7 @@ public class AddRadialNtoN_F32 implements Point2Transform2_F32 {
 		float r2 = x*x + y*y;
 		float ri2 = r2;
 
+		float sum = 0;
 		for( int i = 0; i < radial.length; i++ ) {
 			sum += radial[i]*ri2;
 			ri2 *= r2;

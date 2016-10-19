@@ -16,26 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort;
+package boofcv.alg.distort.universal;
 
-import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestFlipVertical_F32 {
-
+public class TestLensDistortionUniversalOmni {
 	@Test
-	public void basicTest() {
-		FlipVertical_F32 alg = new FlipVertical_F32(100);
-
-		Point2D_F32 found = new Point2D_F32();
-
-		alg.compute(20,30,found);
-		assertEquals(20,found.x,1e-8);
-		assertEquals(100 - 30 - 1, found.y, 1e-8);
+	public void stuff() {
+		fail("Implement");
 	}
 }

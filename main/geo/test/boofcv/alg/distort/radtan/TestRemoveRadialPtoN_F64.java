@@ -21,6 +21,7 @@ package boofcv.alg.distort.radtan;
 import boofcv.alg.distort.Transform2ThenPixel_F64;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
+import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class TestRemoveRadialPtoN_F64 {
 		double xc = 300;
 		double yc = 350;
 
-		double radial[]= new double[]{0.12,-0.13};
+		/**/double radial[]= new /**/double[]{0.12,-0.13};
 
 		Point2D_F64 point = new Point2D_F64();
 
@@ -67,7 +68,7 @@ public class TestRemoveRadialPtoN_F64 {
 
 		GeometryMath_F64.mult(K,point,point);
 
-		assertEquals(undistX,point.x,1e-4);
-		assertEquals(undistY,point.y,1e-4);
+		assertEquals(undistX,point.x, GrlConstants.DOUBLE_TEST_TOL_SQRT);
+		assertEquals(undistY,point.y, GrlConstants.DOUBLE_TEST_TOL_SQRT);
 	}
 }

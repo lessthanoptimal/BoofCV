@@ -49,8 +49,8 @@ public class TestPinholeN2toP_F32 {
 
 		alg.compute(pixel.x, pixel.y, found);
 
-		assertEquals(expected.x, found.x, 1e-4);
-		assertEquals(expected.y, found.y, 1e-4);
+		assertEquals(expected.x, found.x, 1e-8);
+		assertEquals(expected.y, found.y, 1e-8);
 	}
 
 }

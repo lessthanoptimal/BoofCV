@@ -16,18 +16,37 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalomni;
+package boofcv.alg.distort;
 
+import boofcv.struct.distort.Point2Transform2_F32;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestUniOmniStoP_F64 {
+public class TestFlipVerticalNorm_F32 {
+
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void theSuperDuperTest() {
+		
+		FlipVerticalNorm2_F32 alg = new FlipVerticalNorm2_F32(new Dummy(),1);
+		
+		Point2D_F32 out = new Point2D_F32();
+		alg.compute(2,3,out);
+		
+		assertEquals(2,out.x,1e-8);
+		assertEquals(3,-out.y,1e-8);
+	}
+	
+	private class Dummy implements Point2Transform2_F32 {
+
+		@Override
+		public void compute(float x, float y, Point2D_F32 out) {
+			out.x = x;
+			out.y = y;
+		}
 	}
 }

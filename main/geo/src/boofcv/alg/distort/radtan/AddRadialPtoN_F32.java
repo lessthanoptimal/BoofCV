@@ -49,7 +49,7 @@ public class AddRadialPtoN_F32 implements Point2Transform2_F32 {
 	 * @param cx   camera center x-axis in pixels
 	 * @param cy   center center y-axis in pixels
 	 */
-	public AddRadialPtoN_F32 setK(double fx, double fy, double skew, double cx, double cy) {
+	public AddRadialPtoN_F32 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
 
 		K_inv.zero();
 		K_inv.set(0, 0, fx);
@@ -69,8 +69,8 @@ public class AddRadialPtoN_F32 implements Point2Transform2_F32 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialPtoN_F32 setDistortion(double[] radial, double t1, double t2) {
-		params = new RadialTangential_F32().set(radial, t1, t2);
+	public AddRadialPtoN_F32 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
+		params = new RadialTangential_F32(radial, t1, t2);
 		return this;
 	}
 

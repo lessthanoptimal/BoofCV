@@ -38,7 +38,7 @@ public class AddRadialNtoN_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialNtoN_F64 setDistortion(double[] radial, double t1, double t2) {
+	public AddRadialNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
 		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}

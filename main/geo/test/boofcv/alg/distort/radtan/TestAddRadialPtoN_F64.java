@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestAddRadialPtoN_F64 {
 		double xc = 300;
 		double yc = 350;
 
-		double radial[]= new double[]{0.01,-0.03};
+		/**/double radial[]= new /**/double[]{0.01,-0.03};
 
 		Point2D_F64 orig = new Point2D_F64(19.5,400.1); // undistorted pixel coordinates
 

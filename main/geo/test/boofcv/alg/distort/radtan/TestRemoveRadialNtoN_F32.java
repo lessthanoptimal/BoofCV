@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.distort.radtan;
 
-import georegression.struct.point.Point2D_F64;
+import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,26 +37,26 @@ public class TestRemoveRadialNtoN_F32 {
 
 	public void checkManual(float t1, float t2) {
 
-		double radial[]= new double[]{0.12f,-0.13f};
+		/**/double radial[]= new /**/double[]{0.12f,-0.13f};
 
 		// undisorted normalized image coordinate
-		Point2D_F64 undistorted = new Point2D_F64(0.1,-0.2);
+		Point2D_F32 undistorted = new Point2D_F32(0.1f,-0.2f);
 
 		// manually compute the distortion
-		double x = undistorted.x, y = undistorted.y;
-		double r2 = x*x + y*y;
-		double mag = radial[0]*r2 + radial[1]*r2*r2;
+		float x = undistorted.x, y = undistorted.y;
+		float r2 = x*x + y*y;
+		float mag = (float)radial[0]*r2 + (float)radial[1]*r2*r2;
 
 		// distorted normalized image coordinate
-		double distX = undistorted.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
-		double distY = undistorted.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
+		float distX = undistorted.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		float distY = undistorted.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 
-		RemoveRadialNtoN_F64 alg = new RemoveRadialNtoN_F64().setDistortion(radial,t1,t2);
+		RemoveRadialNtoN_F32 alg = new RemoveRadialNtoN_F32().setDistortion(radial,t1,t2);
 
-		Point2D_F64 found = new Point2D_F64();
+		Point2D_F32 found = new Point2D_F32();
 		alg.compute(distX, distY, found);
 
-		assertEquals(undistorted.x,found.x,1e-4);
-		assertEquals(undistorted.y,found.y,1e-4);
+		assertEquals(undistorted.x,found.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
+		assertEquals(undistorted.y,found.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
 	}
 }

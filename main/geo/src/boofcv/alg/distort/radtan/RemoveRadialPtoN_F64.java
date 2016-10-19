@@ -20,6 +20,7 @@ package boofcv.alg.distort.radtan;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -44,7 +45,7 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-	private double tol=1e-10;
+	private double tol = GrlConstants.DCONV_TOL_A;
 
 	public RemoveRadialPtoN_F64() {
 	}
@@ -66,13 +67,13 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 	 * @param cx camera center x-axis in pixels
 	 * @param cy center center y-axis in pixels
 	 */
-	public RemoveRadialPtoN_F64 setK(double fx, double fy, double skew, double cx, double cy ) {
+	public RemoveRadialPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
+		this.fx = (double)fx;
+		this.fy = (double)fy;
+		this.skew = (double)skew;
+		this.cx = (double)cx;
+		this.cy = (double)cy;
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
@@ -86,7 +87,7 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 		return this;
 	}
 
-	public RemoveRadialPtoN_F64 setDistortion( double[] radial, double t1, double t2 ) {
+	public RemoveRadialPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}

@@ -29,26 +29,14 @@ import georegression.struct.point.Point2D_F32;
  */
 public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 
-	// intrinsic camera parameters
 	float fx, fy, skew, cx, cy;
-	// the transform which outputs normalized image coordinates
 	Point2Transform2_F32 first;
 
 	public Transform2ThenPixel_F32(Point2Transform2_F32 first) {
 		this.first = first;
 	}
 
-	public Point2Transform2_F32 set(float fx, float fy, float skew, float cx, float cy ) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
-
-		return this;
-	}
-
-	public Point2Transform2_F32 set(double fx, double fy, double skew, double cx, double cy ) {
+	public Point2Transform2_F32 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (float)fx;
 		this.fy = (float)fy;
 		this.skew = (float)skew;
@@ -60,7 +48,7 @@ public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
-		first.compute(x, y, out);
+		first.compute(x,y,out);
 		x = out.x; y = out.y;
 		out.x = fx*x + skew*y + cx;
 		out.y = fy*y + cy;

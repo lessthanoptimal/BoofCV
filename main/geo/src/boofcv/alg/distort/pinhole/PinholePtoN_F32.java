@@ -35,13 +35,13 @@ public class PinholePtoN_F32 implements Point2Transform2_F32 {
 	// inverse of camera calibration matrix
 	protected DenseMatrix64F K_inv = new DenseMatrix64F(3,3);
 
-	public void set(double fx, double fy, double skew, double x_c, double y_c ) {
+	public void set(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
 		K_inv.set(0,0,fx);
 		K_inv.set(1,1,fy);
 		K_inv.set(0,1,skew);
-		K_inv.set(0,2,x_c);
-		K_inv.set(1,2,y_c);
+		K_inv.set(0,2,cx);
+		K_inv.set(1,2,cy);
 		K_inv.set(2,2,1);
 
 		CommonOps.invert(K_inv);

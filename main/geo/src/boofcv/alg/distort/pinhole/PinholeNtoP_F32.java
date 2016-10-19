@@ -31,7 +31,7 @@ public class PinholeNtoP_F32 implements Point2Transform2_F32 {
 	// camera calibration matrix
 	float fx, fy, skew, cx, cy;
 
-	public PinholeNtoP_F32 set(double fx, double fy, double skew, double cx, double cy) {
+	public PinholeNtoP_F32 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
 		this.fx = (float)fx;
 		this.fy = (float)fy;
 		this.skew = (float)skew;

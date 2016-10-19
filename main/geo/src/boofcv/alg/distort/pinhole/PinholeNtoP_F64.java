@@ -31,12 +31,12 @@ public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 	// camera calibration matrix
 	double fx, fy, skew, cx, cy;
 
-	public PinholeNtoP_F64 set(double fx, double fy, double skew, double cx, double cy) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
+	public PinholeNtoP_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
+		this.fx = (double)fx;
+		this.fy = (double)fy;
+		this.skew = (double)skew;
+		this.cx = (double)cx;
+		this.cy = (double)cy;
 		return this;
 	}
 

@@ -18,24 +18,29 @@
 
 package boofcv.alg.distort;
 
+import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
+ * <p>
+ * Flips the image along the vertical axis and convert to normalized image coordinates using the
+ * provided transform.
+ * </p>
+ *
  * @author Peter Abeles
  */
-public class TestFlipVertical_F32 {
+public class FlipVerticalNorm2_F32 implements Point2Transform2_F32 {
 
-	@Test
-	public void basicTest() {
-		FlipVertical_F32 alg = new FlipVertical_F32(100);
+	Point2Transform2_F32 pixelToNormalized;
+	int height;
 
-		Point2D_F32 found = new Point2D_F32();
+	public FlipVerticalNorm2_F32(Point2Transform2_F32 pixelToNormalized, int imageHeight) {
+		this.pixelToNormalized = pixelToNormalized;
+		this.height = imageHeight - 1;
+	}
 
-		alg.compute(20,30,found);
-		assertEquals(20,found.x,1e-8);
-		assertEquals(100 - 30 - 1, found.y, 1e-8);
+	@Override
+	public void compute(float x, float y, Point2D_F32 out) {
+		pixelToNormalized.compute(x, height - y, out);
 	}
 }

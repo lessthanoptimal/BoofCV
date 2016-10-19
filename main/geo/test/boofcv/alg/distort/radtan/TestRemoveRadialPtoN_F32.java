@@ -21,6 +21,7 @@ package boofcv.alg.distort.radtan;
 import boofcv.alg.distort.Transform2ThenPixel_F32;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F32;
+import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
@@ -45,15 +46,15 @@ public class TestRemoveRadialPtoN_F32 {
 		float xc = 300;
 		float yc = 350;
 
-		double radial[]= new double[]{0.12f,-0.13f};
+		/**/double radial[]= new /**/double[]{0.12f,-0.13f};
 
 		Point2D_F32 point = new Point2D_F32();
 
 		float undistX = 19.5f;
 		float undistY = 200.1f;
 
-		AddRadialPtoN_F32 add_p_to_n = new AddRadialPtoN_F32().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
-		new Transform2ThenPixel_F32(add_p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
+		AddRadialPtoN_F32 p_to_n = new AddRadialPtoN_F32().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
+		new Transform2ThenPixel_F32(p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
 
 		float distX = point.x;
 		float distY = point.y;
@@ -67,7 +68,7 @@ public class TestRemoveRadialPtoN_F32 {
 
 		GeometryMath_F32.mult(K,point,point);
 
-		assertEquals(undistX,point.x,1e-2);
-		assertEquals(undistY,point.y,1e-2);
+		assertEquals(undistX,point.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
+		assertEquals(undistY,point.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
 	}
 }

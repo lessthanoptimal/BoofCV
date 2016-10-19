@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,14 +40,14 @@ public class RadialTangential_F32 {
 	public RadialTangential_F32() {
 	}
 
-	public RadialTangential_F32(float[] radial, float t1, float t2) {
+	public RadialTangential_F32(/**/double[] radial, /**/double t1, /**/double t2) {
 		this.set(radial,t1,t2);
 	}
 
-	public RadialTangential_F32 set(double[] radial, double t1, double t2) {
-		if( radial == null ) {
+	public void set(/**/double[] radial, /**/double t1, /**/double t2) {
+		if( radial == null )
 			this.radial = new float[0];
-		} else {
+		else {
 			this.radial = new float[radial.length];
 			for (int i = 0; i < radial.length; i++) {
 				this.radial[i] = (float)radial[i];
@@ -55,21 +55,6 @@ public class RadialTangential_F32 {
 		}
 		this.t1 = (float)t1;
 		this.t2 = (float)t2;
-
-		return this;
-	}
-
-	public RadialTangential_F32 set(float[] radial, float t1, float t2) {
-		if( radial == null ) {
-			radial = new float[0];
-		} else {
-			this.radial = new float[radial.length];
-			System.arraycopy(radial, 0, this.radial, 0, radial.length);
-		}
-		this.t1 = t1;
-		this.t2 = t2;
-
-		return this;
 	}
 
 	public float getT1() {

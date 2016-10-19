@@ -16,18 +16,35 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.universalomni;
+package boofcv.alg.distort.universal;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.struct.distort.Point2Transform3_F32;
+import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.struct.distort.Point3Transform2_F32;
+import boofcv.struct.distort.Point3Transform2_F64;
 
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionUniversalOmni {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class LensDistortionUniversalOmni implements LensDistortionWideFOV {
+	@Override
+	public Point3Transform2_F64 distortStoP_F64() {
+		return null;
+	}
+
+	@Override
+	public Point3Transform2_F32 distortStoP_F32() {
+		return null;
+	}
+
+	@Override
+	public Point2Transform3_F64 undistortPtoS_F64() {
+		return null;
+	}
+
+	@Override
+	public Point2Transform3_F32 undistortPtoS_F32() {
+		return null;
 	}
 }

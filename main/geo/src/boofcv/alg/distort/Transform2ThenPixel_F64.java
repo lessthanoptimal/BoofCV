@@ -36,12 +36,12 @@ public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 		this.first = first;
 	}
 
-	public Point2Transform2_F64 set(double fx, double fy, double skew, double cx, double cy ) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-		this.cx = cx;
-		this.cy = cy;
+	public Point2Transform2_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
+		this.fx = (double)fx;
+		this.fy = (double)fy;
+		this.skew = (double)skew;
+		this.cx = (double)cx;
+		this.cy = (double)cy;
 
 		return this;
 	}

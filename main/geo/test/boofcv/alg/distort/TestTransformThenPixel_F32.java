@@ -34,12 +34,12 @@ public class TestTransformThenPixel_F32 {
 		Transform2ThenPixel_F32 alg = new Transform2ThenPixel_F32(null);
 
 		assertTrue(alg == alg.set(1, 2, 3, 4, 5));
-		assertEquals(1, alg.fx, 1e-8);
-		assertEquals(2, alg.fy, 1e-8);
-		assertEquals(3, alg.skew, 1e-8);
-		assertEquals(4, alg.cx, 1e-8);
-		assertEquals(5, alg.cy, 1e-8);
-
+		assertEquals(1,alg.fx,1e-8);
+		assertEquals(2,alg.fy,1e-8);
+		assertEquals(3,alg.skew,1e-8);
+		assertEquals(4,alg.cx,1e-8);
+		assertEquals(5,alg.cy,1e-8);
+		
 	}
 
 	@Test
@@ -49,11 +49,11 @@ public class TestTransformThenPixel_F32 {
 
 		float nx = 0.1f, ny = 0.2f;
 
-		float expectedX = 1 * nx + 3 * ny + 4;
-		float expectedY = 2 * ny + 5;
+		float expectedX = 1*nx + 3*ny + 4;
+		float expectedY = 2*ny + 5;
 
 		Point2D_F32 found = new Point2D_F32();
-		alg.compute(1, 2, found);
+		alg.compute(1,2,found);
 
 		assertEquals(expectedX, found.x, 1e-8);
 		assertEquals(expectedY, found.y, 1e-8);
@@ -63,8 +63,8 @@ public class TestTransformThenPixel_F32 {
 
 		@Override
 		public void compute(float x, float y, Point2D_F32 out) {
-			assertEquals(1, x, 1e-8);
-			assertEquals(2, y, 1e-8);
+			assertEquals(1,x,1e-8);
+			assertEquals(2,y,1e-8);
 			out.x = 0.1f;
 			out.y = 0.2f;
 		}

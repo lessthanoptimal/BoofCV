@@ -18,11 +18,10 @@
 
 package boofcv;
 
-import georegression.misc.autocode.ConvertFile32From64;
-
 import java.io.File;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Auto generates 32bit code from 64bit code.
@@ -75,15 +74,25 @@ public class Generate32From64App {
 		}
 	}
 
+	public static String[] addTests( String[] original ) {
+		List<String> path = new ArrayList<>();
+		for( String a : original ) {
+			path.add(a);
+			if( a.contains("src"))
+				path.add( a.replace("src","test"));
+		}
+		return path.toArray(new String[path.size()]);
+	}
+
 	public static void main( String args[] ) {
 		String directories[] = new String[]{
-				"main/geo/src/boofcv/alg/distort/spherical",
-				"main/ip/src/boofcv/struct/distort",
-				"main/geo/test/boofcv/alg/distort/spherical",
-				"main/ip/test/boofcv/struct/distort"};
+				"main/geo/src/boofcv/alg/distort",
+				"main/ip/src/boofcv/struct/distort"};
+
+		directories = addTests(directories);
 
 		for( String dir : directories ) {
-			new georegression.misc.autocode.Generate32From64App( dir ).process();
+			new Generate32From64App( dir ).process();
 		}
 	}
 }
