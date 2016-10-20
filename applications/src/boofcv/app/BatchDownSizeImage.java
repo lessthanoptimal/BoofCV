@@ -178,7 +178,7 @@ public class BatchDownSizeImage {
 					smallWidth = width;
 					smallHeight = height;
 				}
-				small = input._createNew(smallWidth,smallHeight);
+				small = input.createNew(smallWidth,smallHeight);
 			}
 
 			System.out.printf(" %4d out of %4d   %s\n",index+1,images.size(),f.getName());

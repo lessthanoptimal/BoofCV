@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class TestImageBase {
 		public void setTo(ImageBase orig) {}
 
 		@Override
-		public ImageBase _createNew(int imgWidth, int imgHeight) {
+		public ImageBase createNew(int imgWidth, int imgHeight) {
 			return null;
 		}
 	}

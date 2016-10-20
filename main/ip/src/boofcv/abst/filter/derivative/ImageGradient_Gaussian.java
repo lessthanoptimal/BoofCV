@@ -78,7 +78,7 @@ public class ImageGradient_Gaussian<I extends ImageGray, D extends ImageGray>
 	public void process( I inputImage , D derivX, D derivY ) {
 
 		if( storage == null ) {
-			storage = (I)inputImage._createNew(inputImage.width,inputImage.height );
+			storage = (I)inputImage.createNew(inputImage.width,inputImage.height );
 		} else {
 			storage.reshape(inputImage.width,inputImage.height);
 		}

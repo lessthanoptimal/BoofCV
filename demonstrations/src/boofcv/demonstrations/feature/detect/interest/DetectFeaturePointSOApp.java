@@ -93,7 +93,7 @@ public class DetectFeaturePointSOApp<T extends ImageGray, D extends ImageGray>
 		setInputImage(input);
 		this.input = input;
 		grayImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		corruptImage = (T) grayImage._createNew(grayImage.width, grayImage.height);
+		corruptImage = (T) grayImage.createNew(grayImage.width, grayImage.height);
 		workImage = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_BGR);
 		panel.setBufferedImage(workImage);
 		panel.setPreferredSize(new Dimension(workImage.getWidth(), workImage.getHeight()));

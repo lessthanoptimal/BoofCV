@@ -167,7 +167,7 @@ public class GenericOrientationIntegralTests<T extends ImageGray> {
 	 * @param angle
 	 */
 	private void createOrientedImage( double angle ) {
-		T input = (T)ii._createNew(width,height);
+		T input = (T)ii.createNew(width,height);
 
 		double c = Math.cos(angle);
 		double s = Math.sin(angle);

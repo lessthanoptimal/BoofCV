@@ -53,7 +53,7 @@ public class GrayS16 extends GrayI16<GrayS16> {
 	}
 
 	@Override
-	public GrayS16 _createNew(int imgWidth, int imgHeight) {
+	public GrayS16 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS16();
 		return new GrayS16(imgWidth, imgHeight);

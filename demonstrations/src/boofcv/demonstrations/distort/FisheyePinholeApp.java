@@ -104,10 +104,6 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	public FisheyePinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-//		CameraUniversalOmni fisheyeModel = CalibrationIO.load("fisheye.yaml");
-//		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
-//		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
-
 		updateIntrinsic();
 
 		BorderType borderType = BorderType.EXTENDED;

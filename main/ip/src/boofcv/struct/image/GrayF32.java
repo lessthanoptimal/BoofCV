@@ -119,7 +119,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 	}
 
 	@Override
-	public GrayF32 _createNew(int imgWidth, int imgHeight) {
+	public GrayF32 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayF32();
 		return new GrayF32(imgWidth, imgHeight);

@@ -86,7 +86,7 @@ public class GrayS32 extends GrayI<GrayS32> {
 	}
 
 	@Override
-	public GrayS32 _createNew(int imgWidth, int imgHeight) {
+	public GrayS32 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS32();
 		return new GrayS32(imgWidth, imgHeight);

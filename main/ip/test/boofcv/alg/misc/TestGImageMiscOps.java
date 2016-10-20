@@ -70,7 +70,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		Object[][] ret = new Object[1][param.length];
 
 		if( name.equals("copy")) {
-			ImageBase inputB = inputA._createNew(width,height);
+			ImageBase inputB = inputA.createNew(width,height);
 
 			GImageMiscOps.fillUniform(inputA,rand,0,10);
 			GImageMiscOps.fillUniform(inputB,rand,0,10);
@@ -153,14 +153,14 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 				ret[0][0] = inputSquare;
 			} else {
 				ret[0][0] = inputA;
-				ret[0][1] = inputA._createNew(height,width);
+				ret[0][1] = inputA.createNew(height,width);
 			}
 		} else if( name.equals("rotateCCW")) {
 			if( param.length == 1 ) {
 				ret[0][0] = inputSquare;
 			} else {
 				ret[0][0] = inputA;
-				ret[0][1] = inputA._createNew(height,width);
+				ret[0][1] = inputA.createNew(height,width);
 			}
 		} else {
 			throw new RuntimeException("Unknown function: "+name);
@@ -178,7 +178,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 		for( int i = 0; i < ret.length; i++ ) {
 			if( targetParam[i] instanceof ImageBase) {
 				ImageBase img = (ImageBase)targetParam[i];
-				ret[i] = ((ImageBase)targetParam[i])._createNew(img.width,img.height);
+				ret[i] = ((ImageBase)targetParam[i]).createNew(img.width,img.height);
 				((ImageBase)ret[i]).setTo((ImageBase)targetParam[i]);
 			} else if( targetParam[i] instanceof Random ) {
 				ret[i] = new Random(randomSeed);

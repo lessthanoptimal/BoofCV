@@ -50,7 +50,7 @@ public class ConvolutionTestHelper {
 
 		try {
 			ImageGray img = (ImageGray) imageType.newInstance();
-			return (ImageGray)img._createNew(width, height);
+			return (ImageGray)img.createNew(width, height);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
@@ -65,7 +65,7 @@ public class ConvolutionTestHelper {
 			Object o = input[i];
 			if (o instanceof ImageGray) {
 				ImageGray b = (ImageGray)o;
-				ImageGray img = (ImageGray)b._createNew(b.width, b.height);
+				ImageGray img = (ImageGray)b.createNew(b.width, b.height);
 				img.setTo((ImageGray) o);
 				output[i] = img;
 			} else {

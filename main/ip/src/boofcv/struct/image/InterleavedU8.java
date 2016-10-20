@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 	}
 
 	@Override
-	public InterleavedU8 _createNew(int imgWidth, int imgHeight) {
+	public InterleavedU8 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedU8();
 		return new InterleavedU8(imgWidth, imgHeight, numBands);

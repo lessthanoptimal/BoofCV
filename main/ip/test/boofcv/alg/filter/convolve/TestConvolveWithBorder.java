@@ -151,8 +151,8 @@ public class TestConvolveWithBorder extends CompareImageBorder {
 		int w = borderX0+borderX1;
 		int h = borderY0+borderY1;
 
-		ret[1] = inputImage._createNew(width+w,height+h);
-		ret[2] = ((ImageGray)targetParam[2])._createNew(width+w,height+h);
+		ret[1] = inputImage.createNew(width+w,height+h);
+		ret[2] = ((ImageGray)targetParam[2]).createNew(width+w,height+h);
 
 		fillTestImage(inputImage,(ImageGray)ret[1],kernel,m.getName());
 

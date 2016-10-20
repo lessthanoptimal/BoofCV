@@ -51,7 +51,7 @@ public class GrayU8 extends GrayI8<GrayU8> {
 	}
 
 	@Override
-	public GrayU8 _createNew(int imgWidth, int imgHeight) {
+	public GrayU8 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1) {
 			return new GrayU8();
 		}

@@ -55,7 +55,7 @@ public class WrapperMedianCornerIntensity<I extends ImageGray, D extends ImageGr
 		init(input.width,input.height);
 
 		if( medianImage == null ) {
-			medianImage = (I)input._createNew(input.width,input.height);
+			medianImage = (I)input.createNew(input.width,input.height);
 		} else {
 			medianImage.reshape(input.width,input.height);
 		}

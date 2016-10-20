@@ -165,7 +165,7 @@ public class TestImageGray {
 		}
 
 		@Override
-		public DummyImage _createNew(int imgWidth, int imgHeight) {
+		public DummyImage createNew(int imgWidth, int imgHeight) {
 			return new DummyImage(imgWidth,imgHeight);
 		}
 	}

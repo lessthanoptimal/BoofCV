@@ -162,7 +162,7 @@ public class TestConvolveDownNoBorderStandard {
 
 			ret[0] = targetParam[0];
 			ret[1] = input.clone();
-			ret[2] = output._createNew(input.width,input.height);
+			ret[2] = output.createNew(input.width,input.height);
 
 			if( ret.length == 4 ) {
 				ret[3] = DIV;

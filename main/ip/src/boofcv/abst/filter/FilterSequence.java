@@ -60,8 +60,8 @@ public class FilterSequence<Input extends ImageGray, Output extends ImageGray>
 
 	@Override
 	public void process(Input input, Output output) {
-		Output temp1 = (Output)output._createNew( output.width , output.height );
-		Output temp2 = (Output)output._createNew( output.width , output.height );
+		Output temp1 = (Output)output.createNew( output.width , output.height );
+		Output temp2 = (Output)output.createNew( output.width , output.height );
 
 		firstFilter.process(input,temp1);
 

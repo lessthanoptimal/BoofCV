@@ -98,7 +98,7 @@ public class ImagePyramidPanel<T extends ImageGray> extends ListDisplayPanel {
 		T l = pyramid.getLayer(0);
 		if( upscale == null ) {
 			interp = (InterpolatePixelS<T>) FactoryInterpolation.nearestNeighborPixelS(l.getClass());
-			upscale = (T)l._createNew(l.width,l.height);
+			upscale = (T)l.createNew(l.width,l.height);
 		} else {
 			upscale.reshape(l.width,l.height);
 		}

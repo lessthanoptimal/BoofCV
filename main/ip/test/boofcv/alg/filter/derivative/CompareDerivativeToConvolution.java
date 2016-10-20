@@ -103,7 +103,7 @@ public class CompareDerivativeToConvolution {
 		// declare and compute the validation results
 		ImageGray expectedOutput[] = new ImageGray[param.length-2];
 		for( int i = 0; i < expectedOutput.length; i++ ) {
-			expectedOutput[i] = (ImageGray)outputImages[i]._createNew(inputImage.width,inputImage.height);
+			expectedOutput[i] = (ImageGray)outputImages[i].createNew(inputImage.width,inputImage.height);
 			outputFilters[i].process(inputImage,expectedOutput[i]);
 		}
 

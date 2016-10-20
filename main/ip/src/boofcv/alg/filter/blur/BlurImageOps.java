@@ -239,7 +239,7 @@ public class BlurImageOps {
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
 		if( output == null )
-			output = input._createNew(input.width,input.height);
+			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
@@ -260,7 +260,7 @@ public class BlurImageOps {
 	Planar<T> median(Planar<T> input, Planar<T> output, int radius ) {
 
 		if( output == null )
-			output = input._createNew(input.width,input.height);
+			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
@@ -285,7 +285,7 @@ public class BlurImageOps {
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if( output == null )
-			output = input._createNew(input.width,input.height);
+			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
 			GBlurImageOps.gaussian(input.getBand(band),output.getBand(band),sigma,radius,storage);

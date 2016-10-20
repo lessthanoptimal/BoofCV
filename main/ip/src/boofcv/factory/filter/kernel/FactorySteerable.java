@@ -78,7 +78,7 @@ public class FactorySteerable {
 
 		// convert it into an image which can be rotated
 		ImageGray image = GKernelMath.convertToImage(kernel);
-		ImageGray imageRotated = (ImageGray)image._createNew(image.width,image.height);
+		ImageGray imageRotated = (ImageGray)image.createNew(image.width,image.height);
 
 		basis[0] = kernel;
 

@@ -79,7 +79,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 	 */
 	@Override
 	public T subimage(int x0, int y0, int x1, int y1, T subimage) {
-		T ret = _createNew(-1, -1);
+		T ret = createNew(-1, -1);
 		ret._setData(_getData());
 		ret.stride = Math.max(width * numBands, stride); // ok why is this done?!?!  Shouldn't it always be stride?
 		ret.width = x1 - x0;
@@ -100,7 +100,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved> extends Image
 		Object data = _getData();
 
 		if( Array.getLength(data) < width*height*numBands ) {
-			ImageInterleaved<?> a = _createNew(width,height);
+			ImageInterleaved<?> a = createNew(width,height);
 			_setData(a._getData());
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -182,7 +182,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param imgHeight height of the new image
 	 * @return new image
 	 */
-	public abstract T _createNew(int imgWidth, int imgHeight);
+	public abstract T createNew(int imgWidth, int imgHeight);
 
 	/**
 	 * Description of the image data structure
@@ -195,12 +195,12 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 
 	/**
 	 * Creates a new image of the same type which also has the same shape.  This is the same as calling
-	 * {@link #_createNew(int, int)} with this image's width and height.
+	 * {@link #createNew(int, int)} with this image's width and height.
 	 *
 	 * @return new image with the same shape as this.
 	 */
 	public T createSameShape() {
-		return _createNew(width,height);
+		return createNew(width,height);
 	}
 
 	/**

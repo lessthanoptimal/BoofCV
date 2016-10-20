@@ -221,7 +221,7 @@ public class Planar<T extends ImageGray> extends ImageMultiBand<Planar<T>>{
 	 * @return new image
 	 */
 	@Override
-	public Planar<T> _createNew(int imgWidth, int imgHeight) {
+	public Planar<T> createNew(int imgWidth, int imgHeight) {
 		return new Planar<>(type, imgWidth, imgHeight, bands.length);
 	}
 

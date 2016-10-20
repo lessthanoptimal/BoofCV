@@ -95,7 +95,7 @@ public class PyramidFloatGaussianScale< T extends ImageGray> extends PyramidFloa
 			throw new IllegalArgumentException("The original reference cannot be saved");
 
 		if( tempImage == null ) {
-			tempImage = (T)input._createNew(input.width,input.height);
+			tempImage = (T)input.createNew(input.width,input.height);
 		}
 
 		for( int i = 0; i < scale.length; i++ ) {

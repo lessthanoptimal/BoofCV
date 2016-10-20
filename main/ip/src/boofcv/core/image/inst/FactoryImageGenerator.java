@@ -57,7 +57,7 @@ public class FactoryImageGenerator {
 
 		@Override
 		public T createInstance(int width, int height) {
-			return (T)original._createNew(width,height);
+			return (T)original.createNew(width,height);
 		}
 
 		@Override

@@ -91,7 +91,7 @@ public class PyramidDiscreteSampleBlur<T extends ImageGray> extends PyramidDiscr
 
 		if( temp == null ) {
 			// declare it to be the latest image that it might need to be, resize below
-			temp = (T)input._createNew(1,1);
+			temp = (T)input.createNew(1,1);
 		}
 
 		if (scale[0] == 1) {

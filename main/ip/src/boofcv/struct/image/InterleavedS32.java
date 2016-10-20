@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,7 +124,7 @@ public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 	}
 
 	@Override
-	public InterleavedS32 _createNew(int imgWidth, int imgHeight) {
+	public InterleavedS32 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedS32();
 		return new InterleavedS32(imgWidth, imgHeight, numBands);

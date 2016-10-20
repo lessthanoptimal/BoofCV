@@ -97,7 +97,7 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	}
 
 	@Override
-	public GrayS64 _createNew(int imgWidth, int imgHeight) {
+	public GrayS64 createNew(int imgWidth, int imgHeight) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new GrayS64();
 		return new GrayS64(imgWidth, imgHeight);

@@ -216,7 +216,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray> {
 	public void maskDifferentiate() {
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		T template = (T)image._createNew(12,12);
+		T template = (T)image.createNew(12,12);
 		GImageMiscOps.fillUniform(template, rand, 0, 200);
 
 		int x = 10, y = 12;
@@ -226,7 +226,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray> {
 		float valueNoMask = fractionBest(alg.getIntensity(),x,y);
 		float averageNoMask = fractionAverage(alg.getIntensity(),x,y);
 
-		T mask = (T)image._createNew(12,12);
+		T mask = (T)image.createNew(12,12);
 		GImageMiscOps.fill(mask,0);
 		GImageMiscOps.fill(mask.subimage(3,3,9, 9, null),1);
 

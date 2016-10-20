@@ -75,7 +75,7 @@ public class WaveletVisualizeApp
 		setInputImage(input);
 		
 		image = ConvertBufferedImage.convertFromSingle(input, null, imageType);
-		imageInv = (T)image._createNew(image.width,image.height);
+		imageInv = (T)image.createNew(image.width,image.height);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

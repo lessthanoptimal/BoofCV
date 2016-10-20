@@ -57,7 +57,7 @@ public class InputSanityCheck {
 	 */
 	public static <T extends ImageGray> T checkDeclare(T input, T output) {
 		if (output == null) {
-			output = (T) input._createNew(input.width, input.height);
+			output = (T) input.createNew(input.width, input.height);
 		} else if (output.width != input.width || output.height != input.height)
 			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
 		return output;

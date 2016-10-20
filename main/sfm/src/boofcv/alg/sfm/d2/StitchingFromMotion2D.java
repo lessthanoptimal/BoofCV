@@ -133,8 +133,8 @@ public class StitchingFromMotion2D<I extends ImageBase, IT extends InvertibleTra
 	 */
 	public boolean process( I image ) {
 		if( stitchedImage == null ) {
-			stitchedImage = (I)image._createNew(widthStitch, heightStitch);
-			workImage = (I)image._createNew(widthStitch, heightStitch);
+			stitchedImage = (I)image.createNew(widthStitch, heightStitch);
+			workImage = (I)image.createNew(widthStitch, heightStitch);
 		}
 
 		if( motion.process(image) ) {

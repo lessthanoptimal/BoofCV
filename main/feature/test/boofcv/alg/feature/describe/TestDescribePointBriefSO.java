@@ -195,7 +195,7 @@ public class TestDescribePointBriefSO {
 	@Test
 	public void testManualCheck() {
 		GrayF32 input = createImage(width,height);
-		GrayF32 blurred = input._createNew(width, height);
+		GrayF32 blurred = input.createNew(width, height);
 		filterBlur.process(input,blurred);
 
 		GImageGray a = FactoryGImageGray.wrap(blurred);

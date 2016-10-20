@@ -80,7 +80,7 @@ public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions 
 
 		for( int i = 0; i < ret.length; i++ ) {
 			if( targetParam[i] instanceof ImageBase ) {
-				ret[i] = ((ImageBase)targetParam[i])._createNew(width,height);
+				ret[i] = ((ImageBase)targetParam[i]).createNew(width,height);
 				((ImageBase)ret[i]).setTo((ImageBase)targetParam[i]);
 			} else {
 				ret[i] = targetParam[i];

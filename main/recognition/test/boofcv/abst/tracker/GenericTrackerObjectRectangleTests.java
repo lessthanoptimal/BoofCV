@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public abstract class GenericTrackerObjectRectangleTests<T extends ImageBase> {
 		TrackerObjectQuad<T> tracker = create(imageType);
 		render(1,0,0);
 
-		T smaller = (T)input._createNew(width/2,height/2);
+		T smaller = (T)input.createNew(width/2,height/2);
 
 		new FDistort(input,smaller).scaleExt().apply();
 
