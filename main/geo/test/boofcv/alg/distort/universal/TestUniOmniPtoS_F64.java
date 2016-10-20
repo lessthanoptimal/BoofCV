@@ -66,11 +66,11 @@ public class TestUniOmniPtoS_F64 {
 	private void back_and_forth( double mirror ) {
 		CameraUniversalOmni model = createModel(mirror);
 
-		UniOmniPtoS_F64 alg = new UniOmniPtoS_F64();
-		alg.setModel(model);
+		UniOmniPtoS_F64 pixelToUnit = new UniOmniPtoS_F64();
+		pixelToUnit.setModel(model);
 
-		UniOmniStoP_F64 forward = new UniOmniStoP_F64();
-		forward.setModel(model);
+		UniOmniStoP_F64 unitToPixel = new UniOmniStoP_F64();
+		unitToPixel.setModel(model);
 
 		List<Point2D_F64> listPixels = new ArrayList<>();
 		listPixels.add( new Point2D_F64(320,240));
@@ -82,13 +82,13 @@ public class TestUniOmniPtoS_F64 {
 
 		for( Point2D_F64 pixel : listPixels ) {
 			Point3D_F64 circle = new Point3D_F64(10,10, 10);
-			alg.compute(pixel.x,pixel.y, circle);  // directly forward on unit sphere
+			pixelToUnit.compute(pixel.x,pixel.y, circle);  // directly forward on unit sphere
 
 			// it should be on the unit circle
 			assertEquals(1.0, circle.norm(), GrlConstants.DOUBLE_TEST_TOL);
 
 			Point2D_F64 found = new Point2D_F64();
-			forward.compute(circle.x, circle.y, circle.z, found);
+			unitToPixel.compute(circle.x, circle.y, circle.z, found);
 
 			assertEquals(pixel.x, found.x, 0.1);
 			assertEquals(pixel.y, found.y, 0.1);

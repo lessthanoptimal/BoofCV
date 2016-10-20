@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestWideToNarrowPtoP_F32 {
+public class TestNarrowToWidePtoP_F32 {
 	@Test
 	public void stuff() {
 		fail("Implement");

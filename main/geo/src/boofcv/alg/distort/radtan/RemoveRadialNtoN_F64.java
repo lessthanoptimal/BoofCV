@@ -81,7 +81,7 @@ public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
 
 		double prevSum = 0;
 
-		for( int iter = 0; iter < 20; iter++ ) {
+		for( int iter = 0; iter < 500; iter++ ) {
 
 			// estimate the radial distance
 			double r2 = x*x + y*y;

@@ -32,7 +32,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class WideToNarrowPtoP_F32 implements Point2Transform2_F32 {
+public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 
 	// rotation matrix
 	DenseMatrix64F rotateWideToNarrow = CommonOps.identity(3,3);
