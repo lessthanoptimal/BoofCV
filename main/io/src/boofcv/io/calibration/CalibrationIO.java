@@ -20,6 +20,7 @@ package boofcv.io.calibration;
 
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.calib.StereoParameters;
 import georegression.struct.se.Se3_F64;
 import org.yaml.snakeyaml.DumperOptions;
@@ -39,6 +40,7 @@ import java.util.Map;
 public class CalibrationIO {
 	public static String MODEL_PINHOLE = "pinhole";
 	public static String MODEL_PINHOLE_RADIAL_TAN = "pinhole_radial_tangential";
+	public static String MODEL_OMNIDIRECTIONAL_UNIVERSAL = "omnidirectional_universal";
 	public static String MODEL_STEREO = "stereo_camera";
 
 	/**
@@ -61,15 +63,22 @@ public class CalibrationIO {
 
 		if( parameters instanceof CameraPinholeRadial) {
 			out.println("# Pinhole camera model with radial and tangential distortion");
-			out.println("# textual protobuf format");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
 			out.println();
-			putModelRadial((CameraPinholeRadial)parameters,data);
+			putModelRadial((CameraPinholeRadial) parameters, data);
+		} else if( parameters instanceof CameraUniversalOmni ) {
+			out.println("# Omnidirectional camera model with radial and tangential distortion");
+			out.println("# C. Mei, and P. Rives. \"Single view point omnidirectional camera calibration\n" +
+					" from planar grids.\"  ICRA 2007");
+			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
+			out.println("# mirror_offset = offset mirror along z-axis in unit circle");
+			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
+			out.println();
+			putModelUniversalOmni((CameraUniversalOmni) parameters, data);
 		} else {
 
 			out.println("# Pinhole camera model");
-			out.println("# textual protobuf format");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println();
 			putModelPinhole(parameters,data);
@@ -190,6 +199,28 @@ public class CalibrationIO {
 				parameters.t2 = (double) distortion.get("t2");
 
 			return (T) parameters;
+		} else if( model.equals(MODEL_OMNIDIRECTIONAL_UNIVERSAL) ) {
+			CameraUniversalOmni parameters = new CameraUniversalOmni(0);
+
+			loadPinhole((Map<String, Object>) data.get("pinhole"), parameters);
+			parameters.mirrorOffset = (double)data.get("mirror_offset");
+
+			Map<String, Object> distortion = (Map<String, Object>) data.get("radial_tangential");
+			if( distortion.containsKey("radial") ) {
+				List<Double> list = (List<Double>) distortion.get("radial");
+				if( list != null ) {
+					parameters.radial = new double[list.size()];
+					for (int i = 0; i < list.size(); i++) {
+						parameters.radial[i] = list.get(i);
+					}
+				}
+			}
+			if( distortion.containsKey("t1"))
+				parameters.t1 = (double) distortion.get("t1");
+			if( distortion.containsKey("t2"))
+				parameters.t2 = (double) distortion.get("t2");
+			return (T)parameters;
+
 		} else if( model.equals(MODEL_STEREO) ) {
 			StereoParameters parameters = new StereoParameters();
 			parameters.left = load((Map<String, Object>)data.get("left"));
@@ -221,6 +252,25 @@ public class CalibrationIO {
 		return map;
 	}
 
+	private static Map<String,Object> putModelUniversalOmni( CameraUniversalOmni parameters , Map<String,Object> map ) {
+		if( map == null )
+			map = new HashMap<>();
+
+		map.put("model",MODEL_OMNIDIRECTIONAL_UNIVERSAL);
+		map.put("pinhole", putParamsPinhole(parameters));
+		map.put("mirror_offset",parameters.mirrorOffset);
+
+		Map<String,Object> mapDistort = new HashMap<>();
+
+		if( parameters.radial != null )
+			mapDistort.put("radial",parameters.radial);
+		mapDistort.put("t1",parameters.t1);
+		mapDistort.put("t2",parameters.t2);
+
+		map.put("radial_tangential", mapDistort);
+
+		return map;
+	}
 
 	private static Map<String,Object> putParamsPinhole(CameraPinhole parameters  ) {
 		Map<String,Object> map = new HashMap<>();
