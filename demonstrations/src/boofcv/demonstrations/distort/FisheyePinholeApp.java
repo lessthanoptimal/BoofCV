@@ -66,6 +66,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO Show which calibration file is being used
+	// TODO when a file is opened look for a calibration file
 public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase<T>
 	implements PinholePanel.Listener
 {

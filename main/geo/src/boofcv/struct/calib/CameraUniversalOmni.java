@@ -117,4 +117,36 @@ public class CameraUniversalOmni extends CameraPinhole {
 		this.t1 = original.t1;
 		this.t2 = original.t2;
 	}
+
+	public double[] getRadial() {
+		return radial;
+	}
+
+	public void setRadial(double[] radial) {
+		this.radial = radial;
+	}
+
+	public double getT1() {
+		return t1;
+	}
+
+	public void setT1(double t1) {
+		this.t1 = t1;
+	}
+
+	public double getT2() {
+		return t2;
+	}
+
+	public void setT2(double t2) {
+		this.t2 = t2;
+	}
+
+	public double getMirrorOffset() {
+		return mirrorOffset;
+	}
+
+	public void setMirrorOffset(double mirrorOffset) {
+		this.mirrorOffset = mirrorOffset;
+	}
 }

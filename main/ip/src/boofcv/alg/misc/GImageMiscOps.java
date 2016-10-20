@@ -378,7 +378,7 @@ public class GImageMiscOps {
 	 * @param min Minimum value of the distribution.  Inclusive.
 	 * @param max Maximum value of the distribution.  Inclusive.
 	 */
-	public static void fillUniform( ImageBase input , Random rand , double min , double max  ) {
+	public static void fillUniform( ImageBase input , Random rand , double min , double max ) {
 		if( input instanceof ImageGray) {
 			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
 				ImageMiscOps.fillUniform((GrayI8) input, rand, (int) min, ((int) max) - 1);
