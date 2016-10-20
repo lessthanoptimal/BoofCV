@@ -69,7 +69,7 @@ public class CalibrationIO {
 			putModelRadial((CameraPinholeRadial) parameters, data);
 		} else if( parameters instanceof CameraUniversalOmni ) {
 			out.println("# Omnidirectional camera model with radial and tangential distortion");
-			out.println("# C. Mei, and P. Rives. \"Single view point omnidirectional camera calibration\n" +
+			out.println("# C. Mei, and P. Rives. \"Single view point omnidirectional camera calibration" +
 					" from planar grids.\"  ICRA 2007");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println("# mirror_offset = offset mirror along z-axis in unit circle");
