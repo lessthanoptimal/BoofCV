@@ -39,8 +39,10 @@ public class TestUniOmniPtoS_F32 {
 	 */
 	@Test
 	public void centerIsCenter() {
-		centerIsCenter(1.0f); // 1.0f is handled as a special case
+		centerIsCenter(1.0f);
 		centerIsCenter(0.5f);
+		centerIsCenter(3.5f);
+
 	}
 
 	private void centerIsCenter( float mirror ) {
@@ -59,18 +61,19 @@ public class TestUniOmniPtoS_F32 {
 
 	@Test
 	public void back_and_forth() {
-		back_and_forth(1.0f); // 1.0f is handled as a special case
+		back_and_forth(1.0f);
 		back_and_forth(0.5f);
+		back_and_forth(3.5f);
 	}
 
 	private void back_and_forth( float mirror ) {
 		CameraUniversalOmni model = createModel(mirror);
 
-		UniOmniPtoS_F32 alg = new UniOmniPtoS_F32();
-		alg.setModel(model);
+		UniOmniPtoS_F32 pixelToUnit = new UniOmniPtoS_F32();
+		pixelToUnit.setModel(model);
 
-		UniOmniStoP_F32 forward = new UniOmniStoP_F32();
-		forward.setModel(model);
+		UniOmniStoP_F32 unitToPixel = new UniOmniStoP_F32();
+		unitToPixel.setModel(model);
 
 		List<Point2D_F32> listPixels = new ArrayList<>();
 		listPixels.add( new Point2D_F32(320,240));
@@ -79,19 +82,20 @@ public class TestUniOmniPtoS_F32 {
 		listPixels.add( new Point2D_F32(280,240));
 		listPixels.add( new Point2D_F32(360,240));
 		listPixels.add( new Point2D_F32(280,240));
+		listPixels.add( new Point2D_F32(240,180));
 
 		for( Point2D_F32 pixel : listPixels ) {
 			Point3D_F32 circle = new Point3D_F32(10,10, 10);
-			alg.compute(pixel.x,pixel.y, circle);  // directly forward on unit sphere
+			pixelToUnit.compute(pixel.x,pixel.y, circle);  // directly forward on unit sphere
 
 			// it should be on the unit circle
 			assertEquals(1.0f, circle.norm(), GrlConstants.FLOAT_TEST_TOL);
 
 			Point2D_F32 found = new Point2D_F32();
-			forward.compute(circle.x, circle.y, circle.z, found);
+			unitToPixel.compute(circle.x, circle.y, circle.z, found);
 
-			assertEquals(pixel.x, found.x, 0.1f);
-			assertEquals(pixel.y, found.y, 0.1f);
+			assertEquals(pixel.x, found.x, GrlConstants.FLOAT_TEST_TOL_SQRT);
+			assertEquals(pixel.y, found.y, GrlConstants.FLOAT_TEST_TOL_SQRT);
 		}
 	}
 

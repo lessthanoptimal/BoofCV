@@ -44,7 +44,14 @@ public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 	// unit circle coordinate storage
 	Point3D_F32 unit = new Point3D_F32();
 
-	public void configure( LensDistortionWideFOV wide , LensDistortionNarrowFOV narrow ) {
+	public NarrowToWidePtoP_F32() {
+	}
+
+	public NarrowToWidePtoP_F32(LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide) {
+		configure(narrow, wide);
+	}
+
+	public void configure(LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide) {
 		narrowToNorm = narrow.undistort_F32(true,false);
 		unitToWide = wide.distortStoP_F32();
 	}
@@ -80,4 +87,5 @@ public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 
 		unitToWide.compute(unit.x,unit.y,unit.z,out);
 	}
+
 }

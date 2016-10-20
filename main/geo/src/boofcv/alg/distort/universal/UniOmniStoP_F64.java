@@ -66,6 +66,13 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		double t1 = distortion.t1;
 		double t2 = distortion.t2;
 
+		// apply mirror offset
+		z += mirrorOffset;
+
+		// compute normalized image coordinates
+		x /= z;
+		y /= z;
+
 		double r2 = x*x + y*y;
 		double ri2 = r2;
 
@@ -75,19 +82,12 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 			ri2 *= r2;
 		}
 
-		// apply mirror offset
-		z += mirrorOffset;
-
-		// compute normalized image coordinates
-		x /= z;
-		y /= z;
-
 		// compute distorted normalized image coordinates
-		x = x*( 1 + sum);
-		y = y*( 1 + sum);
+		x = x*( 1.0 + sum);
+		y = y*( 1.0 + sum);
 
-		x += 2*t1*x*y + t2*(r2 + 2*x*x);
-		y += t1*(r2 + 2*y*y) + 2*t2*x*y;
+		x += 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+		y += t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
 		// project into pixels
 		out.x = fx * x + skew * y + cx;

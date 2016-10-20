@@ -96,17 +96,30 @@ public class TestNarrowToWidePtoP_F64 {
 		Point3D_F64 vA = new Point3D_F64();
 		Point3D_F64 vB = new Point3D_F64();
 
+		// Compute the horizontal FOV
 		alg.compute(0,250,foundA);
-		alg.compute(499,250,foundB);
+		alg.compute(500,250,foundB);
 
 		Point2Transform3_F64 wideToSphere = createModelWide().undistortPtoS_F64();
 		wideToSphere.compute(foundA.x,foundA.y,vA);
 		wideToSphere.compute(foundB.x,foundB.y,vB);
 
-		double angle = UtilVector3D_F64.acute(new Vector3D_F64(vA),new Vector3D_F64(vB));
-		double expected = 2.0*Math.atan(250.0/400.0);
+		double found = UtilVector3D_F64.acute(new Vector3D_F64(vA),new Vector3D_F64(vB));
+		double expected = 2.0 * Math.atan(250.0/400.0);
 
-		assertEquals(expected,angle,0.01);
+		assertEquals(expected,found,0.01);
+
+		// Compute the vertical FOV
+		alg.compute(250,0,foundA);
+		alg.compute(250,500,foundB);
+
+		wideToSphere.compute(foundA.x,foundA.y,vA);
+		wideToSphere.compute(foundB.x,foundB.y,vB);
+
+		found = UtilVector3D_F64.acute(new Vector3D_F64(vA),new Vector3D_F64(vB));
+		expected = 2.0 * Math.atan(250.0/400.0);
+
+		assertEquals(expected,found,0.001);
 	}
 
 	public static NarrowToWidePtoP_F64 createAlg() {

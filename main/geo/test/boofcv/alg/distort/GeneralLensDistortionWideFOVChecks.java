@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GeneralLensDistortionWideFOVChecks {
 	protected float pixel_tol_F32 = 1e-1f;
-	protected double pixel_tol_F64 = 1e-1;
+	protected double pixel_tol_F64 = 1e-2;
 
 	public abstract LensDistortionWideFOV create();
 
@@ -71,8 +71,8 @@ public abstract class GeneralLensDistortionWideFOVChecks {
 		undistort.compute(240,260,middle);
 		distort.compute(middle.x,middle.y,middle.z,found);
 
-		assertEquals(240, found.x, pixel_tol_F32);
-		assertEquals(260, found.y, pixel_tol_F32);
+		assertEquals(240, found.x, pixel_tol_F64);
+		assertEquals(260, found.y, pixel_tol_F64);
 	}
 
 	/**

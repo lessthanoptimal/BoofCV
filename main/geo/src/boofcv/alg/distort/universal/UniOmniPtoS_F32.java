@@ -97,14 +97,12 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 		// S = (a*u, a*v, a - xi)  and ||S|| = 1
 		float a;
 		float xi = mirrorOffset;
-		if( mirrorOffset == 1.0f ) {
-			a = 2.0f/(u*u + v*v + 1.0f);
-		} else {
-			float c0 = u*u + v*v + 1.0f;
-			float c1 = -2.0f*xi;
-			float c2 = xi*xi - 1;
-			a = (-c1 + (float)Math.sqrt(c1*c1 - 4.0f*c0*c2))/(2.0f*c0);
-		}
+
+		float c0 = u*u + v*v + 1.0f;
+		float c1 = -2.0f*xi;
+		float c2 = xi*xi - 1;
+		a = (-c1 + (float)Math.sqrt(c1*c1 - 4.0f*c0*c2))/(2.0f*c0);
+
 		out.x = u*a;
 		out.y = v*a;
 		out.z = a - xi;

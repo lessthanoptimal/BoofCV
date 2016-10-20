@@ -97,14 +97,12 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		// S = (a*u, a*v, a - xi)  and ||S|| = 1
 		double a;
 		double xi = mirrorOffset;
-		if( mirrorOffset == 1.0 ) {
-			a = 2.0/(u*u + v*v + 1.0);
-		} else {
-			double c0 = u*u + v*v + 1.0;
-			double c1 = -2.0*xi;
-			double c2 = xi*xi - 1;
-			a = (-c1 + Math.sqrt(c1*c1 - 4.0*c0*c2))/(2.0*c0);
-		}
+
+		double c0 = u*u + v*v + 1.0;
+		double c1 = -2.0*xi;
+		double c2 = xi*xi - 1;
+		a = (-c1 + Math.sqrt(c1*c1 - 4.0*c0*c2))/(2.0*c0);
+
 		out.x = u*a;
 		out.y = v*a;
 		out.z = a - xi;

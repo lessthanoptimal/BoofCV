@@ -81,7 +81,7 @@ public class RemoveRadialNtoN_F32 implements Point2Transform2_F32 {
 
 		float prevSum = 0;
 
-		for( int iter = 0; iter < 20; iter++ ) {
+		for( int iter = 0; iter < 500; iter++ ) {
 
 			// estimate the radial distance
 			float r2 = x*x + y*y;

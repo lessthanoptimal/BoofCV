@@ -19,7 +19,6 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -45,8 +44,6 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	// unit circle coordinate storage
 	Point3D_F64 unit = new Point3D_F64();
 
-	Point2Transform3_F64 wideToUnit;
-
 	public NarrowToWidePtoP_F64() {
 	}
 
@@ -57,8 +54,6 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	public void configure(LensDistortionNarrowFOV narrow, LensDistortionWideFOV wide) {
 		narrowToNorm = narrow.undistort_F64(true,false);
 		unitToWide = wide.distortStoP_F64();
-
-		wideToUnit = wide.undistortPtoS_F64();
 	}
 
 	/**
@@ -90,16 +85,7 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 		unit.y /= n;
 		unit.z /= n;
 
-		System.out.println("norm = "+norm);
-		System.out.println("unit = "+unit);
-
 		unitToWide.compute(unit.x,unit.y,unit.z,out);
-		System.out.println("wide = "+out);
-
-		Point3D_F64 hack = new Point3D_F64();
-		wideToUnit.compute(out.x,out.y,hack);
-		System.out.println("hack = "+hack);
-
 	}
 
 }

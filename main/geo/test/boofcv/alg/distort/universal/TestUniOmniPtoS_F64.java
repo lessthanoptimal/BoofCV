@@ -39,8 +39,10 @@ public class TestUniOmniPtoS_F64 {
 	 */
 	@Test
 	public void centerIsCenter() {
-		centerIsCenter(1.0); // 1.0 is handled as a special case
+		centerIsCenter(1.0);
 		centerIsCenter(0.5);
+		centerIsCenter(3.5);
+
 	}
 
 	private void centerIsCenter( double mirror ) {
@@ -59,8 +61,9 @@ public class TestUniOmniPtoS_F64 {
 
 	@Test
 	public void back_and_forth() {
-		back_and_forth(1.0); // 1.0 is handled as a special case
+		back_and_forth(1.0);
 		back_and_forth(0.5);
+		back_and_forth(3.5);
 	}
 
 	private void back_and_forth( double mirror ) {
@@ -79,6 +82,7 @@ public class TestUniOmniPtoS_F64 {
 		listPixels.add( new Point2D_F64(280,240));
 		listPixels.add( new Point2D_F64(360,240));
 		listPixels.add( new Point2D_F64(280,240));
+		listPixels.add( new Point2D_F64(240,180));
 
 		for( Point2D_F64 pixel : listPixels ) {
 			Point3D_F64 circle = new Point3D_F64(10,10, 10);
@@ -90,8 +94,8 @@ public class TestUniOmniPtoS_F64 {
 			Point2D_F64 found = new Point2D_F64();
 			unitToPixel.compute(circle.x, circle.y, circle.z, found);
 
-			assertEquals(pixel.x, found.x, 0.1);
-			assertEquals(pixel.y, found.y, 0.1);
+			assertEquals(pixel.x, found.x, GrlConstants.DOUBLE_TEST_TOL_SQRT);
+			assertEquals(pixel.y, found.y, GrlConstants.DOUBLE_TEST_TOL_SQRT);
 		}
 	}
 
