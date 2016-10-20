@@ -135,7 +135,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			}
 		});
 
-		panelEqui.addMouseListener(new MouseAdapter() {
+		MouseAdapter mouseAdapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				Point2D_F32 latlon = new Point2D_F32();
@@ -167,8 +167,15 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 					}
 				}
 			}
-		});
 
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				mouseClicked(e);
+			}
+		};
+
+		panelEqui.addMouseListener(mouseAdapter);
+		panelEqui.addMouseMotionListener(mouseAdapter);
 
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
