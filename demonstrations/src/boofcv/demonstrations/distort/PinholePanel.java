@@ -66,6 +66,16 @@ public class PinholePanel extends StandardAlgConfigPanel
 		addLabeled(selectFOV,    "Field-of-View: ", this);
 	}
 
+	public void addToFOV( int degrees ) {
+		if( SwingUtilities.isEventDispatchThread() ) {
+			double value = fov + degrees;
+			value = Math.max(5,value);
+			value = Math.min(175,value);
+			selectFOV.setValue(value);
+		} else
+			throw new RuntimeException("Invoke in GUI thread!");
+	}
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if( selectWidth == e.getSource() ) {

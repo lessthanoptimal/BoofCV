@@ -34,6 +34,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
+import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
@@ -55,7 +56,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -90,6 +93,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 	CameraPinhole cameraModel = new CameraPinhole();
 
+	JSplitPane imageView;
 	ImagePanel panelPinhole = new ImagePanel();
 	OmniPanel panelFisheye = new OmniPanel();
 
@@ -100,11 +104,11 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	public FisheyePinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-		CameraUniversalOmni fisheyeModel = CalibrationIO.load("fisheye.yaml");
-		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
+//		CameraUniversalOmni fisheyeModel = CalibrationIO.load("fisheye.yaml");
+//		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
+//		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
 
 		updateIntrinsic();
-		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
@@ -117,12 +121,22 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
 		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
 		panelPinhole.setBufferedImage(buffFisheye);
+		final PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
 
-		panelFisheye.setScaling(ScaleOptions.DOWN);
-		panelFisheye.addMouseListener(new MouseAdapter() {
+		MouseAdapter adapter = new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
+				changeFocus(e);
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+
+				changeFocus(e);
+			}
+
+			private void changeFocus(MouseEvent e) {
 				double scale = panelFisheye.scale;
 
 				double omniX = e.getX()/scale;
@@ -152,20 +166,42 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 					}
 				}
 			}
-		});
 
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int notches = e.getWheelRotation();
+				controlPinhole.addToFOV(notches*2);
+			}
+		};
+
+		panelFisheye.setScaling(ScaleOptions.DOWN);
+		panelFisheye.addMouseListener(adapter);
+		panelFisheye.addMouseMotionListener(adapter);
+		panelFisheye.addMouseWheelListener(adapter);
 
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
 
 		JPanel controlPanel = new JPanel();
 		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
-		PinholePanel controlPinhole = new PinholePanel(camWidth,camHeight,hfov,this);
 		controlPanel.add( controlPinhole );
 
+		imageView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		imageView.setTopComponent(panelPinhole);
+		imageView.setBottomComponent(panelFisheye);
+
 		add(controlPanel, BorderLayout.WEST );
-		add(panelPinhole, BorderLayout.CENTER);
-		add(panelFisheye, BorderLayout.SOUTH);
+		add(imageView, BorderLayout.CENTER);
+	}
+
+	@Override
+	public void openFile(File file) {
+		File intrinsicFile = new File( file.getParent() , "fisheye.yaml");
+		CameraUniversalOmni fisheyeModel = CalibrationIO.load(intrinsicFile);
+		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
+		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
+
+		super.openFile(file);
 	}
 
 	@Override
@@ -174,7 +210,8 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 			// create a copy of the input image for output purposes
 			if (buffFisheye.getWidth() != buffered.getWidth() || buffFisheye.getHeight() != buffered.getHeight()) {
 				buffFisheye = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
-				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth()/2, buffered.getHeight()/2));
+
+				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
 				panelFisheye.setBufferedImageSafe(buffFisheye);
 
 				distortImage.setModel(new PointToPixelTransform_F32(distorter));
@@ -228,29 +265,44 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 			distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
 			distortImage.setModel(new PointToPixelTransform_F32(distorter));
 
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					if( shapeChanged ) {
+						panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
+						panelPinhole.setMinimumSize(new Dimension(camWidth, camHeight));
+						panelPinhole.setMaximumSize(new Dimension(camWidth, camHeight));
+						imageView.setDividerLocation(-1);
+					}
+				}
+			});
+
 			if( inputMethod == InputMethod.IMAGE ) {
 				rerenderPinhole();
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if( shapeChanged ) {
-					panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
-				}
-			}
-		});
+
 	}
 
 	/**
 	 * Draws a circle around the current view's center
 	 */
 	private class OmniPanel extends ImagePanel {
-		Point2D_F32 pixelOmni = new Point2D_F32();
+		int pointsPerEdge = 8;
+		Point2D_F32 corners[] = new Point2D_F32[pointsPerEdge*4];
+		Point2D_F32 center = new Point2D_F32();
+
 		BasicStroke stroke0 = new BasicStroke(3);
 		BasicStroke stroke1 = new BasicStroke(6);
+		Line2D.Double line0 = new Line2D.Double();
 		Ellipse2D.Double circle = new Ellipse2D.Double();
+
+		public OmniPanel() {
+			for (int i = 0; i < corners.length; i++) {
+				corners[i] = new Point2D_F32();
+			}
+		}
 
 		@Override
 		public void paintComponent(Graphics g) {
@@ -260,18 +312,48 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			synchronized (imageLock) {
-				distorter.compute(camWidth/2, camHeight/2, pixelOmni);
+				distorter.compute(camWidth/2, camHeight/2, center);
+				renderLine(0       ,0         ,camWidth, 0,pointsPerEdge,0);
+				renderLine(camWidth,0         ,camWidth, camHeight,pointsPerEdge,pointsPerEdge);
+				renderLine(camWidth,camHeight ,0       , camHeight,pointsPerEdge,pointsPerEdge*2);
+				renderLine(0       ,camHeight ,0       , 0,pointsPerEdge,pointsPerEdge*3);
 			}
 
-			circle.setFrame(pixelOmni.x*scale-10,pixelOmni.y*scale-10,20,20);
+			circle.setFrame(center.x*scale-5,center.y*scale-5,10,10);
 
 			g2.setStroke(stroke1);
 			g2.setColor(Color.BLACK);
+			for (int i = 0, j = corners.length-1; i < corners.length; j=i,i++) {
+				line0.setLine(corners[j].x*scale, corners[j].y*scale, corners[i].x*scale, corners[i].y*scale);
+				g2.draw(line0);
+			}
 			g2.draw(circle);
 
 			g2.setStroke(stroke0);
+			for (int i = 0; i < corners.length; i++) {
+				int j = (i+1)%corners.length;
+				if( i < pointsPerEdge)
+					g2.setColor(Color.BLUE);
+				else if( i < pointsPerEdge*2 )
+					g2.setColor(Color.GREEN);
+				else if( i < pointsPerEdge*3 )
+					g2.setColor(Color.cyan);
+				else
+					g2.setColor(Color.RED);
+				line0.setLine(corners[j].x*scale, corners[j].y*scale, corners[i].x*scale, corners[i].y*scale);
+				g2.draw(line0);
+			}
 			g2.setColor(Color.RED);
 			g2.draw(circle);
+		}
+
+		private void renderLine( double x0 , double y0 , double x1 , double y1 , int segments , int offset ) {
+			for (int i = 0; i < segments; i++) {
+				double x = (x1-x0)*i/segments + x0;
+				double y = (y1-y0)*i/segments + y0;
+
+				distorter.compute((float)x, (float)y, corners[i+offset]);
+			}
 		}
 	}
 
@@ -280,7 +362,10 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
 		List<PathLabel> examples = new ArrayList<>();
-		examples.add(new PathLabel("Test", "/home/pja/projects/accel_robotics/camodocal/split/back/theta_back_00243.png"));
+		examples.add(new PathLabel("Dining Room", UtilIO.pathExample("fisheye/theta_front/dining_room.jpg")));
+		examples.add(new PathLabel("Building Side", UtilIO.pathExample("fisheye/theta_back/building_side.jpg")));
+		examples.add(new PathLabel("Tree Fence", UtilIO.pathExample("fisheye/theta_back/tree_fence.jpg")));
+		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("fisheye/theta_front/half_dome.jpg")));
 
 		FisheyePinholeApp app = new FisheyePinholeApp(examples,type);
 
