@@ -48,12 +48,17 @@ public class VisualizeFiducial {
 		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, targetToCamera);
 		worldToPixel.transform(c,p);
 
+		drawLabel(p,label,g2);
+	}
+
+	public static void drawLabel( Point2D_F64 locationPixel , String label, Graphics2D g2)
+	{
 		// Draw the ID number approximately in the center
 		FontMetrics metrics = g2.getFontMetrics(font);
 		Rectangle2D r = metrics.getStringBounds(label,null);
 		g2.setColor(Color.ORANGE);
 		g2.setFont(font);
-		g2.drawString(label,(float)(p.x-r.getWidth()/2),(float)(p.y+r.getHeight()/2));
+		g2.drawString(label,(float)(locationPixel.x-r.getWidth()/2),(float)(locationPixel.y+r.getHeight()/2));
 	}
 
 	/**

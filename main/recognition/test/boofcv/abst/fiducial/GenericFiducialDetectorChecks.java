@@ -326,6 +326,16 @@ public abstract class GenericFiducialDetectorChecks {
 	}
 
 	/**
+	 * Makes sure that if it hasn't been provided intrinsic it can't support pose
+	 */
+	@Test
+	public void supportsPoseWithNoIntrinsic() {
+		FiducialDetector detector = createDetector(types.get(0));
+
+		assertFalse( detector.isSupportedPose() );
+	}
+
+	/**
 	 * Make sure lens distortion is removed if it was set previously and then removed
 	 */
 	@Test

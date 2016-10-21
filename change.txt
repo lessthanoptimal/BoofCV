@@ -45,6 +45,7 @@ Version : 0.25
   * Added getIntrinsics()
   * Added getImageLocation()
   * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
+  * Fixed bug where if intrinsic was not set it would still claim it could estimate the target's pose
 
 - TODO dual fisheye to equirectangular image
 - TODO fisheye

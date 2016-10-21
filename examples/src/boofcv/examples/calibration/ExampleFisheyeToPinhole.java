@@ -53,6 +53,7 @@ import java.io.File;
  */
 public class ExampleFisheyeToPinhole {
 	public static void main(String[] args) {
+		// Path to image data and calibration data
 		String fisheyePath = UtilIO.pathExample("fisheye/theta_front/");
 
 		// load the fisheye camera parameters

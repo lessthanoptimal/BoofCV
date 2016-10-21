@@ -131,7 +131,7 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 
 	@Override
 	public boolean isSupportedPose() {
-		return true;
+		return intrinsic != null;
 	}
 
 	@Override

@@ -339,7 +339,7 @@ public abstract class BaseFiducialSquare {
 				out.print(" /" + getDisplayDef(pattern) + "\n" +
 						"{\n" +
 						"  /Times-Roman findfont\n" + "7 scalefont setfont b1 " + (fiducialTotalWidth - 10) +
-						" moveto (" + patternName + "   " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
+						" moveto (" + patternName + ",  width: " + fiducialWidthUnit + " " + unit.abbreviation + ") show\n" +
 						"} def\n");
 			}
 		}

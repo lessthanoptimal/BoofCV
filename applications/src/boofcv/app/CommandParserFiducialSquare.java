@@ -71,7 +71,7 @@ public class CommandParserFiducialSquare {
 		System.out.println("./application <optional flags> <fiducial width>  <"+nameOfPatterns+" 0> ... <"+nameOfPatterns+" N-1>");
 		System.out.println();
 		System.out.println("Optional Flags");
-		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is input file + ps");
+		System.out.println("-OutputFile=<name>    Specify name of output file.  Default is <name>.ps");
 		System.out.println("-Grid=fill            Automatically fill the paper with fiducials");
 		System.out.println("-Grid=<rows>,<cols>   Create a grid of fiducials with the specified number of rows and columns");
 		System.out.println("-WhiteBorder=<val>    Size of the white border around the fiducial.");

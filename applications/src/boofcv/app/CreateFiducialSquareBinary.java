@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 
 	@Override
 	protected String getPatternName(int num) {
-		return ""+numbers.get(num);
+		return "grid: "+gridWidth+", value: "+numbers.get(num);
 	}
 
 	@Override
