@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.fiducial.FiducialDetector3D;
+import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
@@ -30,7 +30,6 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.VideoProcessAppBase;
@@ -84,7 +83,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 
 	I gray;
 
-	FiducialDetector3D detector;
+	FiducialDetector detector;
 
 	CameraPinholeRadial intrinsic;
 
@@ -291,15 +290,15 @@ public class FiducialTrackerApp<I extends ImageGray>
 			}
 
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial3D.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageClass);
+			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
-			detector = FactoryFiducial3D.calibSquareGrid(new ConfigSquareGrid(4, 3, 0.03, 0.03), imageClass);
+			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(4, 3, 0.03, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {
 			File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
 			try {
 				ConfigSquareGridBinary config =
 						ConfigSquareGridBinary.parseSimple(new BufferedReader(new FileReader(configFile)));
-				detector = FactoryFiducial3D.calibSquareGridBinary(config, imageClass);
+				detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

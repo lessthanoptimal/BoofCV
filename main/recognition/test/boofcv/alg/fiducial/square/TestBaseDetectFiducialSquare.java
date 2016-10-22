@@ -93,7 +93,7 @@ public class TestBaseDetectFiducialSquare {
 
 		assertEquals(1,dummy.detected.size());
 
-		Quadrilateral_F64 found = dummy.getFound().get(0).locationPixels;
+		Quadrilateral_F64 found = dummy.getFound().get(0).undistortedPixels;
 //		System.out.println("found "+found);
 //		System.out.println("where "+where);
 		checkMatch(where, found.a, tol);
@@ -166,7 +166,7 @@ public class TestBaseDetectFiducialSquare {
 		// see if the returned corners
 		Point2D_F64 expectedDist = new Point2D_F64();
 		for (int j = 0; j < 4; j++) {
-			Point2D_F64 f = ff.locationPixels.get(j);
+			Point2D_F64 f = ff.undistortedPixels.get(j);
 			Point2D_F64 e = expected.get((j + 1) % 4);
 			undistTodist.compute(e.x, e.y, expectedDist);
 			assertTrue(f.distance(expectedDist) <= 0.4 );
@@ -224,7 +224,7 @@ public class TestBaseDetectFiducialSquare {
 			for (int j = 0; j < 4; j++) {
 				int index = j - i;
 				if (index < 0) index = 4 + index;
-				Point2D_F64 f = ff.locationPixels.get(index);
+				Point2D_F64 f = ff.undistortedPixels.get(index);
 				Point2D_F64 e = expected.get((j + 1) % 4);
 				assertTrue(f.distance(e) <= 1e-8);
 			}

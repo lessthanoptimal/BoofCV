@@ -21,7 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.FactoryFiducial3D;
+import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.io.UtilIO;
@@ -35,12 +35,11 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 /**
  * @author Peter Abeles
  */
-public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetector3DChecks {
+public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 
 	String directory = UtilIO.pathExample("fiducial/binary/");
@@ -54,13 +53,13 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	@Override
 	public ImageBase loadImage(ImageType imageType) {
 
-		BufferedImage out = UtilImageIO.loadImage(directory,"image0000.jpg");
+		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("test_square_binary.jpg"));
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
-		CameraPinholeRadial model = CalibrationIO.load(new File(directory,"intrinsic.yaml"));
+		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic.yaml"));
 		if( !distorted ) {
 			model.radial = null;
 			model.t1 = model.t2 = 0;
@@ -69,8 +68,8 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	}
 
 	@Override
-	public FiducialDetector3D createDetector3D(ImageType imageType) {
-		return FactoryFiducial3D.squareBinary(new ConfigFiducialBinary(0.1),
+	public FiducialDetector createDetector(ImageType imageType) {
+		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
 				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6),
 				imageType.getImageClass());
 	}

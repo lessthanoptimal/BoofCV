@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,4 +69,9 @@ public class Point2D3D {
 	public void setLocation(Point3D_F64 location) {
 		this.location = location;
 	}
+
+	public Point2D3D copy() {
+		return new Point2D3D(observation.copy(),location.copy());
+	}
+
 }

@@ -331,7 +331,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
-		f.locationPixels.set(imageShape);
+		f.undistortedPixels.set(imageShape);
 	}
 
 	/**

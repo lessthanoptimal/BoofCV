@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -50,9 +50,7 @@ public class WorldToCameraToPixel {
 	 * @param worldToCamera transform from world to camera
 	 */
 	public void configure(CameraPinholeRadial intrinsic , Se3_F64 worldToCamera ) {
-		this.worldToCamera = worldToCamera;
-
-		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+		configure( new LensDistortionRadialTangential(intrinsic), worldToCamera);
 	}
 
 	/**

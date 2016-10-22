@@ -35,12 +35,11 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 /**
  * @author Peter Abeles
  */
-public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector3DChecks {
+public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 	String directory = UtilIO.pathExample("fiducial/image/examples/");
 
@@ -53,13 +52,13 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 	@Override
 	public ImageBase loadImage(ImageType imageType)
 	{
-		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("image00.jpg"));
+		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("test_square_image.jpg"));
 		return ConvertBufferedImage.convertFrom(out,true,imageType);
 	}
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
-		CameraPinholeRadial model = CalibrationIO.load(new File(directory,"intrinsic.yaml"));
+		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic.yaml"));
 		if( !distorted ) {
 			model.radial = null;
 			model.t1 = model.t2 = 0;
@@ -68,7 +67,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 	}
 
 	@Override
-	public FiducialDetector3D createDetector3D(ImageType imageType) {
+	public FiducialDetector createDetector(ImageType imageType) {
 		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImage (
 				new ConfigFiducialImage(),
 				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 6),

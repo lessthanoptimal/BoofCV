@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,6 @@ package boofcv.abst.fiducial;
 /**
  * @author Peter Abeles
  */
-public class TestBaseSquare_FiducialDetector {
+public class TestSquareBase_to_FiducialDetector {
 	// intentionally left blank since it's functionality is tested elsewhere
 }

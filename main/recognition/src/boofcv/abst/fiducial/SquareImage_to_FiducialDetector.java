@@ -29,7 +29,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class SquareImage_to_FiducialDetector<T extends ImageGray>
-	extends BaseSquare_FiducialDetector3D<T>
+	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareImage<T>>
 {
 	DetectFiducialSquareImage<T> alg;
 

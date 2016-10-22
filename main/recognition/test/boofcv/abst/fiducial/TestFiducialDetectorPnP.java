@@ -18,26 +18,16 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
-import boofcv.struct.image.ImageGray;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
- *
  * @author Peter Abeles
  */
-public class SquareBinary_to_FiducialDetector<T extends ImageGray>
-	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareBinary<T>>
-{
-	private double targetWidth;
-
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> detector, double targetWidth) {
-		super(detector);
-		this.targetWidth = targetWidth;
-	}
-
-	@Override
-	public double getWidth(int which) {
-		return targetWidth;
+public class TestFiducialDetectorPnP {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }

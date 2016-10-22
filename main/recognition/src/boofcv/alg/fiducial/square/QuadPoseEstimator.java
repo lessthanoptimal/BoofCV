@@ -68,7 +68,7 @@ public class QuadPoseEstimator {
 	private Estimate1ofPnP epnp = FactoryMultiView.computePnP_1(EnumPNP.EPNP,50,0);
 
 	// transforms from distorted pixel observation normalized image coordinates
-	private Point2Transform2_F64 distortedToUndistorted;
+	private Point2Transform2_F64 normToUndistorted;
 	private Point2Transform2_F64 pixelToNorm;
 	private Point2Transform2_F64 normToPixel;
 
@@ -96,7 +96,7 @@ public class QuadPoseEstimator {
 
 	// predeclared internal work space.  Minimizing new memory
 	CameraPinholeRadial intrinsicUndist = new CameraPinholeRadial();
-	Quadrilateral_F64 undistortedCorners = new Quadrilateral_F64();
+	Quadrilateral_F64 pixelCorners = new Quadrilateral_F64();
 	Quadrilateral_F64 enlargedCorners = new Quadrilateral_F64();
 	Se3_F64 foundEnlarged = new Se3_F64();
 	Se3_F64 foundRegular = new Se3_F64();
@@ -130,8 +130,6 @@ public class QuadPoseEstimator {
 	 * @param distortion Intrinsic camera parameters
 	 */
 	public void setLensDistoriton(LensDistortionNarrowFOV distortion ) {
-		distortedToUndistorted = distortion.undistort_F64(true,true);
-
 		pixelToNorm = distortion.undistort_F64(true,false);
 		normToPixel = distortion.distort_F64(false, true);
 	}
@@ -152,20 +150,19 @@ public class QuadPoseEstimator {
 	 *
 	 * MUST call {@link #setFiducial} and {@link #setLensDistoriton} before calling this function.
 	 *
-	 * @param corners Observed corners of fiducials which are in the same order as their 2D counter parts
+	 * @param corners Observed corners of the fiducial in normalized image coordinates.
 	 * @return true if successful or false if not
 	 */
 	public boolean process( Quadrilateral_F64 corners ) {
 
 		// put quad into undistorted pixels so that weird stuff doesn't happen when it expands
+		normToPixel.compute(corners.a.x, corners.a.y, pixelCorners.a);
+		normToPixel.compute(corners.b.x, corners.b.y, pixelCorners.b);
+		normToPixel.compute(corners.c.x, corners.c.y, pixelCorners.c);
+		normToPixel.compute(corners.d.x, corners.d.y, pixelCorners.d);
 
-		distortedToUndistorted.compute(corners.a.x, corners.a.y, undistortedCorners.a);
-		distortedToUndistorted.compute(corners.b.x, corners.b.y, undistortedCorners.b);
-		distortedToUndistorted.compute(corners.c.x, corners.c.y, undistortedCorners.c);
-		distortedToUndistorted.compute(corners.d.x, corners.d.y, undistortedCorners.d);
-
-		double length0 =  undistortedCorners.getSideLength(0);
-		double length1 =  undistortedCorners.getSideLength(1);
+		double length0 =  pixelCorners.getSideLength(0);
+		double length1 =  pixelCorners.getSideLength(1);
 
 		double ratio = Math.max(length0,length1)/Math.min(length0,length1);
 
@@ -176,7 +173,7 @@ public class QuadPoseEstimator {
 		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
 			success = estimatePathological(outputFiducialToCamera);
 		} else {
-			success = estimate(undistortedCorners, outputFiducialToCamera);
+			success = estimate(pixelCorners, outputFiducialToCamera);
 		}
 
 		if( success ) {
@@ -202,13 +199,13 @@ public class QuadPoseEstimator {
 	 * @return true if successful false if not
 	 */
 	private boolean estimatePathological( Se3_F64 outputFiducialToCamera ) {
-		enlargedCorners.set(undistortedCorners);
+		enlargedCorners.set(pixelCorners);
 		enlarge(enlargedCorners, 4);
 
 		if( !estimate(enlargedCorners, foundEnlarged) )
 			return false;
 
-		if( !estimate(undistortedCorners, foundRegular) )
+		if( !estimate(pixelCorners, foundRegular) )
 			return false;
 
 		double errorRegular = computeErrors(foundRegular);
@@ -375,7 +372,12 @@ public class QuadPoseEstimator {
 		return outputError;
 	}
 
-	public List<Point2D3D> getPoints2D3D() {
-		return points;
+	public List<Point2D3D> createCopyPoints2D3D() {
+		List<Point2D3D> out = new ArrayList<>();
+
+		for (int i = 0; i < 4; i++) {
+			out.add( points.get(i).copy() );
+		}
+		return out;
 	}
 }

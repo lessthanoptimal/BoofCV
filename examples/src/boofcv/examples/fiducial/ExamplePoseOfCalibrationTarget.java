@@ -18,11 +18,11 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.CalibrationFiducialDetector3D;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
-import boofcv.factory.fiducial.FactoryFiducial3D;
+import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
@@ -77,8 +77,8 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
-		CalibrationFiducialDetector3D<GrayF32> detector =
-				FactoryFiducial3D.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
+		CalibrationFiducialDetector<GrayF32> detector =
+				FactoryFiducial.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
 
 		detector.setLensDistortion(lensDistortion);
 

@@ -42,7 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationFiducialDetector<T extends ImageGray>
-		implements FiducialDetector<T>
+		extends FiducialDetectorPnP<T>
 {
 	// detects the calibration target
 	private CalibrationDetector detector;
@@ -175,6 +175,11 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	}
 
 	@Override
+	public String getMessage(int which) {
+		return null;
+	}
+
+	@Override
 	public ImageType<T> getInputType() {
 		return type;
 	}
@@ -191,7 +196,29 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		return points2D3D;
 	}
 
-	public double getWidth() {
+	@Override
+	public double getWidth(int which) {
 		return width;
+	}
+
+	@Override
+	public boolean hasUniqueID() {
+		return false;
+	}
+
+	@Override
+	public boolean hasMessage() {
+		return false;
+	}
+
+	@Override
+	protected List<PointIndex2D_F64> getDetectedControl(int which) {
+		CalibrationObservation view = getCalibDetector().getDetectedPoints();
+		return view.points;
+	}
+
+	@Override
+	protected List<Point2D3D> getControl3D(int which) {
+		return getPoints2D3D();
 	}
 }

@@ -30,6 +30,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
@@ -58,11 +59,10 @@ public class TestQuadPoseEstimator {
 		Quadrilateral_F64 quadPlane = new Quadrilateral_F64(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
 		Quadrilateral_F64 quadViewed = new Quadrilateral_F64();
 
-		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion,expectedW2C);
-		project(worldToPixel, quadPlane.a, quadViewed.a);
-		project(worldToPixel, quadPlane.b, quadViewed.b);
-		project(worldToPixel, quadPlane.c, quadViewed.c);
-		project(worldToPixel, quadPlane.d, quadViewed.d);
+		project(expectedW2C, quadPlane.a, quadViewed.a);
+		project(expectedW2C, quadPlane.b, quadViewed.b);
+		project(expectedW2C, quadPlane.c, quadViewed.c);
+		project(expectedW2C, quadPlane.d, quadViewed.d);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
 
@@ -76,8 +76,12 @@ public class TestQuadPoseEstimator {
 		assertTrue(MatrixFeatures.isIdentical(found.R, expectedW2C.R,1e-6));
 	}
 
-	private void project( WorldToCameraToPixel worldToPixel, Point2D_F64 p , Point2D_F64 v ) {
-		worldToPixel.transform(new Point3D_F64(p.x,p.y,0),v);
+	private void project( Se3_F64 worldToCamera, Point2D_F64 p , Point2D_F64 v ) {
+		Point3D_F64 a = new Point3D_F64(p.x,p.y,0);
+		Point3D_F64 b = new Point3D_F64();
+		SePointOps_F64.transform(worldToCamera,a,b);
+		v.x = b.x/b.z;
+		v.y = b.y/b.z;
 	}
 
 	@Test

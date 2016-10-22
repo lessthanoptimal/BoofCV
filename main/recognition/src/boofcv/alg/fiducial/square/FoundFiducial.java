@@ -36,7 +36,7 @@ public class FoundFiducial {
 	 *
 	 * <p>For the meaning of each corner see {@link BaseDetectFiducialSquare}. corner a = 0, b = 1, c = 2, d = 3</p>
 	 */
-	public Quadrilateral_F64 locationPixels = new Quadrilateral_F64();
+	public Quadrilateral_F64 undistortedPixels = new Quadrilateral_F64();
 
 }
 

@@ -48,8 +48,7 @@ public class TestDetectFiducialSquareGrid {
 		configBinary.gridWidth = 3;
 
 		BaseDetectFiducialSquare<GrayF32> detector =
-				FactoryFiducial.squareBinary(configBinary, ConfigThreshold.fixed(125),GrayF32.class).
-						getDetectorAlgorithm();
+				FactoryFiducial.squareBinary(configBinary, ConfigThreshold.fixed(125),GrayF32.class).getAlgorithm();
 		DetectFiducialSquareGrid<GrayF32> alg = new DetectFiducialSquareGrid<>(3,2,
 				new long[]{0,1,2,3,4,5},detector);
 

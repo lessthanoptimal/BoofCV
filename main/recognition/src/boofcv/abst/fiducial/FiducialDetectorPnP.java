@@ -26,7 +26,6 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -45,27 +44,29 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
-		implements FiducialDetector3D<T> {
+public abstract class FiducialDetectorPnP<T extends ImageBase>
+		implements FiducialDetector<T> {
 
-	protected FiducialDetector<T> detectorPixel;
 	private LensDistortionNarrowFOV lensDistortion;
 
 	// transform to remove lens distortion
 	private Point2Transform2_F64 pixelToNorm;
 
 	// 2D-3D pairs for just the detected points
-	List<Point2D3D> detectedList = new ArrayList<>();
+	private List<Point2D3D> detected2D3D = new ArrayList<>();
 	// list of the pixel observations for the most recently requested fiducial
-	List<PointIndex2D_F64> detectedPixels;
-	Point2D_F64 workPt = new Point2D_F64();
+	private List<PointIndex2D_F64> detectedPixels;
+	private Point2D_F64 workPt = new Point2D_F64();
+
+	// if a lens distortion model was set or not
+	boolean hasCameraModel = false;
 
 	// non-linear refinement of pose estimate
-	protected Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
-	protected RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-8,100);
+	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
+	private RefinePnP refinePnP = FactoryMultiView.refinePnP(1e-8,100);
 
 	// when computing the pose, this is the initial estimate before non-linear refinement
-	protected Se3_F64 initialEstimate = new Se3_F64();
+	private Se3_F64 initialEstimate = new Se3_F64();
 
 	// max found location and orientation error when computing stability
 	private double maxLocation;
@@ -77,35 +78,6 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 	private Se3_F64 referenceCameraToTarget = new Se3_F64();
 	private Se3_F64 difference = new Se3_F64();
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
-
-	public FiducialDetectorToDetector3D(FiducialDetector<T> detectorPixel) {
-		this.detectorPixel = detectorPixel;
-	}
-
-	@Override
-	public void detect(T input) {
-		detectorPixel.detect(input);
-	}
-
-	@Override
-	public int totalFound() {
-		return detectorPixel.totalFound();
-	}
-
-	@Override
-	public void getImageLocation(int which, Point2D_F64 location) {
-		detectorPixel.getImageLocation(which, location);
-	}
-
-	@Override
-	public long getId(int which) {
-		return detectorPixel.getId(which);
-	}
-
-	@Override
-	public ImageType<T> getInputType() {
-		return detectorPixel.getInputType();
-	}
 
 	/**
 	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
@@ -119,9 +91,9 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 
 		maxOrientation = 0;
 		maxLocation = 0;
-		for (int i = 0; i < detectedList.size(); i++) {
+		for (int i = 0; i < detected2D3D.size(); i++) {
 
-			Point2D3D p23 = detectedList.get(i);
+			Point2D3D p23 = detected2D3D.get(i);
 			Point2D_F64 p = detectedPixels.get(i);
 			workPt.set(p);
 
@@ -148,7 +120,7 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 
 	private void computeDisturbance(Point2D_F64 pixel, Point2D3D p23) {
 		pixelToNorm.compute(pixel.x,pixel.y,p23.observation);
-		if( estimatePose(detectedList, targetToCameraSample) ) {
+		if( estimatePose(detected2D3D, targetToCameraSample) ) {
 			referenceCameraToTarget.concat(targetToCameraSample, difference);
 
 			double d = difference.getT().norm();
@@ -165,6 +137,7 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion) {
+		this.hasCameraModel = true;
 		this.lensDistortion = distortion;
 		this.pixelToNorm = lensDistortion.undistort_F64(true,false);
 	}
@@ -176,6 +149,9 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 
 	@Override
 	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
+		if( !hasCameraModel )
+			return false;
+
 		detectedPixels = getDetectedControl(which);
 		if( detectedPixels.size() < 3 )
 			return false;
@@ -183,21 +159,21 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 		// 2D-3D point associations
 		createDetectedList(which, detectedPixels);
 
-		return estimatePose(detectedList, fiducialToCamera);
+		return estimatePose(detected2D3D, fiducialToCamera);
 	}
 
 	/**
 	 * Create the list of observed points in 2D3D
 	 */
 	public void createDetectedList(int which, List<PointIndex2D_F64> pixels) {
-		detectedList.clear();
+		detected2D3D.clear();
 		List<Point2D3D> all = getControl3D(which);
 		for (int i = 0; i < pixels.size(); i++) {
 			PointIndex2D_F64 a = pixels.get(i);
 			Point2D3D b = all.get(i);
 
 			pixelToNorm.compute(a.x,a.y, b.observation);
-			detectedList.add( b );
+			detected2D3D.add( b );
 		}
 	}
 
@@ -222,5 +198,8 @@ public abstract class FiducialDetectorToDetector3D<T extends ImageBase>
 	 */
 	protected abstract List<Point2D3D> getControl3D( int which );
 
-
+	@Override
+	public boolean is3D() {
+		return hasCameraModel;
+	}
 }

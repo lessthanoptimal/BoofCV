@@ -18,11 +18,11 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.FiducialDetector3D;
+import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.FactoryFiducial3D;
+import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -62,7 +62,7 @@ public class ExampleFiducialBinary {
 		GrayF32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(GrayF32.class));
 
 		// Detect the fiducial
-		FiducialDetector3D<GrayF32> detector = FactoryFiducial3D.squareBinary(
+		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
 				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
 //				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
 
