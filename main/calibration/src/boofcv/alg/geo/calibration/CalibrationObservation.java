@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
@@ -33,24 +34,24 @@ import java.util.List;
  */
 public class CalibrationObservation {
 	/**
-	 * List of observations
+	 * List of pixel observations and the index of the control point
 	 */
-	public List<Point> points = new ArrayList<>();
+	public List<PointIndex2D_F64> points = new ArrayList<>();
 
 	public void setTo( CalibrationObservation obs ) {
 		reset();
 		for (int i = 0; i < obs.size(); i++) {
-			Point p = obs.points.get(i);
-			points.add( new Point(p.pixel.copy(),p.index));
+			PointIndex2D_F64 p = obs.points.get(i);
+			points.add( p.copy() );
 		}
 	}
 
-	public Point get( int index ) {
+	public PointIndex2D_F64 get( int index ) {
 		return points.get(index);
 	}
 
 	public void add( Point2D_F64 observation , int which ) {
-		points.add(new Point(observation, which));
+		points.add(new PointIndex2D_F64(observation, which));
 	}
 
 	public void reset() {
@@ -58,9 +59,9 @@ public class CalibrationObservation {
 	}
 
 	public void sort() {
-		Collections.sort(points, new Comparator<Point>() {
+		Collections.sort(points, new Comparator<PointIndex2D_F64>() {
 			@Override
-			public int compare(Point o1, Point o2) {
+			public int compare(PointIndex2D_F64 o1, PointIndex2D_F64 o2) {
 				if( o1.index < o2.index )
 					return -1;
 				else if( o1.index > o2.index )
@@ -75,26 +76,6 @@ public class CalibrationObservation {
 		return points.size();
 	}
 
-	public static class Point {
-		/**
-		 * Pixel observation of calibration point on the target
-		 */
-		public Point2D_F64 pixel = new Point2D_F64();
-		/**
-		 * Which specific calibration point the observation refers to.  These numbers refer to a point's index in the
-		 * "layout".  The order of indexes here will always be in increasing order.  For example, if calibration points
-		 * 5,7,2,4 are observed then the order will be 2,4,5,7.
-		 */
-		public int index;
-
-		public Point(Point2D_F64 pixel, int index) {
-			this.pixel.set(pixel);
-			this.index = index;
-		}
-
-		public Point() {
-		}
-	}
 
 	public CalibrationObservation copy() {
 		CalibrationObservation c = new CalibrationObservation();

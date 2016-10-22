@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -72,8 +73,8 @@ public interface CalibrationView {
 			sides.add( get(pointRows-1, 0, detections.points));
 		}
 
-		private Point2D_F64 get( int row , int col , List<CalibrationObservation.Point> detections ) {
-			return detections.get(row*pointCols+col).pixel;
+		private Point2D_F64 get( int row , int col , List<PointIndex2D_F64> detections ) {
+			return detections.get(row*pointCols+col);
 		}
 
 		@Override
@@ -105,8 +106,8 @@ public interface CalibrationView {
 			sides.add( get(pointRows-1, 0, detections.points));
 		}
 
-		private Point2D_F64 get( int row , int col , List<CalibrationObservation.Point> detections ) {
-			return detections.get(row*pointCols+col).pixel;
+		private Point2D_F64 get( int row , int col , List<PointIndex2D_F64> detections ) {
+			return detections.get(row*pointCols+col);
 		}
 
 		@Override

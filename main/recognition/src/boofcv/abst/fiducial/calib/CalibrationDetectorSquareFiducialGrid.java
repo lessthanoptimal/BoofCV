@@ -55,7 +55,7 @@ public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetecto
 	public CalibrationDetectorSquareFiducialGrid(ConfigSquareGridBinary config) {
 
 		DetectFiducialSquareBinary<GrayF32> fiducialDetector = FactoryFiducial.
-				squareBinary(config.configDetector, config.configThreshold, GrayF32.class).getAlgorithm();
+				squareBinary(config.configDetector, config.configThreshold, GrayF32.class).getDetectorAlgorithm();
 		detector = new DetectFiducialSquareGrid<>(config.numRows,config.numCols,config.ids,fiducialDetector);
 
 		numRows = config.numRows;

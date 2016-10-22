@@ -182,7 +182,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 				CalibrationObservation orig = solutions.get(i);
 				CalibrationObservation mod = new CalibrationObservation();
 				for (int j = 0; j < orig.size(); j++) {
-					Point2D_F64 p = orig.points.get(i).pixel.copy();
+					Point2D_F64 p = orig.points.get(i).copy();
 
 					o2d.compute(p.x, p.y, p);
 					mod.add(p, orig.get(j).index );
@@ -205,8 +205,8 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 					break;
 				}
 
-				Point2D_F64 f = found.get(i).pixel;
-				Point2D_F64 e = expected.get(i).pixel;
+				Point2D_F64 f = found.get(i);
+				Point2D_F64 e = expected.get(i);
 				if( f.distance(e) >= 3 ) {
 					matched = false;
 					break;

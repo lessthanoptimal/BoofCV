@@ -39,14 +39,9 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 
 	FiducialDetector<T> detector;
 	List<T> images = new ArrayList<>();
-	CameraPinholeRadial param;
 
 	public BenchmarkFiducialDetector(FiducialDetector<T> detector) {
 		this.detector = detector;
-	}
-
-	public void setParam(CameraPinholeRadial param) {
-		this.param = param;
 	}
 
 	public void addImage( String path ) {
@@ -57,7 +52,6 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 	}
 
 	public double benchmark( int numIterations ) {
-		detector.setIntrinsic(param);
 
 		long before = System.nanoTime();
 		for (int i = 0; i < numIterations; i++) {
@@ -77,7 +71,6 @@ public class BenchmarkFiducialDetector<T extends ImageGray> {
 //		intrinsic.t1 = intrinsic.t2 = 0;
 
 		BenchmarkFiducialDetector benchmark = new BenchmarkFiducialDetector(detector);
-		benchmark.setParam(intrinsic);
 		benchmark.addImage(directory + "image0000.jpg");
 		benchmark.addImage(directory + "image0001.jpg");
 		benchmark.addImage(directory + "image0002.jpg");

@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -52,6 +53,17 @@ public class WorldToCameraToPixel {
 		this.worldToCamera = worldToCamera;
 
 		normToPixel = LensDistortionOps.transformPoint(intrinsic).distort_F64(false,true);
+	}
+
+	/**
+	 * Specifies intrinsic camera parameters and  the transform from world to camera.
+	 * @param distortion camera parameters
+	 * @param worldToCamera transform from world to camera
+	 */
+	public void configure(LensDistortionNarrowFOV distortion , Se3_F64 worldToCamera ) {
+		this.worldToCamera = worldToCamera;
+
+		normToPixel = distortion.distort_F64(false,true);
 	}
 
 	/**

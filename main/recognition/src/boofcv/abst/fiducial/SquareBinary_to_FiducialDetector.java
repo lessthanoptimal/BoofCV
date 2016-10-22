@@ -18,33 +18,35 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageGray;
 
 /**
- * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector}
+ * Wrapper around {@link DetectFiducialSquareBinary} for {@link FiducialDetector3D}
  *
  * @author Peter Abeles
  */
 public class SquareBinary_to_FiducialDetector<T extends ImageGray>
-	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareBinary<T>>
+	extends BaseSquare_FiducialDetector3D<T>
 {
-	double targetWidth;
+	private double targetWidth;
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> alg, double targetWidth) {
-		super(alg);
-		this.targetWidth = targetWidth;
+	public SquareBinary_to_FiducialDetector(BaseDetectFiducialSquare<T> alg, double targetWidth) {
+		this(new BaseSquare_FiducialDetector(alg), targetWidth);
 	}
 
-	@Override
-	public void setIntrinsic(CameraPinholeRadial intrinsic) {
-		alg.setLengthSide(targetWidth);
-		super.setIntrinsic(intrinsic);
+	public SquareBinary_to_FiducialDetector(BaseSquare_FiducialDetector<T,?> detector, double targetWidth) {
+		super(detector);
+		this.targetWidth = targetWidth;
 	}
 
 	@Override
 	public double getWidth(int which) {
 		return targetWidth;
+	}
+
+	public <A extends BaseDetectFiducialSquare<T>>A getDetectorAlgorithm() {
+		return (A)getDetectorImage().getAlgorithm();
 	}
 }

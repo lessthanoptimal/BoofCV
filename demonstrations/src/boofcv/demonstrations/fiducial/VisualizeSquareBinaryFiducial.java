@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.core.image.border.BorderType;
@@ -68,7 +69,8 @@ public class VisualizeSquareBinaryFiducial {
 
 		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,GrayF32.class);
 		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
-		detector.configure(paramUndist,false);
+		detector.configure(new LensDistortionRadialTangential(paramUndist),
+				paramUndist.width, paramUndist.height, false);
 		detector.setLengthSide(0.1);
 
 		undistorter.apply(input,undistorted);
@@ -90,7 +92,7 @@ public class VisualizeSquareBinaryFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 		for (int i = 0; i < N; i++) {
-			VisualizeShapes.draw(fiducials.get(i).locationDist,g2);
+			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).locationPixels,3,g2);
 		}
 
 		ShowImages.showWindow(output,"Binary",true);

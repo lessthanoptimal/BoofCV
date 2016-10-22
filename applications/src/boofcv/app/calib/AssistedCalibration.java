@@ -24,6 +24,7 @@ import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -254,7 +255,7 @@ public class AssistedCalibration {
 			if( skewed ) {
 				g2.setColor(Color.BLUE);
 				for (int i = 0; i < points.size(); i++) {
-					Point2D_F64 p = points.points.get(i).pixel;
+					Point2D_F64 p = points.points.get(i);
 
 					ellipse.setFrame(p.x - r, p.y - r, w, w);
 					g2.draw(ellipse);
@@ -405,7 +406,7 @@ public class AssistedCalibration {
 		gui.setMessage(message);
 	}
 
-	private void renderCalibrationPoints(double stationaryTime, List<CalibrationObservation.Point> points) {
+	private void renderCalibrationPoints(double stationaryTime, List<PointIndex2D_F64> points) {
 		int shade = Math.min(255, (int) (255.0 * (stationaryTime / STILL_THRESHOLD)));
 		if( pictureTaken ) {
 			g2.setColor(new Color(0, shade, 0));
@@ -416,8 +417,8 @@ public class AssistedCalibration {
 		int r = 6;
 		int w = 2 * r + 1;
 		for (int i = 0; i < points.size(); i++) {
-			CalibrationObservation.Point p = points.get(i);
-			ellipse.setFrame(p.pixel.x - r, p.pixel.y - r, w, w);
+			PointIndex2D_F64 p = points.get(i);
+			ellipse.setFrame(p.x - r, p.y - r, w, w);
 			g2.fill(ellipse);
 		}
 	}

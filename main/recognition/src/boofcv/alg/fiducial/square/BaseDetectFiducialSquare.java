@@ -30,17 +30,16 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.*;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.homography.UtilHomography;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
@@ -99,15 +98,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	// the minimum fraction of border pixels which must be black for it to be considered a fiducial
 	private double minimumBorderBlackFraction;
 
-	// used to compute 3D pose of target
-	QuadPoseEstimator poseEstimator = new QuadPoseEstimator(1e-6,200);
-
-	// transform from undistorted to distorted image pixels
-	Point2Transform2_F64 pointUndistToDist;
-
-	// boolean indicating if camera intrinsic parameters
-	boolean wasIntrinsicSet = false;
-
 	// Storage for results of fiducial reading
 	private Result result = new Result();
 
@@ -155,11 +145,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 			pairsRemovePerspective.add(new AssociatedPair());
 		}
 
-		// add corner points in target frame.  Used to compute homography.  Target's center is at its origin
-		// see comment in class JavaDoc above.  Note that the target's length is one below.  The scale factor
-		// will be provided later one
-		poseEstimator.setFiducial(-0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5);
-
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
@@ -167,59 +152,39 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		removePerspective = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		// if no camera parameters is specified default to this
-		pointUndistToDist = new DoNothing2Transform2_F64();
 		removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
 	}
 
 	/**
 	 * Specifies the image's intrinsic parameters and target size
 	 *
-	 * @param intrinsic Intrinsic parameters for the distortion free input image
+	 * @param distortion Lens distortion
+	 * @param width Image width
+	 * @param height Image height
 	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%.  Ignored
 	 *              if no lens distortion
 	 */
-	public void configure(CameraPinholeRadial intrinsic , boolean cache ) {
-		wasIntrinsicSet = true;
+	public void configure(LensDistortionNarrowFOV distortion, int width , int height , boolean cache ) {
 		Point2Transform2_F32 pointSquareToInput;
-		if( intrinsic.isDistorted() ) {
+		Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true,true);
+		Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true,true);
+		PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+		PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-			CameraPinholeRadial intrinsicUndist = new CameraPinholeRadial();
-
-			// full view so that none of the pixels are discarded and to ensure that all pixels in the undistorted
-			// image are bounded by the the input image's shape
-
-			Point2Transform2_F32 pointDistToUndist = LensDistortionOps.
-					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, intrinsicUndist, false);
-			Point2Transform2_F32 pointUndistToDist = LensDistortionOps.
-					transform_F32(AdjustmentType.FULL_VIEW, intrinsic, null, true);
-			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
-
-			if( cache ) {
-				distToUndist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, distToUndist);
-				undistToDist = new PixelTransformCached_F32(intrinsic.width, intrinsic.height, undistToDist);
-			}
-
-			squareDetector.setLensDistortion(intrinsic.width,intrinsic.height,distToUndist,undistToDist);
-
-			pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography,pointUndistToDist);
-
-			this.pointUndistToDist = LensDistortionOps.transform_F64(AdjustmentType.FULL_VIEW, intrinsic, null, true);
-
-			intrinsic = intrinsicUndist;
-		} else {
-			pointSquareToInput = transformHomography;
-			pointUndistToDist = new DoNothing2Transform2_F64();
-			squareDetector.clearLensDistortion();
+		if( cache ) {
+			distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
+			undistToDist = new PixelTransformCached_F32(width, height, undistToDist);
 		}
 
-		poseEstimator.setIntrinsic(intrinsic);
+		squareDetector.setLensDistortion(width, height,distToUndist,undistToDist);
+
+		pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography,pointUndistToDist);
 
 		// provide intrinsic camera parameters
 		PixelTransform2_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
 		removePerspective.setModel(squareToInput);
 
-		binary.reshape(intrinsic.width,intrinsic.height);
+		binary.reshape(width, height);
 	}
 
 	Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
@@ -366,22 +331,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
-		f.locationUndist.set(imageShape);
-
-		// put it back into input image coordinates
-		for (int j = 0; j < 4; j++) {
-			Point2D_F64 a = f.locationUndist.get(j);
-			Point2D_F64 b = f.locationDist.get(j);
-
-			pointUndistToDist.compute(a.x,a.y,b);
-		}
-
-		// estimate position
-		if( wasIntrinsicSet )
-			computeTargetToWorld(imageShape, result.lengthSide, f.targetToSensor);
-		else {
-			f.targetToSensor.reset();
-		}
+		f.locationPixels.set(imageShape);
 	}
 
 	/**
@@ -397,24 +347,6 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		quad.b = c;
 		quad.c = d;
 		quad.d = a;
-	}
-
-	/**
-	 * Given observed location of corners, compute the transform from target to world frame.
-	 * See code comments for correct ordering of corners in quad.
-	 *
-	 * @param quad (Input) Observed location of corner points in distorted pixels.  Order is important.
-	 * @param lengthSide (Input) Length of a side on the square
-	 * @param targetToWorld (output) transform from target to world frame.
-	 */
-	public void computeTargetToWorld( Quadrilateral_F64 quad , double lengthSide , Se3_F64 targetToWorld )
-	{
-		if( !poseEstimator.process(quad) ) {
-			throw new RuntimeException("Failed on pose estimation!");
-		}
-
-		targetToWorld.set( poseEstimator.getWorldToCamera() );
-		GeometryMath_F64.scale(targetToWorld.getT(), lengthSide);
 	}
 
 	/**
@@ -456,16 +388,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		return inputType;
 	}
 
-	public QuadPoseEstimator getPoseEstimator() {
-		return poseEstimator;
-	}
-
 	public double getBorderWidthFraction() {
 		return borderWidthFraction;
-	}
-
-	public Point2Transform2_F64 getPointUndistToDist() {
-		return pointUndistToDist;
 	}
 
 	public static class Result {

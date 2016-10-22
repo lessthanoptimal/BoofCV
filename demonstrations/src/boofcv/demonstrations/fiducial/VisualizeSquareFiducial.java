@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.core.image.border.BorderType;
@@ -33,7 +34,6 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -44,7 +44,6 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -76,7 +75,8 @@ public class VisualizeSquareFiducial {
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, paramUndist,
 					ImageType.single(GrayF32.class));
 
-			detector.configure(paramUndist,false);
+			detector.configure(new LensDistortionRadialTangential(paramUndist),
+					paramUndist.width, paramUndist.height, false);
 			undistorter.apply(input,undistorted);
 		} else {
 			undistorted.setTo(input);
@@ -102,14 +102,10 @@ public class VisualizeSquareFiducial {
 
 		if( intrinsic != null ) {
 			Point2Transform2_F64 add_p_to_p = LensDistortionOps.transformPoint(intrinsic).distort_F64(true, true);
-			Se3_F64 targetToWorld = new Se3_F64();
 
 			for (int i = 0; i < N; i++) {
 				// add back in lens distortion
-				Quadrilateral_F64 q = fiducials.get(i).locationDist;
-
-				detector.computeTargetToWorld(q, 0.1, targetToWorld);
-				VisualizeFiducial.drawCube(targetToWorld, intrinsic, 0.1, 3, g2);
+				Quadrilateral_F64 q = fiducials.get(i).locationPixels;
 
 				apply(add_p_to_p, q.a, q.a);
 				apply(add_p_to_p, q.b, q.b);
@@ -126,7 +122,7 @@ public class VisualizeSquareFiducial {
 		g2.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		for (int i = 0; i < N; i++) {
 			// add back in lens distortion
-			Quadrilateral_F64 q = fiducials.get(i).locationDist;
+			Quadrilateral_F64 q = fiducials.get(i).locationPixels;
 //			g2.setStroke(new BasicStroke(2));
 //			VisualizeBinaryData.renderExternal(detector.getSquareDetector().getUsedContours(),Color.BLUE,outputGray);
 			VisualizeShapes.drawArrowSubPixel(q,3,g2);

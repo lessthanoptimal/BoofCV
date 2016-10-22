@@ -29,6 +29,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -193,21 +194,21 @@ public class CalibratedImageGridPanel extends JPanel {
 
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
-			for( CalibrationObservation.Point p : set.points ) {
+			for( PointIndex2D_F64 p : set.points ) {
 				if( showUndistorted ) {
-					remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
-					adj.set((float)p.pixel.x,(float)p.pixel.y);
+					adj.set((float)p.x,(float)p.y);
 				}
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
 			g2.setStroke(new BasicStroke(1));
 			g2.setColor(Color.RED);
-			for( CalibrationObservation.Point p : set.points ) {
+			for( PointIndex2D_F64 p : set.points ) {
 				if( showUndistorted ) {
-					remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
-					adj.set((float)p.pixel.x,(float)p.pixel.y);
+					adj.set((float)p.x,(float)p.y);
 				}
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 4);
 			}
@@ -215,11 +216,11 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		if( showAll ) {
 			for( CalibrationObservation l : features ) {
-				for( CalibrationObservation.Point p : l.points ) {
+				for( PointIndex2D_F64 p : l.points ) {
 					if( showUndistorted ) {
-						remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
+						remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 					} else {
-						adj.set((float)p.pixel.x,(float)p.pixel.y);
+						adj.set((float)p.x,(float)p.y);
 					}
 					VisualizeFeatures.drawPoint(g2,adj.x*scale,adj.y*scale,2,Color.BLUE,false);
 				}
@@ -240,12 +241,12 @@ public class CalibratedImageGridPanel extends JPanel {
 			g2.setStroke(new BasicStroke(4));
 			g2.setColor(Color.BLACK);
 			for( int i = 0; i < set.size(); i++ ) {
-				CalibrationObservation.Point p = set.get(i);
+				PointIndex2D_F64 p = set.get(i);
 
 				if( showUndistorted ) {
-					remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
-					adj.set((float)p.pixel.x,(float)p.pixel.y);
+					adj.set((float)p.x,(float)p.y);
 				}
 
 				double r = errorScale*result.pointError[i];
@@ -258,12 +259,12 @@ public class CalibratedImageGridPanel extends JPanel {
 			g2.setStroke(before);
 			g2.setColor(Color.ORANGE);
 			for( int i = 0; i < set.size(); i++ ) {
-				CalibrationObservation.Point p = set.get(i);
+				PointIndex2D_F64 p = set.get(i);
 
 				if( showUndistorted ) {
-					remove_p_to_p.compute((float)p.pixel.x,(float)p.pixel.y,adj);
+					remove_p_to_p.compute((float)p.x,(float)p.y,adj);
 				} else {
-					adj.set((float)p.pixel.x,(float)p.pixel.y);
+					adj.set((float)p.x,(float)p.y);
 				}
 
 				double r = errorScale*result.pointError[i];
@@ -303,7 +304,7 @@ public class CalibratedImageGridPanel extends JPanel {
 
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < foundTarget.size(); i++ ) {
-			Point2D_F64 p = foundTarget.get(i).pixel;
+			Point2D_F64 p = foundTarget.get(i);
 			int gridIndex = foundTarget.get(i).index;
 
 			if( transform != null ) {

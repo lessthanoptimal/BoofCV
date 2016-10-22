@@ -107,7 +107,7 @@ public class Zhang99OptimizationFunction implements FunctionNtoM {
 			for( int i = 0; i < viewSet.size(); i++ ) {
 
 				int gridIndex = viewSet.get(i).index;
-				Point2D_F64 obs = viewSet.get(i).pixel;
+				Point2D_F64 obs = viewSet.get(i);
 
 				// Put the point in the camera's reference frame
 				SePointOps_F64.transform(se,grid.get(gridIndex), cameraPt);

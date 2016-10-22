@@ -19,23 +19,15 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
-import boofcv.core.image.ConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -49,59 +41,10 @@ public class TestDetectFiducialSquareBinary {
 	static double borderWidth = 0.25;
 	static double blackBorderFraction = 0.65;
 
-	Random rand = new Random(234);
-	BinaryPolygonDetector<GrayU8> squareDetector = FactoryShapeDetector.polygon(
+	private Random rand = new Random(234);
+	private BinaryPolygonDetector<GrayU8> squareDetector = FactoryShapeDetector.polygon(
 			new ConfigPolygonDetector(false, 4,4),GrayU8.class);
-	InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
-
-	/**
-	 * Makes sure the found rotation matrix is correct
-	 */
-	@Test
-	public void checkFoundRotationMatrix() {
-
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480);
-
-		GrayF32 rendered_F32 = create(DetectFiducialSquareBinary.w, 314);
-		GrayU8 rendered = new GrayU8(rendered_F32.width,rendered_F32.height);
-		ConvertImage.convert(rendered_F32,rendered);
-		GrayU8 input = new GrayU8(640,480);
-
-		List<Point2D_F64> expected = new ArrayList<>();
-		expected.add( new Point2D_F64(200,250+rendered.height));
-		expected.add( new Point2D_F64(200,250));
-		expected.add( new Point2D_F64(200+rendered.width,250));
-		expected.add( new Point2D_F64(200+rendered.width,250+rendered.height));
-
-		for (int i = 0; i < 4; i++) {
-			ImageMiscOps.fill(input, 255);
-			input.subimage(200, 250, 200 + rendered.width, 250 + rendered.height, null).setTo(rendered);
-
-			DetectFiducialSquareBinary<GrayU8> alg =
-					new DetectFiducialSquareBinary<>(gridWidth,borderWidth,blackBorderFraction,
-							inputToBinary,squareDetector, GrayU8.class);
-			alg.setLengthSide(2);
-			alg.configure(intrinsic, false);
-			alg.process(input);
-
-			assertEquals(1, alg.getFound().size());
-			FoundFiducial ff = alg.getFound().get(0);
-
-			// lower left hand corner in the fiducial.  side is of length 2
-			Point3D_F64 lowerLeft = new Point3D_F64(-1, -1, 0);
-			Point3D_F64 cameraPt = new Point3D_F64();
-			SePointOps_F64.transform(ff.targetToSensor, lowerLeft, cameraPt);
-			Point2D_F64 pixelPt = new Point2D_F64();
-			PerspectiveOps.convertNormToPixel(intrinsic, cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, pixelPt);
-
-//			System.out.println(pixelPt);
-			// see if that point projects into the correct location
-			assertEquals(expected.get(i).x, pixelPt.x, 1e-4);
-			assertEquals(expected.get(i).y, pixelPt.y, 1e-4);
-
-			ImageMiscOps.rotateCW(rendered);
-		}
-	}
+	private InputToBinary<GrayU8> inputToBinary = FactoryThresholdBinary.globalFixed(50, true, GrayU8.class);
 
 	/**
 	 * Give it easy positive examples

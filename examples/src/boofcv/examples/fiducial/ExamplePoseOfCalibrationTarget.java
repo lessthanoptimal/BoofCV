@@ -18,9 +18,11 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.CalibrationFiducialDetector;
+import boofcv.abst.fiducial.CalibrationFiducialDetector3D;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.gui.MousePauseHelper;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ImagePanel;
@@ -65,6 +67,7 @@ public class ExamplePoseOfCalibrationTarget {
 		// Load camera calibration
 		CameraPinholeRadial intrinsic =
 				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.yaml"));
+		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(intrinsic);
 
 		// load the video file
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");
@@ -74,10 +77,10 @@ public class ExamplePoseOfCalibrationTarget {
 
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
-		CalibrationFiducialDetector<GrayF32> detector =
-				FactoryFiducial.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
+		CalibrationFiducialDetector3D<GrayF32> detector =
+				FactoryFiducial3D.calibChessboard(new ConfigChessboard(4, 5, 0.03),GrayF32.class);
 
-		detector.setIntrinsic(intrinsic);
+		detector.setLensDistortion(lensDistortion);
 
 		// Get the 2D coordinate of calibration points for visualization purposes
 		List<Point2D_F64> calibPts = detector.getCalibrationPoints();

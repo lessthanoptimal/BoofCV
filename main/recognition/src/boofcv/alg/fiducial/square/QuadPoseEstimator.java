@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.square;
 import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -74,7 +74,7 @@ public class QuadPoseEstimator {
 
 	// storage for inputs to estimation algorithms
 	// observations in normalized image coordinates
-	protected Point2D3D[] points = new Point2D3D[4];
+	protected List<Point2D3D> points = new ArrayList<>();
 
 	// observation in undistorted pixels
 	protected List<Point2D_F64> listObs = new ArrayList<>();
@@ -121,22 +121,19 @@ public class QuadPoseEstimator {
 		this.refine = refine;
 
 		for (int i = 0; i < 4; i++) {
-			points[i] = new Point2D3D();
+			points.add( new Point2D3D() );
 		}
 	}
 
 	/**
 	 * Specifies the intrinsic parameters.
-	 * @param intrinsic Intrinsic camera parameters
+	 * @param distortion Intrinsic camera parameters
 	 */
-	public void setIntrinsic( CameraPinholeRadial intrinsic ) {
-		distortedToUndistorted =  LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,true);
+	public void setLensDistoriton(LensDistortionNarrowFOV distortion ) {
+		distortedToUndistorted = distortion.undistort_F64(true,true);
 
-		intrinsicUndist.fsetK(intrinsic.fx, intrinsic.fy, intrinsic.skew, intrinsic.cx, intrinsic.cy,
-				intrinsic.width, intrinsic.height);
-
-		pixelToNorm = LensDistortionOps.transformPoint(intrinsicUndist).undistort_F64(true,false);
-		normToPixel = LensDistortionOps.transformPoint(intrinsicUndist).distort_F64(false, true);
+		pixelToNorm = distortion.undistort_F64(true,false);
+		normToPixel = distortion.distort_F64(false, true);
 	}
 
 	/**
@@ -144,16 +141,16 @@ public class QuadPoseEstimator {
 	 */
 	public void setFiducial( double x0 , double y0 , double x1 , double y1 ,
 							 double x2 , double y2 , double x3 , double y3 ) {
-		points[0].location.set(x0,y0,0);
-		points[1].location.set(x1,y1,0);
-		points[2].location.set(x2,y2,0);
-		points[3].location.set(x3,y3,0);
+		points.get(0).location.set(x0,y0,0);
+		points.get(1).location.set(x1,y1,0);
+		points.get(2).location.set(x2,y2,0);
+		points.get(3).location.set(x3,y3,0);
 	}
 
 	/**
 	 * <p>Estimate the 3D pose of the camera from the observed location of the fiducial.</p>
 	 *
-	 * MUST call {@link #setFiducial} and {@link #setIntrinsic} before calling this function.
+	 * MUST call {@link #setFiducial} and {@link #setLensDistoriton} before calling this function.
 	 *
 	 * @param corners Observed corners of fiducials which are in the same order as their 2D counter parts
 	 * @return true if successful or false if not
@@ -242,10 +239,10 @@ public class QuadPoseEstimator {
 		listObs.add( corners.d );
 
 		// convert observations into normalized image coordinates which P3P requires
-		pixelToNorm.compute(corners.a.x,corners.a.y,points[0].observation);
-		pixelToNorm.compute(corners.b.x,corners.b.y,points[1].observation);
-		pixelToNorm.compute(corners.c.x,corners.c.y,points[2].observation);
-		pixelToNorm.compute(corners.d.x,corners.d.y,points[3].observation);
+		pixelToNorm.compute(corners.a.x,corners.a.y,points.get(0).observation);
+		pixelToNorm.compute(corners.b.x,corners.b.y,points.get(1).observation);
+		pixelToNorm.compute(corners.c.x,corners.c.y,points.get(2).observation);
+		pixelToNorm.compute(corners.d.x,corners.d.y,points.get(3).observation);
 
 		// estimate pose using all permutations
 		bestError = Double.MAX_VALUE;
@@ -260,7 +257,7 @@ public class QuadPoseEstimator {
 		// refine the best estimate
 		inputP3P.clear();
 		for( int i = 0; i < 4; i++ ) {
-			inputP3P.add( points[i] );
+			inputP3P.add( points.get(i) );
 		}
 
 		// got poor or horrible solution the first way, let's try it with EPNP
@@ -297,7 +294,7 @@ public class QuadPoseEstimator {
 		inputP3P.clear();
 		for( int i = 0; i < 4; i++ ) {
 			if( i != excluded ) {
-				inputP3P.add( points[i] );
+				inputP3P.add( points.get(i) );
 			}
 		}
 
@@ -353,7 +350,7 @@ public class QuadPoseEstimator {
 		double maxError = 0;
 
 		for( int i = 0; i < 4; i++ ) {
-			maxError = Math.max(maxError,computePixelError(fiducialToCamera, points[i].location, listObs.get(i)));
+			maxError = Math.max(maxError,computePixelError(fiducialToCamera, points.get(i).location, listObs.get(i)));
 		}
 
 		return maxError;
@@ -376,5 +373,9 @@ public class QuadPoseEstimator {
 	 */
 	public double getError() {
 		return outputError;
+	}
+
+	public List<Point2D3D> getPoints2D3D() {
+		return points;
 	}
 }

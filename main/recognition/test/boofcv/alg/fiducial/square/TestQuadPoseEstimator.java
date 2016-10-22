@@ -18,7 +18,8 @@
 
 package boofcv.alg.fiducial.square;
 
-import boofcv.alg.distort.LensDistortionOps;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -40,9 +41,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestQuadPoseEstimator {
 
+	private static LensDistortionNarrowFOV createDistortion() {
+		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
+
+		return new LensDistortionRadialTangential(intrinsic);
+	}
+
 	@Test
 	public void basicTest() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
+		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 expectedW2C = new Se3_F64();
 		expectedW2C.T.set(0.1,-0.05,4);
@@ -51,7 +58,7 @@ public class TestQuadPoseEstimator {
 		Quadrilateral_F64 quadPlane = new Quadrilateral_F64(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
 		Quadrilateral_F64 quadViewed = new Quadrilateral_F64();
 
-		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic,expectedW2C);
+		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion,expectedW2C);
 		project(worldToPixel, quadPlane.a, quadViewed.a);
 		project(worldToPixel, quadPlane.b, quadViewed.b);
 		project(worldToPixel, quadPlane.c, quadViewed.c);
@@ -60,7 +67,7 @@ public class TestQuadPoseEstimator {
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
 
 		alg.setFiducial(-0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,-0.5);
-		alg.setIntrinsic(intrinsic);
+		alg.setLensDistoriton(distortion);
 		assertTrue(alg.process(quadViewed));
 
 		Se3_F64 found = alg.getWorldToCamera();
@@ -75,29 +82,29 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void estimateP3P() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,550,0,400,300,800,600);
+		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05,0.015,0.001,fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
-		alg.setIntrinsic(intrinsic);
+		alg.setLensDistoriton(distortion);
 		double r = 1.5;
 		alg.setFiducial(r,-r, r,r, -r,r, -r,-r);
 
-		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, fiducialToCamera);
+		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion, fiducialToCamera);
 
-		alg.listObs.add(worldToPixel.transform(alg.points[0].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[1].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[2].location));
-		alg.listObs.add(worldToPixel.transform(alg.points[3].location));
+		alg.listObs.add(worldToPixel.transform(alg.points.get(0).location));
+		alg.listObs.add(worldToPixel.transform(alg.points.get(1).location));
+		alg.listObs.add(worldToPixel.transform(alg.points.get(2).location));
+		alg.listObs.add(worldToPixel.transform(alg.points.get(3).location));
 
-		Point2Transform2_F64 pixelToNorm = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = distortion.undistort_F64(true, false);
 
 		for (int i = 0; i < 4; i++) {
 			Point2D_F64 pixel = alg.listObs.get(i);
-			pixelToNorm.compute(pixel.x,pixel.y,alg.points[i].observation);
+			pixelToNorm.compute(pixel.x,pixel.y,alg.points.get(i).observation);
 		}
 
 		for (int i = 0; i < 4; i++) {
@@ -112,21 +119,21 @@ public class TestQuadPoseEstimator {
 
 	@Test
 	public void computeErrors() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,550,0,400,300,800,600);
+		LensDistortionNarrowFOV distortion = createDistortion();
 
 		Se3_F64 fiducialToCamera = new Se3_F64();
 		fiducialToCamera.getT().set(0.2,-0.15,2);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0.015, 0.001, fiducialToCamera.R);
 
 		QuadPoseEstimator alg = new QuadPoseEstimator(1e-8,200);
-		alg.setIntrinsic(intrinsic);
+		alg.setLensDistoriton(distortion);
 		double r = 1.5;
 		alg.setFiducial(r,-r, r,r, -r,r, -r,-r);
 
-		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, fiducialToCamera);
+		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion, fiducialToCamera);
 
 		for (int i = 0; i < 4; i++) {
-			Point3D_F64 X = alg.points[i].location;
+			Point3D_F64 X = alg.points.get(i).location;
 			alg.listObs.add(worldToPixel.transform(X));
 		}
 

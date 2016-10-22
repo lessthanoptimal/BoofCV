@@ -29,10 +29,13 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class SquareImage_to_FiducialDetector<T extends ImageGray>
-	extends BaseSquare_FiducialDetector<T,DetectFiducialSquareImage<T>>
+	extends BaseSquare_FiducialDetector3D<T>
 {
+	DetectFiducialSquareImage<T> alg;
+
 	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
 		super(alg);
+		this.alg = alg;
 	}
 
 	/**

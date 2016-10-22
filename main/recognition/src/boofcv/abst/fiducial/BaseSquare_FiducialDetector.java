@@ -20,15 +20,14 @@ package boofcv.abst.fiducial;
 
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
-import boofcv.alg.fiducial.square.StabilitySquareFiducialEstimate;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.DoNothing2Transform2_F64;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
@@ -36,20 +35,23 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector extends BaseDetectFiducialSquare<T>>
+public class BaseSquare_FiducialDetector<T extends ImageGray,Detector extends BaseDetectFiducialSquare<T>>
 	implements FiducialDetector<T>
 {
 	Detector alg;
 
-	StabilitySquareFiducialEstimate stability;
-
+	// type of image it can process
 	ImageType<T> type;
 
-	CameraPinholeRadial intrinsic;
+	// storage for undistorted fiducial corner quadrilateral
+	Quadrilateral_F64 undistQuad = new Quadrilateral_F64();
 
 	// Used for finding the center of the square
-	LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
-	LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
+	private LineGeneral2D_F64 line02 = new LineGeneral2D_F64();
+	private LineGeneral2D_F64 line13 = new LineGeneral2D_F64();
+
+	protected Point2Transform2_F64 distToUndist = new DoNothing2Transform2_F64();
+	protected Point2Transform2_F64 undistToDist = new DoNothing2Transform2_F64();
 
 	public BaseSquare_FiducialDetector(Detector alg) {
 		this.alg = alg;
@@ -60,19 +62,6 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 	public void detect(T input) {
 		alg.process(input);
 	}
-
-	@Override
-	public void setIntrinsic(CameraPinholeRadial intrinsic) {
-		this.intrinsic = intrinsic;
-		alg.configure(intrinsic,true);
-		stability = new StabilitySquareFiducialEstimate(alg.getPoseEstimator());
-	}
-
-	@Override
-	public CameraPinholeRadial getIntrinsics() {
-		return intrinsic;
-	}
-
 	/**
 	 * Return the intersection of two lines defined by opposing corners.  This should also be the geometric center
 	 * @param which Fiducial's index
@@ -82,25 +71,26 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 	public void getImageLocation(int which, Point2D_F64 location) {
 		FoundFiducial f = alg.getFound().get(which);
 
+		distToUndist.compute(f.locationPixels.a.x,f.locationPixels.a.y, undistQuad.a);
+		distToUndist.compute(f.locationPixels.b.x,f.locationPixels.b.y, undistQuad.b);
+		distToUndist.compute(f.locationPixels.c.x,f.locationPixels.c.y, undistQuad.c);
+		distToUndist.compute(f.locationPixels.d.x,f.locationPixels.d.y, undistQuad.d);
+
+
 		// compute intersection in undistorted pixels so that the intersection is the true
 		// geometric center of the square
-		UtilLine2D_F64.convert(f.locationUndist.a,f.locationUndist.c,line02);
-		UtilLine2D_F64.convert(f.locationUndist.b,f.locationUndist.d,line13);
+		UtilLine2D_F64.convert(undistQuad.a, undistQuad.c,line02);
+		UtilLine2D_F64.convert(undistQuad.b, undistQuad.d,line13);
 
 		Intersection2D_F64.intersection(line02,line13,location);
 
 		// apply lens distortion to the point so that it appears in the correct location
-		alg.getPointUndistToDist().compute(location.x,location.y, location);
+		undistToDist.compute(location.x,location.y, location);
 	}
 
 	@Override
 	public int totalFound() {
 		return alg.getFound().size;
-	}
-
-	@Override
-	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		fiducialToCamera.set(alg.getFound().get(which).targetToSensor);
 	}
 
 	@Override
@@ -111,32 +101,6 @@ public abstract class BaseSquare_FiducialDetector<T extends ImageGray,Detector e
 	@Override
 	public ImageType<T> getInputType() {
 		return type;
-	}
-
-	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
-		Quadrilateral_F64 quad = alg.getFound().get(which).locationDist;
-		if( !this.stability.process(disturbance, quad) ) {
-			return false;
-		}
-		results.location = stability.getLocationStability();
-		results.orientation = stability.getOrientationStability();
-		return true;
-	}
-
-	@Override
-	public boolean isSupportedID() {
-		return true;
-	}
-
-	@Override
-	public boolean isSupportedPose() {
-		return intrinsic != null;
-	}
-
-	@Override
-	public boolean isSizeKnown() {
-		return true;
 	}
 
 	public Detector getAlgorithm() {

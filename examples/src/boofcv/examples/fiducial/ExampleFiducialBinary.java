@@ -18,9 +18,11 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.FiducialDetector3D;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -52,17 +54,19 @@ public class ExampleFiducialBinary {
 
 		// load the lens distortion parameters and the input image
 		CameraPinholeRadial param = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
+		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(param);
+
 		BufferedImage input = UtilImageIO.loadImage(directory , "image0000.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0001.jpg");
 //		BufferedImage input = UtilImageIO.loadImage(directory , "image0002.jpg");
 		GrayF32 original = ConvertBufferedImage.convertFrom(input,true, ImageType.single(GrayF32.class));
 
 		// Detect the fiducial
-		FiducialDetector<GrayF32> detector = FactoryFiducial.squareBinary(
+		FiducialDetector3D<GrayF32> detector = FactoryFiducial3D.squareBinary(
 				new ConfigFiducialBinary(0.1), ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 10), GrayF32.class);
 //				new ConfigFiducialBinary(0.1), ConfigThreshold.fixed(100),GrayF32.class);
 
-		detector.setIntrinsic(param);
+		detector.setLensDistortion(lensDistortion);
 
 		detector.detect(original);
 
@@ -74,17 +78,14 @@ public class ExampleFiducialBinary {
 			detector.getImageLocation(i, locationPixel);
 
 			System.out.println("Target ID = "+detector.getId(i));
-			if( detector.isSupportedPose() ) {
-				detector.getFiducialToCamera(i, targetToSensor);
-				System.out.println("3D Location:");
-				System.out.println(targetToSensor);
-				VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
-				// draw label at geometric center
-				VisualizeFiducial.drawLabelCenter(targetToSensor,param,""+detector.getId(i), g2);
-			} else {
-				// draw label at visual center
-				VisualizeFiducial.drawLabel(locationPixel,""+detector.getId(i), g2);
-			}
+			detector.getFiducialToCamera(i, targetToSensor);
+			detector.getImageLocation(i, locationPixel);
+
+			System.out.println("2D Image Location = "+locationPixel);
+			System.out.println("3D Location:");
+			System.out.println(targetToSensor);
+			VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
+			VisualizeFiducial.drawLabelCenter(targetToSensor,param,""+detector.getId(i), g2);
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);

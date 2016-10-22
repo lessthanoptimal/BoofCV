@@ -32,6 +32,8 @@ Version : 0.25
   * Renamed IntrinsicParameters to CameraPinhole
   * Broke distortion off into a separate class which extends CameraPinhole
      - CameraPinholeRadial
+  * Added a new camera model Universal Omnidirectional
+  * Created new transforms to handle non-pinhole cameras
 - YAML
   * Changed save format to YAML for camera model parameters.
   * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
@@ -48,7 +50,6 @@ Version : 0.25
   * Fixed bug where if intrinsic was not set it would still claim it could estimate the target's pose
 
 - TODO dual fisheye to equirectangular image
-- TODO fisheye
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: circular grid fiducial and calibration
 - TODO Regression: Chessboard image border to fiducial regression

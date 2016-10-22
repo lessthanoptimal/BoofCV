@@ -18,12 +18,10 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
-import boofcv.factory.fiducial.ConfigFiducialImage;
-import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -40,22 +38,24 @@ import java.io.File;
 /**
  * @author Peter Abeles
  */
-public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector3DChecks {
+public class TestCalibrationFiducialDetector3D extends GenericFiducialDetector3DChecks {
 
-	String directory = UtilIO.pathExample("fiducial/image/examples/");
+	// selected because it has significant lens distortion
+	String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/");
 
-	public TestSquareImage_to_FiducialDetector() {
+	public TestCalibrationFiducialDetector3D() {
+		pixelAndProjectedTol = 10;
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
-		pixelAndProjectedTol = 1.0; // should be very close
 	}
 
 	@Override
-	public ImageBase loadImage(ImageType imageType)
-	{
-		BufferedImage out = UtilImageIO.loadImage(getClass().getResource("image00.jpg"));
-		return ConvertBufferedImage.convertFrom(out,true,imageType);
+	public ImageBase loadImage(ImageType imageType) {
+
+		BufferedImage out = UtilImageIO.loadImage(directory , "frame09.jpg");
+		return ConvertBufferedImage.convertFrom(out, true, imageType);
 	}
+
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
@@ -69,13 +69,6 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 
 	@Override
 	public FiducialDetector3D createDetector3D(ImageType imageType) {
-		SquareImage_to_FiducialDetector ret = FactoryFiducial.squareImage (
-				new ConfigFiducialImage(),
-				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 6),
-				imageType.getImageClass());
-
-		ret.addPatternImage(UtilImageIO.loadImage(directory + "../patterns/chicken.png", imageType.getImageClass()), 125, 0.1);
-
-		return ret;
+		return FactoryFiducial3D.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageType.getImageClass());
 	}
 }

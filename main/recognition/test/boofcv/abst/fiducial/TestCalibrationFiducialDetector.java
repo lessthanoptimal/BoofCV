@@ -21,17 +21,14 @@ package boofcv.abst.fiducial;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.UtilIO;
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 /**
  * @author Peter Abeles
@@ -54,10 +51,10 @@ public class TestCalibrationFiducialDetector extends GenericFiducialDetectorChec
 		return ConvertBufferedImage.convertFrom(out, true, imageType);
 	}
 
-	@Override
-	public CameraPinholeRadial loadIntrinsic() {
-		return CalibrationIO.load(new File(directory,"intrinsic.yaml"));
-	}
+//	@Override
+//	public LensDistortionNarrowFOV loadIntrinsic() {
+//		return CalibrationIO.load(new File(directory,"intrinsic.yaml"));
+//	}
 
 	@Override
 	public FiducialDetector createDetector(ImageType imageType) {

@@ -27,6 +27,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.*;
@@ -67,8 +68,8 @@ public class ExampleDetectCalibrationPoints {
 
 		// render and display the results
 		Graphics2D g2 = orig.createGraphics();
-		for( CalibrationObservation.Point p : set.points )
-			VisualizeFeatures.drawPoint(g2,(int)p.pixel.x,(int)p.pixel.y,3,Color.RED);
+		for( PointIndex2D_F64 p : set.points )
+			VisualizeFeatures.drawPoint(g2,p.x,p.y,3,Color.RED, true);
 
 		ShowImages.showWindow(orig,"Calibration Points", true);
 	}

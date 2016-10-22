@@ -18,14 +18,16 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.FiducialDetector3D;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -68,7 +70,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 
 	PrintStream outputFile;
 
-	FiducialDetector<GrayU8> detector;
+	FiducialDetector3D<GrayU8> detector;
 
 	void printHelp() {
 		System.out.println("java -jar BLAH <Input Flags> <Fiducial Type> <Fiducial Flags>");
@@ -320,7 +322,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
 		ConfigChessboard config = new ConfigChessboard(rows, cols, width);
 
-		detector = FactoryFiducial.calibChessboard(config, GrayU8.class);
+		detector = FactoryFiducial3D.calibChessboard(config, GrayU8.class);
 	}
 	void parseSquareGrid( int index , String []args ) {
 		int rows=-1,cols=-1;
@@ -357,7 +359,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("square grid: rows = "+rows+" columns = "+cols+"  square width "+width+"  space "+space);
 		ConfigSquareGrid config = new ConfigSquareGrid(rows, cols, width,space);
 
-		detector = FactoryFiducial.calibSquareGrid(config, GrayU8.class);
+		detector = FactoryFiducial3D.calibSquareGrid(config, GrayU8.class);
 	}
 
 	private static CameraPinholeRadial handleIntrinsic(CameraPinholeRadial intrinsic, int width, int height) {
@@ -554,7 +556,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ImagePanel gui = new ImagePanel();
 		gui.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
 		ShowImages.showWindow(gui,"Fiducial Detector",true);
-		detector.setIntrinsic(intrinsic);
+		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic));
 
 		if( sequence != null ) {
 			processStream(intrinsic,sequence,gui,pause);

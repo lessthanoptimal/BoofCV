@@ -72,7 +72,7 @@ public class TestZhang99ComputeTargetHomography {
 		// test this homography property: x2 = H*x1
 		for( int i = 0; i < observations.size(); i++ ) {
 			int gridIndex = observations.get(i).index;
-			Point2D_F64 p = observations.get(i).pixel;
+			Point2D_F64 p = observations.get(i);
 
 			Point2D_F64 a = GeometryMath_F64.mult(H, layout.get(gridIndex), new Point2D_F64());
 

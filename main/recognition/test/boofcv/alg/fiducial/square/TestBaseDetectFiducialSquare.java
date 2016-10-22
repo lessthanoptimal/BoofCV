@@ -20,8 +20,7 @@ package boofcv.alg.fiducial.square;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.distort.*;
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.misc.GImageMiscOps;
@@ -41,14 +40,10 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -62,6 +57,8 @@ import static org.junit.Assert.*;
 public class TestBaseDetectFiducialSquare {
 
 	List<Point3D_F64> worldPts = new ArrayList<>();
+	int width = 640;
+	int height = 480;
 
 	public TestBaseDetectFiducialSquare() {
 		// corners of the fiducial in world coordinates
@@ -73,70 +70,12 @@ public class TestBaseDetectFiducialSquare {
 	}
 
 	/**
-	 * Runs the entire processing loop with a very simple oriented fiducial.  Makes sure that the found projection
-	 * from fiducial to camera is consistent by transforming one of the corners and seeing if it ends up
-	 * in the correct location.
-	 */
-	@Test
-	public void checkFoundOrientation() {
-		List<Point2D_F64> expected = new ArrayList<>();
-		expected.add( new Point2D_F64(200,300+120));
-		expected.add( new Point2D_F64(200,300));
-		expected.add( new Point2D_F64(200+120,300));
-		expected.add( new Point2D_F64(200+120,300+120));
-
-		CameraPinholeRadial intrinsic =new CameraPinholeRadial(500,500,0,320,240,640,480);
-
-		// create a pattern with a corner for orientation and put it into the image
-		GrayU8 pattern = createPattern(6*20, true);
-
-		GrayU8 image = new GrayU8(640,480);
-
-		for (int i = 0; i < 4; i++) {
-
-			ImageMiscOps.fill(image, 255);
-
-			image.subimage(200, 300, 200 + pattern.width, 300 + pattern.height, null).setTo(pattern);
-
-			DetectCorner detector = new DetectCorner();
-
-			detector.configure(intrinsic, false);
-			detector.process(image);
-
-			assertEquals(1, detector.getFound().size());
-			FoundFiducial ff = detector.getFound().get(0);
-
-			// make sure the returned quadrilateral makes sense
-			for (int j = 0; j < 4; j++) {
-				int index = j-i;
-				if( index < 0) index = 4 + index;
-				Point2D_F64 f = ff.locationDist.get(index);
-				Point2D_F64 e = expected.get((j+1)%4);
-				assertTrue(f.distance(e) <= 1e-8 );
-			}
-
-			// lower left hand corner in the fiducial.  side is of length 2
-			WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic,ff.targetToSensor);
-
-			for (int j = 0; j < 4; j++) {
-				Point2D_F64 pixelPt = worldToPixel.transform(worldPts.get(j));
-				Point2D_F64 expectedPt = expected.get((i+j)%4);
-
-				assertEquals(expectedPt.x, pixelPt.x, 1e-4);
-				assertEquals(expectedPt.y, pixelPt.y, 1e-4);
-			}
-
-			ImageMiscOps.rotateCW(pattern);
-		}
-	}
-
-	/**
 	 * Basic test where a distorted pattern is places in the image and the found coordinates
 	 * are compared against ground truth
 	 */
 	@Test
 	public void findPatternEasy() {
-		checkFindKnown(new CameraPinholeRadial(500,500,0,320,240,640,480),1.1);
+		checkFindKnown(new CameraPinholeRadial(500,500,0,320,240,width,height),1.1);
 	}
 
 	private void checkFindKnown(CameraPinholeRadial intrinsic, double tol ) {
@@ -144,17 +83,17 @@ public class TestBaseDetectFiducialSquare {
 		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  130,60,  140,150,  40,140);
 //		Quadrilateral_F64 where = new Quadrilateral_F64(50,50,  100,50,  100,150,  50,150);
 
-		GrayU8 image = new GrayU8(640,480);
+		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fill(image, 255);
 		render(pattern, where, image);
 
 		Dummy dummy = new Dummy();
-		dummy.configure(intrinsic,false);
+		dummy.configure(new LensDistortionRadialTangential(intrinsic),width,height,false);
 		dummy.process(image);
 
 		assertEquals(1,dummy.detected.size());
 
-		Quadrilateral_F64 found = dummy.getFound().get(0).locationDist;
+		Quadrilateral_F64 found = dummy.getFound().get(0).locationPixels;
 //		System.out.println("found "+found);
 //		System.out.println("where "+where);
 		checkMatch(where, found.a, tol);
@@ -179,40 +118,6 @@ public class TestBaseDetectFiducialSquare {
 		fail("no match "+p+"    "+q);
 	}
 
-	@Test
-	public void computeTargetToWorld() {
-
-		double lengthSide = 1.5;
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,320,240,640,380);
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic,null);
-
-		Dummy alg = new Dummy();
-		alg.configure(intrinsic,false);
-
-		Se3_F64 targetToWorld = new Se3_F64();
-		targetToWorld.getT().set(0.1,-0.07,1.5);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.03,0.1,0,targetToWorld.getR());
-
-		Quadrilateral_F64 quad = new Quadrilateral_F64();
-
-		// generate observations
-		double r = lengthSide/2.0;
-		quad.a = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r, r)));
-		quad.b = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r, r)));
-		quad.c = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64( r,-r)));
-		quad.d = PerspectiveOps.renderPixel(targetToWorld,K,c(new Point2D_F64(-r,-r)));
-
-		Se3_F64 found = new Se3_F64();
-		alg.computeTargetToWorld(quad, lengthSide, found);
-
-		assertTrue(MatrixFeatures.isIdentical(targetToWorld.getR(), found.getR(), 1e-6));
-		assertEquals(0,targetToWorld.getT().distance(found.getT()),1e-6);
-	}
-
-	private static Point3D_F64 c( Point2D_F64 a ) {
-		return new Point3D_F64(a.x,a.y,0);
-	}
-
 	/**
 	 * Ensure that lens distortion is being removed from the fiducial square.  All check to make sure the class
 	 * updates everything when init is called again with a different model.
@@ -227,17 +132,17 @@ public class TestBaseDetectFiducialSquare {
 
 		DetectCorner detector = new DetectCorner();
 
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
+		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,320,240,width,height).fsetRadial(-0.1,-0.05);
 		detectWithLensDistortion(expected, detector, intrinsic);
 
-		intrinsic = new CameraPinholeRadial(500,500,0,320,240,640,480).fsetRadial(0.1,0.05);
+		intrinsic = new CameraPinholeRadial(500,500,0,320,240,width,height).fsetRadial(0.1,0.05);
 		detectWithLensDistortion(expected, detector, intrinsic);
 	}
 
 	private void detectWithLensDistortion(List<Point2D_F64> expected, DetectCorner detector, CameraPinholeRadial intrinsic) {
 		// create a pattern with a corner for orientation and put it into the image
 		GrayU8 pattern = createPattern(6*20, true);
-		GrayU8 image = new GrayU8(640,480);
+		GrayU8 image = new GrayU8(width,height);
 		ImageMiscOps.fill(image, 255);
 		image.subimage(60, 300, 60 + pattern.width, 300 + pattern.height, null).setTo(pattern);
 		// place the pattern right next to one of the corners to maximize distortion
@@ -249,28 +154,22 @@ public class TestBaseDetectFiducialSquare {
 				TypeInterpolate.BILINEAR, BorderType.ZERO, GrayU8.class);
 		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, interp, GrayU8.class);
 		distorter.setModel(new PointToPixelTransform_F32(distToUndistort));
-		GrayU8 distorted = new GrayU8(640,480);
+		GrayU8 distorted = new GrayU8(width,height);
 		distorter.apply(image, distorted);
 
-		detector.configure(intrinsic, false);
+		detector.configure(new LensDistortionRadialTangential(intrinsic),width,height, false);
 		detector.process(distorted);
 
 		assertEquals(1, detector.getFound().size());
 		FoundFiducial ff = detector.getFound().get(0);
-		WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(intrinsic, ff.targetToSensor);
 
 		// see if the returned corners
 		Point2D_F64 expectedDist = new Point2D_F64();
 		for (int j = 0; j < 4; j++) {
-			Point2D_F64 f = ff.locationDist.get(j);
+			Point2D_F64 f = ff.locationPixels.get(j);
 			Point2D_F64 e = expected.get((j + 1) % 4);
 			undistTodist.compute(e.x, e.y, expectedDist);
 			assertTrue(f.distance(expectedDist) <= 0.4 );
-
-			// see if the projection is as expected
-			Point2D_F64 rendered = new Point2D_F64();
-			worldToPixel.transform(worldPts.get((j+1)%4),rendered);
-			assertTrue(expectedDist.distance(rendered) <= 0.4 );
 		}
 
 		// The check to see if square is correctly undistorted is inside the processing function itself
@@ -306,7 +205,7 @@ public class TestBaseDetectFiducialSquare {
 		// create a pattern with a corner for orientation and put it into the image
 		GrayU8 pattern = createPattern(6*20, true);
 
-		GrayU8 image = new GrayU8(640,480);
+		GrayU8 image = new GrayU8(width,height);
 
 		for (int i = 0; i < 4; i++) {
 
@@ -325,7 +224,7 @@ public class TestBaseDetectFiducialSquare {
 			for (int j = 0; j < 4; j++) {
 				int index = j - i;
 				if (index < 0) index = 4 + index;
-				Point2D_F64 f = ff.locationDist.get(index);
+				Point2D_F64 f = ff.locationPixels.get(index);
 				Point2D_F64 e = expected.get((j + 1) % 4);
 				assertTrue(f.distance(e) <= 1e-8);
 			}

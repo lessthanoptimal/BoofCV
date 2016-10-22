@@ -16,27 +16,45 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.square;
+package boofcv.struct.geo;
 
-import georegression.struct.shapes.Quadrilateral_F64;
+import georegression.struct.point.Point2D_F64;
 
 /**
- * Contains the ID and pose for a fiducial
+ * A 2D point with an index associated with it
  *
  * @author Peter Abeles
  */
-public class FoundFiducial {
-	/**
-	 * ID number of the fiducial
-	 */
-	public long id;
+public class PointIndex2D_F64 extends Point2D_F64 {
+	public int index;
 
-	/**
-	 * <p>Where the fiducial was found in the input image.  pixel coordinates.  Lens distortion has not been removed.</p>
-	 *
-	 * <p>For the meaning of each corner see {@link BaseDetectFiducialSquare}. corner a = 0, b = 1, c = 2, d = 3</p>
-	 */
-	public Quadrilateral_F64 locationPixels = new Quadrilateral_F64();
+	public PointIndex2D_F64(double x, double y, int index) {
+		super(x, y);
+		this.index = index;
+	}
 
+	public PointIndex2D_F64(double x, double y) {
+		super(x, y);
+	}
+
+	public PointIndex2D_F64() {
+	}
+
+	public PointIndex2D_F64( Point2D_F64 p , int index ) {
+		this.x = p.x;
+		this.y = p.y;
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public PointIndex2D_F64 copy() {
+		return new PointIndex2D_F64(x,y,index);
+	}
 }
-

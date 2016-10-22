@@ -82,7 +82,7 @@ public class DetectUserActions {
 	private double averageDifference( CalibrationObservation reference ) {
 		double average = 0;
 		for( int i = 0; i < points.size(); i++ ) {
-			double difference = reference.points.get(i).pixel.distance(points.points.get(i).pixel);
+			double difference = reference.points.get(i).distance(points.points.get(i));
 
 			average += difference;
 		}
@@ -102,7 +102,7 @@ public class DetectUserActions {
 		double centerX = 0, centerY = 0;
 
 		for (int i = 0; i < points.size(); i++) {
-			Point2D_F64 p = points.points.get(i).pixel;
+			Point2D_F64 p = points.points.get(i);
 
 			centerX += p.x;
 			centerY += p.y;

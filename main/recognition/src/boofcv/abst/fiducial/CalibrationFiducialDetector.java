@@ -21,24 +21,16 @@ package boofcv.abst.fiducial;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
-import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.calib.FactoryCalibrationTarget;
-import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,33 +45,22 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		implements FiducialDetector<T>
 {
 	// detects the calibration target
-	CalibrationDetector detector;
-	// transform to remove lens distortion
-	Point2Transform2_F64 distortToUndistorted;
-
-	// non-linear refinement of pose estimate
-	Estimate1ofPnP estimatePnP;
-	RefinePnP refinePnP;
+	private CalibrationDetector detector;
 
 	// indicates if a target was detected and the found transform
-	boolean targetDetected;
-	Se3_F64 initialEstimate = new Se3_F64();
-	Se3_F64 targetToCamera = new Se3_F64(); // refined
+	private boolean targetDetected;
 
 	// storage for converted input image.  Detector only can process GrayF32
-	GrayF32 converted;
+	private GrayF32 converted;
 
 	// Expected type of input image
-	ImageType<T> type;
+	private ImageType<T> type;
 
-	// Known 3D location of points on calibration grid and current obsrevations
-	List<Point2D3D> points2D3D;
-	List<Point2D3D> used2D3D = new ArrayList<>();
+	// Known 3D location of points on calibration grid and current observations
+	private List<Point2D3D> points2D3D;
 
 	// average of width and height
-	double width;
-
-	CameraPinholeRadial intrinsic;
+	private double width;
 
 	/**
 	 * Configure it to detect chessboard style targets
@@ -90,7 +71,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
-		double width = (sideWidth+sideHeight)/2.0;
+		width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
@@ -143,16 +124,10 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 
 			points2D3D.add(p);
 		}
-
-		// TODO more robust estimator that uses multiple approaches.  Similar to 4 point estimator
-//		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.1);
-		this.estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
-		this.refinePnP = FactoryMultiView.refinePnP(1e-8,100);
 	}
 
 	@Override
 	public void detect(T input) {
-
 		if( input instanceof GrayF32) {
 			converted = (GrayF32)input;
 		} else {
@@ -166,112 +141,6 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		} else {
 			targetDetected = true;
 		}
-
-		// convert points into normalized image coord
-		CalibrationObservation view = detector.getDetectedPoints();
-		if( view.size() >= 3 ) {
-			used2D3D.clear();
-			for (int i = 0; i < view.size(); i++) {
-				int gridIndex = view.get(i).index;
-
-				Point2D3D p23 = points2D3D.get(gridIndex);
-				Point2D_F64 pixel = view.get(i).pixel;
-
-				distortToUndistorted.compute(pixel.x, pixel.y, p23.observation);
-
-				used2D3D.add(p23);
-			}
-
-			// estimate using PNP
-			targetDetected = estimatePose(targetToCamera);
-		} else {
-			targetDetected = false;
-		}
-	}
-
-	private boolean estimatePose( Se3_F64 targetToCamera ) {
-		return estimatePnP.process(used2D3D, initialEstimate) &&
-				refinePnP.fitModel(used2D3D, initialEstimate, targetToCamera);
-	}
-
-	Se3_F64 referenceCameraToTarget = new Se3_F64();
-	Se3_F64 targetToCameraSample = new Se3_F64();
-	Se3_F64 difference = new Se3_F64();
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
-	// compute metrics.
-	private double maxLocation;
-	private double maxOrientation;
-
-	/**
-	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
-	 */
-	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
-
-		if( !targetDetected )
-			return false;
-
-		targetToCamera.invert(referenceCameraToTarget);
-
-		CalibrationObservation view = detector.getDetectedPoints();
-		Point2D_F64 workPt = new Point2D_F64();
-
-		maxOrientation = 0;
-		maxLocation = 0;
-		for (int i = 0; i < view.size(); i++) {
-			int gridIndex = view.get(i).index;
-
-			Point2D3D p23 = points2D3D.get(gridIndex);
-			Point2D_F64 p = view.get(i).pixel;
-			workPt.set(p);
-
-			perturb(disturbance,workPt,p,p23);
-		}
-
-		results.location = maxLocation;
-		results.orientation = maxOrientation;
-
-		return true;
-	}
-
-	private void perturb( double disturbance , Point2D_F64 pixel , Point2D_F64 original , Point2D3D p23 ) {
-		pixel.x = original.x + disturbance;
-		computeDisturbance(pixel, p23);
-		pixel.x = original.x - disturbance;
-		computeDisturbance(pixel, p23);
-		pixel.y = original.y;
-		pixel.y = original.y + disturbance;
-		computeDisturbance(pixel, p23);
-		pixel.y = original.y - disturbance;
-		computeDisturbance(pixel, p23);
-	}
-
-	private void computeDisturbance(Point2D_F64 pixel, Point2D3D p23) {
-		distortToUndistorted.compute(pixel.x,pixel.y,p23.observation);
-		if( estimatePose(targetToCameraSample) ) {
-			referenceCameraToTarget.concat(targetToCameraSample, difference);
-
-			double d = difference.getT().norm();
-			ConvertRotation3D_F64.matrixToRodrigues(difference.getR(), rodrigues);
-			double theta = Math.abs(rodrigues.theta);
-			if (theta > maxOrientation) {
-				maxOrientation = theta;
-			}
-			if (d > maxLocation) {
-				maxLocation = d;
-			}
-		}
-	}
-
-	@Override
-	public void setIntrinsic(CameraPinholeRadial intrinsic) {
-		this.intrinsic = intrinsic;
-		distortToUndistorted = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
-	}
-
-	@Override
-	public CameraPinholeRadial getIntrinsics() {
-		return intrinsic;
 	}
 
 	/**
@@ -286,9 +155,9 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 
 		location.set(0,0);
 		for (int i = 0; i < view.size(); i++) {
-			CalibrationObservation.Point p = view.get(i);
-			location.x += p.pixel.x;
-			location.y += p.pixel.y;
+			PointIndex2D_F64 p = view.get(i);
+			location.x += p.x;
+			location.y += p.y;
 		}
 
 		location.x /= view.size();
@@ -301,19 +170,8 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	}
 
 	@Override
-	public void getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		if( which == 0 )
-			fiducialToCamera.set(targetToCamera);
-	}
-
-	@Override
 	public long getId( int which ) {
 		return 0;
-	}
-
-	@Override
-	public double getWidth(int which) {
-		return width;
 	}
 
 	@Override
@@ -321,26 +179,19 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		return type;
 	}
 
-	@Override
-	public boolean isSupportedID() {
-		return false;
-	}
-
-	@Override
-	public boolean isSupportedPose() {
-		return true;
-	}
-
-	@Override
-	public boolean isSizeKnown() {
-		return true;
-	}
-
 	public List<Point2D_F64> getCalibrationPoints() {
 		return detector.getLayout();
 	}
 
-	public CalibrationDetector getDetector() {
+	public CalibrationDetector getCalibDetector() {
 		return detector;
+	}
+
+	public List<Point2D3D> getPoints2D3D() {
+		return points2D3D;
+	}
+
+	public double getWidth() {
+		return width;
 	}
 }

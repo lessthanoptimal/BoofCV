@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -139,7 +139,7 @@ public class RadialDistortionEstimateLinear {
 
 			for( int i = 0; i < set.size(); i++ ) {
 				int gridIndex = set.get(i).index;
-				Point2D_F64 obsPixel = set.get(i).pixel;
+				Point2D_F64 obsPixel = set.get(i);
 
 				// location of grid point in world coordinate (x,y,0)  assume z=0
 				Point2D_F64 gridPt = worldPoints.get(gridIndex);

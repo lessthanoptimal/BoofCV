@@ -18,8 +18,10 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
-import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.fiducial.FactoryFiducial3D;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.io.UtilIO;
@@ -38,7 +40,7 @@ import java.io.File;
 /**
  * @author Peter Abeles
  */
-public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
+public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetector3DChecks {
 
 
 	String directory = UtilIO.pathExample("fiducial/binary/");
@@ -57,13 +59,18 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 	}
 
 	@Override
-	public CameraPinholeRadial loadIntrinsic() {
-		return CalibrationIO.load(new File(directory,"intrinsic.yaml"));
+	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
+		CameraPinholeRadial model = CalibrationIO.load(new File(directory,"intrinsic.yaml"));
+		if( !distorted ) {
+			model.radial = null;
+			model.t1 = model.t2 = 0;
+		}
+		return new LensDistortionRadialTangential(model);
 	}
 
 	@Override
-	public FiducialDetector createDetector(ImageType imageType) {
-		return FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1),
+	public FiducialDetector3D createDetector3D(ImageType imageType) {
+		return FactoryFiducial3D.squareBinary(new ConfigFiducialBinary(0.1),
 				ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,6),
 				imageType.getImageClass());
 	}

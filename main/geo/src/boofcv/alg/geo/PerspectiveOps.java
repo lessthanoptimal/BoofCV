@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
@@ -498,6 +499,16 @@ public class PerspectiveOps {
 	{
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
 		alg.configure(intrinsic,worldToCamera);
+		return alg;
+	}
+
+	/**
+	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
+	 */
+	public static WorldToCameraToPixel createWorldToPixel(LensDistortionNarrowFOV distortion , Se3_F64 worldToCamera )
+	{
+		WorldToCameraToPixel alg = new WorldToCameraToPixel();
+		alg.configure(distortion,worldToCamera);
 		return alg;
 	}
 }
