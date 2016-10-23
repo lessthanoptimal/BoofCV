@@ -77,15 +77,21 @@ public class ExampleFiducialBinary {
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getImageLocation(i, locationPixel);
 
-			System.out.println("Target ID = "+detector.getId(i));
-			detector.getFiducialToCamera(i, targetToSensor);
-			detector.getImageLocation(i, locationPixel);
-
+			if( detector.hasUniqueID() )
+				System.out.println("Target ID = "+detector.getId(i));
+			if( detector.hasMessage() )
+				System.out.println("Message   = "+detector.getMessage(i));
 			System.out.println("2D Image Location = "+locationPixel);
-			System.out.println("3D Location:");
-			System.out.println(targetToSensor);
-			VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
-			VisualizeFiducial.drawLabelCenter(targetToSensor,param,""+detector.getId(i), g2);
+
+			if( detector.is3D() ) {
+				detector.getFiducialToCamera(i, targetToSensor);
+				System.out.println("3D Location:");
+				System.out.println(targetToSensor);
+				VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
+				VisualizeFiducial.drawLabelCenter(targetToSensor, param, "" + detector.getId(i), g2);
+			} else {
+				VisualizeFiducial.drawLabel(locationPixel, "" + detector.getId(i), g2);
+			}
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);

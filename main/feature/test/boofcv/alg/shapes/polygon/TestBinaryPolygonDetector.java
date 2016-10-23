@@ -456,44 +456,6 @@ public class TestBinaryPolygonDetector {
 		assertFalse(alg.touchesBorder(contour));
 	}
 
-	@Test
-	public void touchesBorder_true() {
-		List<Point2D_I32> contour = new ArrayList<>();
-
-		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
-		alg.getLabeled().reshape(20,30);
-
-		contour.add(new Point2D_I32(10,0));
-		assertTrue(alg.touchesBorder(contour));
-		contour.clear();contour.add(new Point2D_I32(10, 29));
-		assertTrue(alg.touchesBorder(contour));
-		contour.clear();contour.add(new Point2D_I32(0,15));
-		assertTrue(alg.touchesBorder(contour));
-		contour.clear();contour.add(new Point2D_I32(19,15));
-		assertTrue(alg.touchesBorder(contour));
-	}
-
-	/**
-	 * Should sanity check transforms to make sure they don't go outside the image
-	 */
-	@Test
-	public void setTransform_input() {
-		Affine2D_F32 a = new Affine2D_F32();
-		transform.set(1.2,0,0,1.2,0,0);
-		UtilAffine.convert(transform,a);
-
-		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
-
-		BinaryPolygonDetector alg = createDetector(GrayU8.class, true, 4,4);
-		alg.setLensDistortion(width, height, tranTo, tranFrom);
-		try {
-			// this should cause it to go outside the image
-			alg.setLensDistortion(width, height, tranFrom, tranTo);
-			fail("didn't blow up");
-		} catch( IllegalArgumentException ignore ){}
-	}
-
 	/**
 	 * When an adaptive threshold is used, the area around a bright light gets marked as "dark" then when
 	 * the polygon is fit to it it can snap around the white object

@@ -34,6 +34,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
@@ -91,14 +92,25 @@ public class ExampleFiducialImage {
 		// print the results
 		Graphics2D g2 = input.createGraphics();
 		Se3_F64 targetToSensor = new Se3_F64();
+		Point2D_F64 locationPixel = new Point2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
-			System.out.println("Target ID = "+detector.getId(i));
-			detector.getFiducialToCamera(i, targetToSensor);
-			System.out.println("Location:");
-			System.out.println(targetToSensor);
+			detector.getImageLocation(i, locationPixel);
 
-			VisualizeFiducial.drawLabelCenter(targetToSensor, param, ""+detector.getId(i), g2);
-			VisualizeFiducial.drawCube(targetToSensor,param,detector.getWidth(i), 3, g2);
+			if( detector.hasUniqueID() )
+				System.out.println("Target ID = "+detector.getId(i));
+			if( detector.hasMessage() )
+				System.out.println("Message   = "+detector.getMessage(i));
+			System.out.println("2D Image Location = "+locationPixel);
+
+			if( detector.is3D() ) {
+				detector.getFiducialToCamera(i, targetToSensor);
+				System.out.println("3D Location:");
+				System.out.println(targetToSensor);
+				VisualizeFiducial.drawCube(targetToSensor, param, detector.getWidth(i), 3, g2);
+				VisualizeFiducial.drawLabelCenter(targetToSensor, param, "" + detector.getId(i), g2);
+			} else {
+				VisualizeFiducial.drawLabel(locationPixel, "" + detector.getId(i), g2);
+			}
 		}
 
 		ShowImages.showWindow(input,"Fiducials",true);

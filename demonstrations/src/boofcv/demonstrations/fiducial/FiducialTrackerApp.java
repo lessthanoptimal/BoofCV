@@ -68,36 +68,36 @@ import java.util.List;
 public class FiducialTrackerApp<I extends ImageGray>
 		extends VideoProcessAppBase<Planar<I>>
 {
-	public static final String SQUARE_NUMBER = "Square Number";
-	public static final String SQUARE_PICTURE = "Square Picture";
-	public static final String CALIB_CHESS = "Chessboard";
-	public static final String CALIB_SQUARE_GRID = "Square Grid";
-	public static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
+	private static final String SQUARE_NUMBER = "Square Number";
+	private static final String SQUARE_PICTURE = "Square Picture";
+	private static final String CALIB_CHESS = "Chessboard";
+	private static final String CALIB_SQUARE_GRID = "Square Grid";
+	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
 
 
 	private static final Font font = new Font("Serif", Font.BOLD, 14);
 
-	Class<I> imageClass;
+	private Class<I> imageClass;
 
-	ImagePanel panel = new ImagePanel();
+	private ImagePanel panel = new ImagePanel();
 
-	I gray;
+	private I gray;
 
-	FiducialDetector detector;
+	private FiducialDetector detector;
 
-	CameraPinholeRadial intrinsic;
+	private CameraPinholeRadial intrinsic;
 
-	boolean processedInputImage = false;
-	boolean firstFrame = true;
+	private boolean processedInputImage = false;
+	private boolean firstFrame = true;
 
-	JCheckBox computeStability = new JCheckBox("Stability");
+	private JCheckBox computeStability = new JCheckBox("Stability");
 
-	FiducialStability stability = new FiducialStability();
+	private FiducialStability stability = new FiducialStability();
 
-	List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
-	FiducialStability stabilityMax = new FiducialStability();
+	private List<FiducialInfo> fiducialInfo = new ArrayList<FiducialInfo>();
+	private FiducialStability stabilityMax = new FiducialStability();
 
-	BufferedImage imageCopy;
+	private BufferedImage imageCopy;
 
 	public FiducialTrackerApp(Class<I> imageType) {
 		super(0, ImageType.pl(3, imageType));
@@ -313,7 +313,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 
 		fiducialInfo.clear();
 		// give it some initial values so that it doesn't look like there is huge errors right off the bat
-		stabilityMax.location = 0.05;
+		stabilityMax.location = 0.01;
 		stabilityMax.orientation = 0.02;
 
 		SimpleImageSequence<Planar<I>> video = media.openVideo(videoName, ImageType.pl(3, imageClass));

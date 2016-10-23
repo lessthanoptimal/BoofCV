@@ -88,16 +88,17 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 			return false;
 		targetToCamera.invert(referenceCameraToTarget);
 
-
 		maxOrientation = 0;
 		maxLocation = 0;
 		for (int i = 0; i < detected2D3D.size(); i++) {
 
+			estimatePose(which, detected2D3D, targetToCameraSample);
+			referenceCameraToTarget.concat(targetToCameraSample, difference);
 			Point2D3D p23 = detected2D3D.get(i);
 			Point2D_F64 p = detectedPixels.get(i);
 			workPt.set(p);
 
-			perturb(disturbance,workPt,p,p23);
+			perturb(which, disturbance,workPt,p,p23);
 		}
 
 		results.location = maxLocation;
@@ -106,21 +107,22 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 		return true;
 	}
 
-	private void perturb( double disturbance , Point2D_F64 pixel , Point2D_F64 original , Point2D3D p23 ) {
+	private void perturb( int which, double disturbance ,
+						  Point2D_F64 pixel , Point2D_F64 original , Point2D3D p23 ) {
 		pixel.x = original.x + disturbance;
-		computeDisturbance(pixel, p23);
+		computeDisturbance(which, pixel, p23);
 		pixel.x = original.x - disturbance;
-		computeDisturbance(pixel, p23);
+		computeDisturbance(which, pixel, p23);
 		pixel.y = original.y;
 		pixel.y = original.y + disturbance;
-		computeDisturbance(pixel, p23);
+		computeDisturbance(which, pixel, p23);
 		pixel.y = original.y - disturbance;
-		computeDisturbance(pixel, p23);
+		computeDisturbance(which, pixel, p23);
 	}
 
-	private void computeDisturbance(Point2D_F64 pixel, Point2D3D p23) {
+	private void computeDisturbance(int which, Point2D_F64 pixel, Point2D3D p23) {
 		pixelToNorm.compute(pixel.x,pixel.y,p23.observation);
-		if( estimatePose(detected2D3D, targetToCameraSample) ) {
+		if( estimatePose(which, detected2D3D, targetToCameraSample) ) {
 			referenceCameraToTarget.concat(targetToCameraSample, difference);
 
 			double d = difference.getT().norm();
@@ -159,7 +161,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 		// 2D-3D point associations
 		createDetectedList(which, detectedPixels);
 
-		return estimatePose(detected2D3D, fiducialToCamera);
+		return estimatePose(which, detected2D3D, fiducialToCamera);
 	}
 
 	/**
@@ -181,7 +183,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 	 * Given the mapping of 2D observations to known 3D points estimate the pose of the fiducial.
 	 * This solves the P-n-P problem.
 	 */
-	protected boolean estimatePose( List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
+	protected boolean estimatePose( int which ,List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
 		return estimatePnP.process(points, initialEstimate) &&
 				refinePnP.fitModel(points, initialEstimate, fiducialToCamera);
 	}

@@ -20,14 +20,12 @@ package boofcv.abst.fiducial;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author Peter Abeles
  */
 public class TestFiducialDetectorPnP {
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void ignore() {
+		// intentionally left blank because it is tested elsewhere
 	}
 }

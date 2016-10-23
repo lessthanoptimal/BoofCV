@@ -116,20 +116,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detecto
 	}
 
 	@Override
-	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		if( super.getFiducialToCamera(which, fiducialToCamera) ) {
-			double width = getWidth(which);
-			fiducialToCamera.T.x *= width;
-			fiducialToCamera.T.y *= width;
-			fiducialToCamera.T.z *= width;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	protected boolean estimatePose(List<Point2D3D> points, Se3_F64 fiducialToCamera) {
+	protected boolean estimatePose( int which, List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
 		quad.a.set( points.get(0).observation );
 		quad.b.set( points.get(1).observation );
 		quad.c.set( points.get(2).observation );
@@ -140,6 +127,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detecto
 		}
 
 		fiducialToCamera.set( poseEstimator.getWorldToCamera() );
+		double width = getWidth(which);
+		fiducialToCamera.T.x *= width;
+		fiducialToCamera.T.y *= width;
+		fiducialToCamera.T.z *= width;
 		return true;
 	}
 

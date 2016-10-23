@@ -170,11 +170,11 @@ public class QuadPoseEstimator {
 		// used if it doesn't add a bunch of error.  But this technique is only needed when certain conditions
 		// are meet.
 		boolean success;
-		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
-			success = estimatePathological(outputFiducialToCamera);
-		} else {
+//		if( ratio < 1.3 && length0 < SMALL_PIXELS && length1 < SMALL_PIXELS ) {
+//			success = estimatePathological(outputFiducialToCamera);
+//		} else {
 			success = estimate(pixelCorners, outputFiducialToCamera);
-		}
+//		}
 
 		if( success ) {
 			outputError = computeErrors(outputFiducialToCamera);

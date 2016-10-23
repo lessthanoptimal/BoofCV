@@ -19,7 +19,6 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
@@ -36,7 +35,6 @@ import georegression.metric.Area2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -185,11 +183,6 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
 	 * coordinates.  The undistorted image is never explicitly created.</p>
 	 *
-	 * <p>
-	 * WARNING: The undistorted image must have the same bounds as the distorted input image.  This is because
-	 * several of the bounds checks use the image shape.  This are simplified greatly by this assumption.
-	 * </p>
-	 *
 	 * @param width Input image width.  Used in sanity check only.
 	 * @param height Input image height.  Used in sanity check only.
 	 * @param distToUndist Transform from distorted to undistorted image.
@@ -200,17 +193,6 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 
 		this.distToUndist = distToUndist;
 		this.undistToDist = undistToDist;
-
-		// sanity check since I think many people will screw this up.
-		RectangleLength2D_F32 rect = DistortImageOps.boundBox_F32(width, height, distToUndist);
-		float x1 = rect.x0 + rect.width;
-		float y1 = rect.y0 + rect.height;
-
-		float tol = 1e-4f;
-		if( rect.getX() < -tol || rect.getY() < -tol || x1 > width+tol || y1 > height+tol ) {
-			throw new IllegalArgumentException("You failed the idiot test! RTFM! The undistorted image "+
-					"must be contained by the same bounds as the input distorted image");
-		}
 
 		if( refinePolygon != null ) {
 			refinePolygon.setLensDistortion(width, height, distToUndist, undistToDist);
@@ -649,17 +631,5 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 		 * true means the corner is a border corner.
 		 */
 		public GrowQueue_B borderCorners = new GrowQueue_B();
-
-		public boolean touchesBorder() {
-			if( borderCorners.size() == 0 )
-				return false;
-			else {
-				for (int i = 0; i < borderCorners.size(); i++) {
-					if( borderCorners.get(i))
-						return true;
-				}
-			}
-			return false;
-		}
 	}
 }
