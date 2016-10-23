@@ -97,7 +97,7 @@ public class DetectFiducialSquareGrid<T extends ImageGray> {
 			int gridIndex = isExpected(fid.id);
 			if( gridIndex >= 0 ) {
 				Detection d = lookupDetection(fid.id,gridIndex);
-				d.location.set(fid.undistortedPixels);
+				d.location.set(fid.distortedPixels);
 				d.numDetected++;
 			}
 		}

@@ -92,7 +92,7 @@ public class VisualizeSquareBinaryFiducial {
 		g2.setColor(Color.RED);
 		g2.setStroke(new BasicStroke(2));
 		for (int i = 0; i < N; i++) {
-			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).undistortedPixels,3,g2);
+			VisualizeShapes.drawArrowSubPixel(fiducials.get(i).distortedPixels,3,g2);
 		}
 
 		ShowImages.showWindow(output,"Binary",true);

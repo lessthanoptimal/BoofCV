@@ -550,6 +550,9 @@ public class BinaryPolygonDetector<T extends ImageGray> {
 		return outputClockwise;
 	}
 
+	/**
+	 * List of found polygons.  Points are in undistorted pixels.
+	 */
 	public FastQueue<Polygon2D_F64> getFoundPolygons() {
 		return found;
 	}

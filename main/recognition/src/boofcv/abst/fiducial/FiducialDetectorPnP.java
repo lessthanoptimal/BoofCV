@@ -188,7 +188,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 
 	/**
 	 * Returns a list of detected control points in the image for the specified fiducial.  Observations
-	 * will be in image pixels.
+	 * will be in distorted image pixels.
 	 */
 	protected abstract List<PointIndex2D_F64> getDetectedControl(int which );
 

@@ -99,21 +99,33 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detecto
 	public void getImageLocation(int which, Point2D_F64 location) {
 		FoundFiducial f = alg.getFound().get(which);
 
-//		distToUndist.compute(f.undistortedPixels.a.x,f.undistortedPixels.a.y, undistQuad.a);
-//		distToUndist.compute(f.undistortedPixels.b.x,f.undistortedPixels.b.y, undistQuad.b);
-//		distToUndist.compute(f.undistortedPixels.c.x,f.undistortedPixels.c.y, undistQuad.c);
-//		distToUndist.compute(f.undistortedPixels.d.x,f.undistortedPixels.d.y, undistQuad.d);
-
+		distToUndist.compute(f.distortedPixels.a.x,f.distortedPixels.a.y, undistQuad.a);
+		distToUndist.compute(f.distortedPixels.b.x,f.distortedPixels.b.y, undistQuad.b);
+		distToUndist.compute(f.distortedPixels.c.x,f.distortedPixels.c.y, undistQuad.c);
+		distToUndist.compute(f.distortedPixels.d.x,f.distortedPixels.d.y, undistQuad.d);
 
 		// compute intersection in undistorted pixels so that the intersection is the true
 		// geometric center of the square
-		UtilLine2D_F64.convert(f.undistortedPixels.a, f.undistortedPixels.c,line02);
-		UtilLine2D_F64.convert(f.undistortedPixels.b, f.undistortedPixels.d,line13);
+		UtilLine2D_F64.convert(undistQuad.a, undistQuad.c,line02);
+		UtilLine2D_F64.convert(undistQuad.b, undistQuad.d,line13);
 
 		Intersection2D_F64.intersection(line02,line13,location);
 
 		// apply lens distortion to the point so that it appears in the correct location
 		undistToDist.compute(location.x,location.y, location);
+	}
+
+	@Override
+	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
+		if( super.getFiducialToCamera(which, fiducialToCamera) ) {
+			double width = getWidth(which);
+			fiducialToCamera.T.x *= width;
+			fiducialToCamera.T.y *= width;
+			fiducialToCamera.T.z *= width;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -174,10 +186,10 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detecto
 	@Override
 	protected List<PointIndex2D_F64> getDetectedControl(int which) {
 		FoundFiducial found = getAlgorithm().getFound().get(which);
-		listQuad.get(0).set( found.undistortedPixels.a );
-		listQuad.get(1).set( found.undistortedPixels.b );
-		listQuad.get(2).set( found.undistortedPixels.c );
-		listQuad.get(3).set( found.undistortedPixels.d );
+		listQuad.get(0).set( found.distortedPixels.a );
+		listQuad.get(1).set( found.distortedPixels.b );
+		listQuad.get(2).set( found.distortedPixels.c );
+		listQuad.get(3).set( found.distortedPixels.d );
 
 		return listQuad;
 	}

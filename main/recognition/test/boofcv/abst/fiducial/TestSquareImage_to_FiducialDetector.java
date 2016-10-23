@@ -58,7 +58,7 @@ public class TestSquareImage_to_FiducialDetector extends GenericFiducialDetector
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic.yaml"));
+		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic_image.yaml"));
 		if( !distorted ) {
 			model.radial = null;
 			model.t1 = model.t2 = 0;

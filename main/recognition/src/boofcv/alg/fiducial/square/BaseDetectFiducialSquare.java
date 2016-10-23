@@ -30,9 +30,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform2_F32;
-import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.distort.SequencePoint2Transform2_F32;
+import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -92,6 +90,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	private List<AssociatedPair> pairsRemovePerspective = new ArrayList<>();
 	private ImageDistort<T,GrayF32> removePerspective;
 	private PointTransformHomography_F32 transformHomography = new PointTransformHomography_F32();
+
+	private Point2Transform2_F64 undistToDist = new DoNothing2Transform2_F64();
 
 	// How wide the border is relative to the fiducial's total width
 	protected double borderWidthFraction;
@@ -185,6 +185,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		removePerspective.setModel(squareToInput);
 
 		binary.reshape(width, height);
+
+		this.undistToDist = distortion.distort_F64(true,true);
 	}
 
 	Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
@@ -198,12 +200,12 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 
 		inputToBinary.process(gray,binary);
 		squareDetector.process(gray,binary);
+		// These are in undistorted pixels
 		FastQueue<Polygon2D_F64> candidates = squareDetector.getFoundPolygons();
 
 		found.reset();
 
 		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
-		// undistort the squares
 		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
@@ -331,7 +333,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		// save the results for output
 		FoundFiducial f = found.grow();
 		f.id = result.which;
-		f.undistortedPixels.set(imageShape);
+
+		undistToDist.compute(imageShape.a.x, imageShape.a.y, f.distortedPixels.a);
+		undistToDist.compute(imageShape.b.x, imageShape.b.y, f.distortedPixels.b);
+		undistToDist.compute(imageShape.c.x, imageShape.c.y, f.distortedPixels.c);
+		undistToDist.compute(imageShape.d.x, imageShape.d.y, f.distortedPixels.d);
 	}
 
 	/**

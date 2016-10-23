@@ -24,7 +24,6 @@ import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -41,9 +40,6 @@ import java.awt.image.BufferedImage;
  */
 public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
-
-	String directory = UtilIO.pathExample("fiducial/binary/");
-
 	public TestSquareBinary_to_FiducialDetector() {
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
@@ -59,7 +55,7 @@ public class TestSquareBinary_to_FiducialDetector extends GenericFiducialDetecto
 
 	@Override
 	public LensDistortionNarrowFOV loadDistortion(boolean distorted) {
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic.yaml"));
+		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("intrinsic_binary.yaml"));
 		if( !distorted ) {
 			model.radial = null;
 			model.t1 = model.t2 = 0;
