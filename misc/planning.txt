@@ -11,7 +11,6 @@ Less High Priority Next Release
   * make float images contain actual disparity, not offset.  negative values for invalid
 
 - Fiducials
-  * Have two interfaces.  One for detection and another for estimating their pose.
   * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
   * Pose: Have generalized code for going from control points to pose?
 

@@ -79,7 +79,48 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void findInnerGrid() {
-		fail("implement");
+		int rows = 3;
+		int cols = 4;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows,cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		List<List<NodeInfo>> outerGrid = new ArrayList<>();
+
+		// the outer grid should be contained in the first rows*cols elements
+		for (int i = 0, index=0; i < rows; i++) {
+			List<NodeInfo> row = new ArrayList<>();
+			for (int j = 0; j < cols; j++, index++) {
+				row.add(alg.listInfo.get(index));
+			}
+			outerGrid.add(row);
+		}
+
+		List<List<NodeInfo>> found = alg.findInnerGrid(outerGrid,rows*cols + (rows-1)*(cols-1));
+
+		// see if it's the expected size
+		int size = 0;
+		for (int i = 0; i < found.size(); i++) {
+			size += found.get(i).size();
+		}
+		assertEquals(size, found.size());
+
+		// make sure none of the found elements are in the outer grid
+		for (int i = 0; i < found.size(); i++) {
+			List<NodeInfo> l = found.get(i);
+			for (int j = 0; j < l.size(); j++) {
+				NodeInfo n = l.get(j);
+				boolean matched = false;
+				for (int k = 0; k < rows * cols; k++) {
+					if( n == alg.listInfo.get(k)) {
+						matched = true;
+						break;
+					}
+				}
+				assertFalse(matched);
+			}
+		}
 	}
 
 	@Test
@@ -194,36 +235,58 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		assertEquals(cols*2+(rows-2)*2, alg.contour.size);
 	}
 
+	private Tuple2<List<Node>,List<EllipseRotated_F64>> createAsymGrid( int rows , int cols ) {
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
+
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				ellipses.add( new EllipseRotated_F64(col,row,0.1,0.1,0) );
+			}
+		}
+		for (int row = 0; row < rows-1; row++) {
+			for (int col = 0; col < cols-1; col++) {
+				ellipses.add( new EllipseRotated_F64(col+0.5,row+0.5,0.1,0.1,0) );
+			}
+		}
+
+		return connectEllipses(ellipses, 1.1 );
+	}
+
 	/**
 	 * Creates a regular grid of nodes and sets up the angle and neighbors correctly
-	 * @param rows
-	 * @param cols
-	 * @return
 	 */
 	private Tuple2<List<Node>,List<EllipseRotated_F64>> createRegularGrid( int rows , int cols ) {
-		List<Node> cluster = new ArrayList<>();
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		for (int row = 0, i = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++, i++) {
 				ellipses.add( new EllipseRotated_F64(col,row,0.1,0.1,0) );
-				cluster.add( new Node());
-				cluster.get(i).which = i;
 			}
 		}
 
-		for (int row = 0, i=0; row < rows; row++) {
-			for (int col = 0; col < cols; col++, i++) {
-				Node a = cluster.get(i);
+		return connectEllipses(ellipses, 1.8 );
+	}
 
-				if( col > 0 )
-					a.connections.add(i-1);
-				if( row > 0 )
-					a.connections.add(i-cols);
-				if( col < cols-1 )
-					a.connections.add(i+1);
-				if( row < rows-1 )
-					a.connections.add(i+cols);
+	private Tuple2<List<Node>, List<EllipseRotated_F64>> connectEllipses(List<EllipseRotated_F64> ellipses, double distance ) {
+		List<Node> cluster = new ArrayList<>();
+
+		for (int i = 0; i < ellipses.size(); i++) {
+			cluster.add( new Node() );
+			cluster.get(i).which = i;
+		}
+
+		for (int i = 0; i < ellipses.size(); i++) {
+			Node n0 = cluster.get(i);
+			EllipseRotated_F64 e0 = ellipses.get(i);
+
+			for (int j = i+1; j < ellipses.size(); j++) {
+				Node n1 = cluster.get(j);
+				EllipseRotated_F64 e1 = ellipses.get(j);
+
+				if( e1.center.distance(e0.center) <= distance ) {
+					n0.connections.add(j);
+					n1.connections.add(i);
+				}
 			}
 		}
 

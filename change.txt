@@ -44,6 +44,7 @@ Version : 0.25
   * VGG trained on CIFAR10  (10 categories at 89.9%)
   * Network-in-Network trained on ImageNet (1000 categories at 62.6%)
 - FiducialDetector
+  * Takes in a distortion factory instead of camera parameters
   * Added getIntrinsics()
   * Added getImageLocation()
   * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
