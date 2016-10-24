@@ -64,17 +64,94 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void combineGrids() {
-		fail("implement");
+		// create a grid in the expected format
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows, cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		// split into the two grids
+		List<List<NodeInfo>> outer = convertIntoGridOfLists(0, rows, cols, alg);
+		List<List<NodeInfo>> inner = convertIntoGridOfLists(rows*cols, rows-1, cols-1, alg);
+
+		alg.combineGrids(outer,inner);
+
+		EllipseClustersIntoAsymmetricGrid.Grid found = alg.getGrids().get(0);
+
+		assertEquals(rows*2-1, found.rows);
+		assertEquals(cols*2-1, found.columns);
+
+		for (int row = 0; row < found.rows; row++) {
+			if( row % 2 == 0 ) {
+				for (int col = 0; col < found.columns; col += 2) {
+					int index = row*found.columns + col;
+					assertTrue( outer.get(row/2).get(col/2).ellipse == found.ellipses.get(index));
+					assertTrue( null == found.ellipses.get(index + 1));
+				}
+			} else {
+				for (int col = 1; col < found.columns; col += 2) {
+					fail("Implement");
+				}
+			}
+		}
 	}
 
 	@Test
 	public void checkGridSize() {
-		fail("implement");
+		// create a grid in the expected format
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows, cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		// split into the two grids
+		List<List<NodeInfo>> outer = convertIntoGridOfLists(0, rows, cols, alg);
+		List<List<NodeInfo>> inner = convertIntoGridOfLists(rows*cols, rows-1, cols-1, alg);
+
+		// test the function
+		int expectedSize = rows*cols + (rows-1)*(cols-1);
+		assertTrue(EllipseClustersIntoAsymmetricGrid.checkGridSize(outer,inner,expectedSize));
+
+		inner.get(1).remove(1);
+		assertFalse(EllipseClustersIntoAsymmetricGrid.checkGridSize(outer,inner,expectedSize));
 	}
 
 	@Test
 	public void checkDuplicates() {
-		fail("implement");
+		// create a grid in the expected format
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(rows, cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+		alg.computeNodeInfo(grid.data1,grid.data0);
+
+		List<List<NodeInfo>> gridLists = convertIntoGridOfLists(0, rows, cols, alg);
+
+		// everything should be unique here
+		assertFalse( alg.checkDuplicates(gridLists));
+
+		// test a negative now
+		gridLists.get(1).set(2, gridLists.get(0).get(0));
+		assertTrue( alg.checkDuplicates(gridLists));
+	}
+
+	public List<List<NodeInfo>> convertIntoGridOfLists( int startIndex ,
+														int rows, int cols,
+														EllipseClustersIntoAsymmetricGrid alg) {
+		List<List<NodeInfo>> gridLists = new ArrayList<>();
+		for (int row = 0; row < rows; row++) {
+			List<NodeInfo> l = new ArrayList<>();
+			gridLists.add(l);
+			for (int col = 0; col < cols; col++) {
+				l.add( alg.listInfo.get(startIndex + row*cols + col));
+			}
+		}
+		return gridLists;
 	}
 
 	@Test
@@ -104,7 +181,7 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		for (int i = 0; i < found.size(); i++) {
 			size += found.get(i).size();
 		}
-		assertEquals(size, found.size());
+		assertEquals(size, (rows-1)*(cols-1));
 
 		// make sure none of the found elements are in the outer grid
 		for (int i = 0; i < found.size(); i++) {

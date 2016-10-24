@@ -127,7 +127,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 				continue;
 			}
 
-			if( !checkDuplicates(outerGrid) || !checkDuplicates(innerGrid)) {
+			if( checkDuplicates(outerGrid) || checkDuplicates(innerGrid)) {
 				continue;
 			}
 
@@ -140,7 +140,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 * Makes sure the found grid is the same size as the original cluster.  If it's not then.
 	 * not all the nodes were used.  All lists must have he same size too.
 	 */
-	boolean checkGridSize(List<List<NodeInfo>> outerGrid ,
+	static boolean checkGridSize(List<List<NodeInfo>> outerGrid ,
 						  List<List<NodeInfo>> innerGrid ,
 						  int clusterSize ) {
 		int total = 0;
@@ -152,7 +152,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		}
 		expected = innerGrid.get(0).size();
 		for (int i = 0; i < innerGrid.size(); i++) {
-			if( expected != outerGrid.get(i).size() )
+			if( expected != innerGrid.get(i).size() )
 				return false;
 			total += innerGrid.get(i).size();
 		}
@@ -170,11 +170,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 			for (int j = 0; j < list.size(); j++) {
 				NodeInfo n = list.get(j);
 				if( n.marked )
-					return false;
+					return true;
 				n.marked = true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 
@@ -220,8 +220,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 		if( corner == null )
 			return null;
 
-		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
-		NodeInfo colNext = selectSeedNext(c00,c10,corner);
+		NodeInfo rowNext = selectSeedNext(c00,c10,corner);
+		NodeInfo colNext = selectSeedNext(c00,c01,corner);
 
 		List<NodeInfo> row = findLine(corner, rowNext, clusterSize);
 		List<NodeInfo> column = findLine(corner, colNext, clusterSize);
