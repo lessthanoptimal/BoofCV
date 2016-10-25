@@ -23,8 +23,12 @@ import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.NodeIn
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.transform.ConvertTransform_F64;
+import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Tuple2;
 import org.junit.Test;
@@ -55,14 +59,26 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		List<List<Node>> nodes = new ArrayList<>();
 		nodes.add( grid.data0 );
 
+		checkProcess(rows, cols, grid, alg, nodes);
+	}
+
+	private void checkProcess(int rows, int cols, Tuple2<List<Node>, List<EllipseRotated_F64>> grid, EllipseClustersIntoAsymmetricGrid alg, List<List<Node>> nodes) {
 		alg.process(grid.data1, nodes);
 
 		FastQueue<Grid> found = alg.getGrids();
 
 		assertEquals( 1 , found.size() );
+		checkShape(rows, cols, found.get(0));
+	}
 
-		assertEquals( rows*2 + 1 , found.get(0).rows );
-		assertEquals( cols*2 + 1 , found.get(0).columns );
+	private void checkShape(int rows, int cols, Grid found) {
+		if( rows*2 - 1 == found.rows ) {
+			assertEquals(rows * 2 - 1, found.rows);
+			assertEquals(cols * 2 - 1, found.columns);
+		} else {
+			assertEquals(rows * 2 - 1, found.columns);
+			assertEquals(cols * 2 - 1, found.rows);
+		}
 	}
 
 	/**
@@ -70,13 +86,68 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	 */
 	@Test
 	public void process_affine() {
-		fail("implement");
+		// scale different amounts along each axis and translate for fun
+		process_affine( new Affine2D_F64(1.05,0,0,0.95,1,2));
+
+		// rotate a bit
+		Affine2D_F64 rotate = ConvertTransform_F64.convert(new Se2_F64(0,0,0.5),(Affine2D_F64)null);
+		process_affine( rotate );
 	}
 
+	private void process_affine( Affine2D_F64 affine ) {
+		// create a grid in the expected format
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows, cols);
 
+		for( EllipseRotated_F64 e : grid.data1 ) {
+			AffinePointOps_F64.transform(affine, e.center, e.center);
+		}
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		List<List<Node>> nodes = new ArrayList<>();
+		nodes.add( grid.data0 );
+
+		checkProcess(rows, cols, grid, alg, nodes);
+	}
+
+	/**
+	 * Multiple grids in view at the same time
+	 */
 	@Test
-	public void process_mutiple_grids() {
-		fail("implement");
+	public void process_multiple_grids() {
+		// create two grids
+		int rows = 4; int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid0 = createAsymGrid(rows, cols);
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid1 = createAsymGrid(rows, cols);
+
+		List<List<Node>> nodes = new ArrayList<>();
+		List<EllipseRotated_F64> ellipses = new ArrayList<>();
+
+		nodes.add( grid0.data0 );
+		nodes.add( grid1.data0 );
+		ellipses.addAll( grid0.data1 );
+		ellipses.addAll( grid1.data1 );
+
+		// adjust indexing for second grid
+		for( Node n : grid1.data0 ) {
+			n.cluster = 1;
+			n.which += grid0.data1.size();
+			for (int i = 0; i < n.connections.size(); i++) {
+				n.connections.data[i] += grid0.data1.size();
+			}
+		}
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		alg.process(ellipses, nodes);
+
+		FastQueue<Grid> found = alg.getGrids();
+
+		assertEquals( 2 , found.size() );
+		checkShape(rows, cols, found.get(0));
+		checkShape(rows, cols, found.get(1));
 	}
 
 	/**
@@ -84,7 +155,25 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	 */
 	@Test
 	public void process_multiple_calls() {
-		fail("implement");
+		// create a grid in the expected format
+		int rows = 4; int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows, cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		List<List<Node>> nodes = new ArrayList<>();
+		nodes.add( grid.data0 );
+
+		checkProcess(rows, cols, grid, alg, nodes);
+
+		// process it a second time with a different grid
+		rows = 4; cols = 3;
+		grid = createAsymGrid(rows, cols);
+		alg = new EllipseClustersIntoAsymmetricGrid();
+		nodes.clear();
+		nodes.add( grid.data0 );
+
+		checkProcess(rows, cols, grid, alg, nodes);
 	}
 
 	/**
@@ -92,7 +181,16 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	 */
 	@Test
 	public void process_too_small() {
-		fail("implement");
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createRegularGrid(2, 1);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		List<List<Node>> nodes = new ArrayList<>();
+		nodes.add( grid.data0 );
+
+		alg.process(grid.data1, nodes);
+
+		assertEquals(0, alg.getGrids().size);
 	}
 
 	@Test
@@ -313,7 +411,7 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
 
 		NodeInfo best = new NodeInfo();
-		best.angleBetween = Math.PI/2.0;
+		best.angleBetween = 3.0*Math.PI/2.0;
 
 		for (int i = 0; i < 10; i++) {
 			NodeInfo n = new NodeInfo();

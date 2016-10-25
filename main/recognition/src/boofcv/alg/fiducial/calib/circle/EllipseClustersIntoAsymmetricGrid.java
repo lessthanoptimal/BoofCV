@@ -223,8 +223,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 		if( corner == null )
 			return null;
 
-		NodeInfo rowNext = selectSeedNext(c00,c10,corner);
-		NodeInfo colNext = selectSeedNext(c00,c01,corner);
+		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
+		NodeInfo colNext = selectSeedNext(c00,c10,corner);
 
 		List<NodeInfo> row = findLine(corner, rowNext, clusterSize);
 		List<NodeInfo> column = findLine(corner, colNext, clusterSize);
@@ -475,7 +475,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		contour.add( seed );
 		seed.contour = true;
 		NodeInfo current = seed.right;
-		while( current != seed && contour.size() < listInfo.size() ) {
+		while( current != null && current != seed && contour.size() < listInfo.size() ) {
 			contour.add( current );
 			seed.contour = true;
 			current = current.right;
@@ -499,7 +499,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	}
 
 	/**
-	 * Selects the node on the contour which is closest to 90 degrees and is thus likely to be
+	 * Selects the node on the contour which is closest to 270 degrees and is thus likely to be
 	 * a node on the corner
 	 */
 	NodeInfo selectSeedCorner() {
@@ -510,7 +510,6 @@ public class EllipseClustersIntoAsymmetricGrid {
 			NodeInfo info = contour.get(i);
 
 			double error = UtilAngle.dist(3*Math.PI/2.0,info.angleBetween);
-			System.out.println("error "+error+"  location "+info.ellipse.center);
 
 			if( error < bestError ) {
 				bestError = error;
