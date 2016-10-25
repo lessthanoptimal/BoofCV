@@ -196,8 +196,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 			} else {
 				list = innerGrid.get(row/2);
 			}
-			for (int i = 0; i < list.size(); i++) {
-				g.ellipses.add( list.get(i).ellipse );
+			for (int i = 0; i < g.columns; i++) {
+				if( (i%2) == (row%2))
+					g.ellipses.add(list.get(i/2).ellipse );
+				else
+					g.ellipses.add(null);
 			}
 		}
 	}
@@ -506,7 +509,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 		for (int i = 0; i < contour.size; i++) {
 			NodeInfo info = contour.get(i);
 
-			double error = UtilAngle.dist(Math.PI/2.0,info.angleBetween);
+			double error = UtilAngle.dist(3*Math.PI/2.0,info.angleBetween);
+			System.out.println("error "+error+"  location "+info.ellipse.center);
 
 			if( error < bestError ) {
 				bestError = error;

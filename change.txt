@@ -32,7 +32,7 @@ Version : 0.25
   * Renamed IntrinsicParameters to CameraPinhole
   * Broke distortion off into a separate class which extends CameraPinhole
      - CameraPinholeRadial
-  * Added a new camera model Universal Omnidirectional
+  * Added a new camera for wide FOV cameras: Universal Omnidirectional
   * Created new transforms to handle non-pinhole cameras
 - YAML
   * Changed save format to YAML for camera model parameters.

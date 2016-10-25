@@ -184,12 +184,11 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		PixelTransform2_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
 		removePerspective.setModel(squareToInput);
 
-		binary.reshape(width, height);
-
 		this.undistToDist = distortion.distort_F64(true,true);
 	}
 
-	Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
+	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
+	private Quadrilateral_F64 q = new Quadrilateral_F64(); // interpolation hack in quadrilateral format
 	/**
 	 * Examines the input image to detect fiducials inside of it
 	 *
@@ -206,7 +205,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 		found.reset();
 
 		if( verbose ) System.out.println("---------- Got Polygons! "+candidates.size);
-		Quadrilateral_F64 q = new Quadrilateral_F64(); // todo predeclare
+
 		for (int i = 0; i < candidates.size; i++) {
 			// compute the homography from the input image to an undistorted square image
 			Polygon2D_F64 p = candidates.get(i);

@@ -18,12 +18,14 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.NodeInfo;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Tuple2;
 import org.junit.Test;
 
@@ -43,6 +45,37 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 	 */
 	@Test
 	public void process() {
+		// create a grid in the expected format
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createAsymGrid(rows, cols);
+
+		EllipseClustersIntoAsymmetricGrid alg = new EllipseClustersIntoAsymmetricGrid();
+
+		List<List<Node>> nodes = new ArrayList<>();
+		nodes.add( grid.data0 );
+
+		alg.process(grid.data1, nodes);
+
+		FastQueue<Grid> found = alg.getGrids();
+
+		assertEquals( 1 , found.size() );
+
+		assertEquals( rows*2 + 1 , found.get(0).rows );
+		assertEquals( cols*2 + 1 , found.get(0).columns );
+	}
+
+	/**
+	 * Apply some affine distortion so that the grid isn't perfect
+	 */
+	@Test
+	public void process_affine() {
+		fail("implement");
+	}
+
+
+	@Test
+	public void process_mutiple_grids() {
 		fail("implement");
 	}
 
@@ -78,7 +111,7 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 		alg.combineGrids(outer,inner);
 
-		EllipseClustersIntoAsymmetricGrid.Grid found = alg.getGrids().get(0);
+		Grid found = alg.getGrids().get(0);
 
 		assertEquals(rows*2-1, found.rows);
 		assertEquals(cols*2-1, found.columns);
@@ -88,11 +121,14 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 				for (int col = 0; col < found.columns; col += 2) {
 					int index = row*found.columns + col;
 					assertTrue( outer.get(row/2).get(col/2).ellipse == found.ellipses.get(index));
-					assertTrue( null == found.ellipses.get(index + 1));
+					if( index+1 < found.rows*found.columns)
+						assertTrue( null == found.ellipses.get(index + 1));
 				}
 			} else {
 				for (int col = 1; col < found.columns; col += 2) {
-					fail("Implement");
+					int index = row*found.columns + col;
+					assertTrue( null == found.ellipses.get(index - 1));
+					assertTrue( inner.get(row/2).get(col/2).ellipse == found.ellipses.get(index));
 				}
 			}
 		}

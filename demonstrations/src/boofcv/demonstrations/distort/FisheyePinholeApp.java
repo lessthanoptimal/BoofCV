@@ -359,9 +359,10 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Dining Room", UtilIO.pathExample("fisheye/theta_front/dining_room.jpg")));
-		examples.add(new PathLabel("Building Side", UtilIO.pathExample("fisheye/theta_back/building_side.jpg")));
-		examples.add(new PathLabel("Tree Fence", UtilIO.pathExample("fisheye/theta_back/tree_fence.jpg")));
-		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("fisheye/theta_front/half_dome.jpg")));
+		// TODO delete other images before adding to git
+//		examples.add(new PathLabel("Building Side", UtilIO.pathExample("fisheye/theta_back/building_side.jpg")));
+//		examples.add(new PathLabel("Tree Fence", UtilIO.pathExample("fisheye/theta_back/tree_fence.jpg")));
+//		examples.add(new PathLabel("Half Dome", UtilIO.pathExample("fisheye/theta_front/half_dome.jpg")));
 
 		FisheyePinholeApp app = new FisheyePinholeApp(examples,type);
 
