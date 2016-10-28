@@ -248,18 +248,40 @@ public class GPixelMath {
 	 * Performs pixel-wise division<br>
 	 * output(x,y) = imgA(x,y) / imgB(x,y)
 	 * </p>
-	 * Only floating point images are supported.
+	 * Only floating point images are supported.  If the numerator has multiple bands and the denominator is a single
+	 * band then the denominator will divide each band.
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void divide(T imgA, T imgB , T output)
+	public static <N extends ImageBase,D extends ImageBase> void divide(N imgA, D imgB , N output)
 	{
-		if( GrayF32.class == imgA.getClass() ) {
-			PixelMath.divide((GrayF32)imgA,(GrayF32)imgB,(GrayF32)output);
-		} else if( GrayF64.class == imgA.getClass() ) {
-			PixelMath.divide((GrayF64)imgA,(GrayF64)imgB,(GrayF64)output);
+		if( imgA instanceof ImageGray && imgB instanceof ImageGray ) {
+			if (GrayF32.class == imgA.getClass()) {
+				PixelMath.divide((GrayF32) imgA, (GrayF32) imgB, (GrayF32) output);
+			} else if (GrayF64.class == imgA.getClass()) {
+				PixelMath.divide((GrayF64) imgA, (GrayF64) imgB, (GrayF64) output);
+			}
+		} else if( imgA instanceof Planar && imgB instanceof ImageGray ) {
+			Planar in = (Planar) imgA;
+			Planar out = (Planar) output;
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				if (GrayF32.class == imgB.getClass()) {
+					PixelMath.divide((GrayF32) in.getBand(i), (GrayF32) imgB, (GrayF32) out.getBand(i));
+				} else if (GrayF64.class == imgB.getClass()) {
+					PixelMath.divide((GrayF64) in.getBand(i), (GrayF64) imgB, (GrayF64) out.getBand(i));
+				}
+			}
+		} else if( imgA instanceof Planar && imgB instanceof Planar ) {
+			Planar inA = (Planar) imgA;
+			Planar inB = (Planar) imgB;
+			Planar out = (Planar) output;
+
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				divide(inA.getBand(i), inB.getBand(i), out.getBand(i));
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+imgA.getClass().getSimpleName());
 		}
@@ -393,18 +415,49 @@ public class GPixelMath {
 	 * Performs pixel-wise multiplication<br>
 	 * output(x,y) = imgA(x,y) * imgB(x,y)
 	 * </p>
-	 * Only floating point images are supported.
+	 * Only floating point images are supported.  If one image has multiple bands and the other is gray then
+	 * the gray image will be multiplied by each band in the multiple band image.
 	 *
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray> void multiply(T imgA, T imgB , T output)
+	public static <N extends ImageBase,D extends ImageBase> void multiply(N imgA, D imgB , N output)
 	{
-		if( GrayF32.class == imgA.getClass() ) {
-			PixelMath.multiply((GrayF32)imgA,(GrayF32)imgB,(GrayF32)output);
-		} else if( GrayF64.class == imgA.getClass() ) {
-			PixelMath.multiply((GrayF64)imgA,(GrayF64)imgB,(GrayF64)output);
+		if( imgA instanceof ImageGray && imgB instanceof ImageGray ) {
+			if (GrayF32.class == imgA.getClass()) {
+				PixelMath.multiply((GrayF32) imgA, (GrayF32) imgB, (GrayF32) output);
+			} else if (GrayF64.class == imgA.getClass()) {
+				PixelMath.multiply((GrayF64) imgA, (GrayF64) imgB, (GrayF64) output);
+			}
+		} else if( imgA instanceof Planar && imgB instanceof Planar ) {
+			Planar inA = (Planar) imgA;
+			Planar inB = (Planar) imgB;
+			Planar out = (Planar) output;
+
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				multiply(inA.getBand(i), inB.getBand(i), out.getBand(i));
+			}
+		} else if( imgA instanceof Planar || imgB instanceof Planar ) {
+			Planar in;
+			ImageGray gray;
+			Planar out = (Planar) output;
+
+			if( imgA instanceof Planar ) {
+				in = (Planar)imgA;
+				gray = (ImageGray)imgB;
+			} else {
+				in = (Planar)imgB;
+				gray = (ImageGray)imgA;
+			}
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				if (GrayF32.class == gray.getClass()) {
+					PixelMath.multiply((GrayF32) in.getBand(i), (GrayF32) gray, (GrayF32) out.getBand(i));
+				} else if (GrayF64.class == gray.getClass()) {
+					PixelMath.multiply((GrayF64) in.getBand(i), (GrayF64) gray, (GrayF64) out.getBand(i));
+				}
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+imgA.getClass().getSimpleName());
 		}
@@ -846,26 +899,36 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Output image. Modified.
 	 */
-	public static <T extends ImageGray, O extends ImageGray>
+	public static <T extends ImageBase, O extends ImageBase>
 	void add(T inputA, T inputB, O output) {
-		if( GrayU8.class == inputA.getClass() ) {
-			PixelMath.add((GrayU8) inputA, (GrayU8)inputB, (GrayU16) output);
-		} else if( GrayS8.class == inputA.getClass() ) {
-			PixelMath.add((GrayS8) inputA, (GrayS8)inputB, (GrayS16) output);
-		} else if( GrayU16.class == inputA.getClass() ) {
-			PixelMath.add((GrayU16) inputA, (GrayU16)inputB, (GrayS32) output);
-		} else if( GrayS16.class == inputA.getClass() ) {
-			PixelMath.add((GrayS16) inputA, (GrayS16)inputB, (GrayS32) output);
-		} else if( GrayS32.class == inputA.getClass() ) {
-			PixelMath.add((GrayS32) inputA, (GrayS32)inputB, (GrayS32) output);
-		} else if( GrayS64.class == inputA.getClass() ) {
-			PixelMath.add((GrayS64) inputA, (GrayS64)inputB, (GrayS64) output);
-		} else if( GrayF32.class == inputA.getClass() ) {
-			PixelMath.add((GrayF32) inputA, (GrayF32)inputB, (GrayF32) output);
-		} else if( GrayF64.class == inputA.getClass() ) {
-			PixelMath.add((GrayF64) inputA, (GrayF64)inputB, (GrayF64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+		if( inputA instanceof ImageGray) {
+			if (GrayU8.class == inputA.getClass()) {
+				PixelMath.add((GrayU8) inputA, (GrayU8) inputB, (GrayU16) output);
+			} else if (GrayS8.class == inputA.getClass()) {
+				PixelMath.add((GrayS8) inputA, (GrayS8) inputB, (GrayS16) output);
+			} else if (GrayU16.class == inputA.getClass()) {
+				PixelMath.add((GrayU16) inputA, (GrayU16) inputB, (GrayS32) output);
+			} else if (GrayS16.class == inputA.getClass()) {
+				PixelMath.add((GrayS16) inputA, (GrayS16) inputB, (GrayS32) output);
+			} else if (GrayS32.class == inputA.getClass()) {
+				PixelMath.add((GrayS32) inputA, (GrayS32) inputB, (GrayS32) output);
+			} else if (GrayS64.class == inputA.getClass()) {
+				PixelMath.add((GrayS64) inputA, (GrayS64) inputB, (GrayS64) output);
+			} else if (GrayF32.class == inputA.getClass()) {
+				PixelMath.add((GrayF32) inputA, (GrayF32) inputB, (GrayF32) output);
+			} else if (GrayF64.class == inputA.getClass()) {
+				PixelMath.add((GrayF64) inputA, (GrayF64) inputB, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + inputA.getClass().getSimpleName());
+			}
+		} else if (inputA instanceof Planar) {
+			Planar inA = (Planar)inputA;
+			Planar inB = (Planar)inputB;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				add(inA.getBand(i),inB.getBand(i),out.getBand(i));
+			}
 		}
 	}
 
@@ -899,6 +962,14 @@ public class GPixelMath {
 				PixelMath.subtract((GrayF64) inputA, (GrayF64)inputB, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+			}
+		} else if (inputA instanceof Planar) {
+			Planar inA = (Planar)inputA;
+			Planar inB = (Planar)inputB;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				subtract(inA.getBand(i),inB.getBand(i),out.getBand(i));
 			}
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());

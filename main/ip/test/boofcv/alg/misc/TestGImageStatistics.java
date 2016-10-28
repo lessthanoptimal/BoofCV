@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
+// TODO add unit tests for Planar images
 public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 	public TestGImageStatistics() {

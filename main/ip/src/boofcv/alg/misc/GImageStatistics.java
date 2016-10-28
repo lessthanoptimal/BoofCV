@@ -232,6 +232,13 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
+		} else if( input instanceof Planar ) {
+			double sum = 0;
+			Planar in = (Planar) input;
+			for (int i = 0; i < in.getNumBands(); i++) {
+				sum += sum( in.getBand(i));
+			}
+			return sum;
 		} else {
 			throw new IllegalArgumentException("Planar image support needs to be added");
 		}

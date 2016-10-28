@@ -26,6 +26,7 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -198,5 +199,25 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		assertTrue(foundNotZero);
 
 		BoofTesting.assertEquals(t, v, 0);
+	}
+
+	@Test
+	public void divide_planar_by_gray() {
+		fail("Implement");
+	}
+
+	@Test
+	public void divide_planar_by_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	public void multiply_planar_by_gray() {
+		fail("Implement");
+	}
+
+	@Test
+	public void multiply_planar_by_planar() {
+		fail("Implement");
 	}
 }
