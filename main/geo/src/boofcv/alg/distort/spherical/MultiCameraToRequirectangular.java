@@ -46,23 +46,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fuses information from multiple camera to create a single equirectangular image
+ * Fuses information from multiple camera to create a single equirectangular image.  Each image
+ * is rendered independently and added to the output image, but weighted by the mask.  The mask
+ * describes the region of pixels in the equirectangular image which it represents.
  *
  * @author Peter Abeles
  */
 public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 
-	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+	private EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 	private int equiWidth, equHeight;
 
-	List<Camera> cameras = new ArrayList<>();
+	private List<Camera> cameras = new ArrayList<>();
 
-	T averageImage;
-	T workImage;
-	T cameraRendered;
-	GrayF32 weightImage;
+	private T averageImage;
+	private T workImage;
+	private T cameraRendered;
+	private GrayF32 weightImage;
 
-	ImageDistort<T,T> distort;
+	private ImageDistort<T,T> distort;
+
+	// how close to original pixel does it need to be to not be masked out
+	private float maskTolerancePixels = 2.0f;
 
 	public MultiCameraToRequirectangular(ImageDistort<T,T> distort , int width , int height , ImageType<T> imageType ) {
 
@@ -99,60 +104,40 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		EquiToCamera equiToCamera = new EquiToCamera(cameraToCommon.getR(),s2p);
 		CameraToEqui cameraToEqui = new CameraToEqui(cameraToCommon.getR(),p2s);
 
-		Point2D_F32 cameraPixel = new Point2D_F32();
 		Point2D_F32 equiPixel = new Point2D_F32();
-		GrayU8 cameraMask = new GrayU8(width, height);
-
-		for (int row = 0; row < height; row++) {
-			for (int col = 0; col < width; col++) {
-				cameraToEqui.compute(col,row, equiPixel);
-				equiToCamera.compute(equiPixel.x, equiPixel.y, cameraPixel);
-
-				double distance = UtilPoint2D_F32.distance(col,row, cameraPixel.x, cameraPixel.y);
-
-				if( distance < 0.5 ) {
-					cameraMask.unsafe_set(col,row,1);
-				}
-			}
-		}
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
 		PixelTransform2_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
 				new PointToPixelTransform_F32(equiToCamera));
 
+		float tol = maskTolerancePixels*maskTolerancePixels;
 
-//		for (int row = 0; row < equHeight; row++) {
-//			for (int col = 0; col < equiWidth; col++) {
-//				transformEquiToCam.compute(col, row);
-//				float pixelX = transformEquiToCam.distX;
-//				float pixelY = transformEquiToCam.distY;
-//				if( pixelX >= 0 && pixelX <= width-1 && pixelY >= 0 && pixelY <= height-1) {
-//					int index = ((int)pixelY)*width + (int)pixelX;
-//					cameraMask.data[index]++;
-//				}
-//			}
-//		}
 		for (int row = 0; row < equHeight; row++) {
 			for (int col = 0; col < equiWidth; col++) {
 				transformEquiToCam.compute(col,row);
+				float x = transformEquiToCam.distX;
+				float y = transformEquiToCam.distY;
 
-				float pixelX = transformEquiToCam.distX;
-				float pixelY = transformEquiToCam.distY;
+				// make sure it is contained inside the camera image
+				if( x < 0f || y < 0f || x > width-1 || y > height-1 )
+					continue;
 
-				// see if it is contained inside the image
-				float weight = 0;
-				if( pixelX >= 0 && pixelX <= width-1 && pixelY >= 0 && pixelY <= height-1) {
+				// need to check this case too
+				if( Double.isNaN(x) || Double.isNaN(y))
+					continue;
 
-					if( cameraMask.unsafe_get((int)pixelX, (int)pixelY) == 1 ) {
-						weight = 1.0f;
-					}
+				// go back to equirectangular and see if it returns the same result
+				cameraToEqui.compute(x,y, equiPixel);
+
+				float distance2 = UtilPoint2D_F32.distanceSq(equiPixel.x,equiPixel.y,col,row);
+
+				if( distance2 < tol ) {
+					equiMask.set(col,row,1);
 				}
 
-				equiMask.set(col,row,weight);
 			}
 		}
-
 		cameras.add( new Camera(equiMask, transformEquiToCam));
 	}
 
@@ -265,6 +250,14 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 	 */
 	public GrayF32 getMask( int which ) {
 		return cameras.get(which).mask;
+	}
+
+	public float getMaskTolerancePixels() {
+		return maskTolerancePixels;
+	}
+
+	public void setMaskTolerancePixels(float maskTolerancePixels) {
+		this.maskTolerancePixels = maskTolerancePixels;
 	}
 
 	private static class Camera {
