@@ -23,7 +23,6 @@ import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.PixelTransformCached_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.distort.PixelTransform2_F32;
@@ -209,33 +208,18 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 			distort.setModel(c.equiToCamera);
 			distort.apply(cameraImage,cameraRendered);
 
-			double sum = GImageStatistics.sum(cameraRendered);
-			System.out.println("cameraRendered sum "+sum);
-
 			/// sum up the total weight for each pixel
 			PixelMath.add(weightImage,c.mask,weightImage);
-
-			sum = GImageStatistics.sum(weightImage);
-			System.out.println("weightImage sum "+sum);
 
 			// apply the weight for this image to the rendered image
 			GPixelMath.multiply(c.mask,cameraRendered,workImage);
 
-			sum = GImageStatistics.sum(workImage);
-			System.out.println("workImage sum "+sum);
-
 			// add the result to the average image
 			GPixelMath.add(workImage, averageImage, averageImage);
-
-			sum = GImageStatistics.sum(averageImage);
-			System.out.println("averageImage sum "+sum);
 		}
 
 		// comput the final output by dividing
 		GPixelMath.divide(averageImage,weightImage,averageImage);
-
-		double sum = GImageStatistics.sum(averageImage);
-		System.out.println("final averageImage sum "+sum);
 	}
 
 	public T getRenderedImage() {
