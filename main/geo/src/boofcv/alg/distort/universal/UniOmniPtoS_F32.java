@@ -93,18 +93,22 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 		float v = p2.y;
 
 		// compute adjustment to go from normalized image coordinate to unit sphere
+		// This is done by finding the intersection of a line with slop X going through the
+		// origin and lying on the sphere's surface, i.e. distance of 1 from the center
 		// X = (u, v , 1)
-		// S = (a*u, a*v, a - xi)  and ||S|| = 1
-		float a;
+		// P = (t*u, t*v, t)  and ||P-C|| = 1
+		// There will be two solutions.  It selects the one farther down the line (top of the
+		// sphere)  If xi is > 1 then it's possible for two pixels to have the same value slope
 		float xi = mirrorOffset;
 
-		float c0 = u*u + v*v + 1.0f;
-		float c1 = -2.0f*xi;
-		float c2 = xi*xi - 1;
-		a = (-c1 + (float)Math.sqrt(c1*c1 - 4.0f*c0*c2))/(2.0f*c0);
+		// solve for the quadratic equation
+		float a = u*u + v*v + 1.0f;
+		float b = -2.0f*xi;
+		float c = xi*xi - 1.0f;
+		float t = (-b + (float)Math.sqrt(b*b - 4.0f*a*c))/(2.0f*a);
 
-		out.x = u*a;
-		out.y = v*a;
-		out.z = a - xi;
+		out.x = u*t;
+		out.y = v*t;
+		out.z = t - xi;
 	}
 }

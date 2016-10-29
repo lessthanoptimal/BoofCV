@@ -69,10 +69,6 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		// apply mirror offset
 		z += mirrorOffset;
 
-		if( z <= 0 ) {
-			out.set(-1,-1);
-		}
-
 		// compute normalized image coordinates
 		x /= z;
 		y /= z;
