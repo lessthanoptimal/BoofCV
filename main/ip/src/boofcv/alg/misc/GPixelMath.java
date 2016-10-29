@@ -470,13 +470,22 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static <T extends ImageGray> void log(T input , T output ) {
-		if( GrayF32.class == input.getClass() ) {
-			PixelMath.log((GrayF32) input, (GrayF32) output);
-		} else if( GrayF64.class == input.getClass() ) {
-			PixelMath.log((GrayF64) input, (GrayF64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+	public static <T extends ImageBase> void log(T input , T output ) {
+		if( input instanceof ImageGray ) {
+			if (GrayF32.class == input.getClass()) {
+				PixelMath.log((GrayF32) input, (GrayF32) output);
+			} else if (GrayF64.class == input.getClass()) {
+				PixelMath.log((GrayF64) input, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar ) {
+			Planar in = (Planar)input;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				log( in.getBand(i), out.getBand(i));
+			}
 		}
 	}
 
@@ -487,13 +496,22 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Modified.
 	 */
-	public static <T extends ImageGray> void pow2(T input , T output ) {
-		if( GrayF32.class == input.getClass() ) {
-			PixelMath.pow2((GrayF32) input, (GrayF32) output);
-		} else if( GrayF64.class == input.getClass() ) {
-			PixelMath.pow2((GrayF64) input, (GrayF64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+	public static <T extends ImageBase> void pow2(T input , T output ) {
+		if( input instanceof ImageGray ) {
+			if (GrayF32.class == input.getClass()) {
+				PixelMath.pow2((GrayF32) input, (GrayF32) output);
+			} else if (GrayF64.class == input.getClass()) {
+				PixelMath.pow2((GrayF64) input, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar ) {
+			Planar in = (Planar)input;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				pow2( in.getBand(i), out.getBand(i));
+			}
 		}
 	}
 
@@ -504,13 +522,22 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the sqrt() image is written to. Modified.
 	 */
-	public static <T extends ImageGray> void sqrt(T input , T output ) {
-		if( GrayF32.class == input.getClass() ) {
-			PixelMath.sqrt((GrayF32) input, (GrayF32) output);
-		} else if( GrayF64.class == input.getClass() ) {
-			PixelMath.sqrt((GrayF64) input, (GrayF64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+	public static <T extends ImageBase> void sqrt(T input , T output ) {
+		if( input instanceof ImageGray ) {
+			if( GrayF32.class == input.getClass() ) {
+				PixelMath.sqrt((GrayF32) input, (GrayF32) output);
+			} else if( GrayF64.class == input.getClass() ) {
+				PixelMath.sqrt((GrayF64) input, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar ) {
+			Planar in = (Planar)input;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				sqrt( in.getBand(i), out.getBand(i));
+			}
 		}
 	}
 
@@ -983,26 +1010,33 @@ public class GPixelMath {
 	 * @param min minimum value. Inclusive.
 	 * @param max maximum value. Inclusive.
 	 */
-	public static <T extends ImageGray> void boundImage(T input , double min , double max ) {
+	public static <T extends ImageBase> void boundImage(T input , double min , double max ) {
+		if( input instanceof ImageGray ) {
+			if (GrayU8.class == input.getClass()) {
+				PixelMath.boundImage((GrayU8) input, (int) min, (int) max);
+			} else if (GrayS8.class == input.getClass()) {
+				PixelMath.boundImage((GrayS8) input, (int) min, (int) max);
+			} else if (GrayU16.class == input.getClass()) {
+				PixelMath.boundImage((GrayU16) input, (int) min, (int) max);
+			} else if (GrayS16.class == input.getClass()) {
+				PixelMath.boundImage((GrayS16) input, (int) min, (int) max);
+			} else if (GrayS32.class == input.getClass()) {
+				PixelMath.boundImage((GrayS32) input, (int) min, (int) max);
+			} else if (GrayS64.class == input.getClass()) {
+				PixelMath.boundImage((GrayS64) input, (long) min, (long) max);
+			} else if (GrayF32.class == input.getClass()) {
+				PixelMath.boundImage((GrayF32) input, (float) min, (float) max);
+			} else if (GrayF64.class == input.getClass()) {
+				PixelMath.boundImage((GrayF64) input, min, max);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar ) {
+			Planar in = (Planar)input;
 
-		if( GrayU8.class == input.getClass() ) {
-			PixelMath.boundImage((GrayU8)input,(int)min,(int)max);
-		} else if( GrayS8.class == input.getClass() ) {
-			PixelMath.boundImage((GrayS8)input,(int)min,(int)max);
-		} else if( GrayU16.class == input.getClass() ) {
-			PixelMath.boundImage((GrayU16)input,(int)min,(int)max);
-		} else if( GrayS16.class == input.getClass() ) {
-			PixelMath.boundImage((GrayS16)input,(int)min,(int)max);
-		} else if( GrayS32.class == input.getClass() ) {
-			PixelMath.boundImage((GrayS32)input,(int)min,(int)max);
-		} else if( GrayS64.class == input.getClass() ) {
-			PixelMath.boundImage((GrayS64)input,(long)min,(long)max);
-		} else if( GrayF32.class == input.getClass() ) {
-			PixelMath.boundImage((GrayF32)input,(float)min,(float)max);
-		} else if( GrayF64.class == input.getClass() ) {
-			PixelMath.boundImage((GrayF64)input,min,max);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			for (int i = 0; i < in.getNumBands(); i++) {
+				boundImage( in.getBand(i), min, max);
+			}
 		}
 	}
 
@@ -1015,26 +1049,35 @@ public class GPixelMath {
 	 * @param inputB Input image. Not modified.
 	 * @param output Absolute value of difference image. Modified.
 	 */
-	public static <T extends ImageGray> void diffAbs(T inputA , T inputB , T output) {
+	public static <T extends ImageBase> void diffAbs(T inputA , T inputB , T output) {
+		if( inputA instanceof ImageGray ) {
+			if (GrayU8.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayU8) inputA, (GrayU8) inputB, (GrayU8) output);
+			} else if (GrayS8.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayS8) inputA, (GrayS8) inputB, (GrayS8) output);
+			} else if (GrayU16.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayU16) inputA, (GrayU16) inputB, (GrayU16) output);
+			} else if (GrayS16.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayS16) inputA, (GrayS16) inputB, (GrayS16) output);
+			} else if (GrayS32.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayS32) inputA, (GrayS32) inputB, (GrayS32) output);
+			} else if (GrayS64.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayS64) inputA, (GrayS64) inputB, (GrayS64) output);
+			} else if (GrayF32.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayF32) inputA, (GrayF32) inputB, (GrayF32) output);
+			} else if (GrayF64.class == inputA.getClass()) {
+				PixelMath.diffAbs((GrayF64) inputA, (GrayF64) inputB, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + inputA.getClass().getSimpleName());
+			}
+		} else if( inputA instanceof Planar ) {
+			Planar inA = (Planar)inputA;
+			Planar inB = (Planar)inputB;
+			Planar out = (Planar)output;
 
-		if( GrayU8.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayU8) inputA, (GrayU8) inputB, (GrayU8) output);
-		} else if( GrayS8.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayS8) inputA, (GrayS8) inputB, (GrayS8) output);
-		} else if( GrayU16.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayU16) inputA, (GrayU16) inputB, (GrayU16) output);
-		} else if( GrayS16.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayS16) inputA, (GrayS16) inputB, (GrayS16) output);
-		} else if( GrayS32.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayS32) inputA, (GrayS32) inputB, (GrayS32) output);
-		} else if( GrayS64.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayS64) inputA, (GrayS64) inputB, (GrayS64) output);
-		} else if( GrayF32.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayF32) inputA, (GrayF32) inputB, (GrayF32) output);
-		} else if( GrayF64.class == inputA.getClass() ) {
-			PixelMath.diffAbs((GrayF64) inputA, (GrayF64) inputB, (GrayF64) output);
-		} else {
-			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				diffAbs( inA.getBand(i), inB.getBand(i), out.getBand(i));
+			}
 		}
 	}
 

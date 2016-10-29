@@ -19,14 +19,18 @@
 package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.Planar;
 import boofcv.testing.BoofTesting;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -201,23 +205,161 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 		BoofTesting.assertEquals(t, v, 0);
 	}
 
+	/**
+	 * Tests all functions with inputs from planar images
+	 */
 	@Test
-	public void divide_planar_by_gray() {
-		fail("Implement");
+	public void all_planar_images() {
+
+		int total = 0;
+		Method[] methods = GPixelMath.class.getMethods();
+
+		for( Method m : methods ) {
+			if(!Modifier.isStatic(m.getModifiers()))
+				continue;
+			Class[] param = m.getParameterTypes();
+			if( param.length < 1 )
+				continue;
+
+			// create input arguments
+			Object[] inputs = new Object[ param.length ];
+
+			for (int i = 0; i < inputs.length; i++) {
+				if( param[i] == ImageBase.class) {
+					inputs[i] = new Planar(GrayF32.class,width,height,2);
+					GImageMiscOps.fillUniform((ImageBase)inputs[i],rand,-100,100);
+				}
+			}
+
+			// specialized inputs for individual functions
+			String name = m.getName();
+			if( name.equals("divide") && param.length == 3) {
+				if( !ImageBase.class.isAssignableFrom(param[1]) )  {
+					inputs[1] = 3;
+				}
+			} else if( name.equals("divide") && param.length == 5) {
+				inputs[1] = 3;
+				inputs[2] = -1;
+				inputs[3] = 5;
+			} else if( name.equals("multiply") && param.length == 3) {
+				if( !ImageBase.class.isAssignableFrom(param[1]) )  {
+					inputs[1] = 3;
+				}
+			} else if( name.equals("multiply") && param.length == 5) {
+				inputs[1] = 3;
+				inputs[2] = -20;
+				inputs[3] = 12;
+			} else if( name.equals("plus") && param.length == 3) {
+				inputs[1] = 3;
+			} else if( name.equals("plus") && param.length == 5) {
+				inputs[1] = 3;
+				inputs[2] = -10;
+				inputs[3] = 12;
+			} else if( name.equals("minus") && param.length == 3) {
+				boolean first = ImageBase.class.isAssignableFrom(param[0]);
+				inputs[first?1:0] = 3;
+			} else if( name.equals("minus") && param.length == 5) {
+				boolean first = ImageBase.class.isAssignableFrom(param[0]);
+				inputs[first?1:0] = 3;
+				inputs[2] = -10;
+				inputs[3] = 12;
+			} else if( name.equals("boundImage") ) {
+				inputs[1] = 2;
+				inputs[2] = 8;
+			} else if( name.equals("averageBand")) {
+				continue;
+			}
+
+			try {
+				// create the expected results
+				Object[] inputsByBand = copy(inputs);
+				invokeByBand(m,inputsByBand);
+
+				// invoke this function
+				m.invoke(null,inputs );
+
+				// compare against each other
+				for (int i = 0; i < inputs.length; i++) {
+					if (Planar.class == inputs[i].getClass()) {
+						BoofTesting.assertEquals((ImageBase)inputs[i],(ImageBase)inputsByBand[i], 1e-4);
+					}
+				}
+				total++;
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		assertEquals(21,total);
+	}
+
+	private Object[] copy( Object inputs[] ) {
+		Object copy[] = new Object[inputs.length];
+
+		for (int i = 0; i < inputs.length; i++) {
+			if( Planar.class == inputs[i].getClass() ) {
+				copy[i] = ((Planar)inputs[i]).createSameShape();
+				((Planar)copy[i]).setTo((Planar)inputs[i]);
+			} else {
+				copy[i] = inputs[i];
+			}
+		}
+		return copy;
+	}
+
+	private void invokeByBand( Method m , Object inputs[] ) {
+		Object modified[] = new Object[inputs.length];
+
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < inputs.length; j++) {
+				if( Planar.class == inputs[j].getClass() ) {
+					modified[j] = ((Planar)inputs[j]).getBand(i);
+				} else {
+					modified[j] = inputs[j];
+				}
+			}
+			try {
+				m.invoke(null, modified);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+
+	@Test
+	public void divide_planar_by_gray_3() {
+		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
+		GrayF32 denominator = new GrayF32(width,height);
+		GImageMiscOps.fillUniform(numerator,rand,-10,10);
+		GImageMiscOps.fillUniform(denominator,rand,1,2);
+
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,width,height,2);
+
+		GPixelMath.divide(numerator,denominator,output);
+
+		GrayF32 expected = denominator.createSameShape();
+
+		for (int i = 0; i < numerator.getNumBands(); i++) {
+			GPixelMath.divide(numerator.getBand(i),denominator, expected);
+			BoofTesting.assertEquals(output.getBand(i),expected, 1e-4);
+		}
 	}
 
 	@Test
-	public void divide_planar_by_planar() {
-		fail("Implement");
-	}
+	public void multiply_planar_by_gray_3() {
+		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
+		GrayF32 denominator = new GrayF32(width,height);
+		GImageMiscOps.fillUniform(numerator,rand,-10,10);
+		GImageMiscOps.fillUniform(denominator,rand,1,2);
 
-	@Test
-	public void multiply_planar_by_gray() {
-		fail("Implement");
-	}
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,width,height,2);
 
-	@Test
-	public void multiply_planar_by_planar() {
-		fail("Implement");
+		GPixelMath.multiply(numerator,denominator,output);
+		GrayF32 expected = denominator.createSameShape();
+
+		for (int i = 0; i < numerator.getNumBands(); i++) {
+			GPixelMath.multiply(numerator.getBand(i),denominator, expected);
+			BoofTesting.assertEquals(output.getBand(i),expected, 1e-4);
+		}
 	}
 }
