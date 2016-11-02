@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 public class TestUtilOpenCV {
 	@Test
 	public void loadCalibration() {
-		URL url = TestUtilOpenCV.class.getResource("intrinsics.yml");
+		URL url = TestUtilOpenCV.class.getResource("pinhole_distorted.yml");
 		CameraPinholeRadial model = UtilOpenCV.loadCalibration(url.getFile());
 		fail("Implement");
 	}
