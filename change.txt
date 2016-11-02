@@ -49,6 +49,9 @@ Version : 0.25
   * Added getImageLocation()
   * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
   * Fixed bug where if intrinsic was not set it would still claim it could estimate the target's pose
+- Binary Fiducial
+  * When decoding the image it now ignores border pixels of inner squares.  These tend to be very noisy.
+  * 7% improvement in regression test.  Idea taken from ArUco
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
 

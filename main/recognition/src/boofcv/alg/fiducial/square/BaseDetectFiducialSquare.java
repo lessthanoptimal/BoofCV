@@ -283,6 +283,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	 * @return fraction of border that's black
 	 */
 	protected double computeFractionBoundary( float pixelThreshold ) {
+		// TODO ignore outer pixels from this computation.  Will require 8 regions (4 corners + top/bottom + left/right)
 		final int w = square.width;
 		int radius = (int) (w * borderWidthFraction);
 

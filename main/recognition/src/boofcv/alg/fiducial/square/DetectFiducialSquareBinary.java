@@ -52,7 +52,8 @@ import java.util.Arrays;
  * NOTE: While a larger grid size will allow you to encode more numbers it will increase the rate at which ID numbers
  * are incorrectly identified.<br>
  * NOTE: The size of the border can be adjusted, but 0.25 is recommended.  The thinner the black border is the worse
- * it will perform when viewed at an angle, but the larger the squares can be.
+ * it will perform when viewed at an angle.  However, the closer the fiducial is the less this is an issue allowing
+ * for thinner borders.
  * <p>
  *
  * @author Peter Abeles Original author/maintainer
@@ -74,8 +75,8 @@ public class DetectFiducialSquareBinary<T extends ImageGray>
 
 	// width of a square in the inner undistorted image.
 	protected final static int w=10;
-	// total number of pixels in a square
-	protected final static int N=w*w;
+	// total number of pixels in a square.  Outer pixels are ignored, hence -2 for each axis
+	protected final static int N=(w-2)*(w-2);
 
 	// length of a side for the fiducial's black border in world units.
 	private double lengthSide = 1;
@@ -240,7 +241,8 @@ public class DetectFiducialSquareBinary<T extends ImageGray>
 	}
 
 	/**
-	 * Converts the gray scale image into a binary number
+	 * Converts the gray scale image into a binary number.  Skip the outer 1 pixel of each inner square.  These
+	 * tend to be incorrectly classified due to distortion.
 	 */
 	protected void findBitCounts(GrayF32 gray , double threshold ) {
 		// compute binary image using an adaptive algorithm to handle shadows
@@ -248,11 +250,11 @@ public class DetectFiducialSquareBinary<T extends ImageGray>
 
 		Arrays.fill(counts, 0);
 		for (int row = 0; row < gridWidth; row++) {
-			int y0 = row * binaryInner.width / gridWidth;
-			int y1 = (row + 1) * binaryInner.width / gridWidth;
+			int y0 = row * binaryInner.width / gridWidth + 1;
+			int y1 = (row + 1) * binaryInner.width / gridWidth - 1;
 			for (int col = 0; col < gridWidth; col++) {
-				int x0 = col * binaryInner.width / gridWidth;
-				int x1 = (col + 1) * binaryInner.width / gridWidth;
+				int x0 = col * binaryInner.width / gridWidth + 1;
+				int x1 = (col + 1) * binaryInner.width / gridWidth - 1;
 
 				int total = 0;
 				for (int i = y0; i < y1; i++) {
@@ -310,16 +312,17 @@ public class DetectFiducialSquareBinary<T extends ImageGray>
 	// This is only works well as a visual representation if the output font is mono spaced.
 	public void printClassified() {
 		System.out.println();
-		System.out.println("██████");
+		System.out.println("      ");
 		for (int row = 0; row < gridWidth; row++) {
-			System.out.print("█");
+			System.out.print(" ");
 			for (int col = 0; col < gridWidth; col++) {
-				System.out.print(classified[row * gridWidth + col] == 1 ? "█︎" : "◻");
+				System.out.print(classified[row * gridWidth + col] == 1 ? " " : "X");
 			}
-			System.out.print("█");
+			System.out.print(" ");
 			System.out.println();
 		}
-		System.out.println("██████");
+		System.out.println("      ");
+
 	}
 }
 
