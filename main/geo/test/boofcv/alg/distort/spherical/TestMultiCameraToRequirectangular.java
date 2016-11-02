@@ -26,8 +26,14 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestMultiCameraToRequirectangular {
+
 	@Test
-	public void stuff() {
+	public void all() {
+		fail("implement");
+	}
+
+	@Test
+	public void addCamera_implicit_mask() {
 		fail("implement");
 	}
 }

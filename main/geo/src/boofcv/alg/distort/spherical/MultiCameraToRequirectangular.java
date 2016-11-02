@@ -70,8 +70,8 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 
 	public MultiCameraToRequirectangular(ImageDistort<T,T> distort , int width , int height , ImageType<T> imageType ) {
 
-		if( imageType.getDataType().isInteger() )
-			throw new IllegalArgumentException("Must be a floating point image");
+		if( imageType.getDataType().isInteger() || imageType.getDataType().getNumBits() != 32 )
+			throw new IllegalArgumentException("Must be a 32 bit floating point image");
 
 		this.distort = distort;
 		this.equiWidth = width;
@@ -267,7 +267,7 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		Point3D_F32 unitCam = new Point3D_F32();
 		Vector3D_F32 unitCommon = new Vector3D_F32();
 
-		public EquiToCamera(DenseMatrix64F cameraToCommon, Point3Transform2_F32 s2p) {
+		EquiToCamera(DenseMatrix64F cameraToCommon, Point3Transform2_F32 s2p) {
 			this.cameraToCommon = cameraToCommon;
 			this.s2p = s2p;
 		}
@@ -296,7 +296,7 @@ public class MultiCameraToRequirectangular<T extends ImageBase<T>> {
 		Point3D_F32 unitCam = new Point3D_F32();
 		Point3D_F32 unitCommon = new Point3D_F32();
 
-		public CameraToEqui(DenseMatrix64F cameraToCommon, Point2Transform3_F32 p2s) {
+		CameraToEqui(DenseMatrix64F cameraToCommon, Point2Transform3_F32 p2s) {
 			this.cameraToCommon = cameraToCommon;
 			this.p2s = p2s;
 		}

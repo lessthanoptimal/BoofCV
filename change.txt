@@ -49,6 +49,8 @@ Version : 0.25
   * Added getImageLocation()
   * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
   * Fixed bug where if intrinsic was not set it would still claim it could estimate the target's pose
+- OpenCV Integration
+  * can read and write camera calibration for pinhole cameras with radial + tangential distortion
 
 - TODO dual fisheye to equirectangular image
 - TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end

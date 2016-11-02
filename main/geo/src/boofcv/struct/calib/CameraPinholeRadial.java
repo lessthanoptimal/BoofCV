@@ -105,7 +105,7 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		return radial;
 	}
 
-	public void setRadial(double[] radial) {
+	public void setRadial(double... radial) {
 		this.radial = radial;
 	}
 
