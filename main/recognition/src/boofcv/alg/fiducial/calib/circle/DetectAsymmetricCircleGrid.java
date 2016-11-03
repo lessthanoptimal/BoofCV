@@ -19,11 +19,15 @@
 package boofcv.alg.fiducial.calib.circle;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.EllipseRotated_F64;
+import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +61,19 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 	// description of the calibration target
 	int numRows, numCols;
 
+	EllipsesIntoClusters clustering;
+	EllipseClustersIntoAsymmetricGrid grider;
+
+	List<Grid> validGrids = new ArrayList<>();
+
+	public DetectAsymmetricCircleGrid( int numRows , int numCols , EllipsesIntoClusters clustering ) {
+		this.numRows = numRows;
+		this.numCols = numCols;
+
+		this.clustering = clustering;
+		this.grider = new EllipseClustersIntoAsymmetricGrid();
+	}
+
 	public void reset() {
 	}
 
@@ -66,9 +83,56 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		inputToBinary.process(gray, binary);
 
 		ellipseDetector.process(gray, binary);
+		List<EllipseRotated_F64> found = ellipseDetector.getFoundEllipses().toList();
 
+		List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
+
+		clustering.process(found, clusters);
+
+		pruneIncorrectSize(clusters, numRows*numCols);
+
+		grider.process(found, clusters);
+
+		FastQueue<Grid> grids = grider.getGrids();
+
+		validGrids.clear();
+
+		// TODO prune based on exact shape
+		// TODO rotate into the desired orientation
+		// TODO compute key points from intersections
 
 		return true;
+	}
+
+	/**
+	 * Prune clusters which do not have the expected number of elements
+	 */
+	static void pruneIncorrectSize(List<List<EllipsesIntoClusters.Node>> clusters, int N) {
+		// prune clusters which can't be a member calibration target
+		for (int i = clusters.size()-1; i >= 0; i--) {
+			if( clusters.get(i).size() != N ) {
+				clusters.remove(i);
+			}
+		}
+	}
+
+	void putIntoCanonical( FastQueue<Grid> grids ) {
+		validGrids.clear();
+
+		for (int i = 0; i < grids.size; i++) {
+			Grid grid = grids.get(i);
+			if( grid.columns == numCols ) {
+				if( grid.rows == numRows ) {
+					// TODO could it be flipped?
+					validGrids.add(grid);
+				}
+			} else if( grid.columns == numRows && grid.rows == numCols ) {
+				// TODO rotate to put into canonical
+
+				validGrids.add( grid );
+			}
+		}
+
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {

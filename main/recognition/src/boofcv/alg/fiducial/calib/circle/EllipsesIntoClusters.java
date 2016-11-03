@@ -92,7 +92,7 @@ public class EllipsesIntoClusters {
 	 * Processes the ellipses and creates clusters.
 	 *
 	 * @param ellipses Set of unordered ellipses
-	 * @param output Resulting found clusters.  Cleared automatically.
+	 * @param output Resulting found clusters.  Cleared automatically.  Returned lists are recycled on next call.
 	 */
 	public void process(List<EllipseRotated_F64> ellipses , List<List<Node>> output ) {
 
