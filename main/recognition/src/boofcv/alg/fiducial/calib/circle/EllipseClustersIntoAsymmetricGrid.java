@@ -583,6 +583,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 			rows = columns = -1;
 			ellipses.clear();
 		}
+
+		public EllipseRotated_F64 get( int row , int col ) {
+			return ellipses.get(row*columns + col);
+		}
 	}
 
 }

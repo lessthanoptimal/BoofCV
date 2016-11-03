@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detects asymetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
+ * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
  * See image below for an example.  Rows and columns are counted by counting every row even if they are offset
- * from each other.
+ * from each other.</p>
  *
  * <p>
  * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
@@ -50,23 +50,25 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO Future: Only refine ellipses inside the grid
 public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
-	BinaryEllipseDetector<T> ellipseDetector;
-	InputToBinary<T> inputToBinary;
+	private BinaryEllipseDetector<T> ellipseDetector;
+	private InputToBinary<T> inputToBinary;
 
-	GrayU8 binary = new GrayU8(1,1);
+	private GrayU8 binary = new GrayU8(1,1);
 
 	// description of the calibration target
-	int numRows, numCols;
+	private int numRows, numCols;
 
-	EllipsesIntoClusters clustering;
-	EllipseClustersIntoAsymmetricGrid grider;
+	// converts ellipses into clusters
+	private EllipsesIntoClusters clustering;
+	private EllipseClustersIntoAsymmetricGrid grider;
 
-	List<Grid> validGrids = new ArrayList<>();
+	private List<Grid> validGrids = new ArrayList<>();
 
-	public DetectAsymmetricCircleGrid( int numRows , int numCols , EllipsesIntoClusters clustering ) {
+	public DetectAsymmetricCircleGrid( int numRows , int numCols , EllipsesIntoClusters clustering,
+									   BinaryEllipseDetector<T> ellipseDetector,
+									   InputToBinary<T> inputToBinary) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 
@@ -74,10 +76,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		this.grider = new EllipseClustersIntoAsymmetricGrid();
 	}
 
-	public void reset() {
-	}
-
-	public boolean process(T gray) {
+	public void process(T gray) {
 		this.binary.reshape(gray.width,gray.height);
 
 		inputToBinary.process(gray, binary);
@@ -95,13 +94,49 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 		FastQueue<Grid> grids = grider.getGrids();
 
+		pruneIncorrectShape(grids,numRows,numCols);
+
 		validGrids.clear();
+		for (int i = 0; i < grids.size(); i++) {
+			Grid g = grids.get(i);
+			putGridIntoCanonical(g,numRows,numCols);
+			validGrids.add( g );
+		}
+	}
 
-		// TODO prune based on exact shape
-		// TODO rotate into the desired orientation
-		// TODO compute key points from intersections
+	/**
+	 * Puts the grid into a canonical orientation
+	 */
+	static void putGridIntoCanonical(Grid g , int numRows , int numCols ) {
+		if( g.columns != numCols ) {
+			rotateGridCCW(g);
+			rotateGridCCW(g);
+		}
 
-		return true;
+		if( g.get(0,0) == null ) {
+			flipHorizontal(g);
+		}
+	}
+
+	static void rotateGridCCW( Grid g ) {
+		// TODO implement
+	}
+
+	static void flipHorizontal( Grid g ) {
+		// TODO implement
+	}
+
+	/**
+	 * Remove grids which cannot possible match the expected shape
+	 */
+	static void pruneIncorrectShape(FastQueue<Grid> grids , int numRows, int numCols ) {
+		// prune clusters which can't be a member calibration target
+		for (int i = grids.size()-1; i >= 0; i--) {
+			Grid g = grids.get(i);
+			if ((g.rows != numRows || g.columns != numCols) && (g.rows != numCols || g.columns != numRows)) {
+				grids.remove(i);
+			}
+		}
 	}
 
 	/**
