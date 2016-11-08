@@ -594,6 +594,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 		public int idx( int row , int col ) {
 			return row*columns + col;
 		}
+
+		public void setShape( int rows , int columns ) {
+			this.rows = rows;
+			this.columns = columns;
+		}
 	}
 
 }

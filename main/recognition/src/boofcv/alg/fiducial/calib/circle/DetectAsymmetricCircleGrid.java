@@ -112,7 +112,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 		clustering.process(found, clusters);
 
-		pruneIncorrectSize(clusters, numRows*numCols);
+		pruneIncorrectSize(clusters, (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2));
 
 		grider.process(found, clusters);
 

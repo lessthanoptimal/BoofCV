@@ -118,7 +118,8 @@ public class EllipsesIntoClusters {
 			Node node1 = nodes.get(i);
 
 			// Only search the maximum of the major axis times two
-			double maxDistance = e1.a * spaceToDiameterRatio;
+			// add a fudge factor.  won't ever be perfect
+			double maxDistance = e1.a * spaceToDiameterRatio*Math.sqrt(2)*1.25;
 			maxDistance *= maxDistance;
 
 			searchResults.reset();

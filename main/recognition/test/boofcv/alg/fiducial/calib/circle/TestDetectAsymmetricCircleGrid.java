@@ -18,10 +18,21 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayU8;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
+import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +44,30 @@ import static org.junit.Assert.*;
 public class TestDetectAsymmetricCircleGrid {
 	@Test
 	public void process_easy() {
-		fail("Implement");
+		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(5,4);
+
+		List<Point2D_F64> locations = new ArrayList<>();
+		GrayU8 image = render(5,4, 20, new Affine2D_F64(1,0,0,1,100,100), locations);
+
+		alg.process(image);
+
+		List<Grid> found = alg.getGrids();
+
+		assertEquals(1, found.size());
+
+		Grid g = found.get(0);
+		assertEquals(5 , g.rows );
+		assertEquals(4 , g.columns );
+
+		int N = g.rows*g.columns;
+		for (int i = 0,j=0; i < N; i+=2,j++) {
+			EllipseRotated_F64 f = g.ellipses.get(i);
+			Point2D_F64 e = locations.get(j);
+
+			assertEquals( e.x , f.center.x , 2.0 );
+			assertEquals( e.y , f.center.y , 2.0 );
+		}
+
 	}
 
 	@Test
@@ -46,14 +80,49 @@ public class TestDetectAsymmetricCircleGrid {
 		fail("Implement");
 	}
 
+	private DetectAsymmetricCircleGrid<GrayU8> createAlg( int numRows , int numCols ) {
+
+		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
+		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
+		EllipsesIntoClusters cluster = new EllipsesIntoClusters(2.0,0.8);
+		return new DetectAsymmetricCircleGrid<>( numRows, numCols,threshold, detector,  cluster);
+	}
+
 	@Test
 	public void pruneIncorrectSize() {
-		fail("Implement");
+		List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
+		clusters.add( createListNodes(4));
+		clusters.add( createListNodes(10));
+		clusters.add( createListNodes(11));
+
+
+		DetectAsymmetricCircleGrid.pruneIncorrectSize(clusters, 10);
+
+		assertEquals(1,clusters.size());
+		assertEquals(10,clusters.get(0).size());
+	}
+
+	private static List<EllipsesIntoClusters.Node> createListNodes( int N ) {
+		List<EllipsesIntoClusters.Node> list = new ArrayList<>();
+
+		for (int i = 0; i < N; i++) {
+			list.add( new EllipsesIntoClusters.Node() );
+		}
+
+		return list;
 	}
 
 	@Test
 	public void pruneIncorrectShape() {
-		fail("Implement");
+		FastQueue<Grid> grids = new FastQueue<>(Grid.class,true);
+		grids.grow().setShape(4,5);
+		grids.grow().setShape(5,4);
+		grids.grow().setShape(4,3);
+		grids.grow().setShape(5,5);
+
+		DetectAsymmetricCircleGrid.pruneIncorrectShape(grids, 4, 5);
+
+		assertEquals( 2 , grids.size );
 	}
 
 	/**
@@ -246,5 +315,41 @@ public class TestDetectAsymmetricCircleGrid {
 		out.rows = g.rows;
 
 		return out;
+	}
+
+	public static GrayU8 render(int rows , int cols , double radius , Affine2D_F64 affine,
+								List<Point2D_F64> locations )
+	{
+		BufferedImage buffered = new BufferedImage(400,350, BufferedImage.TYPE_INT_BGR);
+		Graphics2D g2 = buffered.createGraphics();
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0,0,buffered.getWidth(),buffered.getHeight());
+		g2.setColor(Color.BLACK);
+
+		locations.clear();
+
+		for (int row = 0; row < rows; row++) {
+			double y = row*radius*2;
+			for (int col = 0; col < cols; col++) {
+				double x = col*radius*2;
+
+				if( row%2 == 1 && col%2 ==0 )
+					continue;
+				if( row%2 == 0 && col%2 ==1 )
+					continue;
+
+				double xx = affine.a11*x + affine.a12*y + affine.tx;
+				double yy = affine.a21*x + affine.a22*y + affine.ty;
+
+				g2.fillOval((int)(xx-radius+0.5),(int)(yy-radius+0.5),(int)(radius*2),(int)(radius*2));
+
+				locations.add( new Point2D_F64(xx,yy));
+			}
+		}
+
+		GrayU8 ret = new GrayU8(buffered.getWidth(), buffered.getHeight());
+		ConvertBufferedImage.convertFrom(buffered, ret);
+
+		return ret;
 	}
 }
