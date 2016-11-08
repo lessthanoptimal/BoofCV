@@ -64,6 +64,40 @@ public class TestEllipsesIntoClusters {
 	}
 
 	/**
+	 * Provide it a simple case to cluster and make sure everything is connected properly
+	 */
+	@Test
+	public void checkConnections() {
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(2.1,0.5);
+
+		List<EllipseRotated_F64> input = new ArrayList<>();
+		input.add(new EllipseRotated_F64(0  ,0,1,1,0));
+		input.add(new EllipseRotated_F64(2.0,0,1,1,0));
+		input.add(new EllipseRotated_F64(4.0,0,1,1,0));
+		input.add(new EllipseRotated_F64(  0,2,1,1,0));
+		input.add(new EllipseRotated_F64(2.0,2,1,1,0));
+		input.add(new EllipseRotated_F64(4.0,2,1,1,0));
+
+		List<List<EllipsesIntoClusters.Node>> output = new ArrayList<>();
+
+		alg.process(input,output);
+
+		assertEquals( 1 , output.size());
+		List<EllipsesIntoClusters.Node> found = output.get(0);
+		assertEquals( 6 , found.size());
+
+		int histogram[] = new int[5];
+		for( EllipsesIntoClusters.Node n : found ) {
+			histogram[n.connections.size]++;
+		}
+		assertEquals(0, histogram[0]);
+		assertEquals(0, histogram[1]);
+		assertEquals(4, histogram[2]);
+		assertEquals(2, histogram[3]);
+		assertEquals(0, histogram[4]);
+	}
+
+	/**
 	 * Points should not be clustered together due to distance apart
 	 */
 	@Test

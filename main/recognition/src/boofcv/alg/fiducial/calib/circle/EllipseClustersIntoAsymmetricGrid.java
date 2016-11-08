@@ -418,6 +418,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 			// create the edges and order them based on their direction
 			for (int j = 0; j < n.connections.size(); j++) {
 				NodeInfo infoB = listInfo.get( indexOf(cluster, n.connections.get(j)));
+
 				EllipseRotated_F64 b = infoB.ellipse;
 
 				Edge edge = infoA.edges.grow();
@@ -480,7 +481,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		NodeInfo current = seed.right;
 		while( current != null && current != seed && contour.size() < listInfo.size() ) {
 			contour.add( current );
-			seed.contour = true;
+			current.contour = true;
 			current = current.right;
 		}
 

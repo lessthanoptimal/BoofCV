@@ -36,7 +36,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -44,47 +45,78 @@ import static org.junit.Assert.*;
 public class TestDetectAsymmetricCircleGrid {
 	@Test
 	public void process_easy() {
-		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(5,4);
 
-		List<Point2D_F64> locations = new ArrayList<>();
-		GrayU8 image = render(5,4, 20, new Affine2D_F64(1,0,0,1,100,100), locations);
+		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
-		alg.process(image);
-
-		List<Grid> found = alg.getGrids();
-
-		assertEquals(1, found.size());
-
-		Grid g = found.get(0);
-		assertEquals(5 , g.rows );
-		assertEquals(4 , g.columns );
-
-		int N = g.rows*g.columns;
-		for (int i = 0,j=0; i < N; i+=2,j++) {
-			EllipseRotated_F64 f = g.ellipses.get(i);
-			Point2D_F64 e = locations.get(j);
-
-			assertEquals( e.x , f.center.x , 2.0 );
-			assertEquals( e.y , f.center.y , 2.0 );
-		}
+		performDetectionCheck(5, 6, 5, 6, affine);
 
 	}
 
 	@Test
 	public void process_rotated() {
-		fail("Implement");
+		double c = Math.cos(0.4);
+		double s = Math.sin(0.4);
+		Affine2D_F64 affine = new Affine2D_F64(c,-s,s,c,100,100);
+
+		performDetectionCheck(5, 6, 5, 6, affine);
 	}
 
 	@Test
 	public void process_negative() {
-		fail("Implement");
+		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
+
+		performDetectionCheck(4, 6, 5, 6, affine);
+	}
+
+	private void performDetectionCheck(int expectedRows, int expectedCols, int actualRows, int actualCols, Affine2D_F64 affine) {
+		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols);
+
+		List<Point2D_F64> locations = new ArrayList<>();
+		GrayU8 image = render(actualRows,actualCols, 20, affine, locations);
+
+		alg.process(image);
+
+		List<Grid> found = alg.getGrids();
+
+		if( expectedRows != actualRows || expectedCols != actualCols ) {
+			assertEquals(0, found.size());
+			return;
+		} else {
+			assertEquals(1, found.size());
+		}
+		Grid g = found.get(0);
+		assertEquals(actualRows , g.rows );
+		assertEquals(actualCols , g.columns );
+
+		int index = 0;
+		for (int row = 0; row < g.rows; row++) {
+			for (int col = 0; col < g.columns; col++) {
+				boolean check = false;
+				if( row%2 == 1 && col%2 == 1)
+					check = true;
+				else if( row%2 == 0 && col%2 == 0)
+					check = true;
+
+				if( check ) {
+					EllipseRotated_F64 f = g.get(row,col);
+					Point2D_F64 e = locations.get(index++);
+
+					assertEquals( e.x , f.center.x , 1.5 );
+					assertEquals( e.y , f.center.y , 1.5 );
+					assertEquals( 20 , f.a , 1.0 );
+					assertEquals( 20 , f.a , 1.0 );
+				}
+			}
+		}
 	}
 
 	private DetectAsymmetricCircleGrid<GrayU8> createAlg( int numRows , int numCols ) {
 
+		double spaceRatio = 4.0*1.15;
+
 		InputToBinary<GrayU8> threshold = FactoryThresholdBinary.globalFixed(100,true,GrayU8.class);
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
-		EllipsesIntoClusters cluster = new EllipsesIntoClusters(2.0,0.8);
+		EllipsesIntoClusters cluster = new EllipsesIntoClusters(spaceRatio,0.8);
 		return new DetectAsymmetricCircleGrid<>( numRows, numCols,threshold, detector,  cluster);
 	}
 

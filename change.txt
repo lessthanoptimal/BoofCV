@@ -55,13 +55,11 @@ Version : 0.25
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
 
+- TODO Data set for CNN classifiers
+- TODO Example equirectangular to pinhole example
 - TODO dual fisheye to equirectangular image
-- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
 - TODO Regression: circular grid fiducial and calibration
-- TODO Regression: Chessboard image border to fiducial regression
-- TODO Unit test for getScaleAtRadius
-  * Implement universally
-  * Create unit test for it
+- TODO Regression: Scene Classification
 
 ---------------------------------------------
 Date    : 2016/06/13

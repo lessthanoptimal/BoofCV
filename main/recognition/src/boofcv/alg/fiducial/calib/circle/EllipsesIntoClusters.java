@@ -41,7 +41,7 @@ public class EllipsesIntoClusters {
 	private int neighborsConsidered = 10;
 	// Ratio between the diameter of a circle to the space between circles on the plane
 	// used to filter out ellipses
-	private double spaceToDiameterRatio;
+	private double spaceToMajorAxisRatio;
 
 	// minimum allowed ratio difference between major and minor axis
 	private double sizeSimilarityTolerance = 0.5;
@@ -59,16 +59,16 @@ public class EllipsesIntoClusters {
 	/**
 	 * Configures clustering
 	 *
-	 * @param spaceToDiameterRatio Maximum expected space between ellipse centers in 2D plane divided by
+	 * @param spaceToMajorAxisRatio Maximum expected space between ellipse centers in 2D plane divided by
 	 *                             the ellipses' major axis.   E.g. 3.0 = space between ellipse centers is
-	 *                             3x their width
+	 *                             3x their major axis
 	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect
 	 *                                match and 0.0 = infinite difference in size
 	 */
-	public EllipsesIntoClusters( double spaceToDiameterRatio,
+	public EllipsesIntoClusters( double spaceToMajorAxisRatio,
 								 double sizeSimilarityTolerance ) {
 
-		this.spaceToDiameterRatio = spaceToDiameterRatio;
+		this.spaceToMajorAxisRatio = spaceToMajorAxisRatio;
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
 
 		search.init(2);
@@ -119,7 +119,7 @@ public class EllipsesIntoClusters {
 
 			// Only search the maximum of the major axis times two
 			// add a fudge factor.  won't ever be perfect
-			double maxDistance = e1.a * spaceToDiameterRatio*Math.sqrt(2)*1.25;
+			double maxDistance = e1.a * spaceToMajorAxisRatio;
 			maxDistance *= maxDistance;
 
 			searchResults.reset();
@@ -148,7 +148,8 @@ public class EllipsesIntoClusters {
 				// smallest shape divided by largest shape
 				double ratio = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
 
-				Node node2 = nodes.get(d.data.which);
+				int indexNode2 = d.data.which;
+				Node node2 = nodes.get(indexNode2);
 
 				// connect if they have a similar size to each other
 				if( ratio >= sizeSimilarityTolerance ) {
@@ -157,15 +158,20 @@ public class EllipsesIntoClusters {
 					if( node2.cluster == -1 ) {
 						node2.cluster = node1.cluster;
 						cluster1.add( node2 );
-						node1.connections.add( j );
+						node1.connections.add( indexNode2 );
 						node2.connections.add( i );
 					} else if( node2.cluster != node1.cluster ) {
-						// Node2 is in a differen cluster.  Merge the clusters
+						// Node2 is in a different cluster.  Merge the clusters
 						joinClusters( node1.cluster , node2.cluster );
-						node1.connections.add( j );
+						node1.connections.add( indexNode2 );
 						node2.connections.add( i );
+					} else {
+						// see if they are already connected, if not connect them
+						if( node1.connections.indexOf(indexNode2) == -1 ) {
+							node1.connections.add( indexNode2 );
+							node2.connections.add( i );
+						}
 					}
-					// otherwise they must already be connected
 				}
 			}
 		}
@@ -222,12 +228,12 @@ public class EllipsesIntoClusters {
 		this.neighborsConsidered = neighborsConsidered;
 	}
 
-	public double getSpaceToDiameterRatio() {
-		return spaceToDiameterRatio;
+	public double getSpaceToMajorAxisRatio() {
+		return spaceToMajorAxisRatio;
 	}
 
-	public void setSpaceToDiameterRatio(double spaceToDiameterRatio) {
-		this.spaceToDiameterRatio = spaceToDiameterRatio;
+	public void setSpaceToMajorAxisRatio(double spaceToMajorAxisRatio) {
+		this.spaceToMajorAxisRatio = spaceToMajorAxisRatio;
 	}
 
 	public double getSizeSimilarityTolerance() {

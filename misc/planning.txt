@@ -1,7 +1,10 @@
 Next Release
 
-- TODO Regression: Scene Classification
-- TODO Naive implementation of DLS
+- TODO make sure RANSAC is using the faster method for selecting points.  swapping selected with one at the end
+- TODO Regression: Chessboard image border to fiducial regression
+- TODO Unit test for getScaleAtRadius
+  * Implement universally
+  * Create unit test for it
 
 Less High Priority Next Release
 
@@ -9,6 +12,9 @@ Less High Priority Next Release
   * Make it easier.  Single class like in pyboof
 - Stereo Disparity
   * make float images contain actual disparity, not offset.  negative values for invalid
+
+- SFM
+  * Naive implementation of DLS
 
 - Fiducials
   * Detection:  Return bounding polygon in pixel coordinates (undistorted and distorted)?
