@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * <p>Detects asymmetric grids of circles.  The grid is composed of two regular grids which are offset by half a period.
  * See image below for an example.  Rows and columns are counted by counting every row even if they are offset
- * from each other.</p>
+ * from each other.  The returned grid will be put into canonical orientation, see below.</p>
  *
  * <p>
  * For each circle there is one control point.  The control point is first found by detecting all the ellipses, which
@@ -47,6 +47,10 @@ import java.util.List;
  * <img src="doc-files/asymcirclegrid.jpg"/>
  * </center>
  * Example of a 8 by 5 grid; row, column.
+ *
+ * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied,
+ * and if there are multiple solutions, the solution will be selected with the node closest to the top left
+ * being chosen.</p>
  *
  * @author Peter Abeles
  */
@@ -64,11 +68,27 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 	private EllipsesIntoClusters clustering;
 	private EllipseClustersIntoAsymmetricGrid grider;
 
+	// List of all the found valid grids in the image
 	private List<Grid> validGrids = new ArrayList<>();
 
-	public DetectAsymmetricCircleGrid( int numRows , int numCols , EllipsesIntoClusters clustering,
-									   BinaryEllipseDetector<T> ellipseDetector,
-									   InputToBinary<T> inputToBinary) {
+	// local work space for manipulating the order of points inside a grid
+	private List<EllipseRotated_F64> work = new ArrayList<>();
+
+	/**
+	 * Creates and configures the detector
+	 *
+	 * @param numRows number of rows in grid
+	 * @param numCols number of columns in grid
+	 * @param inputToBinary Converts the input image into a binary image
+	 * @param ellipseDetector Detects ellipses inside the image
+	 * @param clustering Finds clusters of ellipses
+	 */
+	public DetectAsymmetricCircleGrid(int numRows, int numCols,
+									  InputToBinary<T> inputToBinary,
+									  BinaryEllipseDetector<T> ellipseDetector,
+									  EllipsesIntoClusters clustering) {
+		this.ellipseDetector = ellipseDetector;
+		this.inputToBinary = inputToBinary;
 		this.numRows = numRows;
 		this.numCols = numCols;
 
@@ -76,6 +96,10 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		this.grider = new EllipseClustersIntoAsymmetricGrid();
 	}
 
+	/**
+	 * Processes the image and finds grids.  To retrieve the found grids call {@link #getGrids()}
+	 * @param gray Input image
+	 */
 	public void process(T gray) {
 		this.binary.reshape(gray.width,gray.height);
 
@@ -99,7 +123,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		validGrids.clear();
 		for (int i = 0; i < grids.size(); i++) {
 			Grid g = grids.get(i);
-			putGridIntoCanonical(g,numRows,numCols);
+			putGridIntoCanonical(g);
 			validGrids.add( g );
 		}
 	}
@@ -107,23 +131,123 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
-	static void putGridIntoCanonical(Grid g , int numRows , int numCols ) {
+	void putGridIntoCanonical(Grid g ) {
+		// first put it into a plausible solution
 		if( g.columns != numCols ) {
-			rotateGridCCW(g);
 			rotateGridCCW(g);
 		}
 
 		if( g.get(0,0) == null ) {
-			flipHorizontal(g);
+			reverse(g);
+		}
+
+		// select the best corner for canonical
+		if( g.columns%2 == 1 && g.rows%2 == 1) {
+			int numRotationsCCW = closestCorner4(g);
+
+			for (int i = 0; i < numRotationsCCW; i++) {
+				rotateGridCCW(g);
+			}
+		} else if( g.columns%2 == 1 ) {
+			if( g.get(0,0).center.normSq() > g.get(0,g.columns-1).center.normSq() ) {
+				flipHorizontal(g);
+			}
+		} else if( g.rows%2 == 1 ) {
+			if( g.get(0,0).center.normSq() > g.get(g.rows-1,0).center.normSq() ) {
+				flipVertical(g);
+			}
 		}
 	}
 
-	static void rotateGridCCW( Grid g ) {
-		// TODO implement
+	/**
+	 * Number of CCW rotations to put selected corner into the canonical location.  Only works
+	 * when there are 4 possible solutions
+	 * @param g The grid
+	 * @return number of rotations
+	 */
+	static int closestCorner4(Grid g ) {
+		double bestDistance = g.get(0,0).center.normSq();
+		int bestIdx = 0;
+
+		double d = g.get(0,g.columns-1).center.normSq();
+		if( d < bestDistance ) {
+			bestDistance = d;
+			bestIdx = 3;
+		}
+		d = g.get(g.rows-1,g.columns-1).center.normSq();
+		if( d < bestDistance ) {
+			bestDistance = d;
+			bestIdx = 2;
+		}
+		d = g.get(g.rows-1,0).center.normSq();
+		if( d < bestDistance ) {
+			bestIdx = 1;
+		}
+
+		return bestIdx;
 	}
 
-	static void flipHorizontal( Grid g ) {
-		// TODO implement
+	/**
+	 * performs a counter-clockwise rotation
+	 */
+	void rotateGridCCW( Grid g ) {
+
+		work.clear();
+		for (int i = 0; i < g.rows * g.columns; i++) {
+			work.add(null);
+		}
+
+		for (int row = 0; row < g.rows; row++) {
+			for (int col = 0; col < g.columns; col++) {
+				work.set(col*g.rows + row, g.get(g.rows - row - 1,col));
+			}
+		}
+
+		g.ellipses.clear();
+		g.ellipses.addAll(work);
+		int tmp = g.columns;
+		g.columns = g.rows;
+		g.rows = tmp;
+	}
+
+	/**
+	 * Reverse the order of elements inside the grid
+	 */
+	void reverse( Grid g ) {
+		work.clear();
+		int N = g.rows*g.columns;
+		for (int i = 0; i < N; i++) {
+			work.add( g.ellipses.get(N-i-1));
+		}
+
+		g.ellipses.clear();
+		g.ellipses.addAll(work);
+	}
+
+	void flipHorizontal( Grid g ) {
+
+		work.clear();
+		for (int row = 0; row < g.rows; row++) {
+			for (int col = 0; col < g.columns; col++) {
+				work.add(g.get(row, g.columns - col - 1));
+			}
+		}
+
+		g.ellipses.clear();
+		g.ellipses.addAll(work);
+	}
+
+	void flipVertical( Grid g ) {
+
+		work.clear();
+		for (int row = 0; row < g.rows; row++) {
+			for (int col = 0; col < g.columns; col++) {
+				work.add(g.get(g.rows-row-1, col));
+			}
+		}
+
+		g.ellipses.clear();
+		g.ellipses.addAll(work);
 	}
 
 	/**
@@ -151,23 +275,11 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		}
 	}
 
-	void putIntoCanonical( FastQueue<Grid> grids ) {
-		validGrids.clear();
-
-		for (int i = 0; i < grids.size; i++) {
-			Grid grid = grids.get(i);
-			if( grid.columns == numCols ) {
-				if( grid.rows == numRows ) {
-					// TODO could it be flipped?
-					validGrids.add(grid);
-				}
-			} else if( grid.columns == numRows && grid.rows == numCols ) {
-				// TODO rotate to put into canonical
-
-				validGrids.add( grid );
-			}
-		}
-
+	/**
+	 * List of grids found inside the image
+	 */
+	public List<Grid> getGrids() {
+		return validGrids;
 	}
 
 	public List<Point2D_F64> getCalibrationPoints() {

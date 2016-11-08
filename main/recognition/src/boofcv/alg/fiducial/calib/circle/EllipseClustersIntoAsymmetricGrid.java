@@ -37,6 +37,9 @@ import java.util.List;
  * pattern vertically.</p>
  *
  * <p>See {@link Grid} for a description of how the output grids are described.  It uses a sparse format.</p>
+ * <p>See {@link DetectAsymmetricCircleGrid} for an example of an asymmetric grid</p>
+ *
+ *
  *
  * @author Peter Abeles
  */
@@ -586,6 +589,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 		public EllipseRotated_F64 get( int row , int col ) {
 			return ellipses.get(row*columns + col);
+		}
+
+		public int idx( int row , int col ) {
+			return row*columns + col;
 		}
 	}
 
