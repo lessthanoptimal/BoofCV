@@ -25,10 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Computes key points from an observed grid and generates the 2D fiducial coordinate of each key point.
+ * <p>Computes key points from an observed asymmetric circular grid.  Each key point is defined as the center's true
+ * geometric center.  The center is found by detecting tangent points between two neighboring circles (red dots) and
+ * then finding the closest point (green circle) to their lines (yellow).  Tangent points are the same under perspective
+ * distortion and the same can be said for the intersection of their lines.</p>
  *
- *
- * TODO define order
+ * <center>
+ * <img src="doc-files/asymcircle_tangent_intersections.png"/>
+ * </center>
  *
  * @author Peter Abeles
  */
