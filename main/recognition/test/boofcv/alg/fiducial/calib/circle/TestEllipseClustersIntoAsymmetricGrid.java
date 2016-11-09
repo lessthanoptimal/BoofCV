@@ -569,7 +569,11 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		checkLargestAngle(alg.listInfo.get(2),alg.listInfo.get(0),alg.listInfo.get(1));
 		checkLargestAngle(alg.listInfo.get(3),null,null);
 		checkLargestAngle(alg.listInfo.get(4),null,null);
+	}
 
+	@Test
+	public void grid_getIndexOfEllipse() {
+		fail("Implement");
 	}
 
 	/**

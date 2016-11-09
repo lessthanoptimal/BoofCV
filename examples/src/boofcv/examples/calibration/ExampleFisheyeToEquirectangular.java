@@ -53,16 +53,16 @@ import java.util.List;
  */
 public class ExampleFisheyeToEquirectangular {
 	public static Se3_F64 createFrontToBack() {
-//		double[][] a = new double[][]{
-//				{-0.99894111, -0.02166867, -0.04058488},
-//				{0.01742898, -0.99462651,  0.10205069},
-//				{-0.0425781,   0.10123528,  0.99395097}};
+		double[][] a = new double[][]{
+				{-0.99894111, -0.02166867, -0.04058488},
+				{0.01742898, -0.99462651,  0.10205069},
+				{-0.0425781,   0.10123528,  0.99395097}};
 
 		Se3_F64 ret = new Se3_F64();
-//		ret.R = new DenseMatrix64F(a);
-//		ret.T.set(0.10499465, 0.45557971, -0.03715325);
+		ret.R = new DenseMatrix64F(a);
+		ret.T.set(0.10499465, 0.45557971, -0.03715325);
 
-		Rodrigues_F64 rod = new Rodrigues_F64(UtilAngle.radian(182.5),0.0,0,1);
+		Rodrigues_F64 rod = new Rodrigues_F64(UtilAngle.radian(-177.5),0.0,0,1);
 		ret.R = ConvertRotation3D_F64.rodriguesToMatrix(rod,(DenseMatrix64F)null);
 
 		DenseMatrix64F temp = ret.R.copy();

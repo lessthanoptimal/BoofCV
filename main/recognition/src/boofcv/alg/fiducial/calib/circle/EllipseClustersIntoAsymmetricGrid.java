@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid.totalEllipses;
+
 /**
  * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an asymmetric
  * grid.  In an asymmetric grid each row is offset by 1/2 the horizontal spacing between.  This forms a sawtooth
@@ -599,6 +601,16 @@ public class EllipseClustersIntoAsymmetricGrid {
 		public void setShape( int rows , int columns ) {
 			this.rows = rows;
 			this.columns = columns;
+		}
+
+		public int getNumberOfEllipses() {
+			return totalEllipses(rows,columns);
+		}
+
+		public int getIndexOfEllipse( int row , int col ) {
+			int index = 0;
+			index += (row/2)*col + (row%2)*(col/2+col%2);
+			return index + col/2;
 		}
 	}
 

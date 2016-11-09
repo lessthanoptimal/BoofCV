@@ -112,7 +112,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 		clustering.process(found, clusters);
 
-		pruneIncorrectSize(clusters, (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2));
+		pruneIncorrectSize(clusters, totalEllipses(numRows,numCols) );
 
 		grider.process(found, clusters);
 
@@ -126,6 +126,13 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 			putGridIntoCanonical(g);
 			validGrids.add( g );
 		}
+	}
+
+	/**
+	 * Computes the number of ellipses on the grid
+	 */
+	public static int totalEllipses( int numRows , int numCols ) {
+		return (numRows/2)*(numCols/2) + ((numRows+1)/2)*((numCols+1)/2);
 	}
 
 	/**

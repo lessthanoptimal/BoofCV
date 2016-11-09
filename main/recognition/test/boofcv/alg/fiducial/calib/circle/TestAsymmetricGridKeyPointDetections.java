@@ -25,9 +25,34 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestAsymmetricGridKeyPoints {
+public class TestAsymmetricGridKeyPointDetections {
 	@Test
-	public void stuff() {
+	public void all() {
+		fail("Implement");
+	}
+
+	@Test
+	public void horizontal() {
+		fail("Implement");
+	}
+
+	@Test
+	public void vertical() {
+		fail("Implement");
+	}
+
+	@Test
+	public void diagonalLR() {
+		fail("Implement");
+	}
+
+	@Test
+	public void diagonalRL() {
+		fail("Implement");
+	}
+
+	@Test
+	public void computeEllipseCenters() {
 		fail("Implement");
 	}
 }
