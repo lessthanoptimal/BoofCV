@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class MjpegStreamSequence<T extends ImageBase>
 	private void readNext() {
 		byte[] data = codec.readFrame(in);
 		if( data == null ) {
-			original = null;
+			next = null;
 		} else {
 			try {
 				next = ImageIO.read(new ByteArrayInputStream(data));

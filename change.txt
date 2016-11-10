@@ -54,6 +54,8 @@ Version : 0.25
   * 7% improvement in regression test.  Idea taken from ArUco
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
+- FancyInterestPointRender
+  * Fixed addString() being a no-op.  Thanks R-Gerard for the bug report!
 
 - TODO Data set for CNN classifiers
 - TODO Example equirectangular to pinhole example

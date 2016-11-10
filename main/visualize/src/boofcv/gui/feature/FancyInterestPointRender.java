@@ -63,6 +63,11 @@ public class FancyInterestPointRender {
 			g2.setColor(l.color);
 			g2.drawLine(l.x0,l.y0,l.x1,l.y1);
 		}
+
+		for( VString l : strings ) {
+			g2.setColor(l.color);
+			g2.drawString(l.value,l.x,l.y);
+		}
 	}
 
 	public synchronized void reset() {
@@ -72,12 +77,13 @@ public class FancyInterestPointRender {
 		strings.clear();
 	}
 
-	public synchronized void addString( int x , int y , String value ) {
+	public synchronized void addString( int x , int y , String value , Color color) {
 		VString s = new VString();
 		s.x = x;
 		s.y = y;
 		s.value = value;
-		
+		s.color = color;
+		strings.add(s);
 	}
 
 	public synchronized void addPoint( int x , int y ) {
@@ -136,6 +142,7 @@ public class FancyInterestPointRender {
 	{
 		int x,y;
 		String value;
+		Color color = Color.RED;
 	}
 
 	public static class Line
