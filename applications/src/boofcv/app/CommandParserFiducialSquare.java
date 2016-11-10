@@ -199,13 +199,13 @@ public class CommandParserFiducialSquare {
 		if( gridX < 0)
 			System.out.println("Grid                 automatic");
 		else if( gridX > 1 && gridY > 1)
-			System.out.printf("Grid                  rows = %2d cols = %2d",gridY,gridX);
+			System.out.printf("Grid                  rows = %2d cols = %2d\n",gridY,gridX);
 		if( autoCenter)
-			System.out.println("Auto centering");
+			System.out.println("Auto centering enabled");
 		else
-			System.out.printf("Offset                x = %f y = %f",offsetX,offsetY);
+			System.out.printf("Offset                x = %f y = %f\n",offsetX,offsetY);
 		if( !Double.isNaN(pageBorderX))
-			System.out.printf("Page Border           x = %f y = %f", pageBorderX, pageBorderY);
+			System.out.printf("Page Border           x = %f y = %f\n", pageBorderX, pageBorderY);
 		System.out.println();
 		System.out.println("Patterns");
 		for( String p : patternNames ) {

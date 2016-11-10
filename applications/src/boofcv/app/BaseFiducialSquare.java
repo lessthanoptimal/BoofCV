@@ -344,6 +344,12 @@ public abstract class BaseFiducialSquare {
 			}
 		}
 
+		if (printInfo) {
+			out.print("  /Times-Roman findfont\n" + "7 scalefont setfont "+offsetX+" "+offsetY +
+					String.format(" moveto ( Page Size: %4.1f by %4.1f %s) show\n",
+							pageWidth/UNIT_TO_POINTS,pageHeight/UNIT_TO_POINTS,unit.abbreviation));
+		}
+
 		for (int i = 0; i < numPages; i++) {
 			printPageHeader(i+1);
 			if(boundaryHack)
@@ -403,10 +409,13 @@ public abstract class BaseFiducialSquare {
 	private void printHeader( String documentTitle , double widthCM, int totalPages) {
 		out.println("%!PS-Adobe-3.0\n" +
 				"%%Creator: BoofCV\n" +
-				"%%DocumentMedia: Plain "+pageWidth+" "+pageHeight+" 75 white ( )\n" +
+				"%%DocumentMedia: Plain "+pageWidth+" "+pageHeight+" 80 white ( )\n" +
 				"%%Title: "+documentTitle+" w="+ widthCM +" "+unit.abbreviation+"\n" +
 				"%%DocumentData: Clean7Bit\n" +
 				"%%LanguageLevel: 2\n" +
+				"%%BeginSetup\n" +
+				"  << /PageSize ["+pageWidth+" "+pageHeight+"] /Orientation 0 >> setpagedevice\n" +
+				"%%EndSetup\n" +
 				"%%EndComments\n" +
 				"%%BeginProlog\n" +
 				"%%EndProlog\n" +

@@ -125,12 +125,16 @@ public class DetectFiducialSquareBinary<T extends ImageGray>
 		double threshold = (edgeInside+edgeOutside)/2;
 		findBitCounts(grayNoBorder,threshold);
 
-		if (thresholdBinaryNumber())
+		if (thresholdBinaryNumber()) {
+			if( verbose ) System.out.println("  can't threshold binary, ambiguous");
 			return false;
+		}
 		
 		// adjust the orientation until the black corner is in the lower left
-		if (rotateUntilInLowerCorner(result))
+		if (rotateUntilInLowerCorner(result)) {
+			if( verbose ) System.out.println("  rotate to corner failed");
 			return false;
+		}
 
 		result.which = extractNumeral();
 		result.lengthSide = lengthSide;
