@@ -105,7 +105,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray> {
 	private Class<T> inputType;
 
 	// verbose debugging output
-	private boolean verbose = false;
+	protected boolean verbose = false;
 
 	/**
 	 * Configures the detector.
