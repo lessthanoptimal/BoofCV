@@ -18,10 +18,10 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -88,7 +88,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public CalibrationDetector createDetector() {
-		return FactoryCalibrationTarget.detectorChessboard(config);
+	public DetectorFiducialCalibration createDetector() {
+		return FactoryFiducialCalibration.detectorChessboard(config);
 	}
 }

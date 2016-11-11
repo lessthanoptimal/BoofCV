@@ -21,11 +21,11 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.app.calib.AssistedCalibration;
 import boofcv.app.calib.AssistedCalibrationGui;
 import boofcv.app.calib.ComputeGeometryScore;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.calibration.CalibrationIO;
@@ -55,7 +55,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 	protected String inputDirectory;
 	protected String outputFileName = "intrinsic.yaml";
-	protected CalibrationDetector detector;
+	protected DetectorFiducialCalibration detector;
 	protected boolean zeroSkew = true;
 	protected int numRadial = 2;
 	protected boolean tangential = false;
@@ -174,7 +174,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigChessboard config = new ConfigChessboard(numRows, numColumns, 1);
 
-		detector = FactoryCalibrationTarget.detectorChessboard(config);
+		detector = FactoryFiducialCalibration.detectorChessboard(config);
 	}
 
 	protected void parseSquareGrid( int index , String []args ) {
@@ -215,7 +215,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigSquareGrid config = new ConfigSquareGrid(numRows, numColumns, square,space);
 
-		detector = FactoryCalibrationTarget.detectorSquareGrid(config);
+		detector = FactoryFiducialCalibration.detectorSquareGrid(config);
 	}
 
 	public void process() {

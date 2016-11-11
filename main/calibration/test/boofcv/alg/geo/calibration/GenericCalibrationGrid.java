@@ -20,8 +20,8 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -46,8 +46,8 @@ public class GenericCalibrationGrid {
 		return CalibrationDetectorSquareGrid.createLayout(3, 2, 30, 30);
 	}
 
-	public static CalibrationDetector createStandardConfig() {
-		return FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(3, 2, 30, 30));
+	public static DetectorFiducialCalibration createStandardConfig() {
+		return FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(3, 2, 30, 30));
 	}
 
 	public static DenseMatrix64F createStandardCalibration() {

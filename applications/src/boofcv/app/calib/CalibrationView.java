@@ -20,7 +20,7 @@ package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -38,7 +38,7 @@ public interface CalibrationView {
 	 * Intialize by providing it a reference to the detector.  This is then used to determine the appearance
 	 * of the target
 	 */
-	void initialize( CalibrationDetector detector );
+	void initialize( DetectorFiducialCalibration detector );
 
 	/**
 	 * Returns the 4 sides around the fiducial
@@ -55,7 +55,7 @@ public interface CalibrationView {
 		int numRows,numCols;
 		int pointRows,pointCols;
 
-		public void initialize( CalibrationDetector detector ) {
+		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorChessboard chessboard = (CalibrationDetectorChessboard)detector;
 			this.numRows = chessboard.getGridRows();
 			this.numCols = chessboard.getGridColumns();
@@ -88,7 +88,7 @@ public interface CalibrationView {
 		int gridCols;
 		int pointRows,pointCols;
 
-		public void initialize( CalibrationDetector detector ) {
+		public void initialize( DetectorFiducialCalibration detector ) {
 			CalibrationDetectorSquareGrid target = (CalibrationDetectorSquareGrid)detector;
 			pointRows = target.getPointRows();
 			pointCols = target.getPointColumns();

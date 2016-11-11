@@ -609,7 +609,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 		public int getIndexOfEllipse( int row , int col ) {
 			int index = 0;
-			index += (row/2)*col + (row%2)*(col/2+col%2);
+			index += (row/2)*this.columns + (row%2)*(this.columns/2+this.columns%2);
 			return index + col/2;
 		}
 	}

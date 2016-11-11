@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -70,7 +70,7 @@ public class DetectCalibrationChessboardApp
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryCalibrationTarget.detectorChessboard(config).getAlgorithm();
+		alg = FactoryFiducialCalibration.detectorChessboard(config).getAlgorithm();
 	}
 
 	@Override

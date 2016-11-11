@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
@@ -33,11 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectChessboardFiducial} for {@link CalibrationDetector}
+ * Wrapper around {@link DetectChessboardFiducial} for {@link DetectorFiducialCalibration}
  * 
  * @author Peter Abeles
  */
-public class CalibrationDetectorChessboard implements CalibrationDetector {
+public class CalibrationDetectorChessboard implements DetectorFiducialCalibration {
 
 	DetectChessboardFiducial<GrayF32> alg;
 

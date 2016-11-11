@@ -573,7 +573,42 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 
 	@Test
 	public void grid_getIndexOfEllipse() {
-		fail("Implement");
+		grid_getIndexOfEllipse(1,1);
+		grid_getIndexOfEllipse(1,4);
+		grid_getIndexOfEllipse(4,1);
+		grid_getIndexOfEllipse(4,4);
+		grid_getIndexOfEllipse(4,5);
+		grid_getIndexOfEllipse(5,4);
+		grid_getIndexOfEllipse(5,5);
+	}
+
+	private void grid_getIndexOfEllipse( int numRows , int numCols ) {
+		Grid g = new Grid();
+		g.rows = numRows;
+		g.columns = numCols;
+
+		int index[] = new int[g.rows*g.columns];
+
+		int totalEllipses = 0;
+		for (int row = 0; row < g.rows; row++) {
+			for (int col = 0; col < g.columns; col++) {
+				if( row%2==0 && col%2==1 ) {
+					g.ellipses.add(null);
+				} else if( row%2==1 && col%2==0 ) {
+					g.ellipses.add(null);
+				} else {
+					index[totalEllipses++] = row*g.columns + col;
+					g.ellipses.add( new EllipseRotated_F64());
+				}
+			}
+		}
+		assertEquals(totalEllipses, g.getNumberOfEllipses());
+
+		for (int i = 0; i < totalEllipses; i++) {
+			int row = index[i]/g.columns;
+			int col = index[i]%g.columns;
+			assertEquals(row+" "+col, i , g.getIndexOfEllipse(row,col));
+		}
 	}
 
 	/**

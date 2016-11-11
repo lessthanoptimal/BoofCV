@@ -18,10 +18,10 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.RenderSquareBinaryGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
@@ -82,11 +82,11 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	}
 
 	@Override
-	public CalibrationDetector createDetector() {
+	public DetectorFiducialCalibration createDetector() {
 		ConfigSquareGridBinary config = new ConfigSquareGridBinary(numRows,numCols,1.0,1.0);
 		config.squareWidth = 1;
 		config.spaceWidth = 1;
 
-		return FactoryCalibrationTarget.detectorBinaryGrid(config);
+		return FactoryFiducialCalibration.detectorBinaryGrid(config);
 	}
 }

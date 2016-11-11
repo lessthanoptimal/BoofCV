@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,14 @@ import java.io.IOException;
  */
 public class ConfigSquareGridBinary implements Configuration {
 
+	/**
+	 * Description of the binary fiducial detector
+	 */
 	public ConfigFiducialBinary configDetector = new ConfigFiducialBinary();
+
+	/**
+	 * Description of image thresholding algorithm
+	 */
 	public ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE,20);
 
 	/**
@@ -59,7 +66,7 @@ public class ConfigSquareGridBinary implements Configuration {
 	public double squareWidth;
 
 	/**
-	 * Physical width of hte space between each square
+	 * Physical width space between each square
 	 */
 	public double spaceWidth;
 

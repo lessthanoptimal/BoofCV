@@ -21,8 +21,8 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -55,7 +55,7 @@ import java.util.List;
 public class ExampleCalibrateMonocular {
 
 	// Detects the target and calibration point inside the target
-	CalibrationDetector detector;
+	DetectorFiducialCalibration detector;
 
 	// List of calibration images
 	List<String> images;
@@ -65,7 +65,7 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupZhang99() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
+		detector = FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 
 		// load image list
 		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
@@ -77,7 +77,7 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupBumbleBee() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
+		detector = FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		// load image list
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");

@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface CalibrationDetector {
+public interface DetectorFiducialCalibration {
 
 	/**
 	 * Image processing for calibration target detection

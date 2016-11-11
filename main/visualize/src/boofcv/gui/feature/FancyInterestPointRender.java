@@ -24,7 +24,7 @@ import java.util.List;
 
 
 /**
- * Renders image interest points.
+ * Renders image interest points in a thread safe manor.
  *
  * @author Peter Abeles
  */

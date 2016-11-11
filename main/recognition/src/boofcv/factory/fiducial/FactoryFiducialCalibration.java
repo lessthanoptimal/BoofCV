@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.factory.calib;
+package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
@@ -26,7 +26,7 @@ import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
  *
  * @author Peter Abeles
  */
-public class FactoryCalibrationTarget {
+public class FactoryFiducialCalibration {
 
 	/**
 	 * Creates a calibration target detector for square grid targets.

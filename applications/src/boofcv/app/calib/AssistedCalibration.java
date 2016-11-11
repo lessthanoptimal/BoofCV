@@ -20,7 +20,7 @@ package boofcv.app.calib;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
@@ -96,7 +96,7 @@ public class AssistedCalibration {
 	GrayF32 input;
 
 	// detects the calibration target
-	CalibrationDetector detector;
+	DetectorFiducialCalibration detector;
 
 	int imageSize;
 	int imageWidth,imageHeight;
@@ -137,7 +137,7 @@ public class AssistedCalibration {
 	 * @param outputDirectory Root directory for where all output will be stored
 	 * @param imageDirectory  Where images will be stored.  Relative to outputDirectory
 	 */
-	public AssistedCalibration(CalibrationDetector detector,
+	public AssistedCalibration(DetectorFiducialCalibration detector,
 							   ComputeGeometryScore quality,
 							   AssistedCalibrationGui gui,
 							   String outputDirectory , String imageDirectory ) {
@@ -162,7 +162,7 @@ public class AssistedCalibration {
 		view.initialize(detector);
 	}
 
-	public AssistedCalibration(CalibrationDetector detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
+	public AssistedCalibration(DetectorFiducialCalibration detector, ComputeGeometryScore quality, AssistedCalibrationGui gui) {
 		this(detector,quality,gui,OUTPUT_DIRECTORY,IMAGE_DIRECTORY);
 	}
 

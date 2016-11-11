@@ -21,10 +21,10 @@ package boofcv.abst.fiducial;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -45,7 +45,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		extends FiducialDetectorPnP<T>
 {
 	// detects the calibration target
-	private CalibrationDetector detector;
+	private DetectorFiducialCalibration detector;
 
 	// indicates if a target was detected and the found transform
 	private boolean targetDetected;
@@ -67,7 +67,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryCalibrationTarget.detectorChessboard(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorChessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
@@ -81,7 +81,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryCalibrationTarget.detectorSquareGrid(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorSquareGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
@@ -97,7 +97,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
 									   Class<T> imageType) {
-		CalibrationDetector detector = FactoryCalibrationTarget.detectorBinaryGrid(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorBinaryGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
@@ -108,7 +108,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		init(detector, width, imageType);
 	}
 
-	protected void init(CalibrationDetector detector, double width, Class<T> imageType) {
+	protected void init(DetectorFiducialCalibration detector, double width, Class<T> imageType) {
 		this.detector = detector;
 		this.type = ImageType.single(imageType);
 		this.converted = new GrayF32(1,1);
@@ -188,7 +188,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		return detector.getLayout();
 	}
 
-	public CalibrationDetector getCalibDetector() {
+	public DetectorFiducialCalibration getCalibDetector() {
 		return detector;
 	}
 

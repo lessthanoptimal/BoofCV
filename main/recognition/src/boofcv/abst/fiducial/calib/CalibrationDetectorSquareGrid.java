@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
@@ -32,11 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of {@link CalibrationDetector} for square grid target types.
+ * Implementation of {@link DetectorFiducialCalibration} for square grid target types.
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorSquareGrid implements CalibrationDetector {
+public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibration {
 
 
 	DetectSquareGridFiducial<GrayF32> detect;

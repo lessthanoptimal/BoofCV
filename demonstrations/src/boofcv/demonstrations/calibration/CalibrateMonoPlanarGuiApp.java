@@ -20,8 +20,8 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.calibration.MonoPlanarPanel;
 import boofcv.io.MediaManager;
@@ -68,7 +68,7 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 		add(gui,BorderLayout.CENTER);
 	}
 
-	public void configure( CalibrationDetector detector ,
+	public void configure( DetectorFiducialCalibration detector ,
 						   List<String> images  ,
 						   int numRadial, boolean includeTangential )
 	{
@@ -198,10 +198,10 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		CalibrationDetector detector =
+		DetectorFiducialCalibration detector =
 //				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4,3,30,30));
-				FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
+				FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square");
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");

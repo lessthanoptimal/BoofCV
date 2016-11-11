@@ -19,11 +19,11 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -79,7 +79,7 @@ public class ExampleCalibrateMonocularPoints {
 	/**
 	 * Detects calibration points found in several images and returned as a list. Not the focus of this example.
 	 */
-	public static List<CalibrationObservation> loadObservations( CalibrationDetector detector ) {
+	public static List<CalibrationObservation> loadObservations( DetectorFiducialCalibration detector ) {
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 		List<String> imageNames = BoofMiscOps.directoryList(directory, "left");
@@ -101,7 +101,7 @@ public class ExampleCalibrateMonocularPoints {
 	}
 
 	public static void main( String args[] ) {
-		CalibrationDetector detector = FactoryCalibrationTarget.
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
 				detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		List<CalibrationObservation> calibPts = loadObservations(detector);

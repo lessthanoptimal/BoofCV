@@ -20,11 +20,11 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.MediaManager;
@@ -175,7 +175,7 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	 * @param leftImages Images taken by left camera.
 	 * @param rightImages Images taken by right camera.
 	 */
-	public void configure( CalibrationDetector detector ,
+	public void configure( DetectorFiducialCalibration detector ,
 						   int numRadial,
 						   boolean includeTangential,
 						   boolean assumeZeroSkew ,
@@ -240,8 +240,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 	}
 
 	public static void main( String args[] ) {
-		CalibrationDetector detector =
-				FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
+		DetectorFiducialCalibration detector =
+				FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
 //				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
 
 

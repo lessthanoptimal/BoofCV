@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.MediaManager;
 import boofcv.io.SimpleStringNumberReader;
 import boofcv.io.wrapper.DefaultMediaManager;
@@ -42,7 +42,7 @@ public class BaseCalibrationConfig {
 	public boolean assumeZeroSkew;
 	public int numRadial;
 	public boolean includeTangential;
-	public CalibrationDetector detector;
+	public DetectorFiducialCalibration detector;
 
 	public BaseCalibrationConfig(MediaManager media) {
 		this.media = media;
@@ -72,9 +72,9 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(numRows, numCols, width, space));
+			detector = FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(numRows, numCols, width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(numRows, numCols, width));
+			detector = FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(numRows, numCols, width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);
 		}
@@ -84,7 +84,7 @@ public class BaseCalibrationConfig {
 		} catch (IOException e) {}
 	}
 
-	public CalibrationDetector getDetector() {
+	public DetectorFiducialCalibration getDetector() {
 		return detector;
 	}
 }

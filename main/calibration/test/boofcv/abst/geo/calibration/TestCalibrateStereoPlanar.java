@@ -108,7 +108,7 @@ public class TestCalibrateStereoPlanar {
 		assertEquals(intrinsic.t2,found.t2,1e-5);
 	}
 
-	private class FakeDetector implements CalibrationDetector {
+	private class FakeDetector implements DetectorFiducialCalibration {
 
 		int count = 0;
 

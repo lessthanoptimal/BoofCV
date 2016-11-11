@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
@@ -64,7 +64,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	public abstract void renderTarget(GrayF32 original , List<CalibrationObservation> solutions );
 
-	public abstract CalibrationDetector createDetector();
+	public abstract DetectorFiducialCalibration createDetector();
 
 	@Before
 	public void setup() {
@@ -108,7 +108,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void dataNotRecycled() {
-		CalibrationDetector detector = createDetector();
+		DetectorFiducialCalibration detector = createDetector();
 
 		assertTrue(detector.process(original));
 		CalibrationObservation found0 = detector.getDetectedPoints();
@@ -128,7 +128,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void undistorted() {
-		CalibrationDetector detector = createDetector();
+		DetectorFiducialCalibration detector = createDetector();
 
 //		display(original);
 
@@ -143,7 +143,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 * Pinch it a little bit like what is found with perspective distortion
 	 */
 	public void distorted() {
-		CalibrationDetector detector = createDetector();
+		DetectorFiducialCalibration detector = createDetector();
 
 		createTransform(width / 5, height / 5, width * 4 / 5, height / 6, width - 1, height - 1, 0, height - 1);
 
@@ -248,7 +248,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkPointIndexIncreasingOrder() {
-		CalibrationDetector detector = createDetector();
+		DetectorFiducialCalibration detector = createDetector();
 
 		assertTrue(detector.process(original));
 		CalibrationObservation found = detector.getDetectedPoints();

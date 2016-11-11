@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.DetectFiducialSquareGrid;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -29,11 +29,11 @@ import georegression.struct.point.Point2D_F64;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectFiducialSquareGrid} for {@link CalibrationDetector}.
+ * Wrapper around {@link DetectFiducialSquareGrid} for {@link DetectorFiducialCalibration}.
  *
  * @author Peter Abeles
  */
-public class CalibrationDetectorSquareFiducialGrid implements CalibrationDetector {
+public class CalibrationDetectorSquareFiducialGrid implements DetectorFiducialCalibration {
 
 	// number of squares along each grid axis
 	int numRows;

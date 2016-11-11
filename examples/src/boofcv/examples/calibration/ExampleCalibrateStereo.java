@@ -21,8 +21,8 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.CalibrationDetector;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -55,7 +55,7 @@ import java.util.List;
 public class ExampleCalibrateStereo {
 
 	// Detects the target and calibration point inside the target
-	CalibrationDetector detector;
+	DetectorFiducialCalibration detector;
 
 	// List of calibration images
 	List<String> left;
@@ -66,7 +66,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeSquare() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
+		detector = FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -79,7 +79,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeChess() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryCalibrationTarget.detectorChessboard(new ConfigChessboard(7, 5, 30));
+		detector = FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
