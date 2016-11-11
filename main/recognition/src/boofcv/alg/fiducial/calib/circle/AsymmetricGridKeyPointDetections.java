@@ -52,12 +52,18 @@ public class AsymmetricGridKeyPointDetections {
 	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64.class,true);
 
 	// used to compute tangent lines between two ellipses
-	TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.DOUBLE_TEST_TOL,10);
+	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.DOUBLE_TEST_TOL,10);
 
-	Point2D_F64 A0 = new Point2D_F64(); Point2D_F64 A1 = new Point2D_F64();
-	Point2D_F64 A2 = new Point2D_F64(); Point2D_F64 A3 = new Point2D_F64();
-	Point2D_F64 B0 = new Point2D_F64(); Point2D_F64 B1 = new Point2D_F64();
-	Point2D_F64 B2 = new Point2D_F64(); Point2D_F64 B3 = new Point2D_F64();
+	// storage for tangent points on ellipses
+	private Point2D_F64 A0 = new Point2D_F64(); private Point2D_F64 A1 = new Point2D_F64();
+	private Point2D_F64 A2 = new Point2D_F64(); private Point2D_F64 A3 = new Point2D_F64();
+	private Point2D_F64 B0 = new Point2D_F64(); private Point2D_F64 B1 = new Point2D_F64();
+	private Point2D_F64 B2 = new Point2D_F64(); private Point2D_F64 B3 = new Point2D_F64();
+
+	// local work space for center of intersections
+	private LineGeneral2D_F64 lineA = new LineGeneral2D_F64();
+	private LineGeneral2D_F64 lineB = new LineGeneral2D_F64();
+	private Point2D_F64 location = new Point2D_F64();
 
 	/**
 	 * Computes key points from the grid of ellipses
@@ -66,10 +72,7 @@ public class AsymmetricGridKeyPointDetections {
 	 */
 	public boolean process(Grid grid ) {
 		// reset and initialize data structures
-		tangents.resize(totalEllipses(grid.rows,grid.columns));
-		for (int i = 0; i < tangents.size(); i++) {
-			tangents.get(i).reset();
-		}
+		init(grid);
 
 		// add tangent points from adjacent ellipses
 		if( !horizontal(grid) )
@@ -84,9 +87,16 @@ public class AsymmetricGridKeyPointDetections {
 		return computeEllipseCenters();
 	}
 
+	void init(Grid grid) {
+		tangents.resize(totalEllipses(grid.rows,grid.columns));
+		for (int i = 0; i < tangents.size(); i++) {
+			tangents.get(i).reset();
+		}
+	}
+
 	boolean horizontal(Grid grid) {
 		for (int i = 0; i < grid.rows; i++) {
-			for (int j = 0; j < grid.columns-1; j++) {
+			for (int j = 0; j < grid.columns-2; j++) {
 				if( i%2==0 && j%2==1 ) continue;
 				if( i%2==1 && j%2==0 ) continue;
 
@@ -99,7 +109,7 @@ public class AsymmetricGridKeyPointDetections {
 	}
 
 	boolean vertical(Grid grid) {
-		for (int i = 0; i < grid.rows-1; i++) {
+		for (int i = 0; i < grid.rows-2; i++) {
 			for (int j = 0; j < grid.columns; j++) {
 				if( i%2==0 && j%2==1 ) continue;
 				if( i%2==1 && j%2==0 ) continue;
@@ -143,7 +153,7 @@ public class AsymmetricGridKeyPointDetections {
 	/**
 	 * Computes tangent points to the two ellipses specified by the grid coordinates
 	 */
-	boolean addTangents(Grid grid, int rowA, int colA, int rowB, int colB) {
+	private boolean addTangents(Grid grid, int rowA, int colA, int rowB, int colB) {
 		EllipseRotated_F64 a = grid.get(rowA,colA);
 		EllipseRotated_F64 b = grid.get(rowB,colB);
 
@@ -170,24 +180,17 @@ public class AsymmetricGridKeyPointDetections {
 	boolean computeEllipseCenters() {
 		keypoints.reset();
 
-		LineGeneral2D_F64 lineA = new LineGeneral2D_F64();
-		LineGeneral2D_F64 lineB = new LineGeneral2D_F64();
-		Point2D_F64 location = new Point2D_F64();
-
-		for (int tangetntIdx = 0; tangetntIdx < tangents.size(); tangetntIdx++) {
-			Tangents t = tangents.get(tangetntIdx);
+		for (int tangentIdx = 0; tangentIdx < tangents.size(); tangentIdx++) {
+			Tangents t = tangents.get(tangentIdx);
 			Point2D_F64 center = keypoints.grow();
+			center.set(0,0);
 			double totalWeight = 0;
 
 			for (int i = 0; i < t.size(); i += 2) {
 				UtilLine2D_F64.convert(t.get(i),t.get(i+1),lineA);
 
 				for (int j = i+2; j < t.size(); j += 2) {
-					UtilLine2D_F64.convert(t.get(j),t.get(j+1),lineA);
-
-					if( null == Intersection2D_F64.intersection(lineA,lineB, location) ) {
-						return false;
-					}
+					UtilLine2D_F64.convert(t.get(j),t.get(j+1),lineB);
 
 					// way each intersection based on the acute angle.  lines which are nearly parallel will
 					// be unstable estimates
@@ -195,12 +198,24 @@ public class AsymmetricGridKeyPointDetections {
 					if( w > Math.PI/2.0 )
 						w = Math.PI-w;
 
+					// If there is perfect data and no noise there will be duplicated lines.  With noise there will
+					// be very similar lines
+					if( Math.abs(w) <= GrlConstants.EPS )
+						continue;
+
+					if( null == Intersection2D_F64.intersection(lineA,lineB, location) ) {
+						return false;
+					}
+
 					center.x += location.x*w;
 					center.y += location.y*w;
 
 					totalWeight += w;
 				}
 			}
+
+			if( totalWeight == 0 )
+				return false;
 
 			center.x /= totalWeight;
 			center.y /= totalWeight;
@@ -217,7 +232,7 @@ public class AsymmetricGridKeyPointDetections {
 		return keypoints;
 	}
 
-	private static class Tangents extends FastQueue<Point2D_F64> {
+	public static class Tangents extends FastQueue<Point2D_F64> {
 		public Tangents() {
 			super(8, Point2D_F64.class, true);
 		}
