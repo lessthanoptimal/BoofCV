@@ -199,9 +199,9 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
-//				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
-//				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4,3,30,30));
-				FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
+//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
+//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4,3,30,30));
+				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
 
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square");
 //		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");

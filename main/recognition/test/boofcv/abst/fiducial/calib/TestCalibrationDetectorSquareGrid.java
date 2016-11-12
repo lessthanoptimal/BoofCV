@@ -96,6 +96,6 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 
 	@Override
 	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.detectorSquareGrid(config);
+		return FactoryFiducialCalibration.squareGrid(config);
 	}
 }

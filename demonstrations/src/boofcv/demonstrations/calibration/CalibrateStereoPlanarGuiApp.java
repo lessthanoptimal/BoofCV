@@ -241,8 +241,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
-				FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
-//				FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
+				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
+//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
 
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");

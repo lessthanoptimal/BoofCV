@@ -67,7 +67,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorChessboard(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config);
 		double sideWidth = config.numCols*config.squareWidth;
 		double sideHeight = config.numRows*config.squareWidth;
 
@@ -81,7 +81,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGrid config,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorSquareGrid(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
@@ -97,7 +97,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.detectorBinaryGrid(config);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.binaryGrid(config);
 		int squareCols = config.numCols;
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;

@@ -174,7 +174,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigChessboard config = new ConfigChessboard(numRows, numColumns, 1);
 
-		detector = FactoryFiducialCalibration.detectorChessboard(config);
+		detector = FactoryFiducialCalibration.chessboard(config);
 	}
 
 	protected void parseSquareGrid( int index , String []args ) {
@@ -215,7 +215,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigSquareGrid config = new ConfigSquareGrid(numRows, numColumns, square,space);
 
-		detector = FactoryFiducialCalibration.detectorSquareGrid(config);
+		detector = FactoryFiducialCalibration.squareGrid(config);
 	}
 
 	public void process() {

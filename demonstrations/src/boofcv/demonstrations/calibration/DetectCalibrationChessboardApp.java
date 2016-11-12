@@ -70,7 +70,7 @@ public class DetectCalibrationChessboardApp
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.detectorChessboard(config).getAlgorithm();
+		alg = FactoryFiducialCalibration.chessboard(config).getAlgorithm();
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorSquareGrid detectorSquareGrid(ConfigSquareGrid config) {
+	public static CalibrationDetectorSquareGrid squareGrid(ConfigSquareGrid config) {
 		config.checkValidity();
 
 		return new CalibrationDetectorSquareGrid(config);
@@ -51,7 +51,7 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorChessboard detectorChessboard( ConfigChessboard config ) {
+	public static CalibrationDetectorChessboard chessboard(ConfigChessboard config ) {
 		config.checkValidity();
 
 		return new CalibrationDetectorChessboard(config);
@@ -65,9 +65,20 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration of binary target
 	 * @return Detector for binary grid target
 	 */
-	public static CalibrationDetectorSquareFiducialGrid detectorBinaryGrid( ConfigSquareGridBinary config ) {
+	public static CalibrationDetectorSquareFiducialGrid binaryGrid(ConfigSquareGridBinary config ) {
 		config.checkValidity();
 
 		return new CalibrationDetectorSquareFiducialGrid(config);
+	}
+
+	/**
+	 * Detector for asymmetric grid of circles
+	 * @param config Configuration for target
+	 * @return The detector
+	 */
+	public static CalibrationDetectorCircleAsymmGrid circleAsymmGrid( ConfigCircleAsymmetricGrid config ) {
+		config.checkValidity();
+
+		return new CalibrationDetectorCircleAsymmGrid(config);
 	}
 }

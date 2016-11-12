@@ -87,6 +87,6 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 		config.squareWidth = 1;
 		config.spaceWidth = 1;
 
-		return FactoryFiducialCalibration.detectorBinaryGrid(config);
+		return FactoryFiducialCalibration.binaryGrid(config);
 	}
 }

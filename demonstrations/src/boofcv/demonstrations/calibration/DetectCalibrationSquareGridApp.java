@@ -69,7 +69,7 @@ public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 		config.numRows = controlPanel.getGridRows();
 		config.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.detectorSquareGrid(config).getAlgorithm();
+		alg = FactoryFiducialCalibration.squareGrid(config).getAlgorithm();
 	}
 
 	@Override

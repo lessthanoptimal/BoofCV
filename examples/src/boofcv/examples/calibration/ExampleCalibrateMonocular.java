@@ -65,7 +65,7 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupZhang99() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
+		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
 
 		// load image list
 		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
@@ -77,7 +77,7 @@ public class ExampleCalibrateMonocular {
 	 */
 	private void setupBumbleBee() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.detectorChessboard(new ConfigChessboard(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
 
 		// load image list
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");

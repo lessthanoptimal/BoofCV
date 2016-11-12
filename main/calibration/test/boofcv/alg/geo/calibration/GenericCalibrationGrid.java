@@ -47,7 +47,7 @@ public class GenericCalibrationGrid {
 	}
 
 	public static DetectorFiducialCalibration createStandardConfig() {
-		return FactoryFiducialCalibration.detectorSquareGrid(new ConfigSquareGrid(3, 2, 30, 30));
+		return FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(3, 2, 30, 30));
 	}
 
 	public static DenseMatrix64F createStandardCalibration() {

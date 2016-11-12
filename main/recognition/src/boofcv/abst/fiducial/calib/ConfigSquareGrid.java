@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class ConfigSquareGrid implements Configuration {
 	public double squareWidth;
 
 	/**
-	 * Physical width of hte space between each square
+	 * Physical width of the space between each square
 	 */
 	public double spaceWidth;
 

@@ -89,6 +89,6 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 
 	@Override
 	public DetectorFiducialCalibration createDetector() {
-		return FactoryFiducialCalibration.detectorChessboard(config);
+		return FactoryFiducialCalibration.chessboard(config);
 	}
 }

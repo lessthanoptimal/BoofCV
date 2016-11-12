@@ -56,8 +56,8 @@ public class ExampleDetectCalibrationPoints {
 		DetectorFiducialCalibration detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
-//		detector = FactoryCalibrationTarget.detectorSquareGrid(new ConfigSquareGrid(4, 3, 30, 30));
-		detector = FactoryFiducialCalibration.detectorChessboard( new ConfigChessboard(7, 5, 30));
+//		detector = FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
+		detector = FactoryFiducialCalibration.chessboard( new ConfigChessboard(7, 5, 30));
 
 		// process the image and check for failure condition
 		if( !detector.process(input) )

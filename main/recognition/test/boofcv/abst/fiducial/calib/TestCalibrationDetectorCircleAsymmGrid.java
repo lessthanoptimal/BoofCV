@@ -16,18 +16,34 @@
  * limitations under the License.
  */
 
-package boofcv.alg.fiducial.calib.circle;
+package boofcv.abst.fiducial.calib;
 
-import org.junit.Test;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.struct.image.GrayF32;
 
-import static org.junit.Assert.fail;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestAsymmetricGridKeyPointLocations {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class TestCalibrationDetectorCircleAsymmGrid extends GenericPlanarCalibrationDetectorChecks {
+
+	private final static ConfigCircleAsymmetricGrid config =
+			new ConfigCircleAsymmetricGrid(5, 4, 10,30);
+
+	public TestCalibrationDetectorCircleAsymmGrid() {
+		width = 500;
+		height = 600;
+	}
+
+	@Override
+	public void renderTarget(GrayF32 original, List<CalibrationObservation> solutions) {
+
+	}
+
+	@Override
+	public DetectorFiducialCalibration createDetector() {
+		return null;
 	}
 }
