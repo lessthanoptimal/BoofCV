@@ -142,6 +142,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	/**
 	 * Pinch it a little bit like what is found with perspective distortion
 	 */
+	@Test
 	public void distorted() {
 		DetectorFiducialCalibration detector = createDetector();
 

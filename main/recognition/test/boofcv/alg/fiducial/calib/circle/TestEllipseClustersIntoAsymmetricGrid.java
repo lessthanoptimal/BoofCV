@@ -580,6 +580,7 @@ public class TestEllipseClustersIntoAsymmetricGrid {
 		grid_getIndexOfEllipse(4,5);
 		grid_getIndexOfEllipse(5,4);
 		grid_getIndexOfEllipse(5,5);
+		grid_getIndexOfEllipse(5,6);
 	}
 
 	private void grid_getIndexOfEllipse( int numRows , int numCols ) {

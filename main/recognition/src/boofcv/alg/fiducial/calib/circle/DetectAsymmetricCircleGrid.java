@@ -48,9 +48,9 @@ import java.util.List;
  * </center>
  * Example of a 8 by 5 grid; row, column.
  *
- * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied,
- * and if there are multiple solutions, the solution will be selected with the node closest to the top left
- * being chosen.</p>
+ * <p>Canonical orientation is defined as having the rows/columns matched, element (0,0) being occupied.
+ * If there are multiple solution a solution will be selected which is in counter-clockwise order (image coordinates)
+ * and if there is still ambiguity the ellipse closest to the image origin will be selected as (0,0).</p>
  *
  * @author Peter Abeles
  */
@@ -73,6 +73,9 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 	// local work space for manipulating the order of points inside a grid
 	private List<EllipseRotated_F64> work = new ArrayList<>();
+
+	// storage for found clusters
+	private List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
 
 	/**
 	 * Creates and configures the detector
@@ -108,8 +111,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		ellipseDetector.process(gray, binary);
 		List<EllipseRotated_F64> found = ellipseDetector.getFoundEllipses().toList();
 
-		List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
-
+		clusters.clear();
 		clustering.process(found, clusters);
 
 		pruneIncorrectSize(clusters, totalEllipses(numRows,numCols) );
@@ -150,20 +152,49 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 		// select the best corner for canonical
 		if( g.columns%2 == 1 && g.rows%2 == 1) {
-			int numRotationsCCW = closestCorner4(g);
+			// first make sure orientation constraint is maintained
+			if( isClockWise(g)) {
+				flipHorizontal(g);
+			}
 
-			for (int i = 0; i < numRotationsCCW; i++) {
+			int numRotationsCCW = closestCorner4(g);
+			if( g.columns == g.rows ) {
+				for (int i = 0; i < numRotationsCCW; i++) {
+					rotateGridCCW(g);
+				}
+			} else if( numRotationsCCW == 2 ){
+				// only two valid solutions.  rotate only if the other valid solution is better
+				rotateGridCCW(g);
 				rotateGridCCW(g);
 			}
 		} else if( g.columns%2 == 1 ) {
-			if( g.get(0,0).center.normSq() > g.get(0,g.columns-1).center.normSq() ) {
+			// only two solutions.  Go with the one which maintains orientation constraint
+			if( isClockWise(g)) {
 				flipHorizontal(g);
 			}
 		} else if( g.rows%2 == 1 ) {
-			if( g.get(0,0).center.normSq() > g.get(g.rows-1,0).center.normSq() ) {
+			// only two solutions.  Go with the one which maintains orientation constraint
+			if( isClockWise(g)) {
 				flipVertical(g);
 			}
 		}
+	}
+
+	/**
+	 * Uses the cross product to determine if the grid is in clockwise order
+	 */
+	private static boolean isClockWise( Grid g ) {
+		EllipseRotated_F64 v00 = g.get(0,0);
+		EllipseRotated_F64 v02 = g.columns<3?g.get(1,1):g.get(0,2);
+		EllipseRotated_F64 v20 = g.rows<3?g.get(1,1):g.get(2,0);
+
+		double a_x = v02.center.x - v00.center.x;
+		double a_y = v02.center.y - v00.center.y;
+
+		double b_x = v20.center.x - v00.center.x;
+		double b_y = v20.center.y - v00.center.y;
+
+		return a_x * b_y - a_y * b_x < 0;
 	}
 
 	/**

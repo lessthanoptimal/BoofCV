@@ -40,7 +40,7 @@ public class EllipsesIntoClusters {
 	// maximum number of neighbors it will consider
 	private int neighborsConsidered = 10;
 	// ratio between center distance and major axis
-	private double distanceToMajorAxisRatio;
+	private double maxDistanceToMajorAxisRatio;
 
 	// minimum allowed ratio difference between major and minor axis
 	private double sizeSimilarityTolerance = 0.5;
@@ -58,16 +58,15 @@ public class EllipsesIntoClusters {
 	/**
 	 * Configures clustering
 	 *
-	 * @param distanceToMajorAxisRatio Maximum expected space between ellipse centers in 2D plane divided by
-	 *                             the ellipses' major axis.   E.g. 3.0 = space between ellipse centers is
-	 *                             3x their major axis
+	 * @param maxDistanceToMajorAxisRatio The maxium distance away the center of another ellipse can be relative
+	 *                                    to the major axis of the ellipse being examined
 	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect
 	 *                                match and 0.0 = infinite difference in size
 	 */
-	public EllipsesIntoClusters( double distanceToMajorAxisRatio,
+	public EllipsesIntoClusters( double maxDistanceToMajorAxisRatio,
 								 double sizeSimilarityTolerance ) {
 
-		this.distanceToMajorAxisRatio = distanceToMajorAxisRatio;
+		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
 
 		search.init(2);
@@ -118,7 +117,7 @@ public class EllipsesIntoClusters {
 
 			// Only search the maximum of the major axis times two
 			// add a fudge factor.  won't ever be perfect
-			double maxDistance = e1.a * distanceToMajorAxisRatio;
+			double maxDistance = e1.a * maxDistanceToMajorAxisRatio;
 			maxDistance *= maxDistance;
 
 			searchResults.reset();
@@ -227,12 +226,12 @@ public class EllipsesIntoClusters {
 		this.neighborsConsidered = neighborsConsidered;
 	}
 
-	public double getDistanceToMajorAxisRatio() {
-		return distanceToMajorAxisRatio;
+	public double getMaxDistanceToMajorAxisRatio() {
+		return maxDistanceToMajorAxisRatio;
 	}
 
-	public void setDistanceToMajorAxisRatio(double distanceToMajorAxisRatio) {
-		this.distanceToMajorAxisRatio = distanceToMajorAxisRatio;
+	public void setMaxDistanceToMajorAxisRatio(double maxDistanceToMajorAxisRatio) {
+		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
 	}
 
 	public double getSizeSimilarityTolerance() {

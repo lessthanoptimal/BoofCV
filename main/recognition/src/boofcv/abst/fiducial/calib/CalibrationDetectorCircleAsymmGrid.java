@@ -50,11 +50,10 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 	// extracts key points from detected grid
 	private AsymmetricGridKeyPointDetections keypoint = new AsymmetricGridKeyPointDetections();
 
-	// Storage for 2D pixel observations
-	private CalibrationObservation results = new CalibrationObservation();
-
 	// Storage for 2D location of points on fiducial
 	private List<Point2D_F64> layout;
+
+	private CalibrationObservation results;
 
 	/**
 	 * Configures the detector based on the pass in configuration class
@@ -68,7 +67,8 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
 				FactoryShapeDetector.ellipse(config.ellipse,GrayF32.class);
 
-		double spaceToRadius = config.centerDistance/config.circleRadius;
+		// the is a maximum distance away.  add a bit of fudge
+		double spaceToRadius = (config.centerDistance/config.circleRadius)*1.25;
 
 		detector = new DetectAsymmetricCircleGrid<>(config.numRows,config.numCols,inputToBinary,
 				ellipseDetector,new EllipsesIntoClusters(spaceToRadius,config.ellipseSizeSimilarity));
@@ -83,7 +83,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		List<Grid> grids = detector.getGrids();
 
-		if( grids.size() != 0 )
+		if( grids.size() != 1 )
 			return false;
 
 		if( !keypoint.process(grids.get(0)) )
@@ -91,7 +91,8 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 
 		FastQueue<Point2D_F64> foundPixels = keypoint.getKeyPoints();
-		results.reset();
+
+		results = new CalibrationObservation();
 
 		for (int i = 0; i < foundPixels.size; i++) {
 			results.add(foundPixels.get(i),i);
@@ -121,14 +122,20 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		List<Point2D_F64> ret = new ArrayList<>();
 
-		double width = numCols*centerDistance;
-		double height = numRows*centerDistance;
+		double widthCell = centerDistance/2;
+
+		double width = (numCols-1)*widthCell;
+		double height = (numRows-1)*widthCell;
 
 		for (int row = 0; row < numRows; row++) {
-			double y = row*centerDistance - height/2;
+			double y = row*widthCell - height/2;
 			for (int col = 0; col < numCols; col++) {
-				double x = col*centerDistance - width/2;
+				double x = col*widthCell - width/2;
 
+				if( row%2==0 && col%2==1)
+					continue;
+				if( row%2==1 && col%2==0)
+					continue;
 				ret.add( new Point2D_F64(x,y));
 			}
 		}

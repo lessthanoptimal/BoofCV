@@ -236,7 +236,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 		List<List<NodeInfo>> grid = new ArrayList<>();
 
-		if( row != null ) {
+		if( row != null && column != null ) {
 			grid.add(row);
 			for (int i = 1; i < column.size(); i++) {
 				List<NodeInfo> prev = grid.get(i - 1);
@@ -247,13 +247,20 @@ public class EllipseClustersIntoAsymmetricGrid {
 					throw new RuntimeException("Inner grid missing a row");
 				grid.add(row);
 			}
-		} else {
+		} else if( row != null ) {
+			// Inner grid is composed of only a row
+			grid.add(row);
+		} else if( column != null ) {
 			// Inner grid is composed of only a single column
 			for (int i = 0; i < column.size(); i++) {
-				List<NodeInfo> l = new ArrayList<>();
+				List<NodeInfo> l = new ArrayList<>(); // TODO use recycled memory here
 				l.add( column.get(i) );
 				grid.add( l );
 			}
+		} else {
+			row = new ArrayList<>();
+			row.add(corner);
+			grid.add( row );
 		}
 		return grid;
 	}
@@ -345,9 +352,12 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 * @return All the nodes along the line
 	 */
 	static protected List<NodeInfo> findLine( NodeInfo seed , NodeInfo next , int clusterSize ) {
+		if( next == null )
+			return null;
+
 		double anglePrev = direction(seed, next);
 
-		List<NodeInfo> line = new ArrayList<>();
+		List<NodeInfo> line = new ArrayList<>(); // TODO recycle this
 		line.add( seed );
 		line.add( next );
 
@@ -480,10 +490,14 @@ public class EllipseClustersIntoAsymmetricGrid {
 		contour.reset();
 		contour.add( seed );
 		seed.contour = true;
+		NodeInfo prev = seed;
 		NodeInfo current = seed.right;
 		while( current != null && current != seed && contour.size() < listInfo.size() ) {
+			if( prev != current.left )
+				throw new RuntimeException("PROBLEM!  Basic assumption for building contour is wrong");
 			contour.add( current );
 			current.contour = true;
+			prev = current;
 			current = current.right;
 		}
 

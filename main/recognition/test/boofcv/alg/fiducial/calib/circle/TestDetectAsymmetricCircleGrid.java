@@ -25,8 +25,10 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.EllipseRotated_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -49,7 +51,10 @@ public class TestDetectAsymmetricCircleGrid {
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,100,100);
 
 		performDetectionCheck(5, 6, 5, 6, affine);
-
+		performDetectionCheck(5, 4, 5, 4, affine);
+		performDetectionCheck(3, 3, 3, 3, affine);
+		performDetectionCheck(3, 4, 3, 4, affine);
+		performDetectionCheck(4, 3, 4, 3, affine);
 	}
 
 	@Test
@@ -72,7 +77,8 @@ public class TestDetectAsymmetricCircleGrid {
 		DetectAsymmetricCircleGrid<GrayU8> alg = createAlg(expectedRows,expectedCols);
 
 		List<Point2D_F64> locations = new ArrayList<>();
-		GrayU8 image = render(actualRows,actualCols, 20, affine, locations);
+		GrayU8 image = new GrayU8(400,450);
+		render(actualRows,actualCols, 20, 80, affine, locations,image);
 
 		alg.process(image);
 
@@ -87,6 +93,7 @@ public class TestDetectAsymmetricCircleGrid {
 		Grid g = found.get(0);
 		assertEquals(actualRows , g.rows );
 		assertEquals(actualCols , g.columns );
+		checkCounterClockWise(g);
 
 		int index = 0;
 		for (int row = 0; row < g.rows; row++) {
@@ -104,7 +111,7 @@ public class TestDetectAsymmetricCircleGrid {
 					assertEquals( e.x , f.center.x , 1.5 );
 					assertEquals( e.y , f.center.y , 1.5 );
 					assertEquals( 20 , f.a , 1.0 );
-					assertEquals( 20 , f.a , 1.0 );
+					assertEquals( 20 , f.b , 1.0 );
 				}
 			}
 		}
@@ -162,23 +169,27 @@ public class TestDetectAsymmetricCircleGrid {
 	 */
 	@Test
 	public void putGridIntoCanonical_vertical() {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(5,2,null,null,null);
+		putGridIntoCanonical_vertical(5,2);
+		putGridIntoCanonical_vertical(5,6);
+	}
+	private void putGridIntoCanonical_vertical( int numRows , int numCols ) {
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
 
-		Grid g = createGrid(5,2);
+		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
 		original.addAll(g.ellipses);
 
 		alg.putGridIntoCanonical(g);
-
-		assertEquals(5,g.rows);
-		assertEquals(2,g.columns);
+		assertEquals(numRows,g.rows);
+		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 
 		alg.putGridIntoCanonical(flipVertical(g));
-
-		assertEquals(5,g.rows);
-		assertEquals(2,g.columns);
+		assertEquals(numRows,g.rows);
+		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 	}
 
 	/**
@@ -186,23 +197,29 @@ public class TestDetectAsymmetricCircleGrid {
 	 */
 	@Test
 	public void putGridIntoCanonical_horizontal() {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(2,5,null,null,null);
+		putGridIntoCanonical_horizontal(2,5);
+		putGridIntoCanonical_horizontal(6,5);
 
-		Grid g = createGrid(2,5);
+	}
+	private void putGridIntoCanonical_horizontal( int numRows , int numCols) {
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
+
+		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
 		original.addAll(g.ellipses);
 
 		alg.putGridIntoCanonical(g);
-
-		assertEquals(2,g.rows);
-		assertEquals(5,g.columns);
+		assertEquals(numRows,g.rows);
+		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 
-		alg.putGridIntoCanonical(flipHorizontal(g));
-
-		assertEquals(2,g.rows);
-		assertEquals(5,g.columns);
+		g = flipHorizontal(g);
+		alg.putGridIntoCanonical(g);
+		assertEquals(numRows,g.rows);
+		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 	}
 
 	/**
@@ -210,31 +227,60 @@ public class TestDetectAsymmetricCircleGrid {
 	 */
 	@Test
 	public void putGridIntoCanonical_rotate() {
-		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(3,3,null,null,null);
+		putGridIntoCanonical_rotate(3,3);
+		putGridIntoCanonical_rotate(5,3);
+	}
+	public void putGridIntoCanonical_rotate(int numRows , int numCols ) {
+		DetectAsymmetricCircleGrid<?> alg = new DetectAsymmetricCircleGrid<>(numRows,numCols,null,null,null);
 
-		Grid g = createGrid(3,3);
+		Grid g = createGrid(numRows,numCols);
 		List<EllipseRotated_F64> original = new ArrayList<>();
 		original.addAll(g.ellipses);
 
 		alg.putGridIntoCanonical(g);
-		assertEquals(3,g.rows);
-		assertEquals(3,g.columns);
+		assertEquals(numRows,g.rows);
+		assertEquals(numCols,g.columns);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 
 		alg.rotateGridCCW(g);
 		alg.putGridIntoCanonical(g);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 
 		alg.rotateGridCCW(g);
 		alg.rotateGridCCW(g);
 		alg.putGridIntoCanonical(g);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
 
 		alg.rotateGridCCW(g);
 		alg.rotateGridCCW(g);
 		alg.rotateGridCCW(g);
 		alg.putGridIntoCanonical(g);
 		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
+
+		alg.flipVertical(g);
+		alg.putGridIntoCanonical(g);
+		assertTrue(original.get(0) == g.get(0,0));
+		checkCounterClockWise(g);
+	}
+
+	private void checkCounterClockWise(Grid g ) {
+		EllipseRotated_F64 a = g.get(0,0);
+		EllipseRotated_F64 b = g.columns>=3 ? g.get(0,2) : g.get(1,1);
+		EllipseRotated_F64 c = g.rows>=3 ? g.get(2,0) : g.get(1,1);
+
+		double dx0 = b.center.x - a.center.x;
+		double dy0 = b.center.y - a.center.y;
+
+		double dx1 = c.center.x - a.center.x;
+		double dy1 = c.center.y - a.center.y;
+
+		Vector3D_F64 v = new Vector3D_F64();
+		GeometryMath_F64.cross(dx0,dy0,0, dx1,dy1,0, v);
+		assertTrue(v.z>0);
 	}
 
 	@Test
@@ -287,14 +333,14 @@ public class TestDetectAsymmetricCircleGrid {
 			for (int j = 0; j < numCols; j++) {
 				if( i%2 == 0 ) {
 					if( j%2 == 0 )
-						g.ellipses.add(new EllipseRotated_F64(i*20,j*20, 0,0,0));
+						g.ellipses.add(new EllipseRotated_F64(j*20,i*20, 0,0,0));
 					else
 						g.ellipses.add(null);
 				} else {
 					if( j%2 == 0 )
 						g.ellipses.add(null);
 					else
-						g.ellipses.add(new EllipseRotated_F64(i*20,j*20, 0,0,0));
+						g.ellipses.add(new EllipseRotated_F64(j*20,i*20, 0,0,0));
 				}
 			}
 		}
@@ -349,10 +395,10 @@ public class TestDetectAsymmetricCircleGrid {
 		return out;
 	}
 
-	public static GrayU8 render(int rows , int cols , double radius , Affine2D_F64 affine,
-								List<Point2D_F64> locations )
+	public static void render(int rows , int cols , double radius , double centerDistance, Affine2D_F64 affine,
+							  List<Point2D_F64> locations , GrayU8 image )
 	{
-		BufferedImage buffered = new BufferedImage(400,350, BufferedImage.TYPE_INT_BGR);
+		BufferedImage buffered = new BufferedImage(image.width,image.height, BufferedImage.TYPE_INT_BGR);
 		Graphics2D g2 = buffered.createGraphics();
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0,0,buffered.getWidth(),buffered.getHeight());
@@ -361,9 +407,9 @@ public class TestDetectAsymmetricCircleGrid {
 		locations.clear();
 
 		for (int row = 0; row < rows; row++) {
-			double y = row*radius*2;
+			double y = row*centerDistance/2.0;
 			for (int col = 0; col < cols; col++) {
-				double x = col*radius*2;
+				double x = col*centerDistance/2.0;
 
 				if( row%2 == 1 && col%2 ==0 )
 					continue;
@@ -379,9 +425,6 @@ public class TestDetectAsymmetricCircleGrid {
 			}
 		}
 
-		GrayU8 ret = new GrayU8(buffered.getWidth(), buffered.getHeight());
-		ConvertBufferedImage.convertFrom(buffered, ret);
-
-		return ret;
+		ConvertBufferedImage.convertFrom(buffered, image);
 	}
 }
