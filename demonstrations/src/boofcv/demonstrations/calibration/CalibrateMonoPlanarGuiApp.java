@@ -199,20 +199,21 @@ public class CalibrateMonoPlanarGuiApp extends JPanel
 
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
-//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
-//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4,3,30,30));
+//				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
+//				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4,3,30,30));
 				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
+//				FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
 
-//		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square");
-//		String directory = UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess");
-//		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
-		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
-//		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
+		List<String> images;
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square"),"frame");
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess"),"frame");
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"frame");
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang"),"CalibIm");
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration//stereo/Bumblebee2_Square"),"left");
+		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
 
 		CalibrateMonoPlanarGuiApp app = new CalibrateMonoPlanarGuiApp();
-//		app.configure(detector,BoofMiscOps.directoryList(directory, "frame" ),2,false);
-		app.configure(detector,BoofMiscOps.directoryList(directory, "left" ),2,false);
-//		app.configure(detector,BoofMiscOps.directoryList(directory, "CalibIm" ),2,false);
+		app.configure(detector,images,2,false);
 
 		JFrame frame = new JFrame("Planar Calibration");
 		frame.add(app, BorderLayout.CENTER);

@@ -19,7 +19,6 @@
 package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -53,41 +52,21 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ExampleCalibrateMonocular {
+	public static void main( String args[] ) {
+		DetectorFiducialCalibration detector;
+		List<String> images;
 
-	// Detects the target and calibration point inside the target
-	DetectorFiducialCalibration detector;
+		// Asymmetric Circle Example
+//		detector = FactoryFiducialCalibration.circleAsymmGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6));
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleAsym"),"frame");
 
-	// List of calibration images
-	List<String> images;
+		// Square Grid example
+//		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
+//		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left");
 
-	/**
-	 * Images from Zhang's website.  Square grid pattern.
-	 */
-	private void setupZhang99() {
-		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
-
-		// load image list
-		String directory = UtilIO.pathExample("calibration/mono/PULNiX_CCD_6mm_Zhang");
-		images = BoofMiscOps.directoryList(directory,"CalibIm");
-	}
-
-	/**
-	 * Images collected from a Bumblee Bee stereo camera.  Large amounts of radial distortion. Chessboard pattern.
-	 */
-	private void setupBumbleBee() {
-		// Creates a detector and specifies its physical characteristics
+		// Chessboard Example
 		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-
-		// load image list
-		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
-		images = BoofMiscOps.directoryList(directory,"left");
-	}
-
-	/**
-	 * Process calibration images, compute intrinsic parameters, save to a file
-	 */
-	public void process() {
+		images = BoofMiscOps.directoryList(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left");
 
 		// Declare and setup the calibration algorithm
 		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector);
@@ -114,17 +93,5 @@ public class ExampleCalibrateMonocular {
 		System.out.println("--- Intrinsic Parameters ---");
 		System.out.println();
 		intrinsic.print();
-	}
-
-
-	public static void main( String args[] ) {
-		ExampleCalibrateMonocular alg = new ExampleCalibrateMonocular();
-
-		// which target should it process
-//		alg.setupZhang99();
-		alg.setupBumbleBee();
-
-		// compute and save results
-		alg.process();
 	}
 }

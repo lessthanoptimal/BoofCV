@@ -494,7 +494,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		NodeInfo current = seed.right;
 		while( current != null && current != seed && contour.size() < listInfo.size() ) {
 			if( prev != current.left )
-				throw new RuntimeException("PROBLEM!  Basic assumption for building contour is wrong");
+				return false;
 			contour.add( current );
 			current.contour = true;
 			prev = current;

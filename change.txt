@@ -10,7 +10,7 @@ Version : 0.25
   * Binary image
   * Subpixel edge for gray scale images
 - Circular Asymmetric Grid Pattern
-  * For calibration        # TODO
+  * For calibration
   * As a general fiducial  # TODO
 - Histogram of Oriented Gradient
   * Provided another implementation which is more faithful to original paper, but much slower
@@ -64,7 +64,9 @@ Version : 0.25
 - TODO Data set for CNN classifiers
 - TODO Example equirectangular to pinhole example
 - TODO dual fisheye to equirectangular image
-- TODO Regression: circular grid fiducial and calibration
+- TODO Regression: asymmetric circular grid fiducial
+- TODO             orientation, distance, outdoors, motion blur, stationary
+- TODO Regression: asymmetric circular grid calibration
 - TODO Regression: Scene Classification
 
 ---------------------------------------------

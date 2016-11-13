@@ -181,6 +181,7 @@ public class AsymmetricGridKeyPointDetections {
 		keypoints.reset();
 
 		for (int tangentIdx = 0; tangentIdx < tangents.size(); tangentIdx++) {
+//			System.out.println("tangent id "+tangentIdx);
 			Tangents t = tangents.get(tangentIdx);
 			Point2D_F64 center = keypoints.grow();
 			center.set(0,0);
@@ -200,13 +201,14 @@ public class AsymmetricGridKeyPointDetections {
 
 					// If there is perfect data and no noise there will be duplicated lines.  With noise there will
 					// be very similar lines
-					if( Math.abs(w) <= GrlConstants.EPS )
+					if( w <= 0.02 )
 						continue;
 
 					if( null == Intersection2D_F64.intersection(lineA,lineB, location) ) {
 						return false;
 					}
 
+//					System.out.printf("   %4.2f loc %6.2f %6.2f\n",w,location.x,location.y);
 					center.x += location.x*w;
 					center.y += location.y*w;
 
