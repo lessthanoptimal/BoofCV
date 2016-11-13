@@ -22,14 +22,15 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 
 /**
- * Creates descriptions of commonly used calibration targets
+ * Creates detectors of calibration targets.  These detectors return found key points in the image and
+ * their known 2D location on the fiducial.
  *
  * @author Peter Abeles
  */
 public class FactoryFiducialCalibration {
 
 	/**
-	 * Creates a calibration target detector for square grid targets.
+	 * Detector for a grid of square targets.   All squares must be entirely visible inside the image.
 	 *
 	 * @see boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial
 	 *
@@ -43,8 +44,8 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Creates a calibration target detector for chessboard targets.  Adjust the feature radius
-	 * for best performance.
+	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
+	 * inside the image.
 	 *
 	 * @see DetectChessboardFiducial
 	 *
@@ -58,7 +59,8 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Creates a fiducial that is a grid composed of square binary fiducials.
+	 * Detector for a grid of binary targets.  Allows for squares to be obscured or partially outside of the
+	 * image.
 	 *
 	 * @see CalibrationDetectorSquareFiducialGrid
 	 *
@@ -72,7 +74,8 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for asymmetric grid of circles
+	 * Detector for asymmetric grid of circles.  All circles must be entirely inside of the image.
+	 *
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
