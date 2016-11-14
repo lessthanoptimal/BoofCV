@@ -363,7 +363,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 //		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
-		inputs.add(new PathLabel(CALIB_CIRCLE_ASYM_GRID, "/home/pja/Desktop/circle_calib/b.mp4"));
+		inputs.add(new PathLabel(CALIB_CIRCLE_ASYM_GRID, UtilIO.pathExample("fiducial/circle_asymmetric/movie.mp4")));
 
 		app.setInputList(inputs);
 

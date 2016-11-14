@@ -65,6 +65,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 	private LineSegment2D_F64 line0011 = new LineSegment2D_F64();
 	private Point2D_F64 intersection = new Point2D_F64();
 
+	private boolean verbose = false;
+
 	public EllipseClustersIntoAsymmetricGrid() {
 
 		sorter = new QuickSortComparator<>(new Comparator<Edge>() {
@@ -111,15 +113,22 @@ public class EllipseClustersIntoAsymmetricGrid {
 			List<List<NodeInfo>> outerGrid = new ArrayList<>();
 			outerGrid.add( cornerRow );
 
+			boolean failed = false;
 			for (int j = 1; j < cornerColumn.size(); j++) {
 				List<NodeInfo> prev = outerGrid.get( j - 1);
 				NodeInfo seed = cornerColumn.get(j);
 				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed);
-				if( next == null )
-					throw new RuntimeException("Outer column with a row that has only one element");
+				if( next == null ) {
+					if( verbose )
+						System.out.println("Outer column with a row that has only one element");
+					failed = true;
+					break;
+				}
 				List<NodeInfo> row = findLine( seed , next, clusterSize);
 				outerGrid.add( row );
 			}
+			if( failed )
+				continue;
 
 			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid, clusterSize);
 
