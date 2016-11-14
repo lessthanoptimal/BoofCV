@@ -31,8 +31,7 @@ public enum Unit {
 	INCH(0.0254,"in"),
 	FOOT(0.3048,"ft"),
 	YARD(0.9144,"yd"),
-	MILE(1852,"ml"),
-	DEFAULT(-1,"");
+	MILE(1852,"ml");
 
 	double unitToMeter;
 	String abbreviation;

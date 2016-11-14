@@ -38,6 +38,17 @@ public class LengthUnit {
 	}
 
 	public double convert( Unit target ) {
-		return unit.convert(length,target);
+		if( unit == null )
+			return length;
+		else
+			return unit.convert(length,target);
+	}
+
+	@Override
+	public String toString() {
+		if( unit == null )
+			return length+"";
+		else
+			return length+unit.abbreviation;
 	}
 }
