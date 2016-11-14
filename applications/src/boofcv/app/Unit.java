@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,8 @@ public enum Unit {
 	INCH(0.0254,"in"),
 	FOOT(0.3048,"ft"),
 	YARD(0.9144,"yd"),
-	MILE(1852,"ml");
+	MILE(1852,"ml"),
+	DEFAULT(-1,"");
 
 	double unitToMeter;
 	String abbreviation;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,41 +18,64 @@
 
 package boofcv.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Used to specify the size of different standard pieces of paper
  *
  * @author Peter Abeles
  */
-public enum PaperSize {
-	A0(841 , 1189, Unit.MILLIMETER),
-	A1(594 , 841, Unit.MILLIMETER),
-	A2(420 , 594, Unit.MILLIMETER),
-	A3(297 , 420, Unit.MILLIMETER),
-	A4(210 , 297, Unit.MILLIMETER),
-	LEGAL(8.5 , 14.0, Unit.INCH),
-	LETTER(8.5 , 11.0, Unit.INCH);
+public class PaperSize {
+	public static PaperSize A0 = new PaperSize(841 , 1189, Unit.MILLIMETER);
+	public static PaperSize A1 = new PaperSize(594 , 841, Unit.MILLIMETER);
+	public static PaperSize A2 = new PaperSize(420 , 594, Unit.MILLIMETER);
+	public static PaperSize A3 = new PaperSize(297 , 420, Unit.MILLIMETER);
+	public static PaperSize A4 = new PaperSize(210 , 297, Unit.MILLIMETER);
+	public static PaperSize LEGAL = new PaperSize(8.5 , 14.0, Unit.INCH);
+	public static PaperSize LETTER = new PaperSize(8.5 , 11.0, Unit.INCH);
 
-	PaperSize(double width, double height, Unit unit) {
+	public PaperSize(double width, double height, Unit unit) {
 		this.width = width;
 		this.height = height;
 		this.unit = unit;
 	}
 
-	Unit unit;
-	double width;
-	double height;
+	public Unit unit;
+	public double width;
+	public double height;
+
+	private static final List<PaperSize> values = new ArrayList<>();
+
+	static {
+		values.add(A0);
+		values.add(A1);
+		values.add(A2);
+		values.add(A3);
+		values.add(A4);
+		values.add(LEGAL);
+		values.add(LETTER);
+	}
 
 	/**
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
 	public static PaperSize lookup( String word ) {
-		for( PaperSize paper : values() ) {
+		for( PaperSize paper : values ) {
 			if( paper.toString().compareToIgnoreCase(word) == 0 ) {
 				return paper;
 			}
 		}
 
 		return null;
+	}
+
+	public double convertWidth( Unit outputUnit ) {
+		return this.unit.convert(width,outputUnit);
+	}
+
+	public double convertHeight( Unit outputUnit ) {
+		return this.unit.convert(height,outputUnit);
 	}
 
 	public Unit getUnit() {

@@ -23,6 +23,7 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBinary_to_FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.abst.filter.binary.InputToBinary;
@@ -145,6 +146,12 @@ public class FactoryFiducial {
 
 	public static <T extends ImageGray>
 	CalibrationFiducialDetector<T> calibSquareGridBinary( ConfigSquareGridBinary config, Class<T> imageType) {
+
+		return new CalibrationFiducialDetector<>(config, imageType);
+	}
+
+	public static <T extends ImageGray>
+	CalibrationFiducialDetector<T> calibCircleAsymGrid(ConfigCircleAsymmetricGrid config, Class<T> imageType) {
 
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}

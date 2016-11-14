@@ -11,7 +11,7 @@ Version : 0.25
   * Subpixel edge for gray scale images
 - Circular Asymmetric Grid Pattern
   * For calibration
-  * As a general fiducial  # TODO
+  * As a general fiducial
 - Histogram of Oriented Gradient
   * Provided another implementation which is more faithful to original paper, but much slower
   * Can now independently configure block size along each axis
@@ -52,6 +52,10 @@ Version : 0.25
 - Binary Fiducial
   * When decoding the image it now ignores border pixels of inner squares.  These tend to be very noisy.
   * 7% improvement in regression test.  Idea taken from ArUco
+- Command Line Fiducial Generator
+  * Can specify custom document size TODO
+- Added command line application for calibration fiducials TODO
+  * Supports chessboard, square grid, square binary grid, circle asymmetric grid
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
 - FancyInterestPointRender

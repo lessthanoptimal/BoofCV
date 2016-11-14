@@ -19,6 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
@@ -92,7 +93,7 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		init(detector, width, imageType);
 	}
 
-		/**
+	/**
 	 * Configure it to detect square-grid style targets
 	 */
 	public CalibrationFiducialDetector(ConfigSquareGridBinary config,
@@ -102,6 +103,19 @@ public class CalibrationFiducialDetector<T extends ImageGray>
 		int squareRows = config.numRows;
 		double sideWidth = squareCols*config.squareWidth + (squareCols-1)*config.spaceWidth;
 		double sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+
+		double width = (sideWidth+sideHeight)/2.0;
+
+		init(detector, width, imageType);
+	}
+
+	public CalibrationFiducialDetector(ConfigCircleAsymmetricGrid config,
+									   Class<T> imageType) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		int squareCols = config.numCols;
+		int squareRows = config.numRows;
+		double sideWidth = squareCols*config.centerDistance/2.0;
+		double sideHeight = squareRows*config.centerDistance/2.0;
 
 		double width = (sideWidth+sideHeight)/2.0;
 

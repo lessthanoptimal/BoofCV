@@ -89,7 +89,6 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		if( !keypoint.process(grids.get(0)) )
 			return false;
 
-
 		FastQueue<Point2D_F64> foundPixels = keypoint.getKeyPoints();
 
 		results = new CalibrationObservation();
@@ -128,7 +127,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 		double height = (numRows-1)*widthCell;
 
 		for (int row = 0; row < numRows; row++) {
-			double y = row*widthCell - height/2;
+			double y = (numRows-row-1)*widthCell - height/2;
 			for (int col = 0; col < numCols; col++) {
 				double x = col*widthCell - width/2;
 

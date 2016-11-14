@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
@@ -73,6 +74,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
 	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
+	private static final String CALIB_CIRCLE_ASYM_GRID = "Circle Asymmetric Grid";
 
 
 	private static final Font font = new Font("Serif", Font.BOLD, 14);
@@ -302,7 +304,8 @@ public class FiducialTrackerApp<I extends ImageGray>
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-
+		} else if( name.compareTo(CALIB_CIRCLE_ASYM_GRID) == 0 ) {
+			detector = FactoryFiducial.calibCircleAsymGrid(new ConfigCircleAsymmetricGrid(5, 8, 1, 6), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
@@ -360,6 +363,7 @@ public class FiducialTrackerApp<I extends ImageGray>
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 //		inputs.add(new PathLabel(CALIB_SQUARE_BINARY_GRID, UtilIO.pathExample("fiducial/binary_grid/movie.mp4")));
+		inputs.add(new PathLabel(CALIB_CIRCLE_ASYM_GRID, "/home/pja/Desktop/circle_calib/b.mp4"));
 
 		app.setInputList(inputs);
 

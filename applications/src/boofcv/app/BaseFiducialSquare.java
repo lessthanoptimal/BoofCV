@@ -82,10 +82,11 @@ public abstract class BaseFiducialSquare {
 	double innerWidth ;
 	// Length of the fiducial plus the white border
 	double fiducialTotalWidth;
-	// width and height of the page
-	double pageWidth,pageHeight;
 	// offset of the page.  basically changes the origin
 	double offsetX, offsetY;
+
+	// requested paper size.  If null it will be automatically selected
+	PaperSize paper;
 
 	//============= These parameters are used to automatically generate some of the above parameters
 	// No printing is allowed inside the border and this information is used to adjust offsets with the user request
@@ -165,14 +166,7 @@ public abstract class BaseFiducialSquare {
 	public void generateGrid( double fiducialWidth , double whiteBorder , int numCols , int numRows , PaperSize paper )
 			throws IOException
 	{
-		double pageWidthUnit, pageHeightUnit;
-		if( paper != null ) {
-			pageWidthUnit = paper.getUnit().convert(paper.getWidth(), unit);
-			pageHeightUnit = paper.getUnit().convert(paper.getHeight(), unit);
-		} else {
-			pageWidthUnit = -1;
-			pageHeightUnit = -1;
-		}
+		this.paper = paper;
 		this.numRows = numRows;
 		this.numCols = numCols;
 
@@ -183,7 +177,7 @@ public abstract class BaseFiducialSquare {
 			double cm2 = Unit.CENTIMETER.convert(2.0,unit);
 			whiteBorder = Math.max(cm2, fiducialWidth / 4.0);
 		}
-		generate(fiducialWidth, whiteBorder, pageWidthUnit, pageHeightUnit);
+		generate(fiducialWidth, whiteBorder);
 	}
 
 	/**
@@ -191,12 +185,9 @@ public abstract class BaseFiducialSquare {
 	 *
 	 * @param fiducialWidthUnit Width of the fiducial
 	 * @param whiteBorderUnit Thickness of the border around the fiducial
-	 * @param pageWidthUnit Width of the document. If &le; 0 the width will be automatically selected
-	 * @param pageHeightUnit Height of the document. If &le; 0 the height will be automatically selected
 	 * @throws IOException
 	 */
-	private void generate(double fiducialWidthUnit, double whiteBorderUnit,
-						  double pageWidthUnit, double pageHeightUnit) throws IOException {
+	private void generate(double fiducialWidthUnit, double whiteBorderUnit) throws IOException {
 
 		String outputName;
 		if( this.outputFileName == null ) {
@@ -207,7 +198,7 @@ public abstract class BaseFiducialSquare {
 
 		String imageName = selectDocumentName();
 
-		configureDocument(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
+		configureDocument(fiducialWidthUnit, whiteBorderUnit);
 
 		// print out the selected number in binary for debugging purposes
 		out = new PrintStream(outputName);
@@ -219,16 +210,15 @@ public abstract class BaseFiducialSquare {
 	/**
 	 * Compute how to build the documetn and setup all parameters
 	 */
-	private void configureDocument(double fiducialWidthUnit, double whiteBorderUnit,
-								   double pageWidthUnit, double pageHeightUnit ) throws FileNotFoundException
+	private void configureDocument(double fiducialWidthUnit, double whiteBorderUnit) throws FileNotFoundException
 	{
 		UNIT_TO_POINTS = 72.0/(2.54* Unit.conversion(Unit.CENTIMETER, unit));
 
 		if( autofillGrid ) {
-			if( pageWidthUnit <= 0 || pageHeightUnit <=  0)
+			if( paper == null )
 				throw new IllegalArgumentException("If autofillGrid is turned on then the page size must be specified");
 
-			autoSelectGridSize(fiducialWidthUnit, whiteBorderUnit, pageWidthUnit, pageHeightUnit);
+			autoSelectGridSize(fiducialWidthUnit, whiteBorderUnit);
 		}
 
 		System.out.println("Fiducial width "+ fiducialWidthUnit +" ("+unit.abbreviation+")");
@@ -243,15 +233,9 @@ public abstract class BaseFiducialSquare {
 		double deadZoneX = Math.max(0,pageBorderX-whiteBorder);
 		double deadZoneY = Math.max(0,pageBorderY-whiteBorder);
 
-		if( pageWidthUnit <= 0 ) {
-			pageWidth = fiducialTotalWidth*numCols + 2*deadZoneX;
-		} else {
-			pageWidth = pageWidthUnit*UNIT_TO_POINTS;
-		}
-		if( pageHeightUnit <= 0 ) {
-			pageHeight = fiducialTotalWidth*numRows + 2*deadZoneY;
-		} else {
-			pageHeight = pageHeightUnit*UNIT_TO_POINTS;
+		if( paper == null ) {
+			paper = new PaperSize((fiducialTotalWidth*numCols + 2*deadZoneX)/UNIT_TO_POINTS,
+					(fiducialTotalWidth*numRows + 2*deadZoneY)/UNIT_TO_POINTS, unit);
 		}
 
 		// Center the fiducial inside the page.  Reduce the size of the grid if required to fit it inside the
@@ -266,6 +250,9 @@ public abstract class BaseFiducialSquare {
 	 * the grid if necessary.
 	 */
 	private void centerPage() {
+		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
+		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+
 		double validX0 = pageBorderX;
 		double validX1 = pageWidth-pageBorderX;
 		double validY0 = pageBorderY;
@@ -303,7 +290,10 @@ public abstract class BaseFiducialSquare {
 	/**
 	 * Given the page size and other parameters figure out how many fiducials it can fit along the rows and columns
 	 */
-	private void autoSelectGridSize(double fiducialWidthUnit, double whiteBorderUnit, double pageWidthUnit, double pageHeightUnit) {
+	private void autoSelectGridSize(double fiducialWidthUnit, double whiteBorderUnit) {
+
+		double pageWidthUnit = paper.unit.convert(paper.width,unit);
+		double pageHeightUnit = paper.unit.convert(paper.height,unit);
 
 		// find how far away from the page's edge does it need to stay
 		double pageBorderUnitX = Math.max(pageBorderX/UNIT_TO_POINTS , whiteBorderUnit);
@@ -347,7 +337,7 @@ public abstract class BaseFiducialSquare {
 		if (printInfo) {
 			out.print("  /Times-Roman findfont\n" + "7 scalefont setfont "+offsetX+" "+offsetY +
 					String.format(" moveto ( Page Size: %4.1f by %4.1f %s) show\n",
-							pageWidth/UNIT_TO_POINTS,pageHeight/UNIT_TO_POINTS,unit.abbreviation));
+							paper.width,paper.width,paper.unit.abbreviation));
 		}
 
 		for (int i = 0; i < numPages; i++) {
@@ -407,6 +397,8 @@ public abstract class BaseFiducialSquare {
 	}
 
 	private void printHeader( String documentTitle , double widthCM, int totalPages) {
+		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
+		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
 		out.println("%!PS-Adobe-3.0\n" +
 				"%%Creator: BoofCV\n" +
 				"%%DocumentMedia: Plain "+pageWidth+" "+pageHeight+" 80 white ( )\n" +
@@ -439,6 +431,9 @@ public abstract class BaseFiducialSquare {
 	 * Prints an invisible boundary around the document to prevent a smart cropping script from cropping the white space
 	 */
 	private void printInvisibleBoundary() {
+		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
+		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+
 		out.println(" 1.0 setgray");
 		out.printf(" newpath 0 0 moveto %f 0 rlineto 0 setlinewidth stroke\n", pageWidth);
 		out.printf(" newpath 0 0 moveto 0 %f lineto 0 setlinewidth stroke\n", pageHeight);
@@ -452,6 +447,9 @@ public abstract class BaseFiducialSquare {
 	 * Draws the grid in light grey on the document
 	 */
 	private void printGrid() {
+		double pageWidth = paper.convertWidth(unit)*UNIT_TO_POINTS;
+		double pageHeight = paper.convertHeight(unit)*UNIT_TO_POINTS;
+
 		out.println("% grid lines");
 
 		out.print(" /drawRow { moveto "+pageWidth+" 0 rlineto 1 setlinewidth stroke} def\n");

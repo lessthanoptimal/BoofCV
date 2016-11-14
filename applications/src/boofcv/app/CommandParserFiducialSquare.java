@@ -81,13 +81,16 @@ public class CommandParserFiducialSquare {
 		System.out.println("-NoBoundaryHack       By default an invisible rectangle around the document border is added.");
 		System.out.println("                      The invisible border prevents some smart printers from cropping the document.");
 		System.out.println("                      Using this flag will turn off this option.");
-		System.out.println("-PageBorder=<x>,<y>   Specifies the border of the page in which it can't print. default = 1cm");
+		System.out.println("-PageBorder=<x>,<y>   Specifies the border of the page in which it can't print. Default = 1cm");
 		System.out.println("-Offsets=<x>,<y>      Shift the fiducial/grid");
 		System.out.println("                      Turns off auto centering");
-		System.out.println("-Units=<unit>         Specify units used: mm, cm, m, inch, foot, yard");
+		System.out.println("-Units=<unit>         Specify units used: mm, cm, m, inch, foot, yard.  Default = cm");
 		System.out.println("                      example: -Units=cm");
 		System.out.println("-PageSize=<type>      Specify the page: A0, A1, A2, A3, A4, legal, letter");
 		System.out.println("                      example: -PageSize=letter");
+		System.out.println("-PageSize=<w>,<h>     Specify width and height manually.  Units allowed.  No units document default");
+		System.out.println("                      example: -PageSize=10,20");
+		System.out.println("                      example: -PageSize=10in,20in");
 		if(isBinary) {
 			System.out.println("-BinaryGridWidth=<n> Specify the width of the grid used to encode binary numbers. Valid values are 3 to 8");
 			System.out.println("                     Maximum distinct fiducials: 3 is 32, 4 is 4096, 5 is 2,097,152. Default is 4");
@@ -123,7 +126,7 @@ public class CommandParserFiducialSquare {
 						gridY = Integer.parseInt(words[1]);
 					}
 				} else if( "WhiteBorder".compareToIgnoreCase(label) == 0 ) {
-					whiteBorder = Double.parseDouble(param(arg));
+					whiteBorder = Double.parseDouble(param(arg)); // TODO change to LengthUnit
 				} else if( "PrintInfo".compareToIgnoreCase(label) == 0 ) {
 					printInfo = true;
 				} else if( "PrintGrid".compareToIgnoreCase(label) == 0 ) {
@@ -132,8 +135,8 @@ public class CommandParserFiducialSquare {
 					noBoundaryHack = true;
 				} else if( "PageBorder".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
-					pageBorderX = Integer.parseInt(words[0]);
-					pageBorderY = Integer.parseInt(words[1]);
+					pageBorderX = Integer.parseInt(words[0]); // TODO change to LengthUnit
+					pageBorderY = Integer.parseInt(words[1]); // TODO change to LengthUnit
 				} else if( "BlackBorder".compareToIgnoreCase(label) == 0 ) {
 					blackBorder = Double.parseDouble(param(arg));
 					if( blackBorder <= 0 || blackBorder >= 0.5 ) {
@@ -142,13 +145,21 @@ public class CommandParserFiducialSquare {
 					}
 				} else if( "Offsets".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
-					offsetX = Integer.parseInt(words[0]);
-					offsetY = Integer.parseInt(words[1]);
+					offsetX = Integer.parseInt(words[0]); // TODO change to LengthUnit
+					offsetY = Integer.parseInt(words[1]); // TODO change to LengthUnit
 					autoCenter = false;
 				} else if( "Units".compareToIgnoreCase(label) == 0 ) {
 					units = Unit.lookup(param(arg));
 				} else if( "PageSize".compareToIgnoreCase(label) == 0 ) {
 					paper = PaperSize.lookup(param(arg));
+					if( paper == null ) {
+						String words[] = split(param(arg));
+						LengthUnit width = new LengthUnit(words[0]);
+						LengthUnit height = new LengthUnit(words[1]);
+						if( width.unit != height.unit )
+							throw new IllegalArgumentException("Paper width and height must have the same unit");
+						paper = new PaperSize(width.length,height.length,width.unit);
+					}
 				} else if( "BinaryGridWidth".compareToIgnoreCase(label) == 0 ) {
 					binaryGridSize = Integer.parseInt(param(arg));
 					if( binaryGridSize < 3 || binaryGridSize > 8 ) {
