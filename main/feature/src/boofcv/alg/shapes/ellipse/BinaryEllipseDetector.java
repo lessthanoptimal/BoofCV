@@ -142,6 +142,10 @@ public class BinaryEllipseDetector<T extends ImageGray> {
 		}
 	}
 
+	public BinaryEllipseDetectorPixel getEllipseDetector() {
+		return ellipseDetector;
+	}
+
 	public boolean isVerbose() {
 		return verbose;
 	}

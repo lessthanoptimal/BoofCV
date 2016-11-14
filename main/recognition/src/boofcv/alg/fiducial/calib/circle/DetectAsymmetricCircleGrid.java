@@ -313,6 +313,10 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 		}
 	}
 
+	public BinaryEllipseDetector<T> getEllipseDetector() {
+		return ellipseDetector;
+	}
+
 	/**
 	 * List of grids found inside the image
 	 */

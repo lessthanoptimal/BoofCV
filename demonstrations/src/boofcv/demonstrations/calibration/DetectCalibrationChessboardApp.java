@@ -30,8 +30,8 @@ import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,8 +99,13 @@ public class DetectCalibrationChessboardApp
 	}
 
 	@Override
-	protected FastQueue<Polygon2D_F64> getFoundPolygons() {
-		return alg.getFindSeeds().getDetectorSquare().getFoundPolygons();
+	protected List<Polygon2D_F64> getFoundPolygons() {
+		return alg.getFindSeeds().getDetectorSquare().getFoundPolygons().toList();
+	}
+
+	@Override
+	protected List<EllipseRotated_F64> getFoundEllipses() {
+		return new ArrayList<>();
 	}
 
 	@Override

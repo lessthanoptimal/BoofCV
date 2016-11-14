@@ -234,6 +234,10 @@ public class AsymmetricGridKeyPointDetections {
 		return keypoints;
 	}
 
+	public FastQueue<Tangents> getTangents() {
+		return tangents;
+	}
+
 	public static class Tangents extends FastQueue<Point2D_F64> {
 		public Tangents() {
 			super(8, Point2D_F64.class, true);

@@ -213,6 +213,10 @@ public class BinaryEllipseDetectorPixel {
 		return true;
 	}
 
+	public LinearContourLabelChang2004 getContourFinder() {
+		return contourFinder;
+	}
+
 	public boolean isVerbose() {
 		return verbose;
 	}

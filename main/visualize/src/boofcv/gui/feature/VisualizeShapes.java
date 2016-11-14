@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2015, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -257,7 +257,6 @@ public class VisualizeShapes {
 		double w = ellipse.a*2;
 		double h = ellipse.b*2;
 
-
 		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
 		shape = AffineTransform.getTranslateInstance(ellipse.center.x,ellipse.center.y).createTransformedShape(shape);
 
@@ -267,11 +266,10 @@ public class VisualizeShapes {
 	public static void drawEllipse( EllipseRotated_F64 ellipse , double scale , Graphics2D g2 ) {
 
 		AffineTransform rotate = new AffineTransform();
-		rotate.rotate(ellipse.phi);
+		rotate.rotate(ellipse.phi+Math.PI/2.0);
 
 		double w = scale*ellipse.a*2;
 		double h = scale*ellipse.b*2;
-
 
 		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
 		shape = AffineTransform.getTranslateInstance(scale*ellipse.center.x,scale*ellipse.center.y).createTransformedShape(shape);

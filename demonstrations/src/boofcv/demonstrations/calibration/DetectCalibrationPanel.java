@@ -34,8 +34,8 @@ import java.awt.event.MouseWheelListener;
  *
  * @author Peter Abeles
  */
-public class ChessboardPanel extends StandardAlgConfigPanel
-		implements  ChangeListener, ItemListener, MouseWheelListener
+public class DetectCalibrationPanel extends StandardAlgConfigPanel
+		implements ChangeListener, ItemListener, MouseWheelListener
 {
 	// zoom values
 	private static double ZOOM_MAX = 20;
@@ -57,7 +57,7 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 	JCheckBox showNumbers;
 	JCheckBox showGraph;
 	JCheckBox showGrids;
-	JCheckBox showSquares;
+	JCheckBox showShapes;
 	JCheckBox showOrder;
 	JCheckBox showContour;
 
@@ -72,9 +72,9 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
 	boolean doShowGraph = false;
-	boolean doShowOrder = false;
+	boolean doShowOrder = true;
 	boolean doShowGrids = false;
-	boolean doShowSquares = false;
+	boolean doShowShapes = false;
 	boolean doShowContour = false;
 
 	double scale = 1;
@@ -87,7 +87,7 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 	int selectedView = 0;
 	int thresholdLevel = 60;
 
-	public ChessboardPanel(int gridRows, int gridColumns, boolean hasManualMode) {
+	public DetectCalibrationPanel(int gridRows, int gridColumns, boolean hasManualMode) {
 		this.gridRows = gridRows;
 		this.gridColumns = gridColumns;
 
@@ -128,10 +128,10 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		showOrder.addItemListener(this);
 		showOrder.setMaximumSize(showOrder.getPreferredSize());
 
-		showSquares = new JCheckBox("Show Squares");
-		showSquares.setSelected(doShowSquares);
-		showSquares.addItemListener(this);
-		showSquares.setMaximumSize(showSquares.getPreferredSize());
+		showShapes = new JCheckBox("Show Shapes");
+		showShapes.setSelected(doShowShapes);
+		showShapes.addItemListener(this);
+		showShapes.setMaximumSize(showShapes.getPreferredSize());
 
 		showContour = new JCheckBox("Show Contour");
 		showContour.setSelected(doShowContour);
@@ -175,7 +175,7 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		addAlignLeft(showGraph,this);
 		addAlignLeft(showGrids,this);
 		addAlignLeft(showOrder,this);
-		addAlignLeft(showSquares, this);
+		addAlignLeft(showShapes, this);
 		addAlignLeft(showContour, this);
 	}
 
@@ -218,8 +218,8 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		return selectedView;
 	}
 
-	public boolean isShowSquares() {
-		return doShowSquares;
+	public boolean isShowShapes() {
+		return doShowShapes;
 	}
 
 	public boolean isShowPoints() {
@@ -270,8 +270,8 @@ public class ChessboardPanel extends StandardAlgConfigPanel
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
 			listener.calibEventGUI();
-		} else if( e.getSource() == showSquares ) {
-			doShowSquares = showSquares.isSelected();
+		} else if( e.getSource() == showShapes) {
+			doShowShapes = showShapes.isSelected();
 			listener.calibEventGUI();
 		} else if( e.getSource() == showNumbers ) {
 			doShowNumbers = showNumbers.isSelected();

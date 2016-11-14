@@ -34,14 +34,15 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -55,20 +56,20 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  * @author Peter Abeles
  */
 public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF32>
-		implements ChessboardPanel.Listener
+		implements DetectCalibrationPanel.Listener
 {
 	boolean success;
 
-	ChessboardPanel controlPanel;
+	DetectCalibrationPanel controlPanel;
 
 	VisualizePanel imagePanel = new VisualizePanel();
 	BufferedImage input;
 	BufferedImage binary;
 	GrayF32 grayPrev = new GrayF32(1,1);
 
-	public CommonDetectCalibrationApp( int numRows , int numColumns , List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp(int numRows , int numColumns , List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayF32.class));
-		controlPanel = new ChessboardPanel(numRows,numColumns,true);
+		controlPanel = new DetectCalibrationPanel(numRows,numColumns,true);
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
@@ -91,15 +92,17 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 
 	protected abstract GrayU8 getBinaryImage();
 
-	protected abstract java.util.List<java.util.List<SquareNode>> getClusters();
+	protected abstract List<List<SquareNode>> getClusters();
 
-	protected abstract java.util.List<Point2D_F64> getCalibrationPoints();
+	protected abstract List<Point2D_F64> getCalibrationPoints();
 
-	protected abstract java.util.List<Contour> getContours();
+	protected abstract List<Contour> getContours();
 
-	protected abstract FastQueue<Polygon2D_F64> getFoundPolygons();
+	protected abstract List<Polygon2D_F64> getFoundPolygons();
 
-	protected abstract java.util.List<SquareGrid> getGrids();
+	protected abstract List<EllipseRotated_F64> getFoundEllipses();
+
+	protected abstract List<SquareGrid> getGrids();
 
 	@Override
 	public void processImage( final BufferedImage buffered , GrayF32 gray ) {
@@ -113,8 +116,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		processFrame();
 	}
 
-	private void renderGraph( Graphics2D g2 , double scale ) {
-		java.util.List<java.util.List<SquareNode>> graphs = getClusters();
+	protected void renderGraph( Graphics2D g2 , double scale ) {
+		List<List<SquareNode>> graphs = getClusters();
 
 		BasicStroke strokeWide = new BasicStroke(3);
 		BasicStroke strokeNarrow = new BasicStroke(2);
@@ -124,14 +127,14 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		g2.setStroke(new BasicStroke(3));
 		for( int i = 0; i < graphs.size(); i++ ) {
 
-			java.util.List<SquareNode> graph = graphs.get(i);
+			List<SquareNode> graph = graphs.get(i);
 
 			int key = graphs.size() == 1 ? 0 : 255 * i / (graphs.size() - 1);
 
 			int rgb = key << 8 | (255 - key);
 			g2.setColor(new Color(rgb));
 
-			java.util.List<SquareEdge> edges = new ArrayList<>();
+			List<SquareEdge> edges = new ArrayList<>();
 
 			for( SquareNode n : graph ) {
 				for (int j = 0; j < n.edges.length; j++) {
@@ -208,8 +211,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			synchronized ( CommonDetectCalibrationApp.this ) {
 
 				if( success ) {
+					if( controlPanel.isShowOrder() ) {
+						renderOrder(g2,scale);
+					}
+
 					if ( controlPanel.isShowPoints() ) {
-						java.util.List<Point2D_F64> candidates = getCalibrationPoints();
+						List<Point2D_F64> candidates = getCalibrationPoints();
 						for (Point2D_F64 c : candidates) {
 							VisualizeFeatures.drawPoint(g2, (int) (scale * c.x + 0.5), (int) (scale * c.y + 0.5), 1, Color.RED);
 						}
@@ -220,7 +227,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 				}
 
 				if( controlPanel.doShowContour ) {
-					java.util.List<Contour> contour = getContours();
+					List<Contour> contour = getContours();
 
 					g2.setStroke(new BasicStroke(1));
 					g2.setColor(Color.RED);
@@ -231,86 +238,106 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 					renderGraph(g2, scale);
 				}
 
-				if( controlPanel.isShowOrder() ) {
-					renderOrder(g2,scale);
-				}
-
-				if( controlPanel.isShowSquares() ) {
-					FastQueue<Polygon2D_F64> squares =  getFoundPolygons();
-
-					for (int i = 0; i < squares.size(); i++) {
-						Polygon2D_F64 p = squares.get(i);
-						if (isInGrids(p))
-							continue;
-						g2.setColor(Color.cyan);
-						g2.setStroke(new BasicStroke(4));
-						drawPolygon(p, g2, scale);
-						g2.setColor(Color.blue);
-						g2.setStroke(new BasicStroke(2));
-						drawPolygon(p, g2, scale);
-
-						drawCornersInside(g2,scale,p);
-					}
+				if( controlPanel.isShowShapes() ) {
+					renderShapes(g2, scale);
 				}
 
 				if( controlPanel.isShowGrids() ) {
-					java.util.List<SquareGrid> grids = getGrids();
-
-					for (int i = 0; i < grids.size(); i++) {
-						SquareGrid g = grids.get(i);
-						int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
-
-						int rgb = a << 16 | (255 - a) << 8;
-
-						g2.setStroke(new BasicStroke(3));
-
-						Color color = new Color(rgb);
-						for (int j = 0; j < g.nodes.size(); j++) {
-							SquareNode n = g.nodes.get(j);
-							if( n == null )
-								continue;
-							g2.setColor(color);
-							VisualizeShapes.drawPolygon(n.corners, true, scale, g2);
-
-							drawCornersInside(g2,scale,n.corners);
-						}
-					}
+					renderGrid(g2,scale);
 				}
 			}
 		}
 	}
 
-	private void renderOrder(Graphics2D g2, double scale ) {
-		java.util.List<SquareGrid> grids = getGrids();
-		g2.setStroke(new BasicStroke(3));
+	protected void renderShapes(Graphics2D g2, double scale) {
+		List<Polygon2D_F64> squares =  getFoundPolygons();
 
-		Line2D.Double l = new Line2D.Double();
+		for (int i = 0; i < squares.size(); i++) {
+			Polygon2D_F64 p = squares.get(i);
+//						if (isInGrids(p)) TODO fix broken method isInGrids
+//							continue;
+			g2.setColor(Color.cyan);
+			g2.setStroke(new BasicStroke(4));
+			drawPolygon(p, g2, scale);
+			g2.setColor(Color.blue);
+			g2.setStroke(new BasicStroke(2));
+			drawPolygon(p, g2, scale);
+
+			drawCornersInside(g2,scale,p);
+		}
+
+		List<EllipseRotated_F64> ellipses =  getFoundEllipses();
+		AffineTransform rotate = new AffineTransform();
+
+		for (int i = 0; i < ellipses.size(); i++) {
+			EllipseRotated_F64 ellipse = ellipses.get(i);
+
+			rotate.setToIdentity();
+			rotate.rotate(ellipse.phi);
+
+			double w = scale*ellipse.a*2;
+			double h = scale*ellipse.b*2;
+
+			Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-w/2,-h/2,w,h));
+			shape = AffineTransform.getTranslateInstance(scale*ellipse.center.x,scale*ellipse.center.y).
+					createTransformedShape(shape);
+
+			g2.setColor(Color.cyan);
+			g2.setStroke(new BasicStroke(4));
+			g2.draw(shape);
+			g2.setColor(Color.blue);
+			g2.setStroke(new BasicStroke(2));
+			g2.draw(shape);
+		}
+	}
+
+	protected void renderGrid(Graphics2D g2, double scale) {
+		List<SquareGrid> grids = getGrids();
 
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
+			int a = grids.size() == 1 ? 0 : 255 * i / (grids.size() - 1);
 
-			SquareNode p0 = null;
+			int rgb = a << 16 | (255 - a) << 8;
+
+			g2.setStroke(new BasicStroke(3));
+
+			Color color = new Color(rgb);
 			for (int j = 0; j < g.nodes.size(); j++) {
-				SquareNode p1 = g.nodes.get(j);
-				if( p1 == null)
+				SquareNode n = g.nodes.get(j);
+				if( n == null )
 					continue;
-				if( p0 != null) {
-					double fraction = j / ((double) g.nodes.size() - 1);
-					fraction = fraction * 0.8 + 0.1;
+				g2.setColor(color);
+				VisualizeShapes.drawPolygon(n.corners, true, scale, g2);
 
-					int red   = (int)(0xFF*fraction) + (int)(0x10*(1-fraction));
-					int green = (int)(0x00*fraction) + (int)(0x00*(1-fraction));
-					int blue  = (int)(0x10*fraction) + (int)(0xff*(1-fraction));
-
-					int lineRGB = red << 16 | green << 8 | blue;
-
-					l.setLine(scale * p0.center.x , scale * p0.center.y, scale * p1.center.x, scale * p1.center.y );
-
-					g2.setColor(new Color(lineRGB));
-					g2.draw(l);
-				}
-				p0 = p1;
+				drawCornersInside(g2,scale,n.corners);
 			}
+		}
+	}
+
+	private void renderOrder(Graphics2D g2, double scale ) {
+		List<Point2D_F64> points = getCalibrationPoints();
+		g2.setStroke(new BasicStroke(5));
+
+		Line2D.Double l = new Line2D.Double();
+
+		for (int i = 0,j = 1; j < points.size(); i=j,j++) {
+			Point2D_F64 p0 = points.get(i);
+			Point2D_F64 p1 = points.get(j);
+
+			double fraction = i / ((double) points.size() - 2);
+//			fraction = fraction * 0.8 + 0.1;
+
+			int red   = (int)(0xFF*fraction) + (int)(0x00*(1-fraction));
+			int green = 0x00;
+			int blue  = (int)(0x00*fraction) + (int)(0xff*(1-fraction));
+
+			int lineRGB = red << 16 | green << 8 | blue;
+
+			l.setLine(scale * p0.x , scale * p0.y, scale * p1.x, scale * p1.y );
+
+			g2.setColor(new Color(lineRGB));
+			g2.draw(l);
 		}
 	}
 
@@ -334,7 +361,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	}
 
 	private boolean isInGrids( Polygon2D_F64 p ) {
-		java.util.List<SquareGrid> grids = getGrids();
+		List<SquareGrid> grids = getGrids();
 
 		for (int i = 0; i < grids.size(); i++) {
 			SquareGrid g = grids.get(i);
@@ -366,7 +393,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 		}
 	}
 
-	public static void drawNumbers( Graphics2D g2 , java.util.List<Point2D_F64> foundTarget ,
+	public static void drawNumbers( Graphics2D g2 , List<Point2D_F64> foundTarget ,
 									Point2Transform2_F32 transform ,
 									double scale ) {
 

@@ -141,4 +141,12 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 		return ret;
 	}
+
+	public DetectAsymmetricCircleGrid<GrayF32> getDetector() {
+		return detector;
+	}
+
+	public AsymmetricGridKeyPointDetections getKeypointFinder() {
+		return keypoint;
+	}
 }
