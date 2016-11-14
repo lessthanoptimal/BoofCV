@@ -210,7 +210,7 @@ public class CommandParserFiducialSquare {
 		if( gridX < 0)
 			System.out.println("Grid                 automatic");
 		else if( gridX > 1 && gridY > 1)
-			System.out.printf("Grid                  rows = %2d cols = %2d\n",gridY,gridX);
+			System.out.printf("Grid                 rows = %2d cols = %2d\n",gridY,gridX);
 		if( autoCenter)
 			System.out.println("Auto centering enabled");
 		else
@@ -219,9 +219,20 @@ public class CommandParserFiducialSquare {
 			System.out.printf("Page Border           x = %s y = %s\n", pageBorderX, pageBorderY);
 		System.out.println();
 		System.out.println("Patterns");
+		// compactly print out the patterns
+		int maxPatternNameLength = 0;
 		for( String p : patternNames ) {
-			System.out.println("  "+p);
+			maxPatternNameLength = Math.max(maxPatternNameLength, p.length());
 		}
+		int l = 0;
+		for( String p : patternNames ) {
+			System.out.printf(" %"+maxPatternNameLength+"s",p);
+			l += maxPatternNameLength;
+			if( l > 80 ) {
+				System.out.println();
+			}
+		}
+		System.out.println();
 
 		System.out.println("################### Generating");
 
