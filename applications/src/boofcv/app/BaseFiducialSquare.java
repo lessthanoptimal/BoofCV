@@ -337,7 +337,7 @@ public abstract class BaseFiducialSquare {
 		if (printInfo) {
 			out.print("  /Times-Roman findfont\n" + "7 scalefont setfont "+offsetX+" "+offsetY +
 					String.format(" moveto ( Page Size: %4.1f by %4.1f %s) show\n",
-							paper.width,paper.width,paper.unit.abbreviation));
+							paper.width,paper.height,paper.unit.abbreviation));
 		}
 
 		for (int i = 0; i < numPages; i++) {
