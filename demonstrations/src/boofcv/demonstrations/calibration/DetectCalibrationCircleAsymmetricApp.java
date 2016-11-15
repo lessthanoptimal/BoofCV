@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.circle.AsymmetricGridKeyPointDetections.Tangents;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoAsymmetricGrid.Grid;
+import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.Contour;
@@ -53,14 +54,18 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 	CalibrationDetectorCircleAsymmGrid detector;
 	ConfigCircleAsymmetricGrid config;
 
+	Color colorId[];
+
 	public DetectCalibrationCircleAsymmetricApp(int numRows , int numColumns ,
 												double circleRadius, double centerDistance,
 												List<String> exampleInputs) {
-		super(numRows,numColumns,exampleInputs);
+		super(numRows,numColumns,true,exampleInputs);
 
 		config = new ConfigCircleAsymmetricGrid(numRows, numColumns, circleRadius, centerDistance);
 
 		declareDetector();
+
+		colorId = new Color[]{Color.RED,Color.BLUE,Color.CYAN,Color.ORANGE};
 	}
 
 	@Override
@@ -76,6 +81,26 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 		config.numCols = controlPanel.getGridColumns();
 
 		detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+	}
+
+	@Override
+	protected void renderClusters(Graphics2D g2, double scale) {
+		List<EllipseRotated_F64> found = detector.getDetector().getEllipseDetector().getFoundEllipses().toList();
+		List<List<EllipsesIntoClusters.Node>> clusters = detector.getDetector().getClusters();
+
+		g2.setStroke(new BasicStroke(2));
+		int id = 0;
+		for( List<EllipsesIntoClusters.Node> c : clusters ) {
+
+			g2.setColor(colorId[Math.min(id++,colorId.length-1)]);
+			for( EllipsesIntoClusters.Node n : c ) {
+				EllipseRotated_F64 a = found.get(n.which);
+				for (int i = 0; i < n.connections.size; i++) {
+					EllipseRotated_F64 b = found.get(n.connections.get(i));
+					g2.drawLine((int)(a.center.x*scale),(int)(a.center.y*scale),(int)(b.center.x*scale),(int)(b.center.y*scale));
+				}
+			}
+		}
 	}
 
 	@Override
@@ -111,7 +136,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 	@Override
 	protected void renderGrid(Graphics2D g2 , double scale ) {
-		List<Grid> grids = detector.getDetector().getGrids();
+		List<Grid> grids = detector.getDetector().getGrider().getGrids().toList();
 
 		BasicStroke thin = new BasicStroke(3);
 		BasicStroke thick = new BasicStroke(5);

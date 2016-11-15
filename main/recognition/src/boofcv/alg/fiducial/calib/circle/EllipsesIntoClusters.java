@@ -144,13 +144,14 @@ public class EllipsesIntoClusters {
 					continue;
 
 				// smallest shape divided by largest shape
-				double ratio = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
+				double ratioA = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
+				double ratioB = e1.b > e2.b ? e2.b / e1.b : e1.b / e2.b;
 
 				int indexNode2 = d.data.which;
 				Node node2 = nodes.get(indexNode2);
 
 				// connect if they have a similar size to each other
-				if( ratio >= sizeSimilarityTolerance ) {
+				if( ratioA >= sizeSimilarityTolerance && ratioB >= sizeSimilarityTolerance ) {
 
 					// node2 isn't in a cluster already.  Add it to this one
 					if( node2.cluster == -1 ) {

@@ -51,7 +51,7 @@ public class DetectCalibrationChessboardApp
 
 	public DetectCalibrationChessboardApp( int numRows , int numColumns , boolean forCalibration ,
 										   List<String> exampleInputs) {
-		super(numRows,numColumns,exampleInputs);
+		super(numRows,numColumns,false,exampleInputs);
 		config = new ConfigChessboard(numRows, numColumns, 1);
 		config.refineWithCorners = forCalibration;
 

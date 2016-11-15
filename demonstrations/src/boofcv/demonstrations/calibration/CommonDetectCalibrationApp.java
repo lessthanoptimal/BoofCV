@@ -67,9 +67,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 	BufferedImage binary;
 	GrayF32 grayPrev = new GrayF32(1,1);
 
-	public CommonDetectCalibrationApp(int numRows , int numColumns , List<String> exampleInputs ) {
+	public CommonDetectCalibrationApp(int numRows , int numColumns , boolean hasClusters, List<String> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayF32.class));
-		controlPanel = new DetectCalibrationPanel(numRows,numColumns,true);
+		controlPanel = new DetectCalibrationPanel(numRows,numColumns,true,hasClusters);
 		add(imagePanel,BorderLayout.CENTER);
 		add(controlPanel,BorderLayout.WEST);
 
@@ -226,6 +226,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 					}
 				}
 
+				if( controlPanel.doShowClusters ) {
+					renderClusters(g2, scale);
+				}
+
 				if( controlPanel.doShowContour ) {
 					List<Contour> contour = getContours();
 
@@ -248,6 +252,8 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase<GrayF
 			}
 		}
 	}
+
+	protected void renderClusters(Graphics2D g2, double scale) {}
 
 	protected void renderShapes(Graphics2D g2, double scale) {
 		List<Polygon2D_F64> squares =  getFoundPolygons();

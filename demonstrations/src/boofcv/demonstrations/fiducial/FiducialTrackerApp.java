@@ -159,7 +159,6 @@ public class FiducialTrackerApp<I extends ImageGray>
 		stopWorker();
 
 		sequence.reset();
-
 		refreshAll(null);
 	}
 
@@ -172,6 +171,10 @@ public class FiducialTrackerApp<I extends ImageGray>
 		}
 
 		detector.detect(gray);
+
+//		if( detector.totalFound() == 0 ) {
+//			System.out.println("Failed on "+sequence.getFrameNumber());
+//		}
 
 		processedInputImage = true;
 	}
