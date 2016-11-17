@@ -242,6 +242,7 @@ public class DetectCalibrationCircleAsymmetricApp extends CommonDetectCalibratio
 
 		List<String>  examples = new ArrayList<>();
 
+		examples.add("/home/pja/projects/ValidationBoof/data/calib/mono/circle_asymmetric/large/image01.jpg");
 		for (int i = 1; i <= 9; i++) {
 			examples.add(UtilIO.pathExample(String.format("calibration/mono/Sony_DSC-HX5V_CircleAsym/image%02d.jpg", i)));
 		}

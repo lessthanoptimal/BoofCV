@@ -139,9 +139,15 @@ public abstract class FiducialDetectorPnP<T extends ImageBase>
 
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion) {
-		this.hasCameraModel = true;
-		this.lensDistortion = distortion;
-		this.pixelToNorm = lensDistortion.undistort_F64(true,false);
+		if( distortion != null ) {
+			this.hasCameraModel = true;
+			this.lensDistortion = distortion;
+			this.pixelToNorm = lensDistortion.undistort_F64(true, false);
+		} else {
+			this.hasCameraModel = false;
+			this.lensDistortion = null;
+			this.pixelToNorm = null;
+		}
 	}
 
 	@Override

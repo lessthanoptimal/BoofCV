@@ -113,6 +113,44 @@ public abstract class GenericFiducialDetectorChecks {
 	}
 
 	/**
+	 * Provide an intrinsic model then remove it
+	 */
+	@Test
+	public void checkRemoveIntrinsic() {
+		for( ImageType type : types ) {
+			ImageBase image = loadImage(type);
+
+			// detect with no intrinsics
+			FiducialDetector detector = createDetector(type);
+			detector.detect(image);
+
+			assertFalse(detector.is3D());
+			assertTrue(detector.totalFound() >= 1);
+			Results expected = extractResults(detector);
+
+			// detect with intrinsics
+			detector.setLensDistortion(loadDistortion(true));
+			assertTrue(detector.is3D());
+			assertTrue(detector.totalFound() >= 1);
+
+			// detect without intrinsics again
+			detector.setLensDistortion(null);
+			assertFalse(detector.is3D());
+			assertTrue(detector.totalFound() >= 1);
+			Results found = extractResults(detector);
+
+			// compare results
+			assertEquals(expected.id.length, found.id.length);
+			for (int i = 0; i < expected.id.length; i++) {
+				assertEquals(expected.id[i],found.id[i]);
+				assertTrue(expected.pose.get(i).T.distance(found.pose.get(i).T) <= 1e-4);
+				assertTrue(MatrixFeatures.isIdentical(expected.pose.get(i).getR(), found.pose.get(i).R, 1e-4));
+				assertTrue(found.pixel.get(i).distance(expected.pixel.get(i)) <= 1e-4 );
+			}
+		}
+	}
+
+	/**
 	 * Makes sure the input is not modified
 	 */
 	@Test

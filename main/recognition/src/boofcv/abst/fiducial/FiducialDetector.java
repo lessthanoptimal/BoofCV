@@ -79,7 +79,8 @@ public interface FiducialDetector<T extends ImageBase>
 	 * Specifies how to remove lens distortion from the input image and how to convert pixels into normalized
 	 * image coordinates.
 	 *
-	 * @param distortion Lens distortion model
+	 * @param distortion Lens distortion model.  null if you want to remove a lens distortion model that had previously
+	 *                   been set.
 	 */
 	void setLensDistortion(LensDistortionNarrowFOV distortion );
 

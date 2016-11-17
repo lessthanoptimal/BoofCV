@@ -137,9 +137,14 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray,Detecto
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion) {
 		super.setLensDistortion(distortion);
-		poseEstimator.setLensDistoriton(distortion);
-		distToUndist = distortion.undistort_F64(true,true);
-		undistToDist = distortion.distort_F64(true,true);
+		if( distortion == null ) {
+			distToUndist = new DoNothing2Transform2_F64();
+			undistToDist = new DoNothing2Transform2_F64();
+		} else {
+			poseEstimator.setLensDistoriton(distortion);
+			distToUndist = distortion.undistort_F64(true, true);
+			undistToDist = distortion.distort_F64(true, true);
+		}
 	}
 
 	@Override
