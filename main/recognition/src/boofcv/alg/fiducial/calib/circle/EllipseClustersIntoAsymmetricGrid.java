@@ -50,7 +50,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 	private FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
 
 	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
-	private static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(20);
+	private static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(10);
 
 	// Information on each ellipse/node in a cluster
 	FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo.class,true);
@@ -64,6 +64,8 @@ public class EllipseClustersIntoAsymmetricGrid {
 	private LineSegment2D_F64 line0110 = new LineSegment2D_F64();
 	private LineSegment2D_F64 line0011 = new LineSegment2D_F64();
 	private Point2D_F64 intersection = new Point2D_F64();
+
+	private boolean verbose = false;
 
 	public EllipseClustersIntoAsymmetricGrid() {
 
@@ -97,8 +99,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 			computeNodeInfo(ellipses, cluster);
 
 			// finds all the nodes in the outside of the cluster
-			if( !findContour() )
+			if( !findContour() ) {
+				if( verbose ) System.out.println("Contour find failed");
 				continue;
+			}
 
 			// Find corner to start alignment
 			NodeInfo corner = selectSeedCorner();
@@ -111,28 +115,47 @@ public class EllipseClustersIntoAsymmetricGrid {
 			List<List<NodeInfo>> outerGrid = new ArrayList<>();
 			outerGrid.add( cornerRow );
 
+			boolean failed = false;
 			for (int j = 1; j < cornerColumn.size(); j++) {
 				List<NodeInfo> prev = outerGrid.get( j - 1);
 				NodeInfo seed = cornerColumn.get(j);
 				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed);
-				if( next == null )
-					throw new RuntimeException("Outer column with a row that has only one element");
+				if( next == null ) {
+					if( verbose )
+						System.out.println("Outer column with a row that has only one element");
+					failed = true;
+					break;
+				}
 				List<NodeInfo> row = findLine( seed , next, clusterSize);
 				outerGrid.add( row );
 			}
+			if( failed )
+				continue;
 
 			List<List<NodeInfo>> innerGrid = findInnerGrid(outerGrid, clusterSize);
 
 			// see if it failed to find the inner grid
-			if( innerGrid == null )
+			if( innerGrid == null ) {
+				if( verbose ) System.out.println("Inner grid find failed");
 				continue;
+			}
 
 			// perform sanity checks
 			if( !checkGridSize(outerGrid,innerGrid, cluster.size()) ) {
+				if( verbose ) {
+					System.out.println("grid size check failed");
+					for (int j = 0; j < outerGrid.size(); j++) {
+						System.out.println("  outer row "+outerGrid.get(j).size());
+					}
+					for (int j = 0; j < innerGrid.size(); j++) {
+						System.out.println("  inner row "+innerGrid.get(j).size());
+					}
+				}
 				continue;
 			}
 
 			if( checkDuplicates(outerGrid) || checkDuplicates(innerGrid)) {
+				if( verbose ) System.out.println("contains duplicates");
 				continue;
 			}
 
@@ -225,8 +248,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 		NodeInfo c11 = outerGrid.get(1).get(1);
 
 		NodeInfo corner = selectInnerSeed( c00, c01, c10 , c11 );
-		if( corner == null )
+		if( corner == null ) {
+			if( verbose )
+				System.out.println("Can't select inner grid seed");
 			return null;
+		}
 
 		NodeInfo rowNext = selectSeedNext(c00,c01,corner);
 		NodeInfo colNext = selectSeedNext(c00,c10,corner);
@@ -243,8 +269,11 @@ public class EllipseClustersIntoAsymmetricGrid {
 				NodeInfo seed = column.get(i);
 				NodeInfo next = selectSeedNext(prev.get(0), prev.get(1), seed);
 				row = findLine(seed, next, clusterSize);
-				if (row == null)
-					throw new RuntimeException("Inner grid missing a row");
+				if (row == null) {
+					if( verbose )
+						System.out.println("Inner grid missing a row");
+					return null;
+				}
 				grid.add(row);
 			}
 		} else if( row != null ) {
@@ -276,9 +305,9 @@ public class EllipseClustersIntoAsymmetricGrid {
 	 */
 	static protected NodeInfo selectSeedNext(  NodeInfo prevSeed , NodeInfo prevNext ,
 											   NodeInfo currentSeed) {
-		double anglePrev = direction(prevSeed, prevNext);
+		double angleTarget = direction(prevSeed, prevNext);
 
-		double bestDistance = Double.MAX_VALUE;
+		double bestScore = Double.MAX_VALUE;
 		NodeInfo best = null;
 
 		// cut down on verbosity by saving the reference here
@@ -287,13 +316,12 @@ public class EllipseClustersIntoAsymmetricGrid {
 		for (int i = 0; i < currentSeed.edges.size(); i++) {
 			Edge edge = currentSeed.edges.get(i);
 
-			if( UtilAngle.dist(edge.angle, anglePrev) <= MAX_LINE_ANGLE_CHANGE ) {
-				double d = edge.target.ellipse.center.distance2(c);
+			double angleDiff = UtilAngle.dist(edge.angle, angleTarget);
+			double score = (angleDiff+0.001)*c.distance(edge.target.ellipse.center);
 
-				if( d < bestDistance ) {
-					bestDistance = d;
-					best = edge.target;
-				}
+			if( score < bestScore ) {
+				bestScore = score;
+				best = edge.target;
 			}
 		}
 
@@ -363,8 +391,10 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 		for( int i = 0; i < clusterSize+1; i++) {
 			// find the child of next which is within tolerance and closest to it
+			double bestScore = Double.MAX_VALUE;
 			double bestDistance = Double.MAX_VALUE;
 			double bestAngle = Double.NaN;
+			double closestDistance = Double.MAX_VALUE;
 			NodeInfo best = null;
 
 			for (int j = 0; j < next.edges.size(); j++) {
@@ -373,16 +403,19 @@ public class EllipseClustersIntoAsymmetricGrid {
 
 				double diff = UtilAngle.dist(angle,anglePrev);
 				if( diff <= MAX_LINE_ANGLE_CHANGE ) {
-					double d = c.ellipse.center.distance2(next.ellipse.center);
-					if( d < bestDistance ) {
+					double d = c.ellipse.center.distance(next.ellipse.center);
+					double score = (diff+0.01)*d;
+					if( score < bestScore ) {
 						bestDistance = d;
+						bestScore = score;
 						bestAngle = angle;
 						best = c;
 					}
+					closestDistance = Math.min(d,closestDistance);
 				}
 			}
 
-			if( best == null )
+			if( best == null || bestDistance > closestDistance*2.0)
 				return line;
 			else {
 				line.add(best);
@@ -415,6 +448,7 @@ public class EllipseClustersIntoAsymmetricGrid {
 		}
 
 		addEdgesToInfo(cluster);
+		pruneNearlyIdenticalAngles();
 		findLargestAnglesForAllNodes();
 	}
 
@@ -440,6 +474,37 @@ public class EllipseClustersIntoAsymmetricGrid {
 			}
 
 			sorter.sort(infoA.edges.data, infoA.edges.size);
+		}
+	}
+
+	/**
+	 * If there is a nearly perfect line a node farther down the line can come before.  This just selects the closest
+	 */
+	void pruneNearlyIdenticalAngles() {
+		for (int i = 0; i < listInfo.size(); i++) {
+			NodeInfo infoN = listInfo.get(i);
+
+			for (int j = 0; j < infoN.edges.size(); ) {
+				int k = (j+1)%infoN.edges.size;
+
+				double angularDiff = UtilAngle.dist(infoN.edges.get(j).angle,infoN.edges.get(k).angle);
+				if( angularDiff < UtilAngle.radian(5)) {
+					NodeInfo infoJ = infoN.edges.get(j).target;
+					NodeInfo infoK = infoN.edges.get(k).target;
+
+					double distJ = infoN.ellipse.center.distance(infoJ.ellipse.center);
+					double distK = infoN.ellipse.center.distance(infoK.ellipse.center);
+
+					if( distJ < distK ) {
+						infoN.edges.remove(k);
+					} else {
+						infoN.edges.remove(j);
+					}
+
+				} else {
+					j++;
+				}
+			}
 		}
 	}
 
@@ -577,6 +642,14 @@ public class EllipseClustersIntoAsymmetricGrid {
 	public static class Edge {
 		NodeInfo target;
 		double angle;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	/**

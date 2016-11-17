@@ -27,24 +27,32 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PaperSize {
-	public static PaperSize A0 = new PaperSize(841 , 1189, Unit.MILLIMETER);
-	public static PaperSize A1 = new PaperSize(594 , 841, Unit.MILLIMETER);
-	public static PaperSize A2 = new PaperSize(420 , 594, Unit.MILLIMETER);
-	public static PaperSize A3 = new PaperSize(297 , 420, Unit.MILLIMETER);
-	public static PaperSize A4 = new PaperSize(210 , 297, Unit.MILLIMETER);
-	public static PaperSize LEGAL = new PaperSize(8.5 , 14.0, Unit.INCH);
-	public static PaperSize LETTER = new PaperSize(8.5 , 11.0, Unit.INCH);
+	public static PaperSize A0 = new PaperSize("A0",841 , 1189, Unit.MILLIMETER);
+	public static PaperSize A1 = new PaperSize("A1",594 , 841, Unit.MILLIMETER);
+	public static PaperSize A2 = new PaperSize("A2",420 , 594, Unit.MILLIMETER);
+	public static PaperSize A3 = new PaperSize("A3",297 , 420, Unit.MILLIMETER);
+	public static PaperSize A4 = new PaperSize("A4",210 , 297, Unit.MILLIMETER);
+	public static PaperSize LEGAL = new PaperSize("LEGAL",8.5 , 14.0, Unit.INCH);
+	public static PaperSize LETTER = new PaperSize("LETTER",8.5 , 11.0, Unit.INCH);
 
+	public PaperSize( String name , double width, double height, Unit unit) {
+		this(width, height, unit);
+		this.name = name;
+	}
 	public PaperSize(double width, double height, Unit unit) {
 		this.width = width;
 		this.height = height;
 		this.unit = unit;
 	}
 
+	public String name;
 	public Unit unit;
 	public double width;
 	public double height;
 
+	public static List<PaperSize> values() {
+		return values;
+	}
 	private static final List<PaperSize> values = new ArrayList<>();
 
 	static {
@@ -62,7 +70,7 @@ public class PaperSize {
 	 */
 	public static PaperSize lookup( String word ) {
 		for( PaperSize paper : values ) {
-			if( paper.toString().compareToIgnoreCase(word) == 0 ) {
+			if( paper.name.compareToIgnoreCase(word) == 0 ) {
 				return paper;
 			}
 		}
@@ -88,5 +96,9 @@ public class PaperSize {
 
 	public double getHeight() {
 		return height;
+	}
+
+	public String getName() {
+		return name;
 	}
 }

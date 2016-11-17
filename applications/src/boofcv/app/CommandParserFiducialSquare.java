@@ -34,17 +34,17 @@ public class CommandParserFiducialSquare {
 
 	public String outputName = null;
 	public int gridX = 1, gridY = 1;
-	public double pageBorderX = Double.NaN, pageBorderY = Double.NaN;
+	public LengthUnit pageBorderX = null, pageBorderY = null;
 	public double blackBorder = 0.25;
 	public double offsetX = 0, offsetY = 0;
 	public boolean autoCenter = true;
-	public double whiteBorder = -1;
+	public LengthUnit whiteBorder = null;
 	public Unit units = Unit.CENTIMETER;
 	public PaperSize paper = null;
 	public boolean printInfo = false;
 	public boolean printGrid = false;
 	public boolean noBoundaryHack = false;
-	public double fiducialWidth = -1;
+	public LengthUnit fiducialWidth = null;
 	private boolean isBinary = false;
 
 	// binary specific flags
@@ -126,7 +126,7 @@ public class CommandParserFiducialSquare {
 						gridY = Integer.parseInt(words[1]);
 					}
 				} else if( "WhiteBorder".compareToIgnoreCase(label) == 0 ) {
-					whiteBorder = Double.parseDouble(param(arg)); // TODO change to LengthUnit
+					whiteBorder = new LengthUnit(param(arg));
 				} else if( "PrintInfo".compareToIgnoreCase(label) == 0 ) {
 					printInfo = true;
 				} else if( "PrintGrid".compareToIgnoreCase(label) == 0 ) {
@@ -135,8 +135,8 @@ public class CommandParserFiducialSquare {
 					noBoundaryHack = true;
 				} else if( "PageBorder".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
-					pageBorderX = Integer.parseInt(words[0]); // TODO change to LengthUnit
-					pageBorderY = Integer.parseInt(words[1]); // TODO change to LengthUnit
+					pageBorderX = new LengthUnit(words[0]);
+					pageBorderY = new LengthUnit(words[1]);
 				} else if( "BlackBorder".compareToIgnoreCase(label) == 0 ) {
 					blackBorder = Double.parseDouble(param(arg));
 					if( blackBorder <= 0 || blackBorder >= 0.5 ) {
@@ -145,8 +145,8 @@ public class CommandParserFiducialSquare {
 					}
 				} else if( "Offsets".compareToIgnoreCase(label) == 0 ) {
 					String words[] = split(param(arg));
-					offsetX = Integer.parseInt(words[0]); // TODO change to LengthUnit
-					offsetY = Integer.parseInt(words[1]); // TODO change to LengthUnit
+					offsetX = Double.parseDouble(words[0]);
+					offsetY = Double.parseDouble(words[1]);
 					autoCenter = false;
 				} else if( "Units".compareToIgnoreCase(label) == 0 ) {
 					units = Unit.lookup(param(arg));
@@ -199,7 +199,7 @@ public class CommandParserFiducialSquare {
 		System.out.println("Output               "+outputName);
 		System.out.println("Units                "+units);
 		System.out.println("Fiducial Width       "+fiducialWidth);
-		if( whiteBorder > -1 )
+		if( whiteBorder != null )
 			System.out.println("White Border         "+whiteBorder);
 		System.out.println("Black Border         "+blackBorder);
 		System.out.println("Print Info           "+printInfo);
@@ -210,18 +210,29 @@ public class CommandParserFiducialSquare {
 		if( gridX < 0)
 			System.out.println("Grid                 automatic");
 		else if( gridX > 1 && gridY > 1)
-			System.out.printf("Grid                  rows = %2d cols = %2d\n",gridY,gridX);
+			System.out.printf("Grid                 rows = %2d cols = %2d\n",gridY,gridX);
 		if( autoCenter)
 			System.out.println("Auto centering enabled");
 		else
 			System.out.printf("Offset                x = %f y = %f\n",offsetX,offsetY);
-		if( !Double.isNaN(pageBorderX))
-			System.out.printf("Page Border           x = %f y = %f\n", pageBorderX, pageBorderY);
+		if( pageBorderX != null)
+			System.out.printf("Page Border           x = %s y = %s\n", pageBorderX, pageBorderY);
 		System.out.println();
 		System.out.println("Patterns");
+		// compactly print out the patterns
+		int maxPatternNameLength = 0;
 		for( String p : patternNames ) {
-			System.out.println("  "+p);
+			maxPatternNameLength = Math.max(maxPatternNameLength, p.length());
 		}
+		int l = 0;
+		for( String p : patternNames ) {
+			System.out.printf(" %"+maxPatternNameLength+"s",p);
+			l += maxPatternNameLength;
+			if( l > 80 ) {
+				System.out.println();
+			}
+		}
+		System.out.println();
 
 		System.out.println("################### Generating");
 
@@ -244,13 +255,14 @@ public class CommandParserFiducialSquare {
 			app.setCentering(false);
 			app.setOffset(offsetX, offsetY, units);
 		}
-		if( !Double.isNaN(pageBorderX)) {
-			app.setPageBorder(pageBorderX, pageBorderY, units);
+		if( pageBorderX != null ) {
+			app.setPageBorder(pageBorderX.convert(units), pageBorderY.convert(units), units);
 		} else {
 			app.setPageBorder(0,0, units);
 		}
+		double whiteBorderValue = whiteBorder==null?-1:whiteBorder.convert(units);
 		app.setBlackBorderFractionalWidth(blackBorder);
-		app.generateGrid(fiducialWidth,whiteBorder,gridX,gridY,paper);
+		app.generateGrid(fiducialWidth.convert(units),whiteBorderValue,gridX,gridY,paper);
 
 		System.out.println("################### Finished");
 	}
@@ -260,7 +272,7 @@ public class CommandParserFiducialSquare {
 		if( args.length-where < 2 )
 			throw new IllegalArgumentException("Expected size followed by image list");
 
-		fiducialWidth = Double.parseDouble(args[where++]);
+		fiducialWidth = new LengthUnit(args[where++]);
 
 		while( where < args.length ) {
 			patternNames.add(args[where++]);

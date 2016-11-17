@@ -76,6 +76,7 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 	// storage for found clusters
 	private List<List<EllipsesIntoClusters.Node>> clusters = new ArrayList<>();
+	private List<List<EllipsesIntoClusters.Node>> clustersPruned = new ArrayList<>();
 
 	/**
 	 * Creates and configures the detector
@@ -113,10 +114,12 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 
 		clusters.clear();
 		clustering.process(found, clusters);
+		clustersPruned.clear();
+		clustersPruned.addAll(clusters);
 
-		pruneIncorrectSize(clusters, totalEllipses(numRows,numCols) );
+		pruneIncorrectSize(clustersPruned, totalEllipses(numRows,numCols) );
 
-		grider.process(found, clusters);
+		grider.process(found, clustersPruned);
 
 		FastQueue<Grid> grids = grider.getGrids();
 
@@ -311,6 +314,26 @@ public class DetectAsymmetricCircleGrid<T extends ImageGray> {
 				clusters.remove(i);
 			}
 		}
+	}
+
+	public BinaryEllipseDetector<T> getEllipseDetector() {
+		return ellipseDetector;
+	}
+
+	public EllipseClustersIntoAsymmetricGrid getGrider() {
+		return grider;
+	}
+
+	public EllipsesIntoClusters getClustering() {
+		return clustering;
+	}
+
+	public List<List<EllipsesIntoClusters.Node>> getClusters() {
+		return clusters;
+	}
+
+	public List<List<EllipsesIntoClusters.Node>> getClustersPruned() {
+		return clustersPruned;
 	}
 
 	/**

@@ -19,36 +19,44 @@
 package boofcv.app;
 
 /**
+ * Generates the actual calibration target.
+ *
  * @author Peter Abeles
  */
-public class LengthUnit {
-	public double length;
-	public Unit unit;
+public class CreateCalibrationTargetGenerator {
 
-	public LengthUnit( String string ) {
-		unit = null;
-		for( Unit u : Unit.values() ) {
-			if( string.endsWith(u.abbreviation)) {
-				unit = u;
-				string = string.substring(0,string.length()-u.abbreviation.length());
-				break;
-			}
-		}
-		length = Double.parseDouble(string);
+	String documentName;
+	PaperSize paper;
+	int rows,cols;
+	Unit units;
+
+	public CreateCalibrationTargetGenerator( String documentName , PaperSize paper, int rows , int cols , Unit units ) {
+		this.documentName = documentName;
+		this.paper = paper;
+		this.rows = rows;
+		this.cols = cols;
+		this.units = units;
 	}
 
-	public double convert( Unit target ) {
-		if( unit == null )
-			return length;
-		else
-			return unit.convert(length,target);
+	public void chessboard( double squareWidth ) {
+
 	}
 
-	@Override
-	public String toString() {
-		if( unit == null )
-			return length+"";
-		else
-			return length+unit.abbreviation;
+	public void squareGrid( double squareWidth , double spacing ) {
+
 	}
+
+	public void binaryGrid( double squareWidth , double spacing ) {
+
+	}
+
+	public void circleAsymmetric( double diameter , double centerDistance ) {
+
+	}
+
+	private void printHeader() {
+
+	}
+
+
 }
