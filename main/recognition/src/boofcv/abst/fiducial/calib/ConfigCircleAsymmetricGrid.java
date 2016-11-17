@@ -67,7 +67,7 @@ public class ConfigCircleAsymmetricGrid implements Configuration {
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
 	 * difference in size
 	 */
-	public double ellipseSizeSimilarity = 0.7;
+	public double ellipseSizeSimilarity = 0.6;
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
