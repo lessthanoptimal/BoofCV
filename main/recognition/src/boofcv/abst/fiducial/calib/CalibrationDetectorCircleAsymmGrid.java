@@ -79,6 +79,7 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 
 	@Override
 	public boolean process(GrayF32 input) {
+		results = new CalibrationObservation();
 		detector.process(input);
 
 		List<Grid> grids = detector.getGrids();
@@ -90,8 +91,6 @@ public class CalibrationDetectorCircleAsymmGrid implements DetectorFiducialCalib
 			return false;
 
 		FastQueue<Point2D_F64> foundPixels = keypoint.getKeyPoints();
-
-		results = new CalibrationObservation();
 
 		for (int i = 0; i < foundPixels.size; i++) {
 			results.add(foundPixels.get(i),i);

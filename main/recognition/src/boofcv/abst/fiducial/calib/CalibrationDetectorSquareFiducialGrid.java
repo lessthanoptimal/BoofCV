@@ -69,11 +69,10 @@ public class CalibrationDetectorSquareFiducialGrid implements DetectorFiducialCa
 
 	@Override
 	public boolean process(GrayF32 input) {
+		observations = new CalibrationObservation();
 		if( !detector.detect(input) ) {
 			return false;
 		}
-
-		observations = new CalibrationObservation();
 
 		List<DetectFiducialSquareGrid.Detection> detections = detector.getDetections();
 

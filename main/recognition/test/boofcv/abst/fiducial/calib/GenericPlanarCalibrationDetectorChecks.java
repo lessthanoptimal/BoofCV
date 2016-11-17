@@ -75,6 +75,35 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 
 	/**
+	 * Nothing was detected.  make sure it doesn't return null.
+	 */
+	@Test
+	public void checkDetectionsNotNull() {
+		DetectorFiducialCalibration detector = createDetector();
+
+		detector.process(original.createSameShape());
+
+		assertTrue( detector.getDetectedPoints() != null );
+		assertTrue( detector.getDetectedPoints().size() == 0 );
+	}
+
+	/**
+	 * First call something was detected, second call nothing was detected.  it should return an empty list
+	 */
+	@Test
+	public void checkDetectionsResetOnFailure() {
+		DetectorFiducialCalibration detector = createDetector();
+
+		detector.process(original);
+		assertTrue( detector.getDetectedPoints().size() > 0 );
+
+		detector.process(original.createSameShape());
+
+		assertTrue( detector.getDetectedPoints() != null );
+		assertTrue( detector.getDetectedPoints().size() == 0 );
+	}
+
+	/**
 	 * Makes sure origin in the target's physical center.  This is done by seeing that most extreme
 	 * points are all equally distant.  Can't use the mean since the target might not evenly distributed.
 	 *
