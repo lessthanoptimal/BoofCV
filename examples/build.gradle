@@ -12,9 +12,7 @@ dependencies {
     compile project(':integration:WebcamCapture')
 
     ['io'].each {String a ->
-        compile('org.deepboof:'+a+':0.2-SNAPSHOT'){
-            exclude group: 'com.google.protobuf'
-        }}
+        compile('org.deepboof:'+a+':0.2-SNAPSHOT')}
 }
 
 idea {
