@@ -101,4 +101,15 @@ public class PaperSize {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public String toString() {
+		String output = "";
+		if( name != null )
+			output += name+" ";
+		output += String.format("%4.1f x %4.1f",width,height);
+		if( unit != null)
+			output += "  "+unit.abbreviation;
+		return output;
+	}
 }
