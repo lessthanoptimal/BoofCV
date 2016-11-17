@@ -37,7 +37,7 @@ Version : 0.25
 - YAML
   * Changed save format to YAML for camera model parameters.
   * This should allow saved files to be independent of internal refactoring in BoofCV and cross platform, I hope.
-- Deleted BoofAndroidFiles because you can now simply use the protobuf format
+- Deleted BoofAndroidFiles because you can now simply use yaml format
 - Deep Learning
   * Integrated in DeepBoof to provide support for deep artificial neural networks (ANN)
 - Image Classification
